@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-Bu-sJ0oEeeRmMnJfp9igw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/2/18 3:32 PM
+Save-Time: 1/2/18 3:39 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -67,6 +67,6 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    | get-property "getItems().length" | equals 181 | verify-true
 }-else{
 	get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" 
-	    | get-property "getItems().length" | equals 172 | verify-true
+	    | get-property "getItems().length" | equals 181 | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
