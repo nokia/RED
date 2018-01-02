@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _fiIkUBulEeezQPN39rc8sA
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 8/25/17 7:54 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/2/18 10:25 AM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -61,7 +61,7 @@ let [val home_path [replace $user_folder -old "\\" -new "\\\\"]]{
 	        | equals ".*/success_big.png" | verify-true
 	    get-item "external_lib" | get-property "image.path" 
 	        | equals ".*/success_big.png" | verify-true
-	    get-item "c:folderfile.py" | get-property "image.path" 
+	    get-item [format "c:%sfolder%sfile.py" $sys_sep $sys_sep] | get-property "image.path" 
 	        | equals ".*/error_fatal.png" | verify-true
 	}
 	//check fields for add.py (success)
@@ -87,18 +87,18 @@ let [val home_path [replace $user_folder -old "\\" -new "\\\\"]]{
 	}
 	//check windows path
 	with [get-window "Discovering libraries summary" | get-tree] {
-	    get-item "c:folderfile.py/Status: Not added to project configuration" | get-property index | equals 0 | verify-true
-	    get-item "c:folderfile.py/Source: Unknown" | get-property index | equals 1 | verify-true
-	    get-item "c:folderfile.py/Importers:.*"| get-property caption | equals [format "Importers: %s%sRobotProject%stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+	    get-item [format "c:%sfolder%sfile.py/Status: Not added to project configuration" $sys_sep $sys_sep] | get-property index | equals 0 | verify-true
+	    get-item [format "c:%sfolder%sfile.py/Source: Unknown" $sys_sep $sys_sep] | get-property index | equals 1 | verify-true
+	    get-item [format "c:%sfolder%sfile.py/Importers:.*" $sys_sep $sys_sep] | get-property caption | equals [format "Importers: %s%sRobotProject%stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
 	        | verify-true
-	    get-item "c:folderfile.py/Additional info: .*" | get-property caption | equals [format "Additional info: Error in file '%s%sRobotProject%stests%swindows_path.robot': Test library 'c:folderfile.py' does not exist." $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+	    get-item [format "c:%sfolder%sfile.py/Additional info: .*" $sys_sep $sys_sep] | get-property caption | equals [format "Additional info: Unable to find library under 'c:%sfolder%sfile.py' location." $sys_sep $sys_sep]
 	         | verify-true
 	}
 	get-window "Discovering libraries summary" | get-tree 
-	    | select "c:folderfile.py/Additional info: .*"
+	    | select [format "c:%sfolder%sfile.py/Additional info: .*" $sys_sep $sys_sep]
 	get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (3):"] 
 	    | get-property text 
-	    | equals [format "Additional info: Error in file '%s%sRobotProject%stests%swindows_path.robot': Test library 'c:folderfile.py' does not exist." $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+	    | equals [format "Additional info: Unable to find library under 'c:%sfolder%sfile.py' location." $sys_sep $sys_sep]
 	    | verify-true
 	get-window "Discovering libraries summary" | get-button OK | click
 	
@@ -119,10 +119,15 @@ get-view "Project Explorer" | get-tree | select "RobotProject/tests/tsv_with_rel
 
 //edit and save    
 with [get-editor "tsv_with_relative_paths.tsv" | get-text-viewer] {
-    set-caret-pos 11 4
-    type-text " "
+    set-caret-pos 2 10
+    type-text "."
+    set-caret-pos 3 10
+    type-text "."
+    set-caret-pos 4 10
+    type-text "."
     key-type "M1+s"
 }
+
 wait-for-discover-window
 
 //check icons for status: ok, warning, warning
@@ -171,9 +176,9 @@ get-window "Discovering libraries summary" | get-button OK | click
 get-tab-folder -index 1 | get-tab-item "*RobotProject/red.xml" | click
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
     get-property itemCount | equals 3 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "add - RobotProject/libs" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "lib_with_args - RobotProject/libs" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "multiply - RobotProject" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "add - RobotProject/libs" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "lib_with_args - RobotProject/libs" | verify-true
 }
 get-button "Save \((Ctrl|M1)\+S\)" | click
 
