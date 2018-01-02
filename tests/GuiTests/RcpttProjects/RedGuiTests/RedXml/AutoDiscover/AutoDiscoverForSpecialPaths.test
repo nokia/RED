@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fiIkUBulEeezQPN39rc8sA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/2/18 10:25 AM
+Save-Time: 1/2/18 2:36 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -30,14 +30,14 @@ let [val home_path [replace $user_folder -old "\\" -new "\\\\"]]{
 	}
 	
 	//check error about full windows path for: c:\folder\file.py
-	try -times 4 -delay 1000 -command{
-		with [get-view Problems | get-tree] {
-		    get-item "Errors \\(.* items\\)/Windows paths are not supported. Use global variable '${\\/}' or Linux-like '\\/' path separators." 
-		        | get-property "columns[0]" 
-		        | equals "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators." 
-		        | verify-true
-		 }       
-	}	 
+//	try -times 4 -delay 1000 -command{
+//		with [get-view Problems | get-tree] {
+//		    get-item "Errors \\(.* items\\)/Windows paths are not supported. Use global variable '${\\/}' or Linux-like '\\/' path separators." 
+//		        | get-property "columns[0]" 
+//		        | equals "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators." 
+//		        | verify-true
+//		 }       
+//	}	 
 		
 	with [get-view Problems | get-tree] {
 	    get-item "Errors \\(.* items\\)/Windows paths are not supported. Use global variable '${\\/}' or Linux-like '\\/' path separators." 
