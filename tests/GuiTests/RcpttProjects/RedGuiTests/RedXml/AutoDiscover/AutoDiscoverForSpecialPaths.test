@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fiIkUBulEeezQPN39rc8sA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/2/18 3:12 PM
+Save-Time: 1/2/18 3:24 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -89,16 +89,16 @@ let [val home_path [replace $user_folder -old "\\" -new "\\\\"]]{
 	with [get-window "Discovering libraries summary" | get-tree] {
 	    get-item "c:\\folder\\file.py/Status: Not added to project configuration" | get-property index | equals 0 | verify-true
 	    get-item "c:\\folder\\file.py/Source: Unknown" | get-property index | equals 1 | verify-true
-	    get-item [format "c:%sfolder%sfile.py/Importers:.*" $sys_sep $sys_sep] | get-property caption | equals [format "Importers: %s%sRobotProject%stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+	    get-item "c:\\folder\\file.py/Importers:.*" | get-property caption | equals [format "Importers: %s%sRobotProject%stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
 	        | verify-true
-	    get-item [format "c:%sfolder%sfile.py/Additional info: .*" $sys_sep $sys_sep] | get-property caption | equals [format "Additional info: Unable to find library under 'c:%sfolder%sfile.py' location." $sys_sep $sys_sep]
+	    get-item "c:\\folder\\file.py/Additional info: .*" | get-property caption | equals "Additional info: Unable to find library under 'c:\\folder\\file.py' location."
 	         | verify-true
 	}
 	get-window "Discovering libraries summary" | get-tree 
-	    | select [format "c:%sfolder%sfile.py/Additional info: .*" $sys_sep $sys_sep]
+	    | select "c:\\folder\\file.py/Additional info: .*"
 	get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (3):"] 
 	    | get-property text 
-	    | equals [format "Additional info: Unable to find library under 'c:%sfolder%sfile.py' location." $sys_sep $sys_sep]
+	    | equals "Additional info: Unable to find library under 'c:\\folder\\file.py' location."
 	    | verify-true
 	get-window "Discovering libraries summary" | get-button OK | click
 	
