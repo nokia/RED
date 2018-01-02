@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5wbGUP_mEeWRL4nRKA71zA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/20/17 11:45 AM
+Save-Time: 1/2/18 1:53 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,10 +33,14 @@ with [get-window "Discovering libraries summary" | get-tree] {
     get-item multiply | get-property index | equals 0 | verify-true
     get-item multiply | get-property "image.path" 
         | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-    get-item "lib1.py" | get-property index | equals 1 | verify-true
+       
+    get-item "${not_existing}\\/path\\/file.py" | get-property index | equals 1 | verify-true
+    get-item "${not_existing}\\/path\\/file.py" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error_fatal.png" | verify-true
+    get-item "lib1.py" | get-property index | equals 2 | verify-true
     get-item "lib1.py" | get-property "image.path" 
         | equals "org.robotframework.ide.eclipse.main.plugin/resources/error_fatal.png" | verify-true
-    get-property itemCount | equals 2 | verify-true
+    get-property itemCount | equals 3 | verify-true
 }
 get-window "Discovering libraries summary" | get-button OK | click
 
@@ -47,10 +51,31 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
     get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
 }
 
+//edit and save
+get-view "Project Explorer" | get-tree | select "RobotProject/tests/tsv_with_relative_paths.tsv" | double-click
+with [get-editor "tsv_with_relative_paths.tsv" | get-text-viewer] {
+    set-caret-pos 2 10
+    type-text "."
+    set-caret-pos 3 10
+    type-text "."
+    set-caret-pos 4 10
+    type-text "."
+    key-type "M1+s"
+}
+get-editor "tsv_with_relative_paths.tsv" | close
+
+get-view "Project Explorer" | get-tree | select "RobotProject/resources/resource.robot" | double-click
+with [get-editor "resource.robot" | get-text-viewer] {
+    set-caret-pos 2 12
+    type-text "../"
+    key-type "M1+s"
+}
+get-editor "resource.robot" | close
 //remove lib from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-    select "multiply - RobotProject" | key-type Del
+	key-type "M1+a"
+    key-type Del
     key-type "M1+s"
 }
 //use autodiscover on folder
@@ -68,7 +93,7 @@ with [get-window "Discovering libraries summary" | get-tree] {
     get-property "getItems().TreeItem[2].getText()" | equals "lib_with_args" | verify-true
     get-property "getItems().TreeItem[3].getText()" | equals multiply | verify-true
     get-property "getItems().TreeItem[4].getText()" | equals res1 | verify-true
-    get-property "getItems().TreeItem[5].getText()" | equals "c:folderfile.py" | verify-true
+    get-property "getItems().TreeItem[5].getText()" | equals [format "c:%sfolder%sfile.py" $sys_sep $sys_sep] | verify-true
 }
 get-window "Discovering libraries summary" | get-button OK | click
 
@@ -76,11 +101,11 @@ get-window "Discovering libraries summary" | get-button OK | click
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
     get-property itemCount | equals 5 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "divide - RobotProject/libs/t" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "res1 - RobotProject/libs/for_resource" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "multiply - RobotProject" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "add - RobotProject/libs" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "lib_with_args - RobotProject/libs" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "add - RobotProject/libs" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "divide - RobotProject/libs/t" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "lib_with_args - RobotProject/libs" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "multiply - RobotProject" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "res1 - RobotProject/libs/for_resource" | verify-true
 }
 
 //use autodiscver on .py - is  disable
