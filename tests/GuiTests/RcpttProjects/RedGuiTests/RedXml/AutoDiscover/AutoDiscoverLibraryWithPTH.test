@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KASD8JISEea_J4BglwdxcA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/8/17 3:52 PM
+Save-Time: 1/3/18 3:38 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -88,17 +88,17 @@ get-editor "ImportFromSitePkg/red.xml" | get-tab-folder | get-tab-item "Referenc
 if [ get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	with [get-editor "ImportFromSitePkg/red.xml" | get-section "Referenced libraries" | get-table] {
 	    get-property itemCount | equals 2 | verify-true
-	    get-property "getItems().TableItem[0].getText()" 
-	        | equals [format "pthRedTest.api.LogLib.LogLib - %s/lib/site-packages/pthRedTest/api" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
 	    get-property "getItems().TableItem[1].getText()" 
+	        | equals [format "pthRedTest.api.LogLib.LogLib - %s/lib/site-packages/pthRedTest/api" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
+	    get-property "getItems().TableItem[0].getText()" 
 	        | equals [format "pthRedTest.api.dump.Dump - %s/lib/site-packages/pthRedTest/api" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
 	}	
 }-else{
 	with [get-editor "ImportFromSitePkg/red.xml" | get-section "Referenced libraries" | get-table] {
 	    get-property itemCount | equals 2 | verify-true
-	    get-property "getItems().TableItem[0].getText()" 
-	        | equals  "pthRedTest.api.LogLib.LogLib - /usr/lib/python2.7/site-packages/pthRedTest/api" | verify-true
 	    get-property "getItems().TableItem[1].getText()" 
+	        | equals  "pthRedTest.api.LogLib.LogLib - /usr/lib/python2.7/site-packages/pthRedTest/api" | verify-true
+	    get-property "getItems().TableItem[0].getText()" 
 	        | equals  "pthRedTest.api.dump.Dump - /usr/lib/python2.7/site-packages/pthRedTest/api" | verify-true
 	}	
 }					
