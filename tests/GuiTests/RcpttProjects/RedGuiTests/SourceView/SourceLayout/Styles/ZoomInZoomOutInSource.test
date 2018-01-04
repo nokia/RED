@@ -1,0 +1,73 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ZoomInZoomOutInSource
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _j0pnEPE4Eeeotd-8Sx1R8w
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/4/18 11:29 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/TestFile.robot" | double-click
+}
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "#comment at the beginning of test case\n"
+    + "CAPITAL LETTER\n"
+    + "    [Documentation]  This is documentation\n"
+    + "    [Setup]    Sum Two Values  3  4\n"
+    + "    [Tags]    run me   \n"
+    + "    [Timeout]    1 min \n"
+    + "\tSet Global Variable  ${x}  made by test\n"
+    + "T1\n"
+    + "     Log    ok\n"
+    + "     ...   #should not check value    ${value}\n"
+    + "     Comment   Log    ${value}\n\n"
+    + "T1b\n"
+    + "     Log    ok\n"
+    + "     ...   #should not check value    ${a}\n"
+    + "     Comment   Log    ${b}\n"
+    + "     \n"
+    + "*** Keywords ***\n"
+    + "#comment at the beginning of keyword\n"
+    + "Sum Two Values\n"
+    + "    [Arguments]    ${expression}    ${expected}\n"
+    + "    [Documentation]    Keyword documentation  #comment in section\n"
+    + "    [Tags]    abc\n"
+    + "    # [Timeout]    15\n"
+    + "    [Teardown]    Log    7\n"
+    + "    Log   ${expression}\n"
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 27 24
+    key-type "M1+s"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property "getFont().getFontData().FontData[0].height" 
+    | equals "9.75" | verify-true
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 13 1
+    key-type "M1+="
+    key-type "M1+=" -times 2
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property "getFont().getFontData().FontData[0].height" 
+    | equals "15.75" | verify-true
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 12 31
+    key-type "M1+-"
+    key-type "M1+-" -times 4
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property "getFont().getFontData().FontData[0].height" 
+    | equals "6.0" | verify-true
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 28 1
+    key-type "M1+="
+    key-type "M1+="
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property "getFont().getFontData().FontData[0].height" 
+    | equals "9.75" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
