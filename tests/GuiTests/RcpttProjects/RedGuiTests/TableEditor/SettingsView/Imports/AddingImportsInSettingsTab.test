@@ -1,0 +1,132 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2rVvIENaEeaEVfxTnoQ14g
+Element-Name: AddingImportsInSettingsTab
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _9zaK8PE_Eeeotd-8Sx1R8w
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/4/18 1:16 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+
+// open .robot file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+// add Source content
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
+    + "@{TAGS}    q  e\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  8\n"
+    + "    \n"
+    + "    \n"
+    + "*** Settings ***\n"
+    + "Library    Collection"
+// save it
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 10 1
+        key-type "M1+s"
+    }
+    // go to Setting tab - Imports
+    get-tab-folder | get-tab-item Settings | click
+    get-section Imports | click
+}
+// go to table
+get-view Outline | get-tree | select "TestFile.robot/Settings/Library/Collection" | double-click
+// add next import - Resource
+with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
+    key-type Down
+    key-type Enter -times 2
+}
+with [get-window -from "NatCombo.createDropdownControl()" | get-table] {
+    key-type Down
+    select Resource | key-type Enter
+}
+// type resource name
+with [get-editor "TestFile.robot" | get-section Imports] {
+    with [get-editbox] {
+        type-text "a.py"
+        key-type Enter
+    }
+    get-editbox | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas] {
+        key-type Down
+        key-type Left -times 2
+        key-type Enter -times 2
+    }
+}
+// add Variables import
+with [get-window -from "NatCombo.createDropdownControl()" | get-table] {
+    key-type Down
+    select Resource | key-type Down
+    select Variables | key-type Enter
+}
+// type file name
+with [get-editor "TestFile.robot" | get-section Imports] {
+    with [get-editbox] {
+        type-text "var.py"
+        key-type Enter
+    }
+    get-editbox | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas] {
+        key-type "M1+s"
+        key-type Left -times 2
+        key-type Up -times 2
+        key-type Enter
+    }
+}
+// change Library into Resources
+with [get-window -from "NatCombo.createDropdownControl()" | get-table] {
+    key-type Down
+    select Resource | key-type Enter
+}
+with [get-editor "TestFile.robot" | get-section Imports] {
+    get-editbox | key-type Enter
+    get-editbox | key-type "TRAVERSE_ESCAPE"
+    get-canvas | key-type Enter
+    get-editbox | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas] {
+        key-type Left -times 2
+        key-type Down -times 3
+        key-type Enter -times 2
+    }
+}
+// add another Library
+get-window -from "NatCombo.createDropdownControl()" | get-table | key-type Enter
+with [get-editor "TestFile.robot"] {
+    with [get-section Imports] {
+        with [get-editbox] {
+            type-text Collection
+            key-type Enter
+        }
+        get-editbox | key-type "TRAVERSE_ESCAPE"
+        get-canvas | key-type "M1+s"
+    }
+    // verify table content
+    check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 1 -import "Resource" -name "Collection"
+	check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 2 -import "Resource" -name "a.py" 
+	check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 3 -import "Variables" -name "var.py"
+	check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 4 -import "Library" -name "Collection" 
+	// go to Source
+    get-tab-folder | get-tab-item Source | click
+}
+// verify Source
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "@{TAGS}    q  e\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  8\n"
+    + "    \n"
+    + "    \n"
+    + "*** Settings ***\n"
+    + "Resource    Collection\n"
+    + "Resource    a.py\n"
+    + "Variables    var.py\n"
+    + "Library    Collection" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
