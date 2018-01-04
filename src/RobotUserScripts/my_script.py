@@ -5,13 +5,13 @@
 # */
 
 import sys
- from io import StringIO
- from subprocess import Popen, PIPE
+from io import StringIO
+from subprocess import Popen, PIPE
 
- print('##########')
- print('Running Robot tests via script!')
- print('##########')
- sys.stdout.flush()
+print('##########')
+print('Running Robot tests via script!')
+print('##########')
+sys.stdout.flush()
 
- execution = Popen(sys.argv[1:])
- execution.communicate()
+execution = Popen(sys.argv[1:])
+execution.communicate()
