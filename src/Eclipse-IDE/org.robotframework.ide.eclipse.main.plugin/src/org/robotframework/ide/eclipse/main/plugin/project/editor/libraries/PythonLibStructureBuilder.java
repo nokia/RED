@@ -7,9 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Splitter;
 
 public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
@@ -42,22 +39,14 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
     @Override
     public Collection<ILibraryClass> provideEntriesFromFile(final URI path) throws RobotEnvironmentException {
-        return provideEntriesFromFile(path, null, false);
+        return provideEntriesFromFile(path, null);
     }
 
     public Collection<ILibraryClass> provideEntriesFromFile(final URI path, final String moduleName)
             throws RobotEnvironmentException {
-        return provideEntriesFromFile(path, moduleName, true);
-    }
-
-    private Collection<ILibraryClass> provideEntriesFromFile(final URI path, final String moduleName,
-            final boolean allowDuplicationOfFileAndClassName) {
         final List<String> classes = environment.getClassesFromModule(new File(path), moduleName,
                 additionalSearchPaths);
-        final List<PythonClass> pythonClasses = classes.stream()
-                .map(name -> PythonClass.create(name, allowDuplicationOfFileAndClassName))
-                .collect(Collectors.toList());
-        return new LinkedHashSet<>(pythonClasses);
+        return classes.stream().map(PythonClass::new).collect(Collectors.toList());
     }
 
     public static final class PythonClass implements ILibraryClass {
@@ -66,25 +55,6 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
         private PythonClass(final String qualifiedName) {
             this.qualifiedName = qualifiedName;
-        }
-
-        static PythonClass create(final String name, final boolean allowDuplicationOfFileAndClassName) {
-            final List<String> splitted = new ArrayList<>(Splitter.on('.').splitToList(name));
-            if (splitted.size() > 1) {
-                final String last = splitted.get(splitted.size() - 1);
-                final String beforeLast = splitted.get(splitted.size() - 2);
-
-                // ROBOT requires whole qualified name of class if it is defined with different name
-                // than module
-                // containing it in module
-                // FIXME check the comment above if its still apply
-                if (last.equals(beforeLast) && !allowDuplicationOfFileAndClassName) {
-                    splitted.remove(splitted.size() - 1);
-                }
-                return new PythonClass(String.join(".", splitted));
-            } else {
-                return new PythonClass(name);
-            }
         }
 
         @Override
