@@ -1,0 +1,53 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _DMUj0PFVEeeotd-8Sx1R8w,_znjMEBtDEeWSh6BKjAxDIw,_OCxtEBRGEeWWV9IuysVI_A
+Element-Name: DebugTupleVariable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3t8cAPFUEeeotd-8Sx1R8w
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/4/18 3:20 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "project1/red.xml" | double-click
+wait 1000
+with [get-editor "project1/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    with [get-section "Referenced libraries" | get-table] {
+        key-type "M1+a"
+        select "database_lib - project" "database_lib.database_lib - project" "http:\\/\\/127.0.0.1:8270\\/ - Remote"
+        key-type Del
+        key-type "M1+s"
+    }
+}
+get-view "Project Explorer" | click
+get-editor "project1/red.xml" | close
+with [get-view "Project Explorer" | get-tree] {
+    select "project1/sutie.robot" | double-click
+    select "project1/database_lib.py" | get-menu -path "Robot Framework/Add Library to red.xml" | click
+}
+with [get-editor "sutie.robot"] {
+    get-left-ruler | get-ruler-column LineNumberColumn | click-ruler -line 6 -button Right
+    get-text-viewer | set-caret-pos 7 16
+    get-left-ruler | get-ruler-column LineNumberColumn | double-click-ruler 6
+}
+get-view "Project Explorer" | get-tree | select "project1/sutie.robot" | select "project1/sutie.robot" | get-menu 
+    -path "Debug As/1 Robot Test" | click
+get-view Debug | get-tree | key-type F6
+wait 2000
+with [get-view Variables | get-tree] {
+    get-item -path "@{x}/\\[0\\]" | get-property childCount | equals 3 | verify-true
+    get-item -path "@{x}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+    get-item -path "@{x}/\\[0\\]" | get-property "values['Value']" | equals "tuple[3]" | verify-true
+    get-item -path "@{x}/\\[1\\]" | get-property childCount | equals 3 | verify-true
+    get-item -path "@{x}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+    get-item -path "@{x}/\\[1\\]" | get-property "values['Value']" | equals "tuple[3]" | verify-true
+}
+get-view "Message Log" | get-editbox | get-property text | contains "INFO : ${x} = [(1, 2, 3), (4, 5, 6)]\n" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
