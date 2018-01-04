@@ -31,6 +31,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -469,16 +470,18 @@ public class RobotProject extends RobotContainer {
                     }
                 }
 
-                final Map<String, Object> varsMap = getRuntimeEnvironment()
-                        .getVariablesFromFile(path.toPortableString(), variableFile.getArguments());
-                if (varsMap != null && !varsMap.isEmpty()) {
+                try {
+                    final Map<String, Object> varsMap = getRuntimeEnvironment()
+                            .getVariablesFromFile(path.toPortableString(), variableFile.getArguments());
                     variableFile.setVariables(varsMap);
                     referencedVariableFiles.add(variableFile);
+                } catch (final RobotEnvironmentException e) {
+                    // unable to import the variables file
                 }
             }
             return referencedVariableFiles;
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     public String resolve(final String expression) {
