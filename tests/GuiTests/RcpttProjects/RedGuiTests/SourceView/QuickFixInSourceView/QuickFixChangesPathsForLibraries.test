@@ -1,0 +1,214 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _t9mOYJ3DEeWVv_UItyy1RQ
+Element-Name: QuickFixChangesPathsForLibraries
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _TkwYoPCWEeePD6aU90_GvA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/4/18 10:29 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//-----------------------------------------------------------------------------------------------------------
+// QF chagnes path to correct
+get-view "Project Explorer" | get-tree | select "RobotProject/Script.robot" | double-click
+// remove content of Source
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 11 19
+    key-type "M1+a"
+    key-type Del
+}
+// add new content
+get-editor "Script.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Library  ../../calculator.py\n"
+    + "Library  ../emptyfile/empty.py\n"
+    + "Library  folder/only_function.py\n"
+    + "Library  not/existing/path/here_is_class.py\n"
+    + "Library  ../ONLY_FUNCTION.py\n"
+    + "Library  only_function.py\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log	2\n"
+// check QuickFix for every import
+// 1 --------------------------------------------------------------
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 2 29
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Discover '../../calculator.py' and add to configuration" 
+        | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to calculator.py" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to calculator.py" 
+    | click -default
+// 2 --------------------------------------------------------------
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 3 31
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals "Discover '../emptyfile/empty.py' and add to configuration" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to empty_file/empty.py" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Change to empty_file\\/empty.py" | click -default
+// 3 --------------------------------------------------------------
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 4 33
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals "Discover 'folder/only_function.py' and add to configuration" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to only_function.py" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to only_function.py" 
+    | click -default
+// 4 --------------------------------------------------------------
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 5 44
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals "Discover 'not/existing/path/here_is_class.py' and add to configuration" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to here_is_class.py" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to here_is_class.py" 
+    | click -default
+// 5 --------------------------------------------------------------
+with [get-editor "Script.robot" | get-text-viewer] {
+    hover-text 6 19
+    set-caret-pos 6 29
+}
+get-eclipse-window | key-type "M1+1"
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Discover '../ONLY_FUNCTION.py' and add to configuration" 
+        | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover '..\\/ONLY_FUNCTION.py' and add to configuration" | click -default
+get-window "Library import problem" | get-button OK | click
+// 6 --------------------------------------------------------------
+get-editor "Script.robot" | get-text-viewer | set-caret-pos 7 26
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 7 26
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Discover 'only_function.py' and add to configuration" 
+        | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "TRAVERSE_ESCAPE"
+// again 5 --------------------------------------------------------------
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 6 13
+    key-type BackSpace -times 3
+    key-type "M1+s"
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Discover 'ONLY_FUNCTION.py' and add to configuration" 
+        | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "TRAVERSE_ESCAPE"
+
+//-----------------------------------------------------------------------------------------------------------
+// QF chagnes separators in path from '\' to '/' or '${/}'
+// make empty.py lib more nested - add folders
+get-view "Project Explorer" | get-tree | select "RobotProject/empty_file" | get-menu -path "New/Folder" | click
+with [get-window "New Folder"] {
+    get-editbox -after [get-label "Folder name:"] | set-text empty1
+    get-button Finish | click
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/empty_file/empty1" | get-menu -path "New/Folder" | click
+with [get-window "New Folder"] {
+    get-editbox -after [get-label "Folder name:"] | set-text empty2
+    get-button Finish | click
+}
+// move lib
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/empty_file/empty.pyc" "RobotProject/empty_file/empty.py"
+    get-item -path "RobotProject/empty_file/empty.py" | drag-start 23 14
+    get-item -path "RobotProject/empty_file/empty1/empty2" | drag-enter 38 5 -detail move
+    get-item -path "RobotProject/empty_file/empty1/empty2" | drag-over 40 4 -detail move
+    get-item -path "RobotProject/empty_file/empty1/empty2" | drag-exit
+    get-item -path "RobotProject/empty_file/empty1/empty2" | drag-accept 40 4 -detail move
+    drag-set-data
+    get-item -path "RobotProject/empty_file/empty1/empty2" | drop 40 4 -detail move
+    drag-end -detail move
+}
+// add new import to Source
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 7 26
+    key-type Enter -times 2
+    type-text "Library  empty_file\\empty1\\empty2\\empty.py"
+    key-type "M1+s"
+}
+// verify problem for last import
+get-view Problems | click
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(7 items\\)/Windows paths are not supported. Use global variable '${\\/}' or Linux-like '\\/' path separators. Try to use Quick Fix \\(Ctrl\\+1\\)" 
+    | get-property caption 
+    | equals "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators. Try to use Quick Fix (Ctrl+1)" 
+    | verify-true
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 9 43
+    key-type "M1+1"
+}
+// verify QF - new separators
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Change to 'empty_file/empty1/empty2/empty.py'" 
+        | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to 'empty_file${/}empty1${/}empty2${/}empty.py'" 
+        | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Change to 'empty_file\\/empty1\\/empty2\\/empty.py'" | click -default
+get-eclipse-window | key-type "M1+s"
+// add '..\' at the begging of this import
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 9 10
+    type-text "..\\"
+    key-type "M1+s"
+    key-type "M1+1"
+}
+// verify QF again
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Change to '../empty_file/empty1/empty2/empty.py'" 
+        | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to '..${/}empty_file/empty1/empty2/empty.py'" // !!!!!!!!!!!!! << to change
+        | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Change to '..\\/empty_file\\/empty1\\/empty2\\/empty.py'" | click -default
+get-eclipse-window | key-type "M1+s"
+// verify Source
+get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  calculator.py\n"
+    + "Library  empty_file/empty.py\n"
+    + "Library  only_function.py\n"
+    + "Library  here_is_class.py\n"
+    + "Library  ONLY_FUNCTION.py\n"
+    + "Library  only_function.py\n\n"
+    + "Library  ../empty_file/empty1/empty2/empty.py\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log\t2" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
