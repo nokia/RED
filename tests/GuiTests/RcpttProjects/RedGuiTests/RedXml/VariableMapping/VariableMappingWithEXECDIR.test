@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8F_DcOcFEeecNpv54eOlqg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/8/18 11:52 AM
+Save-Time: 1/8/18 12:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,10 +22,16 @@ with [get-view Problems | get-tree] {
         | equals "Unknown './external_lib/calculator.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
         | verify-true
     get-item 
-	    -path [format "Errors \\(2 items\\)/Unknown '%s%sProjectWithResource\\/external_lib\\/calculator.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" $RED_workspace_path $sys_sep]
+	    -path "Errors \\(2 items\\)/Unknown '\\home_local\\root\\jenkins\\workspace\\Run_Custom_Tests\\Tests_Outputs\\red_workspace_0\\ProjectWithResource\\/external_lib\\/calculator.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"
 	    | get-property caption 
 	    | equals [format "Unknown '%s%sProjectWithResource/external_lib/calculator.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation"  $RED_workspace_path $sys_sep]
 	    | verify-true
+//	[format "Resource import '%s%sProjectWithResource/resource_folder/res_2.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" $RED_workspace_path $sys_sep]
+//    get-item 
+//        -path "Errors \\(2 items\\)/Unknown '.*/calculator.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+//        | get-property caption 
+//        | equals "Unknown 'D:\\RCPTT_2_2\\aut-red-produkt\\ProjectWithResource\\external_lib\\calculator.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+//        | verify-true
 }
 
 proc "change_variable" [val var_name] [val new_path]{
