@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9zaK8PE_Eeeotd-8Sx1R8w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/4/18 1:16 PM
+Save-Time: 1/8/18 11:56 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -50,7 +50,8 @@ with [get-window -from "NatCombo.createDropdownControl()" | get-table] {
 }
 // type resource name
 with [get-editor "TestFile.robot" | get-section Imports] {
-    with [get-editbox] {
+    with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
+//        key-type 
         type-text "a.py"
         key-type Enter
     }
