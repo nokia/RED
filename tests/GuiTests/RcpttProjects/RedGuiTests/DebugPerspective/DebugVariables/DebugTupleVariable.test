@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _DMUj0PFVEeeotd-8Sx1R8w,_znjMEBtDEeWSh6BKjAxDIw,_OCxtEBRGEeWWV9IuysVI_A
+Contexts: _DMUj0PFVEeeotd-8Sx1R8w,_znjMEBtDEeWSh6BKjAxDIw,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
 Element-Name: DebugTupleVariable
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _3t8cAPFUEeeotd-8Sx1R8w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/8/18 8:58 AM
+Save-Time: 1/8/18 3:05 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -17,7 +17,8 @@ Entry-Name: .content
 
 // open red.xml
 get-view "Project Explorer" | get-tree | select "project1/red.xml" | double-click
-wait 1000
+wait-for-loading-red-xml -editor_name "project1/red.xml"
+
 // del all refereced libs
 with [get-editor "project1/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
@@ -32,6 +33,7 @@ with [get-editor "project1/red.xml"] {
 get-view "Project Explorer" | click
 get-editor "project1/red.xml" | close
 wait 2000
+
 // add database_lib.py to red.xml
 with [get-view "Project Explorer" | get-tree] {
     select "project1/sutie.robot" | double-click
@@ -43,21 +45,30 @@ with [get-editor "sutie.robot"] {
     get-text-viewer | set-caret-pos 7 16
     get-left-ruler | get-ruler-column LineNumberColumn | double-click-ruler 6
 }
-// debug
-get-view "Project Explorer" | get-tree | select "project1/sutie.robot" | select "project1/sutie.robot" | get-menu 
-    -path "Debug As/1 Robot Test" | click
-// press f6
-get-view Debug | get-tree | key-type F6
-wait 2000
-// verify variables in debug perspective - there should be the tuples - no errors is runned
-with [get-view Variables | get-tree] {
-    get-item -path "@{x}/\\[0\\]" | get-property childCount | equals 3 | verify-true
-    get-item -path "@{x}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
-    get-item -path "@{x}/\\[0\\]" | get-property "values['Value']" | equals "tuple[3]" | verify-true
-    get-item -path "@{x}/\\[1\\]" | get-property childCount | equals 3 | verify-true
-    get-item -path "@{x}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
-    get-item -path "@{x}/\\[1\\]" | get-property "values['Value']" | equals "tuple[3]" | verify-true
+
+exec-with-options -disableJobWaiting -command{
+	// debug
+	get-view "Project Explorer" | get-tree | select "project1/sutie.robot" | select "project1/sutie.robot" | get-menu 
+	    -path "Debug As/1 Robot Test" | click
+	 wait-for-specific-nr-of-threads -nr_items_in_thread 3  	    
+	// press f6
+	get-view Debug | get-tree | key-type F6
+	wait 2000
+	// verify variables in debug perspective - there should be the tuples - no errors is runned
+	get-view Variables | get-tree | get-item -path "@{x}"  | expand-all
+
+	with [get-view Variables | get-tree] {
+	    get-item -path "@{x}/\\[0\\]" | get-property childCount | equals 3 | verify-true
+	    get-item -path "@{x}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item -path "@{x}/\\[0\\]" | get-property "values['Value']" | equals "tuple[3]" | verify-true  
+	    get-item -path "@{x}/\\[1\\]" | get-property childCount | equals 3 | verify-true
+	    get-item -path "@{x}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item -path "@{x}/\\[1\\]" | get-property "values['Value']" | equals "tuple[3]" | verify-true
+	}
+	// verify if tuples are in Message Log
+	get-view "Message Log" | get-editbox | get-property text | contains "INFO : ${x} = [(1, 2, 3), (4, 5, 6)]\n" | verify-true
+	
+	get-button "Terminate (M1+F2)" | click
 }
-// verify if tuples are in Message Log
-get-view "Message Log" | get-editbox | get-property text | contains "INFO : ${x} = [(1, 2, 3), (4, 5, 6)]\n" | verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
