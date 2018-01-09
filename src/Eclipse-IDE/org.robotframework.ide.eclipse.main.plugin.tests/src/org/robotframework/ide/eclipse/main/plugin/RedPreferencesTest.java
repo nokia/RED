@@ -139,6 +139,26 @@ public class RedPreferencesTest {
     }
 
     @Test
+    public void turnOffValidationIsTakenFromStore_1() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getBoolean(RedPreferences.TURN_OFF_VALIDATION)).thenReturn(true);
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.isValidationTurnedOff()).isTrue();
+    }
+
+    @Test
+    public void turnOffValidationIsTakenFromStore_2() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getBoolean(RedPreferences.TURN_OFF_VALIDATION)).thenReturn(false);
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.isValidationTurnedOff()).isFalse();
+    }
+
+    @Test
     public void equalsColoringPreferences_areEquals() {
         final ColoringPreference pref1 = new ColoringPreference(new RGB(1, 2, 3), SWT.NONE);
         final ColoringPreference pref2 = new ColoringPreference(new RGB(1, 2, 3), SWT.NONE);

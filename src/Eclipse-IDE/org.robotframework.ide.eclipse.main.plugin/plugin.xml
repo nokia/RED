@@ -1639,20 +1639,26 @@
 	       class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RevalidateSelectionHandler"
 	       commandId="org.robotframework.red.revalidateSelection">
 	    <activeWhen>
-	       <with
-	             variable="selection">
-	          <iterate
-	                ifEmpty="false"
-	                operator="and">
-	             <adapt
-	                   type="org.eclipse.core.resources.IResource">
-	                <test
-	                      property="org.eclipse.core.resources.projectNature"
-	                      value="org.robotframework.ide.eclipse.main.plugin.robotNature">
-	                </test>
-	             </adapt>
-	          </iterate>
-	       </with>
+	       <and>
+               <test
+                     property="org.robotframework.red.preferences.isValidationTurnedOff"
+                     value="false">
+               </test>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+           </and>
 	    </activeWhen>
 	    <enabledWhen>
 	       <with

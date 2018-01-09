@@ -26,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.validation.ArgumentsParser.Inv
 import org.robotframework.ide.eclipse.main.plugin.validation.ArgumentsParser.ProvidedArguments;
 import org.robotframework.ide.eclipse.main.plugin.validation.ProblemsReportingStrategyFactory.HeadlessValidationReportingStrategy;
 
-
 public class ValidationApplication implements IApplication {
 
     private final Logger logger = new Logger();
