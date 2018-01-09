@@ -7,8 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
@@ -24,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
 
 public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
@@ -39,14 +42,19 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
     @Override
     public Collection<ILibraryClass> provideEntriesFromFile(final URI path) throws RobotEnvironmentException {
-        return provideEntriesFromFile(path, null);
+        return provideEntriesFromFile(path, null, PythonClass::createWithoutDuplicationOfFileAndClassName);
     }
 
     public Collection<ILibraryClass> provideEntriesFromFile(final URI path, final String moduleName)
             throws RobotEnvironmentException {
+        return provideEntriesFromFile(path, moduleName, PythonClass::new);
+    }
+
+    private Collection<ILibraryClass> provideEntriesFromFile(final URI path, final String moduleName,
+            final Function<String, ILibraryClass> classNameMapper) throws RobotEnvironmentException {
         final List<String> classes = environment.getClassesFromModule(new File(path), moduleName,
                 additionalSearchPaths);
-        return classes.stream().map(PythonClass::new).collect(Collectors.toList());
+        return classes.stream().map(classNameMapper).distinct().collect(Collectors.toList());
     }
 
     public static final class PythonClass implements ILibraryClass {
@@ -55,6 +63,20 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
         private PythonClass(final String qualifiedName) {
             this.qualifiedName = qualifiedName;
+        }
+
+        static PythonClass createWithoutDuplicationOfFileAndClassName(final String name) {
+            final List<String> splitted = new ArrayList<>(Splitter.on('.').splitToList(name));
+            if (splitted.size() > 1) {
+                final String last = splitted.get(splitted.size() - 1);
+                final String beforeLast = splitted.get(splitted.size() - 2);
+                if (last.equals(beforeLast)) {
+                    splitted.remove(splitted.size() - 1);
+                }
+                return new PythonClass(String.join(".", splitted));
+            } else {
+                return new PythonClass(name);
+            }
         }
 
         @Override

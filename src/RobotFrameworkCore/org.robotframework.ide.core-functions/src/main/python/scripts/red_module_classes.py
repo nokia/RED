@@ -8,7 +8,6 @@
 # FIXME: check if module_name is needed and eventually replace it with boolean
 def get_classes_from_module(module_location, module_name=None):
     import os
-    import pkgutil
     from robot import pythonpathsetter
 
     module_directory = os.path.dirname(module_location)
@@ -17,46 +16,46 @@ def get_classes_from_module(module_location, module_name=None):
 
     if module_location.endswith('__init__.py'):
         pythonpathsetter.add_path(os.path.dirname(module_directory))
-
-        module_name_from_location = os.path.basename(module_directory)
-        module = _load_module(module_location, module_name_from_location, module_full_name)
-        class_names.extend(_find_names_in_module(module, module_name_from_location))
-        for loader, name, _ in pkgutil.walk_packages([module_directory]):
-            module = loader.find_module(name).load_module(name)
-            class_names.extend(_find_names_in_module(module, module_name_from_location))
+        module = _load_module(module_full_name, module_location)
+        class_names.extend(_find_names_in_module(module, module_full_name))
+        class_names.extend(_find_names_in_path([module_directory], module_full_name))
 
     elif module_location.endswith('.py'):
         pythonpathsetter.add_path(module_directory)
-
-        module_name_from_location = os.path.basename(module_location)[:-3]
-        module = _load_module(module_location, module_name_from_location, module_full_name)
-        class_names.extend(_find_names_in_module(module, module_name_from_location, module_name is not None))
+        module = _load_module(module_full_name, module_location)
+        class_names.extend(_find_names_in_module(module, module_full_name))
 
     elif module_location.endswith(".zip") or module_location.endswith(".jar"):
         pythonpathsetter.add_path(module_location)
-
-        for loader, name, _ in pkgutil.walk_packages([module_location]):
-            module = loader.load_module(name)
-            class_names.extend(_find_names_in_module(module, name))
+        class_names.extend(_find_names_in_path([module_location], module_full_name))
 
     else:
         raise Exception('Unrecognized library path: ' + module_location)
     
-    class_names.extend(_find_missing_names(class_names, module_full_name))
     return sorted(set(class_names))
 
 
+def _find_names_in_path(path, module_full_name):
+    import pkgutil
+    
+    class_names = list()
+    for loader, name, _ in pkgutil.walk_packages(path):
+        try:
+            module = loader.find_module(name).load_module(name)
+            class_names.extend(_find_names_in_module(module, module_full_name))
+        except:
+            pass  # some modules can't be loaded  separately
+    return class_names    
+
+
 # FIXME: check if such import fallback is needed & unify it with imports in red_modules.py and red_libraries.py
-def _load_module(module_location, module_name, module_full_name):
+def _load_module(module_name, module_location):
     import importlib
     try:
         return importlib.import_module(module_name)
     except Exception as e:
         _extend_sys_path(module_location)
-        try:
-            return importlib.import_module(module_name)
-        except Exception as e:
-            return importlib.import_module(module_full_name)
+        return importlib.import_module(module_name)
 
 
 def _extend_sys_path(start_path):
@@ -100,40 +99,26 @@ def _find_module_name_by_path(start_path):
         path_to_module = start_path.replace(path_to_replace, '', 1)
         result = path_to_module.replace(os.sep, '.')
         if os.path.isfile(start_path):
-            result = result[:-3]
+            if start_path.endswith('__init__.py'):
+                result = result[:-12]
+            else:
+                _, start_path_extension = os.path.splitext(start_path)
+                result = result[:-len(start_path_extension)]
 
     return result
 
 
-def _find_missing_names(names, module_name):
-    result = list()
-
-    if names != [module_name]:
-        module_names = module_name.split('.')[:-1]
-        if len(module_names) > 0:
-            for mod_index in range(len(module_names) - 1, -1, -1):
-                pre_index = '.'.join(module_names[mod_index:])
-                for get_index in range(0, len(names)):
-                    if not names[get_index].startswith(pre_index) and not pre_index + '.' + names[get_index] in result:
-                        result.append(pre_index + '.' + names[get_index])
-
-    return result
-
-
-def _find_names_in_module(module, name, allow_duplicated_module_name=True):
+def _find_names_in_module(module, module_full_name):
     import inspect
 
     result = list()
-    if allow_duplicated_module_name:
+    if module.__name__.startswith(module_full_name):
         result.append(module.__name__)
+    else:
+        result.append(module_full_name + "." + module.__name__)
     for _, obj in inspect.getmembers(module):
-        if inspect.isfunction(obj):
-            result.append(obj.__module__)
-        if inspect.isclass(obj) and obj.__module__.startswith(name):
-            if allow_duplicated_module_name or obj.__module__ != obj.__name__:
-                result.append(obj.__module__ + "." + obj.__name__)
-            else:
-                result.append(obj.__module__)
+        if inspect.isclass(obj) and obj.__module__.startswith(module_full_name):
+            result.append(obj.__module__ + "." + obj.__name__)
 
     return result
 
