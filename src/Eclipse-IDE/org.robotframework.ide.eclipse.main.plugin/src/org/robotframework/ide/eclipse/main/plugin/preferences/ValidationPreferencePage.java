@@ -11,9 +11,15 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -26,6 +32,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.ProblemCategoryType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
@@ -74,12 +81,19 @@ public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
             }
         });
 
+        createTurnOffButton(scrolled.getBody());
+
         final Map<ProblemCategoryType, Collection<ProblemCategory>> categories = ProblemCategory.getAllCategories();
         for (final Entry<ProblemCategoryType, Collection<ProblemCategory>> categoryEntry : categories.entrySet()) {
             if (!categoryEntry.getValue().isEmpty()) {
                 createProblemCategorySection(scrolled.getBody(), categoryEntry.getKey(), categoryEntry.getValue());
             }
         }
+    }
+
+    private void createTurnOffButton(final Composite parent) {
+        addField(new BooleanFieldEditor(RedPreferences.TURN_OFF_VALIDATION,
+                "Turn off validation", parent));
     }
 
     @Override
@@ -89,6 +103,24 @@ public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
         }
 
         super.performDefaults();
+    }
+
+    @Override
+    public boolean performOk() {
+        final boolean result = super.performOk();
+        if (getPreferenceStore().getBoolean(RedPreferences.TURN_OFF_VALIDATION)) {
+            for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+                if (project.exists() && project.isOpen()) {
+                    try {
+                        project.deleteMarkers(null, true, IResource.DEPTH_INFINITE);
+                    } catch (final CoreException e) {
+                        MessageDialog.openError(getShell(), "Deleting markers",
+                                "Problems occurred during deleting markers " + e.getMessage());
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     private void createProblemCategorySection(final Composite parent, final ProblemCategoryType type,
