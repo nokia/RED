@@ -5,10 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -75,6 +79,38 @@ public class PythonLibStructureBuilderTest {
 
         verify(environment).getClassesFromModule(new File(moduleLocation), null,
                 new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(projectProvider.getProject()));
+    }
+
+    @Test
+    public void fileNameAndClassNameDuplicationsAreSkipped() throws Exception {
+        when(environment.getClassesFromModule(new File(moduleLocation), null, new EnvironmentSearchPaths()))
+                .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName",
+                        "module.OtherClassName", "module.OtherClassName.OtherClassName"));
+
+        final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
+                projectProvider.getProject());
+
+        final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(moduleLocation);
+
+        assertThat(classes.stream().map(ILibraryClass::getQualifiedName)).containsExactly("module", "module.ClassName",
+                "module.OtherClassName");
+    }
+
+    @Test
+    public void fileNameAndClassNameDuplicationsAreNotSkipped() throws Exception {
+        when(environment.getClassesFromModule(new File(moduleLocation), "module.ClassName.ClassName",
+                new EnvironmentSearchPaths()))
+                        .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName",
+                                "module.OtherClassName", "module.OtherClassName.OtherClassName"));
+
+        final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
+                projectProvider.getProject());
+
+        final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(moduleLocation,
+                "module.ClassName.ClassName");
+
+        assertThat(classes.stream().map(ILibraryClass::getQualifiedName)).containsExactly("module", "module.ClassName",
+                "module.ClassName.ClassName", "module.OtherClassName", "module.OtherClassName.OtherClassName");
     }
 
 }
