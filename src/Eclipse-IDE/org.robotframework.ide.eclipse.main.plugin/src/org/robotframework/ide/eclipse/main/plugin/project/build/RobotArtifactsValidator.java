@@ -90,6 +90,9 @@ public class RobotArtifactsValidator {
     }
 
     private static boolean shouldValidate(final RobotSuiteFile suiteModel) {
+        if (RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
+            return false;
+        }
         final IFile file = suiteModel.getFile();
         if (file == null || !file.exists() || file.getProject() == null || !file.getProject().exists()
                 || !RobotProjectNature.hasRobotNature(file.getProject())) {
@@ -101,10 +104,10 @@ public class RobotArtifactsValidator {
         }
         return true;
     }
-    
+
     private static synchronized ModelUnitValidator createSynchronizedValidator(final IResource resource,
             final ModelUnitValidator validator) {
-        
+
         return new ModelUnitValidator() {
 
             @Override
@@ -147,6 +150,9 @@ public class RobotArtifactsValidator {
 
     private IStatus runValidation(final Job dependentJob, final ModelUnitValidatorConfig validatorConfig,
             final IProgressMonitor monitor) {
+        if (RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
+            return Status.OK_STATUS;
+        }
         try {
             if (dependentJob != null) {
                 dependentJob.join();
@@ -331,7 +337,7 @@ public class RobotArtifactsValidator {
                 throws CoreException {
             return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating)
                     ? createProperValidator(context, (IFile) resource, reporter)
-                    : Optional.<ModelUnitValidator> empty();
+                    : Optional.empty();
         }
 
         private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource,
