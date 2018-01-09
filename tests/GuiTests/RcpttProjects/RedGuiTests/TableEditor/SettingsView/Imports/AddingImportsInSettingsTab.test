@@ -7,13 +7,24 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9zaK8PE_Eeeotd-8Sx1R8w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/8/18 2:36 PM
+Save-Time: 1/9/18 9:14 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+proc "change_variable" [val var_name] [val new_path]{
+	with [get-editor "TestFile.robot" | get-section "Imports"] {
+	    select $var_name | double-click
+	    select $var_name | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+	    with [get-editbox] {
+	        set-text $new_path
+	        key-type Enter
+	    }
+		apply-cell-edit -deactivate
+	}	
+}
 
 // open .robot file
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
@@ -48,7 +59,7 @@ with [get-window -from "NatCombo.createDropdownControl()" | get-table] {
     key-type Down
     select Resource | key-type Enter
 }
-with [get-editor "TestFile.robot" | get-section Imports] {
+with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
     with [get-editbox] {
         type-text ble
         key-type Enter
