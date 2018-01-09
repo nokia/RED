@@ -46,6 +46,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeProblemSeverityPreferences(preferences);
         initializeDefaultLaunchConfigurationPreferences(preferences);
         initializeRfLintPreferences(preferences);
+        initializeValidationPreference(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -127,5 +128,9 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "");
         preferences.put(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "");
         preferences.put(RedPreferences.RFLINT_RULES_CONFIG_ARGS, "");
+    }
+
+    private void initializeValidationPreference(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.TURN_OFF_VALIDATION, false);
     }
 }
