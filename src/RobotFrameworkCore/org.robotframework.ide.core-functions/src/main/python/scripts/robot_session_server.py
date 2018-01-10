@@ -204,7 +204,8 @@ def run_rf_lint(host, port, filepath, additional_arguments):
     command.append(host)
     command.append(str(port))
     command.extend(additional_arguments)
-    command.extend(['-r', filepath])
+    command.append('-r')
+    command.append(__encode_unicode_if_needed(filepath))
 
     subprocess.Popen(command, stdin=subprocess.PIPE)
 
