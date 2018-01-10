@@ -6,17 +6,27 @@
 # Author: Mateusz Marzec
 #
 
+import sys
+import logging
 
-class Logger(object):
-    def log(self, message):
-        import sys
-        sys.stdout.write(message + '\n')
-        sys.stdout.flush()
+formatter = logging.Formatter('[%(asctime)s.%(msecs)d] %(message)s', '%H:%M:%S')
+std_handler = logging.StreamHandler(sys.stdout)
+std_handler.setFormatter(formatter)
+STD_LOGGER = logging.getLogger(__name__)
+STD_LOGGER.setLevel(logging.INFO)
+STD_LOGGER.addHandler(std_handler)
 
-    def log_error(self, message):
-        import sys
-        sys.stderr.write(message + '\n')
-        sys.stderr.flush()
+err_handler = logging.StreamHandler(sys.stderr)
+err_handler.setFormatter(formatter)
+ERR_LOGGER = logging.getLogger(__name__ + '_err')
+ERR_LOGGER.setLevel(logging.ERROR)
+ERR_LOGGER.addHandler(err_handler)
+
+args_handler = logging.StreamHandler(sys.stdout)
+args_handler.setFormatter(logging.Formatter('    > %(message)s'))
+STD_ARGS_LOGGER = logging.getLogger(__name__ + '_args')
+STD_ARGS_LOGGER.setLevel(logging.INFO)
+STD_ARGS_LOGGER.addHandler(args_handler)
 
 
 def encode_result_or_exception(func):
@@ -29,39 +39,38 @@ def encode_result_or_exception(func):
         except:
             msg = traceback.format_exc()
             result['exception'] = msg
-            Logger().log_error(msg)
+            ERR_LOGGER.exception('')
             return result
 
     return inner
 
 
 def logargs(func):
-    from datetime import datetime
     def inner(*args, **kwargs):
-        current_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-
-        msg = '[' + current_time + '] calling \'' + func.__name__ + '\' function, '
-        if args == None or len(args) == 0:
-            msg = msg + 'no arguments'
-        else:
-            msg = msg + 'supplied arguments:\n' + '\n'.join(map(lambda arg: '    > ' + str(arg), args))
-        Logger().log(msg)
-        return func(*args, **kwargs)
+        try:        
+            if args == None or len(args) == 0:
+                STD_LOGGER.info('calling \'%s\' function, no arguments', func.__name__)
+            else:
+                STD_LOGGER.info('calling\'%s\' function, supplied arguments:', func.__name__)
+                for arg in args:
+                    STD_ARGS_LOGGER.info(arg)
+        finally:
+            return func(*args, **kwargs)
 
     return inner
 
 
 def logresult(func):
-    from datetime import datetime
     def inner(*args, **kwargs):
         ret = func(*args, **kwargs)
-        current_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-
-        if ret['exception']:
-            Logger().log('[' + current_time + '] call ended with exception, see stderr for details')
-        else:
-            Logger().log('[' + current_time + '] call ended with result:\n    > ' + str(ret['result']))
-        return ret
+        try:
+            if ret['exception']:
+                STD_LOGGER.info('call ended with exception, see stderr for details')
+            else:
+                STD_LOGGER.info('call ended with result:')
+                STD_ARGS_LOGGER.info(ret['result'])
+        finally:
+            return ret
 
     return inner
 
@@ -150,15 +159,6 @@ def get_robot_version():
     return __get_robot_version()
 
 
-def __get_robot_version():
-    try:
-        import robot
-    except ImportError:
-        return None
-    from robot import version
-    return 'Robot Framework ' + version.get_full_version()
-
-
 @logresult
 @encode_result_or_exception
 @logargs
@@ -172,7 +172,10 @@ def is_virtualenv():
 @logargs
 def start_library_auto_discovering(port, data_source_path, python_paths, class_paths):
     import red_library_autodiscover
-    red_library_autodiscover.start_library_auto_discovering_process(port, data_source_path, python_paths, class_paths)
+    red_library_autodiscover.start_library_auto_discovering_process(port, 
+                                                                    __encode_unicode_if_needed(data_source_path), 
+                                                                    __encode_unicode_if_needed(python_paths), 
+                                                                    __encode_unicode_if_needed(class_paths))
 
 
 @logresult
@@ -215,6 +218,24 @@ def create_libdoc(libname, python_paths, class_paths):
         return __cleanup_modules(red_libraries.create_libdoc)(libname)
 
     return __extend_paths(to_call, python_paths, class_paths)
+
+
+def __get_robot_version():
+    try:
+        import robot
+    except ImportError:
+        return None
+    from robot import version
+    return 'Robot Framework ' + version.get_full_version()
+
+
+def __encode_unicode_if_needed(s):
+    if sys.version_info < (3, 0, 0) and isinstance(s, unicode):
+        return s.encode('utf-8')
+    elif sys.version_info < (3, 0, 0) and isinstance(s, list):
+        return [__encode_unicode_if_needed(elem) for elem in s]
+    else:
+        return s
 
 
 # decorator which cleans up all the modules that were loaded
@@ -283,13 +304,11 @@ def __shutdown_server_when_parent_process_becomes_unavailable(server):
 
 
 if __name__ == '__main__':
+    from threading import Thread
     import socket
 
     socket.setdefaulttimeout(10)
-
-    import sys
-    from threading import Thread
-
+    
     try:
         from xmlrpc.server import SimpleXMLRPCServer
     except ImportError:
@@ -318,13 +337,12 @@ if __name__ == '__main__':
     red_checking_thread = Thread(target=__shutdown_server_when_parent_process_becomes_unavailable, args=(server,))
     red_checking_thread.setDaemon(True)
     red_checking_thread.start()
-
+    
     robot_ver = __get_robot_version()
-    logger = Logger()
-    logger.log('# RED session server started @' + str(PORT))
-    logger.log('# python version: ' + sys.version)
-    logger.log('# robot version: ' + (robot_ver if robot_ver else "<no robot installed>"))
-    logger.log('# script path: ' + __file__)
-    logger.log('\n')
+    print('# RED session server started @' + str(PORT))
+    print('# python version: ' + sys.version)
+    print('# robot version: ' + (robot_ver if robot_ver else "<no robot installed>"))
+    print('# script path: ' + __file__)
+    print('\n')
 
     server.serve_forever()
