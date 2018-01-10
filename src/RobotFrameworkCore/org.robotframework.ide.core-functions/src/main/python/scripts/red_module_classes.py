@@ -9,6 +9,8 @@
 def get_classes_from_module(module_location, module_name=None):
     import os
     from robot import pythonpathsetter
+    import importlib
+    import pkgutil
 
     module_directory = os.path.dirname(module_location)
     module_full_name = _find_module_name_by_path(module_location)
@@ -16,56 +18,34 @@ def get_classes_from_module(module_location, module_name=None):
 
     if module_location.endswith('__init__.py'):
         pythonpathsetter.add_path(os.path.dirname(module_directory))
-        module = _load_module(module_full_name, module_location)
+        module = importlib.import_module(module_full_name)
         class_names.extend(_find_names_in_module(module, module_full_name))
-        class_names.extend(_find_names_in_path([module_directory], module_full_name))
+        for loader, name, _ in pkgutil.walk_packages([module_directory]):
+            try:
+                module = loader.find_module(name).load_module(name)
+                class_names.extend(_find_names_in_module(module, name))
+            except:
+                pass  # some modules can't be loaded  separately
+        class_names = [n if n.startswith(module_full_name) else module_full_name + "." + n for n in class_names]
 
     elif module_location.endswith('.py'):
         pythonpathsetter.add_path(module_directory)
-        module = _load_module(module_full_name, module_location)
+        module = importlib.import_module(module_full_name)
         class_names.extend(_find_names_in_module(module, module_full_name))
 
     elif module_location.endswith(".zip") or module_location.endswith(".jar"):
         pythonpathsetter.add_path(module_location)
-        class_names.extend(_find_names_in_path([module_location], module_full_name))
+        for loader, name, _ in pkgutil.walk_packages([module_location]):
+            try:
+                module = loader.find_module(name).load_module(name)
+                class_names.extend(_find_names_in_archive_module(module, name))
+            except:
+                pass  # some modules can't be loaded  separately
 
     else:
         raise Exception('Unrecognized library path: ' + module_location)
-    
+
     return sorted(set(class_names))
-
-
-def _find_names_in_path(path, module_full_name):
-    import pkgutil
-    
-    class_names = list()
-    for loader, name, _ in pkgutil.walk_packages(path):
-        try:
-            module = loader.find_module(name).load_module(name)
-            class_names.extend(_find_names_in_module(module, module_full_name))
-        except:
-            pass  # some modules can't be loaded  separately
-    return class_names    
-
-
-# FIXME: check if such import fallback is needed & unify it with imports in red_modules.py and red_libraries.py
-def _load_module(module_name, module_location):
-    import importlib
-    try:
-        return importlib.import_module(module_name)
-    except Exception as e:
-        _extend_sys_path(module_location)
-        return importlib.import_module(module_name)
-
-
-def _extend_sys_path(start_path):
-    import sys
-    import pkgutil
-    from robot import pythonpathsetter
-
-    path_walk = start_path if start_path in sys.path else _find_module_path(start_path)
-    for loader, _, _ in pkgutil.walk_packages([path_walk]):
-        pythonpathsetter.add_path(loader.path)
 
 
 def _find_module_path(start_path):
@@ -108,18 +88,31 @@ def _find_module_name_by_path(start_path):
     return result
 
 
-def _find_names_in_module(module, module_full_name):
+def _find_names_in_module(module, name):
     import inspect
 
     result = list()
-    if module.__name__.startswith(module_full_name):
-        result.append(module.__name__)
-    else:
-        result.append(module_full_name + "." + module.__name__)
+    result.append(module.__name__)
     for _, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and obj.__module__.startswith(module_full_name):
+        if inspect.isclass(obj) and obj.__module__.startswith(name):            
             result.append(obj.__module__ + "." + obj.__name__)
 
+    return result
+
+
+def _find_names_in_archive_module(module, name):
+    import inspect
+ 
+    result = list()
+    for n, obj in inspect.getmembers(module):
+        if inspect.isfunction(obj):
+            result.append(obj.__module__)
+        if inspect.isclass(obj) and obj.__module__.startswith(name):
+            if obj.__module__ != obj.__name__:
+                result.append(obj.__module__ + "." + obj.__name__)
+            else:
+                result.append(obj.__module__)
+ 
     return result
 
 

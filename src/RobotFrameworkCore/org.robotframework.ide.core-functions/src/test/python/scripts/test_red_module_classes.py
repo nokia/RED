@@ -82,7 +82,8 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         result = get_classes_from_module(module_location)
 
-        self.assertEqual(result, ['module', 'module.ModuleClass', 'module.OtherModuleClass'])
+        self.assertEqual(result, ['module', 'module.ModuleClass', 'module.ModuleClass.ModuleClass', 'module.OtherModuleClass', 
+                                  'module.OtherModuleClass.DifferentModuleClass', 'module.OtherModuleClass.OtherModuleClass'])
 
     def test_retrieving_classes_from_python_module_with_init_3(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
@@ -91,20 +92,30 @@ class ClassesRetrievingTests(unittest.TestCase):
         result = get_classes_from_module(module_location)
 
         self.assertEqual(result, ['init_and_module', 'init_and_module.InitClass', 'init_and_module.ModuleClass', 
-                                  'init_and_module.OtherInitClass', 'init_and_module.OtherModuleClass'])
+                                  'init_and_module.ModuleClass.ModuleClass', 'init_and_module.OtherInitClass', 
+                                  'init_and_module.OtherModuleClass', 'init_and_module.OtherModuleClass.DifferentModuleClass', 
+                                  'init_and_module.OtherModuleClass.OtherModuleClass'])
 
     def test_retrieving_classes_from_python_module_in_zip(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'compressed.zip')
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'JythonLibWithPython.zip')
 
         result = get_classes_from_module(module_location)
 
-        self.assertEqual(result, ['compressed', 'compressed.mod_compressed_1', 'compressed.mod_compressed_2'])
+        import platform
+        if 'Jython' in platform.python_implementation():
+            self.assertEqual(result, ['PythonOnly', 'PythonOnly.Other', 'PythonWithJava'])
+        else:
+            self.assertEqual(result, ['PythonOnly', 'PythonOnly.Other'])
 
     def test_retrieving_classes_from_python_module_in_jar(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'compressed.jar')
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'JythonLibWithPython.jar')
 
         result = get_classes_from_module(module_location)
 
-        self.assertEqual(result, ['compressed', 'compressed.mod_compressed_1', 'compressed.mod_compressed_2'])
+        import platform
+        if 'Jython' in platform.python_implementation():
+            self.assertEqual(result, ['PythonOnly', 'PythonOnly.Other', 'PythonWithJava'])
+        else:
+            self.assertEqual(result, ['PythonOnly', 'PythonOnly.Other'])
