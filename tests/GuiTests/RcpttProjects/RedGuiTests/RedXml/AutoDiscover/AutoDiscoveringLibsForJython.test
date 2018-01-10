@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dOy-EAJFEea9vai2oGByIg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/10/18 9:57 AM
+Save-Time: 1/10/18 3:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -204,10 +204,5 @@ with [get-window "Discovering libraries summary"] {
 }
 get-window "Discovering libraries summary" | get-button OK | click
 
-proc "release-files-handle_l"{
-	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-	exec-process -command "C:\\jenkins\\workspace\\Testing_and_Building\\Tools\\Handle\\RemoveFilesHandle.bat" -args  $RED_workspace_path  
-    }
-}
-release-files-handle_l
+release-files-handle
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
