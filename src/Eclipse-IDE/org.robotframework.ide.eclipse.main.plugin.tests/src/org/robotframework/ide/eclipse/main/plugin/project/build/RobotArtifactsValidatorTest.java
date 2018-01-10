@@ -8,18 +8,25 @@ package org.robotframework.ide.eclipse.main.plugin.project.build;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
+import org.robotframework.red.junit.PreferenceUpdater;
 
 public class RobotArtifactsValidatorTest {
+
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     @Test
     public void test_revalidate_noRobot_installed() throws Exception {
@@ -48,5 +55,19 @@ public class RobotArtifactsValidatorTest {
         order.verify(suiteModel, times(1)).getProject();
         order.verify(runtime, times(1)).getVersion();
         order.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void test_noRevalidate_ifValidationTurnedOffInPreferences() throws Exception {
+        // prepare
+        final RobotSuiteFile suiteModel = mock(RobotSuiteFile.class);
+
+        preferenceUpdater.setValue(RedPreferences.TURN_OFF_VALIDATION, "true");
+
+        // execute
+        RobotArtifactsValidator.revalidate(suiteModel);
+
+        // verify
+        verifyNoMoreInteractions(suiteModel);
     }
 }
