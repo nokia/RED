@@ -34,7 +34,7 @@ public enum ProblemCategory {
 
         @Override
         public Severity[] getPossibleSeverities() {
-            return new Severity[] {Severity.FATAL};
+            return new Severity[] {Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
         }
     },
     MISSING_ROBOT_ENVIRONMENT(
@@ -51,7 +51,7 @@ public enum ProblemCategory {
 
         @Override
         public Severity[] getPossibleSeverities() {
-            return new Severity[] {Severity.FATAL};
+            return new Severity[] {Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
         }
     },
     LIBRARY_SPECIFICATION_FILE(
@@ -66,7 +66,7 @@ public enum ProblemCategory {
 
         @Override
         public Severity[] getPossibleSeverities() {
-            return new Severity[] {Severity.FATAL};
+            return new Severity[] {Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
         }
     },
     REMOVED_API(
@@ -187,11 +187,6 @@ public enum ProblemCategory {
         @Override
         public Severity getDefaultSeverity() {
             return Severity.ERROR;
-        }
-
-        @Override
-        public Severity[] getPossibleSeverities() {
-            return new Severity[] { Severity.ERROR };
         }
     };
 
