@@ -57,7 +57,12 @@ class RedRfLint(RfLint):
                 {'filepath' : filename, 'line' : linenumber, 'character' : char, 
                     'rule_name' : rulename, 'severity' : severity, 'message' : message})
 
-        super(RedRfLint, self).report(linenumber, filename, severity, message, rulename, char)
+        try:
+            super(RedRfLint, self).report(linenumber, filename, severity, message, rulename, char)
+        except:
+            # call to super may have problems with encoding performed when printing to stdout
+            # we don't need this printing anyway, so just swallow the exception
+            pass
 
 
 class JsonClient(object):
@@ -136,7 +141,7 @@ def run_analysis(host, port, args):
     try:
         client.connect(host, port, 30)
         
-        result = RedRfLint(client).run(args)
+        result = RedRfLint(client).run(__decode_args_if_needed(args))
         client.send_to_server('analysis_finished')
         client.close_connection()
         return result
@@ -144,6 +149,12 @@ def run_analysis(host, port, args):
         client.send_to_server('analysis_finished', traceback.format_exc())
         client.close_connection()
         return 1
+    
+def __decode_args_if_needed(args):
+    if sys.version_info < (3, 0, 0):
+        return [arg.decode('utf-8') for arg in args]
+    else:
+        return args
     
 if __name__ == "__main__":
     host = sys.argv[1]
