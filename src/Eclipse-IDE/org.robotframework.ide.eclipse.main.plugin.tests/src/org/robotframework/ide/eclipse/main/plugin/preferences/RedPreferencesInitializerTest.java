@@ -129,4 +129,13 @@ public class RedPreferencesInitializerTest {
         verify(preferences).put(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "");
         verify(preferences).put(RedPreferences.RFLINT_RULES_CONFIG_ARGS, "");
     }
+
+    @Test
+    public void byDefaultValidationIsNotTurnedOff() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).putBoolean(RedPreferences.TURN_OFF_VALIDATION, false);
+    }
 }

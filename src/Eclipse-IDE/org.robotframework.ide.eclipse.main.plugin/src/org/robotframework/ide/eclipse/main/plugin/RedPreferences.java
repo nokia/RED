@@ -85,11 +85,13 @@ public class RedPreferences {
 
     public static final String DEBUGGER_SUSPEND_ON_ERROR = "red.launch.debug.suspsendOnError";
     public static final String DEBUGGER_OMIT_LIB_KEYWORDS = "red.launch.debug.omitLibraryKeywords";
-    
+
     public static final String RFLINT_RULES_CONFIG_NAMES = "red.validation.rflint.rulesConfig.names";
     public static final String RFLINT_RULES_CONFIG_SEVERITIES = "red.validation.rflint.rulesConfig.severities";
     public static final String RFLINT_RULES_CONFIG_ARGS = "red.validation.rflint.rulesConfig.arguments";
     public static final String RFLINT_RULES_FILES = "red.validation.rflint.rulesFiles";
+
+    public static final String TURN_OFF_VALIDATION = "red.validation.turnOff";
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -267,6 +269,10 @@ public class RedPreferences {
 
     public boolean shouldDebuggerOmitLibraryKeywords() {
         return store.getBoolean(DEBUGGER_OMIT_LIB_KEYWORDS);
+    }
+    
+    public boolean isValidationTurnedOff() {
+        return store.getBoolean(TURN_OFF_VALIDATION);
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
