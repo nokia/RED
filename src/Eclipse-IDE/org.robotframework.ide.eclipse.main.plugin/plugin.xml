@@ -2980,9 +2980,15 @@
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RevalidateEditorHandler"
           commandId="org.robotframework.red.revalidateEditor">
        <activeWhen>
-          <reference
+         <and>
+            <test
+                property="org.robotframework.red.preferences.isValidationTurnedOff"
+                value="false">
+            </test>
+            <reference
                 definitionId="org.robotframework.sourcePartIsActiveAndEditable">
-          </reference>
+            </reference>
+         </and>
        </activeWhen>
     </handler>
  </extension>
@@ -3599,11 +3605,10 @@
                 label="Exclude from validation"
                 style="push">
           </command>
-          <command
-                commandId="org.robotframework.red.revalidateSelection"
-                label="Revalidate"
-                style="push">
-          </command>
+          <dynamic
+                class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RevalidateSelectionDynamicMenuItem"
+                id="org.robotframework.red.menu.dynamic.selection.revalidate">
+          </dynamic>
           <separator
                 name="rflint"
                 visible="true">
@@ -4788,6 +4793,13 @@
           namespace="org.robotframework.red.view.execution"
           properties="currentLaunchIsTerminated,currentLaunchExecStoreIsDisposed,currentLaunchHasFailedTest"
           type="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
+    </propertyTester>
+    <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedPreferencesPropertyTester"
+          id="org.robotframework.red.isValidationTurnedOff"
+          namespace="org.robotframework.red.preferences"
+          properties="isValidationTurnedOff"
+          type="java.lang.Object">
     </propertyTester>
  </extension>
  <extension
