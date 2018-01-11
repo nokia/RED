@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VMj88KTbEeazyPh6f3_hNQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/5/17 10:49 AM
+Save-Time: 1/11/18 3:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -35,28 +35,37 @@ get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings"
 
 with [get-window Preferences | get-control Any -after [get-label "Errors/Warnings"] -index 9] {
 	
+	
 	//title
     get-property "getChildren().length" | equals 3 | verify-true
     get-property "getChildren().Control[0].getText()" | equals "RED validation settings" | verify-true
     
     //sections
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().length" 
-        | equals 7 | verify-true
+        | equals 8 | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().Control[0].getText()" 
-        | equals "Code style" | verify-true
+        | equals "Turn off validation" | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().Control[1].getText()" 
-        | equals "Name shadowing and conflicts" | verify-true
+        | equals "Code style" | verify-true    
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().Control[2].getText()" 
-        | equals "Unnecessary code" | verify-true
+        | equals "Name shadowing and conflicts" | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().Control[3].getText()" 
-        | equals Import | verify-true
+        | equals "Unnecessary code" | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().Control[4].getText()" 
-        | equals "Robot version" | verify-true
+        | equals Import | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().Control[5].getText()" 
-        | equals Runtime | verify-true
+        | equals "Robot version" | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().Control[6].getText()" 
+        | equals Runtime | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getChildren().Control[7].getText()" 
         | equals "Project configuration" | verify-true
         
+    // selection    
+    with [get-window Preferences | get-button "Turn off validation"] {
+    	get-property selected | equals false | verify-true
+    	get-property kind | equals Check | verify-true
+	}
+    
     //buttons    
     get-property "getChildren().Control[2].getChildren().length" | equals 2 | verify-true
     get-property "getChildren().Control[2].getChildren().Control[0].getText()" | equals "Restore &Defaults" 
