@@ -42,18 +42,16 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
     @Override
     public Collection<ILibraryClass> provideEntriesFromFile(final URI path) throws RobotEnvironmentException {
-        return provideEntriesFromFile(path, null, PythonClass::createWithoutDuplicationOfFileAndClassName);
+        return provideEntriesFromFile(path, PythonClass::createWithoutDuplicationOfFileAndClassName);
     }
 
-    public Collection<ILibraryClass> provideEntriesFromFile(final URI path, final String moduleName)
-            throws RobotEnvironmentException {
-        return provideEntriesFromFile(path, moduleName, PythonClass::new);
+    public Collection<ILibraryClass> provideAllEntriesFromFile(final URI path) throws RobotEnvironmentException {
+        return provideEntriesFromFile(path, PythonClass::new);
     }
 
-    private Collection<ILibraryClass> provideEntriesFromFile(final URI path, final String moduleName,
+    private Collection<ILibraryClass> provideEntriesFromFile(final URI path,
             final Function<String, ILibraryClass> classNameMapper) throws RobotEnvironmentException {
-        final List<String> classes = environment.getClassesFromModule(new File(path), moduleName,
-                additionalSearchPaths);
+        final List<String> classes = environment.getClassesFromModule(new File(path), additionalSearchPaths);
         return classes.stream().map(classNameMapper).distinct().collect(Collectors.toList());
     }
 

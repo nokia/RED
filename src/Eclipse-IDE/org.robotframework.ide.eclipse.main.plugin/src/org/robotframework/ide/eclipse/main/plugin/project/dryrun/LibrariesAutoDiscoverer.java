@@ -210,7 +210,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     robotProject.getProject());
             try {
                 final Collection<ILibraryClass> libraryClasses = pythonLibStructureBuilder
-                        .provideEntriesFromFile(libraryImport.getSourcePath(), libraryImport.getName());
+                        .provideAllEntriesFromFile(libraryImport.getSourcePath());
                 addReferencedLibrariesFromClasses(libraryImport, libraryClasses);
             } catch (final RobotEnvironmentException e) {
                 final Optional<File> modulePath = findPythonLibraryModulePath(libraryImport);
