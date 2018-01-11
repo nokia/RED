@@ -92,8 +92,14 @@ public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
     }
 
     private void createTurnOffButton(final Composite parent) {
-        addField(new BooleanFieldEditor(RedPreferences.TURN_OFF_VALIDATION,
-                "Turn off validation", parent));
+        final BooleanFieldEditor validationCheck = new BooleanFieldEditor(RedPreferences.TURN_OFF_VALIDATION,
+                "Turn off validation (Not recommended)", parent);
+        validationCheck.getDescriptionControl(parent).setToolTipText(
+                "This is strongly recommended to NOT turn off the whole validation."
+                        + "\nUse this option ONLY if you understand possible consequences."
+                        + "\nValidation is responsible for providing markers, mostly errors and warnings for possibly problematic code."
+                        + "\nIt can be triggered during code typing, manual project building, file saving (autobuilding), revalidation and by some other tools.");
+        addField(validationCheck);
     }
 
     @Override
