@@ -82,7 +82,7 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         result = get_classes_from_module(module_location)
 
-        self.assertEqual(result, ['module', 'module.ModuleClass', 'module.ModuleClass.ModuleClass', 'module.OtherModuleClass', 
+        self.assertEqual(result, ['module', 'module.ModuleClass', 'module.ModuleClass.ModuleClass', 'module.OtherModuleClass',
                                   'module.OtherModuleClass.DifferentModuleClass', 'module.OtherModuleClass.OtherModuleClass'])
 
     def test_retrieving_classes_from_python_module_with_init_3(self):
@@ -91,9 +91,9 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         result = get_classes_from_module(module_location)
 
-        self.assertEqual(result, ['init_and_module', 'init_and_module.InitClass', 'init_and_module.ModuleClass', 
-                                  'init_and_module.ModuleClass.ModuleClass', 'init_and_module.OtherInitClass', 
-                                  'init_and_module.OtherModuleClass', 'init_and_module.OtherModuleClass.DifferentModuleClass', 
+        self.assertEqual(result, ['init_and_module', 'init_and_module.InitClass', 'init_and_module.ModuleClass',
+                                  'init_and_module.ModuleClass.ModuleClass', 'init_and_module.OtherInitClass',
+                                  'init_and_module.OtherModuleClass', 'init_and_module.OtherModuleClass.DifferentModuleClass',
                                   'init_and_module.OtherModuleClass.OtherModuleClass'])
 
     def test_retrieving_classes_from_python_module_in_zip(self):

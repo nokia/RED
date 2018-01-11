@@ -112,10 +112,10 @@ def get_run_module_path():
 @logresult
 @encode_result_or_exception
 @logargs
-def get_classes_from_module(module_location, module_name, python_paths, class_paths):
+def get_classes_from_module(module_location, python_paths, class_paths):
     def to_call():
         import red_module_classes
-        return __cleanup_modules(red_module_classes.get_classes_from_module)(module_location, module_name)
+        return __cleanup_modules(red_module_classes.get_classes_from_module)(module_location)
 
     return __extend_paths(to_call, python_paths, class_paths)
 
@@ -172,9 +172,9 @@ def is_virtualenv():
 @logargs
 def start_library_auto_discovering(port, data_source_path, python_paths, class_paths):
     import red_library_autodiscover
-    red_library_autodiscover.start_library_auto_discovering_process(port, 
-                                                                    __encode_unicode_if_needed(data_source_path), 
-                                                                    __encode_unicode_if_needed(python_paths), 
+    red_library_autodiscover.start_library_auto_discovering_process(port,
+                                                                    __encode_unicode_if_needed(data_source_path),
+                                                                    __encode_unicode_if_needed(python_paths),
                                                                     __encode_unicode_if_needed(class_paths))
 
 
@@ -296,7 +296,7 @@ def __extend_classpath(class_paths):
 def __shutdown_server_when_parent_process_becomes_unavailable(server):
     import sys
 
-    # this causes the function to block on readline() call; parent process which 
+    # this causes the function to block on readline() call; parent process which
     # started this script shouldn't write anything to the input, so this function will
     # be blocked until parent process will be closed/killed; this will cause readline()
     # to read EOF and hence proceed to server.shutdown() which will terminate whole script
@@ -309,7 +309,7 @@ if __name__ == '__main__':
     import socket
 
     socket.setdefaulttimeout(10)
-    
+
     try:
         from xmlrpc.server import SimpleXMLRPCServer
     except ImportError:
@@ -338,7 +338,7 @@ if __name__ == '__main__':
     red_checking_thread = Thread(target=__shutdown_server_when_parent_process_becomes_unavailable, args=(server,))
     red_checking_thread.setDaemon(True)
     red_checking_thread.start()
-    
+
     robot_ver = __get_robot_version()
     print('# RED session server started @' + str(PORT))
     print('# python version: ' + sys.version)

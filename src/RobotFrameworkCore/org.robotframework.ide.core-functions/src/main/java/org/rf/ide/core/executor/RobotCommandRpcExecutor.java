@@ -354,12 +354,11 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public List<String> getClassesFromModule(final File moduleLocation, final String moduleName,
-            final EnvironmentSearchPaths additionalPaths) {
+    public List<String> getClassesFromModule(final File moduleLocation, final EnvironmentSearchPaths additionalPaths) {
         try {
             final List<String> classes = newArrayList();
             final Object[] libs = (Object[]) callRpcFunction("getClassesFromModule", moduleLocation.getAbsolutePath(),
-                    moduleName, newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+                    newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
             for (final Object o : libs) {
                 classes.add((String) o);
