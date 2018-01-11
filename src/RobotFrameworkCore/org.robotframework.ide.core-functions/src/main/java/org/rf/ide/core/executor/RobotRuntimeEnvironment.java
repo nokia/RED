@@ -419,17 +419,15 @@ public class RobotRuntimeEnvironment {
      *
      * @param moduleLocation
      *            Module location
-     * @param moduleName
-     *            Module name or null
      * @return list of class names or empty list
      * @throws RobotEnvironmentException
      */
-    public List<String> getClassesFromModule(final File moduleLocation, final String moduleName,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
+    public List<String> getClassesFromModule(final File moduleLocation, final EnvironmentSearchPaths additionalPaths)
+            throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getClassesFromModule(moduleLocation, moduleName, additionalPaths);
+            return executor.getClassesFromModule(moduleLocation, additionalPaths);
         }
         return new ArrayList<>();
     }
