@@ -240,17 +240,12 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public List<String> getClassesFromModule(final File moduleLocation, final String moduleName,
-            final EnvironmentSearchPaths additionalPaths) {
+    public List<String> getClassesFromModule(final File moduleLocation, final EnvironmentSearchPaths additionalPaths) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_module_classes.py");
 
             final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths,
                     moduleLocation.getAbsolutePath());
-            if (moduleName != null) {
-                cmdLine.add("-modulename");
-                cmdLine.add(moduleName);
-            }
             if (additionalPaths.hasPythonPaths()) {
                 cmdLine.add(String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType)));
             }

@@ -49,7 +49,7 @@ public class JarStructureBuilderTest {
 
         builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(new File(moduleLocation), null, new EnvironmentSearchPaths());
+        verify(environment).getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class JarStructureBuilderTest {
 
         builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(new File(moduleLocation), null, new EnvironmentSearchPaths());
+        verify(environment).getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class JarStructureBuilderTest {
 
         builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(new File(moduleLocation), null,
+        verify(environment).getClassesFromModule(new File(moduleLocation),
                 new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(projectProvider.getProject()));
     }
 
