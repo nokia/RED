@@ -53,17 +53,17 @@ public class PythonLibStructureBuilderTest {
 
         builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(new File(moduleLocation), null, new EnvironmentSearchPaths());
+        verify(environment).getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths());
     }
 
     @Test
-    public void testGettingPythonClassesFromModuleWithSpecifiedName() throws Exception {
+    public void testGettingAllPythonClassesFromModule() throws Exception {
         final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
                 projectProvider.getProject());
 
-        builder.provideEntriesFromFile(moduleLocation, "module_name");
+        builder.provideAllEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(new File(moduleLocation), "module_name", new EnvironmentSearchPaths());
+        verify(environment).getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths());
     }
 
     @Test
@@ -77,13 +77,13 @@ public class PythonLibStructureBuilderTest {
 
         builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(new File(moduleLocation), null,
+        verify(environment).getClassesFromModule(new File(moduleLocation),
                 new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(projectProvider.getProject()));
     }
 
     @Test
     public void fileNameAndClassNameDuplicationsAreSkipped() throws Exception {
-        when(environment.getClassesFromModule(new File(moduleLocation), null, new EnvironmentSearchPaths()))
+        when(environment.getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths()))
                 .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName",
                         "module.OtherClassName", "module.OtherClassName.OtherClassName"));
 
@@ -98,16 +98,14 @@ public class PythonLibStructureBuilderTest {
 
     @Test
     public void fileNameAndClassNameDuplicationsAreNotSkipped() throws Exception {
-        when(environment.getClassesFromModule(new File(moduleLocation), "module.ClassName.ClassName",
-                new EnvironmentSearchPaths()))
-                        .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName",
-                                "module.OtherClassName", "module.OtherClassName.OtherClassName"));
+        when(environment.getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths()))
+                .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName",
+                        "module.OtherClassName", "module.OtherClassName.OtherClassName"));
 
         final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
                 projectProvider.getProject());
 
-        final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(moduleLocation,
-                "module.ClassName.ClassName");
+        final Collection<ILibraryClass> classes = builder.provideAllEntriesFromFile(moduleLocation);
 
         assertThat(classes.stream().map(ILibraryClass::getQualifiedName)).containsExactly("module", "module.ClassName",
                 "module.ClassName.ClassName", "module.OtherClassName", "module.OtherClassName.OtherClassName");
