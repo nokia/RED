@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kceEYJ3bEeeXWuMXjZT9ng
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/25/17 11:37 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/11/18 4:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -55,13 +55,15 @@ with [get-window "Discovering libraries summary"] {
 //	    get-property "getVerticalBar().isVisible()" | equals true | verify-true
 //	}
 }
-get-window "Discovering libraries summary" | get-tree {
-	 get-item "lib1.py/Status: Not added to project configuration" -index 0 
-	 | get-property caption | equals "Status: Not added to project configuration" | verify-true
-	 get-item "lib1.py/Source.*" -index 0 | get-property caption | equals "Source: Unknown" | verify-true
-	 get-item "lib1.py/Importers.*" -index 0 | get-property caption | equals "Importers: .*" | verify-true
-	 get-item "lib1.py/Additional info: Error in file.*" -index 0 
-	 | get-property caption | equals "Additional info: Error in file '.*': Test library 'lib1.py' does not exist." | verify-true
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path "lib1.py/Status: Not added to project configuration" | get-property caption 
+        | equals "Status: Not added to project configuration" | verify-true
+    get-item -path "lib1.py/Status: Not added to project configuration" | get-property index | equals 0 | verify-true
+    get-item -path "lib1.py/Source: Unknown" | get-property index | equals 1 | verify-true
+    get-item -path "lib1.py/Importers: .*" 
+        | get-property index | equals 2 | verify-true
+    get-item -path "lib1.py/Additional info: Unable to find library under 'lib1.py' location." | get-property index 
+        | equals 3 | verify-true
 }
 // copy libs list
 get-window "Discovering libraries summary" | get-tree | get-item multiply | click
