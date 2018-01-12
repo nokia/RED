@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfig;
@@ -50,7 +51,7 @@ class RobotFormEditorPartListener implements IPartListener {
         if (part instanceof RobotFormEditor) {
             final RobotFormEditor editor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = editor.provideSuiteModel();
-            if (suiteModel.getParent() != null) {
+            if (suiteModel.getParent() != null && !RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
                 cancelValidationJobIfScheduled();
                 scheduleValidationJob(suiteModel);
             }
