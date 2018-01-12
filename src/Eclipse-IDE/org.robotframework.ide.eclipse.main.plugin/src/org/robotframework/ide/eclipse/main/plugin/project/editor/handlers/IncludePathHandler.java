@@ -5,10 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.handlers;
 
-import static com.google.common.collect.Lists.transform;
-
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -23,9 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.Includ
 import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Function;
-
 
 public class IncludePathHandler extends DIParameterizedHandler<E4IncludePathHandler> {
 
@@ -47,13 +43,8 @@ public class IncludePathHandler extends DIParameterizedHandler<E4IncludePathHand
                 input.getProjectConfiguration().removeExcludedPath(toRemove.toPortableString());
             }
 
-            final Collection<IPath> includedPaths = transform(locationsToInclude,
-                    new Function<ProjectTreeElement, IPath>() {
-                        @Override
-                        public IPath apply(final ProjectTreeElement element) {
-                            return element.getPath();
-                        }
-                    });
+            final List<IPath> includedPaths = locationsToInclude.stream().map(ProjectTreeElement::getPath).collect(
+                    Collectors.toList());
             final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
                     input.getRobotProject().getConfigurationFile(), includedPaths);
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);

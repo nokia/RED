@@ -47,7 +47,7 @@ public class ExcludedPathAddChangeTest {
     }
 
     @Test
-    public void excludedPathIsAdded_whenChangeIsPerfomed() throws Exception {
+    public void excludedPathIsAdded_whenChangeIsPerformed() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final ExcludedFolderPath excludedPathToAdd = ExcludedFolderPath.create("a/b/c");
 
