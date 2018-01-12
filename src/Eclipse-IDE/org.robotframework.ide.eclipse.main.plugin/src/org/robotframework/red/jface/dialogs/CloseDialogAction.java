@@ -15,34 +15,14 @@ class CloseDialogAction extends Action {
 
     private final Shell shell;
 
-    private final DialogCloseListener listener;
-
     CloseDialogAction(final Shell shell, final ImageDescriptor image) {
-        this(shell, image, new DialogCloseListener());
-    }
-
-    CloseDialogAction(final Shell shell, final ImageDescriptor image, final DialogCloseListener listener) {
         super(ACTION_TOOLTIP_NAME, AS_PUSH_BUTTON);
         setImageDescriptor(image);
         this.shell = shell;
-        this.listener = listener;
     }
 
     @Override
     public void run() {
-        listener.beforeClose();
         shell.close();
-        listener.afterClose();
-    }
-
-    public static class DialogCloseListener {
-
-        public void beforeClose() {
-            // nothing to do
-        }
-
-        public void afterClose() {
-            // nothing to do
-        }
     }
 }

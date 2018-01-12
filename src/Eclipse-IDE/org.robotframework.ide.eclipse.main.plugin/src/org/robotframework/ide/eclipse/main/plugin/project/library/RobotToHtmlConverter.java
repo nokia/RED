@@ -5,36 +5,30 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.library;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 
 class RobotToHtmlConverter {
 
     public String convert(final String robotStyleString) {
-        final List<String> splitted1 = Splitter.on('\n').splitToList(robotStyleString);
-        final List<String> wrapped = Lists.transform(splitted1, new Function<String, String>() {
-            @Override
-            public String apply(final String line) {
-                final String escaped = escapeGtLtAmp(line);
-                return wrapLineIntoTags(escaped);
-            }
-        });
-        final String consecutiveParagraphsJoined = Joiner.on('\n').join(joinPargraphsToLists(wrapped))
+        final List<String> wrapped = Splitter.on('\n')
+                .splitToList(robotStyleString)
+                .stream()
+                .map(this::escapeGtLtAmp)
+                .map(this::wrapLineIntoTags)
+                .collect(toList());
+
+        final String consecutiveParagraphsJoined = Joiner.on('\n')
+                .join(joinParagraphsToLists(wrapped))
                 .replaceAll("</p>\n<p>", "\n");
 
-        final List<String> splitted2 = Splitter.on('\n').splitToList(consecutiveParagraphsJoined);
-        final List<String> spansWrappedIntoParagraphs = Lists.transform(splitted2, new Function<String, String>() {
-            @Override
-            public String apply(final String line) {
-                return isSpan(line) ? "<p>" + line + "</p>" : line;
-            }
-        });
-        return Joiner.on('\n').join(spansWrappedIntoParagraphs);
+        return Splitter.on('\n').splitToList(consecutiveParagraphsJoined).stream().map(line -> isSpan(line) ? "<p>" + line + "</p>" : line).collect(joining("\n"));
     }
 
     private String wrapLineIntoTags(final String line) {
@@ -53,7 +47,7 @@ class RobotToHtmlConverter {
         }
     }
 
-    private List<String> joinPargraphsToLists(final List<String> lines) {
+    private List<String> joinParagraphsToLists(final List<String> lines) {
         final List<String> result = new ArrayList<>();
 
         for (int i = 0; i < lines.size(); i++) {
