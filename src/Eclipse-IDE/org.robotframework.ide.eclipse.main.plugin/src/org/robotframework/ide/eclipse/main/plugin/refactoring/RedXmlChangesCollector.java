@@ -34,7 +34,7 @@ class RedXmlChangesCollector {
             final CompositeChange compositeChange = new CompositeChange("Change in both editors",
                     new Change[] { changesInProjectEditor.get(), changesInTextEditor.get() });
             compositeChange.markAsSynthetic();
-            return Optional.<Change> of(compositeChange);
+            return Optional.of(compositeChange);
         } else if (changesInProjectEditor.isPresent()) {
             return changesInProjectEditor;
         } else if (changesInTextEditor.isPresent()) {

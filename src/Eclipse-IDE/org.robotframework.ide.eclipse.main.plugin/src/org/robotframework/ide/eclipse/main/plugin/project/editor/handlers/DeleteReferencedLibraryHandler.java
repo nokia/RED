@@ -51,7 +51,7 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
             input.getProjectConfiguration().removeRemoteLocations(locations);
 
             if (!locations.isEmpty()) {
-                final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<List<RemoteLocation>>(
+                final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<>(
                         input.getRobotProject().getConfigurationFile(), locations);
                 eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
             }

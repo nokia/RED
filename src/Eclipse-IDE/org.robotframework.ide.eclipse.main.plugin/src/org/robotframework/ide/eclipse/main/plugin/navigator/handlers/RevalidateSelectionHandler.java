@@ -34,17 +34,21 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
 
         @Execute
         public void revalidate(final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
-
-            final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
-                    .collectGroupedByProject(selectedResources);
-            filesGroupedByProject.forEach((robotProject, suiteModels) -> {
-                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
-                final Job validationJob = RobotArtifactsValidator.createValidationJob(robotProject.getProject(),
-                        validatorConfig);
-                validationJob.schedule();
-            });
+            RevalidateSelectionHandler.revalidate(selection, 0);
         }
+    }
+
+    static void revalidate(final IStructuredSelection selection, final long delay) {
+        final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
+
+        final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
+                .collectGroupedByProject(selectedResources);
+        filesGroupedByProject.forEach((robotProject, suiteModels) -> {
+            final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
+            final Job validationJob = RobotArtifactsValidator.createValidationJob(robotProject.getProject(),
+                    validatorConfig);
+            validationJob.schedule(delay);
+        });
     }
 
 }

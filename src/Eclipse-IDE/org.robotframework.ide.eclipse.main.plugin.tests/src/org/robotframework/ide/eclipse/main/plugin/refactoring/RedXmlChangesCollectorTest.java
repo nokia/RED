@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -63,7 +62,7 @@ public class RedXmlChangesCollectorTest {
         final IEditorPart projectEditor = Editors.openInProjectEditor(redXmlFile);
 
         final Optional<Change> change = new RedXmlChangesCollector().collect(projectProvider.getDir("a"),
-                Optional.<IPath> of(new Path(PROJECT_NAME + "/moved")));
+                Optional.of(new Path(PROJECT_NAME + "/moved")));
 
         change.get().perform(new NullProgressMonitor());
 
@@ -80,7 +79,7 @@ public class RedXmlChangesCollectorTest {
         final IEditorPart projectEditor = Editors.openInProjectEditor(redXmlFile);
 
         final Optional<Change> change = new RedXmlChangesCollector().collect(projectProvider.getDir("a"),
-                Optional.<IPath> of(new Path(PROJECT_NAME + "/moved")));
+                Optional.of(new Path(PROJECT_NAME + "/moved")));
 
         change.get().perform(new NullProgressMonitor());
 
@@ -95,7 +94,7 @@ public class RedXmlChangesCollectorTest {
         final IEditorPart textEditor = Editors.openInTextEditor(redXmlFile);
 
         final Optional<Change> change = new RedXmlChangesCollector().collect(projectProvider.getDir("a"),
-                Optional.<IPath> of(new Path(PROJECT_NAME + "/moved")));
+                Optional.of(new Path(PROJECT_NAME + "/moved")));
 
         change.get().perform(new NullProgressMonitor());
 
@@ -109,7 +108,7 @@ public class RedXmlChangesCollectorTest {
         assertThat(Editors.isAnyEditorOpened()).isFalse();
 
         final Optional<Change> change = new RedXmlChangesCollector().collect(projectProvider.getDir("a"),
-                Optional.<IPath> of(new Path(PROJECT_NAME + "/moved")));
+                Optional.of(new Path(PROJECT_NAME + "/moved")));
 
         change.get().perform(new NullProgressMonitor());
 

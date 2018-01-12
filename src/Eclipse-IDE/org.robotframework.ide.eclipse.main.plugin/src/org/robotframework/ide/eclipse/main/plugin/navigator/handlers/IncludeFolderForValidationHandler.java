@@ -12,6 +12,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.IncludeFolderForValidationHandler.E4IncludeFolderForValidationHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -24,12 +25,16 @@ public class IncludeFolderForValidationHandler extends DIParameterizedHandler<E4
 
     public static class E4IncludeFolderForValidationHandler extends ChangeExclusionHandler {
 
+        private static final long REVALIDATE_JOB_DELAY = 2000;
+
         @Override
         @Execute
         public void changeExclusion(final IEventBroker eventBroker,
                 final @Named(Selections.SELECTION) IStructuredSelection selection) {
             super.changeExclusion(eventBroker, selection);
-
+            if (!RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
+                RevalidateSelectionHandler.revalidate(selection, REVALIDATE_JOB_DELAY);
+            }
         }
 
         @Override

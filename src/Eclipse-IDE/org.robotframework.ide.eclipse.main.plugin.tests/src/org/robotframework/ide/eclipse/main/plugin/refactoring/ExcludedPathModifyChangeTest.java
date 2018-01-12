@@ -47,7 +47,7 @@ public class ExcludedPathModifyChangeTest {
     }
 
     @Test
-    public void excludedPathIsModified_whenChangeIsPerfomed() throws Exception {
+    public void excludedPathIsModified_whenChangeIsPerformed() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("a/b/c");
 
