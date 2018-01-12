@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/21/17 12:04 PM
+Save-Time: 1/11/18 4:14 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -26,7 +26,7 @@ proc "restore-interpreters"{
 				    get-button Discover | click
 				}
 				try -times 10 -delay 1500 -command{
-				    get-table | get-item "Robot Framework .*\(Python .*\)" | check
+				    get-table | get-item "Robot Framework .*\(Python 2.*\)" | check
 				}
 				    get-button $Apply_and_OK_in_preference | click
 				    get-window "Rebuild required" | get-button OK | click
