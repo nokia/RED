@@ -150,15 +150,15 @@ public class RobotArtifactsValidator {
 
     private IStatus runValidation(final Job dependentJob, final ModelUnitValidatorConfig validatorConfig,
             final IProgressMonitor monitor) {
-        if (RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
-            return Status.OK_STATUS;
-        }
         try {
             if (dependentJob != null) {
                 dependentJob.join();
                 if (!dependentJob.getResult().isOK()) {
                     return Status.CANCEL_STATUS;
                 }
+            }
+            if (RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
+                return Status.OK_STATUS;
             }
 
             logger.log("VALIDATING: validation of '" + project.getName() + "' project started");
