@@ -12,7 +12,7 @@
             <property name="aboutImage" value="icons/about.bmp" />
             <property name="aboutText" value="RED - Robot Editor&#x0D;
 &#x0D;Development environment for Robot Framework http://www.robotframework.org/&#x0D;
-&#x0D;(c) Copyright 2015-2017 Nokia Solutions and Networks.&#x0D;
+&#x0D;(c) Copyright 2015-2018 Nokia Solutions and Networks.&#x0D;
 &#x0D;
 &#x0D;Eclipse and the Eclipse logo are trademarks of the Eclipse Foundation, Inc., https://www.eclipse.org/. 
 Oracle and Java are trademarks or registered trademarks of Oracle and/or its 
