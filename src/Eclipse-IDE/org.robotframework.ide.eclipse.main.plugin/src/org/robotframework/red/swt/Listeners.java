@@ -20,6 +20,9 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.events.IHyperlinkListener;
 
 public class Listeners {
 
@@ -138,6 +141,36 @@ public class Listeners {
 
             @Override
             public void shellClosed(final ShellEvent e) {
+                consumer.accept(e);
+            }
+        };
+    }
+
+    public static IHyperlinkListener linkEnteredAdapter(final Consumer<HyperlinkEvent> consumer) {
+        return new HyperlinkAdapter() {
+
+            @Override
+            public void linkEntered(final HyperlinkEvent e) {
+                consumer.accept(e);
+            }
+        };
+    }
+
+    public static IHyperlinkListener linkActivatedAdapter(final Consumer<HyperlinkEvent> consumer) {
+        return new HyperlinkAdapter() {
+
+            @Override
+            public void linkActivated(final HyperlinkEvent e) {
+                consumer.accept(e);
+            }
+        };
+    }
+
+    public static IHyperlinkListener linkExitedAdapter(final Consumer<HyperlinkEvent> consumer) {
+        return new HyperlinkAdapter() {
+
+            @Override
+            public void linkExited(final HyperlinkEvent e) {
                 consumer.accept(e);
             }
         };

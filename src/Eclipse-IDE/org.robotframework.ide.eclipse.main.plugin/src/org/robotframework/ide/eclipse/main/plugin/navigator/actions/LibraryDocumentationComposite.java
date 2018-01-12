@@ -14,29 +14,26 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IFormColors;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.ScrolledFormText;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
+import org.robotframework.red.swt.Listeners;
 
 class LibraryDocumentationComposite extends InputLoadingFormComposite {
 
     private InputLoadingFormComposite.InputJob collectingJob;
+
     private Label versionLabel;
     private Label scopeLabel;
-    private FormText documentationText;
-    private ScrolledFormText scrolledFormText;
-
+    private ScrolledFormText documentationFormText;
 
     LibraryDocumentationComposite(final Composite parent, final LibrarySpecification specification) {
         super(parent, SWT.NONE, specification.getName() + " library documentation");
@@ -76,29 +73,27 @@ class LibraryDocumentationComposite extends InputLoadingFormComposite {
         final Label separator = getToolkit().createSeparator(actualComposite, SWT.HORIZONTAL | SWT.SHADOW_OUT);
         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(separator);
 
-        scrolledFormText = new ScrolledFormText(actualComposite, SWT.V_SCROLL | SWT.H_SCROLL, true);
-        getToolkit().adapt(scrolledFormText);
-        GridDataFactory.fillDefaults().span(2, 1).hint(400, 500).grab(true, true).applyTo(scrolledFormText);
-        GridLayoutFactory.fillDefaults().applyTo(scrolledFormText);
+        documentationFormText = new ScrolledFormText(actualComposite, SWT.V_SCROLL | SWT.H_SCROLL, true);
+        getToolkit().adapt(documentationFormText);
+        GridDataFactory.fillDefaults().span(2, 1).hint(400, 500).grab(true, true).applyTo(documentationFormText);
 
-        documentationText = scrolledFormText.getFormText();
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(documentationText);
-        documentationText.setWhitespaceNormalized(false);
+        final FormText docFormText = documentationFormText.getFormText();
+        docFormText.setWhitespaceNormalized(false);
+        docFormText.setFont("monospace", JFaceResources.getTextFont());
+        docFormText.setFont("monospace_inline", JFaceResources.getTextFont());
+        docFormText.setColor("header", getToolkit().getColors().getColor(IFormColors.TITLE));
+        docFormText.setFont("header", JFaceResources.getBannerFont());
 
-        documentationText.setFont("monospace", JFaceResources.getTextFont());
-        documentationText.setFont("monospace_inline", JFaceResources.getTextFont());
-        documentationText.setColor("header", getToolkit().getColors().getColor(IFormColors.TITLE));
-        documentationText.setFont("header", JFaceResources.getBannerFont());
-
-        final HyperlinkAdapter hyperlinkListener = createHyperlinkListener();
-        documentationText.addHyperlinkListener(hyperlinkListener);
-        addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                documentationText.removeHyperlinkListener(hyperlinkListener);
-            }
-        });
+        final IHyperlinkListener hyperlinkListener = createHyperlinkListener();
+        docFormText.addHyperlinkListener(hyperlinkListener);
+        addDisposeListener(e -> docFormText.removeHyperlinkListener(hyperlinkListener));
         return actualComposite;
+    }
+
+    @Override
+    protected void createActions() {
+        addAction(new WrapFormAction(documentationFormText));
+        super.createActions();
     }
 
     @Override
@@ -106,21 +101,17 @@ class LibraryDocumentationComposite extends InputLoadingFormComposite {
         return (Composite) super.getControl();
     }
 
-    private HyperlinkAdapter createHyperlinkListener() {
-        return new HyperlinkAdapter() {
-            @Override
-            public void linkActivated(final HyperlinkEvent event) {
-                final Object href = event.getHref();
-                if (href instanceof String) {
-                    try {
-                        PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
-                                .openURL(new URL((String) href));
-                    } catch (PartInitException | MalformedURLException e) {
-                        throw new IllegalStateException("Unable to open hyperlink: " + event.getLabel(), e);
-                    }
+    static IHyperlinkListener createHyperlinkListener() {
+        return Listeners.linkActivatedAdapter(event -> {
+            final Object href = event.getHref();
+            if (href instanceof String) {
+                try {
+                    PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(new URL((String) href));
+                } catch (PartInitException | MalformedURLException e) {
+                    throw new IllegalStateException("Unable to open hyperlink: " + event.getLabel(), e);
                 }
             }
-        };
+        });
     }
 
     @Override
@@ -134,9 +125,9 @@ class LibraryDocumentationComposite extends InputLoadingFormComposite {
 
         versionLabel.setText(doc.version);
         scopeLabel.setText(doc.scope);
-        documentationText.setText(doc.text, doc.isHtml, true);
 
-        scrolledFormText.reflow(true);
+        documentationFormText.getFormText().setText(doc.text, doc.isHtml, true);
+        documentationFormText.reflow(true);
         getControl().layout();
     }
 
