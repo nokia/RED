@@ -15,8 +15,6 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -73,13 +71,9 @@ public abstract class InputLoadingFormComposite extends Composite {
     }
 
     protected final void createComposite() {
-        addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                formToolkit.dispose();
-                formToolkit = null;
-            }
+        addDisposeListener(e -> {
+            formToolkit.dispose();
+            formToolkit = null;
         });
         setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
         setLayout(new FillLayout(SWT.VERTICAL));
@@ -118,6 +112,9 @@ public abstract class InputLoadingFormComposite extends Composite {
         form.setImage(ImagesManager.getImage(image));
     }
 
+    /**
+     * @param head
+     */
     protected Control createHeadClient(final Composite head) {
         // nothing to do, override if needed
         return null;
