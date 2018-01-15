@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -25,28 +25,24 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.ExcludedResources;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotResourceFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotSuiteFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
-
-import com.google.common.collect.Queues;
 
 public class RobotArtifactsValidator {
 
@@ -168,7 +164,7 @@ public class RobotArtifactsValidator {
                     logger);
             final List<ModelUnitValidator> validators = validatorConfig.createValidators(context);
 
-            validateModelUnits(monitor, Queues.newArrayDeque(validators));
+            validateModelUnits(monitor, new ArrayDeque<>(validators));
 
             return Status.OK_STATUS;
         } catch (final CoreException | InterruptedException e) {
@@ -255,7 +251,7 @@ public class RobotArtifactsValidator {
 
                 @Override
                 public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
-                    final List<ModelUnitValidator> validators = newArrayList();
+                    final List<ModelUnitValidator> validators = new ArrayList<>();
                     for (final RobotSuiteFile suiteModel : suiteModels) {
                         if (RobotArtifactsValidator.shouldValidate(suiteModel)) {
                             suiteModel.getFile().accept(new IResourceVisitor() {
@@ -283,7 +279,7 @@ public class RobotArtifactsValidator {
 
                 @Override
                 public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
-                    final List<ModelUnitValidator> validators = newArrayList();
+                    final List<ModelUnitValidator> validators = new ArrayList<>();
                     project.accept(new IResourceVisitor() {
 
                         @Override
@@ -308,7 +304,7 @@ public class RobotArtifactsValidator {
 
                 @Override
                 public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
-                    final List<ModelUnitValidator> validators = newArrayList();
+                    final List<ModelUnitValidator> validators = new ArrayList<>();
                     delta.accept(new IResourceDeltaVisitor() {
 
                         @Override
@@ -340,50 +336,12 @@ public class RobotArtifactsValidator {
                     : Optional.empty();
         }
 
-        private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource,
+        private static boolean shouldValidate(final RobotProjectConfig projectConfig, final IResource resource,
                 final boolean isRevalidating) {
-            if (robotProjectConfig != null && resource.getType() == IResource.FILE
-                    && !isInsideEclipseHiddenDirectory(resource)
-                    && hasRequiredFileSize(robotProjectConfig, resource, isRevalidating)) {
-                final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
-                for (final ExcludedFolderPath excludedPath : excludedPaths) {
-
-                    if (Path.fromPortableString(excludedPath.getPath()).isPrefixOf(resource.getProjectRelativePath())) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-
-        private static boolean isInsideEclipseHiddenDirectory(final IResource resource) {
-            for (final String segment : resource.getFullPath().segments()) {
-                if (!segment.isEmpty() && segment.charAt(0) == '.') {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static boolean hasRequiredFileSize(final RobotProjectConfig robotProjectConfig,
-                final IResource resource, final boolean isRevalidating) {
-            if (!isRevalidating && robotProjectConfig.isValidatedFileSizeCheckingEnabled()) {
-                final IPath fileLocation = resource.getLocation();
-                if (fileLocation != null) {
-                    final long fileSizeInKilobytes = fileLocation.toFile().length() / 1024;
-                    long maxFileSize = 0L;
-                    try {
-                        maxFileSize = Long.parseLong(robotProjectConfig.getValidatedFileMaxSize());
-                    } catch (final NumberFormatException e) {
-                        maxFileSize = Long.parseLong(robotProjectConfig.getValidatedFileDefaultMaxSize());
-                    }
-                    if (fileSizeInKilobytes > maxFileSize) {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return projectConfig != null && resource.getType() == IResource.FILE
+                    && !ExcludedResources.isHiddenInEclipse(resource)
+                    && !ExcludedResources.isInsideExcludedPath(resource, projectConfig)
+                    && (isRevalidating || ExcludedResources.hasRequiredSize((IFile) resource, projectConfig));
         }
 
         private static Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext context,

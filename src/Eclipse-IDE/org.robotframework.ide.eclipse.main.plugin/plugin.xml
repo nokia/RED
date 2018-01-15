@@ -1505,9 +1505,6 @@
                 <adapt
                       type="org.eclipse.core.resources.IResource">
                    <and>
-                      <instanceof
-                            value="org.eclipse.core.resources.IResource">
-                      </instanceof>
                       <test
                             property="org.robotframework.redxml.navigator.isIncluded"
                             value="true">
@@ -1550,9 +1547,6 @@
                 <adapt
                       type="org.eclipse.core.resources.IResource">
                    <and>
-                      <instanceof
-                            value="org.eclipse.core.resources.IResource">
-                      </instanceof>
                       <test
                             property="org.robotframework.redxml.navigator.isExcluded"
                             value="true">
@@ -1619,19 +1613,34 @@
 	   <enabledWhen>
 		  <with
 				variable="selection">
-			 <iterate operator="or" ifEmpty="false">
-			 	<or>
-			 		<adapt type="org.eclipse.core.resources.IFile">
-			         <or>
-			            <test property="org.eclipse.core.resources.name" value="*.robot"/> 
-			            <test property="org.eclipse.core.resources.name" value="*.txt"/> 
-			            <test property="org.eclipse.core.resources.name" value="*.tsv"/> 
-			         </or>
-			      	</adapt>
-			      	<adapt type="org.eclipse.core.resources.IFolder" />
-			      	<adapt type="org.eclipse.core.resources.IProject" />
-			   	</or>
-			   </iterate>
+	          <iterate operator="or" ifEmpty="false">
+                <and>
+                    <or>
+                        <adapt type="org.eclipse.core.resources.IFile">
+                            <or>
+	                            <test property="org.eclipse.core.resources.name" value="*.robot"/>
+                                <test property="org.eclipse.core.resources.name" value="*.txt"/>
+                                <test property="org.eclipse.core.resources.name" value="*.tsv"/>
+                            </or>
+                        </adapt>
+                        <adapt type="org.eclipse.core.resources.IFolder" />
+                        <adapt type="org.eclipse.core.resources.IProject" />
+                    </or>
+                    <adapt
+                          type="org.eclipse.core.resources.IResource">
+                       <and>
+                          <test
+                               property="org.robotframework.redxml.navigator.isIncluded"
+                               value="true">
+                          </test>
+                          <test
+                               property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
+                               value="false">
+                          </test>
+                       </and>
+                    </adapt>
+                </and>
+	          </iterate>
 		  	</with>
          </enabledWhen>
 	</handler>
@@ -1695,9 +1704,6 @@
                     <adapt
                           type="org.eclipse.core.resources.IResource">
                        <and>
-                          <instanceof
-                                     value="org.eclipse.core.resources.IResource">
-                          </instanceof>
                           <test
                                property="org.robotframework.redxml.navigator.isIncluded"
                                value="true">

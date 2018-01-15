@@ -37,13 +37,9 @@ import com.google.common.collect.Multimap;
 abstract class ChangeExclusionHandler {
 
     public void changeExclusion(final IEventBroker eventBroker, final IStructuredSelection selection) {
-        final List<IResource> resourcesToChange = Selections.getAdaptableElements(selection, IResource.class);
+        final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
-        for (final IResource res : resourcesToChange) {
-            removeMarkers(res);
-        }
-
-        final Map<RobotProject, Collection<IPath>> pathGroupedByProject = groupByProject(resourcesToChange).asMap();
+        final Map<RobotProject, Collection<IPath>> pathGroupedByProject = groupByProject(selectedResources).asMap();
         pathGroupedByProject.forEach((robotProject, paths) -> {
             changeExclusion(robotProject, paths);
             fireEvents(eventBroker, robotProject.getProject(), paths);
@@ -54,11 +50,12 @@ abstract class ChangeExclusionHandler {
             manager.update(RobotValidationExcludedDecorator.ID);
         });
 
+        postExclusionChange(selectedResources);
     }
 
-    private Multimap<RobotProject, IPath> groupByProject(final List<IResource> resourcesToChange) {
+    private Multimap<RobotProject, IPath> groupByProject(final List<IResource> selectedResources) {
         final Multimap<RobotProject, IPath> groupedPaths = LinkedListMultimap.create();
-        for (final IResource resource : resourcesToChange) {
+        for (final IResource resource : selectedResources) {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(resource.getProject());
             groupedPaths.put(robotProject, resource.getProjectRelativePath());
         }
@@ -93,16 +90,7 @@ abstract class ChangeExclusionHandler {
         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
     }
 
-    private void removeMarkers(final IResource resource) {
-        try {
-            if (resource.exists()) {
-                resource.deleteMarkers(null, true, IResource.DEPTH_INFINITE);
-            }
-        } catch (final CoreException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     protected abstract void changeExclusion(RobotProjectConfig config, IPath pathToChange);
+
+    protected abstract void postExclusionChange(List<IResource> selectedResources);
 }
