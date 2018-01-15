@@ -158,6 +158,27 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
     }
 
     @Test
+    public void autodiscovererIsNotStarted_whenSuiteIsExcludedFromProject() throws Exception {
+        turnOnAutoDiscoveringInProjectConfig();
+        excludePathInProjectConfig("suite_with_unknown_library_1.robot");
+
+        final RobotSuiteFile suite = model
+                .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
+
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
+
+        final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
+        trigger.startLibrariesAutoDiscoveryIfRequired(suite);
+
+        verifyZeroInteractions(discoverer);
+
+        turnOffAutoDiscoveringInProjectConfig();
+        includePathInProjectConfig("suite_with_unknown_library_1.robot");
+    }
+
+    @Test
     public void autodiscovererStarts_whenUnknownLibraryIsDetected() {
         turnOnAutoDiscoveringInProjectConfig();
 
@@ -285,5 +306,17 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final RobotProjectConfig config = model.createRobotProject(projectProvider.getProject())
                 .getRobotProjectConfig();
         config.setReferencedLibrariesAutoDiscoveringEnabled(false);
+    }
+
+    private void excludePathInProjectConfig(final String path) {
+        final RobotProjectConfig config = model.createRobotProject(projectProvider.getProject())
+                .getRobotProjectConfig();
+        config.addExcludedPath(path);
+    }
+
+    private void includePathInProjectConfig(final String path) {
+        final RobotProjectConfig config = model.createRobotProject(projectProvider.getProject())
+                .getRobotProjectConfig();
+        config.removeExcludedPath(path);
     }
 }
