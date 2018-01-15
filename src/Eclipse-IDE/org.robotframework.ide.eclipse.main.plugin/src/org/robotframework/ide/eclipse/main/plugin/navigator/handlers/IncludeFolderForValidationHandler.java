@@ -5,8 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
+import java.util.List;
+
 import javax.inject.Named;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -32,14 +35,18 @@ public class IncludeFolderForValidationHandler extends DIParameterizedHandler<E4
         public void changeExclusion(final IEventBroker eventBroker,
                 final @Named(Selections.SELECTION) IStructuredSelection selection) {
             super.changeExclusion(eventBroker, selection);
-            if (!RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
-                RevalidateSelectionHandler.revalidate(selection, REVALIDATE_JOB_DELAY);
-            }
         }
 
         @Override
         protected void changeExclusion(final RobotProjectConfig config, final IPath pathToChange) {
             config.removeExcludedPath(pathToChange.toPortableString());
+        }
+
+        @Override
+        protected void postExclusionChange(final List<IResource> selectedResources) {
+            if (!RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
+                RevalidateSelectionHandler.revalidate(selectedResources, REVALIDATE_JOB_DELAY);
+            }
         }
     }
 }

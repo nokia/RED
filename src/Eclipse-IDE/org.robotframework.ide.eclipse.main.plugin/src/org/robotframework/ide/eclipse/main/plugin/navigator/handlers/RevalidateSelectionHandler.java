@@ -12,6 +12,11 @@ import java.util.Map;
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.WorkspaceJob;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -34,21 +39,35 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
 
         @Execute
         public void revalidate(final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            RevalidateSelectionHandler.revalidate(selection, 0);
+            final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
+            RevalidateSelectionHandler.revalidate(selectedResources, 0);
         }
     }
 
-    static void revalidate(final IStructuredSelection selection, final long delay) {
-        final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
+    static void revalidate(final List<IResource> selectedResources, final long delay) {
+        final WorkspaceJob suiteCollectingJob = new WorkspaceJob("Collecting robot suites") {
 
-        final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
-                .collectGroupedByProject(selectedResources);
-        filesGroupedByProject.forEach((robotProject, suiteModels) -> {
-            final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
-            final Job validationJob = RobotArtifactsValidator.createValidationJob(robotProject.getProject(),
-                    validatorConfig);
-            validationJob.schedule(delay);
-        });
+            @Override
+            public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
+                final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
+                        .collectGroupedByProject(selectedResources, monitor);
+
+                if (monitor.isCanceled()) {
+                    return Status.CANCEL_STATUS;
+                }
+
+                filesGroupedByProject.forEach((robotProject, suiteModels) -> {
+                    final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory
+                            .create(suiteModels);
+                    final Job validationJob = RobotArtifactsValidator.createValidationJob(robotProject.getProject(),
+                            validatorConfig);
+                    validationJob.schedule();
+                });
+
+                return Status.OK_STATUS;
+            }
+        };
+        suiteCollectingJob.schedule(delay);
     }
 
 }
