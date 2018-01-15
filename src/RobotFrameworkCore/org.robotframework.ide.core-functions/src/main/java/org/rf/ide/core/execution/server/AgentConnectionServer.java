@@ -6,8 +6,10 @@
 package org.rf.ide.core.execution.server;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -20,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
+
+import com.google.common.base.Charsets;
 
 public class AgentConnectionServer {
 
@@ -92,10 +96,11 @@ public class AgentConnectionServer {
                 final int clientId = clientSocket.hashCode();
 
                 final BufferedReader eventsReader = new BufferedReader(
-                        new InputStreamReader(clientSocket.getInputStream()));
-                final PrintWriter eventsWriter = new PrintWriter(clientSocket.getOutputStream());
+                        new InputStreamReader(clientSocket.getInputStream(), Charsets.UTF_8));
+                final BufferedWriter eventsWriter = new BufferedWriter(
+                        new OutputStreamWriter(clientSocket.getOutputStream(), Charsets.UTF_8));
 
-                client = new AgentClient(clientId, eventsWriter);
+                client = new AgentClient(clientId, new PrintWriter(eventsWriter));
                 final RobotAgentEventDispatcher eventsDispatcher = new RobotAgentEventDispatcher(
                         client, eventsListeners);
 
