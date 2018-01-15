@@ -28,6 +28,7 @@ import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.ExcludedResources;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -124,7 +125,11 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         final RobotProjectConfig projectConfig = suite.getProject().getRobotProjectConfig();
         final boolean isAutodiscoveryEnabled = projectConfig != null
                 && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled();
-        return projectHasRobotNature && isAutodiscoveryEnabled && suiteHasUnknownLibraryIncludingNestedResources(suite);
+        final boolean suiteShouldBeProcessed = projectConfig != null
+                && !ExcludedResources.isHiddenInEclipse(suite.getFile())
+                && !ExcludedResources.isInsideExcludedPath(suite.getFile(), projectConfig);
+        return projectHasRobotNature && isAutodiscoveryEnabled && suiteShouldBeProcessed
+                && suiteHasUnknownLibraryIncludingNestedResources(suite);
     }
 
     private boolean suiteHasUnknownLibraryIncludingNestedResources(final RobotSuiteFile suite) {
