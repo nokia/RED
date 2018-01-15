@@ -50,7 +50,6 @@ class KeywordDocumentationComposite extends InputLoadingFormComposite {
 
         argumentsText = getToolkit().createFormText(actualComposite, false);
         argumentsText.setFont("monospace", JFaceResources.getTextFont());
-        argumentsText.setFont("monospace_inline", JFaceResources.getTextFont());
         argumentsText.setColor("header", getToolkit().getColors().getColor(IFormColors.TITLE));
         argumentsText.setFont("header", JFaceResources.getBannerFont());
         GridDataFactory.fillDefaults().span(2, 1).hint(400, SWT.DEFAULT).grab(true, false).applyTo(argumentsText);
@@ -62,7 +61,6 @@ class KeywordDocumentationComposite extends InputLoadingFormComposite {
         final FormText docFormText = documentationFormText.getFormText();
         docFormText.setWhitespaceNormalized(false);
         docFormText.setFont("monospace", JFaceResources.getTextFont());
-        docFormText.setFont("monospace_inline", JFaceResources.getTextFont());
         docFormText.setColor("header", getToolkit().getColors().getColor(IFormColors.TITLE));
         docFormText.setFont("header", JFaceResources.getBannerFont());
 
