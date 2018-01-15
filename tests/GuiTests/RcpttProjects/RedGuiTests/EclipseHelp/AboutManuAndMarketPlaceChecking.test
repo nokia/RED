@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _qlaH4O0SEeWqTNBmS5Gi4w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/24/17 3:14 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/15/18 4:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,7 +19,12 @@ if [$is_product]{
 	get-menu "Help/About RED" | get-property index | equals 15 | verify-true
 	get-about-menu | click
 	get-window "About RED" | get-editbox | get-property text 
-	    | equals "RED - Robot Editor\r \rDevelopment environment for Robot Framework http://www.robotframework.org/\r \r(c) Copyright 2015-2017 Nokia Solutions and Networks.\r \r \rEclipse and the Eclipse logo are trademarks of the Eclipse Foundation, Inc., https://www.eclipse.org/.  Oracle and Java are trademarks or registered trademarks of Oracle and/or its  affiliates. Other names may be trademarks of their respective owners.\r \rThis product includes software developed by other open source projects.\r \rGitHub https://github.com/nokia/RED" 
+	    | equals [format "RED - Robot Editor\r \rDevelopment environment for Robot Framework http://www.robotframework.org/\r \r(c) "
+	    + "Copyright 2015-%s Nokia Solutions and Networks.\r \r \rEclipse and the Eclipse logo are trademarks of the Eclipse Foundation,"
+	    + " Inc., https://www.eclipse.org/.  Oracle and Java are trademarks or registered trademarks of Oracle and/or its  affiliates. "
+	    + "Other names may be trademarks of their respective owners.\r \r"
+	    + "This product includes software developed by other open source projects.\r \r"
+	    + "GitHub https://github.com/nokia/RED" [get-time | format-time -format "yyyy" ]]
 	    | verify-true
 	get-window "About RED" | close
 }

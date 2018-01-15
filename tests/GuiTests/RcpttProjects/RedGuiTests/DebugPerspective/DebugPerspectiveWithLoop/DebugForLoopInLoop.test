@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _iiMbgJ2WEeWVv_UItyy1RQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/7/17 4:26 PM
+Save-Time: 1/15/18 5:21 PM
 Tags: Debug,Quick
 Testcase-Type: ecl
 
@@ -199,7 +199,7 @@ exec-with-options -disableJobWaiting -command {
 	try -times 4 -delay 500 -command{
 		get-view Debug | get-tree
 			| get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
-	        	| get-property "getItems().TreeItem[6].getText()" | equals "[Test] loop in keyword [line: 8]" | verify-true
+	        | get-property "getItems().TreeItem[8].getText()" | equals "[Suite] RobotProject" | verify-true
 	}
 	check-debug-marker-on-ruler -line 20 -script_name "TestFile.robot"
 	with [get-view Debug | get-tree] {
