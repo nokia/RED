@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -15,14 +13,9 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IFormColors;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.ScrolledFormText;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -32,9 +25,9 @@ import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
 class KeywordDocumentationComposite extends InputLoadingFormComposite {
 
     private InputLoadingFormComposite.InputJob collectingJob;
+
     private FormText argumentsText;
-    private ScrolledFormText scrolledFormText;
-    private FormText documentationText;
+    private ScrolledFormText documentationFormText;
 
     KeywordDocumentationComposite(final Composite parent, final KeywordSpecification specification) {
         super(parent, SWT.NONE, specification.getName());
@@ -62,52 +55,36 @@ class KeywordDocumentationComposite extends InputLoadingFormComposite {
         argumentsText.setFont("header", JFaceResources.getBannerFont());
         GridDataFactory.fillDefaults().span(2, 1).hint(400, SWT.DEFAULT).grab(true, false).applyTo(argumentsText);
 
-        scrolledFormText = new ScrolledFormText(actualComposite, SWT.V_SCROLL | SWT.H_SCROLL, true);
-        getToolkit().adapt(scrolledFormText);
-        GridDataFactory.fillDefaults().span(2, 1).hint(400, 500).grab(true, true).applyTo(scrolledFormText);
-        GridLayoutFactory.fillDefaults().applyTo(scrolledFormText);
+        documentationFormText = new ScrolledFormText(actualComposite, SWT.V_SCROLL | SWT.H_SCROLL, true);
+        getToolkit().adapt(documentationFormText);
+        GridDataFactory.fillDefaults().span(2, 1).hint(400, 500).grab(true, true).applyTo(documentationFormText);
 
-        documentationText = scrolledFormText.getFormText();
-        documentationText.setFont("monospace", JFaceResources.getTextFont());
-        documentationText.setFont("monospace_inline", JFaceResources.getTextFont());
-        documentationText.setColor("header", getToolkit().getColors().getColor(IFormColors.TITLE));
-        documentationText.setFont("header", JFaceResources.getBannerFont());
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(documentationText);
-        documentationText.setWhitespaceNormalized(false);
+        final FormText docFormText = documentationFormText.getFormText();
+        docFormText.setWhitespaceNormalized(false);
+        docFormText.setFont("monospace", JFaceResources.getTextFont());
+        docFormText.setFont("monospace_inline", JFaceResources.getTextFont());
+        docFormText.setColor("header", getToolkit().getColors().getColor(IFormColors.TITLE));
+        docFormText.setFont("header", JFaceResources.getBannerFont());
 
-        final HyperlinkAdapter hyperlinkListener = createHyperlinkListener();
-        documentationText.addHyperlinkListener(hyperlinkListener);
+        final IHyperlinkListener hyperlinkListener = LibraryDocumentationComposite.createHyperlinkListener();
+        docFormText.addHyperlinkListener(hyperlinkListener);
         argumentsText.addHyperlinkListener(hyperlinkListener);
-        addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                documentationText.removeHyperlinkListener(hyperlinkListener);
-                argumentsText.removeHyperlinkListener(hyperlinkListener);
-            }
+        addDisposeListener(e -> {
+            docFormText.removeHyperlinkListener(hyperlinkListener);
+            argumentsText.removeHyperlinkListener(hyperlinkListener);
         });
         return actualComposite;
     }
 
     @Override
-    protected Composite getControl() {
-        return (Composite) super.getControl();
+    protected void createActions() {
+        addAction(new WrapFormAction(documentationFormText));
+        super.createActions();
     }
 
-    private HyperlinkAdapter createHyperlinkListener() {
-        return new HyperlinkAdapter() {
-            @Override
-            public void linkActivated(final HyperlinkEvent event) {
-                final Object href = event.getHref();
-                if (href instanceof String) {
-                    try {
-                        PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
-                                .openURL(new URL((String) href));
-                    } catch (PartInitException | MalformedURLException e) {
-                        throw new IllegalStateException("Unable to open hyperlink: " + event.getLabel(), e);
-                    }
-                }
-            }
-        };
+    @Override
+    protected Composite getControl() {
+        return (Composite) super.getControl();
     }
 
     @Override
@@ -124,13 +101,13 @@ class KeywordDocumentationComposite extends InputLoadingFormComposite {
         }
 
         if (kwSpec.isHtml) {
-            documentationText.setText(kwSpec.text, true, true);
+            documentationFormText.getFormText().setText(kwSpec.text, true, true);
         } else {
             argumentsText.setText(kwSpec.arguments, true, false);
-            documentationText.setText(kwSpec.text, false, true);
+            documentationFormText.getFormText().setText(kwSpec.text, false, true);
         }
         argumentsText.layout();
-        scrolledFormText.reflow(true);
+        documentationFormText.reflow(true);
         getControl().layout();
     }
 
