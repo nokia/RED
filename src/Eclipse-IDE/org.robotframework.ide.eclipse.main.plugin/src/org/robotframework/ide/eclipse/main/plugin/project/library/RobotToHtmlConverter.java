@@ -24,11 +24,14 @@ class RobotToHtmlConverter {
                 .map(this::wrapLineIntoTags)
                 .collect(toList());
 
-        final String consecutiveParagraphsJoined = Joiner.on('\n')
-                .join(joinParagraphsToLists(wrapped))
-                .replaceAll("</p>\n<p>", "\n");
+        final String consecutiveParagraphsJoined = Joiner.on('\n').join(joinParagraphsToLists(wrapped)).replaceAll(
+                "</p>\n<p>", "\n");
 
-        return Splitter.on('\n').splitToList(consecutiveParagraphsJoined).stream().map(line -> isSpan(line) ? "<p>" + line + "</p>" : line).collect(joining("\n"));
+        return Splitter.on('\n')
+                .splitToList(consecutiveParagraphsJoined)
+                .stream()
+                .map(line -> isSpan(line) ? "<p>" + line + "</p>" : line)
+                .collect(joining("\n"));
     }
 
     private String wrapLineIntoTags(final String line) {

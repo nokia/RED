@@ -80,7 +80,6 @@ class LibraryDocumentationComposite extends InputLoadingFormComposite {
         final FormText docFormText = documentationFormText.getFormText();
         docFormText.setWhitespaceNormalized(false);
         docFormText.setFont("monospace", JFaceResources.getTextFont());
-        docFormText.setFont("monospace_inline", JFaceResources.getTextFont());
         docFormText.setColor("header", getToolkit().getColors().getColor(IFormColors.TITLE));
         docFormText.setFont("header", JFaceResources.getBannerFont());
 
