@@ -1,150 +1,151 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _uN5FEPYVEeeUrNB_UfA7mw
 Element-Name: UnicodeNamesInProject
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _bWrqQPbgEeeAutaDcoLQIQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/12/18 11:18 AM
+Save-Time: 1/15/18 5:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-////------------------------------------- rf lint------------------------------------------------
-//
-//get-view "Project Explorer" | get-tree | select "normal_name"
-//
-//exec-with-options {
-//    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
-//    verify-error {get-window "Problem Occurred"}
-//} -allowStatusDialog
-//
-//get-view "Project Explorer" | get-tree | select "żółć"
-//exec-with-options {
-//    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
-//    verify-error {get-window "Problem Occurred"}
-//} -allowStatusDialog
-//
-////check problems
-//get-view Problems | click
-//with [get-view Problems | get-tree] {
-//    get-item -path "Warnings \\(2 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
-//        | get-property enablement | equals false | verify-true
-//    get-item -path "Errors \\(4 items\\)/No testcase documentation \\(RequireTestDocumentation\\)" 
-//        | get-property enablement | equals false | verify-true
-//}
-//
-////------------------------------------- autodiscovery ------------------------------------------------
-//
-////disover on first project
-//get-view "Project Explorer" | get-tree | select "normal_name/test.robot" | get-menu 
-//    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
-//
-////unicode text is inside python file
-//get-window "Discovering libraries summary" | get-tree | get-item  -path "unicode_inside.py" | click    
-//with [get-window "Discovering libraries summary"] {
-//	//error
-//	get-tree | get-item -path "unicode_inside.py" | get-property "image.path" 
-//        | equals ".*error_fatal.png" | verify-true
-//        
-//    get-editbox -after [get-label "Discovered libraries (2):"] | get-property text 
-//        | contains "SyntaxError: Non-ASCII character '\\xc5' in file" 
-//        | verify-true        
-//}
-//    
-////second file
-//get-window "Discovering libraries summary" | get-tree | get-item  -path "żółtość.py"  | click    
-//with [get-window "Discovering libraries summary"] {
-//	//error
-//	get-tree | get-item -path "żółtość.py" | get-property "image.path" 
-//        | equals ".*error_fatal.png" | verify-true
-//        
-//    get-editbox -after [get-label "Discovered libraries (2):"] | get-property text 
-//        | contains "UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)" 
-//        | verify-true        
-//}
-//    
-//get-window "Discovering libraries summary" | get-button OK | click
-//
-////select AD on second project
-//get-view "Project Explorer" | get-tree | select "żółć" | get-menu 
-//    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
-//get-window "Discovering libraries summary" | get-tree | get-item -path "żółtość2.py" | click
-//   
-//with [get-window "Discovering libraries summary"] {
-//	//error
-//	get-tree | get-item -path "żółtość2.py" | get-property "image.path" 
-//        | equals ".*error_fatal.png" | verify-true
-//        
-//    get-editbox -after [get-label "Discovered libraries (1):"] | get-property text 
-//        | contains "UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)" 
-//        | verify-true        
-//}
-//get-window "Discovering libraries summary" | get-button OK | click
-//
-////-------------------------------------quick fix ------------------------------------------------
-//
-//get-view "Project Explorer" | get-tree | select "żółć/różową.robot" | double-click
-//with [get-editor "różową.robot" | get-text-viewer] {
-//    set-caret-pos 2 16
-//    hover-text 2 17
-//    key-type "M1+1"
-//}
-//get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-//    | select "Discover 'żółtość2.py' and add to configuration"
-//exec-with-options {
-//    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | click -default
-//    get-window "Problem Occurred" | get-button "Details >>" | click
-//    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
-//        | get-property text 
-//        | contains "UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)" 
-//        | verify-true
-//    get-window "Problem Occurred" | get-button OK | click
-//} -allowStatusDialog
-//
-//
-//
-////-------------------------------------------- python 3---------------------------------------
-//get-preferences-menu | click
-//get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
-//
-//try  {
-//	with [get-window Preferences] {
-//	    get-table | get-item -path "Robot Framework.*\\(Python 3.*\\)" | check
-//	    get-button "Apply and Close" | click
-//	    get-window "Rebuild required" | get-button OK | click
-//	}
-//	
-//	//add 2 files with unicode
-//	get-view "Project Explorer" | get-tree | select "normal_name" | select "normal_name" | get-menu 
-//	    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
-//	with [get-window "Discovering libraries summary" | get-tree] {
-//	    get-item -path "unicode_inside" | get-property "image.path" 
-//	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-//	    get-item -path "żółtość" | get-property "image.path" 
-//	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-//	    get-property itemCount | equals 2 | verify-true
-//	}
-//	get-window "Discovering libraries summary" | get-button OK | click
-//	
-//	//check libspeck
-//	with [get-view "Project Explorer" | get-tree] {
-//	    get-item -path "normal_name/Robot Referenced libraries/unicode_inside normal_name \\(1\\)/Maść" 
-//	        | get-property index | equals 0 | verify-true
-//	    get-item -path "normal_name/Robot Referenced libraries/żółtość normal_name \\(1\\)/Zółw" | get-property index 
-//	        | equals 0 | verify-true
-//	}
-//	// run rf lint
-//	get-view "Project Explorer" | get-tree | select "normal_name"
-//
-//	exec-with-options {
-//	    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
-//	    verify-error {get-window "Problem Occurred"}
-//	} -allowStatusDialog
-//		
-//	
-//}
+//------------------------------------- rf lint------------------------------------------------
+
+get-view "Project Explorer" | get-tree | select "normal_name"
+
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+    verify-error {get-window "Problem Occurred"}
+} -allowStatusDialog
+
+get-view "Project Explorer" | get-tree | select "żółć"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+    verify-error {get-window "Problem Occurred"}
+} -allowStatusDialog
+
+//check problems
+get-view Problems | click
+with [get-view Problems | get-tree] {
+    get-item -path "Warnings \\(2 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
+        | get-property enablement | equals false | verify-true
+    get-item -path "Errors \\(4 items\\)/No testcase documentation \\(RequireTestDocumentation\\)" 
+        | get-property enablement | equals false | verify-true
+}
+
+//------------------------------------- autodiscovery ------------------------------------------------
+
+//disover on first project
+get-view "Project Explorer" | get-tree | select "normal_name/test.robot" | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+
+//unicode text is inside python file
+get-window "Discovering libraries summary" | get-tree | get-item  -path "unicode_inside.py" | click    
+with [get-window "Discovering libraries summary"] {
+	//error
+	get-tree | get-item -path "unicode_inside.py" | get-property "image.path" 
+        | equals ".*error_fatal.png" | verify-true
+        
+    get-editbox -after [get-label "Discovered libraries (2):"] | get-property text 
+        | contains "SyntaxError: Non-ASCII character '\\xc5' in file" 
+        | verify-true        
+}
+    
+//second file
+get-window "Discovering libraries summary" | get-tree | get-item  -path "żółtość.py"  | click    
+with [get-window "Discovering libraries summary"] {
+	//error
+	get-tree | get-item -path "żółtość.py" | get-property "image.path" 
+        | equals ".*error_fatal.png" | verify-true
+        
+    get-editbox -after [get-label "Discovered libraries (2):"] | get-property text 
+        | contains "UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)" 
+        | verify-true        
+}
+    
+get-window "Discovering libraries summary" | get-button OK | click
+
+//select AD on second project
+get-view "Project Explorer" | get-tree | select "żółć" | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+get-window "Discovering libraries summary" | get-tree | get-item -path "żółtość2.py" | click
+   
+with [get-window "Discovering libraries summary"] {
+	//error
+	get-tree | get-item -path "żółtość2.py" | get-property "image.path" 
+        | equals ".*error_fatal.png" | verify-true
+        
+    get-editbox -after [get-label "Discovered libraries (1):"] | get-property text 
+        | contains "UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)" 
+        | verify-true        
+}
+get-window "Discovering libraries summary" | get-button OK | click
+
+//-------------------------------------quick fix ------------------------------------------------
+
+get-view "Project Explorer" | get-tree | select "żółć/różową.robot" | double-click
+with [get-editor "różową.robot" | get-text-viewer] {
+    set-caret-pos 2 16
+    hover-text 2 17
+    key-type "M1+1"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'żółtość2.py' and add to configuration"
+exec-with-options {
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | click -default
+    get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
+        | get-property text 
+        | contains "UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)" 
+        | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+
+
+//-------------------------------------------- python 3---------------------------------------
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+
+try  {
+	with [get-window Preferences] {
+	    get-table | get-item -path "Robot Framework.*\\(Python 3.*\\)" | check
+	    get-button "Apply and Close" | click
+	    get-window "Rebuild required" | get-button OK | click
+	}
+	
+	//add 2 files with unicode
+	get-view "Project Explorer" | get-tree | select "normal_name" | select "normal_name" | get-menu 
+	    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+	with [get-window "Discovering libraries summary" | get-tree] {
+	    get-item -path "unicode_inside" | get-property "image.path" 
+	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+	    get-item -path "żółtość" | get-property "image.path" 
+	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+	    get-property itemCount | equals 2 | verify-true
+	}
+	get-window "Discovering libraries summary" | get-button OK | click
+	
+	//check libspeck
+	with [get-view "Project Explorer" | get-tree] {
+	    get-item -path "normal_name/Robot Referenced libraries/unicode_inside normal_name \\(1\\)/Maść" 
+	        | get-property index | equals 0 | verify-true
+	    get-item -path "normal_name/Robot Referenced libraries/żółtość normal_name \\(1\\)/Zółw" | get-property index 
+	        | equals 0 | verify-true
+	}
+	// run rf lint
+	get-view "Project Explorer" | get-tree | select "normal_name"
+
+	exec-with-options {
+	    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+	    verify-error {get-window "Problem Occurred"}
+	} -allowStatusDialog
+		
+	
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
