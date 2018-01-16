@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
+import com.google.common.base.Charsets;
 
 /**
  * @author Michal Anglart
@@ -67,7 +68,7 @@ class SaveRedSessionAction extends Action {
 
     private InputStream createStream() {
         final String consoleOutput = console.getDocument().get();
-        return new ByteArrayInputStream(consoleOutput.getBytes());
+        return new ByteArrayInputStream(consoleOutput.getBytes(Charsets.UTF_8));
     }
 
     void dispose() {
