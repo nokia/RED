@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _bWrqQPbgEeeAutaDcoLQIQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/16/18 11:29 AM
+Save-Time: 1/16/18 2:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,7 +34,7 @@ get-view Problems | click
 with [get-view Problems | get-tree] {
     get-item -path "Warnings \\(2 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
         | get-property enablement | equals false | verify-true
-    get-item -path "Errors \\(4 items\\)/No testcase documentation \\(RequireTestDocumentation\\)" 
+    get-item -path "Errors \\(7 items\\)/No testcase documentation \\(RequireTestDocumentation\\)" 
         | get-property enablement | equals false | verify-true
 }
 
@@ -106,6 +106,22 @@ exec-with-options {
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 
+//----------------------------------------------added utf formating tag to python file --------------------------------------------------
+get-view "Project Explorer" | get-tree | select "test2/test2.robot" | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+
+//file with tag is added to red.xml    
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path lib2 | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "lib1.py" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error_fatal.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-tree | get-item -path "lib1.py" | click
+get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (2):"] 
+    | get-property text | contains "SyntaxError: Non-ASCII character '\\xc5' in file" 
+    | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
 
 
 //-------------------------------------------- python 3---------------------------------------
