@@ -46,6 +46,7 @@ import org.rf.ide.core.rflint.RfLintRule;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
@@ -114,7 +115,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             semaphore.release();
             final InputStream inputStream = process.getInputStream();
-            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8))) {
                 String line = reader.readLine();
                 while (line != null) {
                     for (final PythonProcessListener listener : getListeners()) {
@@ -145,7 +146,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 // that fine
             }
             final InputStream inputStream = process.getErrorStream();
-            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8))) {
                 String line = reader.readLine();
                 while (line != null) {
                     for (final PythonProcessListener listener : getListeners()) {

@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
 
 public class RfLintIntegrationServer {
@@ -83,7 +84,7 @@ public class RfLintIntegrationServer {
             try (Socket clientSocket = serverSocket.accept()) {
                 this.clientSocket = clientSocket;
                 final BufferedReader eventsReader = new BufferedReader(
-                        new InputStreamReader(clientSocket.getInputStream()));
+                        new InputStreamReader(clientSocket.getInputStream(), Charsets.UTF_8));
 
                 runEventsLoop(eventsReader, eventsListeners);
             } catch (final Exception e) {
