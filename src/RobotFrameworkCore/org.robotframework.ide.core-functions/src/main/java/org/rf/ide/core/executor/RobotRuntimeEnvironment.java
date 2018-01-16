@@ -30,6 +30,8 @@ import java.util.function.Consumer;
 
 import org.rf.ide.core.rflint.RfLintRule;
 
+import com.google.common.base.Charsets;
+
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotRuntimeEnvironment {
 
@@ -53,7 +55,7 @@ public class RobotRuntimeEnvironment {
             final Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
 
             final InputStream inputStream = process.getInputStream();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 lineHandler.accept(line);
