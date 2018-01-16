@@ -1,0 +1,71 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2Q6oEPOSEeaWpbE3jg39cA,_OCxtEBRGEeWWV9IuysVI_A,_jcbUQGu1Eeeps9cepQRw2Q,_FdCn8PoWEeeWEdEv7cvntA
+Element-Name: UnicodeVariablesInDebug
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _J42E4PoWEeeWEdEv7cvntA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/16/18 11:31 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file and add BP
+get-view "Project Explorer" | get-tree | select "UnciodeProject/test.robot" | double-click
+get-editor "test.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 8
+
+//run test
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "UnciodeProject/test.robot" | get-menu -path "Debug As/1 Robot Test" 
+    	| click
+    	
+   wait-for-specific-nr-of-threads -nr_items_in_thread 3 	
+   
+   //change varaible value 	
+   with [get-view Variables | get-tree] {
+	    select "${żółty}" | activate-cell-edit -column 1 -type MouseClickSelection
+	    with [get-editbox] {
+	        set-text "maść"
+	        key-type Enter
+	    }
+	    apply-cell-edit -deactivate
+	    get-item "&{brązowy}" | expand
+	    wait 500
+	    //change value in dictionary
+		select "&{brązowy}/1" | activate-cell-edit -column 1 -type MouseClickSelection
+	    with [get-editbox] {
+	        set-text "róża"
+	        key-type Enter
+	    }
+	apply-cell-edit -deactivate
+	get-item "&{brązowy}" | collapse
+	
+	//change value in list
+	get-item "@{różowa lista}" | expand
+    select "@{różowa lista}/\\[1\\]" | activate-cell-edit -column 1 -type MouseClickSelection
+    with [get-editbox] {
+	        set-text "jaśmin"
+	        key-type Enter
+    }
+    apply-cell-edit -deactivate
+	}
+	get-button "Step Into (F5)" | click
+	wait 1000
+	get-button "Resume (F8)" | click    
+}
+
+wait-for-message-log
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: UnciodeProject.Test.źrebię\n"
+    + ".* : INFO : 7\n"
+    + ".* : INFO : maść\n"
+    + ".* : INFO : jeżowiec\n"
+    + ".* : INFO : jaśmin\n"
+    + ".* : INFO : 1=róża\n"
+    + ".* : INFO : 2=pączek\n"
+    + "Ending test: UnciodeProject.Test.źrebię" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
