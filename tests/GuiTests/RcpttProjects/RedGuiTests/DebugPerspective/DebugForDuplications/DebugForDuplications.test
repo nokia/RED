@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _L6rZUIyzEeeQ1rr93JCGzA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/4/17 12:21 PM
+Save-Time: 1/17/18 3:55 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -149,7 +149,7 @@ exec-with-options -disableJobWaiting -command{
 get-button Robot | click
 get-view "Project Explorer" | get-tree | select "TheSameFileName/a1/s1.robot" | get-menu "Debug As/1 Robot Test" | click
 
-wait-for-message-log
+wait-for-message-log -last_line "TheSameFileName.A2.S1.test 1"
 //check that test was run and not stopped
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: TheSameFileName.A1.S1.test 1\n"
     + ".* : INFO : This is from a1\n"
