@@ -85,18 +85,6 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.MISSING_ROBOT_ENVIRONMENT;
         }
-    },
-    LIBRARY_SPEC_CANNOT_BE_GENERATED {
-
-        @Override
-        public String getProblemDescription() {
-            return "FATAL: %s";
-        }
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.LIBRARY_SPECIFICATION_FILE;
-        }
     };
 
     @Override

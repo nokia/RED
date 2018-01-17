@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -47,6 +48,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -83,6 +85,9 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final RobotProjectConfig model = config.getConfigurationModel();
 
         if (model.hasCurrentVersion()) {
+
+            validateLibspecsAreGenerated(monitor, config);
+
             for (final RemoteLocation location : model.getRemoteLocations()) {
                 validateRemoteLocation(monitor, location, config);
             }
@@ -111,6 +116,47 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         }
     }
 
+    private void validateLibspecsAreGenerated(final IProgressMonitor monitor,
+            final RobotProjectConfigWithLines config) {
+        if (monitor.isCanceled()) {
+            return;
+        }
+
+        final RobotProject robotProject = context.getModel().createRobotProject(configFile.getProject());
+
+        final Map<String, LibrarySpecification> stdLibs = robotProject.getStandardLibraries();
+        for (final Entry<String, LibrarySpecification> entry : stdLibs.entrySet()) {
+            if (entry.getValue() == null) {
+                final RobotProblem problem;
+                final ProblemPosition position;
+
+                if (entry.getKey().startsWith("Remote")) {
+                    problem = RobotProblem.causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
+                            .formatMessageWith("Remote");
+                    final RemoteLocation remoteLocation = RemoteLocation
+                            .create(entry.getKey().substring("Remote".length()).trim());
+                    position = new ProblemPosition(config.getLineFor(remoteLocation));
+                } else {
+                    problem = RobotProblem.causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
+                            .formatMessageWith(entry.getKey());
+                    position = new ProblemPosition(config.getLineFor(config.getConfigurationModel()));
+                }
+
+                reporter.handleProblem(problem, configFile, position);
+            }
+        }
+
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = robotProject.getReferencedLibraries();
+        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : refLibs.entrySet()) {
+            if (entry.getValue() == null) {
+                final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
+                        .formatMessageWith(entry.getKey().getName());
+                final ProblemPosition position = new ProblemPosition(config.getLineFor(entry.getKey()));
+                reporter.handleProblem(problem, configFile, position);
+            }
+        }
+    }
+
     private void validateRemoteLocation(final IProgressMonitor monitor, final RemoteLocation location,
             final RobotProjectConfigWithLines config)
             throws CoreException {
@@ -118,8 +164,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             return;
         }
         final URI uriAddress = location.getUriAddress();
-        final Socket s = new Socket();
-        try {
+        try (final Socket s = new Socket()) {
             final SocketAddress sockaddr = new InetSocketAddress(uriAddress.getHost(), uriAddress.getPort());
             s.connect(sockaddr, 5000);
         } catch (final IOException | IllegalArgumentException ex) {
@@ -127,12 +172,6 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
                     .formatMessageWith(uriAddress);
             final ProblemPosition position = new ProblemPosition(config.getLineFor(location));
             reporter.handleProblem(unreachableHostProblem, configFile, position);
-        } finally {
-            try {
-                s.close();
-            } catch (final IOException e) {
-                // fine
-            }
         }
     }
 

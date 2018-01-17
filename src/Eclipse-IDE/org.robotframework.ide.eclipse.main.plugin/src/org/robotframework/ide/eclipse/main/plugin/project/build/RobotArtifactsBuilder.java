@@ -36,8 +36,7 @@ public class RobotArtifactsBuilder {
         this.logger = logger;
     }
 
-    public Job createBuildJob(final boolean rebuildNeeded, final ProblemsReportingStrategy fatalReporter,
-            final ProblemsReportingStrategy usualReporter) {
+    public Job createBuildJob(final boolean rebuildNeeded, final ProblemsReportingStrategy fatalReporter) {
         if (rebuildNeeded) {
             logger.log("BUILDING: refreshing project");
             try {
@@ -64,7 +63,7 @@ public class RobotArtifactsBuilder {
                         } catch (final CoreException e) {
                             // that's fine, lets try to build project
                         }
-                        buildArtifacts(project, monitor, fatalReporter, usualReporter);
+                        buildArtifacts(project, monitor, fatalReporter);
 
                         return Status.OK_STATUS;
                     } catch (final ReportingInterruptedException e) {
@@ -87,7 +86,7 @@ public class RobotArtifactsBuilder {
     }
 
     private void buildArtifacts(final IProject project, final IProgressMonitor monitor,
-            final ProblemsReportingStrategy fatalReporter, final ProblemsReportingStrategy usualReporter) {
+            final ProblemsReportingStrategy fatalReporter) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -113,7 +112,7 @@ public class RobotArtifactsBuilder {
         }
 
         new LibrariesBuilder(logger).buildLibraries(robotProject, runtimeEnvironment, configuration,
-                subMonitor.newChild(70), usualReporter);
+                subMonitor.newChild(70));
         logger.log("BUILDING: project '" + project.getName() + "' build finished");
     }
 

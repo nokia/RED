@@ -57,16 +57,12 @@ public enum ProblemCategory {
     LIBRARY_SPECIFICATION_FILE(
             ProblemCategoryType.PROJECT_CONFIGURATION,
             "Library documentation file cannot be generated",
-            "Occurs when for some reason Robot framework is unable to generate library specification file,probably due to missing library dependencies or errors in library source code.\n") {
+            "Occurs when for some reason Robot framework is unable to generate library specification file, probably "
+                    + "due to missing library dependencies or errors in library source code.\n") {
 
         @Override
         public Severity getDefaultSeverity() {
-            return Severity.FATAL;
-        }
-
-        @Override
-        public Severity[] getPossibleSeverities() {
-            return new Severity[] {Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
+            return Severity.ERROR;
         }
     },
     REMOVED_API(
