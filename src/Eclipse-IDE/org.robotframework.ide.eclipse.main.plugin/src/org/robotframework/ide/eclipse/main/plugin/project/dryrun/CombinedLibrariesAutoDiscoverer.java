@@ -22,10 +22,6 @@ public class CombinedLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
 
     private final ReferenceLibraryImportCollector referenceLibraryImportCollector;
 
-    public CombinedLibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites) {
-        this(robotProject, suites, defaultSummaryHandler());
-    }
-
     public CombinedLibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler) {
         super(robotProject, summaryHandler);
