@@ -5,8 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
+import java.util.List;
+
 import javax.inject.Named;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -34,6 +38,18 @@ public class ExcludeFolderForValidationHandler extends DIParameterizedHandler<E4
         @Override
         protected void changeExclusion(final RobotProjectConfig config, final IPath pathToChange) {
             config.addExcludedPath(pathToChange.toPortableString());
+        }
+
+        @Override
+        protected void postExclusionChange(final List<IResource> selectedResources) {
+            for (final IResource resource : selectedResources) {
+                try {
+                    resource.deleteMarkers(null, true, IResource.DEPTH_INFINITE);
+                } catch (final CoreException e) {
+                    throw new IllegalStateException(
+                            "Unable to remove problems from " + resource.getFullPath().toOSString());
+                }
+            }
         }
     }
 }
