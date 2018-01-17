@@ -75,6 +75,43 @@ def logresult(func):
     return inner
 
 
+# decorator which cleans up all modules that were loaded during decorated call
+def cleanup_modules(to_call):
+    def inner(*args, **kwargs):
+        old_modules = set(sys.modules.keys())
+        try:
+            return to_call(*args, **kwargs)
+        except:
+            raise
+        finally:
+            current_modules = set(sys.modules.keys())
+            builtin_modules = set(sys.builtin_module_names)
+
+            # some modules should not be removed because it causes rpc server problems
+            to_remove = [m for m in current_modules - old_modules - builtin_modules if
+                         not m.startswith('robot.') and not m.startswith('encodings.')]
+            for m in to_remove:
+                del sys.modules[m]
+                del m
+
+    return inner
+
+
+# decorator which cleans system path changed during decorated call
+def cleanup_sys_path(to_call):
+    def inner(*args, **kwargs):
+        old_sys_path = list(sys.path)
+
+        try:
+            return to_call(*args, **kwargs)
+        except:
+            raise
+        finally:
+            sys.path = old_sys_path
+
+    return inner
+
+
 @logresult
 @encode_result_or_exception
 @logargs
@@ -93,12 +130,11 @@ def get_modules_search_paths():
 @logresult
 @encode_result_or_exception
 @logargs
+@cleanup_sys_path
 def get_module_path(module_name, python_paths, class_paths):
-    def to_call():
-        import red_modules
-        return red_modules.get_module_path(module_name)
-
-    return __extend_paths(to_call, python_paths, class_paths)
+    import red_modules
+    __extend_paths(python_paths, class_paths)
+    return red_modules.get_module_path(module_name)
 
 
 @logresult
@@ -112,20 +148,21 @@ def get_run_module_path():
 @logresult
 @encode_result_or_exception
 @logargs
+@cleanup_modules
+@cleanup_sys_path
 def get_classes_from_module(module_location, python_paths, class_paths):
-    def to_call():
-        import red_module_classes
-        return __cleanup_modules(red_module_classes.get_classes_from_module)(module_location)
-
-    return __extend_paths(to_call, python_paths, class_paths)
+    import red_module_classes
+    __extend_paths(python_paths, class_paths)
+    return red_module_classes.get_classes_from_module(module_location)
 
 
 @logresult
 @encode_result_or_exception
 @logargs
+@cleanup_modules
 def get_variables(path, args):
     import red_variables
-    return __cleanup_modules(red_variables.get_variables)(path, args)
+    return red_variables.get_variables(path, args)
 
 
 @logresult
@@ -213,12 +250,12 @@ def run_rf_lint(host, port, filepath, additional_arguments):
 @logresult
 @encode_result_or_exception
 @logargs
+@cleanup_modules
+@cleanup_sys_path
 def create_libdoc(libname, python_paths, class_paths):
-    def to_call():
-        import red_libraries
-        return __cleanup_modules(red_libraries.create_libdoc)(libname)
-
-    return __extend_paths(to_call, python_paths, class_paths)
+    import red_libraries
+    __extend_paths(python_paths, class_paths)
+    return red_libraries.create_libdoc(libname)
 
 
 def __get_robot_version():
@@ -239,48 +276,13 @@ def __encode_unicode_if_needed(s):
         return s
 
 
-# decorator which cleans up all the modules that were loaded
-# during decorated call
-def __cleanup_modules(to_call):
-    import sys
-
-    def inner(*args, **kwargs):
-        old_modules = set(sys.modules.keys())
-        try:
-            return to_call(*args, **kwargs)
-        except:
-            raise
-        finally:
-            current_modules = set(sys.modules.keys())
-            builtin_modules = set(sys.builtin_module_names)
-
-            # some modules should not be removed because it causes rpc server problems
-            to_remove = [m for m in current_modules - old_modules - builtin_modules if
-                         not m.startswith('robot.') and not m.startswith('encodings.')]
-            for m in to_remove:
-                del (sys.modules[m])
-                del (m)
-
-    return inner
-
-
-def __extend_paths(to_call, python_paths, class_paths):
-    import sys
+def __extend_paths(python_paths, class_paths):
     from robot import pythonpathsetter
-
-    old_sys_path = list(sys.path)
 
     __extend_classpath(class_paths)
 
     for path in python_paths + class_paths:
         pythonpathsetter.add_path(path)
-
-    try:
-        return to_call()
-    except:
-        raise
-    finally:
-        sys.path = old_sys_path
 
 
 def __extend_classpath(class_paths):
@@ -294,8 +296,6 @@ def __extend_classpath(class_paths):
 
 
 def __shutdown_server_when_parent_process_becomes_unavailable(server):
-    import sys
-
     # this causes the function to block on readline() call; parent process which
     # started this script shouldn't write anything to the input, so this function will
     # be blocked until parent process will be closed/killed; this will cause readline()
