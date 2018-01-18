@@ -265,33 +265,16 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public boolean isVirtualenv() {
-        try {
-            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_virtualenv_check.py");
-            final List<String> cmdLine = createCommandLine(scriptFile);
-
-            final StringBuilder result = new StringBuilder();
-            RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> result.append(line));
-
-            return Boolean.parseBoolean(result.toString().toLowerCase().trim());
-        } catch (final IOException e) {
-            return false;
-        }
-    }
-
-    @Override
-    public void startLibraryAutoDiscovering(final int port, final String dataSourcePath,
-            final EnvironmentSearchPaths additionalPaths) {
+    public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
+            final boolean recursiveInVirtualenv) {
         try {
             RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py");
             RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_library_autodiscover.py");
 
-            final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, String.valueOf(port),
-                    dataSourcePath);
-            if (additionalPaths.hasPythonPaths()) {
-                cmdLine.add(String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType)));
-            }
+            final List<String> cmdLine = createCommandLine(scriptFile, String.valueOf(port),
+                    dataSource.getAbsolutePath(), projectLocation.getAbsolutePath(),
+                    String.valueOf(recursiveInVirtualenv));
 
             RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> {});
         } catch (final IOException | NumberFormatException e) {
@@ -300,7 +283,27 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void stopLibraryAutoDiscovering() {
+    public void startKeywordAutoDiscovering(final int port, final File dataSource,
+            final EnvironmentSearchPaths additionalPaths) {
+        try {
+            RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py");
+            RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_keyword_autodiscover.py");
+
+            final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, String.valueOf(port),
+                    dataSource.getAbsolutePath());
+            if (additionalPaths.hasPythonPaths()) {
+                cmdLine.add(String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType)));
+            }
+
+            RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> {});
+        } catch (final IOException | NumberFormatException e) {
+            throw new RobotEnvironmentException("Unable to start keyword autodiscovering.");
+        }
+    }
+
+    @Override
+    public void stopAutoDiscovering() {
         // nothing to do
     }
 

@@ -462,40 +462,53 @@ public class RobotRuntimeEnvironment {
         }
     }
 
-    public boolean isVirtualenv() {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.isVirtualenv();
-        }
-        return false;
-    }
-
     /**
      * Start library auto discovering with robot dryrun
      *
      * @param port
      *            Port number for communication with AgentConnectionServer
-     * @param dataSourcePath
-     *            Path to test case file
+     * @param dataSource
+     *            Test case file with unknown library imports
+     * @param projectLocation
+     *            Project file
+     * @param recursiveInVirtualenv
+     *            Virtualenv recursive library source lookup switch
+     * @throws RobotEnvironmentException
+     */
+    public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
+            final boolean recursiveInVirtualenv) throws RobotEnvironmentException {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv);
+        }
+    }
+
+    /**
+     * Start keyword auto discovering with robot dryrun
+     *
+     * @param port
+     *            Port number for communication with AgentConnectionServer
+     * @param dataSource
+     *            Test case file with known library imports
      * @param additionalPaths
      *            Additional pythonPaths and classPaths
      * @throws RobotEnvironmentException
      */
-    public void startLibraryAutoDiscovering(final int port, final String dataSourcePath,
+    public void startKeywordAutoDiscovering(final int port, final File dataSource,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.startLibraryAutoDiscovering(port, dataSourcePath, additionalPaths);
+            executor.startKeywordAutoDiscovering(port, dataSource, additionalPaths);
         }
     }
 
-    public void stopLibraryAutoDiscovering() throws RobotEnvironmentException {
+    public void stopAutoDiscovering() throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.stopLibraryAutoDiscovering();
+            executor.stopAutoDiscovering();
         }
     }
 
