@@ -57,7 +57,7 @@ public abstract class AbstractAutoDiscoverer {
 
     abstract RobotAgentEventListener createDryRunCollectorEventListener(Consumer<String> libNameHandler);
 
-    abstract void startDryRunClient(int port, String dataSourcePath) throws CoreException;
+    abstract void startDryRunClient(int port, final File dataSource) throws CoreException;
 
     final boolean lockDryRun() {
         return IS_DRY_RUN_RUNNING.compareAndSet(false, true);
@@ -70,7 +70,7 @@ public abstract class AbstractAutoDiscoverer {
     void stopDiscovering() {
         if (serverJob != null) {
             serverJob.stopServer();
-            robotProject.getRuntimeEnvironment().stopLibraryAutoDiscovering();
+            robotProject.getRuntimeEnvironment().stopAutoDiscovering();
         }
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractAutoDiscoverer {
             subMonitor.setWorkRemaining(libraryNames.size() + 3);
             subMonitor.subTask("Preparing Robot dry run execution...");
             try {
-                executeDryRun(tempSuite.get().getAbsolutePath(), subMonitor);
+                executeDryRun(tempSuite.get(), subMonitor);
                 subMonitor.worked(1);
             } finally {
                 subMonitor.done();
@@ -91,14 +91,14 @@ public abstract class AbstractAutoDiscoverer {
         }
     }
 
-    private void executeDryRun(final String dataSourcePath, final SubMonitor subMonitor)
+    private void executeDryRun(final File dataSource, final SubMonitor subMonitor)
             throws InterruptedException, CoreException {
         final String host = AgentConnectionServer.DEFAULT_CONNECTION_HOST;
         final int port = AgentConnectionServer.findFreePort();
         final int timeout = CONNECTION_TIMEOUT;
         serverJob = startDryRunServer(host, port, timeout, subMonitor);
 
-        startDryRunClient(port, dataSourcePath);
+        startDryRunClient(port, dataSource);
 
         serverJob.join();
     }

@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.WorkspaceJob;
@@ -69,7 +70,7 @@ public class AbstractAutoDiscovererTest {
             }
 
             @Override
-            void startDryRunClient(final int port, final String dataSourcePath) throws CoreException {
+            void startDryRunClient(final int port, final File dataSource) throws CoreException {
                 // nothing to implement
             }
         };

@@ -22,9 +22,10 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
     LIB_IMPORT_TIMEOUT = 60
 
-    def __init__(self):
+    def __init__(self, handle_keywords=False):
         import robot.running.namespace
-        robot.running.namespace.IMPORTER = RedImporter(robot.running.namespace.IMPORTER, self.LIB_IMPORT_TIMEOUT)
+        robot.running.namespace.IMPORTER = RedImporter(robot.running.namespace.IMPORTER, self.LIB_IMPORT_TIMEOUT,
+                                                       handle_keywords)
 
     def visit_suite(self, suite):
         suite.tests.clear()
@@ -45,9 +46,10 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
 
 class RedImporter(object):
-    def __init__(self, importer, lib_import_timeout):
+    def __init__(self, importer, lib_import_timeout, handle_keywords=False):
         self.importer = importer
         self.lib_import_timeout = lib_import_timeout
+        self.handle_keywords = handle_keywords
         self.func = None
         self.lock = threading.Lock()
         self.cached_lib_items = list()
@@ -115,7 +117,8 @@ class RedImporter(object):
             msg = json.dumps({'import_error': {'name': args[0], 'error': str(e)}})
             LOGGER.message(Message(message=msg, level='NONE'))
 
-        self._handle_keywords(library)
+        if self.handle_keywords:
+            self._handle_keywords(library)
 
         return library
 

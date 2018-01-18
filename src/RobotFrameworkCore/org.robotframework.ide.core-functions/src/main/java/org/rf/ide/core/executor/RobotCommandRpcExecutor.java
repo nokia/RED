@@ -371,19 +371,21 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public boolean isVirtualenv() {
+    public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
+            final boolean recursiveInVirtualenv) {
         try {
-            return (boolean) callRpcFunction("isVirtualenv");
+            callRpcFunction("startLibraryAutoDiscovering", port, dataSource.getAbsolutePath(),
+                    projectLocation.getAbsolutePath(), recursiveInVirtualenv);
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
     @Override
-    public void startLibraryAutoDiscovering(final int port, final String dataSourcePath,
+    public void startKeywordAutoDiscovering(final int port, final File dataSource,
             final EnvironmentSearchPaths additionalPaths) {
         try {
-            callRpcFunction("startLibraryAutoDiscovering", port, dataSourcePath,
+            callRpcFunction("startKeywordAutoDiscovering", port, dataSource.getAbsolutePath(),
                     newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
         } catch (final XmlRpcException e) {
@@ -392,9 +394,9 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void stopLibraryAutoDiscovering() {
+    public void stopAutoDiscovering() {
         try {
-            callRpcFunction("stopLibraryAutoDiscovering");
+            callRpcFunction("stopAutoDiscovering");
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
