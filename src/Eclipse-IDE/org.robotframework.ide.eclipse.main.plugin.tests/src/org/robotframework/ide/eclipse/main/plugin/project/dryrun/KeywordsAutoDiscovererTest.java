@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -51,8 +51,10 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(robotProject).start();
 
-        verifyKwSource("TestLib.Kw X", "libs/TestLib.py", 1, 4, 4);
-        verifyKwSource("TestLib.Kw Abc", "libs/TestLib.py", 3, 6, 6);
+        assertThat(robotProject.getKeywordSource("TestLib.Kw X"))
+                .hasValueSatisfying(equalSource("libs/TestLib.py", 1, 4, 4));
+        assertThat(robotProject.getKeywordSource("TestLib.Kw Abc"))
+                .hasValueSatisfying(equalSource("libs/TestLib.py", 3, 6, 6));
     }
 
     @Test
@@ -64,8 +66,10 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(robotProject).start();
 
-        verifyKwSource("First.Kw X", "libs/First.py", 1, 4, 4);
-        verifyKwSource("Second.Kw X", "libs/Second.py", 0, 4, 4);
+        assertThat(robotProject.getKeywordSource("First.Kw X"))
+                .hasValueSatisfying(equalSource("libs/First.py", 1, 4, 4));
+        assertThat(robotProject.getKeywordSource("Second.Kw X"))
+                .hasValueSatisfying(equalSource("libs/Second.py", 0, 4, 4));
     }
 
     @Test
@@ -79,8 +83,10 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(robotProject).start();
 
-        verifyKwSource("Decorated.Add ${x:\\d+}", "libs/Decorated.py", 3, 4, 3);
-        verifyKwSource("Decorated.Deco", "libs/Decorated.py", 6, 4, 16);
+        assertThat(robotProject.getKeywordSource("Decorated.Add ${x:\\d+}"))
+                .hasValueSatisfying(equalSource("libs/Decorated.py", 3, 4, 3));
+        assertThat(robotProject.getKeywordSource("Decorated.Deco"))
+                .hasValueSatisfying(equalSource("libs/Decorated.py", 6, 4, 16));
     }
 
     @Test
@@ -92,8 +98,10 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(robotProject).start();
 
-        verifyKwSource("DynaLib.Dyna Kw", "libs/DynaLib.py", 3, 6, 11);
-        verifyKwSource("DynaLib.Other Kw", "libs/DynaLib.py", 3, 6, 11);
+        assertThat(robotProject.getKeywordSource("DynaLib.Dyna Kw"))
+                .hasValueSatisfying(equalSource("libs/DynaLib.py", 3, 6, 11));
+        assertThat(robotProject.getKeywordSource("DynaLib.Other Kw"))
+                .hasValueSatisfying(equalSource("libs/DynaLib.py", 3, 6, 11));
     }
 
     @Test
@@ -106,8 +114,10 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(robotProject).start();
 
-        verifyKwSource("Child.Parent Kw", "libs/Parent.py", 1, 6, 9);
-        verifyKwSource("Child.Child Kw", "libs/Child.py", 2, 6, 8);
+        assertThat(robotProject.getKeywordSource("Child.Parent Kw"))
+                .hasValueSatisfying(equalSource("libs/Parent.py", 1, 6, 9));
+        assertThat(robotProject.getKeywordSource("Child.Child Kw"))
+                .hasValueSatisfying(equalSource("libs/Child.py", 2, 6, 8));
     }
 
     @Test
@@ -120,8 +130,10 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(robotProject).start();
 
-        verifyKwSource("Internal.Ex Kw", "libs/External.py", 0, 4, 5);
-        verifyKwSource("Internal.Int Kw", "libs/Internal.py", 1, 4, 6);
+        assertThat(robotProject.getKeywordSource("Internal.Ex Kw"))
+                .hasValueSatisfying(equalSource("libs/External.py", 0, 4, 5));
+        assertThat(robotProject.getKeywordSource("Internal.Int Kw"))
+                .hasValueSatisfying(equalSource("libs/Internal.py", 1, 4, 6));
     }
 
     private Map<ReferencedLibrary, LibrarySpecification> createLibrary(final String name, final String[] lines)
@@ -148,15 +160,15 @@ public class KeywordsAutoDiscovererTest {
         robotProject.setReferencedLibraries(libraries);
     }
 
-    private void verifyKwSource(final String qualifiedKwName, final String expectedFilePath, final int expectedLine,
+    private Consumer<RobotDryRunKeywordSource> equalSource(final String expectedFilePath, final int expectedLine,
             final int expectedOffset, final int expectedLength) {
-        final Optional<RobotDryRunKeywordSource> kwSource = robotProject.getKeywordSource(qualifiedKwName);
-        assertThat(kwSource).isPresent();
-        assertThat(kwSource.get().getFilePath())
-                .isEqualTo(projectProvider.getFile(expectedFilePath).getLocation().toOSString());
-        assertThat(kwSource.get().getLine()).isEqualTo(expectedLine);
-        assertThat(kwSource.get().getOffset()).isEqualTo(expectedOffset);
-        assertThat(kwSource.get().getLength()).isEqualTo(expectedLength);
+        return kwSource -> {
+            assertThat(kwSource.getFilePath())
+                    .isEqualTo(projectProvider.getFile(expectedFilePath).getLocation().toOSString());
+            assertThat(kwSource.getLine()).isEqualTo(expectedLine);
+            assertThat(kwSource.getOffset()).isEqualTo(expectedOffset);
+            assertThat(kwSource.getLength()).isEqualTo(expectedLength);
+        };
     }
 
 }
