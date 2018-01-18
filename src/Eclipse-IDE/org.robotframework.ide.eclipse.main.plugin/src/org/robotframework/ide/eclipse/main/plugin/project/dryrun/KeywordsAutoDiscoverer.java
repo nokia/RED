@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
@@ -79,11 +80,11 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    void startDryRunClient(final int port, final String dataSourcePath) throws CoreException {
+    void startDryRunClient(final int port, final File dataSource) throws CoreException {
         final EnvironmentSearchPaths additionalPaths = new EnvironmentSearchPaths(robotProject.getClasspath(),
                 robotProject.getPythonpath());
 
-        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSourcePath, additionalPaths);
+        robotProject.getRuntimeEnvironment().startKeywordAutoDiscovering(port, dataSource, additionalPaths);
     }
 
     private void startAddingKeywordsToProject(final IProgressMonitor monitor,

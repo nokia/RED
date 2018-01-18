@@ -5,10 +5,7 @@
 #
 
 
-RED_DRYRUN_PROCESSES = []
-
-
-def start_library_auto_discovering(port, data_source_path):
+def start_auto_discovering(port, data_source_path):
     from robot.run import run
     from TestRunnerAgent import TestRunnerAgent
     from SuiteVisitorImportProxy import SuiteVisitorImportProxy
@@ -24,63 +21,58 @@ def start_library_auto_discovering(port, data_source_path):
         console='NONE')
 
 
-def start_library_auto_discovering_process(port, data_source_path, python_paths=[], class_paths=[]):
-    import sys
-    import os
-    import subprocess
-
-    command = [sys.executable]
-    command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_library_autodiscover.py'))
-    command.append(str(port))
-    command.append(data_source_path)
-
-    dryrun_env = _create_dryrun_environment(python_paths, class_paths)
-
-    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE, env=dryrun_env))
-
-
-def stop_library_auto_discovering_process():
-    for process in RED_DRYRUN_PROCESSES:
-        process.kill()
-    del RED_DRYRUN_PROCESSES[:]
-
-
-def _create_dryrun_environment(python_paths, class_paths):
+def _collect_source_paths(start_path, recursive=True):
     import os
     import platform
 
-    env = os.environ.copy()
-    if python_paths:
-        env['RED_DRYRUN_PYTHONPATH'] = ';'.join(python_paths)
-    if class_paths and 'Jython' in platform.python_implementation():
-        env['RED_DRYRUN_CLASSPATH'] = ';'.join(class_paths)
-    return env
+    max_depth = start_path.count(os.sep) + 1
+
+    python_paths = list()
+    class_paths = list()
+
+    for root, dirs, files in os.walk(start_path):
+        for file in files:
+            _, extension = os.path.splitext(file)
+            if extension == ".py" and not root in python_paths:
+                python_paths.append(root)
+            elif extension == ".jar" and 'Jython' in platform.python_implementation():
+                class_paths.append(os.path.join(root, file))
+
+        # FIXME: check if such limit is still needed for virtualenv
+        if not recursive and root.count(os.sep) >= max_depth:
+            del dirs[:]
+
+    return python_paths, class_paths
 
 
-def _extend_paths_from_dryrun_environment():
+def _decode_path_if_needed(path):
     import sys
-    import os
-    import platform
-    if ('RED_DRYRUN_PYTHONPATH' in os.environ):
-        sys.path.extend(os.environ['RED_DRYRUN_PYTHONPATH'].split(';'))
-    if ('RED_DRYRUN_CLASSPATH' in os.environ):
-        sys.path.extend(os.environ['RED_DRYRUN_CLASSPATH'].split(';'))
-        if 'Jython' in platform.python_implementation():
-            for class_path in os.environ['RED_DRYRUN_CLASSPATH'].split(';'):
-                from classpath_updater import ClassPathUpdater
-                cp_updater = ClassPathUpdater()
-                cp_updater.add_file(class_path)
+    return path.decode('utf-8') if sys.version_info < (3, 0, 0) else path
+
+
+def _is_virtualenv():
+    import sys
+    return hasattr(sys, 'real_prefix')
 
 
 if __name__ == '__main__':
     import sys
+    import platform
 
     port = sys.argv[1]
     data_source_path = sys.argv[2]
+    project_location_path = sys.argv[3]
+    recursiveInVirtualenv = sys.argv[4]
 
-    if len(sys.argv) > 3:
-        sys.path.extend(sys.argv[3].split(';'))
-    else:
-        _extend_paths_from_dryrun_environment()
+    start_path = _decode_path_if_needed(project_location_path)
+    recursive = not _is_virtualenv() or recursiveInVirtualenv
+    python_paths, class_paths = _collect_source_paths(start_path, recursive)
 
-    start_library_auto_discovering(port, data_source_path)
+    sys.path.extend(python_paths + class_paths)
+    if 'Jython' in platform.python_implementation():
+        for class_path in class_paths:
+            from classpath_updater import ClassPathUpdater
+            cp_updater = ClassPathUpdater()
+            cp_updater.add_file(class_path)
+
+    start_auto_discovering(port, data_source_path)

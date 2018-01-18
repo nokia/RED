@@ -54,8 +54,6 @@ import org.robotframework.red.swt.SwtThread;
  */
 public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
-    private static final int VIRTUAL_ENV_SEARCH_DEPTH = 1;
-
     private final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler;
 
     private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
@@ -129,17 +127,14 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    void startDryRunClient(final int port, final String dataSourcePath) throws CoreException {
-        final LibrariesSourcesCollector sourcesCollector = new LibrariesSourcesCollector(robotProject);
-        if (!robotProject.getRuntimeEnvironment().isVirtualenv()
-                || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled()) {
-            sourcesCollector.collectPythonAndJavaLibrariesSources();
-        } else {
-            sourcesCollector.collectPythonAndJavaLibrariesSources(VIRTUAL_ENV_SEARCH_DEPTH);
-        }
-        final EnvironmentSearchPaths additionalPaths = sourcesCollector.getEnvironmentSearchPaths();
+    void startDryRunClient(final int port, final File dataSource) throws CoreException {
+        final File projectLocation = robotProject.getProject().getLocation().toFile();
+        final boolean recursiveInVirtualenv = RedPlugin.getDefault()
+                .getPreferences()
+                .isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
 
-        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSourcePath, additionalPaths);
+        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSource, projectLocation,
+                recursiveInVirtualenv);
     }
 
     void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> collection) {

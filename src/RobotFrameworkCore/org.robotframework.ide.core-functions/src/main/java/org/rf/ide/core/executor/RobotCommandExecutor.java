@@ -33,17 +33,16 @@ interface RobotCommandExecutor {
 
     String getRobotVersion();
 
-    boolean isVirtualenv();
-
     void createLibdocForStdLibrary(String resultFilePath, String libName, String libPath);
 
     void createLibdocForThirdPartyLibrary(String resultFilePath, String libName, String libPath,
             EnvironmentSearchPaths additionalPaths);
 
-    void startLibraryAutoDiscovering(int port, String dataSourcePath, EnvironmentSearchPaths additionalPaths);
+    void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean recursiveInVirtualenv);
 
-    void stopLibraryAutoDiscovering();
+    void startKeywordAutoDiscovering(int port, File dataSource, EnvironmentSearchPaths additionalPaths);
 
-    void runRfLint(final String host, final int port, final File filepath, List<RfLintRule> rules,
-            List<String> rulesFiles);
+    void stopAutoDiscovering();
+
+    void runRfLint(String host, int port, File filepath, List<RfLintRule> rules, List<String> rulesFiles);
 }

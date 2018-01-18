@@ -28,6 +28,7 @@ STD_ARGS_LOGGER = logging.getLogger(__name__ + '_args')
 STD_ARGS_LOGGER.setLevel(logging.INFO)
 STD_ARGS_LOGGER.addHandler(args_handler)
 
+RED_DRYRUN_PROCESSES = []
 
 def encode_result_or_exception(func):
     import traceback
@@ -47,7 +48,7 @@ def encode_result_or_exception(func):
 
 def logargs(func):
     def inner(*args, **kwargs):
-        try:        
+        try:
             if args == None or len(args) == 0:
                 STD_LOGGER.info('calling \'%s\' function, no arguments', func.__name__)
             else:
@@ -199,28 +200,43 @@ def get_robot_version():
 @logresult
 @encode_result_or_exception
 @logargs
-def is_virtualenv():
-    import red_virtualenv_check
-    return red_virtualenv_check.is_virtualenv()
+def start_library_auto_discovering(port, data_source_path, project_location_path, recursiveInVirtualenv):
+    import subprocess
+    import os
+
+    command = [sys.executable]
+    command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_library_autodiscover.py'))
+    command.append(str(port))
+    command.append(__encode_unicode_if_needed(data_source_path))
+    command.append(__encode_unicode_if_needed(project_location_path))
+    command.append(str(recursiveInVirtualenv))
+
+    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
 
 
 @logresult
 @encode_result_or_exception
 @logargs
-def start_library_auto_discovering(port, data_source_path, python_paths, class_paths):
-    import red_library_autodiscover
-    red_library_autodiscover.start_library_auto_discovering_process(port,
-                                                                    __encode_unicode_if_needed(data_source_path),
-                                                                    __encode_unicode_if_needed(python_paths),
-                                                                    __encode_unicode_if_needed(class_paths))
+def start_keyword_auto_discovering(port, data_source_path, python_paths, class_paths):
+    import subprocess
+    import os
+
+    command = [sys.executable]
+    command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_keyword_autodiscover.py'))
+    command.append(str(port))
+    command.append(__encode_unicode_if_needed(data_source_path))
+    command.append(';'.join(__encode_unicode_if_needed(python_paths + class_paths)))    
+
+    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
 
 
 @logresult
 @encode_result_or_exception
 @logargs
-def stop_library_auto_discovering():
-    import red_library_autodiscover
-    red_library_autodiscover.stop_library_auto_discovering_process()
+def stop_auto_discovering():
+    for process in RED_DRYRUN_PROCESSES:
+        process.kill()
+    del RED_DRYRUN_PROCESSES[:]
 
 
 @logresult
@@ -328,9 +344,9 @@ if __name__ == '__main__':
     server.register_function(get_standard_libraries_names, 'getStandardLibrariesNames')
     server.register_function(get_standard_library_path, 'getStandardLibraryPath')
     server.register_function(get_robot_version, 'getRobotVersion')
-    server.register_function(is_virtualenv, 'isVirtualenv')
     server.register_function(start_library_auto_discovering, 'startLibraryAutoDiscovering')
-    server.register_function(stop_library_auto_discovering, 'stopLibraryAutoDiscovering')
+    server.register_function(start_keyword_auto_discovering, 'startKeywordAutoDiscovering')
+    server.register_function(stop_auto_discovering, 'stopAutoDiscovering')
     server.register_function(run_rf_lint, "runRfLint")
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
