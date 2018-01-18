@@ -41,6 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
@@ -117,6 +118,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         robotConfig.setProjectName(project.getName());
         robotConfig.updateTestCases(suitesMapping);
         robotConfig.setIsGeneralPurposeEnabled(type == RobotLaunchConfigurationType.GENERAL_PURPOSE);
+
+        robotConfig.setEnvironmentVariables(ImmutableMap.of("PYTHONIOENCODING", "utf8"));
     }
 
     public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,
@@ -390,6 +393,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         for (final Entry<String, String> entry : vars.entrySet()) {
             varMappings.add(entry.getKey() + "=" + entry.getValue());
         }
+    }
+
+    public void setEnvironmentVariables(final Map<String, String> mapping) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, mapping);
     }
 
 }

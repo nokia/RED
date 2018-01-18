@@ -117,6 +117,8 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
         assertThat(robotConfig.getExecutableFilePath()).isEqualTo("");
         assertThat(robotConfig.getExecutableFileArguments()).isEqualTo("");
+
+        assertThat(robotConfig.getEnvironmentVariables()).contains("PYTHONIOENCODING=utf8");
     }
 
     @Test
@@ -183,6 +185,8 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
         assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
+
+        assertThat(robotConfig.getEnvironmentVariables()).contains("PYTHONIOENCODING=utf8");
     }
 
     @Test
