@@ -28,11 +28,12 @@ public class ExcludeFolderForValidationHandler extends DIParameterizedHandler<E4
 
     public static class E4ExcludeFolderForValidationHandler extends ChangeExclusionHandler {
 
-        @Override
         @Execute
         public void changeExclusion(final IEventBroker eventBroker,
                 final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            super.changeExclusion(eventBroker, selection);
+            final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
+            removeMarkers(selectedResources);
+            changeExclusion(eventBroker, selectedResources);
         }
 
         @Override
@@ -40,8 +41,7 @@ public class ExcludeFolderForValidationHandler extends DIParameterizedHandler<E4
             config.addExcludedPath(pathToChange.toPortableString());
         }
 
-        @Override
-        protected void postExclusionChange(final List<IResource> selectedResources) {
+        private void removeMarkers(final List<IResource> selectedResources) {
             for (final IResource resource : selectedResources) {
                 try {
                     resource.deleteMarkers(null, true, IResource.DEPTH_INFINITE);
