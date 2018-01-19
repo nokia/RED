@@ -8,13 +8,14 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -26,21 +27,15 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.red.swt.SwtThread;
-import org.robotframework.red.viewers.Selections;
-
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 
 /**
  * @author Michal Anglart
  */
 abstract class ChangeExclusionHandler {
 
-    public void changeExclusion(final IEventBroker eventBroker, final IStructuredSelection selection) {
-        final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
-
-        final Map<RobotProject, Collection<IPath>> pathGroupedByProject = groupByProject(selectedResources).asMap();
-        pathGroupedByProject.forEach((robotProject, paths) -> {
+    protected void changeExclusion(final IEventBroker eventBroker, final List<IResource> selectedResources) {
+        final Map<RobotProject, List<IPath>> pathsGroupedByProject = groupByProject(selectedResources);
+        pathsGroupedByProject.forEach((robotProject, paths) -> {
             changeExclusion(robotProject, paths);
             fireEvents(eventBroker, robotProject.getProject(), paths);
         });
@@ -49,17 +44,13 @@ abstract class ChangeExclusionHandler {
             final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
             manager.update(RobotValidationExcludedDecorator.ID);
         });
-
-        postExclusionChange(selectedResources);
     }
 
-    private Multimap<RobotProject, IPath> groupByProject(final List<IResource> selectedResources) {
-        final Multimap<RobotProject, IPath> groupedPaths = LinkedListMultimap.create();
-        for (final IResource resource : selectedResources) {
-            final RobotProject robotProject = RedPlugin.getModelManager().createProject(resource.getProject());
-            groupedPaths.put(robotProject, resource.getProjectRelativePath());
-        }
-        return groupedPaths;
+    private Map<RobotProject, List<IPath>> groupByProject(final List<IResource> selectedResources) {
+        final Function<IResource, RobotProject> projectClassifier = resource -> RedPlugin.getModelManager()
+                .createProject(resource.getProject());
+        return selectedResources.stream().collect(Collectors.groupingBy(projectClassifier,
+                Collectors.mapping(IResource::getProjectRelativePath, Collectors.toList())));
     }
 
     private void changeExclusion(final RobotProject robotProject, final Collection<IPath> toChange) {
@@ -91,6 +82,4 @@ abstract class ChangeExclusionHandler {
     }
 
     protected abstract void changeExclusion(RobotProjectConfig config, IPath pathToChange);
-
-    protected abstract void postExclusionChange(List<IResource> selectedResources);
 }
