@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.executor;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -30,12 +32,15 @@ import java.util.function.Consumer;
 
 import org.rf.ide.core.rflint.RfLintRule;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotRuntimeEnvironment {
 
     private static Path temporaryDirectory = null;
+
+    private final RobotCommandsExecutors executors;
 
     private final File location;
 
@@ -267,6 +272,12 @@ public class RobotRuntimeEnvironment {
     }
 
     private RobotRuntimeEnvironment(final File location, final String version) {
+        this(PythonInterpretersCommandExecutors.getInstance(), location, version);
+    }
+
+    @VisibleForTesting
+    RobotRuntimeEnvironment(final RobotCommandsExecutors executors, final File location, final String version) {
+        this.executors = executors;
         this.location = location;
         this.version = version;
     }
@@ -318,20 +329,28 @@ public class RobotRuntimeEnvironment {
 
     public List<File> getModuleSearchPaths() {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getModulesSearchPaths();
+            return executor.getModulesSearchPaths().stream().map(this::tryToCanonical).collect(toList());
         }
         return new ArrayList<>();
     }
 
     public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getModulePath(moduleName, additionalPaths);
+            return executor.getModulePath(moduleName, additionalPaths).map(this::tryToCanonical);
         }
         return Optional.empty();
+    }
+
+    private File tryToCanonical(final File file) {
+        try {
+            return file.getCanonicalFile();
+        } catch (final IOException e) {
+            return file;
+        }
     }
 
     public File getFile() {
@@ -340,14 +359,14 @@ public class RobotRuntimeEnvironment {
 
     public void resetCommandExecutors() {
         if (hasRobotInstalled()) {
-            PythonInterpretersCommandExecutors.getInstance().resetExecutorFor((PythonInstallationDirectory) location);
+            executors.resetExecutorFor((PythonInstallationDirectory) location);
         }
     }
 
     public void createLibdocForStdLibrary(final String libName, final File outputFile)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdocForStdLibrary(outputFile.getAbsolutePath(), libName, "");
         }
@@ -356,7 +375,7 @@ public class RobotRuntimeEnvironment {
     public void createLibdocForStdLibraryForcibly(final String libName, final File outputFile)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdocForStdLibrary(outputFile.getAbsolutePath(), libName, "");
         }
@@ -365,7 +384,7 @@ public class RobotRuntimeEnvironment {
     public void createLibdocForThirdPartyLibrary(final String libName, final String libPath,
             final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdocForThirdPartyLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
         }
@@ -374,7 +393,7 @@ public class RobotRuntimeEnvironment {
     public void createLibdocForThirdPartyLibraryForcibly(final String libName, final String libPath,
             final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdocForThirdPartyLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
         }
@@ -382,7 +401,7 @@ public class RobotRuntimeEnvironment {
 
     public List<String> getStandardLibrariesNames() {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             final List<String> libs = executor.getStandardLibrariesNames();
             // Remote is a library without keywords and libdoc throws
@@ -396,7 +415,7 @@ public class RobotRuntimeEnvironment {
 
     public File getStandardLibraryPath(final String libraryName) {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             final String pycPath = executor.getStandardLibraryPath(libraryName);
             if (pycPath == null) {
@@ -427,7 +446,7 @@ public class RobotRuntimeEnvironment {
     public List<String> getClassesFromModule(final File moduleLocation, final EnvironmentSearchPaths additionalPaths)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             return executor.getClassesFromModule(moduleLocation, additionalPaths);
         }
@@ -436,7 +455,7 @@ public class RobotRuntimeEnvironment {
 
     public Map<String, Object> getGlobalVariables() {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             return executor.getGlobalVariables();
         }
@@ -446,7 +465,7 @@ public class RobotRuntimeEnvironment {
     public Map<String, Object> getVariablesFromFile(final String path, final List<String> args) {
         if (hasRobotInstalled()) {
             final String normalizedPath = path.replace('\\', '/');
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             return executor.getVariables(normalizedPath, args);
         }
@@ -456,7 +475,7 @@ public class RobotRuntimeEnvironment {
     public void runRfLint(final String host, final int port, final File filepath, final List<RfLintRule> rules,
             final List<String> rulesFiles) {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.runRfLint(host, port, filepath, rules, rulesFiles);
         }
@@ -478,7 +497,7 @@ public class RobotRuntimeEnvironment {
     public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
             final boolean recursiveInVirtualenv) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv);
         }
@@ -498,7 +517,7 @@ public class RobotRuntimeEnvironment {
     public void startKeywordAutoDiscovering(final int port, final File dataSource,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.startKeywordAutoDiscovering(port, dataSource, additionalPaths);
         }
@@ -506,7 +525,7 @@ public class RobotRuntimeEnvironment {
 
     public void stopAutoDiscovering() throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+            final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.stopAutoDiscovering();
         }
@@ -576,7 +595,7 @@ public class RobotRuntimeEnvironment {
         // we dont' want anyone to create those objects; they should only be
         // created
         // when given uri is valid python location
-        private PythonInstallationDirectory(final URI uri, final SuiteExecutor interpreter) {
+        PythonInstallationDirectory(final URI uri, final SuiteExecutor interpreter) {
             super(uri);
             this.interpreter = interpreter;
         }
