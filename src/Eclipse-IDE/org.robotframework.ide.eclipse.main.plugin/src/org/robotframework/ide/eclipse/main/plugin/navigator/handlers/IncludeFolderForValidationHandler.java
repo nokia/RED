@@ -30,11 +30,12 @@ public class IncludeFolderForValidationHandler extends DIParameterizedHandler<E4
 
         private static final long REVALIDATE_JOB_DELAY = 2000;
 
-        @Override
         @Execute
         public void changeExclusion(final IEventBroker eventBroker,
                 final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            super.changeExclusion(eventBroker, selection);
+            final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
+            changeExclusion(eventBroker, selectedResources);
+            scheduleRevalidation(selectedResources);
         }
 
         @Override
@@ -42,8 +43,7 @@ public class IncludeFolderForValidationHandler extends DIParameterizedHandler<E4
             config.removeExcludedPath(pathToChange.toPortableString());
         }
 
-        @Override
-        protected void postExclusionChange(final List<IResource> selectedResources) {
+        private void scheduleRevalidation(final List<IResource> selectedResources) {
             if (!RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
                 RevalidateSelectionHandler.revalidate(selectedResources, REVALIDATE_JOB_DELAY);
             }
