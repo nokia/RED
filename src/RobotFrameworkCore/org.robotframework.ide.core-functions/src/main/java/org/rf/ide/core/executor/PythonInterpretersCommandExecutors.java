@@ -18,7 +18,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirect
 /**
  * @author Michal Anglart
  */
-class PythonInterpretersCommandExecutors {
+class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
     private static class InstanceHolder {
 
@@ -65,7 +65,8 @@ class PythonInterpretersCommandExecutors {
         processListeners.remove(listener);
     }
 
-    synchronized void resetExecutorFor(final PythonInstallationDirectory interpreterPath) {
+    @Override
+    public synchronized void resetExecutorFor(final PythonInstallationDirectory interpreterPath) {
         final String pathAsName = interpreterPath.toPath()
                 .resolve(interpreterPath.getInterpreter().executableName())
                 .toAbsolutePath()
@@ -76,7 +77,9 @@ class PythonInterpretersCommandExecutors {
         }
     }
 
-    synchronized RobotCommandExecutor getRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
+    @Override
+    public synchronized RobotCommandExecutor getRobotCommandExecutor(
+            final PythonInstallationDirectory interpreterPath) {
         final SuiteExecutor interpreter = interpreterPath.getInterpreter();
         final String pathAsName = interpreterPath.toPath()
                 .resolve(interpreter.executableName())
@@ -105,7 +108,8 @@ class PythonInterpretersCommandExecutors {
         return new RobotCommandDirectExecutor(pathAsName, interpreter);
     }
 
-    RobotCommandExecutor getDirectRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
+    @Override
+    public RobotCommandExecutor getDirectRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
         final String pathAsName = interpreterPath.toPath()
                 .resolve(interpreterPath.getInterpreter().executableName())
                 .toAbsolutePath()
