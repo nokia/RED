@@ -168,6 +168,18 @@ public enum ConfigFileProblem implements IProblemCause {
         public String getProblemDescription() {
             return "The path '%s' is invalid";
         }
+    },
+    LIBRARY_SPEC_CANNOT_BE_GENERATED {
+
+        @Override
+        public String getProblemDescription() {
+            return "Library specification file was not generated for '%s' library";
+        }
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.LIBRARY_SPECIFICATION_FILE;
+        }
     };
 
     public static final String LIBRARY_INDEX = "marker.libraryIndex";

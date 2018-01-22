@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
@@ -24,6 +25,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -31,8 +34,10 @@ import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLi
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class RobotProjectConfigFileValidatorTest {
@@ -45,6 +50,8 @@ public class RobotProjectConfigFileValidatorTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    private RobotModel model;
+
     private RobotProjectConfigFileValidator validator;
 
     private MockReporter reporter;
@@ -53,7 +60,8 @@ public class RobotProjectConfigFileValidatorTest {
     public void beforeTest() throws Exception {
         reporter = new MockReporter();
         final ValidationContext context = mock(ValidationContext.class);
-        when(context.getModel()).thenReturn(new RobotModel());
+        model = new RobotModel();
+        when(context.getModel()).thenReturn(model);
         final IFile file = mock(IFile.class);
         when(file.getProject()).thenReturn(projectProvider.getProject());
         validator = new RobotProjectConfigFileValidator(context, file, reporter);
@@ -99,6 +107,81 @@ public class RobotProjectConfigFileValidatorTest {
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(ConfigFileProblem.INVALID_VERSION, new ProblemPosition(3)));
+    }
+
+    @Test
+    public void whenLibspecForStandardLibraryIsMissing_notGeneratedProblemIsReported() throws Exception {
+        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
+        stdLibs.put("StdLib1", LibrarySpecification.create("StdLib1"));
+        stdLibs.put("StdLib2", null);
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject.setStandardLibraries(stdLibs);
+        
+        final RobotProjectConfig config = RobotProjectConfig.create();
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(config, new FilePosition(2, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(
+                        new Problem(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED, new ProblemPosition(2)));
+    }
+
+    @Test
+    public void whenLibspecForStandardRemoteLibraryIsMissing_notGeneratedProblemIsReported() throws Exception {
+        final String address = "http://127.0.0.1:" + findFreePort() + "/";
+
+        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
+        stdLibs.put("Remote " + address, null);
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject.setStandardLibraries(stdLibs);
+
+        final RemoteLocation remoteLocation = RemoteLocation.create(address);
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addRemoteLocation(remoteLocation);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(remoteLocation, new FilePosition(42, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        // there is also unreachable host problem
+        assertThat(reporter.getReportedProblems()).hasSize(2)
+                .contains(new Problem(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED, new ProblemPosition(42)));
+    }
+
+    @Test
+    public void whenLibspecForReferencedLibraryIsMissing_notGeneratedProblemIsReported() throws CoreException {
+        final ReferencedLibrary refLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "ref", "/some/path");
+        final ReferencedLibrary refLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "missing", "/some/other/path");
+
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(refLib1, LibrarySpecification.create("ref"));
+        refLibs.put(refLib2, null);
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(refLib1, new FilePosition(1728, 0));
+        locations.put(refLib2, new FilePosition(1729, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED, new ProblemPosition(1729)));
     }
 
     @Test
