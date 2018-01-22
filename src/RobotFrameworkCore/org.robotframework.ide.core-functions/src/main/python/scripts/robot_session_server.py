@@ -242,7 +242,7 @@ def stop_auto_discovering():
 @logresult
 @encode_result_or_exception
 @logargs
-def run_rf_lint(host, port, filepath, additional_arguments):
+def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, additional_arguments):
     import subprocess
     import os
 
@@ -256,6 +256,10 @@ def run_rf_lint(host, port, filepath, additional_arguments):
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rflint_integration.py'))
     command.append(host)
     command.append(str(port))
+    command.append(__encode_unicode_if_needed(project_location_path))
+    if excluded_paths:
+        command.append('-exclude')
+        command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
     command.extend(additional_arguments)
     command.append('-r')
     command.append(__encode_unicode_if_needed(filepath))
