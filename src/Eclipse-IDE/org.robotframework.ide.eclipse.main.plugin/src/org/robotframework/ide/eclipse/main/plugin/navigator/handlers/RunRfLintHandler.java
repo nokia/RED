@@ -1,6 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,14 +18,15 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.rflint.RfLintClientEventsListener;
 import org.rf.ide.core.rflint.RfLintIntegrationServer;
 import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RunRfLintHandler.E4RunRfLintHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
@@ -45,10 +47,6 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
 
             RfLintProblem.cleanProblems(newArrayList(selectedResource));
 
-            final File filepath = selectedResource.getLocation().toFile();
-            final RobotRuntimeEnvironment env = RedPlugin.getModelManager()
-                    .createProject(selectedResource.getProject())
-                    .getRuntimeEnvironment();
             final RfLintIntegrationServer server = scheduleServerJob();
             try {
                 server.waitForServerToSetup();
@@ -56,11 +54,7 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
                 showErrorDialog(e);
             }
             try {
-                final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-                final List<RfLintRule> rules = preferences.getRfLintRules();
-                final List<String> rulesFiles = preferences.getRfLintRulesFiles();
-
-                env.runRfLint(server.getHost(), server.getPort(), filepath, rules, rulesFiles);
+                runRfLint(selectedResource, server);
             } catch (final RobotEnvironmentException e) {
                 killServer(server);
                 showErrorDialog(e);
@@ -98,6 +92,23 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
 
         static void showErrorDialog(final Exception e) {
             DetailedErrorDialog.openErrorDialog("Error occurred when trying to run RfLint analysis", e.getMessage());
+        }
+
+        private void runRfLint(final IResource resource, final RfLintIntegrationServer server) {
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(resource.getProject());
+            final File projectLocation = robotProject.getProject().getLocation().toFile();
+            final List<String> excludedPaths = robotProject.getRobotProjectConfig()
+                    .getExcludedPath()
+                    .stream()
+                    .map(ExcludedFolderPath::getPath)
+                    .collect(toList());
+            final File filepath = resource.getLocation().toFile();
+            final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+            final List<RfLintRule> rules = preferences.getRfLintRules();
+            final List<String> rulesFiles = preferences.getRfLintRulesFiles();
+
+            robotProject.getRuntimeEnvironment().runRfLint(server.getHost(), server.getPort(), projectLocation,
+                    excludedPaths, filepath, rules, rulesFiles);
         }
     }
 
