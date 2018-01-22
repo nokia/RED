@@ -29,9 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Objects;
@@ -115,8 +112,7 @@ public class LibrariesBuilder {
     }
 
     public void buildLibraries(final RobotProject robotProject, final RobotRuntimeEnvironment runtimeEnvironment,
-            final RobotProjectConfig configuration, final SubMonitor monitor,
-            final ProblemsReportingStrategy reporter) {
+            final RobotProjectConfig configuration, final SubMonitor monitor) {
         logger.log("BUILDING: generating library docs");
         monitor.subTask("generating libdocs");
 
@@ -144,10 +140,7 @@ public class LibrariesBuilder {
                 generator.generateLibdoc(runtimeEnvironment, new RedEclipseProjectConfig(configuration)
                         .createEnvironmentSearchPaths(robotProject.getProject()));
             } catch (final RobotEnvironmentException e) {
-                final RobotProblem problem = RobotProblem
-                        .causedBy(ProjectConfigurationProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
-                        .formatMessageWith(e.getMessage());
-                reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
+                // the libraries with missing libspec are reported in validation phase
             }
             monitor.worked(1);
         }
