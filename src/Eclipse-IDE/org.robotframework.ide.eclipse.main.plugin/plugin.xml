@@ -1749,31 +1749,46 @@
                <iterate
                      ifEmpty="false"
                      operator="or">
-                  <or>
-                     <adapt
-                           type="org.eclipse.core.resources.IFile">
-                        <or>
-                           <test
-                                 property="org.eclipse.core.resources.name"
-                                 value="*.robot">
-                           </test>
-                           <test
-                                 property="org.eclipse.core.resources.name"
-                                 value="*.txt">
-                           </test>
-                           <test
-                                 property="org.eclipse.core.resources.name"
-                                 value="*.tsv">
-                           </test>
-                        </or>
-                     </adapt>
-                     <adapt
-                           type="org.eclipse.core.resources.IFolder">
-                     </adapt>
-                     <adapt
-                           type="org.eclipse.core.resources.IProject">
-                     </adapt>
-                  </or>
+                  <and>
+                    <or>
+                       <adapt
+                             type="org.eclipse.core.resources.IFile">
+                          <or>
+                             <test
+                                   property="org.eclipse.core.resources.name"
+                                   value="*.robot">
+                             </test>
+                             <test
+                                   property="org.eclipse.core.resources.name"
+                                   value="*.txt">
+                             </test>
+                             <test
+                                   property="org.eclipse.core.resources.name"
+                                   value="*.tsv">
+                             </test>
+                          </or>
+                       </adapt>
+                       <adapt
+                             type="org.eclipse.core.resources.IFolder">
+                       </adapt>
+                       <adapt
+                             type="org.eclipse.core.resources.IProject">
+                       </adapt>
+                    </or>
+                    <adapt
+                          type="org.eclipse.core.resources.IResource">
+                       <and>
+                          <test
+                               property="org.robotframework.redxml.navigator.isIncluded"
+                               value="true">
+                          </test>
+                          <test
+                               property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
+                               value="false">
+                          </test>
+                       </and>
+                    </adapt>
+                  </and>
                </iterate>
             </with>
          </enabledWhen>
