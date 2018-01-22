@@ -403,7 +403,8 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void runRfLint(final String host, final int port, final File filepath, final List<RfLintRule> rules,
+    public void runRfLint(final String host, final int port, final File projectLocation,
+            final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
             final List<String> rulesFiles) {
         try {
             final List<String> additionalArgs = new ArrayList<>();
@@ -421,7 +422,8 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     additionalArgs.add(rule.getRuleName() + ":" + rule.getConfiguration());
                 }
             }
-            callRpcFunction("runRfLint", host, port, filepath.getAbsolutePath(), additionalArgs);
+            callRpcFunction("runRfLint", host, port, projectLocation.getAbsolutePath(), excludedPaths,
+                    filepath.getAbsolutePath(), additionalArgs);
 
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);

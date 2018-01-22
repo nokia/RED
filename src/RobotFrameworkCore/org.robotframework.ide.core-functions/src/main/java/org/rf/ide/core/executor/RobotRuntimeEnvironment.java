@@ -472,12 +472,13 @@ public class RobotRuntimeEnvironment {
         return new LinkedHashMap<>();
     }
 
-    public void runRfLint(final String host, final int port, final File filepath, final List<RfLintRule> rules,
+    public void runRfLint(final String host, final int port, final File projectLocation,
+            final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
             final List<String> rulesFiles) {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.runRfLint(host, port, filepath, rules, rulesFiles);
+            executor.runRfLint(host, port, projectLocation, excludedPaths, filepath, rules, rulesFiles);
         }
     }
 
