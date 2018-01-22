@@ -308,7 +308,8 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void runRfLint(final String host, final int port, final File filepath, final List<RfLintRule> rules,
+    public void runRfLint(final String host, final int port, final File projectLocation,
+            final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
             final List<String> rulesFiles) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("rflint_integration.py");
@@ -317,6 +318,11 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
             cmdLine.add(host);
             cmdLine.add(Integer.toString(port));
+            cmdLine.add(projectLocation.getAbsolutePath());
+            if (!excludedPaths.isEmpty()) {
+                cmdLine.add("-exclude");
+                cmdLine.add(String.join(";", excludedPaths));
+            }
             for (final String path : rulesFiles) {
                 cmdLine.add("-R");
                 cmdLine.add(path);
