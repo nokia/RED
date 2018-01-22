@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Nm22AO38EeaEfJH5Ahap2w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/7/17 4:58 PM
+Save-Time: 1/22/18 10:42 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -68,6 +68,8 @@ exec-with-options -disableJobWaiting -command {
 	//run this test
 	get-window "Errors in Workspace" | get-button Proceed | click
 }
+wait-for-console
+
 get-view Console | get-text-viewer | get-property text 
     | contains  "test 2                                                                | PASS |\n"
     + "------------------------------------------------------------------------------\n"
@@ -90,6 +92,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-button Proceed | click
 	}
 }
+wait-for-console
 get-view Console | get-text-viewer | get-property text 
     | contains 
     "test 1                                                                | FAIL |\n"
@@ -105,6 +108,7 @@ get-view Console | get-text-viewer | get-property text
     
 //run entire test    
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+wait-for-console
 
 get-view Console | get-text-viewer | get-property text 
     | contains 
@@ -191,10 +195,7 @@ exec-with-options -disableJobWaiting -command {
 	}
 }	
 
-try -times 4 -delay 500 -command{
-	get-view "Message Log" | get-editbox | get-property text | contains "Ending test: RobotProject.TestFile.test 2" |verify-true
-}
-
+wait-for-message-log -last_line "RobotProject.TestFile.test 2"
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
     + ".* : FAIL : No keyword with name 'I will cause an error' found.\n"
     + "Ending test: RobotProject.TestFile.test 1\n\n"
