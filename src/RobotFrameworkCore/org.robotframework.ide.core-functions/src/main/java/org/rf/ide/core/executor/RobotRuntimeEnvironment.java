@@ -493,14 +493,17 @@ public class RobotRuntimeEnvironment {
      *            Project file
      * @param recursiveInVirtualenv
      *            Virtualenv recursive library source lookup switch
+     * @param excludedPaths
+     *            Project relative excluded paths
      * @throws RobotEnvironmentException
      */
     public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
-            final boolean recursiveInVirtualenv) throws RobotEnvironmentException {
+            final boolean recursiveInVirtualenv, final List<String> excludedPaths) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv);
+            executor.startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv,
+                    excludedPaths);
         }
     }
 

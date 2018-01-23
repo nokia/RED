@@ -27,17 +27,16 @@ class RedRfLint(RfLint):
         # overridden the bug in rflint which causes the tree to be traversed too many times
         self.count_files(path)
 
-        for entry in sorted(os.listdir(path)):
-            whole_path = os.path.join(path, entry)
-
-            # skip excluded paths
-            if whole_path in self._to_exclude:
-                continue
-
-            if os.path.isfile(whole_path) and self.__is_robot_file(entry):
-                self._process_file(os.path.join(path, entry))
-            elif os.path.isdir(whole_path) and self.args.recursive:
-                self._process_folder(os.path.join(path, entry))
+        for root, dirs, files in os.walk(path):
+            for file in sorted(files):
+                if self.__is_robot_file(file) and not self.__is_excluded_path(root, file):
+                    self._process_file(os.path.join(root, file))
+            if self.args.recursive:
+                # skip excluded directories
+                dirs[:] = [dir for dir in dirs if not self.__is_excluded_path(root, dir)]
+            else:
+                # stop traversing
+                del dirs[:]
 
     def count_files(self, path):
         if self._total_files is None:
@@ -50,16 +49,21 @@ class RedRfLint(RfLint):
 
         total = 0
         for root, dirs, files in os.walk(path):
-            total += len([f for f in files if self.__is_robot_file(f) and os.path.join(root, f) not in self._to_exclude])
-            if not self.args.recursive:
-                break
-            # skip excluded directories
-            dirs[:] = [dir for dir in dirs if not os.path.join(root, dir) in self._to_exclude]
+            total += len([f for f in files if self.__is_robot_file(f) and not self.__is_excluded_path(root, f)])
+            if self.args.recursive:
+                # skip excluded directories
+                dirs[:] = [dir for dir in dirs if not self.__is_excluded_path(root, dir)]
+            else:
+                # stop traversing
+                del dirs[:]
         return total
 
     def __is_robot_file(self, filepath):
         _, ext = os.path.splitext(filepath)
         return ext.lower() in (".robot", ".txt", ".tsv")
+
+    def __is_excluded_path(self, root, path):
+        return path.startswith('.') or os.path.join(root, path) in self._to_exclude
 
     def report(self, linenumber, filename, severity, message, rulename, char):
         self._client.send_to_server('violation_found', 
@@ -96,7 +100,7 @@ class JsonClient(object):
                 return True, sock, MessagesEncoder(sock)
             except socket.error as e:
                 print('TestRunnerAgent: connection trial #%s failed' % trials)
-                print('\tUnable to open socket to "%s:%s"'  % (host, port))
+                print('\tUnable to open socket to "%s:%s"' % (host, port))
                 print('\terror: %s' % str(e))
                 time.sleep(self.CONNECTION_SLEEP_BETWEEN_TRIALS)
             trials += 1
@@ -120,7 +124,7 @@ class JsonClient(object):
             self.encoder.close()
             self.encoder = None
 
-            self.sock.close()           
+            self.sock.close()
             self.sock = None
 
 
