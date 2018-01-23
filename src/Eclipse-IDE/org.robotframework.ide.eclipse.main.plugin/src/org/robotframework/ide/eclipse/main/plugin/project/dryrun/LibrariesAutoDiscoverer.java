@@ -27,8 +27,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
@@ -37,6 +35,7 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -47,7 +46,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
-import org.robotframework.red.swt.SwtThread;
 
 /**
  * @author mmarzec
@@ -57,12 +55,6 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     private final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler;
 
     private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
-
-    public static Consumer<Collection<RobotDryRunLibraryImport>> defaultSummaryHandler() {
-        final Shell parent = Display.getCurrent().getActiveShell();
-        return libraryImports -> SwtThread
-                .syncExec(() -> new LibrariesAutoDiscovererWindow(parent, libraryImports).open());
-    }
 
     LibrariesAutoDiscoverer(final RobotProject robotProject,
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler) {
@@ -132,9 +124,14 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         final boolean recursiveInVirtualenv = RedPlugin.getDefault()
                 .getPreferences()
                 .isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
+        final List<String> excludedPaths = robotProject.getRobotProjectConfig()
+                .getExcludedPath()
+                .stream()
+                .map(ExcludedFolderPath::getPath)
+                .collect(toList());
 
         robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSource, projectLocation,
-                recursiveInVirtualenv);
+                recursiveInVirtualenv, excludedPaths);
     }
 
     void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> collection) {
