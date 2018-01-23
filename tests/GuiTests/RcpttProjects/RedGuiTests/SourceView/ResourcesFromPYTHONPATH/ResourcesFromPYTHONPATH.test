@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/4/17 11:41 AM
+Save-Time: 1/23/18 2:16 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -20,12 +20,12 @@ test: AddPythonLibFromPythonPath
 Content-Type: text/ecl
 Entry-Name: .content
 
-// 1. Before test add full path to folder from this test library to PYTHONPATH:
-//   your_path\RedGuiTests\TestData\LibsFromPythonPath
+// 1. Before test add full path to folder in RCPTT library to PYTHONPATH:
+//   your_path_tor_rcptt_lib\RedGuiTests\TestData\LibsFromPythonPath
 //
 // 2. Set in Contex -> global_parameters -> user_RCPTT_project_path
-//   full path to this test library, i.e.:
-//   D:\RED_testy\RcpttProjects\RedGuiTests
+//   full path to test library, i.e.:
+//   your_path_tor_rcptt_lib\RedGuiTests
 //
 
 proc "check-warnings"{
@@ -36,11 +36,13 @@ proc "check-warnings"{
         | verify-true
     get-item "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals [format "Path 'Resources/ResourcesFromFolder.robot' is relative to location from python Modules Search Path (sys.path). " +
-        	"Points to '%s/TestData/LibsFromPythonPath/Resources/ResourcesFromFolder.robot'"  [replace -input $RCPTT_project_path -old "\\" -new "/"]]
+        	"Points to '%s/TestData/LibsFromPythonPath/Resources/ResourcesFromFolder.robot'"  
+        	[get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]]]
         | verify-true
     get-item "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[2].getText()" 
         | equals [format "Path 'SimpleResource.robot' is relative to location from python Modules Search Path (sys.path). " +
-        	"Points to '%s/TestData/LibsFromPythonPath/SimpleResource.robot'" [replace -input $RCPTT_project_path -old "\\" -new "/"]]
+        	"Points to '%s/TestData/LibsFromPythonPath/SimpleResource.robot'" 
+        	[get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]]]
         | verify-true
 	}
 }
