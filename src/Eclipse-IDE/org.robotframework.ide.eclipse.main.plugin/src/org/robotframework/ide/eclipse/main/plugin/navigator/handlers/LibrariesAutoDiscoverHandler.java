@@ -25,7 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.LibrariesAutoDiscoverHandler.E4LibrariesAutoDiscoverHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrariesAutoDiscoverer;
-import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscovererWindow;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -41,8 +41,8 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
         public void discoverLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
-            final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler = LibrariesAutoDiscoverer
-                    .defaultSummaryHandler();
+            final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler = LibrariesAutoDiscovererWindow
+                    .openSummary();
             final WorkspaceJob suiteCollectingJob = new WorkspaceJob("Collecting robot suites") {
 
                 @Override

@@ -266,7 +266,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
     @Override
     public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
-            final boolean recursiveInVirtualenv) {
+            final boolean recursiveInVirtualenv, final List<String> excludedPaths) {
         try {
             RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py");
             RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
@@ -275,6 +275,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final List<String> cmdLine = createCommandLine(scriptFile, String.valueOf(port),
                     dataSource.getAbsolutePath(), projectLocation.getAbsolutePath(),
                     String.valueOf(recursiveInVirtualenv));
+            cmdLine.add(String.join(";", excludedPaths));
 
             RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> {});
         } catch (final IOException | NumberFormatException e) {
