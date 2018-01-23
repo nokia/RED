@@ -53,6 +53,8 @@ public class SimpleLibrariesAutoDiscovererTest {
         projectProvider.createFile("CorrectLibWithClasses.py", "class ClassA(object):", "  def kw():", "   pass",
                 "class ClassB(object):", "  def kw():", "   pass", "class ClassC(object):", "  def kw():", "   pass");
         projectProvider.createFile("ErrorLib.py", "error():");
+        projectProvider.createDir("excluded");
+        projectProvider.createFile("excluded/ExcludedLib.py", "def kw():", " pass");
 
         // this should not be found in any case
         projectProvider.createFile("notUsedLib.py", "def kw():", " pass");
@@ -146,6 +148,26 @@ public class SimpleLibrariesAutoDiscovererTest {
 
         verify(summaryHandler)
                 .accept(argThat(hasLibImports(createImport(NOT_ADDED, "NotExistingLib", newHashSet(suite.getFile())))));
+        verifyNoMoreInteractions(summaryHandler);
+    }
+
+    @Test
+    public void nothingIsAddedToProjectConfig_whenPathWithExistingLibIsExcluded() throws Exception {
+        robotProject.getRobotProjectConfig().addExcludedPath("excluded");
+
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  ExcludedLib",
+                "*** Test Cases ***"));
+
+        final SimpleLibrariesAutoDiscoverer discoverer = new SimpleLibrariesAutoDiscoverer(robotProject, suite,
+                "ExcludedLib", summaryHandler);
+        discoverer.start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+
+        verify(summaryHandler)
+                .accept(argThat(hasLibImports(createImport(NOT_ADDED, "ExcludedLib", newHashSet(suite.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }
 }

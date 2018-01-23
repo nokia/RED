@@ -19,8 +19,6 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class SimpleLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
 
     private final RobotSuiteFile suite;
@@ -28,12 +26,6 @@ public class SimpleLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
     private final String libraryNameToDiscover;
 
     public SimpleLibrariesAutoDiscoverer(final RobotProject robotProject, final RobotSuiteFile suite,
-            final String libraryNameToDiscover) {
-        this(robotProject, suite, libraryNameToDiscover, defaultSummaryHandler());
-    }
-
-    @VisibleForTesting
-    SimpleLibrariesAutoDiscoverer(final RobotProject robotProject, final RobotSuiteFile suite,
             final String libraryNameToDiscover, final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler) {
         super(robotProject, summaryHandler);
         this.suite = suite;

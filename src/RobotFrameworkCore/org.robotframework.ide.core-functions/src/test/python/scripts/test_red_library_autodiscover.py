@@ -59,7 +59,7 @@ class LibraryAutodiscoveringTests(unittest.TestCase):
         else:
             self.assertEqual(class_paths, [])
 
-    def test_if_nested_pats_are_not_collected_when_search_is_not_recursive(self):
+    def test_if_nested_paths_are_not_collected_when_search_is_not_recursive(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         project_location = os.path.join(parent_path, 'res_test_red_library_autodiscover', 'python_libs')
 
@@ -68,4 +68,15 @@ class LibraryAutodiscoveringTests(unittest.TestCase):
         self.assertEqual(python_paths, [project_location,
                                         os.path.join(project_location, 'a'),
                                         os.path.join(project_location, 'other')])
+        self.assertEqual(class_paths, [])
+
+    def test_if_excluded_paths_are_not_collected(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        project_location = os.path.join(parent_path, 'res_test_red_library_autodiscover', 'python_libs')
+
+        python_paths, class_paths = _collect_source_paths(project_location, True, ['lib.py', 'other'])
+
+        self.assertEqual(python_paths, [os.path.join(project_location, 'a'),
+                                        os.path.join(project_location, 'a', 'b'),
+                                        os.path.join(project_location, 'a', 'b', 'c')])
         self.assertEqual(class_paths, [])
