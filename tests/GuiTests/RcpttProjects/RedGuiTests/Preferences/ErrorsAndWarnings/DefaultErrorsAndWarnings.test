@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VMj88KTbEeazyPh6f3_hNQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/12/18 2:33 PM
+Save-Time: 1/23/18 11:19 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -232,7 +232,7 @@ with [get-window Preferences | get-section "Project configuration"] {
         + "Python main directory with Robot modules installed should be defined in preferences.\n"
         + "Project may override this setting in its configuration file." | verify-true
     get-label "Library documentation file cannot be generated" | get-property "getToolTipText()" 
-        | equals "Occurs when for some reason Robot framework is unable to generate library specification file,probably due to missing library dependencies or errors in library source code." 
+        | equals "Occurs when for some reason Robot framework is unable to generate library specification file, probably due to missing library dependencies or errors in library source code." 
         | verify-true
     with [get-combo -after [get-label "Project configuration file (red.xml) cannot be read"]] {
         get-property selection | equals Fatal | verify-true
@@ -245,9 +245,9 @@ with [get-window Preferences | get-section "Project configuration"] {
         get-property "values[0]" | equals Fatal | verify-true
     }
     with [get-combo -after [get-label "Library documentation file cannot be generated"]] {
-        get-property selection | equals Fatal | verify-true
+        get-property selection | equals Error | verify-true
         get-property readOnly | equals true | verify-true
-        get-property "values[0]" | equals Fatal | verify-true
+        get-property "values[0]" | equals Error | verify-true
     }
 }  	
 
