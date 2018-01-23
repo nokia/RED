@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/23/18 2:16 PM
+Save-Time: 1/23/18 4:12 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -37,12 +37,12 @@ proc "check-warnings"{
     get-item "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals [format "Path 'Resources/ResourcesFromFolder.robot' is relative to location from python Modules Search Path (sys.path). " +
         	"Points to '%s/TestData/LibsFromPythonPath/Resources/ResourcesFromFolder.robot'"  
-        	[get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]]]
+        	[get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
         | verify-true
     get-item "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[2].getText()" 
         | equals [format "Path 'SimpleResource.robot' is relative to location from python Modules Search Path (sys.path). " +
         	"Points to '%s/TestData/LibsFromPythonPath/SimpleResource.robot'" 
-        	[get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]]]
+        	[get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ] -linux $RCPTT_project_path ]]
         | verify-true
 	}
 }
