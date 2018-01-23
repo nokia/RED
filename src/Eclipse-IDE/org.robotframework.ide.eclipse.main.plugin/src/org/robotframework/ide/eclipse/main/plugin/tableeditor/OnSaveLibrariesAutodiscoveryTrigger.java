@@ -38,8 +38,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.GeneralSettingsLibrariesImportValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrariesAutoDiscoverer;
-import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscovererWindow;
 
 class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
@@ -56,7 +56,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
             final boolean showSummary = robotProject.getRobotProjectConfig()
                     .isLibrariesAutoDiscoveringSummaryWindowEnabled();
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler = showSummary
-                    ? LibrariesAutoDiscoverer.defaultSummaryHandler()
+                    ? LibrariesAutoDiscovererWindow.openSummary()
                     : libraryImports -> {};
             return new CombinedLibrariesAutoDiscoverer(robotProject, suites, summaryHandler);
         });

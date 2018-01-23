@@ -38,7 +38,8 @@ interface RobotCommandExecutor {
     void createLibdocForThirdPartyLibrary(String resultFilePath, String libName, String libPath,
             EnvironmentSearchPaths additionalPaths);
 
-    void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean recursiveInVirtualenv);
+    void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean recursiveInVirtualenv,
+            List<String> excludedPaths);
 
     void startKeywordAutoDiscovering(int port, File dataSource, EnvironmentSearchPaths additionalPaths);
 

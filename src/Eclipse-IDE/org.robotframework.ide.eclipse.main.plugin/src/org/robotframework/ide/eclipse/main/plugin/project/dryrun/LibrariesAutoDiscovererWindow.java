@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +43,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -54,6 +56,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.TreeContentProvider;
 
@@ -107,7 +110,13 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private final RedClipboard clipboard;
 
-    public LibrariesAutoDiscovererWindow(final Shell parent,
+    public static Consumer<Collection<RobotDryRunLibraryImport>> openSummary() {
+        final Shell parent = Display.getCurrent().getActiveShell();
+        return libraryImports -> SwtThread
+                .syncExec(() -> new LibrariesAutoDiscovererWindow(parent, libraryImports).open());
+    }
+
+    private LibrariesAutoDiscovererWindow(final Shell parent,
             final Collection<RobotDryRunLibraryImport> importedLibraries) {
         super(parent);
         setShellStyle(SWT.CLOSE | SWT.MODELESS | SWT.BORDER | SWT.TITLE | SWT.RESIZE);
