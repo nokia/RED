@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -32,6 +33,10 @@ public class ValidationApplication implements IApplication {
 
     @Override
     public Object start(final IApplicationContext context) throws Exception {
+        // this is necessary to load preferences before start or sometimes error stack
+        // would appear due to using prefs in another thread before fully loaded
+        RedPlugin.getDefault().getPreferences();
+        
         IWorkspaceDescription description = ResourcesPlugin.getWorkspace().getDescription();
         final boolean isAutobuildingEnabled = description.isAutoBuilding();
         description.setAutoBuilding(false);
