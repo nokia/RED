@@ -200,7 +200,8 @@ def get_robot_version():
 @logresult
 @encode_result_or_exception
 @logargs
-def start_library_auto_discovering(port, data_source_path, project_location_path, recursiveInVirtualenv):
+def start_library_auto_discovering(port, data_source_path, project_location_path, recursiveInVirtualenv,
+                                   excluded_paths):
     import subprocess
     import os
 
@@ -210,6 +211,7 @@ def start_library_auto_discovering(port, data_source_path, project_location_path
     command.append(__encode_unicode_if_needed(data_source_path))
     command.append(__encode_unicode_if_needed(project_location_path))
     command.append(str(recursiveInVirtualenv))
+    command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
 
     RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
 

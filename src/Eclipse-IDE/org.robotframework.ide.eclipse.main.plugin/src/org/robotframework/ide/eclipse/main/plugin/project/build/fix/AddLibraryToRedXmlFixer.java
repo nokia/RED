@@ -27,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscovererWindow;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.SimpleLibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
@@ -49,7 +50,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
     public AddLibraryToRedXmlFixer(final String pathOrName, final boolean isPath) {
         this(pathOrName, isPath, (project, suites) -> new SimpleLibrariesAutoDiscoverer(project,
-                Iterables.getFirst(suites, null), pathOrName));
+                Iterables.getFirst(suites, null), pathOrName, LibrariesAutoDiscovererWindow.openSummary()));
     }
 
     AddLibraryToRedXmlFixer(final String pathOrName, final boolean isPath, final DiscovererFactory discovererFactory) {

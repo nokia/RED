@@ -372,10 +372,10 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     @Override
     public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
-            final boolean recursiveInVirtualenv) {
+            final boolean recursiveInVirtualenv, final List<String> excludedPaths) {
         try {
             callRpcFunction("startLibraryAutoDiscovering", port, dataSource.getAbsolutePath(),
-                    projectLocation.getAbsolutePath(), recursiveInVirtualenv);
+                    projectLocation.getAbsolutePath(), recursiveInVirtualenv, excludedPaths);
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
