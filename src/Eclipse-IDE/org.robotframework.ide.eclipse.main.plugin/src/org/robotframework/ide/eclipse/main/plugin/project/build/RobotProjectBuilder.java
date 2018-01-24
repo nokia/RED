@@ -49,6 +49,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
     public void build(final int kind, final RobotProject robotProject, final IProgressMonitor monitor)
             throws CoreException {
+        final boolean isValidationTurnedOff = RedPlugin.getDefault().getPreferences().isValidationTurnedOff();
         try {
             final IProject project = robotProject.getProject();
             final LibspecsFolder libspecsFolder = LibspecsFolder.createIfNeeded(project);
@@ -57,16 +58,21 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
             final Job buildJob = new RobotArtifactsBuilder(project, logger).createBuildJob(rebuildNeeded,
                     fatalReporter);
-            final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(project, delta,
-                    kind, reporter);
-            final Job validationJob = new RobotArtifactsValidator(project, logger).createValidationJob(buildJob,
-                    validatorConfig);
+            Job validationJob = null;
+            if (!isValidationTurnedOff) {
+                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(project, delta,
+                        kind, reporter);
+                validationJob = new RobotArtifactsValidator(project, logger).createValidationJob(buildJob,
+                        validatorConfig);
+            }
             try {
                 final String projectPath = project.getFullPath().toString();
 
                 monitor.subTask("waiting for project " + projectPath + " build end");
                 buildJob.schedule();
-                validationJob.schedule();
+                if (!isValidationTurnedOff) {
+                    validationJob.schedule();
+                }
                 buildJob.join();
 
                 if (buildJob.getResult().getSeverity() == IStatus.CANCEL
@@ -74,7 +80,9 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                     robotProject.clearConfiguration();
                     if (libspecsFolder.exists()) {
                         libspecsFolder.remove();
-                        validationJob.cancel();
+                        if (!isValidationTurnedOff) {
+                            validationJob.cancel();
+                        }
                         return;
                     }
                 }
@@ -83,7 +91,9 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
                 if (!monitor.isCanceled()) {
                     monitor.subTask("waiting for project " + projectPath + " validation end");
-                    validationJob.join();
+                    if (!isValidationTurnedOff) {
+                        validationJob.join();
+                    }
                 }
             } catch (final InterruptedException e) {
                 throw new CoreException(Status.CANCEL_STATUS);
