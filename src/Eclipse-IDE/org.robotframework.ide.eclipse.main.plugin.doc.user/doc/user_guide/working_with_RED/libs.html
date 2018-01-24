@@ -5,7 +5,7 @@
 	rel="stylesheet" type="text/css" />
 </head>
 <body>
-<h2>Recognizing external libraries and variable files in RED</h2>
+<h2>Recognizing external libraries in RED</h2>
 
 <h3>External libraries installed by pip or included in testcase by file path</h3>
 
@@ -24,15 +24,15 @@ External libraries as python files can be directly included to red.xml file by r
 <i>Robot Framework -> Add Library to red.xml.</i>
 <h3>Quick Fix - shortcut CTRL+1</h3>
 Lets focus on following example:
-<br><br><img src="libs/libs_1.png"> <br><br>
+<br><br><img src="libs/unknown_libs.png"> <br><br>
 
 In sample testcase, there are two libraries included. CalculatorLibrary.py is custom user local library placed in the same folder as testcase, Selenium2Library was installed by pip.<br>
 Both libraries are not recognized by RED as libraries names are underlined and error markers are placed next to line numbers. <br>
 Note the light bulb in error marker - it indicates that there is Quick Fix action available.  
 <br>Click on the library name in test editor, open right click menu and choose Quick Fix or use CTRL+1.
-<br><br><img src="libs/libs_2.png"> <br><br>
+<br><br><img src="libs/quick_fix.png"> <br><br>
 Double click on Discover option, RED will search either PythonPath or library file path, if successful library will be added to Referenced libraries in red.xml 
-<br><br><img src="libs/libs_3.png"> <br><br>
+<br><br><img src="libs/reference_libs.png"> <br><br>
 <br>
 All changes are stored in red.xml, if you need to modify them, open red.xml using Eclipse Default Editor.
 
@@ -46,7 +46,7 @@ During library import, RED is generating LibDoc from given python file using loc
 Under the hood RED is executing following command to RobotFramework to get list of Keywords from give library:<br>
 <i>python -m robot.libdoc &ltPATH_TO_LIBNAME&gt &ltOPTIONS&gt</i><br>
 Whenever RED encounters problem, it will be shown as popup window from Python execution:
-<br><br><img src="libs/libs_8.png"> <br><br>
+<br><br><img src="libs/error.png"> <br><br>
 This indicates that some of the dependencies are missing on your local machine which may affect testcase execution.    
 To verify you can try to execute libdoc in console:<br>
 <i>python -m robot.libdoc &ltPATH_TO_LIBNAME&gt list </i>
@@ -54,7 +54,7 @@ To verify you can try to execute libdoc in console:<br>
 <h3>Reloading libraries after change</h3>
 
 Whenever external library is changed (for instance new keyword is added), libdoc needs to be regenerated to provide changes on content assist and validation in RED.</br>
-This can be done by right click on project name and selecting <i>Robot Framework -&gt Reset Robot Enviroment</i>. <br>
-For reloading selected libdoc, right click on library from Project Explorer and use <i>Reload action</i>. 
+Since version 0.6.3, RED can automatically detect library change and regenerate libdoc (it can be switch off/on in red.xml).<br>
+This can be also done manually by right clicking on library in Project Explorer and selecting <i>Reload action</i>
 </body>
 </html>
