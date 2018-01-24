@@ -58,9 +58,9 @@ This section holds anything related to libraries and RED mechanisms for
 dealing with libraries.
 
 **Referenced libraries** \- holds a list of discovered or manually added
-libraries in current Project.At the bottom of pane, library auto discovery
-settings can be changed. More detail can be found under topic [Recognizing
-external libraries and variable files in RED
+libraries in current Project. At the bottom of pane, library auto discovery
+and reloading settings can be changed. More details can be found under topic
+[Recognizing external libraries in RED
 
 **Paths** \- holds settings for user defined Python/ClassPath which are used
 for Libraries discovery and testcase execution, additionally relative paths
