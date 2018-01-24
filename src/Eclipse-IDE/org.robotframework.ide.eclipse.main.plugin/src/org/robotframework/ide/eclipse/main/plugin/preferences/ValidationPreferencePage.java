@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,8 +25,10 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
@@ -71,22 +74,61 @@ public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
     @Override
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
-        final ScrolledContent scrolled = new ScrolledContent(parent);
-        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 200).applyTo(scrolled);
-        scrolled.addControlListener(new ControlAdapter() {
+        createValidationFields(parent);
+        createNonValidationFields(parent);
+    }
+
+    private void createValidationFields(final Composite parent) {
+        final Group validationGroup = new Group(parent, SWT.NONE);
+        validationGroup.setText("Validation");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 3).applyTo(validationGroup);
+        GridLayoutFactory.fillDefaults().applyTo(validationGroup);
+
+        createTurnOffButton(validationGroup);
+
+        final ScrolledContent validationScrolled = new ScrolledContent(validationGroup);
+        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 200).applyTo(validationScrolled);
+        validationScrolled.addControlListener(new ControlAdapter() {
 
             @Override
             public void controlResized(final ControlEvent e) {
-                scrolled.reflow(true);
+                validationScrolled.reflow(true);
             }
         });
 
-        createTurnOffButton(scrolled.getBody());
-
-        final Map<ProblemCategoryType, Collection<ProblemCategory>> categories = ProblemCategory.getAllCategories();
-        for (final Entry<ProblemCategoryType, Collection<ProblemCategory>> categoryEntry : categories.entrySet()) {
+        final Map<ProblemCategoryType, List<ProblemCategory>> validationCategories = ProblemCategory
+                .getValidationCategories();
+        for (final Entry<ProblemCategoryType, List<ProblemCategory>> categoryEntry : validationCategories
+                .entrySet()) {
             if (!categoryEntry.getValue().isEmpty()) {
-                createProblemCategorySection(scrolled.getBody(), categoryEntry.getKey(), categoryEntry.getValue());
+                createProblemCategorySection(validationScrolled.getBody(), categoryEntry.getKey(),
+                        categoryEntry.getValue());
+            }
+        }
+    }
+
+    private void createNonValidationFields(final Composite parent) {
+        final Group executionGroup = new Group(parent, SWT.NONE);
+        executionGroup.setText("Runtime and Building");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 2).applyTo(executionGroup);
+        GridLayoutFactory.fillDefaults().applyTo(executionGroup);
+
+        final ScrolledContent execScrolled = new ScrolledContent(executionGroup);
+        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 200).applyTo(execScrolled);
+        execScrolled.addControlListener(new ControlAdapter() {
+
+            @Override
+            public void controlResized(final ControlEvent e) {
+                execScrolled.reflow(true);
+            }
+        });
+
+        final Map<ProblemCategoryType, List<ProblemCategory>> runtimeCategories = ProblemCategory
+                .getNonValidationCategories();
+        for (final Entry<ProblemCategoryType, List<ProblemCategory>> categoryEntry : runtimeCategories
+                .entrySet()) {
+            if (!categoryEntry.getValue().isEmpty()) {
+                createProblemCategorySection(execScrolled.getBody(), categoryEntry.getKey(), categoryEntry.getValue());
             }
         }
     }
@@ -94,6 +136,8 @@ public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
     private void createTurnOffButton(final Composite parent) {
         final BooleanFieldEditor validationCheck = new BooleanFieldEditor(RedPreferences.TURN_OFF_VALIDATION,
                 "Turn off validation (Not recommended)", parent);
+        final Button button = (Button) validationCheck.getDescriptionControl(parent);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
         validationCheck.getDescriptionControl(parent).setToolTipText(
                 "This is strongly recommended to NOT turn off the whole validation."
                         + "\nUse this option ONLY if you understand possible consequences."
