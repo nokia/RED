@@ -18,7 +18,14 @@ Every time when user edits test suite which has error markers on library declara
 When there is a need to run autodiscovery on list of files, folders or whole project, this can be achieved by using right click menu in Project Explorer from Robot Framework option.  
 <br><br><img src="libs/autodiscovery_menu.png"> <br><br>
 
-Autodiscovery mechanism is configured per project. Its preferences are stored in red.xml file under Referenced Libraries tab.
+<p>Autodiscovery mechanism is configured per project. Its preferences are stored in red.xml file under Referenced Libraries tab.</p>
+
+<dl class="note">
+   <dt>Note</dt>
+   <dd>Library autodiscovering is not run on excluded project parts (see more under topic <a href="../validation/scope.html">Limiting validation scope</a>.
+   </dd>
+</dl>
+
 <h3>Add library from Project Explorer</h3>
 External libraries as python files can be directly included to red.xml file by right clicking on file and using option:<br>
 <i>Robot Framework -> Add Library to red.xml.</i>
