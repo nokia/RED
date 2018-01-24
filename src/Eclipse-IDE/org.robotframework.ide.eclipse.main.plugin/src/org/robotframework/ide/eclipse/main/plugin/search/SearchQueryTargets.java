@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.ExcludedResources;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchTarget;
@@ -26,7 +27,6 @@ import com.google.common.collect.Multimap;
 
 /**
  * @author Michal Anglart
- *
  */
 class SearchQueryTargets {
 
@@ -62,9 +62,10 @@ class SearchQueryTargets {
 
             try {
                 resourceRoot.accept(new IResourceVisitor() {
+
                     @Override
                     public boolean visit(final IResource resource) throws CoreException {
-                        if (resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource)) {
+                        if (resource.getType() == IResource.FILE && !ExcludedResources.isHiddenInEclipse(resource)) {
                             final IFile file = (IFile) resource;
                             if (targets.contains(SearchTarget.SUITE) && ASuiteFileDescriber.isSuiteFile(file)) {
                                 filesToSearch.add(file);
@@ -81,15 +82,6 @@ class SearchQueryTargets {
                 // then we'll try to get those resources we would be able to
             }
         }
-    }
-
-    private boolean isInsideEclipseHiddenDirectory(final IResource resource) {
-        for (final String segment : resource.getFullPath().segments()) {
-            if (!segment.isEmpty() && segment.charAt(0) == '.') {
-                return true;
-            }
-        }
-        return false;
     }
 
     private boolean isClosedOrNonRobotProject(final IResource resourceRoot) {
