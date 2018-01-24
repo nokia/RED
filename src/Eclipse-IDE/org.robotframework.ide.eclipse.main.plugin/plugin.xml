@@ -1453,7 +1453,7 @@
        </activeWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ReloadPythonModulesHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ResetRobotEnvironmentHandler"
           commandId="org.robotframework.red.reloadProjectRuntimeEnvironment">
        <activeWhen>
           <with
