@@ -24,7 +24,7 @@
     <topic href="doc/user_guide/working_with_RED.html" label="Working with RED">
         <topic href="doc/user_guide/working_with_RED/table_general.html" label="Table Editors - general usage hints">
         </topic>
-        <topic href="doc/user_guide/working_with_RED/libs.html" label="Recognizing external libraries and variable files in RED">
+        <topic href="doc/user_guide/working_with_RED/libs.html" label="Recognizing external libraries in RED">
         </topic>
         <topic href="doc/user_guide/working_with_RED/variable_mapping.html" label="Variable mapping - dealing with parametrized paths to libraries and resources">
         </topic>
