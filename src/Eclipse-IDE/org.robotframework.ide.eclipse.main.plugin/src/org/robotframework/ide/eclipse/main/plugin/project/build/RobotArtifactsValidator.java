@@ -153,9 +153,6 @@ public class RobotArtifactsValidator {
                     return Status.CANCEL_STATUS;
                 }
             }
-            if (RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
-                return Status.OK_STATUS;
-            }
 
             logger.log("VALIDATING: validation of '" + project.getName() + "' project started");
             logger.log("VALIDATING: gathering files to be validated");
