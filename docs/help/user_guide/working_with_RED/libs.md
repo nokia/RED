@@ -1,4 +1,4 @@
-## Recognizing external libraries and variable files in RED
+## Recognizing external libraries in RED
 
 ### External libraries installed by pip or included in testcase by file path
 
@@ -33,7 +33,7 @@ _Robot Framework -> Add Library to red.xml._
 
 Lets focus on following example:  
   
-![](libs/libs_1.png)  
+![](libs/unknown_libs.png)  
   
 In sample testcase, there are two libraries included. CalculatorLibrary.py is
 custom user local library placed in the same folder as testcase,
@@ -45,13 +45,13 @@ action available.
 Click on the library name in test editor, open right click menu and choose
 Quick Fix or use CTRL+1.  
   
-![](libs/libs_2.png)  
+![](libs/quick_fix.png)  
   
 Double click on Discover option, RED will search either PythonPath or library
 file path, if successful library will be added to Referenced libraries in
 red.xml  
   
-![](libs/libs_3.png)  
+![](libs/reference_libs.png)  
   
   
 All changes are stored in red.xml, if you need to modify them, open red.xml
@@ -79,7 +79,7 @@ _python -m robot.libdoc &ltPATH;_TO_LIBNAME> &ltOPTIONS;>_
 Whenever RED encounters problem, it will be shown as popup window from Python
 execution:  
   
-![](libs/libs_8.png)  
+![](libs/error.png)  
   
 This indicates that some of the dependencies are missing on your local machine
 which may affect testcase execution. To verify you can try to execute libdoc
@@ -90,9 +90,9 @@ _python -m robot.libdoc &ltPATH;_TO_LIBNAME> list _
 
 Whenever external library is changed (for instance new keyword is added),
 libdoc needs to be regenerated to provide changes on content assist and
-validation in RED. This can be done by right click on project name and
-selecting _Robot Framework - > Reset Robot Enviroment_.  
-For reloading selected libdoc, right click on library from Project Explorer
-and use _Reload action_.
+validation in RED. Since version 0.6.3, RED can automatically detect library
+change and regenerate libdoc (it can be switch off/on in red.xml).  
+This can be also done manually by right clicking on library in Project
+Explorer and selecting _Reload action_
 
 [Return to Help index](http://nokia.github.io/RED/help/)
