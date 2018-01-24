@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -65,13 +63,13 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     private IEventBroker eventBroker = null;
 
     private final ListMultimap<LibrarySpecification, String> registeredLibrarySpecifications = Multimaps
-            .synchronizedListMultimap(ArrayListMultimap.<LibrarySpecification, String> create());
+            .synchronizedListMultimap(ArrayListMultimap.create());
 
-    private final Set<LibrarySpecification> dirtySpecs = Collections.synchronizedSet(new HashSet<LibrarySpecification>());
+    private final Set<LibrarySpecification> dirtySpecs = Collections.synchronizedSet(new HashSet<>());
 
     private final Set<LibrarySpecification> removedSpecs = new HashSet<>();
 
-    private final Map<ReferencedLibrary, String> registeredRefLibraries = Collections.synchronizedMap(new HashMap<ReferencedLibrary, String>());
+    private final Map<ReferencedLibrary, String> registeredRefLibraries = Collections.synchronizedMap(new HashMap<>());
 
     private final ConcurrentLinkedQueue<RebuildTask> rebuildTasksQueue = new ConcurrentLinkedQueue<>();
 
@@ -130,26 +128,17 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     }
 
     private String[] extractPythonModuleFiles(final File fileDir) {
-        return fileDir.list(new FilenameFilter() {
-
-            @Override
-            public boolean accept(final File dir, final String name) {
-                if (name.endsWith(".py")) {
-                    return true;
-                }
-                return false;
-            }
-        });
+        return fileDir.list((dir, name) -> name.endsWith(".py"));
     }
 
     private void addLibraryToWatch(final String fileName, final Path dir, final LibrarySpecification spec) {
         final List<LibrarySpecification> specsToReplace = new ArrayList<>();
         synchronized (registeredLibrarySpecifications) {
-            for (final Entry<LibrarySpecification, String> entry : registeredLibrarySpecifications.entries()) {
-                if (entry.getValue().equals(fileName) && entry.getKey().equalsIgnoreKeywords(spec)) {
-                    specsToReplace.add(entry.getKey());
+            registeredLibrarySpecifications.forEach((registeredSpec, registeredName) -> {
+                if (registeredName.equals(fileName) && registeredSpec.equalsIgnoreKeywords(spec)) {
+                    specsToReplace.add(registeredSpec);
                 }
-            }
+            });
             for (final LibrarySpecification specToReplace : specsToReplace) {
                 registeredLibrarySpecifications.removeAll(specToReplace);
             }
@@ -166,11 +155,11 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     private void removeLibrarySpecification(final String fileName) {
         final List<LibrarySpecification> specsToRemove = new ArrayList<>();
         synchronized (registeredLibrarySpecifications) {
-            for (final Entry<LibrarySpecification, String> entry : registeredLibrarySpecifications.entries()) {
-                if (entry.getValue().equals(fileName)) {
-                    specsToRemove.add(entry.getKey());
+            registeredLibrarySpecifications.forEach((registeredSpec, registeredName) -> {
+                if (registeredName.equals(fileName)) {
+                    specsToRemove.add(registeredSpec);
                 }
-            }
+            });
             for (final LibrarySpecification spec : specsToRemove) {
                 registeredLibrarySpecifications.removeAll(spec);
             }
@@ -228,11 +217,11 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 private List<LibrarySpecification> collectModifiedLibSpecs(final String modifiedFileName) {
                     final List<LibrarySpecification> specsToRebuild = new ArrayList<>();
                     synchronized (registeredLibrarySpecifications) {
-                        for (final Entry<LibrarySpecification, String> entry : registeredLibrarySpecifications.entries()) {
-                            if (entry.getValue().equals(modifiedFileName)) {
-                                specsToRebuild.add(entry.getKey());
+                        registeredLibrarySpecifications.forEach((registeredSpec, registeredName) -> {
+                            if (registeredName.equals(modifiedFileName)) {
+                                specsToRebuild.add(registeredSpec);
                             }
-                        }
+                        });
                     }
                     return specsToRebuild;
                 }
@@ -298,7 +287,10 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private void removePossibleDuplicatedRebuildTasks(final RebuildTask nextRebuildTask) {
         final Iterator<RebuildTask> tasksIterator = rebuildTasksQueue.iterator();
-        if(tasksIterator.hasNext()) {tasksIterator.next();} //skip queue head
+        if (tasksIterator.hasNext()) {
+            // skip queue head
+            tasksIterator.next();
+        }
         while (tasksIterator.hasNext()) {
             if (tasksIterator.next().equals(nextRebuildTask)) {
                 tasksIterator.remove();
@@ -308,7 +300,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private void markLibSpecsAsModified(final List<LibrarySpecification> specsToRebuild) {
         synchronized (dirtySpecs) {
-            if(!dirtySpecs.containsAll(specsToRebuild)) {
+            if (!dirtySpecs.containsAll(specsToRebuild)) {
                 dirtySpecs.addAll(specsToRebuild);
                 final Map<ReferencedLibrary, LibrarySpecification> referencedLibraries = robotProject
                         .getReferencedLibraries();
