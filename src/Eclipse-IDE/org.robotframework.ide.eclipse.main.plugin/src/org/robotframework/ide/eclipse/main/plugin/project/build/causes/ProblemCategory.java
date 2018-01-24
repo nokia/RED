@@ -5,19 +5,18 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IMarker;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.TreeMultimap;
 
 public enum ProblemCategory {
     PROJECT_CONFIGURATION_FILE(
@@ -225,11 +224,20 @@ public enum ProblemCategory {
         return new Severity[] { Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
     }
 
-    public static Map<ProblemCategoryType, Collection<ProblemCategory>> getAllCategories() {
-        final List<ProblemCategory> categories = Arrays.asList(ProblemCategory.values());
-        final Multimap<ProblemCategoryType, ProblemCategory> groupedCategories = Multimaps.index(categories,
-                category -> category.type);
-        return TreeMultimap.create(groupedCategories).asMap();
+    public boolean isValidationCategory() {
+        return !(ProblemCategoryType.RUNTIME.equals(type) || ProblemCategoryType.PROJECT_CONFIGURATION.equals(type));
+    }
+    
+    public static Map<ProblemCategoryType, List<ProblemCategory>> getValidationCategories() {
+        return Stream.of(ProblemCategory.values())
+                .filter(ProblemCategory::isValidationCategory)
+                .collect(Collectors.groupingBy(category -> category.type, TreeMap::new, Collectors.toList()));
+    }
+    
+    public static Map<ProblemCategoryType, List<ProblemCategory>> getNonValidationCategories() {
+        return Stream.of(ProblemCategory.values())
+                .filter(((Predicate<ProblemCategory>)ProblemCategory::isValidationCategory).negate())
+                .collect(Collectors.groupingBy(category -> category.type, TreeMap::new, Collectors.toList()));
     }
 
     public static enum ProblemCategoryType {
