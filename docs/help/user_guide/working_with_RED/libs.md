@@ -20,8 +20,13 @@ from Robot Framework option.
   
 ![](libs/autodiscovery_menu.png)  
   
+
 Autodiscovery mechanism is configured per project. Its preferences are stored
 in red.xml file under Referenced Libraries tab.
+
+Note
+
+    Library autodiscovering is not run on excluded project parts (see more under topic [Limiting validation scope](../validation/scope.md). 
 
 ### Add library from Project Explorer
 
