@@ -13,11 +13,17 @@ import com.google.common.base.Preconditions;
 
 public class RedXmlValidationPropertyTester extends PropertyTester {
 
-    @VisibleForTesting static final String IS_EXCLUDED = "isExcluded";
-    @VisibleForTesting static final String IS_INCLUDED = "isIncluded";
-    @VisibleForTesting static final String IS_INTERNAL_FOLDER = "isInternalFolder";
-    @VisibleForTesting static final String IS_FILE = "isFile";
-    @VisibleForTesting static final String PARENT_EXCLUDED = "isExcludedViaInheritance";
+    @VisibleForTesting
+    static final String IS_EXCLUDED = "isExcluded";
+
+    @VisibleForTesting
+    static final String IS_INTERNAL_FOLDER = "isInternalFolder";
+
+    @VisibleForTesting
+    static final String IS_FILE = "isFile";
+
+    @VisibleForTesting
+    static final String PARENT_EXCLUDED = "isExcludedViaInheritance";
 
     @VisibleForTesting
     static final String IS_PROJECT = "isProject";
@@ -29,8 +35,7 @@ public class RedXmlValidationPropertyTester extends PropertyTester {
                         + ". It should be used with " + ProjectTreeElement.class.getName());
 
         if (expectedValue instanceof Boolean) {
-            final boolean result = testProperty((ProjectTreeElement) receiver, property, ((Boolean) expectedValue).booleanValue());
-            return result;
+            return testProperty((ProjectTreeElement) receiver, property, ((Boolean) expectedValue).booleanValue());
         }
         return false;
     }
@@ -39,9 +44,6 @@ public class RedXmlValidationPropertyTester extends PropertyTester {
             final boolean expected) {
         if (IS_INTERNAL_FOLDER.equals(property)) {
             return projectElement.isInternalFolder() == expected;
-        } else if (IS_INCLUDED.equals(property)) {
-            final boolean isIncluded = !projectElement.isExcluded();
-            return isIncluded == expected;
         } else if (IS_EXCLUDED.equals(property)) {
             return projectElement.isExcluded() == expected;
         } else if (IS_FILE.equals(property)) {
