@@ -1,18 +1,19 @@
-## Validation - setting issues severity level
+## Validation - setting issues severity levels
 
 ### General information
 
 Validation findings levels can be customized in Preferences (
 _[Window->Preferences->Robot
 Framework->Errors/Warnings](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.validation\)'\))_
-). Each issue can be reported as error/warning/info/ignore. In case of setting
+).  
+Each issue can be reported as error/warning/info/ignore. In case of setting
 ignore level, such validation issue type will not be visible in Problems view.
 
-There are RED specific validation types group under Project configuration
-which are essential for RED thus everything under Project configuration group
-is hardcoded to be reported as Fatal level.
+Note
 
-### Error/Warnings types with examples
+    There are RED specific validation types grouped under Project configuration category, which are essential for RED and can have Fatal severity level. Such problems are reported even when validation is turned off, and building as well as validation is cancelled then. 
+
+### Validation related Error/Warnings types with examples
 
 #### Code style
 
@@ -22,6 +23,7 @@ is hardcoded to be reported as Fatal level.
   * **Variable given as keyword name** \- occurs when variable is used as keyword call in test suite setup or teardown.
   * **Collection size should be equal to keyword arguments number** \- occurs when collection variable is used in keyword call and collection elements number is different than keyword arguments number.
   * **Invalid time format** \- occurs when time is not formatted correctly. Use number, time string or timer string.
+  * **Variable declared without assignment** \- occurs when variable is declared without assignment in Variables section.
 
 #### Name shadowing and conflicts
 
@@ -41,6 +43,7 @@ is hardcoded to be reported as Fatal level.
   * **Absolute path is used** \- occurs when absolute path is used. Workspace-relative paths are preferred in RED.
   * **HTML format is used** \- occurs when imported file is in HTML format. Use supported formats only.
   * **Import path relative via modules path** \- occurs when imported path is relative to python path.
+  * **Import Remote library without arguments** \- occurs when Remote library is imported without agruments.
 
 #### Robot version
 
@@ -49,6 +52,8 @@ is hardcoded to be reported as Fatal level.
   * **Deprecated Robot Framework API used** \- occurs when deprecated syntax is used. Use current Robot Framework syntax instead.
   * **Duplicated definitions used** \- occurs when testcase or keywords definitions names are not unique.Refers to syntax in pre Robot Framework 2.9.0.
   * **Incorrect variable initialization** \- occurs when there is syntax error in variable initialization.Refers to syntax in pre Robot Framework 2.9.0.
+
+### Runtime and Building related Error/Warnings types with examples
 
 #### Runtime
 
