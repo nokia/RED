@@ -28,6 +28,10 @@ findings are visible in **Problems** view and are also visible in editors.
 In order to remove problems simply choose **Robot Framework -> Clean RfLint
 problems** from context menu of selected resource.
 
+Note
+
+    Robot Framework Lint analysis is not run on excluded project parts (see more under topic [Limiting validation scope](../validation/scope.md). 
+
 ### Configuration
 
 It is possible to configure RfLint behavior in Preferences (

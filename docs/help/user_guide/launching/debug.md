@@ -5,7 +5,7 @@ execution. It works similar as debug functionality in most of programming
 languages - it allows to track execution of a program for checking unwanted
 behavior either on tests side or in tested software.
 
-Note
+Warning
 
     Avoid making changes in scripts/suites when debugging as you may encounter problems with finding proper code elements to suspend on. 
 
