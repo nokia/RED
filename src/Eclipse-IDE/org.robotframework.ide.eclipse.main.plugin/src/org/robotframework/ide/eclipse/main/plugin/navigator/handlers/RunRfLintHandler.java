@@ -28,7 +28,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RunRfLintHandler.E4RunRfLintHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.ExcludedResources;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.viewers.Selections;
@@ -44,10 +43,6 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
         @Execute
         public void runRfLint(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final IResource selectedResource = Selections.getAdaptableElements(selection, IResource.class).get(0);
-
-            if (ExcludedResources.isHiddenInEclipse(selectedResource)) {
-                return;
-            }
 
             RfLintProblem.cleanProblems(newArrayList(selectedResource));
 

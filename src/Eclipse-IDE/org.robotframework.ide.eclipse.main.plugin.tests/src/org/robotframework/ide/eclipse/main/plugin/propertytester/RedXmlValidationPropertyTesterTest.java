@@ -2,19 +2,30 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement;
+import org.robotframework.red.junit.ProjectProvider;
 
 public class RedXmlValidationPropertyTesterTest {
+
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(RedXmlValidationPropertyTesterTest.class);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     private final RedXmlValidationPropertyTester tester = new RedXmlValidationPropertyTester();
+
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
+        projectProvider.createDir("dir");
+        projectProvider.createFile("file");
+    }
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotProjectTreeElement() {
@@ -40,18 +51,6 @@ public class RedXmlValidationPropertyTesterTest {
     }
 
     @Test
-    public void testIsIncludedProperty() {
-        final ProjectTreeElement includedElement = new ProjectTreeElement(null, false);
-        final ProjectTreeElement notIncludedElement = new ProjectTreeElement(null, true);
-
-        assertThat(isIncluded(includedElement, true)).isTrue();
-        assertThat(isIncluded(includedElement, false)).isFalse();
-
-        assertThat(isIncluded(notIncludedElement, true)).isFalse();
-        assertThat(isIncluded(notIncludedElement, false)).isTrue();
-    }
-
-    @Test
     public void testIsExcludedProperty() {
         final ProjectTreeElement excludedElement = new ProjectTreeElement(null, true);
         final ProjectTreeElement notExcludedElement = new ProjectTreeElement(null, false);
@@ -65,20 +64,63 @@ public class RedXmlValidationPropertyTesterTest {
 
     @Test
     public void testIsInternalFolderProperty() {
-        final ProjectTreeElement internalFolder = mock(ProjectTreeElement.class);
-        final ProjectTreeElement nonInternalFolder = mock(ProjectTreeElement.class);
-        when(internalFolder.isInternalFolder()).thenReturn(true);
-        when(nonInternalFolder.isInternalFolder()).thenReturn(false);
+        final ProjectTreeElement folderElement = new ProjectTreeElement(projectProvider.getDir("dir"), false);
+        final ProjectTreeElement nonFolderElement = new ProjectTreeElement(projectProvider.getFile("file"), false);
 
-        assertThat(isInternalFolder(internalFolder, true)).isTrue();
-        assertThat(isInternalFolder(internalFolder, false)).isFalse();
+        assertThat(isInternalFolder(folderElement, true)).isTrue();
+        assertThat(isInternalFolder(folderElement, false)).isFalse();
 
-        assertThat(isInternalFolder(nonInternalFolder, true)).isFalse();
-        assertThat(isInternalFolder(nonInternalFolder, false)).isTrue();
+        assertThat(isInternalFolder(nonFolderElement, true)).isFalse();
+        assertThat(isInternalFolder(nonFolderElement, false)).isTrue();
     }
 
-    private boolean isIncluded(final ProjectTreeElement element, final boolean expected) {
-        return tester.test(element, RedXmlValidationPropertyTester.IS_INCLUDED, null, expected);
+    @Test
+    public void testIsFileProperty() {
+        final ProjectTreeElement fileElement = new ProjectTreeElement(projectProvider.getFile("file"), false);
+        final ProjectTreeElement notFileElement = new ProjectTreeElement(projectProvider.getDir("dir"), false);
+
+        assertThat(isFile(fileElement, true)).isTrue();
+        assertThat(isFile(fileElement, false)).isFalse();
+
+        assertThat(isFile(notFileElement, true)).isFalse();
+        assertThat(isFile(notFileElement, false)).isTrue();
+    }
+
+    @Test
+    public void testIsExcludedViaInheritanceProperty() {
+        final ProjectTreeElement rootElement = new ProjectTreeElement(null, false);
+        final ProjectTreeElement excludedElement = new ProjectTreeElement(null, true);
+        final ProjectTreeElement notExcludedElement = new ProjectTreeElement(null, false);
+        final ProjectTreeElement excludedViaInheritanceElement = new ProjectTreeElement(null, false);
+        final ProjectTreeElement notExcludedViaInheritanceElement = new ProjectTreeElement(null, false);
+        rootElement.addChild(excludedElement);
+        rootElement.addChild(notExcludedElement);
+        excludedElement.addChild(excludedViaInheritanceElement);
+        notExcludedElement.addChild(notExcludedViaInheritanceElement);
+
+        assertThat(isExcludedViaInheritance(excludedViaInheritanceElement, true)).isTrue();
+        assertThat(isExcludedViaInheritance(excludedViaInheritanceElement, false)).isFalse();
+
+        assertThat(isExcludedViaInheritance(notExcludedViaInheritanceElement, true)).isFalse();
+        assertThat(isExcludedViaInheritance(notExcludedViaInheritanceElement, false)).isTrue();
+
+        assertThat(isExcludedViaInheritance(excludedElement, true)).isTrue();
+        assertThat(isExcludedViaInheritance(excludedElement, false)).isFalse();
+
+        assertThat(isExcludedViaInheritance(notExcludedElement, true)).isFalse();
+        assertThat(isExcludedViaInheritance(notExcludedElement, false)).isTrue();
+    }
+
+    @Test
+    public void testIsProjectProperty() {
+        final ProjectTreeElement projectElement = new ProjectTreeElement(projectProvider.getProject(), false);
+        final ProjectTreeElement notProjectElement = new ProjectTreeElement(projectProvider.getFile("file"), false);
+
+        assertThat(isProject(projectElement, true)).isTrue();
+        assertThat(isProject(projectElement, false)).isFalse();
+
+        assertThat(isProject(notProjectElement, true)).isFalse();
+        assertThat(isProject(notProjectElement, false)).isTrue();
     }
 
     private boolean isExcluded(final ProjectTreeElement element, final boolean expected) {
@@ -87,5 +129,17 @@ public class RedXmlValidationPropertyTesterTest {
 
     private boolean isInternalFolder(final ProjectTreeElement element, final boolean expected) {
         return tester.test(element, RedXmlValidationPropertyTester.IS_INTERNAL_FOLDER, null, expected);
+    }
+
+    private boolean isFile(final ProjectTreeElement element, final boolean expected) {
+        return tester.test(element, RedXmlValidationPropertyTester.IS_FILE, null, expected);
+    }
+
+    private boolean isExcludedViaInheritance(final ProjectTreeElement element, final boolean expected) {
+        return tester.test(element, RedXmlValidationPropertyTester.PARENT_EXCLUDED, null, expected);
+    }
+
+    private boolean isProject(final ProjectTreeElement element, final boolean expected) {
+        return tester.test(element, RedXmlValidationPropertyTester.IS_PROJECT, null, expected);
     }
 }
