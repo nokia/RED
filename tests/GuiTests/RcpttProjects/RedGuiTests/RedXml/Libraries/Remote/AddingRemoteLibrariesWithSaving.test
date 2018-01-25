@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _a7l9oLkNEeWzJthH3JoEWQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/22/17 11:47 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/25/18 4:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -96,11 +96,61 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
 //check Problems
 get-tab-folder -index 4 | get-tab-item Problems | click
 with [get-view Problems | get-tree] {
-    get-item "Errors \\(3 items\\)/Unreachable remote server http:\\/\\/127.0.0.1:8270\\/" | get-property caption 
-        | equals "Unreachable remote server http://127.0.0.1:8270/" | verify-true
-    get-item "Errors \\(3 items\\)/Unreachable remote server http:\\/\\/158.5.0.1:994\\/" | get-property caption 
-        | equals "Unreachable remote server http://158.5.0.1:994/" | verify-true
-    get-item "Errors \\(3 items\\)/Unreachable remote server nothing" | get-property caption 
-        | equals "Unreachable remote server nothing" | verify-true
+    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+        | get-property "values['Description']" 
+        | equals "Library specification file was not generated for 'Remote' library" | verify-true
+    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+        | get-property "values['Resource']" | equals "red.xml" | verify-true
+    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+        | get-property "values['Path']" | equals "/RobotProject" | verify-true
+    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+        | get-property "values['Location']" | equals "line 7" | verify-true
+    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+        | get-property "values['Type']" | equals "Robot Problem" | verify-true
+    
+    //second remote    
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        | get-property "values['Description']" 
+        | equals "Library specification file was not generated for 'Remote' library" | verify-true
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        | get-property "values['Resource']" | equals "red.xml" | verify-true
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        | get-property "values['Path']" | equals "/RobotProject" | verify-true
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        | get-property "values['Location']" | equals "line 8" | verify-true
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        | get-property "values['Type']" | equals "Robot Problem" | verify-true
+    
+    //3. remote
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        | get-property "values['Description']" 
+        | equals "Library specification file was not generated for 'Remote' library" | verify-true
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        | get-property "values['Resource']" | equals "red.xml" | verify-true
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        | get-property "values['Path']" | equals "/RobotProject" | verify-true
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        | get-property "values['Location']" | equals "line 9" | verify-true
+    get-item -path "Errors \\(6 items\\)" | get-item 
+        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        | get-property "values['Type']" | equals "Robot Problem" | verify-true
+}
+
+with [get-view Problems | get-tree] {
+    get-item -path "Errors \\(6 items\\)/Unreachable remote server http:\\/\\/127.0.0.1:8270\\/" | get-property index 
+        | equals 3 | verify-true
+    get-item -path "Errors \\(6 items\\)/Unreachable remote server http:\\/\\/158.5.0.1:994\\/" | get-property index 
+        | equals 4 | verify-true
+    get-item -path "Errors \\(6 items\\)/Unreachable remote server nothing" | get-property index | equals 5 
+        | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
