@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +24,6 @@ import com.google.common.base.Objects;
 
 /**
  * @author Michal Anglart
- *
  */
 public class ProjectTreeElement implements IWorkbenchAdapter {
 
@@ -36,7 +33,7 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
 
     private ProjectTreeElement parent;
 
-    private final List<ProjectTreeElement> children = newArrayList();
+    private final List<ProjectTreeElement> children = new ArrayList<>();
 
     public ProjectTreeElement(final IResource resource, final boolean isExcluded) {
         this.resource = resource;
@@ -77,6 +74,7 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
     public boolean isInternalFolder() {
         return resource instanceof IFolder;
     }
+
     public boolean isFile() {
         return resource instanceof IFile;
     }
@@ -235,7 +233,6 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
 
     public boolean isProject() {
         return resource instanceof IProject;
-
     }
 
 }
