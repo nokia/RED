@@ -1,0 +1,97 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _8PW3oPuaEeeWEdEv7cvntA
+Element-Name: TurnOffValidation
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _0qWOEPuaEeeWEdEv7cvntA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/25/18 3:17 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//check if 4 errors are in problems
+get-view Problems | get-tree | get-item -path "Errors \\(4 items\\)" | get-property childCount | equals 4 | verify-true
+
+//turn off validation
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings"
+
+with [get-window Preferences] {
+    get-button "Turn off validation (Not recommended)" | check
+    get-button "Apply and Close" | click
+}
+
+//clean project
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
+
+
+//check that now only one error
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(1 item\\)/FATAL: project configuration file red.xml does not exist" | get-property index 
+    | equals 0 | verify-true
+    
+// check menu on elements in proeject    
+get-view "Project Explorer" | get-tree | select FirstProject
+get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Revalidate (disabled by preference)" 
+	| get-property enablement | equals false 
+	
+//select test	
+get-view "Project Explorer" | get-tree | select "FirstProject/test1.robot"
+get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Revalidate (disabled by preference)" 
+	| get-property enablement | equals false 
+	
+//check red.xml	
+get-view "Project Explorer" | get-tree | select "FirstProject/red.xml"
+get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Revalidate (disabled by preference)" 
+	| get-property enablement | equals false 
+	
+//check test in second project
+get-view "Project Explorer" | get-tree | select "SecondProject/test/file_with_error.robot"
+get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Revalidate (disabled by preference)" 
+	| get-property enablement | equals false 
+	
+// change preference that is not connected to validation and change it to warning
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-section "Project configuration" | get-combo 
+        -after [get-label "Project configuration file (red.xml) cannot be read"] | select Warning
+    get-button "Apply and Close" | click
+}
+
+//clean
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
+
+//check if now error is warning
+get-view Problems | get-tree | get-item -path "Warnings \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+    | equals "FATAL: project configuration file red.xml does not exist" | verify-true
+    
+//open file and add wrong kw, save file
+get-view "Project Explorer" | get-tree | select "FirstProject/test1.robot" | double-click
+with [get-editor "test1.robot" | get-text-viewer] {
+    set-caret-pos 3 20
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "wrong kw"
+    key-type "M1+s"
+}
+get-view Problems | get-label "0 errors, 1 warning, 0 others" | get-property caption 
+    | equals "0 errors, 1 warning, 0 others" | verify-true
+    
+// add wrong kw again and check if no new problem was shown    
+with [get-editor "test1.robot" | get-text-viewer] {
+    set-caret-pos 4 13
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "another wrong "
+}
+
+wait 1000
+get-view Problems | get-label "0 errors, 1 warning, 0 others" | get-property caption 
+    | equals "0 errors, 1 warning, 0 others" | verify-true   
+     
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
