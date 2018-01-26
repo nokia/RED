@@ -1506,8 +1506,12 @@
                       type="org.eclipse.core.resources.IResource">
                    <and>
                       <test
-                            property="org.robotframework.redxml.navigator.isIncluded"
-                            value="true">
+                            property="org.robotframework.redxml.navigator.isHidden"
+                            value="false">
+                      </test>
+                      <test
+                            property="org.robotframework.redxml.navigator.isExcluded"
+                            value="false">
                       </test>
                       <test
                             property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
@@ -1547,6 +1551,10 @@
                 <adapt
                       type="org.eclipse.core.resources.IResource">
                    <and>
+                      <test
+                            property="org.robotframework.redxml.navigator.isHidden"
+                            value="false">
+                      </test>
                       <test
                             property="org.robotframework.redxml.navigator.isExcluded"
                             value="true">
@@ -1629,9 +1637,13 @@
                     <adapt
                           type="org.eclipse.core.resources.IResource">
                        <and>
+	                      <test
+	                           property="org.robotframework.redxml.navigator.isHidden"
+	                           value="false">
+	                      </test>
                           <test
-                               property="org.robotframework.redxml.navigator.isIncluded"
-                               value="true">
+                               property="org.robotframework.redxml.navigator.isExcluded"
+                               value="false">
                           </test>
                           <test
                                property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
@@ -1704,9 +1716,13 @@
                     <adapt
                           type="org.eclipse.core.resources.IResource">
                        <and>
+	                      <test
+	                           property="org.robotframework.redxml.navigator.isHidden"
+	                           value="false">
+	                      </test>
                           <test
-                               property="org.robotframework.redxml.navigator.isIncluded"
-                               value="true">
+                               property="org.robotframework.redxml.navigator.isExcluded"
+                               value="false">
                           </test>
                           <test
                                property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
@@ -1778,9 +1794,13 @@
                     <adapt
                           type="org.eclipse.core.resources.IResource">
                        <and>
+	                      <test
+	                           property="org.robotframework.redxml.navigator.isHidden"
+	                           value="false">
+	                      </test>
                           <test
-                               property="org.robotframework.redxml.navigator.isIncluded"
-                               value="true">
+                               property="org.robotframework.redxml.navigator.isExcluded"
+                               value="false">
                           </test>
                           <test
                                property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
@@ -3187,9 +3207,7 @@
                    </or>
                    <test
                          property="org.robotframework.redxml.validation.isExcluded"
-                         value="true">
-
-                         
+                         value="true">                         
                    </test>
                 </and>
              </iterate>
@@ -3226,8 +3244,8 @@
                          </test>
                    </or>
                   	<test
-                         property="org.robotframework.redxml.validation.isIncluded"
-                         value="true">
+                         property="org.robotframework.redxml.validation.isExcluded"
+                         value="false">
                    </test>
                 </and>
              </iterate>
@@ -4781,7 +4799,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlValidationPropertyTester"
           id="org.robotframework.redxml.validationConfigPropertyTester"
           namespace="org.robotframework.redxml.validation"
-          properties="isInternalFolder, isExcluded, isIncluded, isFile, isExcludedViaInheritance, isProject"
+          properties="isInternalFolder, isExcluded, isFile, isExcludedViaInheritance, isProject"
           type="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
     </propertyTester>
     <propertyTester
@@ -4795,7 +4813,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester"
           id="org.robotframework.redxml.navigatorProjectConfigPropertyTester"
           namespace="org.robotframework.redxml.navigator"
-          properties="isInternalFolder, isExcluded, isIncluded, isFile, isExcludedViaInheritance, isProject"
+          properties="isInternalFolder, isExcluded, isFile, isExcludedViaInheritance, isProject, isHidden"
           type="org.eclipse.core.resources.IResource">
     </propertyTester>
     <propertyTester
