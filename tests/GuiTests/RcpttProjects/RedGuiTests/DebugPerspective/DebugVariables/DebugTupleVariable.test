@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3t8cAPFUEeeotd-8Sx1R8w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/22/18 3:18 PM
+Save-Time: 1/26/18 12:11 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -55,7 +55,7 @@ exec-with-options -disableJobWaiting -command{
 	// press f6
 	get-view Debug | get-tree | key-type F6
 	try -times 3 -delay 1000 -command{
-		get-view Variables | get-tree | get-item -path "@{x}" | get-property "values['Name']" | equals "@{x}" | verify-true
+		get-view Variables | get-tree | get-item -path "@{x}"
 	}	
 		
 	// verify variables in debug perspective - there should be the tuples - no errors is runned
