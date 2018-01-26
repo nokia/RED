@@ -191,8 +191,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
         if (templateKeywordToken != null && !templateKeywordToken.getFilePosition().isNotSet()
                 && isTemplateFromTestCasesTable(testCase)
                 && !templateKeywordToken.getText().toLowerCase().equals("none")) {
-            validateExistingKeywordCall(validationContext, reporter, templateKeywordToken,
-                    Optional.<List<RobotToken>> empty());
+            validateExistingKeywordCall(validationContext, reporter, templateKeywordToken, Optional.empty());
         }
     }
 
@@ -230,7 +229,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 for (final BuildMessage buildMessage : messages) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_FOR_KEYWORD)
                             .formatMessageWith(buildMessage.getMessage());
-                    final ProblemPosition position = new ProblemPosition(buildMessage.getFileRegion().getStart().getLine(),
+                    final ProblemPosition position = new ProblemPosition(
+                            buildMessage.getFileRegion().getStart().getLine(),
                             Range.closed(buildMessage.getFileRegion().getStart().getOffset(),
                                     buildMessage.getFileRegion().getEnd().getOffset()));
                     reporter.handleProblem(problem, file, position);
@@ -410,8 +410,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
 
         final Map<String, Object> additionalMarkerAttributes = ImmutableMap
                 .of(AdditionalMarkerAttributes.DEFINE_VAR_LOCALLY, Boolean.TRUE);
-        final ProblemsReportingStrategy reportingStrategy = AttributesAugmentingReportingStrategy
-                .create(reporter, additionalMarkerAttributes);
+        final ProblemsReportingStrategy reportingStrategy = AttributesAugmentingReportingStrategy.create(reporter,
+                additionalMarkerAttributes);
 
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reportingStrategy);
         for (final RobotExecutableRow<?> row : executables) {

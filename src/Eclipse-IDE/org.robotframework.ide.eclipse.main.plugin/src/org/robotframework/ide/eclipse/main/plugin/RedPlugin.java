@@ -19,7 +19,7 @@ import org.osgi.framework.BundleContext;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.rf.ide.core.fileWatcher.RedFileWatcher;
+import org.rf.ide.core.watcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
