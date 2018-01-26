@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -72,22 +73,23 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     }
 
     private LibrarySpecification findSpecification(final IPath candidate) {
-        final Map<ReferencedLibrary, LibrarySpecification> libs = validationContext.getReferencedLibrarySpecifications();
-        for (final ReferencedLibrary refLib : libs.keySet()) {
-            final IPath entryPath = new Path(refLib.getFilepath().getPath());
+        final Map<ReferencedLibrary, LibrarySpecification> libs = validationContext
+                .getReferencedLibrarySpecifications();
+        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : libs.entrySet()) {
+            final IPath entryPath = new Path(entry.getKey().getFilepath().getPath());
             final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
             final IPath libPath2 = RedWorkspace.Paths
                     .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
             if (candidate.equals(libPath1) || candidate.equals(libPath2)) {
-                return libs.get(refLib);
+                return entry.getValue();
             }
         }
         return null;
     }
 
     @Override
-    protected void validateNameImport(final String name, final RobotToken nameToken,
-            final List<RobotToken> arguments) throws CoreException {
+    protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
+            throws CoreException {
         final String libName = createLibName(name, arguments);
         final LibrarySpecification specification = validationContext.getLibrarySpecifications(libName);
         validateWithSpec(specification, name, nameToken, arguments, false);
@@ -132,8 +134,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         } else {
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
                     .formatMessageWith(pathOrName);
-            final Map<String, Object> additional = isPath
-                    ? ImmutableMap.of(AdditionalMarkerAttributes.PATH, pathOrName)
+            final Map<String, Object> additional = isPath ? ImmutableMap.of(AdditionalMarkerAttributes.PATH, pathOrName)
                     : ImmutableMap.of(AdditionalMarkerAttributes.NAME, pathOrName);
             reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
         }

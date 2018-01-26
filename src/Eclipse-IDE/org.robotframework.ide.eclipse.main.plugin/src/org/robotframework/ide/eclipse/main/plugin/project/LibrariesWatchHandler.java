@@ -33,10 +33,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-import org.rf.ide.core.fileWatcher.IWatchEventHandler;
-import org.rf.ide.core.fileWatcher.RedFileWatcher;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.watcher.IWatchEventHandler;
+import org.rf.ide.core.watcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -304,12 +304,11 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 dirtySpecs.addAll(specsToRebuild);
                 final Map<ReferencedLibrary, LibrarySpecification> referencedLibraries = robotProject
                         .getReferencedLibraries();
-                for (final ReferencedLibrary refLib : referencedLibraries.keySet()) {
-                    final LibrarySpecification librarySpecification = referencedLibraries.get(refLib);
+                referencedLibraries.forEach((refLib, librarySpecification) -> {
                     if (specsToRebuild.contains(librarySpecification)) {
                         librarySpecification.setIsModified(true);
                     }
-                }
+                });
             }
         }
     }

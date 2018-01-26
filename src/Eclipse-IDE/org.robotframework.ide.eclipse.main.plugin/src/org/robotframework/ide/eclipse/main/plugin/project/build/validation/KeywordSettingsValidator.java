@@ -138,19 +138,19 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         final IFile file = validationContext.getFile();
         final boolean tooManySettings = declarationTokens.size() > 1;
 
-        for (final RobotToken defToken : declarationTokens.keySet()) {
+        declarationTokens.forEach((defToken, isEmpty) -> {
             if (tooManySettings) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD_SETTING)
                         .formatMessageWith(kwName, defToken.getText());
                 reporter.handleProblem(problem, file, defToken);
             }
 
-            if (declarationTokens.get(defToken).booleanValue()) {
+            if (isEmpty) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD_SETTING)
                         .formatMessageWith(defToken.getText());
                 reporter.handleProblem(problem, file, defToken);
             }
-        }
+        });
     }
 
     private void reportArgumentsProblems() {

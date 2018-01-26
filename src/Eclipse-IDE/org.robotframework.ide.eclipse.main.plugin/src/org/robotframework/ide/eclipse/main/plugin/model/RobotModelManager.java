@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.fileWatcher.RedFileWatcher;
+import org.rf.ide.core.watcher.RedFileWatcher;
 
 public final class RobotModelManager {
 
