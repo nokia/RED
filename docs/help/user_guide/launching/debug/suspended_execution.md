@@ -9,13 +9,13 @@ appear. First of all the toolbar buttons gets activated:
 moving from left to right:
 
   * **Skip All Breakpoints** \- allow to continue execution onwards without stopping on defined breakpoints (globally disabling all the breakpoints) 
-  * **Resume** \-  F8 described in [Controlling execution](../exec_control.md)
+  * **Resume** \- ` F8` described in [Controlling execution](../exec_control.md)
   * **Suspend** \- as above
-  * **Terminate** \-  Ctrl+F2 as above
+  * **Terminate** \- ` Ctrl`+`F2` as above
   * **Disconnect** \- as above
-  * **Step Into** \-  F5 \- each F5 key press will execute active line and move to next one. If active line consists Keyword or embedded TestCase, test executor will jump into item and execute it line by line. To exit from executing inherited items use Step Return (F7)
-  * **Step Over** \-  F6 \- each F6 key press will execute active line and move to next one. If keyword exists in current line, keyword result will be returned without going into Keyword content
-  * **Step Return** \-  F7 \- allows to return to main TestCase execution from embedded TestCase or Keyword if Step Into was used before
+  * **Step Into** \- ` F5` \- each `F5` key press will execute active line and move to next one. If active line consists Keyword or embedded TestCase, test executor will jump into item and execute it line by line. To exit from executing inherited items use Step Return (`F7`)
+  * **Step Over** \- ` F6` \- each `F6` key press will execute active line and move to next one. If keyword exists in current line, keyword result will be returned without going into Keyword content
+  * **Step Return** \- ` F7` \- allows to return to main TestCase execution from embedded TestCase or Keyword if Step Into was used before
 
 ### Debug view
 
@@ -160,15 +160,15 @@ unknown keyword:
 ### Continuing
 
 Whenever you're ready to resume tests execution simply hit **Resume** button
-(or  F8) and debugger will suspend on next breakpoint or in next erroneous
+(or ` F8`) and debugger will suspend on next breakpoint or in next erroneous
 state (if not disabled in preferences) or whenever you explicitly pause the
 execution. Apart from that you may perform step. There are 3 kinds of steps:
 
-  * **Step Into** F5 \- this kind of step is only possible for top stack frame. When performing **step into** the execution will resume only for a single step which will enter inside into the keyword from current line. 
+  * **Step Into** ` F5` \- this kind of step is only possible for top stack frame. When performing **step into** the execution will resume only for a single step which will enter inside into the keyword from current line. 
 
-  * **Step Over** F6 \- this kind of step is possible for every frame on stack and it will behave differently for each of them. In general this kind of step means 'suspend the execution on next keyword from instruction pointed by selected stack frame on the same level'. 
+  * **Step Over** ` F6` \- this kind of step is possible for every frame on stack and it will behave differently for each of them. In general this kind of step means 'suspend the execution on next keyword from instruction pointed by selected stack frame on the same level'. 
 
-  * **Step Return** F7 \- similarly to **Step Over** this action is possible for every frame on stack and will have different behaviour. This kind of step means 'suspend the execution on next keyword which will be executed after selected frame have ended'. For frame related to user keyword this mean that debugger will pause on next instruction after this user keyword ends. For test-related frame the dubugger will suspend at the very first instruction in next test (if any). For suite-related frame the debugger will suspend at very first keyword in next suite (if any). 
+  * **Step Return** ` F7` \- similarly to **Step Over** this action is possible for every frame on stack and will have different behaviour. This kind of step means 'suspend the execution on next keyword which will be executed after selected frame have ended'. For frame related to user keyword this mean that debugger will pause on next instruction after this user keyword ends. For test-related frame the dubugger will suspend at the very first instruction in next test (if any). For suite-related frame the debugger will suspend at very first keyword in next suite (if any). 
 
 Of course the debugger will suspend if it encounter e.g. breakpoint inside the
 code which should be stepped over.
