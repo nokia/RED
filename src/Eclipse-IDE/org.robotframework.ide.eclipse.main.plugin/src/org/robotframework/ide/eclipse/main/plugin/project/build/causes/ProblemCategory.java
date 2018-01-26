@@ -33,7 +33,7 @@ public enum ProblemCategory {
 
         @Override
         public Severity[] getPossibleSeverities() {
-            return new Severity[] {Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
+            return new Severity[] { Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
         }
     },
     MISSING_ROBOT_ENVIRONMENT(
@@ -50,7 +50,7 @@ public enum ProblemCategory {
 
         @Override
         public Severity[] getPossibleSeverities() {
-            return new Severity[] {Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
+            return new Severity[] { Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
         }
     },
     LIBRARY_SPECIFICATION_FILE(
@@ -166,6 +166,10 @@ public enum ProblemCategory {
             ProblemCategoryType.IMPORT,
             "Import path relative via modules path",
             "Occurs when imported path is relative to python path."),
+    IMPORT_PATH_OUTSIDE_WORKSPACE(
+            ProblemCategoryType.IMPORT,
+            "Import path outside of workspace",
+            "Occurs when imported path points to location not from workspace."),
     IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS(
             ProblemCategoryType.IMPORT,
             "Import Remote library without arguments",
@@ -227,13 +231,13 @@ public enum ProblemCategory {
     public boolean isValidationCategory() {
         return !(ProblemCategoryType.RUNTIME.equals(type) || ProblemCategoryType.PROJECT_CONFIGURATION.equals(type));
     }
-    
+
     public static Map<ProblemCategoryType, List<ProblemCategory>> getValidationCategories() {
         return Stream.of(ProblemCategory.values())
                 .filter(ProblemCategory::isValidationCategory)
                 .collect(Collectors.groupingBy(category -> category.type, TreeMap::new, Collectors.toList()));
     }
-    
+
     public static Map<ProblemCategoryType, List<ProblemCategory>> getNonValidationCategories() {
         return Stream.of(ProblemCategory.values())
                 .filter(((Predicate<ProblemCategory>)ProblemCategory::isValidationCategory).negate())

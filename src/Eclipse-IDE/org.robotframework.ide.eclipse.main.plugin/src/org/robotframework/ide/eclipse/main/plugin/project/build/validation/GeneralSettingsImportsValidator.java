@@ -48,7 +48,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     protected final FileValidationContext validationContext;
 
-    protected final RobotSuiteFile suiteFile;
+    private final RobotSuiteFile suiteFile;
 
     private final List<? extends AImported> imports;
 
@@ -218,7 +218,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
     }
 
-    protected void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {
+    private void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {
         final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
         reporter.handleProblem(RobotProblem.causedBy(getCauseForNonExistingImport()).formatMessageWith(path),
