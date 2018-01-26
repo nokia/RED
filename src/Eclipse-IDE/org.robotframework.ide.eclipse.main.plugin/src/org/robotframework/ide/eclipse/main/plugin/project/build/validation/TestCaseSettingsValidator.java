@@ -124,19 +124,19 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
         final IFile file = validationContext.getFile();
         final boolean tooManySettings = declarationTokens.size() > 1;
 
-        for (final RobotToken defToken : declarationTokens.keySet()) {
+        declarationTokens.forEach((defToken, isEmpty) -> {
             if (tooManySettings) {
                 final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.DUPLICATED_CASE_SETTING)
                         .formatMessageWith(caseName, defToken.getText());
                 reporter.handleProblem(problem, file, defToken);
             }
 
-            if (declarationTokens.get(defToken).booleanValue()) {
+            if (isEmpty) {
                 final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE_SETTING)
                         .formatMessageWith(defToken.getText());
                 reporter.handleProblem(problem, file, defToken);
             }
-        }
+        });
     }
 
     private void reportKeywordUsageProblemsInTestCaseSettings() {
