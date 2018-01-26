@@ -108,8 +108,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     private void validateSpecifiedImport(final AImported imported, final String pathOrName,
-            final RobotToken pathOrNameToken, final boolean isParameterized)
-                    throws CoreException {
+            final RobotToken pathOrNameToken, final boolean isParameterized) throws CoreException {
         if (isPathImport(pathOrName)) {
             validatePathImport(pathOrName, pathOrNameToken, isParameterized, imported.getArguments());
         } else {
@@ -196,8 +195,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
         final String absolutePath = RedURI
-                .reverseUriSpecialCharsEscapes(
-                        new File(absoluteUri).getAbsolutePath().replaceAll("\\\\", "/"));
+                .reverseUriSpecialCharsEscapes(new File(absoluteUri).getAbsolutePath().replaceAll("\\\\", "/"));
         reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH)
                 .formatMessageWith(path, absolutePath), validationContext.getFile(), pathToken, attributes);
     }
@@ -234,8 +232,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     private void reportWindowsPathImport(final RobotToken pathToken) {
-        final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
-                pathToken.getText());
+        final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH, pathToken.getText());
         final RobotProblem problem = RobotProblem
                 .causedBy(GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS);
         reporter.handleProblem(problem, validationContext.getFile(), pathToken, attributes);

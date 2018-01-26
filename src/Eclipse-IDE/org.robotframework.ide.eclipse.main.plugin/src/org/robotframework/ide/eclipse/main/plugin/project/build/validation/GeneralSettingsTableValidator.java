@@ -152,14 +152,14 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private void validateVariables(final RobotSuiteFile suiteFile, final List<VariablesImport> variablesImports,
             final IProgressMonitor monitor) throws CoreException {
-        new GeneralSettingsVariablesImportValidator(validationContext, suiteFile, variablesImports,
-                reporter).validate(monitor);
+        new GeneralSettingsVariablesImportValidator(validationContext, suiteFile, variablesImports, reporter)
+                .validate(monitor);
     }
 
     private void validateResources(final RobotSuiteFile suiteFile, final List<ResourceImport> resourcesImports,
             final IProgressMonitor monitor) throws CoreException {
-        new GeneralSettingsResourcesImportValidator(validationContext, suiteFile, resourcesImports,
-                reporter).validate(monitor);
+        new GeneralSettingsResourcesImportValidator(validationContext, suiteFile, resourcesImports, reporter)
+                .validate(monitor);
     }
 
     private void validateSetupsAndTeardowns(final List<? extends AKeywordBaseSetting<?>> keywordBasedSettings,
@@ -200,7 +200,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                     continue;
                 }
                 TestCaseTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken,
-                        Optional.<List<RobotToken>> empty());
+                        Optional.empty());
             }
             if (!template.getUnexpectedTrashArguments().isEmpty()) {
                 final String actualArgs = "[" + Joiner.on(", ").join(toString(template.getUnexpectedTrashArguments()))
