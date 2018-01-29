@@ -259,12 +259,24 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.HTML_FORMAT;
+            return ProblemCategory.UNSUPPORTED_RESOURCE_IMPORT;
         }
 
         @Override
         public String getProblemDescription() {
             return "HTML is valid resource type for Robot although RED does not support html files.";
+        }
+    },
+    NON_WORKSPACE_RESOURCE_IMPORT {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.UNSUPPORTED_RESOURCE_IMPORT;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "RED does not support importing resources located outside of workspace.";
         }
     },
     NON_EXISTING_VARIABLES_IMPORT {
