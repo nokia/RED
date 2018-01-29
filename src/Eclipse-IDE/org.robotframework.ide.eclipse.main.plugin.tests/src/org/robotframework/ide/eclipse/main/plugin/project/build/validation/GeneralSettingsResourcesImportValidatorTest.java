@@ -304,35 +304,6 @@ public class GeneralSettingsResourcesImportValidatorTest {
     }
 
     @Test
-    public void markerIsReported_whenResourceFileIsImportedViaRedXmlPythonPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
-
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<>());
-
-        final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
-
-        validateResourceImport("external_nested.robot");
-
-        assertThat(reporter.getReportedProblems()).contains(new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
-                new ProblemPosition(2, Range.closed(27, 48))));
-    }
-
-    @Test
-    public void markerIsReported_whenResourceFileIsImportedViaSysPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
-
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(dir));
-
-        validateResourceImport("external_nested.robot");
-
-        assertThat(reporter.getReportedProblems()).contains(new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
-                new ProblemPosition(2, Range.closed(27, 48))));
-    }
-
-    @Test
     public void noMajorProblemsAreReported_whenResourceFileExistLocally_1() throws Exception {
         final IFile file = projectProvider.createFile("res.robot");
 
@@ -392,6 +363,20 @@ public class GeneralSettingsResourcesImportValidatorTest {
     }
 
     @Test
+    public void noMajorProblemsAreReported_whenResourceFileIsImportedViaSysPathFromExternalLocation() {
+        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject.setModuleSearchPaths(newArrayList(dir));
+
+        validateResourceImport("external_nested.robot");
+        assertThat(reporter.getReportedProblems())
+                .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
+                        GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE,
+                        GeneralSettingsProblem.NON_WORKSPACE_RESOURCE_IMPORT));
+    }
+
+    @Test
     public void noMajorProblemsAreReported_whenResourceFileIsImportedViaSysPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
@@ -423,6 +408,23 @@ public class GeneralSettingsResourcesImportValidatorTest {
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH));
 
         dir.delete(true, null);
+    }
+
+    @Test
+    public void noMajorProblemsAreReported_whenResourceFileIsImportedViaRedXmlPythonPathFromExternalLocation() {
+        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject.setModuleSearchPaths(new ArrayList<File>());
+
+        final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
+        robotProject.getRobotProjectConfig().setPythonPath(paths);
+
+        validateResourceImport("external_nested.robot");
+        assertThat(reporter.getReportedProblems())
+                .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
+                        GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE,
+                        GeneralSettingsProblem.NON_WORKSPACE_RESOURCE_IMPORT));
     }
 
     @Test
