@@ -12,17 +12,14 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public abstract class AVariablesTokenRecognizer extends ATokenRecognizer {
 
     private static final String TEMPLATE = "[ ]?[" + "%s" + "]"
             + "(\\s*)[{].*([}]$|$)";
 
-
     protected AVariablesTokenRecognizer(final VariableType varType) {
         super(createVariablePattern(varType), varType.getType());
     }
-
 
     @VisibleForTesting
     protected static Pattern createVariablePattern(final VariableType varType) {
