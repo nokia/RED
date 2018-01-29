@@ -51,6 +51,10 @@ public class RedFileWatcher {
 
     private final AtomicBoolean isEventConsumerThreadStarted = new AtomicBoolean(false);
 
+    private RedFileWatcher() {
+        // instance of this class should not be created outside
+    }
+
     public synchronized void registerPath(final Path fileDir, final String fileName,
             final IWatchEventHandler watchEventHandler) {
 
