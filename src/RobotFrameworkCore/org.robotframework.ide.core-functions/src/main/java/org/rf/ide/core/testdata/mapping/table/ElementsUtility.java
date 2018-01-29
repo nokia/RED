@@ -93,7 +93,8 @@ public class ElementsUtility {
 
         RobotToken correct = null;
 
-        final List<VariableDeclaration> correctVariables = varExtractor.extract(FilePosition.createNotSet(), text, "fake")
+        final List<VariableDeclaration> correctVariables = varExtractor
+                .extract(FilePosition.createNotSet(), text, "fake")
                 .getCorrectVariables();
 
         if (robotTokens.size() > 1) {
@@ -141,8 +142,8 @@ public class ElementsUtility {
                                             && tokenType.isSettingDeclaration()) {
                                         if (!correctVariables.isEmpty()) {
                                             final VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
-                                            if (typeByTokenType.getIdentificator()
-                                                    .equals(correctVariables.get(0).getTypeIdentificator().getText())) {
+                                            if (correctVariables.stream().anyMatch(c -> typeByTokenType
+                                                    .getIdentificator().equals(c.getTypeIdentificator().getText()))) {
                                                 isVarDec = true;
                                                 break;
                                             }
