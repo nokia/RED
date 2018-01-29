@@ -100,8 +100,6 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
         final List<RobotToken> tokens = prepareTokens(currentElement);
 
-        finishPreviousLineIfIsRequired(model, lines, lastToken, tokens);
-
         final int nrOfTokens = getElementDumperHelper().getLastIndexNotEmptyIndex(tokens) + 1;
 
         if (!elemDeclaration.isDirty() && currentLine != null) {
@@ -428,14 +426,5 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             }
         }
         return lastTokenToReturn;
-    }
-
-    private void finishPreviousLineIfIsRequired(final RobotFile model, final List<RobotLine> lines,
-            final IRobotLineElement lastToken, final List<RobotToken> tokens) {
-        if (getDumperHelper().isCurrentFileDirty() && !lines.isEmpty()
-                && !getDumperHelper().getEmptyLineDumper().isEmptyLine(lines.get(lines.size() - 1))
-                && canBeDumpedDirectly(lastToken, tokens)) {
-            getDumperHelper().getDumpLineUpdater().updateLine(model, lines, getDumperHelper().getLineSeparator(model));
-        }
     }
 }
