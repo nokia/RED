@@ -154,6 +154,11 @@ public enum GeneralSettingsProblem implements IProblemCause {
     IMPORT_PATH_OUTSIDE_WORKSPACE {
 
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.IMPORT_PATH_OUTSIDE_WORKSPACE;
+        }
+
+        @Override
         public String getProblemDescription() {
             return "Path '%s' points to location outside your workspace";
         }

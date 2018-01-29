@@ -83,6 +83,11 @@ class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsVali
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
                         .formatMessageWith(path, ": given file is not a Resource file"), validationContext.getFile(),
                         pathToken);
+            } else {
+                reporter.handleProblem(
+                        RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT).formatMessageWith(path,
+                                ": RED does not support importing resources located outside of workspace"),
+                        validationContext.getFile(), pathToken);
             }
         }
     }
