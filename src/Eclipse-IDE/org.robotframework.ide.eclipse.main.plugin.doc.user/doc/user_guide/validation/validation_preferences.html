@@ -37,19 +37,19 @@ Such problems are reported even when validation is turned off, and building as w
 <ul>
 <li><b>Duplicated variable name</b> - occurs when variable name is duplicated and one variable value overrides another.</li>
 <li><b>Duplicated test case name</b> - occurs when test case name is duplicated and both test cases can be run</li>
-<li><b>Masked keyword name</b> - occurs when keyword defined in test suite has the same name like keyword from imported library.You can use fully qualified name when calling masked keyword.</li>
+<li><b>Masked keyword name</b> - occurs when keyword defined in test suite has the same name like keyword from imported library. You can use fully qualified name when calling masked keyword.</li>
 </ul>
 <h4>Unnecessary code</h4>
 <ul>
 <li><b>Empty settings definition</b> - occurs when suite, test case or keyword setting is defined with empty content.</li>
-<li><b>Unrecognized header type</b> - occurs when Robot Framework does not recognize section header.Only ***Settings***, ***Variables***, ***Test Cases*** or ***Keywords*** sections are valid.</li>
+<li><b>Unrecognized header type</b> - occurs when Robot Framework does not recognize section header. Only ***Settings***, ***Variables***, ***Test Cases*** or ***Keywords*** sections are valid.</li>
 <li><b>Duplicated configuration path</b> - occurs when path defined in configuration is subpath of different one. Such path is skipped.</li>
 <li><b>Missing configuration path</b> - occurs when missing path is defined in configuration. Such path is skipped.</li>
 </ul>
 <h4>Import</h4>
 <ul>
 <li><b>Absolute path is used</b> - occurs when absolute path is used. Workspace-relative paths are preferred in RED.</li>
-<li><b>HTML format is used</b> - occurs when imported file is in HTML format. Use supported formats only.</li>
+<li><b>Unsupported resource import used</b> - occurs when imported file is in HTML format or is outside of workspace. Red will not parse such files, so keywords and variables defined inside will not be accessible. Use supported formats from workspace only.</li>
 <li><b>Import path relative via modules path</b> - occurs when imported path is relative to python path.</li>
 <li><b>Import path outside of workspace</b> - occurs when imported path points to location not from workspace.</li>
 <li><b>Import Remote library without arguments</b> - occurs when Remote library is imported without agruments.</li>
@@ -59,8 +59,8 @@ Such problems are reported even when validation is turned off, and building as w
 <li><b>Removed Robot Framework API used</b> - occurs when syntax from older Robot Framework version is not available in current version.</li>
 <li><b>Unsupported Robot Framework API used</b> - occurs when syntax from newer Robot Framework version is not available in older version.</li>
 <li><b>Deprecated Robot Framework API used</b> - occurs when deprecated syntax is used. Use current Robot Framework syntax instead.</li>
-<li><b>Duplicated definitions used</b> - occurs when testcase or keywords definitions names are not unique.Refers to syntax in pre Robot Framework 2.9.0.</li>
-<li><b>Incorrect variable initialization</b> - occurs when there is syntax error in variable initialization.Refers to syntax in pre Robot Framework 2.9.0.</li>
+<li><b>Duplicated definitions used</b> - occurs when testcase or keywords definitions names are not unique. Refers to syntax in pre Robot Framework 2.9.0.</li>
+<li><b>Incorrect variable initialization</b> - occurs when there is syntax error in variable initialization. Refers to syntax in pre Robot Framework 2.9.0.</li>
 </ul>
 
 <h3>Runtime and Building related Error/Warnings types with examples</h3>
@@ -73,7 +73,7 @@ Such problems are reported even when validation is turned off, and building as w
 <h4>Project configuration</h4>
 <ul>
 <li><b>Project configuration file (red.xml) cannot be read</b> - occurs when project has no red.xml configuration file or it cannot be read.</li>
-<li><b>Python Robot Framework environment missing</b> - occurs when there is no Robot Environment defined.\n Python main directory with Robot modules installed should be defined in preferences.\n Project may override this setting in its configuration file. </li>
+<li><b>Python Robot Framework environment missing</b> - occurs when there is no Robot Environment defined. Python main directory with Robot modules installed should be defined in preferences. Project may override this setting in its configuration file.</li>
 <li><b>Library documentation file cannot be generated</b> - occurs when for some reason Robot framework is unable to generate library specification file, probably due to missing library dependencies or errors in library source code.</li>
 </ul>
 
