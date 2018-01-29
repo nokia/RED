@@ -158,10 +158,12 @@ public enum ProblemCategory {
             ProblemCategoryType.IMPORT,
             "Absolute path used",
             "Occurs when absolute path is used. Workspace-relative paths are preferred in RED."),
-    HTML_FORMAT(
+    UNSUPPORTED_RESOURCE_IMPORT(
             ProblemCategoryType.IMPORT,
-            "HTML format used",
-            "Occurs when imported file is in HTML format. Use supported formats only."),
+            "Unsupported resource import used",
+            "Occurs when imported file is in HTML format or is outside of workspace.\n"
+                    + "Red will not parse such files, so keywords and variables defined inside will not be accessible.\n"
+                    + "Use supported formats from workspace only."),
     IMPORT_PATH_RELATIVE_VIA_MODULES_PATH(
             ProblemCategoryType.IMPORT,
             "Import path relative via modules path",
