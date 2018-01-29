@@ -26,15 +26,7 @@ import org.rf.ide.core.testdata.text.write.DumperHelper;
 public class TableElementDumperHelper {
 
     public boolean isDirtyAnyDirtyInside(final List<RobotToken> elems) {
-        boolean result = false;
-        for (final RobotToken rt : elems) {
-            if (rt.isDirty()) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
+        return elems.stream().anyMatch(RobotToken::isDirty);
     }
 
     public int getLastIndexNotEmptyIndex(final List<RobotToken> elems) {
@@ -186,7 +178,7 @@ public class TableElementDumperHelper {
         }
 
         if (isLastElementTheSameAsFirstInTokensToDump(lastToken, tokens)
-                || isAssigmentAfterCurrentToken(tokens.get(0), lastToken)) {
+                || isAssignmentAfterCurrentToken(tokens.get(0), lastToken)) {
             // dump token before this method
             meatTokens++;
         }
@@ -300,9 +292,9 @@ public class TableElementDumperHelper {
         return (dumps.size() > 0);
     }
 
-    public boolean dumpEOLAsItIs(final DumperHelper dumpHelper, final RobotFile model, final IRobotLineElement startToken, final List<RobotLine> lines) {
-
-        int offset = startToken.getFilePosition().getOffset();
+    public boolean dumpEOLAsItIs(final DumperHelper dumpHelper, final RobotFile model,
+            final IRobotLineElement startToken, final List<RobotLine> lines) {
+        final int offset = startToken.getFilePosition().getOffset();
 
         final Optional<Integer> line = model.getRobotLineIndexBy(offset);
         if (!line.isPresent()) {
@@ -319,10 +311,11 @@ public class TableElementDumperHelper {
         return true;
     }
 
-    private boolean isAssigmentAfterCurrentToken(final IRobotLineElement prevToken,
+    private boolean isAssignmentAfterCurrentToken(final IRobotLineElement prevToken,
             final IRobotLineElement currentToken) {
-        return (!prevToken.getFilePosition().isNotSet() && prevToken.getFilePosition().getOffset()
-                + prevToken.getText().length() == currentToken.getFilePosition().getOffset()
+        return (!prevToken.getFilePosition().isNotSet()
+                && prevToken.getFilePosition().getOffset()
+                        + prevToken.getText().length() == currentToken.getFilePosition().getOffset()
                 && currentToken.getTypes().contains(RobotTokenType.ASSIGNMENT));
     }
 
