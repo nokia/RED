@@ -177,7 +177,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<File>());
+        robotProject.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(tmpFile.getParent()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -462,7 +462,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectProvider.createFile("dir/lib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<File>());
+        robotProject.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getLocation().toString()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -483,7 +483,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<File>());
+        robotProject.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -507,7 +507,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<File>());
+        robotProject.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -565,8 +565,11 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     private LibraryImport getImport(final RobotSuiteFile suiteFile) {
-        return (LibraryImport) suiteFile.findSection(RobotSettingsSection.class).get()
-                .getChildren().get(0).getLinkedElement();
+        return (LibraryImport) suiteFile.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getLinkedElement();
     }
 
     private RobotSuiteFile createLibraryImportingSuite(final String toImport) {
