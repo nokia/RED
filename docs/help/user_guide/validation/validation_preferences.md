@@ -43,6 +43,7 @@ Note
   * **Absolute path is used** \- occurs when absolute path is used. Workspace-relative paths are preferred in RED.
   * **HTML format is used** \- occurs when imported file is in HTML format. Use supported formats only.
   * **Import path relative via modules path** \- occurs when imported path is relative to python path.
+  * **Import path outside of workspace** \- occurs when imported path points to location not from workspace.
   * **Import Remote library without arguments** \- occurs when Remote library is imported without agruments.
 
 #### Robot version
