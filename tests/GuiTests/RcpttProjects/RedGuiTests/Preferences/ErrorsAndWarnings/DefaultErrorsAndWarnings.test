@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VMj88KTbEeazyPh6f3_hNQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/25/18 3:11 PM
+Save-Time: 1/30/18 12:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -188,17 +188,24 @@ with [get-window Preferences | get-group Validation] {
     get-section Import | click
 }
 
-get-window Preferences | get-section "Import" | get-control Any -index 2 | get-property "getChildren().length" | equals 8 | verify-true
+get-window Preferences | get-section "Import" | get-control Any -index 2 | get-property "getChildren().length" | equals 10 | verify-true
 
 check-combobox-list-and-selection -section "Import" -label "Absolute path used"
   	-text "Occurs when absolute path is used. Workspace-relative paths are preferred in RED." 
   	
-check-combobox-list-and-selection -section "Import" -label "HTML format used"
-  	-text "Occurs when imported file is in HTML format. Use supported formats only." 
+check-combobox-list-and-selection -section "Import" -label "Unsupported resource import used"
+  	-text  "Occurs when imported file is in HTML format or is outside of workspace.\n"
+        + "Red will not parse such files, so keywords and variables defined inside will not be accessible.\n"
+        + "Use supported formats from workspace only."
   	
 check-combobox-list-and-selection -section "Import" -label "Import path relative via modules path"
   	-text  "Occurs when imported path is relative to python path." 
   	
+check-combobox-list-and-selection -section "Import" -label "Import path outside of workspace"
+  	-text  "Occurs when imported path points to location not from workspace." 
+
+check-combobox-list-and-selection -section "Import" -label "Import Remote library without arguments" 
+  	-text  "Occurs when Remote library is imported without agruments." 	  	
 //====================================== Robot version  =============================  		
 
 with [get-window Preferences | get-group Validation] {
