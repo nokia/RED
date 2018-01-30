@@ -6,11 +6,10 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _UUQjsLrCEeW29Kbu_epUIA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/8/17 5:35 PM
-Tags: notTestable
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/30/18 3:16 PM
 Testcase-Type: ecl
-Verifications: _KRyuULrEEeW29Kbu_epUIA,_UEHU0NGWEeaZNMwBvlrsag
+Verifications: _UEHU0NGWEeaZNMwBvlrsag,_KRyuULrEEeW29Kbu_epUIA
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
 Content-Type: text/plain
@@ -49,101 +48,9 @@ with [get-view "Project Explorer" | get-tree] {
 
 wait 2000
 
-//check icons on PE
-if [$is_product | eq true]{
-
-	get-view "Project Explorer" | get-tree | select "RobotProject/empty_TC_KW.robot"
-	with [get-view "Project Explorer" | get-tree] {
-	    get-item "RobotProject/empty_TC_KW.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "RobotProject/incorrect_header.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning.png" | verify-true
-	    get-item "RobotProject/my_keywords.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_resource_file.png" | verify-true
-	    get-item "RobotProject/resource_invalid_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_resource_file.png" | verify-true
-	    get-item "RobotProject/resource_invalid_settings.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "RobotProject/test_case_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "RobotProject/wrong_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item RobotProject | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_suite_folder.png" | verify-true
-	    get-item RobotProject | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item SecondRobotProject | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_suite_folder.png" | verify-true
-	    get-item SecondRobotProject | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "SecondRobotProject/all_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "SecondRobotProject/missing_keyword.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "SecondRobotProject/set_variable_commands.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "SecondRobotProject/variable_errors.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	}
-
-}-else{
-	with [get-view "Project Explorer" | get-tree] {
-	    get-item "RobotProject/empty_TC_KW.robot" | get-property "image.decorations[0].path" 
-	        | equals  "org.eclipse.jdt.ui.*error_co.*"  | verify-true
-	    get-item "RobotProject/empty_TC_KW.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "RobotProject/incorrect_header.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning.png" | verify-true
-	    get-item "RobotProject/resource_invalid_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item "RobotProject/resource_invalid_settings.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_resource_file.png" | verify-true
-	    get-item "RobotProject/resource_invalid_settings.robot" | get-property "image.decorations[2].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "RobotProject/resource_invalid_settings.robot" | get-property backgroundColor | equals "#FFFFFF" 
-	        | verify-true
-	    get-item "RobotProject/test_case_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item "RobotProject/test_case_settings.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "RobotProject/wrong_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item "RobotProject/wrong_settings.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item SecondRobotProject | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_suite_folder.png" | verify-true
-	    get-item SecondRobotProject | get-property "image.decorations[1].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item SecondRobotProject | get-property "image.decorations[2].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "SecondRobotProject/all_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item "SecondRobotProject/all_settings.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "SecondRobotProject/missing_keyword.robot" | get-property "image.decorations[0].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item "SecondRobotProject/missing_keyword.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "SecondRobotProject/set_variable_commands.robot" | get-property "image.decorations[0].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item "SecondRobotProject/set_variable_commands.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item "SecondRobotProject/variable_errors.robot" | get-property "image.decorations[0].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item "SecondRobotProject/variable_errors.robot" | get-property "image.decorations[1].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	    get-item RobotProject | get-property "image.decorations[0].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_suite_folder.png" | verify-true
-	    get-item RobotProject | get-property "image.decorations[1].path" 
-	        | equals ".*error_co.*" | verify-true
-	    get-item RobotProject | get-property "image.decorations[2].path" 
-	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
-	}
-}	
-
 //double click on problems
 get-view Problems | get-tree 
-    | select "Errors \\(96 items\\)/Invalid number of arguments. Keyword 'Close Aplication' expects 0 arguments, but 1 is provided" 
+    | select "Errors \\(.* items\\)/Invalid number of arguments. Keyword 'Close Aplication' expects 0 arguments, but 1 is provided" 
     | double-click
     
 with [get-editor "all_settings.robot" | get-text-viewer] {
@@ -151,16 +58,16 @@ with [get-editor "all_settings.robot" | get-text-viewer] {
 }    		
 
 //double click on problems	
-get-view Problems | get-tree | select "Errors (96 items)/Test case 'Empty test' contains no keywords to execute" 
-   | double-click
+get-view Problems | get-tree | select "Errors \\(.* items\\)/Test case 'Empty test' contains no keywords to execute" 
+    | double-click   
     
 get-editor "empty_TC_KW.robot" | get-text-viewer | get-property "getSelectionText()" | equals "Empty test" | verify-true	
 
 with [get-view Problems | get-tree] {
-    select "Warnings \\(9 items\\)/Dictionary argument '&{f 1}' has to provide 1 value in order to ensure \\[message\\] arguments of keyword definition" 
+    select "Warnings \\(.* items\\)/Dictionary argument '&{f 1}' has to provide 1 value in order to ensure \\[message\\] arguments of keyword definition" 
         | double-click
 }	
 
-get-editor "variable_errors.robot" | get-text-viewer | get-property "getSelectionText()" | equals "&{f 1}" | verify-true
+get-editor "simple_variable_errors.robot" | get-text-viewer | get-property "getSelectionText()" | equals "&{f 1}" | verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
