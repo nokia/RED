@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gjwJoLpnEee_RrklJFm4zA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/17/17 10:31 AM
+Save-Time: 1/31/18 2:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -37,6 +37,9 @@ with [get-window Preferences] {
 get-view "Project Explorer" | get-tree | select "project_a"
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+    try -times 4 -delay 500 -command{
+    	get-window "Problem Occurred"
+    }
     get-window "Problem Occurred" | get-label "Error occurred when trying to run RfLint analysis" 
         | get-property caption | equals "Error occurred when trying to run RfLint analysis" | verify-true
         
