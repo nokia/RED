@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,8 +27,6 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -125,19 +124,22 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     private void createColumns() {
         final Supplier<VariableMapping> elementsCreator = newElementsCreator();
-        ViewerColumnsFactory.newColumn("Variable name").withWidth(150)
-            .withMinWidth(50)
-            .editingEnabledOnlyWhen(editorInput.isEditable())
-            .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, elementsCreator))
-            .labelsProvidedBy(new VariableMappingsNameLabelProvider())
-            .createFor(viewer);
+        ViewerColumnsFactory.newColumn("Variable name")
+                .withWidth(150)
+                .withMinWidth(50)
+                .editingEnabledOnlyWhen(editorInput.isEditable())
+                .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, elementsCreator))
+                .labelsProvidedBy(new VariableMappingsNameLabelProvider())
+                .createFor(viewer);
 
-        ViewerColumnsFactory.newColumn("Value").withWidth(100)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
-            .editingEnabledOnlyWhen(editorInput.isEditable())
-            .editingSupportedBy(new VariableMappingValueEditingSupport(viewer, elementsCreator))
-            .labelsProvidedBy(new VariableMappingsValueLabelProvider())
-            .createFor(viewer);
+        ViewerColumnsFactory.newColumn("Value")
+                .withWidth(100)
+                .shouldGrabAllTheSpaceLeft(true)
+                .withMinWidth(50)
+                .editingEnabledOnlyWhen(editorInput.isEditable())
+                .editingSupportedBy(new VariableMappingValueEditingSupport(viewer, elementsCreator))
+                .labelsProvidedBy(new VariableMappingsValueLabelProvider())
+                .createFor(viewer);
     }
 
     private Supplier<VariableMapping> newElementsCreator() {
@@ -278,9 +280,11 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         private boolean isVariablePredefined;
 
         private VariableMapping mapping;
+
         private Label exceptionLabel;
 
         private Text nameText;
+
         private Text valueText;
 
         private final String initialVariableName;
@@ -300,6 +304,12 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         public void create() {
             super.create();
             getShell().setText("Add variable mapping");
+            getShell().setMinimumSize(400, 200);
+        }
+
+        @Override
+        protected boolean isResizable() {
+            return true;
         }
 
         @Override
@@ -313,17 +323,11 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
             final Label nameLabel = new Label(dialogComposite, SWT.NONE);
             nameLabel.setText("Name");
-            
+
             nameText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
             GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(nameText);
             nameText.setText(initialVariableName);
-            nameText.addModifyListener(new ModifyListener() {
-
-                @Override
-                public void modifyText(final ModifyEvent event) {
-                    validate();
-                }
-            });
+            nameText.addModifyListener(e -> validate());
 
             final Label valueLabel = new Label(dialogComposite, SWT.NONE);
             valueLabel.setText("Value");
@@ -331,17 +335,11 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
             valueText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
             GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(valueText);
             valueText.setText("value");
-            valueText.addModifyListener(new ModifyListener() {
+            valueText.addModifyListener(e -> validate());
 
-                @Override
-                public void modifyText(final ModifyEvent event) {
-                    validate();
-                }
-            });
-
-            exceptionLabel = new Label(dialogComposite, SWT.NONE);
+            exceptionLabel = new Label(dialogComposite, SWT.WRAP);
             exceptionLabel.setText("");
-            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(exceptionLabel);
+            GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(exceptionLabel);
 
             final Text controlToFocus = isVariablePredefined ? valueText : nameText;
             controlToFocus.setFocus();
@@ -351,26 +349,24 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         }
 
         private void validate() {
-            boolean hasError = false;
-            String errorMsg = "";
+            final List<String> errorMsgs = new ArrayList<>();
+
             if (nameText.getText().isEmpty()) {
-                errorMsg += "Name cannot be empty";
+                errorMsgs.add("Name cannot be empty");
                 nameText.setBackground(nameText.getDisplay().getSystemColor(SWT.COLOR_RED));
-                hasError = true;
             } else {
                 nameText.setBackground(nameText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
             }
-            
+
             if (valueText.getText().isEmpty()) {
-                errorMsg += "\nValue cannot be empty";
+                errorMsgs.add("Value cannot be empty");
                 valueText.setBackground(valueText.getDisplay().getSystemColor(SWT.COLOR_RED));
-                hasError = true;
             } else {
                 valueText.setBackground(valueText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
             }
 
-            exceptionLabel.setText(errorMsg);
-            getButton(IDialogConstants.OK_ID).setEnabled(!hasError);
+            exceptionLabel.setText(String.join("\n", errorMsgs));
+            getButton(IDialogConstants.OK_ID).setEnabled(errorMsgs.isEmpty());
         }
 
         @Override

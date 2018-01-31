@@ -5,11 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -25,14 +22,10 @@ import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
-
 
 /**
  * @author Michal Anglart
- *
  */
 class PathEntryDialog extends Dialog {
 
@@ -48,6 +41,12 @@ class PathEntryDialog extends Dialog {
     public void create() {
         super.create();
         getShell().setText("Add new search path");
+        getShell().setMinimumSize(400, 200);
+    }
+
+    @Override
+    protected boolean isResizable() {
+        return true;
     }
 
     @Override
@@ -59,23 +58,21 @@ class PathEntryDialog extends Dialog {
         infoLabel.setText("Provide search paths to be added. Each path should be specified in separate line.");
         GridDataFactory.fillDefaults().hint(350, SWT.DEFAULT).applyTo(infoLabel);
 
-        pathText = new Text(dialogComposite, SWT.BORDER | SWT.MULTI);
-        GridDataFactory.fillDefaults().hint(350, 100).applyTo(pathText);
+        pathText = new Text(dialogComposite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        GridDataFactory.fillDefaults().grab(true, true).hint(350, 100).applyTo(pathText);
 
         return dialogComposite;
     }
 
     @Override
     protected void okPressed() {
-        searchPath = newArrayList(
-                filter(transform(Splitter.on('\n').splitToList(pathText.getText()), new Function<String, SearchPath>() {
-
-                    @Override
-                    public SearchPath apply(final String singlePath) {
-                        final String trimmedPath = singlePath.trim().replaceAll("\t", " ");
-                        return trimmedPath.isEmpty() ? null : SearchPath.create(trimmedPath);
-                    }
-                }), Predicates.notNull()));
+        searchPath = Splitter.on('\n')
+                .splitToList(pathText.getText())
+                .stream()
+                .map(singlePath -> singlePath.trim().replaceAll("\t", " "))
+                .filter(trimmedPath -> !trimmedPath.isEmpty())
+                .map(SearchPath::create)
+                .collect(Collectors.toList());
         super.okPressed();
     }
 
