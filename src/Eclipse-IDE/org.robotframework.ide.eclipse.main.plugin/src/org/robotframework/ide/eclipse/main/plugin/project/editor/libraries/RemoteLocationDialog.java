@@ -13,8 +13,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -27,7 +25,9 @@ import com.google.common.base.Strings;
 class RemoteLocationDialog extends Dialog {
 
     private RemoteLocation location;
+
     private Label exceptionLabel;
+
     private Text uriText;
 
     RemoteLocationDialog(final Shell parentShell) {
@@ -38,6 +38,12 @@ class RemoteLocationDialog extends Dialog {
     public void create() {
         super.create();
         getShell().setText("Add Remote location");
+        getShell().setMinimumSize(400, 200);
+    }
+
+    @Override
+    protected boolean isResizable() {
+        return true;
     }
 
     @Override
@@ -52,47 +58,44 @@ class RemoteLocationDialog extends Dialog {
 
         final Label uriLabel = new Label(dialogComposite, SWT.NONE);
         uriLabel.setText("URI");
-        
+
         uriText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(uriText);
         uriText.setText("http://127.0.0.1:8270/");
-        uriText.addModifyListener(new ModifyListener() {
+        uriText.addModifyListener(e -> validate());
 
-            @Override
-            public void modifyText(final ModifyEvent event) {
-                try {
-                    final URI uri = new URI(uriText.getText());
-                    getButton(IDialogConstants.OK_ID).setEnabled(true);
-
-                    if (Strings.isNullOrEmpty(uri.getPath()) && uri.getPort() == -1) {
-                        uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
-                        exceptionLabel
-                                .setText("URI have an empty path and port. Path '/RPC2' and port 8270 will be used");
-                    } else if (Strings.isNullOrEmpty(uri.getPath())) {
-                        uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
-                        exceptionLabel.setText("URI have an empty path. Path '/RPC2' will be used");
-                    } else if (uri.getPort() == -1) {
-                        uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
-                        exceptionLabel.setText("URI have no port specified. Port 8270 will be used");
-                    } else {
-                        uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-                        exceptionLabel.setText("");
-                    }
-                } catch (final URISyntaxException e) {
-                    uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_RED));
-                    getButton(IDialogConstants.OK_ID).setEnabled(false);
-                    exceptionLabel.setText("URI problem " + e.getMessage().toLowerCase());
-                }
-            }
-        });
-
-        exceptionLabel = new Label(dialogComposite, SWT.NONE);
+        exceptionLabel = new Label(dialogComposite, SWT.WRAP);
         exceptionLabel.setText("");
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(exceptionLabel);
+        GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(exceptionLabel);
 
         uriText.setFocus();
 
         return dialogComposite;
+    }
+
+    private void validate() {
+        try {
+            final URI uri = new URI(uriText.getText());
+            getButton(IDialogConstants.OK_ID).setEnabled(true);
+
+            if (Strings.isNullOrEmpty(uri.getPath()) && uri.getPort() == -1) {
+                uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+                exceptionLabel.setText("URI have an empty path and port. Path '/RPC2' and port 8270 will be used");
+            } else if (Strings.isNullOrEmpty(uri.getPath())) {
+                uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+                exceptionLabel.setText("URI have an empty path. Path '/RPC2' will be used");
+            } else if (uri.getPort() == -1) {
+                uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+                exceptionLabel.setText("URI have no port specified. Port 8270 will be used");
+            } else {
+                uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+                exceptionLabel.setText("");
+            }
+        } catch (final URISyntaxException e) {
+            uriText.setBackground(uriText.getDisplay().getSystemColor(SWT.COLOR_RED));
+            getButton(IDialogConstants.OK_ID).setEnabled(false);
+            exceptionLabel.setText("URI problem " + e.getMessage().toLowerCase());
+        }
     }
 
     @Override

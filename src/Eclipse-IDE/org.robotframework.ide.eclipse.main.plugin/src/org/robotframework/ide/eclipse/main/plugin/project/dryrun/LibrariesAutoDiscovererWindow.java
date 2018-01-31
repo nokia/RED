@@ -133,9 +133,10 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     @Override
-    protected void configureShell(final Shell newShell) {
-        super.configureShell(newShell);
-        newShell.setText("Discovering libraries summary");
+    public void create() {
+        super.create();
+        getShell().setText("Discovering libraries summary");
+        getShell().setMinimumSize(300, 300);
     }
 
     @Override
