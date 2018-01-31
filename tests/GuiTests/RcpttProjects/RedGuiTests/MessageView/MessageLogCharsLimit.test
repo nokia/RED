@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _R_4xIM6rEee4YdJy8LnSAg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/7/17 5:25 PM
+Save-Time: 1/31/18 12:36 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -128,7 +128,7 @@ with [get-window Preferences] {
 }
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
     | click
-wait-for-console
+wait-for-console -times 6
 wait 1000  
 get-view "Message Log" | get-editbox | get-property "getCharCount()" | equals 0 | verify-true    
 
