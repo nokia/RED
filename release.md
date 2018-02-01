@@ -1,3 +1,35 @@
+# RED - Robot Editor v0.8.3
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon,please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- support for UTF charset mantioned in #169 and RED-914
+- improved performance of autodiscovery - from now on robot dry run will be run only when quick fix will not return any libs. This also fixes SSHLibrary import via __init__.py
+- changed Include/Exclude - from now on, Excluded folders will not be taken into autodiscovery and keyword assistance.
+- Errors/Validation can be switched off globally (under Preferences->RobotFramework->Errors/Warnings
+- fixed inserting/deleting cell in Table Editor in Settings tab
+
+## GitHub issues updates
+#155 - resolve value of ${EXECDIR} in VM when used in mappings to another variable
+#166 - exception thrown by debugger
+#167 - allow to change text size in Source by [ctrl] + [=] and [ctrl] + [-]
+#162 - incorrect "Invalid Variable syntax" error with list and dictionary variables
+#169 - rflint/session server does not work with non-asci chars in filename
+#160 - console output encoding problems
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.2
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
