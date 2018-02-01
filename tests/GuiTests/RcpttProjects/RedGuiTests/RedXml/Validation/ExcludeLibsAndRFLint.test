@@ -1,0 +1,206 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _hUCv4ATeEeim3830xglzMw
+Element-Name: ExcludeLibsAndRFLint
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _c2s9wAaSEeiksYLFL8zyCg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/31/18 5:14 PM
+Testcase-Type: ecl
+Verifications: _boFGIAagEeiksYLFL8zyCg
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-errors" [val number_of_erorrs]{
+	$number_of_erorrs | each [val element_index]
+	{
+		list "Errors \\(.* items\\)/Test case 'empty test case' contains no keywords to execute"   //0
+		"Errors \\(.*\\)/Unknown '..\\/libs\\/add2.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"   //1
+		"Errors \\(.*\\)/Unknown '..\\/libs\\/add3.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"	//2
+		"Errors \\(.*\\)/Unknown '..\\/libs\\/remove.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 	//3
+		"Errors \\(.*\\)/Unknown 'libs\\/remove2.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 	//4
+		"Errors \\(.*\\)/Unknown 'no_lib' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" //5
+		"Errors \\(.*\\)/Unknown keyword 'error1'" 	//6
+		"Errors \\(.*\\)/Unknown keyword 'kw from second project'" 	//7
+		 "Errors \\(.*\\)/Unknown keyword 'kw from single test'"		//8
+		"Errors \\(.* items\\)/Unknown keyword 'kw from single test'"  | get $element_index | let [val text -input]{
+		 
+			 get-view Problems | get-tree | get-item -path $text
+	            	| get-property enablement | equals false | verify-true
+			 
+		}
+	}
+}
+
+proc "check-menus-enablament" [val is_project true] [val include true]{
+
+	if [$is_project |eq true]{
+		with [get-view "Project Explorer" | get-tree] {
+		    get-menu -path "Robot Framework/Reset Robot Environment" | get-property enablement | equals true | verify-true
+		    get-menu -path "Robot Framework/Deconfigure as Robot project" | get-property enablement | equals true | verify-true
+		}
+	}	
+	with [get-view "Project Explorer" | get-tree] {
+		    get-menu -path "Robot Framework/Include for validation" | get-property enablement | equals $include | verify-true
+		    get-menu -path "Robot Framework/Exclude from validation" | get-property enablement | equals false | verify-true
+		    get-menu -path "Robot Framework/Revalidate" | get-property enablement | equals false | verify-true
+		    get-menu -path "Robot Framework/Run RfLint analysis" | get-property enablement | equals false | verify-true
+		    get-menu -path "Robot Framework/Clean RfLint problems" | get-property enablement | equals true | verify-true
+		    get-menu -path "Robot Framework/Automatically discover and add libraries to red.xml" | get-property enablement 
+		        | equals false | verify-true
+		    get-menu -path "Robot Framework/Add Library to red.xml" | get-property enablement | equals false | verify-true
+	}
+}
+check-errors [list 0 1 2 3 4 5 6 7 8 9]
+
+//exclude entire project
+get-view "Project Explorer" | get-tree | select SecondProject | get-menu 
+    -path "Robot Framework/Exclude from validation" | click
+    
+//one error from second project was removed
+check-errors [list 0 1 2 3 4 5 6  8 9]
+
+//open file from second project and edit it - no validation should be run
+get-view "Project Explorer" | get-tree | select "SecondProject \\[excluded\\]/test/file_with_error.robot" | double-click
+with [get-editor "file_with_error.robot" | get-text-viewer] {
+    set-caret-pos 3 27
+    type-text " 3"
+    key-type "M1+s"
+}
+check-errors [list 0 1 2 3 4 5 6 8 9]
+
+get-view "Project Explorer" | get-tree | select "SecondProject [excluded]"
+check-menus-enablament 
+
+//check how red.xml looks like - only one item is in window
+get-view "Project Explorer" | get-tree | select "SecondProject \\[excluded\\]/red.xml" | double-click
+get-editor "SecondProject/red.xml" | get-tab-folder | get-tab-item Validation | click
+with [get-editor "SecondProject/red.xml" | get-section "Excluded project parts" | get-tree] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "SecondProject [excluded]" | verify-true
+}
+
+//----------------------------------------- test importing resource and lib ----------------------------
+with [get-view "Project Explorer" | get-tree] {
+    select "FirstProject/TestFile.robot" | get-menu -path "Robot Framework/Exclude from validation" | click
+}
+
+wait 1000
+with [get-view "Project Explorer" | get-tree] {
+    select "FirstProject/TestFile.robot \\[excluded\\]" | double-click
+}
+
+
+check-errors [list 0 1 2 3 5 6 8 9]
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 16
+    type-text " "
+    key-type "M1+s"
+}
+
+check-errors [list 0 1 2 3 5 6 8 9]
+check-menus-enablament -is_project false
+
+//----------------------------------- exclude resource that is imported by test----------------------------
+
+get-view "Project Explorer" | get-tree
+	| select "FirstProject/test_and_res/res2.robot" | get-menu -path "Robot Framework/Exclude from validation" | click
+
+
+//open test that is including res
+with [get-view "Project Explorer" | get-tree] {
+    select "FirstProject/test_and_res/test2.robot" | double-click
+}
+
+//change text to run autodiscovery
+with [get-editor "test2.robot" | get-text-viewer] {
+    set-caret-pos 7 16
+    type-text " "
+    key-type "M1+s"
+}
+wait-for-discover-window
+
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-property "getItemCount()" | equals 2 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals add3 | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals remove | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+check-errors [list 0 1 5 6 8]
+
+//----------------------------------- exclude entire folder with previosly excluded res ----------------------------
+get-view "Project Explorer" | get-tree | select "FirstProject/test_and_res" | select "FirstProject/test_and_res" 
+    | get-menu -path "Robot Framework/Exclude from validation" | click
+    
+//folder and resrource have labels
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "FirstProject/test_and_res \\[excluded\\]" | get-property caption | equals "test_and_res [excluded]" 
+        | verify-true
+    get-item -path "FirstProject/test_and_res \\[excluded\\]/res2.robot \\[excluded\\]" | get-property caption 
+        | equals "res2.robot [excluded]" | verify-true
+}
+
+//check menu on folder
+get-view "Project Explorer" | get-tree | select "FirstProject/test_and_res [excluded]"    
+check-menus-enablament -is_project false
+
+//check menu on file
+get-view "Project Explorer" | get-tree | select "FirstProject/test_and_res [excluded]" 
+    | select "FirstProject/test_and_res [excluded]/res2.robot [excluded]" 
+check-menus-enablament -is_project false -include false
+
+//check menu of test
+get-view "Project Explorer" | get-tree | select "FirstProject/test_and_res [excluded]"  
+    | select "FirstProject/test_and_res [excluded]/test2.robot" 
+check-menus-enablament -is_project false -include false   
+
+
+
+
+//open red.xml and check validation tab
+get-view "Project Explorer" | get-tree | select "FirstProject/red.xml" | double-click
+get-editor "FirstProject/red.xml" | get-tab-folder | get-tab-item Validation | click
+with [get-editor "FirstProject/red.xml" | get-section "Excluded project parts" | get-tree] {
+    get-item -path "FirstProject/test_and_res \\[excluded\\]" | get-property caption | equals "test_and_res [excluded]" 
+        | verify-true
+    get-item -path "FirstProject/test_and_res \\[excluded\\]/res2.robot \\[excluded\\]" | get-property caption 
+        | equals "res2.robot [excluded]" | verify-true
+    get-item -path "FirstProject/TestFile.robot \\[excluded\\]" | get-property caption 
+        | equals "TestFile.robot [excluded]" | verify-true
+}
+
+//removed added libs
+with [get-editor "FirstProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    with [get-section "Referenced libraries" | get-table] {
+        select "add3 - FirstProject\\/libs" | key-type Del
+        select "remove - FirstProject\\/libs" | key-type Del
+    }
+}
+get-button "Save (M1+S)" | click
+
+//auto discover on entire project
+get-view "Project Explorer" | get-tree | select FirstProject | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+
+//only 2 libs are found
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals add2 | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "no_lib" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+
+get-button "Save All (M1+M2+S)" | click
+
+//run rf lint
+get-view "Project Explorer" | get-tree | select "FirstProject/TestFile.robot [excluded]" | select FirstProject 
+    | get-menu -path "Robot Framework/Run RfLint analysis" | click
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
