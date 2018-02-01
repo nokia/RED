@@ -1,3 +1,39 @@
+RED 0.8.3 - 2018/02/05
+Enhancement
+
+    [RED-549] - Autodiscovering - handling __init__ importers paths
+    [RED-840] - Removing or changing window for Settings->Imports
+    [RED-902] - Autodiscovery on PE could work like Quick Fix on lib in Editor
+    [RED-985] - add a action for force line wrapping in libdoc window for non-wrappable strings(html links)
+    [RED-991] - GitHub #155 - resolve value of ${EXECDIR} in VM when used in mappings to another variable
+    [RED-994] - for resources outside of workspace, provide additional marker: no KW from this res will be visible
+    [RED-1003] - QuickFix for incorrect windows paths separator
+    [RED-1005] - Skip excluded project parts in features other than validation
+    [RED-1006] - Preferences - Errors/Warning - on/off for whole validation and change Runtime errors levels
+    [RED-1009] - Report problem in red.xml when libspec was not generated
+    [RED-1013] - Improve suite collecting in handlers for project explorer
+    [RED-1033] - update validation & library discovering topics in RED user guide
+
+Bug
+
+    [RED-913] - User cannot change variable value in debug mode for variable with unicode
+    [RED-914] - UTF-8 support in RPC server
+    [RED-979] - Slash is added in inserted cell after trying to insert next cell
+    [RED-980] - Column disappears after inserting cell in general settings
+    [RED-982] - Cannot delete cell in Settings table
+    [RED-993] - Adding __init__.py from SshLibrary returns robot_session exception when adding lib from red.xml
+    [RED-1002] - Quick fix for libraries shows the same path as is defined
+    [RED-1008] - Github #166 - exception thrown by debugger
+    [RED-1010] - GitHub #167 - allow to change text size in Source by [ctrl] + [=] and [ctrl] + [-]
+    [RED-1011] - Github #162 - incorrect "Invalid Variable syntax" error with list and dictionary variables
+    [RED-1017] - GitHub #169 - rflint/session server does not work with non-asci chars in filename
+    [RED-1026] - GitHub #160 - console output encoding problems
+
+Task
+
+    [RED-996] - Provide missing junits for insert/delete cell
+
+
 RED 0.8.2 - 2017/12/18
 Enhancement
 
