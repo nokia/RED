@@ -1,0 +1,75 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _VDbgkAdUEeiksYLFL8zyCg
+Element-Name: RedXmlMarkerForMissingLibspecs
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _G53vcAdVEeiksYLFL8zyCg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 2/1/18 3:02 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+global [val StandardLibs [list
+	"BuiltIn"
+	"Collections"
+	"DateTime"
+	"Dialogs"
+	"Easter"
+	"OperatingSystem"
+	"Process"
+	"Reserved"
+	"Screenshot"
+	"String"
+	"Telnet"
+	"XML"
+]]
+
+proc "check-project-explorer"{
+	repeat [val index] -times 10 -command {
+		with [get-view "Project Explorer" | get-tree] {
+		    get-item -path "WithoutLibspecks/Robot Standard libraries \\[Robot Framework .* \\(Python .*\\)\\]" 
+		        | get-property [format "getItems().TreeItem[%s].getText()" $index] | equals [format "%s (non-accessible)" [$StandardLibs | get $index]] | verify-true
+		}        
+	}
+}
+
+proc "check-problems"{
+	repeat [val index] -times 10 -command {
+		get-view Problems | get-tree | get-item 
+		    -path [format "Errors \\(15 items\\)/Library specification file was not generated for '%s' library" [$StandardLibs | get $index]]
+		    | get-property enablement | equals false | verify-true
+	}   
+} 
+
+//delete libspec folder to generate errors
+delete-file [uri-from-path [concat $RED_workspace_path "/WithoutLibspecks/libspecs"]]
+
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
+
+get-view Problems | click
+check-project-explorer
+check-problems
+
+//this is error from wrong python file
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(15 items\\)/Unknown 'Zlib.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+    | get-property enablement | equals false | verify-true
+    
+
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
+
+with [get-view Problems | get-tree] {
+    get-item -path "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Library specification file was not generated for 'ZLib' library" | verify-true
+    get-item -path "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Unknown 'Zlib.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
