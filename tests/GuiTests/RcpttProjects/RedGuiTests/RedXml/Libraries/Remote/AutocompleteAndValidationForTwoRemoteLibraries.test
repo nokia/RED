@@ -7,7 +7,8 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tMPTMN5NEeeM0Z7Do3ZSmA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/11/17 11:13 AM
+Save-Time: 2/1/18 6:43 PM
+Tags: Unstable
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -123,4 +124,5 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
     | get-menu -path "Run As/1 Robot Test" | click
 // check if connection to server is broken
 get-view "Message Log" | get-editbox | get-property text | contains "FAIL : Connection to remote server broken: "| verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
