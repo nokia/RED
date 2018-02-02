@@ -31,9 +31,6 @@ public class DumperHelper {
 
     private static final int NUMBER_OF_AFTER_UNIT_ELEMENTS_TO_TREAT_AS_NEW_UNIT_START = 3;
 
-    // private static final int MAX_NUMBER_OF_COLUMN_IN_LINE = 7;
-    //
-    // private static final int MAX_NUMBER_OF_CHARS_IN_LINE = 120;
     private Optional<ILineDumpTokenListener> dumpTokenListeners = Optional.empty();
 
     private static final String EMPTY = "\\";

@@ -194,7 +194,7 @@ public class KeywordSettingsValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
-    @Ignore
+    @Ignore("see RED-1036")
     @Test
     public void duplicatedDocumentationsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
@@ -243,7 +243,7 @@ public class KeywordSettingsValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
-    @Ignore
+    @Ignore("see RED-1036")
     @Test
     public void duplicatedTimeoutsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
@@ -259,7 +259,7 @@ public class KeywordSettingsValidatorTest {
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
         assertThat(reporter.getReportedProblems()).containsOnly(
                 new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 36))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(47, 56))));
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(44, 53))));
     }
 
     @Test
@@ -310,7 +310,7 @@ public class KeywordSettingsValidatorTest {
                 new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(41, 48))));
     }
 
-    @Ignore
+    @Ignore("see RED-1036")
     @Test
     public void duplicatedTeardownsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
