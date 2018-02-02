@@ -1,9 +1,9 @@
 /*
- * Copyright 2016 Nokia Solutions and Networks
+ * Copyright 2018 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,28 +14,29 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.swt.SwtThread;
 
-public class PathEntryDialogTest {
+public class VariableMappingDialogTest {
 
     @Rule
     public ShellProvider shell = new ShellProvider();
 
     @Test
-    public void entryDialogProperlyGeneratesSearchPaths_whenPathsAreProvidedInTextBox() throws Exception {
+    public void entryDialogProperlyGeneratesVariableMapping_whenNameAndValueAreProvidedInTextBoxes() throws Exception {
         final AtomicBoolean finished = new AtomicBoolean(false);
-        final AtomicReference<PathEntryDialog> dialog = new AtomicReference<>(null);
+        final AtomicReference<VariableMappingDialog> dialog = new AtomicReference<>(null);
 
         final Thread guiChangesRequestingThread = new Thread(() -> {
             SwtThread.asyncExec(() -> {
-                dialog.set(new PathEntryDialog(shell.getShell()));
+                dialog.set(new VariableMappingDialog(shell.getShell()));
                 dialog.get().open();
                 finished.set(true);
             });
             SwtThread.asyncExec(() -> {
-                dialog.get().getSearchPathsText().setText("path1\n\n  \t  \npath\t2\n");
+                dialog.get().getNameText().setText("${someVar}");
+                dialog.get().getValueText().setText("123456");
                 dialog.get().getOkButton().notifyListeners(SWT.Selection, new Event());
             });
         });
@@ -49,7 +50,6 @@ public class PathEntryDialogTest {
             }
         }
 
-        assertThat(dialog.get().getSearchPath()).containsExactly(SearchPath.create("path1"),
-                SearchPath.create("path 2"));
+        assertThat(dialog.get().getMapping()).isEqualTo(VariableMapping.create("${someVar}", "123456"));
     }
 }

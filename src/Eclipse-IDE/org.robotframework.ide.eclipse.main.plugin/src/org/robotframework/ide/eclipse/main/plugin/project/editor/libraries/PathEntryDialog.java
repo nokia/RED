@@ -13,12 +13,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -31,7 +31,7 @@ class PathEntryDialog extends Dialog {
 
     private List<SearchPath> searchPath;
 
-    private Text pathText;
+    private StyledText pathText;
 
     PathEntryDialog(final Shell parentShell) {
         super(parentShell);
@@ -58,7 +58,7 @@ class PathEntryDialog extends Dialog {
         infoLabel.setText("Provide search paths to be added. Each path should be specified in separate line.");
         GridDataFactory.fillDefaults().hint(350, SWT.DEFAULT).applyTo(infoLabel);
 
-        pathText = new Text(dialogComposite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        pathText = new StyledText(dialogComposite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         GridDataFactory.fillDefaults().grab(true, true).hint(350, 100).applyTo(pathText);
 
         return dialogComposite;
@@ -82,7 +82,7 @@ class PathEntryDialog extends Dialog {
     }
 
     @VisibleForTesting
-    Text getSearchPathsText() {
+    StyledText getSearchPathsText() {
         return pathText;
     }
 
