@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aZra8NS6EeWO-beUKyHz0g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/21/17 10:21 AM
+Save-Time: 2/2/18 10:20 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -58,6 +58,8 @@ get-view "Project Explorer" | get-tree | get-menu Debug | get-property enablemen
 
 //run empty test
 get-view "Project Explorer" | get-tree | select "RobotProject/Test.tsv/Test Cases/Empty test" | get-menu Run | click
+
+wait-for-message-log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.Test.Empty test\n"
     + "Ending test: RobotProject.Test.Empty test" | verify-true
     
