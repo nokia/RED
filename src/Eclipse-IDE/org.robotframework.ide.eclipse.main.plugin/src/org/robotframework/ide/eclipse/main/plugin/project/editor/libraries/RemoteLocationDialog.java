@@ -13,13 +13,15 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 class RemoteLocationDialog extends Dialog {
@@ -28,7 +30,7 @@ class RemoteLocationDialog extends Dialog {
 
     private Label exceptionLabel;
 
-    private Text uriText;
+    private StyledText uriText;
 
     RemoteLocationDialog(final Shell parentShell) {
         super(parentShell);
@@ -59,7 +61,7 @@ class RemoteLocationDialog extends Dialog {
         final Label uriLabel = new Label(dialogComposite, SWT.NONE);
         uriLabel.setText("URI");
 
-        uriText = new Text(dialogComposite, SWT.SINGLE | SWT.BORDER);
+        uriText = new StyledText(dialogComposite, SWT.SINGLE | SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, false).hint(300, SWT.DEFAULT).applyTo(uriText);
         uriText.setText("http://127.0.0.1:8270/");
         uriText.addModifyListener(e -> validate());
@@ -109,6 +111,7 @@ class RemoteLocationDialog extends Dialog {
         super.okPressed();
     }
 
+    @VisibleForTesting
     static URI createUriWithDefaultsIfMissing(final URI uri, final int defaultPort, final String defaultPath) {
         try {
             final int port = uri.getPort() != -1 ? uri.getPort() : defaultPort;
@@ -120,6 +123,16 @@ class RemoteLocationDialog extends Dialog {
         } catch (final URISyntaxException e) {
             return uri;
         }
+    }
+
+    @VisibleForTesting
+    Button getOkButton() {
+        return getButton(IDialogConstants.OK_ID);
+    }
+
+    @VisibleForTesting
+    StyledText getUriText() {
+        return uriText;
     }
 
     RemoteLocation getRemoteLocation() {

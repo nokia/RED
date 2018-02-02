@@ -24,7 +24,7 @@ import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.general.VariableMappingsFormFragment.VariableMappingDialog;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.general.VariableMappingDialog;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
