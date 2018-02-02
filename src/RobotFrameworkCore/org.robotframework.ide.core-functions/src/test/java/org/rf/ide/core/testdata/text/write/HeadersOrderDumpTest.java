@@ -24,8 +24,8 @@ public class HeadersOrderDumpTest extends RobotFormatParameterizedTest {
     @Test
     public void test_givenTestCase_whenAddSettings_thenSettingsShouldBeTheFirst() throws Exception {
         // prepare
-        final String inFileName = "headers/update/Input_TestCaseExists_addingSettings." + getExtension();
-        final String outputFileName = "headers/update/Output_TestCaseExists_addingSettings." + getExtension();
+        final String inFileName = convert("Input_TestCaseExists_addingSettings");
+        final String outputFileName = convert("Output_TestCaseExists_addingSettings");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getLazyParser());
@@ -41,9 +41,8 @@ public class HeadersOrderDumpTest extends RobotFormatParameterizedTest {
     public void test_givenTestCase_whenAddSettings_andVariables_thenSettings_andVariablesShouldBeTheFirst()
             throws Exception {
         // prepare
-        final String inFileName = "headers/update/Input_TestCaseExists_addingSettingsAndVariables." + getExtension();
-        final String outputFileName = "headers/update/Output_TestCaseExists_addingSettingsAndVariables."
-                + getExtension();
+        final String inFileName = convert("Input_TestCaseExists_addingSettingsAndVariables");
+        final String outputFileName = convert("Output_TestCaseExists_addingSettingsAndVariables");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getLazyParser());
@@ -54,5 +53,9 @@ public class HeadersOrderDumpTest extends RobotFormatParameterizedTest {
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    private String convert(final String fileName) {
+        return "headers/update/" + fileName + "." + getExtension();
     }
 }
