@@ -16,14 +16,12 @@ import org.rf.ide.core.testdata.model.RobotFile;
  */
 public class HeadersAndHashCommentMixTest {
 
-    private final String HEADERS_UPDATE_DIR = "headers/update/";
-
     @Test
-    public void test_givenTestCase_whenAddSettings_thenSettingsShouldBeTheFirst_andCommentShouldNotDisapper()
+    public void test_givenTestCase_whenAddSettings_thenSettingsShouldBeTheFirst_andCommentShouldNotDisappear()
             throws Exception {
         // prepare
-        final String inFileName = HEADERS_UPDATE_DIR + "Input_HeadersWithHashCommentAtTheEnd.robot";
-        final String outputFileName = HEADERS_UPDATE_DIR + "Output_HeadersWithHashCommentAtTheEnd.robot";
+        final String inFileName = "headers/update/Input_HeadersWithHashCommentAtTheEnd.robot";
+        final String outputFileName = "headers/update/Output_HeadersWithHashCommentAtTheEnd.robot";
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 

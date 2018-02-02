@@ -5,17 +5,7 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.execution.creation;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.lang.model.element.Modifier;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -23,11 +13,15 @@ import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOfThreeExecUnitsTest.TestFilesCompareStore.InvalidTestStoreException;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
+import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
+import org.rf.ide.core.testdata.text.write.tables.execution.creation.ATestFilesCompareStore.InvalidTestStoreException;
 
-import com.google.common.base.Joiner;
+public abstract class ACreationOfThreeExecUnitsTest extends RobotFormatParameterizedTest {
 
-public abstract class ACreationOfThreeExecUnitsTest {
+    public ACreationOfThreeExecUnitsTest(final String extension, final FileFormat format) {
+        super(extension, format);
+    }
 
     public abstract List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> getExecutablesAllWithNames();
 
@@ -111,17 +105,17 @@ public abstract class ACreationOfThreeExecUnitsTest {
 
     private void checkEnvironment() throws InvalidTestStoreException {
         final TestFilesCompareStore cmpExecWithName = getCompareFilesStoreForExecutableWithName();
-        if (!cmpExecWithName.wasValidated.get()) {
+        if (!cmpExecWithName.wasValidated()) {
             cmpExecWithName.validate();
         }
 
         final TestFilesCompareStore cmpExecWithoutName = getCompareFilesStoreForExecutableWithTheFirstWithoutName();
-        if (!cmpExecWithoutName.wasValidated.get()) {
+        if (!cmpExecWithoutName.wasValidated()) {
             cmpExecWithoutName.validate();
         }
     }
 
-    public static class TestFilesCompareStore {
+    public static class TestFilesCompareStore extends ATestFilesCompareStore {
 
         private String threeExecUnitsWithOneLineEachOtherInsideCmpFile;
 
@@ -133,69 +127,6 @@ public abstract class ACreationOfThreeExecUnitsTest {
         public void setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
                 final String threeExecUnitsWithOneLineEachOtherInsideCmpFile) {
             this.threeExecUnitsWithOneLineEachOtherInsideCmpFile = threeExecUnitsWithOneLineEachOtherInsideCmpFile;
-        }
-
-        private final AtomicBoolean wasValidated = new AtomicBoolean(false);
-
-        public void validate() throws InvalidTestStoreException {
-            final List<String> errors = new ArrayList<>(0);
-            errors.addAll(collectMismatchesForNotNullValidation());
-
-            this.wasValidated.set(true);
-            if (!errors.isEmpty()) {
-                throw new InvalidTestStoreException(errors);
-            }
-        }
-
-        protected List<String> collectMismatchesForNotNullValidation() {
-            final List<String> errors = new ArrayList<>(0);
-            final Class<ValidateNotNull> ano = ValidateNotNull.class;
-            final List<Method> publicMethodsAnnotatedWith = getPublicMethodsAnnotatedWith(ano);
-            for (final Method method : publicMethodsAnnotatedWith) {
-                final ValidateNotNull validError = method.getAnnotation(ano);
-                try {
-                    final Object invoke = method.invoke(this);
-                    if (invoke == null || ((String) invoke).isEmpty()) {
-                        errors.add("Method \'" + method.getName() + "\' should return null for file path "
-                                + validError.errorParameterMsg());
-                    }
-                } catch (final Exception e) {
-                    errors.add("Problem found when \'" + validError.errorParameterMsg() + "\' with message " + e);
-                }
-            }
-
-            return errors;
-        }
-
-        protected List<Method> getPublicMethodsAnnotatedWith(final Class<? extends Annotation> ano) {
-            final List<Method> methodsToCheck = new ArrayList<>(0);
-
-            final Method[] declaredMethods = this.getClass().getDeclaredMethods();
-            for (final Method method : declaredMethods) {
-                if (Modifier.PUBLIC.ordinal() == method.getModifiers()) {
-                    if (method.getAnnotation(ano) != null) {
-                        methodsToCheck.add(method);
-                    }
-                }
-            }
-
-            return methodsToCheck;
-        }
-
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target({ ElementType.METHOD })
-        private @interface ValidateNotNull {
-
-            String errorParameterMsg();
-        }
-
-        public static class InvalidTestStoreException extends Exception {
-
-            private static final long serialVersionUID = 3123604043036477588L;
-
-            public InvalidTestStoreException(final List<String> errors) {
-                super(Joiner.on("\nerror: ").join(errors));
-            }
         }
     }
 }
