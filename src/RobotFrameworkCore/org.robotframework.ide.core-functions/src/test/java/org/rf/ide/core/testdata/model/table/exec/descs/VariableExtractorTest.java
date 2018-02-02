@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.JoinedTextDeclarations;
@@ -25,9 +24,9 @@ public class VariableExtractorTest {
     public void test_extractionOf_escapedQuotaTest_forSPACE_PIPE_SPACE_GREP_ESCAPE_part_commentOfComment() {
         // prepare
         final String text = "   \\\\${result}   Run \"echo \"\"${result}\"\" | grep \\\"\"PLMN-PLMN\\\"\" | awk -F '/' '{print \\$NF}' | awk '{print \\$1}'\"";
-        VariableExtractor extractor = new VariableExtractor();
+        final VariableExtractor extractor = new VariableExtractor();
 
-        RobotToken varToken = new RobotToken();
+        final RobotToken varToken = new RobotToken();
         varToken.setLineNumber(3);
         varToken.setStartColumn(1);
         varToken.setStartOffset(39);
@@ -68,14 +67,13 @@ public class VariableExtractorTest {
         checkpoint.assertMappingResult(mapResult);
     }
 
-    @Ignore
     @Test
     public void test_extractionOf_escapedQuotaTest_forSPACE_PIPE_SPACE_GREP_ESCAPE_part_onlyOneVariable() {
         // prepare
         final String text = "   \\${result}   Run \"echo \"\"${result}\"\" | grep \\\"\"PLMN-PLMN\\\"\" | awk -F '/' '{print \\$NF}' | awk '{print \\$1}'\"";
-        VariableExtractor extractor = new VariableExtractor();
+        final VariableExtractor extractor = new VariableExtractor();
 
-        RobotToken varToken = new RobotToken();
+        final RobotToken varToken = new RobotToken();
         varToken.setLineNumber(3);
         varToken.setStartColumn(1);
         varToken.setStartOffset(39);
@@ -117,14 +115,13 @@ public class VariableExtractorTest {
         checkpoint.assertMappingResult(mapResult);
     }
 
-    @Ignore
     @Test
     public void test_extractionOf_escapedQuotaTest_forSPACE_PIPE_SPACE_GREP_ESCAPE_part() {
         // prepare
         final String text = "   ${result}   Run \"echo \"\"${result}\"\" | grep \\\"\"PLMN-PLMN\\\"\" | awk -F '/' '{print \\$NF}' | awk '{print \\$1}'\"";
-        VariableExtractor extractor = new VariableExtractor();
+        final VariableExtractor extractor = new VariableExtractor();
 
-        RobotToken varToken = new RobotToken();
+        final RobotToken varToken = new RobotToken();
         varToken.setLineNumber(3);
         varToken.setStartColumn(1);
         varToken.setStartOffset(39);
@@ -166,7 +163,7 @@ public class VariableExtractorTest {
 
     private static class MappedResultStepHelper {
 
-        private List<Step> steps = new ArrayList<>(0);
+        private final List<Step> steps = new ArrayList<>(0);
 
         private final int offset;
 
@@ -190,7 +187,7 @@ public class VariableExtractorTest {
             final List<IElementDeclaration> mappedElements = mapResult.getMappedElements();
 
             int offsetCounter = offset;
-            int size = steps.size();
+            final int size = steps.size();
             for (int i = 0; i < size; i++) {
                 final Step step = steps.get(i);
                 assertThat(step.type.isCorrectType(mappedElements.get(i))).isTrue();
@@ -204,12 +201,12 @@ public class VariableExtractorTest {
             JOINED_TEXT {
 
                 @Override
-                public boolean isCorrectType(IElementDeclaration e) {
+                public boolean isCorrectType(final IElementDeclaration e) {
                     return (e instanceof JoinedTextDeclarations);
                 }
 
                 @Override
-                public boolean isTheSameText(IElementDeclaration e, String text) {
+                public boolean isTheSameText(final IElementDeclaration e, final String text) {
                     return (((JoinedTextDeclarations) e).getText()).equals(text);
                 }
 
@@ -217,18 +214,18 @@ public class VariableExtractorTest {
             VARIABLE {
 
                 @Override
-                public boolean isCorrectType(IElementDeclaration e) {
+                public boolean isCorrectType(final IElementDeclaration e) {
                     return (e instanceof VariableDeclaration);
                 }
 
                 @Override
-                public boolean isTheSameText(IElementDeclaration e, String text) {
+                public boolean isTheSameText(final IElementDeclaration e, final String text) {
                     return ((VariableDeclaration) e).asToken().getText().equals(text);
                 }
             };
 
             @Override
-            public boolean isTheSameOffset(int offset, IElementDeclaration e) {
+            public boolean isTheSameOffset(final int offset, final IElementDeclaration e) {
                 return (offset == e.getStartFromFile().getOffset());
             }
         }
@@ -256,9 +253,9 @@ public class VariableExtractorTest {
     @Test
     public void test_extractionOf_EnvironmentVariable_ONLY() {
         // prepare
-        VariableExtractor extractor = new VariableExtractor();
+        final VariableExtractor extractor = new VariableExtractor();
 
-        RobotToken varToken = new RobotToken();
+        final RobotToken varToken = new RobotToken();
         varToken.setLineNumber(0);
         varToken.setStartColumn(1);
         varToken.setStartOffset(2);
@@ -266,7 +263,7 @@ public class VariableExtractorTest {
         varToken.setText("%{user.home}");
 
         // execute
-        MappingResult mapResult = extractor.extract(varToken, "myFile.robot");
+        final MappingResult mapResult = extractor.extract(varToken, "myFile.robot");
 
         // verify
         assertThat(mapResult.getMessages()).isEmpty();
@@ -275,11 +272,11 @@ public class VariableExtractorTest {
         assertThat(mapResult.getMappedElements()).hasSize(1);
         assertThat(mapResult.getTextElements()).isEmpty();
         assertThat(mapResult.getCorrectVariables()).hasSize(1);
-        VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
+        final VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
         assertThat(variableDeclaration.getRobotType()).isEqualTo(VariableType.ENVIRONMENT);
         assertThat(variableDeclaration.getVariableText().getText()).isEqualTo("%{user.home}");
         assertThat(variableDeclaration.getVariableName().getText()).isEqualTo("user.home");
-        RobotToken asToken = variableDeclaration.asToken();
+        final RobotToken asToken = variableDeclaration.asToken();
         assertThat(asToken.getStartColumn()).isEqualTo(1);
         assertThat(asToken.getEndColumn()).isEqualTo("%{user.home}".length() + 1);
     }
@@ -287,13 +284,13 @@ public class VariableExtractorTest {
     @Test
     public void test_extractionOf_ScalarVariable_ONLY_withoutPositionSet() {
         // prepare
-        VariableExtractor extractor = new VariableExtractor();
+        final VariableExtractor extractor = new VariableExtractor();
 
-        RobotToken varToken = new RobotToken();
+        final RobotToken varToken = new RobotToken();
         varToken.setText("${user}");
 
         // execute
-        MappingResult mapResult = extractor.extract(varToken, "myFile.robot");
+        final MappingResult mapResult = extractor.extract(varToken, "myFile.robot");
 
         // verify
         assertThat(mapResult.getMessages()).isEmpty();
@@ -302,11 +299,11 @@ public class VariableExtractorTest {
         assertThat(mapResult.getMappedElements()).hasSize(1);
         assertThat(mapResult.getTextElements()).isEmpty();
         assertThat(mapResult.getCorrectVariables()).hasSize(1);
-        VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
+        final VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
         assertThat(variableDeclaration.getRobotType()).isEqualTo(VariableType.SCALAR);
         assertThat(variableDeclaration.getVariableText().getText()).isEqualTo("${user}");
         assertThat(variableDeclaration.getVariableName().getText()).isEqualTo("user");
-        RobotToken asToken = variableDeclaration.asToken();
+        final RobotToken asToken = variableDeclaration.asToken();
         assertThat(asToken.getStartColumn()).isEqualTo(-1);
         assertThat(asToken.getEndColumn()).isEqualTo(-1);
     }
