@@ -95,7 +95,7 @@ public class TestCaseSettingsValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
-    @Ignore
+    @Ignore("see RED-1036")
     @Test
     public void duplicatedTagsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
@@ -142,7 +142,7 @@ public class TestCaseSettingsValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
-    @Ignore
+    @Ignore("see RED-1036")
     @Test
     public void duplicatedDocumentationsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
@@ -189,7 +189,7 @@ public class TestCaseSettingsValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
-    @Ignore
+    @Ignore("see RED-1036")
     @Test
     public void duplicatedTimeoutsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
@@ -284,7 +284,7 @@ public class TestCaseSettingsValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
-    @Ignore
+    @Ignore("see RED-1036")
     @Test
     public void duplicatedSetupsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
@@ -301,7 +301,7 @@ public class TestCaseSettingsValidatorTest {
 
         assertThat(reporter.getReportedProblems()).containsOnly(
                 new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 33))),
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(49, 56))));
+                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(47, 54))));
     }
 
     @Test
@@ -352,7 +352,7 @@ public class TestCaseSettingsValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
-    @Ignore
+    @Ignore("see RED-1036")
     @Test
     public void duplicatedTeardownsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
@@ -369,7 +369,7 @@ public class TestCaseSettingsValidatorTest {
 
         assertThat(reporter.getReportedProblems()).containsOnly(
                 new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 36))),
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(52, 62))));
+                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(50, 60))));
     }
 
     @Test
