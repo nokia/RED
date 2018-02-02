@@ -26,7 +26,7 @@ public class TestCaseNotChangedDumperTest extends RobotFormatParameterizedTest {
     @Test
     public void dumpAsItIsInFile() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile("remainNotChanged//TestCase." + getExtension());
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile("remainNotChanged/TestCase." + getExtension());
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
 
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(fileContent, getFormat(),
