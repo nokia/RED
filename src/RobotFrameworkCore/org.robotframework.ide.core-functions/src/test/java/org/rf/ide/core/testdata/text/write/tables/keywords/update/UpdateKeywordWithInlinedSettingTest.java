@@ -13,24 +13,22 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
+import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public abstract class AUpdateKeywordWithInlinedSettingTest {
+public class UpdateKeywordWithInlinedSettingTest extends RobotFormatParameterizedTest {
 
-    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//setting//";
-
-    private final String extension;
-
-    public AUpdateKeywordWithInlinedSettingTest(final String extension) {
-        this.extension = extension;
+    public UpdateKeywordWithInlinedSettingTest(final String extension, final FileFormat format) {
+        super(extension, format);
     }
 
     @Test
     public void test_forIssueRelatedToDump() throws Exception {
         // prepare
-        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Output_OneKeywordWithInlinedSetting." + extension;
-        final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_OneKeywordWithInlinedSetting." + extension;
+        final String inFileName = convert("Output_OneKeywordWithInlinedSetting");
+        final String outputFileName = convert("Output_OneKeywordWithInlinedSetting");
 
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
@@ -43,5 +41,9 @@ public abstract class AUpdateKeywordWithInlinedSettingTest {
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    private String convert(final String fileName) {
+        return "keywords/setting/" + fileName + "." + getExtension();
     }
 }
