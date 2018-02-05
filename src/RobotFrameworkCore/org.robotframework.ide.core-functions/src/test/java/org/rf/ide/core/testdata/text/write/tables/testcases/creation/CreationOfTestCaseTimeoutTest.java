@@ -3,32 +3,32 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
+package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
+public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest {
 
-    public CreationOfKeywordTimeoutTest(final String extension, final FileFormat format) {
+    public CreationOfTestCaseTimeoutTest(final String extension, final FileFormat format) {
         super(extension, format);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDecOnly() throws Exception {
-        test_timeoutDecOnly("EmptyKeywordTimeoutNoKeywordName", "");
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDecOnly() throws Exception {
+        test_timeoutDecOnly("EmptyTestCaseTimeoutNoTestName", "");
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDecOnly() throws Exception {
-        test_timeoutDecOnly("EmptyKeywordTimeout", "User Keyword");
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDecOnly() throws Exception {
+        test_timeoutDecOnly("EmptyTestCaseTimeout", "TestCase");
     }
 
     private void test_timeoutDecOnly(final String fileNameWithoutExt, final String userKeywordName) throws Exception {
@@ -37,29 +37,29 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        modelFile.includeKeywordTableSection();
-        final KeywordTable keywordTable = modelFile.getKeywordTable();
+        modelFile.includeTestCaseTableSection();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
         final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        final UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        uk.newTimeout(0);
+        final TestCase test = new TestCase(keyName);
+        testCaseTable.addTest(test);
+        test.newTimeout(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withComment()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withComment()
             throws Exception {
-        test_timeoutDec_withCommentOnly("EmptyKeywordTimeoutCommentNoKeywordName", "");
+        test_timeoutDec_withCommentOnly("EmptyTestCaseTimeoutCommentNoTestName", "");
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withComment()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withComment()
             throws Exception {
-        test_timeoutDec_withCommentOnly("EmptyKeywordTimeoutComment", "User Keyword");
+        test_timeoutDec_withCommentOnly("EmptyTestCaseTimeoutComment", "TestCase");
     }
 
     private void test_timeoutDec_withCommentOnly(final String fileNameWithoutExt, final String userKeywordName)
@@ -69,14 +69,14 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        modelFile.includeKeywordTableSection();
-        final KeywordTable keywordTable = modelFile.getKeywordTable();
+        modelFile.includeTestCaseTableSection();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
         final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        final UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
+        final TestCase test = new TestCase(keyName);
+        testCaseTable.addTest(test);
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
         final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
@@ -85,23 +85,24 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
-        keyTimeout.addCommentPart(cmTok1);
-        keyTimeout.addCommentPart(cmTok2);
-        keyTimeout.addCommentPart(cmTok3);
+        testTimeout.addCommentPart(cmTok1);
+        testTimeout.addCommentPart(cmTok2);
+        testTimeout.addCommentPart(cmTok3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue()
             throws Exception {
-        test_timeoutDec_withComment_andValue("EmptyKeywordTimeoutWithValueNoKeywordName", "");
+        test_timeoutDec_withComment_andValue("EmptyTestCaseTimeoutWithValueNoTestName", "");
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue() throws Exception {
-        test_timeoutDec_withComment_andValue("EmptyKeywordTimeoutWithValue", "User Keyword");
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue()
+            throws Exception {
+        test_timeoutDec_withComment_andValue("EmptyTestCaseTimeoutWithValue", "TestCase");
     }
 
     private void test_timeoutDec_withComment_andValue(final String fileNameWithoutExt, final String userKeywordName)
@@ -111,33 +112,33 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        modelFile.includeKeywordTableSection();
-        final KeywordTable keywordTable = modelFile.getKeywordTable();
+        modelFile.includeTestCaseTableSection();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
         final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        final UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
+        final TestCase test = new TestCase(keyName);
+        testCaseTable.addTest(test);
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
         final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
-        keyTimeout.setTimeout(timeout);
+        testTimeout.setTimeout(timeout);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_andComment()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_andComment()
             throws Exception {
-        test_timeoutDec_withComment_andValue_andComment("EmptyKeywordTimeoutWithValueAndCommentNoKeywordName", "");
+        test_timeoutDec_withComment_andValue_andComment("EmptyTestCaseTimeoutWithValueAndCommentNoTestName", "");
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_andComment()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_andComment()
             throws Exception {
-        test_timeoutDec_withComment_andValue_andComment("EmptyKeywordTimeoutWithValueAndComment", "User Keyword");
+        test_timeoutDec_withComment_andValue_andComment("EmptyTestCaseTimeoutWithValueAndComment", "TestCase");
     }
 
     private void test_timeoutDec_withComment_andValue_andComment(final String fileNameWithoutExt,
@@ -147,18 +148,18 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        modelFile.includeKeywordTableSection();
-        final KeywordTable keywordTable = modelFile.getKeywordTable();
+        modelFile.includeTestCaseTableSection();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
         final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        final UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
+        final TestCase test = new TestCase(keyName);
+        testCaseTable.addTest(test);
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
         final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
-        keyTimeout.setTimeout(timeout);
+        testTimeout.setTimeout(timeout);
 
         final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
@@ -167,24 +168,24 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
-        keyTimeout.addCommentPart(cmTok1);
-        keyTimeout.addCommentPart(cmTok2);
-        keyTimeout.addCommentPart(cmTok3);
+        testTimeout.addCommentPart(cmTok1);
+        testTimeout.addCommentPart(cmTok2);
+        testTimeout.addCommentPart(cmTok3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs()
             throws Exception {
-        test_timeoutDec_withComment_andValue_and3MsgArgs("KeywordTimeoutWithValueAnd3MsgArgsNoKeywordName", "");
+        test_timeoutDec_withComment_andValue_and3MsgArgs("TestCaseTimeoutWithValueAnd3MsgArgsNoTestName", "");
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs()
             throws Exception {
-        test_timeoutDec_withComment_andValue_and3MsgArgs("KeywordTimeoutWithValueAnd3MsgArgs", "User Keyword");
+        test_timeoutDec_withComment_andValue_and3MsgArgs("TestCaseTimeoutWithValueAnd3MsgArgs", "TestCase");
     }
 
     private void test_timeoutDec_withComment_andValue_and3MsgArgs(final String fileNameWithoutExt,
@@ -194,18 +195,18 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        modelFile.includeKeywordTableSection();
-        final KeywordTable keywordTable = modelFile.getKeywordTable();
+        modelFile.includeTestCaseTableSection();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
         final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        final UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
+        final TestCase test = new TestCase(keyName);
+        testCaseTable.addTest(test);
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
         final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
-        keyTimeout.setTimeout(timeout);
+        testTimeout.setTimeout(timeout);
 
         final RobotToken msg1 = new RobotToken();
         msg1.setText("msg1");
@@ -214,26 +215,26 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotToken msg3 = new RobotToken();
         msg3.setText("msg3");
 
-        keyTimeout.addMessagePart(msg1);
-        keyTimeout.addMessagePart(msg2);
-        keyTimeout.addMessagePart(msg3);
+        testTimeout.addMessagePart(msg1);
+        testTimeout.addMessagePart(msg2);
+        testTimeout.addMessagePart(msg3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment()
             throws Exception {
         test_timeoutDec_withComment_andValue_and3MsgArgs_andComment(
-                "KeywordTimeoutWithValueAnd3MsgArgsAndCommentNoKeywordName", "");
+                "TestCaseTimeoutWithValueAnd3MsgArgsAndCommentNoTestName", "");
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment()
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment()
             throws Exception {
-        test_timeoutDec_withComment_andValue_and3MsgArgs_andComment("KeywordTimeoutWithValueAnd3MsgArgsAndComment",
-                "User Keyword");
+        test_timeoutDec_withComment_andValue_and3MsgArgs_andComment("TestCaseTimeoutWithValueAnd3MsgArgsAndComment",
+                "TestCase");
     }
 
     private void test_timeoutDec_withComment_andValue_and3MsgArgs_andComment(final String fileNameWithoutExt,
@@ -243,18 +244,18 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        modelFile.includeKeywordTableSection();
-        final KeywordTable keywordTable = modelFile.getKeywordTable();
+        modelFile.includeTestCaseTableSection();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
         final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        final UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
+        final TestCase test = new TestCase(keyName);
+        testCaseTable.addTest(test);
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
         final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
-        keyTimeout.setTimeout(timeout);
+        testTimeout.setTimeout(timeout);
 
         final RobotToken msg1 = new RobotToken();
         msg1.setText("msg1");
@@ -263,9 +264,9 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotToken msg3 = new RobotToken();
         msg3.setText("msg3");
 
-        keyTimeout.addMessagePart(msg1);
-        keyTimeout.addMessagePart(msg2);
-        keyTimeout.addMessagePart(msg3);
+        testTimeout.addMessagePart(msg1);
+        testTimeout.addMessagePart(msg2);
+        testTimeout.addMessagePart(msg3);
 
         final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
@@ -274,15 +275,15 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
-        keyTimeout.addCommentPart(cmTok1);
-        keyTimeout.addCommentPart(cmTok2);
-        keyTimeout.addCommentPart(cmTok3);
+        testTimeout.addCommentPart(cmTok1);
+        testTimeout.addCommentPart(cmTok2);
+        testTimeout.addCommentPart(cmTok3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     private String convert(final String fileName) {
-        return "keywords/setting/timeout/new/" + fileName + "." + getExtension();
+        return "testCases/setting/timeout/new/" + fileName + "." + getExtension();
     }
 }
