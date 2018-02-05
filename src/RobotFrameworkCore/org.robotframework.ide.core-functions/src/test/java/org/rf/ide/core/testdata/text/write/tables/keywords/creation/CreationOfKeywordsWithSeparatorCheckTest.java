@@ -147,23 +147,6 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
     }
 
-    @Test
-    public void test_update_addingNewKeyword() throws Exception {
-        // prepare
-        final String inFileName = convert("Input_ThreeKeywordsAndAddingNewEmptyOne");
-        final String outputFileName = convert("Output_ThreeKeywordsAndAddingNewEmptyOne");
-
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
-
-        // test prepare
-        final KeywordTable table = modelFile.getKeywordTable();
-        table.createUserKeyword("key 3");
-
-        // execute & verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
-    }
-
     private String convert(final String fileName) {
         return "keywords/new/" + fileName + "." + getExtension();
     }
