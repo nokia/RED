@@ -1,0 +1,79 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _dNGIkAqEEeilIssQF8sfyw
+Element-Name: AddNewLineForSettings
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: __U5w0AqDEeilIssQF8sfyw
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 2/5/18 4:30 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "TSVfiles/a1.tsv" | double-click
+
+with [get-editor "a1.tsv"] {
+    with [get-text-viewer] {
+        set-caret-pos 21 29
+        type-text " "
+    }
+    with [get-tab-folder] {
+        get-tab-item "Test Cases" | click
+        get-tab-item Source | click
+    }
+    get-text-viewer | set-caret-pos 21 7
+}
+get-editor "a1.tsv" | get-text-viewer | get-property text | equals "*Test Cases*\t\t\t\t\t\t\t\n"
+    + "test 1\t[tags]\tTests for ping\t\t\t\t\n"
+    + "\tlog\t1\n"
+    + "\tlog\t2\n"
+    + "\tlog\t3\n"
+    + "\t\n"
+    + "test 2\t[Documentation]\tdoc is here\n"
+    + "\t...\tand here too\n"
+    + "\tConvert To Hex\t555\t\t\n"
+    + "\t\t\t\t\t\t\t\t\n"
+    + "test 3\t[Documentation]\tabc def\t\t\t\n"
+    + "\t# Here is comment\n"
+    + "\tCatenate\t44\t88\t\t\t\t\t\t\n"
+    + "\t: FOR\t${swam_app_name}\tIN RANGE\t12\t\t\t\n"
+    + "\t\\\t# Validation\n"
+    + "\t\\\t${output1} =\tShould Be Equal\tls\t99\n"
+    + "\t\\\tlog\t8\t\t\n"
+    + "\t# abc1\n"
+    + "\tComment\ttext\n"
+    + "\t# Teardown\n"
+    + "\tConvert To String\tabc" | verify-true
+get-editor "a1.tsv" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "a1.tsv/Test Cases/test 3/Catenate"
+with [get-editor "a1.tsv"] {
+    get-canvas -after [get-label "Test Cases"] -index 1 | get-menu -path "Row/Move up" | click
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "a1.tsv" | get-text-viewer | get-property text | equals "*Test Cases*\t\t\t\t\t\t\t\n"
+    + "test 1\t[tags]\tTests for ping\t\t\t\t\n"
+    + "\tlog\t1\n"
+    + "\tlog\t2\n"
+    + "\tlog\t3\n"
+    + "\t\n"
+    + "test 2\t[Documentation]\tdoc is here\n"
+    + "\t...\tand here too\n"
+    + "\tConvert To Hex\t555\t\t\n"
+    + "\t\t\t\t\t\t\t\t\n"
+    + "test 3\t[Documentation]\tabc def\t\t\t\n"
+    + "\tCatenate\t44\t88\t\t\t\t\t\t\n"
+    + "\t# Here is comment\n"
+    + "\t: FOR\t${swam_app_name}\tIN RANGE\t12\t\t\t\n"
+    + "\t\\\t# Validation\n"
+    + "\t\\\t${output1} =\tShould Be Equal\tls\t99\n"
+    + "\t\\\tlog\t8\t\t\n"
+    + "\t# abc1\n"
+    + "\tComment\ttext\n"
+    + "\t# Teardown\n"
+    + "\tConvert To String\tabc" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
