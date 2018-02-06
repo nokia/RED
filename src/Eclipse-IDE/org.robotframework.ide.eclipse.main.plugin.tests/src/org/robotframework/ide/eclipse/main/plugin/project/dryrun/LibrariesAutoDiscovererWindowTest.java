@@ -86,8 +86,8 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void testConvertingToText_forChildElementWithLabel() throws Exception {
-        assertThat(LibrariesAutoDiscovererWindow.convertToText(new DryRunLibraryImportChildElement("label", "value")))
-                .isEqualTo("label: value");
+        assertThat(LibrariesAutoDiscovererWindow.convertToText(new DryRunLibraryImportChildElement("name", "value")))
+                .isEqualTo("name value");
     }
 
     @Test
@@ -107,7 +107,7 @@ public class LibrariesAutoDiscovererWindowTest {
                 childElements);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(listChildElement))
-                .isEqualTo("name:\n" + "value1\n" + "value2\n" + "value3\n" + "value4");
+                .isEqualTo("name\n" + "value1\n" + "value2\n" + "value3\n" + "value4");
     }
 
     @Test
@@ -225,16 +225,16 @@ public class LibrariesAutoDiscovererWindowTest {
 
         final Object[] libImportChildren = contentProvider.getChildren(libImportElement);
         assertThat(libImportChildren).hasSize(4).allMatch(p -> p instanceof DryRunLibraryImportChildElement);
-        assertThat(((DryRunLibraryImportChildElement) libImportChildren[0]).getName()).isEqualTo("Status");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[0]).getName()).isEqualTo("Status:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[0]).getValue())
                 .isEqualTo("Not added to project configuration");
-        assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getName()).isEqualTo("Source");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getName()).isEqualTo("Source:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getValue())
                 .isEqualTo(lib.getLocation().toFile().getAbsolutePath());
-        assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getValue())
                 .isEqualTo(suite1.getLocation().toFile().getAbsolutePath());
-        assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getName()).isEqualTo("Additional info");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getName()).isEqualTo("Additional info:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getValue())
                 .isEqualTo("additional info error");
     }
