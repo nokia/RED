@@ -1,7 +1,7 @@
 ## Locally launched tests using own scripts
 
-The **Robot** launch configurations may be called through some user-defined
-executable/script. This may be useful when integrating tests launches from RED
+The **Robot** launch configurations may be called through user-defined
+executable/script. This is useful when integrating tests launches from RED
 with other tools like PyDev for Robot  & Python debugging, Maven, Gradle, etc.
 
 The general idea is that the command line call which RED executes for
