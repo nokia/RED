@@ -60,6 +60,7 @@ import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.TreeContentProvider;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 /**
@@ -76,30 +77,17 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private static final String ADDITIONAL_INFO_ELEMENT_NAME = "Additional info";
 
-    private static final String ELEMENT_SEPARATOR = ":";
-
-    private static final Comparator<RobotDryRunLibraryImport> LIBRARY_IMPORT_COMPARATOR = (import1, import2) -> {
+    @VisibleForTesting
+    static final Comparator<RobotDryRunLibraryImport> LIBRARY_IMPORT_COMPARATOR = (import1, import2) -> {
         if (import1.getStatus() == import2.getStatus()) {
             return import1.getName().compareToIgnoreCase(import2.getName());
-        }
-        if (import1.getStatus() == DryRunLibraryImportStatus.ADDED
-                && import2.getStatus() != DryRunLibraryImportStatus.ADDED) {
+        } else if (import1.getStatus() == DryRunLibraryImportStatus.ADDED
+                || import1.getStatus() == DryRunLibraryImportStatus.ALREADY_EXISTING
+                        && import2.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
             return -1;
-        }
-        if (import1.getStatus() == DryRunLibraryImportStatus.NOT_ADDED
-                && import2.getStatus() != DryRunLibraryImportStatus.NOT_ADDED) {
+        } else {
             return 1;
         }
-        if (import1.getStatus() == DryRunLibraryImportStatus.ALREADY_EXISTING
-                && import2.getStatus() == DryRunLibraryImportStatus.ADDED) {
-            return 1;
-        }
-        if (import1.getStatus() == DryRunLibraryImportStatus.ALREADY_EXISTING
-                && import2.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
-            return -1;
-        }
-
-        return 0;
     };
 
     private TreeViewer discoveredLibrariesViewer;
@@ -186,13 +174,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     private void registerLibrariesViewerListeners() {
         discoveredLibrariesViewer.addSelectionChangedListener(event -> {
             final Object selection = ((TreeSelection) event.getSelection()).getFirstElement();
-            if (selection instanceof DryRunLibraryImportChildElement) {
-                detailsText.setText(selection.toString());
-            } else if (selection instanceof RobotDryRunLibraryImport) {
-                detailsText.setText(convertDryRunLibraryImportToText((RobotDryRunLibraryImport) selection));
-            } else {
-                detailsText.setText("");
-            }
+            detailsText.setText(convertToText(selection));
         });
 
         discoveredLibrariesViewer.getTree().addKeyListener(keyReleasedAdapter(e -> {
@@ -206,7 +188,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         final Menu menu = createContextMenu();
         discoveredLibrariesViewer.getTree().addMouseListener(mouseDownAdapter(e -> {
             if (e.button == 3) {
-                if (discoveredLibrariesViewer.getTree().getSelectionCount() == 1 && getOpenableFilePath().isPresent()) {
+                if (discoveredLibrariesViewer.getTree().getSelectionCount() == 1
+                        && getSelectionOpenableFile().isPresent()) {
                     menu.setVisible(true);
                     menu.getItem(0).setEnabled(false);
                     menu.getItem(1).setEnabled(true);
@@ -253,20 +236,18 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     private void handleFileOpeningEvent() {
-        getOpenableFilePath().flatMap(LibrariesAutoDiscovererWindow::getOpenableFile).ifPresent(file -> {
+        getSelectionOpenableFile().ifPresent(file -> {
             final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
             SourceOpeningSupport.tryToOpenInEditor(page, file);
         });
     }
 
-    private Optional<String> getOpenableFilePath() {
+    private Optional<IFile> getSelectionOpenableFile() {
         final ITreeSelection selection = discoveredLibrariesViewer.getStructuredSelection();
         if (selection != null && selection.getFirstElement() instanceof DryRunLibraryImportChildElement) {
             final DryRunLibraryImportChildElement childElement = (DryRunLibraryImportChildElement) selection
                     .getFirstElement();
-            if (childElement.isOpenableFilePath()) {
-                return Optional.of(childElement.getValue());
-            }
+            return getOpenableFile(childElement.getValue());
         }
         return Optional.empty();
     }
@@ -293,34 +274,41 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         detailsText.setAlwaysShowScrollBars(false);
     }
 
-    private static String convertDryRunLibraryImportToText(final RobotDryRunLibraryImport libraryImport) {
-        final StringBuilder libraryImportTxtBuilder = new StringBuilder("");
-        for (final Object child : extractDryRunLibraryImportChildren(libraryImport)) {
-            if (child instanceof DryRunLibraryImportChildElement) {
-                libraryImportTxtBuilder.append(child + "\n");
-            } else if (child instanceof DryRunLibraryImportListChildElement) {
-                libraryImportTxtBuilder.append(((DryRunLibraryImportListChildElement) child).getName() + "\n");
-                for (final DryRunLibraryImportChildElement listChild : ((DryRunLibraryImportListChildElement) child)
-                        .getList()) {
-                    libraryImportTxtBuilder.append(listChild + "\n");
-                }
-            }
+    @VisibleForTesting
+    static String convertToText(final Object selection) {
+        if (selection instanceof RobotDryRunLibraryImport) {
+            return createChildElements((RobotDryRunLibraryImport) selection).stream()
+                    .map(LibrariesAutoDiscovererWindow::convertToText)
+                    .collect(Collectors.joining("\n"));
+        } else if (selection instanceof DryRunLibraryImportChildElement) {
+            final String name = ((DryRunLibraryImportChildElement) selection).getName();
+            final String value = ((DryRunLibraryImportChildElement) selection).getValue();
+            return name != null ? name + ": " + value : value;
+        } else if (selection instanceof DryRunLibraryImportListChildElement) {
+            final String importerPaths = ((DryRunLibraryImportListChildElement) selection).getList()
+                    .stream()
+                    .map(LibrariesAutoDiscovererWindow::convertToText)
+                    .collect(Collectors.joining("\n"));
+            return ((DryRunLibraryImportListChildElement) selection).getName() + ":\n" + importerPaths;
         }
-        return libraryImportTxtBuilder.toString();
+        return "";
     }
 
-    private static List<Object> extractDryRunLibraryImportChildren(final RobotDryRunLibraryImport libraryImport) {
+    private static List<Object> createChildElements(final RobotDryRunLibraryImport libraryImport) {
         final List<Object> children = new ArrayList<>();
+
         if (libraryImport.getStatus() != null) {
             children.add(
                     new DryRunLibraryImportChildElement(STATUS_ELEMENT_NAME, libraryImport.getStatus().getMessage()));
         }
+
         if (libraryImport.getSourcePath() != null) {
             children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME,
-                    new File(libraryImport.getSourcePath()).getAbsolutePath(), true));
+                    new File(libraryImport.getSourcePath()).getAbsolutePath()));
         } else {
             children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, "Unknown"));
         }
+
         final List<String> importersPaths = libraryImport.getImportersPaths()
                 .stream()
                 .map(File::new)
@@ -329,18 +317,23 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         if (importersPaths.isEmpty()) {
             children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, "Unknown"));
         } else if (importersPaths.size() == 1) {
-            children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, importersPaths.get(0), true));
+            children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, importersPaths.get(0)));
         } else {
-            children.add(new DryRunLibraryImportListChildElement(IMPORTERS_ELEMENT_NAME, importersPaths));
+            final List<DryRunLibraryImportChildElement> list = importersPaths.stream()
+                    .map(value -> new DryRunLibraryImportChildElement(null, value))
+                    .collect(Collectors.toList());
+            children.add(new DryRunLibraryImportListChildElement(IMPORTERS_ELEMENT_NAME, list));
         }
-        final String additionalInfo = libraryImport.getAdditionalInfo();
-        if (additionalInfo != null && !additionalInfo.isEmpty()) {
-            children.add(new DryRunLibraryImportChildElement(ADDITIONAL_INFO_ELEMENT_NAME, additionalInfo));
+
+        if (!Strings.isNullOrEmpty(libraryImport.getAdditionalInfo())) {
+            children.add(new DryRunLibraryImportChildElement(ADDITIONAL_INFO_ELEMENT_NAME,
+                    libraryImport.getAdditionalInfo()));
         }
         return children;
     }
 
-    private static class DiscoveredLibrariesViewerContentProvider extends TreeContentProvider {
+    @VisibleForTesting
+    static class DiscoveredLibrariesViewerContentProvider extends TreeContentProvider {
 
         @Override
         public Object[] getElements(final Object inputElement) {
@@ -350,8 +343,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         @Override
         public Object[] getChildren(final Object parentElement) {
             if (parentElement instanceof RobotDryRunLibraryImport) {
-                final List<Object> children = extractDryRunLibraryImportChildren(
-                        (RobotDryRunLibraryImport) parentElement);
+                final List<Object> children = createChildElements((RobotDryRunLibraryImport) parentElement);
                 return children.toArray(new Object[children.size()]);
             } else if (parentElement instanceof DryRunLibraryImportListChildElement) {
                 final List<DryRunLibraryImportChildElement> childElementList = ((DryRunLibraryImportListChildElement) parentElement)
@@ -372,7 +364,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         }
     }
 
-    private static class DiscoveredLibrariesViewerLabelProvider extends RedCommonLabelProvider {
+    @VisibleForTesting
+    static class DiscoveredLibrariesViewerLabelProvider extends RedCommonLabelProvider {
 
         @Override
         public StyledString getStyledText(final Object element) {
@@ -391,7 +384,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 }
                 final String childElementValue = libraryImportChildElement.getValue();
                 if (!Strings.isNullOrEmpty(childElementValue)) {
-                    if (libraryImportChildElement.isOpenableFilePath()) {
+                    if (getOpenableFile(libraryImportChildElement.getValue()).isPresent()) {
                         label.append(childElementValue, Stylers.Common.HYPERLINK_STYLER);
                     } else {
                         label.append(childElementValue);
@@ -429,76 +422,45 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         }
     }
 
-    private static class DryRunLibraryImportChildElement {
+    @VisibleForTesting
+    static class DryRunLibraryImportChildElement {
 
-        private String name;
+        private final String name;
 
         private final String value;
 
-        private final boolean isOpenableFilePath;
-
-        public DryRunLibraryImportChildElement(final String name, final String value) {
-            this(name, value, false);
-        }
-
-        public DryRunLibraryImportChildElement(final String name, final String value, final boolean isFilePath) {
-            if (name != null) {
-                this.name = name + ELEMENT_SEPARATOR;
-            }
+        DryRunLibraryImportChildElement(final String name, final String value) {
+            this.name = name;
             this.value = value;
-            this.isOpenableFilePath = isFilePath && getOpenableFile(value).isPresent();
         }
 
-        public String getName() {
+        String getName() {
             return name;
         }
 
-        public String getValue() {
+        String getValue() {
             return value;
-        }
-
-        public boolean isOpenableFilePath() {
-            return isOpenableFilePath;
-        }
-
-        @Override
-        public String toString() {
-            if (value == null && name != null) {
-                return name;
-            }
-            if (value != null && name == null) {
-                return value;
-            }
-            if (value == null && name == null) {
-                return "";
-            }
-            return name + " " + value;
         }
 
     }
 
-    private static class DryRunLibraryImportListChildElement {
+    @VisibleForTesting
+    static class DryRunLibraryImportListChildElement {
 
-        private String name;
+        private final String name;
 
-        private final List<DryRunLibraryImportChildElement> list = new ArrayList<>();
+        private final List<DryRunLibraryImportChildElement> list;
 
-        public DryRunLibraryImportListChildElement(final String name, final List<String> list) {
-            if (name != null) {
-                this.name = name + ELEMENT_SEPARATOR;
-            }
-            if (list != null) {
-                for (final String listElement : list) {
-                    this.list.add(new DryRunLibraryImportChildElement(null, listElement, true));
-                }
-            }
+        DryRunLibraryImportListChildElement(final String name, final List<DryRunLibraryImportChildElement> list) {
+            this.name = name;
+            this.list = list;
         }
 
-        public List<DryRunLibraryImportChildElement> getList() {
+        List<DryRunLibraryImportChildElement> getList() {
             return list;
         }
 
-        public String getName() {
+        String getName() {
             return name;
         }
 
