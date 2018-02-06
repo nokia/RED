@@ -27,6 +27,7 @@ For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform:
 #162 - incorrect "Invalid Variable syntax" error with list and dictionary variables
 #169 - rflint/session server does not work with non-asci chars in filename
 #160 - console output encoding problems
+#174 - venv hidden folders should be handled correctly
 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 

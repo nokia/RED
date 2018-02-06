@@ -1,4 +1,4 @@
-RED 0.8.3 - 2018/02/05
+RED 0.8.3 - 2018/02/06
 Enhancement
 
     [RED-549] - Autodiscovering - handling __init__ importers paths
@@ -12,12 +12,16 @@ Enhancement
     [RED-1006] - Preferences - Errors/Warning - on/off for whole validation and change Runtime errors levels
     [RED-1009] - Report problem in red.xml when libspec was not generated
     [RED-1013] - Improve suite collecting in handlers for project explorer
+    [RED-1029] - Resizing of 'Add Remote location' dialog window in red.xml
     [RED-1033] - update validation & library discovering topics in RED user guide
 
 Bug
-
+    [RED-258] - Showing error when libspec from BuildIn was not generated
+    [RED-772] - Wrong saving to source when setting is in one line with KW/TC name
     [RED-913] - User cannot change variable value in debug mode for variable with unicode
     [RED-914] - UTF-8 support in RPC server
+    [RED-946] - Warning is removed when empty line is below empty [Doc] section
+    [RED-971] - In table editors in tsv file,when adding new line, spearator left side of special kw like [TAG] is removed
     [RED-979] - Slash is added in inserted cell after trying to insert next cell
     [RED-980] - Column disappears after inserting cell in general settings
     [RED-982] - Cannot delete cell in Settings table
