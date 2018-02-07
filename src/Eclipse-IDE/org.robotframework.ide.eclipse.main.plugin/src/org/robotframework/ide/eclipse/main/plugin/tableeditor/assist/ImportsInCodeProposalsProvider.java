@@ -5,11 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedImportProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -33,10 +30,6 @@ public class ImportsInCodeProposalsProvider implements RedContentProposalProvide
         final List<? extends AssistProposal> imports = new RedImportProposals(suiteFile)
                 .getImportsProposals(prefix);
 
-        final List<IContentProposal> proposals = newArrayList();
-        for (final AssistProposal proposedImport : imports) {
-            proposals.add(new AssistProposalAdapter(proposedImport));
-        }
-        return proposals.toArray(new RedContentProposal[0]);
+        return imports.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
     }
 }

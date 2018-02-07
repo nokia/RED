@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
@@ -31,7 +30,7 @@ public class SettingProposalsProvider implements RedContentProposalProvider {
             final AssistantContext context) {
         final String prefix = contents.substring(0, position);
 
-        final List<IContentProposal> proposals = newArrayList();
+        final List<IContentProposal> proposals = new ArrayList<>();
 
         final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(settingTarget)
                 .getSettingsProposals(prefix);

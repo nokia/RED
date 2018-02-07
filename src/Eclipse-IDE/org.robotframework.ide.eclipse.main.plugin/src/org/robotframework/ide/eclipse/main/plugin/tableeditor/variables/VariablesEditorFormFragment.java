@@ -96,8 +96,6 @@ import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
-import com.google.common.base.Function;
-
 public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
@@ -226,7 +224,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                         RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyOddRowBackground());
         table.setForeground(parent.getForeground());
-        
+
         // calculate columns width
         table.addListener(SWT.Paint, factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer));
 
@@ -403,20 +401,15 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_REMOVED) final RobotSuiteFileSection section) {
 
         if (section.getSuiteFile() == fileModel) {
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
-                    new Function<PositionCoordinate, PositionCoordinate>() {
-
-                        @Override
-                        public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                            if (section.getChildren().isEmpty()) {
-                                return null;
-                            } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
-                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                        coordinate.getRowPosition() - 1);
-                            }
-                            return coordinate;
-                        }
-                    });
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
+                if (section.getChildren().isEmpty()) {
+                    return null;
+                } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                            coordinate.getRowPosition() - 1);
+                }
+                return coordinate;
+            });
         }
     }
 
