@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.red.jface.assist.AssistantContext;
@@ -24,7 +25,7 @@ public class CombinedProposalsProvider implements RedContentProposalProvider {
     @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
-        final List<RedContentProposal> proposals = newArrayList();
+        final List<RedContentProposal> proposals = new ArrayList<>();
         for (final RedContentProposalProvider provider : providers) {
             final RedContentProposal[] newProposals = provider.getProposals(contents, position, context);
             if (newProposals != null) {

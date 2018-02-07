@@ -58,14 +58,14 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
-        final String additionalContent = atTheEndOfLine ? DocumentUtilities.getDelimiter(document) : "";
+        final String contentSuffix = atTheEndOfLine ? DocumentUtilities.getDelimiter(document) : "";
 
         final List<? extends AssistProposal> sectionProposals = new RedSectionProposals()
                 .getSectionsProposals(userContent);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal settingProposal : sectionProposals) {
-            final DocumentModification modification = new DocumentModification(additionalContent,
+            final DocumentModification modification = new DocumentModification(contentSuffix,
                     new Position(offset - userContent.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));

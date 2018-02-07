@@ -51,14 +51,14 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
-        final String additionalContent = atTheEndOfLine ? assist.getSeparatorToFollow() : "";
+        final String contentSuffix = atTheEndOfLine ? assist.getSeparatorToFollow() : "";
 
         final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(getTarget(document, offset))
                 .getSettingsProposals(userContent);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal settingProposal : settingsProposals) {
-            final DocumentModification modification = new DocumentModification(additionalContent,
+            final DocumentModification modification = new DocumentModification(contentSuffix,
                     new Position(offset - userContent.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));

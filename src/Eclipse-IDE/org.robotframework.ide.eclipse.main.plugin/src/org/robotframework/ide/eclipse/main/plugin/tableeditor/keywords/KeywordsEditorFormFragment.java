@@ -114,7 +114,6 @@ import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 import org.robotframework.services.event.Events;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 
 @SuppressWarnings("restriction")
@@ -152,7 +151,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private SelectionLayerAccessor selectionLayerAccessor;
 
     private TreeLayerAccessor treeLayerAccessor;
-    
+
     private TableHyperlinksSupport detector;
 
     public ISelectionProvider getSelectionProvider() {
@@ -248,7 +247,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
-        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false, true);
         selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
@@ -433,22 +432,17 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private void whenKeywordDefinitionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
-                    new Function<PositionCoordinate, PositionCoordinate>() {
-
-                        @Override
-                        public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                            if (section.getChildren().isEmpty()) {
-                                return null;
-                            } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
-                                final RobotFileInternalElement lastCase = section.getChildren()
-                                        .get(section.getChildren().size() - 1);
-                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                        dataProvider.indexOfRowObject(lastCase));
-                            }
-                            return coordinate;
-                        }
-                    });
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
+                if (section.getChildren().isEmpty()) {
+                    return null;
+                } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                    final RobotFileInternalElement lastCase = section.getChildren()
+                            .get(section.getChildren().size() - 1);
+                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                            dataProvider.indexOfRowObject(lastCase));
+                }
+                return coordinate;
+            });
         }
     }
 
@@ -471,7 +465,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         if (def != null && def.getSuiteFile() == fileModel) {
             if (keywordCall instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) keywordCall).isArguments()) {
-                // when arguments were added, we don't need to reload the input for data provider;
+                // when arguments were added, we don't need to reload the input for data
+                // provider;
                 // this also does not influence selections
                 table.refresh();
                 setDirty();
@@ -497,27 +492,22 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         if (definition != null && definition.getSuiteFile() == fileModel) {
             if (setting != null && setting.isArguments()) {
-                // when arguments were removed, we don't need to reload the input for data provider;
+                // when arguments were removed, we don't need to reload the input for data
+                // provider;
                 // this also does not influence selections
                 table.refresh();
                 setDirty();
             } else {
-                selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
-                        new Function<PositionCoordinate, PositionCoordinate>() {
-
-                            @Override
-                            public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                                if (definition.getChildren().isEmpty()) {
-                                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                            dataProvider.indexOfRowObject(definition));
-                                } else if (dataProvider
-                                        .getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
-                                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                            coordinate.getRowPosition() - 1);
-                                }
-                                return coordinate;
-                            }
-                        });
+                selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
+                    if (definition.getChildren().isEmpty()) {
+                        return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                                dataProvider.indexOfRowObject(definition));
+                    } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                        return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                                coordinate.getRowPosition() - 1);
+                    }
+                    return coordinate;
+                });
             }
         }
     }
@@ -635,7 +625,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
             final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
-                    ? (RobotSuiteFile) change.getElement() : null;
+                    ? (RobotSuiteFile) change.getElement()
+                    : null;
             if (suite == fileModel) {
                 dataProvider.setInput(getSection());
                 table.refresh();

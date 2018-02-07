@@ -113,7 +113,6 @@ import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 import org.robotframework.services.event.Events;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 
 @SuppressWarnings("restriction")
@@ -247,7 +246,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
-        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false, true);
         selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
@@ -431,22 +430,17 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private void whenCaseIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_CASE_REMOVED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
-                    new Function<PositionCoordinate, PositionCoordinate>() {
-
-                        @Override
-                        public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                            if (section.getChildren().isEmpty()) {
-                                return null;
-                            } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
-                                final RobotFileInternalElement lastCase = section.getChildren()
-                                        .get(section.getChildren().size() - 1);
-                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                        dataProvider.indexOfRowObject(lastCase));
-                            }
-                            return coordinate;
-                        }
-                    });
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
+                if (section.getChildren().isEmpty()) {
+                    return null;
+                } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                    final RobotFileInternalElement lastCase = section.getChildren()
+                            .get(section.getChildren().size() - 1);
+                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                            dataProvider.indexOfRowObject(lastCase));
+                }
+                return coordinate;
+            });
         }
     }
 
@@ -482,21 +476,16 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private void whenKeywordCallIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED) final RobotCase testCase) {
         if (testCase.getSuiteFile() == fileModel) {
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
-                    new Function<PositionCoordinate, PositionCoordinate>() {
-
-                        @Override
-                        public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                            if (testCase.getChildren().isEmpty()) {
-                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                        dataProvider.indexOfRowObject(testCase));
-                            } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
-                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                        coordinate.getRowPosition() - 1);
-                            }
-                            return coordinate;
-                        }
-                    });
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
+                if (testCase.getChildren().isEmpty()) {
+                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                            dataProvider.indexOfRowObject(testCase));
+                } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                            coordinate.getRowPosition() - 1);
+                }
+                return coordinate;
+            });
         }
     }
 
@@ -615,7 +604,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
             final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
-                    ? (RobotSuiteFile) change.getElement() : null;
+                    ? (RobotSuiteFile) change.getElement()
+                    : null;
             if (suite == fileModel) {
                 dataProvider.setInput(getSection());
                 table.refresh();

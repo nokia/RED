@@ -24,8 +24,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -390,17 +388,13 @@ public class RedContentProposalAdapter {
                 // Check whether there are any proposals to be shown.
                 recordCursorPosition(); // must be done before getting proposals
                 final RedContentProposal[] proposals = getProposals();
+                if (proposals == null)
+                    return;
                 if (proposals.length > 0) {
                     recordCursorPosition();
                     popup = new ContentProposalPopup(null, proposals);
                     popup.open();
-                    popup.getShell().addDisposeListener(new DisposeListener() {
-
-                        @Override
-                        public void widgetDisposed(final DisposeEvent event) {
-                            popup = null;
-                        }
-                    });
+                    popup.getShell().addDisposeListener(event -> popup = null);
                     internalPopupOpened();
                     notifyPopupOpened();
                 } else if (!autoActivated) {
@@ -511,26 +505,16 @@ public class RedContentProposalAdapter {
      */
     private void autoActivate() {
         if (autoActivationDelay > 0) {
-            final Runnable runnable = new Runnable() {
-
-                @Override
-                public void run() {
-                    receivedKeyDown = false;
-                    try {
-                        Thread.sleep(autoActivationDelay);
-                    } catch (final InterruptedException e) {
-                    }
-                    if (!isValid() || receivedKeyDown) {
-                        return;
-                    }
-                    control.getDisplay().syncExec(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            openProposalPopup(true);
-                        }
-                    });
+            final Runnable runnable = () -> {
+                receivedKeyDown = false;
+                try {
+                    Thread.sleep(autoActivationDelay);
+                } catch (final InterruptedException e) {
                 }
+                if (!isValid() || receivedKeyDown) {
+                    return;
+                }
+                control.getDisplay().syncExec(() -> openProposalPopup(true));
             };
             final Thread t = new Thread(runnable);
             t.start();
@@ -541,13 +525,9 @@ public class RedContentProposalAdapter {
             // some event that will cause the cursor position or
             // other important info to change as a result of this
             // event occurring.
-            control.getDisplay().asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (isValid()) {
-                        openProposalPopup(true);
-                    }
+            control.getDisplay().asyncExec(() -> {
+                if (isValid()) {
+                    openProposalPopup(true);
                 }
             });
         }
@@ -646,25 +626,22 @@ public class RedContentProposalAdapter {
                      * scrollbar. Do this in an async since the focus is not
                      * actually switched when this event is received.
                      */
-                    e.display.asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (popupExists()) {
-                                if (scrollbarClicked || hasFocus()) {
-                                    return;
-                                }
-                                // Workaround a problem on X and Mac, whereby at
-                                // this point, the focus control is not known.
-                                // This can happen, for example, when resizing
-                                // the popup shell on the Mac.
-                                // Check the active shell.
-                                final Shell activeShell = e.display.getActiveShell();
-                                if (activeShell == getShell()
-                                        || (infoPopup != null && infoPopup.getShell() == activeShell)) {
-                                    return;
-                                }
-                                close();
+                    e.display.asyncExec(() -> {
+                        if (popupExists()) {
+                            if (scrollbarClicked || hasFocus()) {
+                                return;
                             }
+                            // Workaround a problem on X and Mac, whereby at
+                            // this point, the focus control is not known.
+                            // This can happen, for example, when resizing
+                            // the popup shell on the Mac.
+                            // Check the active shell.
+                            final Shell activeShell = e.display.getActiveShell();
+                            if (activeShell == getShell()
+                                    || (infoPopup != null && infoPopup.getShell() == activeShell)) {
+                                return;
+                            }
+                            close();
                         }
                     });
                     return;
@@ -1369,45 +1346,34 @@ public class RedContentProposalAdapter {
                 // before creating the popup. We do not use Jobs since this
                 // code must be able to run independently of the Eclipse
                 // runtime.
-                final Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        pendingDescriptionUpdate = true;
-                        try {
-                            Thread.sleep(SECONDARY_POPUP_DELAY);
-                        } catch (final InterruptedException e) {
-                        }
-                        if (!popupExists()) {
+                final Runnable runnable = () -> {
+                    pendingDescriptionUpdate = true;
+                    try {
+                        Thread.sleep(SECONDARY_POPUP_DELAY);
+                    } catch (final InterruptedException e) {
+                    }
+                    if (!popupExists()) {
+                        return;
+                    }
+                    getShell().getDisplay().syncExec(() -> {
+                        // Query the current selection since we have
+                        // been delayed
+                        final RedContentProposal p = getSelectedProposal();
+                        if (p == null) {
                             return;
                         }
-                        getShell().getDisplay().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Query the current selection since we have
-                                // been delayed
-                                final RedContentProposal p = getSelectedProposal();
-                                if (p == null) {
-                                    return;
-                                }
-                                if (p.hasDescription()) {
-                                    if (infoPopup == null) {
-                                        infoPopup = new InfoPopupDialog(getShell());
-                                        infoPopup.open();
-                                        infoPopup.getShell().addDisposeListener(new DisposeListener() {
-                                            @Override
-                                            public void widgetDisposed(final DisposeEvent event) {
-                                                infoPopup = null;
-                                            }
-                                        });
-                                    }
-                                    infoPopup.setContents(p.getDescription());
-                                } else if (infoPopup != null) {
-                                    infoPopup.close();
-                                }
-                                pendingDescriptionUpdate = false;
+                        if (p.hasDescription()) {
+                            if (infoPopup == null) {
+                                infoPopup = new InfoPopupDialog(getShell());
+                                infoPopup.open();
+                                infoPopup.getShell().addDisposeListener(event -> infoPopup = null);
                             }
-                        });
-                    }
+                            infoPopup.setContents(p.getDescription());
+                        } else if (infoPopup != null) {
+                            infoPopup.close();
+                        }
+                        pendingDescriptionUpdate = false;
+                    });
                 };
                 final Thread t = new Thread(runnable);
                 t.start();
@@ -1447,12 +1413,9 @@ public class RedContentProposalAdapter {
          */
         private void asyncRecomputeProposals(final String filterText) {
             if (popupExists()) {
-                control.getDisplay().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        recordCursorPosition();
-                        recomputeProposals(filterText);
-                    }
+                control.getDisplay().asyncExec(() -> {
+                    recordCursorPosition();
+                    recomputeProposals(filterText);
                 });
             } else {
                 recomputeProposals(filterText);
