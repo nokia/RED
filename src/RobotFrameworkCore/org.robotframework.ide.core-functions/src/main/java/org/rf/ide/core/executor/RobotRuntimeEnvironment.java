@@ -166,12 +166,6 @@ public class RobotRuntimeEnvironment {
             if (file.isFile() && (fileName.equals("python") || fileName.equals("python.exe"))) {
                 installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python));
             }
-            if (file.isFile() && (fileName.equals("python2") || fileName.equals("python2.exe"))) {
-                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python));
-            }
-            if (file.isFile() && (fileName.equals("python3") || fileName.equals("python3.exe"))) {
-                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python));
-            }
             if (file.isFile() && (fileName.equals("jython") || fileName.equals("jython.exe"))) {
                 installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Jython));
             }
