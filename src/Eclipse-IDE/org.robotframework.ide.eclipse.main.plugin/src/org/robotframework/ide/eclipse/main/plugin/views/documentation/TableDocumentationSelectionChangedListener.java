@@ -14,12 +14,16 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
+import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.red.viewers.Selections;
 
 class TableDocumentationSelectionChangedListener implements ISelectionChangedListener {
@@ -53,7 +57,14 @@ class TableDocumentationSelectionChangedListener implements ISelectionChangedLis
 
                 final DocViewUpdateType docViewUpdateType = chooseDocViewUpdateType(robotFileInternalElement,
                         modelType);
-                scheduleUpdate(robotFileInternalElement, docViewUpdateType);
+                final SelectionLayerAccessor selectionLayerAccessor = ((RobotFormEditor) (PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage().getActiveEditor())).getSelectionLayerAccessor();
+                final PositionCoordinate[] positions = selectionLayerAccessor.getSelectedPositions();
+                if (positions.length > 0) {
+                    final String label = selectionLayerAccessor.getLabelFromCell(positions[0].getRowPosition(),
+                            positions[0].getColumnPosition());
+                    scheduleUpdate(robotFileInternalElement, label, docViewUpdateType);
+                }
             }
         }
     }
@@ -81,10 +92,11 @@ class TableDocumentationSelectionChangedListener implements ISelectionChangedLis
         return DocViewUpdateType.UNKNOWN;
     }
 
-    private void scheduleUpdate(final RobotFileInternalElement robotFileInternalElement,
+    private void scheduleUpdate(final RobotFileInternalElement robotFileInternalElement, final String label,
             final DocViewUpdateType docUpdateType) {
         if (docUpdateType != DocViewUpdateType.UNKNOWN) {
             updateJob.setRobotFileInternalElement(robotFileInternalElement);
+            updateJob.setLabel(label);
             updateJob.setDocUpdateType(docUpdateType);
             updateJob.schedule(DocViewUpdateJob.DOCVIEW_UPDATE_JOB_DELAY);
         }
@@ -95,8 +107,10 @@ class TableDocumentationSelectionChangedListener implements ISelectionChangedLis
         public static final int DOCVIEW_UPDATE_JOB_DELAY = 500;
 
         private DocViewUpdateType docViewUpdateType;
-        
+
         private RobotFileInternalElement robotFileInternalElement;
+
+        private String label;
 
         public DocViewUpdateJob(final String name) {
             super(name);
@@ -108,7 +122,7 @@ class TableDocumentationSelectionChangedListener implements ISelectionChangedLis
             if (docViewUpdateType == DocViewUpdateType.SETTING) {
                 view.showDocumentation(robotFileInternalElement);
             } else if (docViewUpdateType == DocViewUpdateType.LIBDOC) {
-                view.showLibdoc(robotFileInternalElement);
+                view.showLibdoc(robotFileInternalElement, label);
             } else if (docViewUpdateType == DocViewUpdateType.PARENT && currentElementParent != null) {
                 final RobotCodeHoldingElement<?> codeHoldingElement = (RobotCodeHoldingElement<?>) currentElementParent;
                 final Optional<RobotDefinitionSetting> docSettingFromParent = codeHoldingElement
@@ -121,9 +135,13 @@ class TableDocumentationSelectionChangedListener implements ISelectionChangedLis
         public void setDocUpdateType(final DocViewUpdateType docViewUpdateType) {
             this.docViewUpdateType = docViewUpdateType;
         }
-        
+
         public void setRobotFileInternalElement(final RobotFileInternalElement robotFileInternalElement) {
             this.robotFileInternalElement = robotFileInternalElement;
+        }
+
+        public void setLabel(final String label) {
+            this.label = label;
         }
     }
 

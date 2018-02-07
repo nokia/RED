@@ -8,17 +8,16 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newIdentityHashSet;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -33,8 +32,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.primitives.Ints;
 
 /**
@@ -129,7 +126,7 @@ public class SelectionLayerAccessor {
         return columnsIndexes;
     }
 
-    public boolean isAnyCellSelectedInColumn(int index) {
+    public boolean isAnyCellSelectedInColumn(final int index) {
         for (final PositionCoordinate position : getSelectedPositions()) {
             if (position.getColumnPosition() == index) {
                 return true;
@@ -158,23 +155,17 @@ public class SelectionLayerAccessor {
     }
 
     public void preserveSelectionWhen(final Runnable operation) {
-        preserveSelectionWhen(operation, Functions.<PositionCoordinate>identity());
+        preserveSelectionWhen(operation, Function.identity());
     }
 
     public void preserveSelectionWhen(final Runnable operation,
-            final Function<PositionCoordinate, PositionCoordinate> transform) {
+            final Function<PositionCoordinate, PositionCoordinate> mapper) {
         final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
         operation.run();
         // this has to be done separately, because it will hit locks on
         // some layers which can be already locked, so we have to schedule it
         // for later (example: adding element using key press hangs the main thread)
-        SwtThread.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                reestablishSelection(selectionLayer, positions, transform);
-            }
-        });
+        SwtThread.asyncExec(() -> reestablishSelection(selectionLayer, positions, mapper));
     }
 
     public void preserveElementSelectionWhen(final Runnable operation) {
@@ -200,13 +191,7 @@ public class SelectionLayerAccessor {
         selectionProvider.setSelection(selectionToRestore);
 
         final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
-        SwtThread.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                reestablishSelection(selectionLayer, positions, Functions.<PositionCoordinate>identity());
-            }
-        });
+        SwtThread.asyncExec(() -> reestablishSelection(selectionLayer, positions, Function.identity()));
     }
 
     private Object getAncestorOfClass(final Class<? extends RobotElement> parentClass, final Object element) {
@@ -222,46 +207,29 @@ public class SelectionLayerAccessor {
 
     public void selectElementInFirstCellAfterOperation(final Object elementToSelect, final Runnable operation) {
         operation.run();
-        SwtThread.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                selectionProvider.setSelection(new StructuredSelection(elementToSelect));
-                final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
-                reestablishSelection(selectionLayer, newlySelected,
-                        new Function<PositionCoordinate, PositionCoordinate>() {
-
-                            @Override
-                            public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                                return new PositionCoordinate(selectionLayer, 0, coordinate.getRowPosition());
-                            }
-                        });
-            }
+        SwtThread.asyncExec(() -> {
+            selectionProvider.setSelection(new StructuredSelection(elementToSelect));
+            final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
+            reestablishSelection(selectionLayer, newlySelected,
+                    coordinate -> new PositionCoordinate(selectionLayer, 0, coordinate.getRowPosition()));
         });
     }
 
     public void selectElementPreservingSelectedColumnsAfterOperation(final Object elementToSelect,
             final Runnable operation) {
         operation.run();
-        SwtThread.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                final HashSet<Integer> columns = newHashSet(Ints.asList(selectionLayer.getSelectedColumnPositions()));
-                selectionProvider.setSelection(new StructuredSelection(elementToSelect));
-                final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
+        SwtThread.asyncExec(() -> {
+            final Set<Integer> columns = newHashSet(Ints.asList(selectionLayer.getSelectedColumnPositions()));
+            selectionProvider.setSelection(new StructuredSelection(elementToSelect));
+            final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
 
-                reestablishSelection(selectionLayer, newlySelected,
-                        new Function<PositionCoordinate, PositionCoordinate>() {
-
-                            @Override
-                            public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                                if (columns.contains(coordinate.getColumnPosition())) {
-                                    return new PositionCoordinate(selectionLayer, coordinate.getColumnPosition(),
-                                            coordinate.getRowPosition());
-                                }
-                                return null;
-                            }
-                        });
-            }
+            reestablishSelection(selectionLayer, newlySelected, coordinate -> {
+                if (columns.contains(coordinate.getColumnPosition())) {
+                    return new PositionCoordinate(selectionLayer, coordinate.getColumnPosition(),
+                            coordinate.getRowPosition());
+                }
+                return null;
+            });
         });
     }
 
@@ -270,27 +238,24 @@ public class SelectionLayerAccessor {
         if (positions.length == 1 && positions[0].getColumnPosition() == 0) {
             selectElementPreservingSelectedColumnsAfterOperation(elementToSelect, operation);
         } else {
-            preserveSelectionWhen(operation, Functions.<PositionCoordinate>identity());
+            preserveSelectionWhen(operation, Function.identity());
         }
     }
 
     private void reestablishSelection(final SelectionLayer layer, final PositionCoordinate[] positions,
-            final Function<PositionCoordinate, PositionCoordinate> mapping) {
+            final Function<PositionCoordinate, PositionCoordinate> mapper) {
         final PositionCoordinate anchor = layer.getSelectionAnchor();
         final int anchorColumn = anchor.getColumnPosition();
         final int anchorRow = anchor.getRowPosition();
         layer.clear();
 
         // transform, remove nulls, remove duplicates, sort
-        final List<PositionCoordinate> transformedCoordinates = newArrayList(
-                newHashSet(filter(transform(newArrayList(positions), mapping), notNull())));
-        Collections.sort(transformedCoordinates, new Comparator<PositionCoordinate>() {
-
-            @Override
-            public int compare(final PositionCoordinate o1, final PositionCoordinate o2) {
-                return Integer.compare(o2.getColumnPosition(), o1.getColumnPosition());
-            }
-        });
+        final List<PositionCoordinate> transformedCoordinates = Stream.of(positions)
+                .map(mapper)
+                .filter(notNull())
+                .distinct()
+                .sorted((o1, o2) -> Integer.compare(o2.getColumnPosition(), o1.getColumnPosition()))
+                .collect(Collectors.toList());
 
         boolean shouldAdd = false;
         for (final PositionCoordinate coordinate : transformedCoordinates) {

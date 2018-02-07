@@ -112,8 +112,6 @@ import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
-import com.google.common.base.Function;
-
 public class MetadataSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     @Inject
@@ -272,7 +270,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                         RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyOddRowBackground());
         table.setForeground(parent.getForeground());
-        
+
         // calculate columns width
         table.addListener(SWT.Paint, factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer));
 
@@ -430,7 +428,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             if (activeCellEditor != null && !activeCellEditor.isClosed()) {
                 activeCellEditor.close();
             }
-            
+
             refreshTable();
             selectionLayerAccessor.clear();
             setDirty();
@@ -447,7 +445,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             setDirty();
         }
     }
-    
+
     @Inject
     @Optional
     private void whenSettingIsAdded(
@@ -465,23 +463,18 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         if (section.getSuiteFile() == fileModel) {
             final RobotSettingsSection settingsSection = (RobotSettingsSection) section;
 
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
-                    new Function<PositionCoordinate, PositionCoordinate>() {
-
-                        @Override
-                        public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                            if (settingsSection.getMetadataSettings().isEmpty()) {
-                                return null;
-                            } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
-                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                        coordinate.getRowPosition() - 1);
-                            }
-                            return coordinate;
-                        }
-                    });
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
+                if (settingsSection.getMetadataSettings().isEmpty()) {
+                    return null;
+                } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                            coordinate.getRowPosition() - 1);
+                }
+                return coordinate;
+            });
         }
     }
-    
+
     @Inject
     @Optional
     private void whenSettingIsMoved(
