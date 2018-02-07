@@ -254,16 +254,12 @@ public class RedTextCellEditor extends TextCellEditor {
             // due to GTK2 issue we're queuing new runnable to be executed after all
             // currently waiting operations in order to regain focus to text control
             // end enable focus changes handling once again
-            SwtThread.asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    final Text editorControl = getEditorControl();
-                    if (editorControl != null && !editorControl.isDisposed()) {
-                        editorControl.forceFocus();
-                    }
-                    focusListener.handleFocusChanges = true;
+            SwtThread.asyncExec(() -> {
+                final Text editorControl = getEditorControl();
+                if (editorControl != null && !editorControl.isDisposed()) {
+                    editorControl.forceFocus();
                 }
+                focusListener.handleFocusChanges = true;
             });
             addEditorControlListeners();
         }

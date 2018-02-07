@@ -64,9 +64,9 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : wordsProposals) {
-            final String additional = getAdditionalContent(atTheEndOfLine, proposal);
+            final String contentSuffix = getContentSuffix(atTheEndOfLine, proposal);
 
-            final DocumentModification modification = new DocumentModification(additional,
+            final DocumentModification modification = new DocumentModification(contentSuffix,
                     new Position(offset - userContent.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
@@ -74,7 +74,7 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
         return proposals;
     }
 
-    private String getAdditionalContent(final boolean atTheEndOfLine, final AssistProposal proposal) {
+    private String getContentSuffix(final boolean atTheEndOfLine, final AssistProposal proposal) {
         if (!atTheEndOfLine) {
             return "";
         } else if (RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())) {
