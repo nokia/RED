@@ -59,6 +59,8 @@ public class DocumentationView {
 
     private CurrentlyDisplayedDocElement currentlyDisplayedDocElement;
 
+    private String labelForWhichDocIsDisplayed;
+
     private final AtomicBoolean hasShowLibdocEnabled = new AtomicBoolean();
 
     private ShowLibdocAction showLibdocAction;
@@ -137,17 +139,18 @@ public class DocumentationView {
         }
     }
 
-    public void showLibdoc(final RobotFileInternalElement element) {
-        if (element == null) {
+    public void showLibdoc(final RobotFileInternalElement element, final String label) {
+        if (element == null || label == null) {
             clearView();
             return;
         }
 
         initCurrentlyDisplayedDocElement();
 
-        if (!currentlyDisplayedDocElement.isEqualTo(element)) {
+        if (!currentlyDisplayedDocElement.isEqualTo(element) || !label.equals(labelForWhichDocIsDisplayed)) {
             currentlyDisplayedDocElement.setRobotFileInternalElement(element);
-            showLibdocText(element.getName(), element.getSuiteFile());
+            labelForWhichDocIsDisplayed = label;
+            showLibdocText(label, element.getSuiteFile());
         }
     }
 
@@ -188,6 +191,7 @@ public class DocumentationView {
         if (currentlyDisplayedDocElement != null) {
             currentlyDisplayedDocElement.reset();
         }
+        labelForWhichDocIsDisplayed = null;
     }
 
     public boolean hasShowLibdocEnabled() {
