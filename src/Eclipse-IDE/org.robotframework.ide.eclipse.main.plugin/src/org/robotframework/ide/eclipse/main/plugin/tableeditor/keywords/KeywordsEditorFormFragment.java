@@ -152,7 +152,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private SelectionLayerAccessor selectionLayerAccessor;
 
     private TreeLayerAccessor treeLayerAccessor;
-    
+
     private TableHyperlinksSupport detector;
 
     public ISelectionProvider getSelectionProvider() {
@@ -248,7 +248,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
-        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false, true);
         selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
@@ -471,7 +471,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         if (def != null && def.getSuiteFile() == fileModel) {
             if (keywordCall instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) keywordCall).isArguments()) {
-                // when arguments were added, we don't need to reload the input for data provider;
+                // when arguments were added, we don't need to reload the input for data
+                // provider;
                 // this also does not influence selections
                 table.refresh();
                 setDirty();
@@ -497,7 +498,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         if (definition != null && definition.getSuiteFile() == fileModel) {
             if (setting != null && setting.isArguments()) {
-                // when arguments were removed, we don't need to reload the input for data provider;
+                // when arguments were removed, we don't need to reload the input for data
+                // provider;
                 // this also does not influence selections
                 table.refresh();
                 setDirty();
@@ -635,7 +637,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
             final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
-                    ? (RobotSuiteFile) change.getElement() : null;
+                    ? (RobotSuiteFile) change.getElement()
+                    : null;
             if (suite == fileModel) {
                 dataProvider.setInput(getSection());
                 table.refresh();
