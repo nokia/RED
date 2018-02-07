@@ -69,8 +69,8 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal libProposal : libProposals) {
             final List<String> args = libProposal.getArguments();
-            final String additionalContent = atTheEndOfLine ? separator + String.join(separator, args) : "";
-            final DocumentModification modification = new DocumentModification(additionalContent,
+            final String contentSuffix = atTheEndOfLine ? separator + String.join(separator, args) : "";
+            final DocumentModification modification = new DocumentModification(contentSuffix,
                     new Position(offset - userContent.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(libProposal, modification));

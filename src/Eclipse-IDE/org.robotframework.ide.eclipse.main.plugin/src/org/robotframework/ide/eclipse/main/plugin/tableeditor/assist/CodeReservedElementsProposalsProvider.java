@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +40,7 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
         final List<? extends AssistProposal> reservedWordProposals = new RedCodeReservedWordProposals(
                 predicateWordHasToSatisfy).getReservedWordProposals(prefix);
 
-        final List<IContentProposal> proposals = newArrayList();
+        final List<IContentProposal> proposals = new ArrayList<>();
         for (final AssistProposal proposal : reservedWordProposals) {
 
             final String additionalSuffix = RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())

@@ -22,8 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
-import com.google.common.base.Joiner;
-
 public class WithNameAssistProcessor extends RedContentAssistProcessor {
 
     public WithNameAssistProcessor(final SuiteSourceAssistantContext assist) {
@@ -62,8 +60,8 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : wordsProposals) {
-            final List<String> args = isInLastCell ? proposal.getArguments() : new ArrayList<String>();
-            final String contentSuffix = args.isEmpty() ? "" : (separator + Joiner.on(separator).join(args));
+            final List<String> args = isInLastCell ? proposal.getArguments() : new ArrayList<>();
+            final String contentSuffix = args.isEmpty() ? "" : separator + String.join(separator, args);
 
             final Position toReplace = new Position(offset - userContent.length(), cellLength);
             final Position toSelect = contentSuffix.equals("")

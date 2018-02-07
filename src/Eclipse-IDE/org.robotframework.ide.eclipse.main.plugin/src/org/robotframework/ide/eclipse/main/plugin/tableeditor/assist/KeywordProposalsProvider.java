@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -38,12 +37,10 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> keywordsEntities = new RedKeywordProposals(suiteFile.get())
                 .getKeywordProposals(prefix);
 
-        final List<IContentProposal> proposals = new ArrayList<>();
-        for (final AssistProposal proposedKeyword : keywordsEntities) {
-            proposals.add(new AssistProposalAdapter(proposedKeyword,
-                    () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
-        }
-        return proposals.toArray(new RedContentProposal[0]);
+        return keywordsEntities.stream()
+                .map(proposal -> new AssistProposalAdapter(proposal,
+                        () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal)))
+                .toArray(RedContentProposal[]::new);
     }
 
     private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword) {
