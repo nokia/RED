@@ -74,9 +74,9 @@ right-click menu select "Run".
 During TestSuite execution, RED displays RobotFramework console and message
 logs. Those information are available in Console and Message Log, by default
 visible in the Robot perspective or by _Window -> Show View -> Other.... ->
-Robot_ ![](create_run/console_1.png) If any of those 2 views are missing, best
-way is to reset perspective settings by using action _Window -> Perspective ->
-Reset Perspective ..._
+Robot_ ![](create_run/console_1.png) ![](create_run/msg_log_1.png) If any of
+those 2 views are missing, best way is to reset perspective settings by using
+action _Window -> Perspective -> Reset Perspective ..._
 
 #### Execution status
 
