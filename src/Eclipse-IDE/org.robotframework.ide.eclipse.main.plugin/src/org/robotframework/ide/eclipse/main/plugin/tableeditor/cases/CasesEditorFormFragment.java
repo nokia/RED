@@ -247,7 +247,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
-        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false, true);
         selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
@@ -615,7 +615,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
             final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
-                    ? (RobotSuiteFile) change.getElement() : null;
+                    ? (RobotSuiteFile) change.getElement()
+                    : null;
             if (suite == fileModel) {
                 dataProvider.setInput(getSection());
                 table.refresh();
