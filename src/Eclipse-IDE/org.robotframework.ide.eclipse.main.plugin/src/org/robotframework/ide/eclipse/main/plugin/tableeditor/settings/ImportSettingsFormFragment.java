@@ -108,8 +108,6 @@ import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 import org.robotframework.services.event.Events;
 
-import com.google.common.base.Function;
-
 public class ImportSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     @Inject
@@ -481,20 +479,15 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         if (section.getSuiteFile() == fileModel) {
             final RobotSettingsSection settingsSection = (RobotSettingsSection) section;
 
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
-                    new Function<PositionCoordinate, PositionCoordinate>() {
-
-                        @Override
-                        public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                            if (settingsSection.getImportSettings().isEmpty()) {
-                                return null;
-                            } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
-                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
-                                        coordinate.getRowPosition() - 1);
-                            }
-                            return coordinate;
-                        }
-                    });
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
+                if (settingsSection.getImportSettings().isEmpty()) {
+                    return null;
+                } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                            coordinate.getRowPosition() - 1);
+                }
+                return coordinate;
+            });
         }
     }
 

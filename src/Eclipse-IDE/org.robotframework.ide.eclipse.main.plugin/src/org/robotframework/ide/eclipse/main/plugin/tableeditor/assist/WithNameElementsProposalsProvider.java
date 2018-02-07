@@ -5,11 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
@@ -39,13 +36,7 @@ public class WithNameElementsProposalsProvider implements RedContentProposalProv
         final List<? extends AssistProposal> withNameProposals = new RedWithNameProposals(predicateWordHasToSatisfy)
                 .getWithNameProposals(prefix);
 
-        final List<IContentProposal> proposals = newArrayList();
-        for (final AssistProposal proposal : withNameProposals) {
-
-            final String additionalSuffix = "";
-            proposals.add(new AssistProposalAdapter(proposal, additionalSuffix));
-        }
-        return proposals.toArray(new RedContentProposal[0]);
+        return withNameProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
     }
 
     private AssistProposalPredicate<String> createWordPredicate(final NatTableAssistantContext context) {

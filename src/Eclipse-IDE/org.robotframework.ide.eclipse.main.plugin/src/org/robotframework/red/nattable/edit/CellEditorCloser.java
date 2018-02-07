@@ -14,13 +14,9 @@ public class CellEditorCloser {
             if (!committed) {
                 cellEditor.close();
             }
-            SwtThread.asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (table != null && !table.isDisposed()) {
-                        table.setFocus();
-                    }
+            SwtThread.asyncExec(() -> {
+                if (table != null && !table.isDisposed()) {
+                    table.setFocus();
                 }
             });
         }
