@@ -7,7 +7,7 @@
 <body>
 	<h2>Locally launched tests</h2>
 	
-	<p>When <b>Robot</b> launch configuration is launched it setups a simple server inside your RED instance to which 
+	<p>When <b>Robot</b> launch configuration is launched, it setups a simple server inside RED instance to which 
 	execution events can be send from tests. Then it automatically starts the tests choosing suites/tests which
 	has to be executed from the configuration. The tests are either started using some kind of python interpreter
 	or using <a href="local_launch_scripting.html">user-defined script</a>.
@@ -58,8 +58,8 @@
 	
 	<h4>Listener tab</h4>
 	<img src="images/local_config_listener.png"/>
-	<p>At this tab one can specify how RED will setup the server for execution tracking. By default it 
-	will use localhost and some currently free port to start the server and wait for connection, but
+	<p>At this tab, one can specify how RED will setup the server for execution tracking. By default it 
+	will use localhost and random free port to start the server and wait for connection, but
 	other host, port and timeout can be specified. This is especially useful when used together with 
 	<a href="local_launch_scripting.html">scripted launch</a>, when the script is setting up agent connection 
 	in its own way.
@@ -73,10 +73,10 @@
 	freely defined arguments can be passed to interpreter.
 	</p>
 	
-	<p>Moreover the whole call can be passed to a script (or other executable) with additional arguments.
-	The script can be for example batch/bash script or any other executable. When this option is used whole 
-	call is passed to this script and it's up to script to properly run tests. This option can be used 
-	for example in order to integrate 3rd party tools into execution process.
+	<p>Moreover, the whole call can be passed to a script (or other executable) with additional arguments.
+	The script/executable's command line paramters are the same as RED command line during normal test execution 
+    (path to python interpreter with robot call, parameters for suites/testcases etc.). Such script/external executable 
+    mechanism can be used to wrap Robot execution into other tools. 
 	</p>
 	
 	<p>For more information read <a href="local_launch_scripting.html">Local launches scripting</a> topic in this guide.
