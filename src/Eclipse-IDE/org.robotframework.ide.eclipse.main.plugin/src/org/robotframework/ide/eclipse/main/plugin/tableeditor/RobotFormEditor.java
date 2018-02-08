@@ -326,18 +326,14 @@ public class RobotFormEditor extends FormEditor {
 
     private void reopenEditor() {
         close(false);
-        getSite().getShell().getDisplay().asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
-                final IWorkbenchPage page = RobotFormEditor.this.getSite().getPage();
-                try {
-                    page.openEditor(new FileEditorInput(suiteModel.getFile()), desc.getId());
-                } catch (final PartInitException e) {
-                    throw new IllegalStateException("Unable to reopen editor", e);
-                }
+        getSite().getShell().getDisplay().asyncExec(() -> {
+            final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+            final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
+            final IWorkbenchPage page = RobotFormEditor.this.getSite().getPage();
+            try {
+                page.openEditor(new FileEditorInput(suiteModel.getFile()), desc.getId());
+            } catch (final PartInitException e) {
+                throw new IllegalStateException("Unable to reopen editor", e);
             }
         });
     }
@@ -443,16 +439,10 @@ public class RobotFormEditor extends FormEditor {
             page.updateOnActivation();
 
             if (isDirty()) {
-                SwtThread.asyncExec(new Runnable() {
-
-                    // there are some locking threads involved which results in blocking
-                    // main thread for hundreds of milliseconds thus giving stops when switching
-                    // from source part to some section editor part
-                    @Override
-                    public void run() {
-                        getSourceEditor().disableReconcilation();
-                    }
-                });
+                // there are some locking threads involved which results in blocking
+                // main thread for hundreds of milliseconds thus giving stops when switching
+                // from source part to some section editor part
+                SwtThread.asyncExec(() -> getSourceEditor().disableReconcilation());
             } else {
                 getSourceEditor().disableReconcilation();
             }
