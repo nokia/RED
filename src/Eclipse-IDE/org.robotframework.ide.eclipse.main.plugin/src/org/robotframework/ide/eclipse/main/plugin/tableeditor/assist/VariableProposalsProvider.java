@@ -60,10 +60,10 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
 
         final Object rowElement = dataProvider.getRowObject(((NatTableAssistantContext) context).getRow());
         final AssistProposalPredicate<String> predicate = createGlobalVarPredicate(rowElement);
-        final List<? extends AssistProposal> variableEntities = new RedVariableProposals(suiteFile, predicate)
+        final List<? extends AssistProposal> variableProposals = new RedVariableProposals(suiteFile, predicate)
                 .getVariableProposals(userContentToReplace, getModelElement(rowElement));
 
-        return variableEntities.stream()
+        return variableProposals.stream()
                 .map(proposal -> new AssistProposalAdapter(proposal, modificationStrategy))
                 .toArray(RedContentProposal[]::new);
     }

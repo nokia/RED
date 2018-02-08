@@ -25,8 +25,6 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -112,12 +110,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
         final IHyperlinkListener hyperlinkListener = createHyperlinkListener();
         currentFramework.addHyperlinkListener(hyperlinkListener);
-        currentFramework.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                currentFramework.removeHyperlinkListener(hyperlinkListener);
-            }
-        });
+        currentFramework.addDisposeListener(e -> currentFramework.removeHyperlinkListener(hyperlinkListener));
     }
 
     private IHyperlinkListener createHyperlinkListener() {
@@ -187,12 +180,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
         final ICheckStateListener checkListener = createCheckListener();
         viewer.addCheckStateListener(checkListener);
-        viewer.getTable().addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                viewer.removeCheckStateListener(checkListener);
-            }
-        });
+        viewer.getTable().addDisposeListener(e -> viewer.removeCheckStateListener(checkListener));
 
         ColumnViewerToolTipSupport.enableFor(viewer);
 

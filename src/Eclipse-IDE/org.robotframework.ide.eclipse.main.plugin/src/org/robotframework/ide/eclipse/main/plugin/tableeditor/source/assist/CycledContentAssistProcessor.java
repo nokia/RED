@@ -136,13 +136,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         }
         if (shouldActivateAssist(proposal)) {
             canReopenAssistantProgramatically = false;
-            Display.getCurrent().asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    assistant.openCompletionProposals();
-                }
-            });
+            Display.getCurrent().asyncExec(() -> assistant.openCompletionProposals());
         }
 
         for (final Runnable operation : getOperationsAfterAccept(proposal)) {

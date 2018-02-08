@@ -31,13 +31,7 @@ public class CollapseAllHandler extends DIParameterizedHandler<E4CollapseAllHand
 
             if (treeLayerAccessor.isPresent()) {
                 editor.getSelectionLayerAccessor().preserveElementsParentSelectionWhen(RobotCodeHoldingElement.class,
-                        new Runnable() {
-
-                            @Override
-                            public void run() {
-                                treeLayerAccessor.get().collapseAll();
-                            }
-                        });
+                        () -> treeLayerAccessor.get().collapseAll());
             }
         }
     }

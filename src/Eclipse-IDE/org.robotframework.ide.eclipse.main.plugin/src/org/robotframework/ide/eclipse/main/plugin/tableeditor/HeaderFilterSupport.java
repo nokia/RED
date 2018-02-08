@@ -93,27 +93,21 @@ class HeaderFilterSupport {
 
                     @Override
                     protected IStatus run(final IProgressMonitor monitor) {
-                        filter.getDisplay().syncExec(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                HeaderFilterMatchesCollection matches = null;
-                                if (!filter.getText().isEmpty()) {
-                                    matches = new HeaderFilterMatchesCollection(collectors);
-                                    for (final HeaderFilterMatchesCollector collector : collectors) {
-                                        matches.addAll(collector.collectMatches(filter.getText()));
-                                    }
+                        filter.getDisplay().syncExec(() -> {
+                            HeaderFilterMatchesCollection matches = null;
+                            if (!filter.getText().isEmpty()) {
+                                matches = new HeaderFilterMatchesCollection(collectors);
+                                for (final HeaderFilterMatchesCollector collector : collectors) {
+                                    matches.addAll(collector.collectMatches(filter.getText()));
                                 }
-                                showProperTooltip(matches);
-                                if (matches == null) {
-                                    broker.send(
-                                            RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC + "/" + sectionId,
-                                            collectors);
-                                } else {
-                                    broker.send(
-                                            RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC + "/" + sectionId,
-                                            matches);
-                                }
+                            }
+                            showProperTooltip(matches);
+                            if (matches == null) {
+                                broker.send(RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC + "/" + sectionId,
+                                        collectors);
+                            } else {
+                                broker.send(RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC + "/" + sectionId,
+                                        matches);
                             }
                         });
                         monitor.done();

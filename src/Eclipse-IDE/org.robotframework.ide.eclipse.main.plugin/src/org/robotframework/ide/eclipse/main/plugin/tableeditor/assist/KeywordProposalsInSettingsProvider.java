@@ -10,7 +10,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
@@ -37,21 +36,22 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
     @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
-        final String prefix = contents.substring(0, position);
-
-        final List<IContentProposal> proposals = new ArrayList<>();
-
-        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
-        if (tableContext.getColumn() == 1 && isKeywordBasedSetting(dataProvider, tableContext.getRow())) {
-            final List<? extends AssistProposal> keywordsEntities = new RedKeywordProposals(suiteFile)
-                    .getKeywordProposals(prefix);
-
-            for (final AssistProposal proposedKeyword : keywordsEntities) {
-                proposals.add(new AssistProposalAdapter(proposedKeyword,
-                        () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
-            }
+        if (!areApplicable((NatTableAssistantContext) context)) {
+            return new RedContentProposal[0];
         }
-        return proposals.toArray(new RedContentProposal[0]);
+
+        final String prefix = contents.substring(0, position);
+        final List<? extends AssistProposal> keywordsProposals = new RedKeywordProposals(suiteFile)
+                .getKeywordProposals(prefix);
+
+        return keywordsProposals.stream()
+                .map(proposal -> new AssistProposalAdapter(proposal,
+                        () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal)))
+                .toArray(RedContentProposal[]::new);
+    }
+
+    private boolean areApplicable(final NatTableAssistantContext tableContext) {
+        return tableContext.getColumn() == 1 && isKeywordBasedSetting(dataProvider, tableContext.getRow());
     }
 
     private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword) {

@@ -6,8 +6,6 @@
 package org.eclipse.jface.viewers;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
@@ -34,12 +32,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
     private void registerActivationListener(final ColumnViewerEditor viewerEditor) {
         final EditorActivationListener activationListener = new EditorActivationListener();
         viewerEditor.addEditorActivationListener(activationListener);
-        getControl().addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                viewerEditor.removeEditorActivationListener(activationListener);
-            }
-        });
+        getControl().addDisposeListener(e -> viewerEditor.removeEditorActivationListener(activationListener));
     }
 
     @Override
