@@ -96,7 +96,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         addField(additionalInterpreterArguments);
 
         final FileFieldEditor scriptPathEditor = new FileFieldEditor(RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH,
-                "Executable file:", true, StringFieldEditor.VALIDATE_ON_KEY_STROKE, group);
+                "Executable file to run Robot Framework tests:", true, StringFieldEditor.VALIDATE_ON_KEY_STROKE, group);
         scriptPathEditor.setFileExtensions(RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions());
         scriptPathEditor.setFilterPath(ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile());
         scriptPathEditor.load();

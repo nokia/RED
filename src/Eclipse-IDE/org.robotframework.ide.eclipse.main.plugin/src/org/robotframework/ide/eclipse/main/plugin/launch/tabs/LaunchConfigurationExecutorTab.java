@@ -153,13 +153,13 @@ class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab impl
 
     private void createExecutableFileGroup(final Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
-        group.setText("Executable file");
+        group.setText("External script");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
 
         final Label executableFileDescription = new Label(group, SWT.WRAP);
         executableFileDescription.setText(
-                "Setup executable file which will be used to run Robot Framework tests instead of interpreter selected above");
+                "Executable file to run Robot Framework tests:");
         GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(executableFileDescription);
 
         executableFileComposite = new ExecutableFileComposite(group, new ModifyListener() {
@@ -171,7 +171,7 @@ class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab impl
         }, RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executableFileComposite);
 
-        executableFileArgumentsText = createLabeledText(group, "Additional executable file arguments:");
+        executableFileArgumentsText = createLabeledText(group, "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords.");
     }
 
     private Text createLabeledText(final Composite parent, final String label) {
