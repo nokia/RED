@@ -32,7 +32,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -47,8 +46,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -223,21 +220,9 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         final Tree control = viewer.getTree();
         final MenuManager manager = new MenuManager("Red.xml file editor validation context menu", menuId);
         manager.setRemoveAllWhenShown(true);
-        final IMenuListener menuListener = new IMenuListener() {
-
-            @Override
-            public void menuAboutToShow(final IMenuManager menuManager) {
-                menuManager.add(new Separator("additions"));
-            }
-        };
+        final IMenuListener menuListener = menuManager -> menuManager.add(new Separator("additions"));
         manager.addMenuListener(menuListener);
-        control.addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                manager.removeMenuListener(menuListener);
-            }
-        });
+        control.addDisposeListener(e -> manager.removeMenuListener(menuListener));
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
         site.registerContextMenu(menuId, manager, viewer, false);
@@ -373,13 +358,8 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             }
         };
         ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
-        viewer.getTree().addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
-            }
-        });
+        viewer.getTree()
+                .addDisposeListener(e -> ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener));
     }
 
     @Override

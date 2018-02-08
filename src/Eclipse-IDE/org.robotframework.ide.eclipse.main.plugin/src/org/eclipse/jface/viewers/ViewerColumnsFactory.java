@@ -131,13 +131,9 @@ public class ViewerColumnsFactory {
         column.getColumn().setWidth(Math.max(width, minimumWidth));
         column.getColumn().setText(name);
         column.getColumn().setImage(image);
-        column.getColumn().addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                if (image != null) {
-                    image.dispose();
-                }
+        column.getColumn().addDisposeListener(e -> {
+            if (image != null) {
+                image.dispose();
             }
         });
         column.getColumn().setToolTipText(tooltip);
@@ -145,13 +141,7 @@ public class ViewerColumnsFactory {
         if (shouldExtend) {
             column.getColumn().setData("autoExtending", Boolean.TRUE);
             final ControlAdapter resizeListener = createResizeListener(viewer);
-            column.getColumn().addDisposeListener(new DisposeListener() {
-
-                @Override
-                public void widgetDisposed(final DisposeEvent e) {
-                    viewer.getTable().removeControlListener(resizeListener);
-                }
-            });
+            column.getColumn().addDisposeListener(e -> viewer.getTable().removeControlListener(resizeListener));
             viewer.getTable().addControlListener(resizeListener);
         }
 
@@ -287,13 +277,9 @@ public class ViewerColumnsFactory {
         column.getColumn().setWidth(Math.max(width, minimumWidth));
         column.getColumn().setText(name);
         column.getColumn().setImage(image);
-        column.getColumn().addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                if (image != null) {
-                    image.dispose();
-                }
+        column.getColumn().addDisposeListener(e -> {
+            if (image != null) {
+                image.dispose();
             }
         });
         column.getColumn().setToolTipText(tooltip);

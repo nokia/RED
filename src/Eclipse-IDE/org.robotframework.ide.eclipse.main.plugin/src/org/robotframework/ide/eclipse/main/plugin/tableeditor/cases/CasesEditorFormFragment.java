@@ -528,23 +528,19 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     private Runnable tableInputIsReplaced() {
-        return new Runnable() {
+        return () -> {
+            final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
+            final int rowCountBeforeChange = dataProvider.getSortedList().size();
+            final List<Integer> expandedRowIndexes = treeLayerAccessor
+                    .expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
 
-            @Override
-            public void run() {
-                final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
-                final int rowCountBeforeChange = dataProvider.getSortedList().size();
-                final List<Integer> expandedRowIndexes = treeLayerAccessor
-                        .expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
+            dataProvider.setInput(getSection());
+            table.refresh();
+            setDirty();
 
-                dataProvider.setInput(getSection());
-                table.refresh();
-                setDirty();
-
-                final int rowCountChange = dataProvider.getSortedList().size() - rowCountBeforeChange;
-                treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition,
-                        rowCountChange);
-            }
+            final int rowCountChange = dataProvider.getSortedList().size() - rowCountBeforeChange;
+            treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition,
+                    rowCountChange);
         };
     }
 

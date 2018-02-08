@@ -5,10 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedImportProposals;
@@ -32,21 +30,20 @@ public class ImportsInSettingsProposalsProvider implements RedContentProposalPro
     @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
-        final String prefix = contents.substring(0, position);
-
-        final List<IContentProposal> proposals = new ArrayList<>();
-
-        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
-        if (tableContext.getColumn() == 1
-                && KeywordProposalsInSettingsProvider.isKeywordBasedSetting(dataProvider, tableContext.getRow())) {
-            final List<? extends AssistProposal> imports = new RedImportProposals(suiteFile)
-                    .getImportsProposals(prefix);
-
-            for (final AssistProposal proposedImport : imports) {
-                proposals.add(new AssistProposalAdapter(proposedImport));
-            }
+        if (!areApplicable((NatTableAssistantContext) context)) {
+            return new RedContentProposal[0];
         }
-        return proposals.toArray(new RedContentProposal[0]);
+
+        final String prefix = contents.substring(0, position);
+        final List<? extends AssistProposal> importProposals = new RedImportProposals(suiteFile)
+                .getImportsProposals(prefix);
+
+        return importProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
+    }
+
+    private boolean areApplicable(final NatTableAssistantContext tableContext) {
+        return tableContext.getColumn() == 1
+                && KeywordProposalsInSettingsProvider.isKeywordBasedSetting(dataProvider, tableContext.getRow());
     }
 
 }

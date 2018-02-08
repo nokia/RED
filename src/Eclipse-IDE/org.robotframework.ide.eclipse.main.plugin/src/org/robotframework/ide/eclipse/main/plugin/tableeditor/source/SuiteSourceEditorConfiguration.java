@@ -37,8 +37,6 @@ import org.eclipse.jface.text.source.DefaultAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.executor.RedSystemProperties;
@@ -362,13 +360,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 sourceViewer);
         assistant.setQuickAssistProcessor(processor);
         assistant.addCompletionListener(processor);
-        sourceViewer.getTextWidget().addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                assistant.removeCompletionListener(processor);
-            }
-        });
+        sourceViewer.getTextWidget().addDisposeListener(e -> assistant.removeCompletionListener(processor));
         assistant.setInformationControlCreator(new AbstractReusableInformationControlCreator() {
 
             @Override

@@ -140,14 +140,10 @@ public class RobotDocument extends Document {
         if (scheduledOperation != null) {
             scheduledOperation.cancel(true);
         }
-        final Runnable parsingRunnable = new Runnable() {
-            @Override
-            public void run() {
-                reparse();
-                parsingSemaphore.release();
-            }
-        };
-        scheduledOperation = executor.schedule(parsingRunnable, DELAY, TimeUnit.MILLISECONDS);
+        scheduledOperation = executor.schedule(() -> {
+            reparse();
+            parsingSemaphore.release();
+        }, DELAY, TimeUnit.MILLISECONDS);
     }
 
     private Future<RobotFileOutput> getNewestOutput() {
