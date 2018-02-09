@@ -8,13 +8,13 @@ The general idea is that the command line call which RED executes for
 launching is wrapped with a call to user defined executable. For example RED
 would normally use following command line call:
 
-` python.exe -m robot.run --suite mySuite c:\\location\\to\\project `
+` python.exe -m robot.run --suite mySuite <path to project> `
 
 but when script `my_script.bat` with arguments `arg1`, `arg2` is used the
 command line call becomes:
 
-` my_script.bat arg1 arg2 python.exe -m robot.run --suite mySuite
-c:\\location\\to\\project `
+` my_script.bat arg1 arg2 python.exe -m robot.run --suite mySuite <path to
+project> `
 
 The script is now free to process the arguments which were passed - it may use
 them or not, or select those which are interesting for the script but
@@ -24,7 +24,7 @@ Note
 
     By default, RED passes Robot executable command line to user script as is thus each space separated entry is own parameter. From above example, following Robot command line passed to script by RED: 
 
-` python.exe -m robot.run --suite mySuite c:\\location\\to\\project `
+` python.exe -m robot.run --suite mySuite <path to project> `
 
 is passed to a user script as 6 arguments. This can be changed in
 [preferences](launch_prefs.md), so whole Robot executable command line is
@@ -34,18 +34,19 @@ parameters.
 ### Defining script call in launch configuration
 
 Script/executable to be used when launching is defined in launch configuration
-dialog at **Executor** tab:
+dialog in **Executor** tab under **External script** part:
 
-![](images/local_config_exec_script.png)
+![](images/local_config_exec.png)
 
-In first field an executable has to be chosen from local system. Under Windows
-this may be `.exe`, `.bat` or `.com` file. Under Linux this may be any binary
-executable, but also any text script file which contains
+**Executable file** field is path to executable file from local system. Under
+Windows this may be `.exe`, `.bat` or `.com` file. Under Linux this may be any
+binary executable, but also any text script file which contains
 [shebang](https://en.wikipedia.org/wiki/Shebang_\(Unix\)) line - just remember
 that this file need to have `x` permission granted, so that the system will
 allow to execute it.
 
-In second line any arguments which are required by the script can be passed.
+**Additional executable file arguments** holds any arguments which are
+required by the script.
 
 Note
 
@@ -57,7 +58,13 @@ Note
 
     User scipts examples can be found at <https://github.com/nokia/RED/tree/master/src/RobotUserScripts>. 
 
-We'll use simple python script which will be used to launch tests:
+Windows batch example:
+
+@ECHO OFF echo running scripts with external batch file echo script name: %0
+echo script's arguments: %* echo running arguments as they consist call to
+start python scripts: %* `
+
+Python script example:
 
 ` import sys  
 from io import StringIO  
