@@ -18,7 +18,7 @@
 	</p>
 	
 	<div class="code"><code>
-	python.exe -m robot.run --suite mySuite c:\\location\\to\\project
+	python.exe -m robot.run --suite mySuite &lt;path to project&gt;
 	</code></div>
 	
 	<p>but when script <code>my_script.bat</code> with arguments <code>arg1</code>, <code>arg2</code> is
@@ -26,7 +26,7 @@
 	</p>
 	
 	<div class="code"><code>
-	my_script.bat arg1 arg2 python.exe -m robot.run --suite mySuite c:\\location\\to\\project
+	my_script.bat arg1 arg2 python.exe -m robot.run --suite mySuite &lt;path to project&gt;
 	</code></div>
 	
 	<p>The script is now free to process the arguments which were passed - it may use them or not, or
@@ -38,7 +38,7 @@
 	   <dd>By default, RED passes Robot executable command line to user script as is thus each space separated entry is own parameter.
        From above example, following Robot command line passed to script by RED:
        	<div class="code"><code>
-            python.exe -m robot.run --suite mySuite c:\\location\\to\\project
+            python.exe -m robot.run --suite mySuite &lt;path to project&gt;
         </code></div>
         is passed to a user script as 6 arguments. This can be changed in <a href="launch_prefs.html">preferences</a>, so whole Robot executable command line is wrapped with quotation marks. This affects how script handles input parameters.
 	   </dd>
@@ -47,10 +47,10 @@
     
 	<h3>Defining script call in launch configuration</h3>
 	
-	<p>Script/executable to be used when launching is defined in launch configuration dialog at <b>Executor</b> tab:</p>
-	<img src="images/local_config_exec_script.png"/>
+	<p>Script/executable to be used when launching is defined in launch configuration dialog in <b>Executor</b> tab under <b>External script</b> part:</p>
+	<img src="images/local_config_exec.png"/>
 	
-	<p>In first field an executable has to be chosen from local system. Under Windows this may be <code>.exe</code>,
+	<p><b>Executable file</b> field is path to executable file from local system. Under Windows this may be <code>.exe</code>,
 	<code>.bat</code> or <code>.com</code> file. Under Linux this may be any binary executable, but also 
 	any text script file which contains 
 	<a class="external" target="_blank" href="https://en.wikipedia.org/wiki/Shebang_(Unix)" target="_blank" class="external" >shebang</a> line - just 
@@ -58,7 +58,7 @@
 	execute it.
 	</p>
 	
-	<p>In second line any arguments which are required by the script can be passed.</p>
+	<p><b>Additional executable file arguments</b> holds any arguments which are required by the script.</p>
 
 	<dl class="note">
 	   <dt>Note</dt>
@@ -76,7 +76,17 @@
 	   <dd>User scipts examples can be found at <a href="https://github.com/nokia/RED/tree/master/src/RobotUserScripts" target="_blank" class="external" >https://github.com/nokia/RED/tree/master/src/RobotUserScripts</a>.
 	   </dd>
 	</dl>
-	<p>We'll use simple python script which will be used to launch tests:</p>
+    
+    <p>Windows batch example:</p>
+    <div class="code"<code>
+    @ECHO OFF</br>
+    echo running scripts with external batch file</br>
+    echo script name: %0</br>
+    echo script's arguments: %*</br>
+    echo running arguments as they consist call to start python scripts:</br>
+    %*</br>
+    </code></div>
+	<p>Python script example:</p>
 	
 	<div class="code"><code>
 	import sys<br/>
