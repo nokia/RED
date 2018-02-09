@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -17,21 +18,18 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
 public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
 
-    private List<ISettingsFormFragment> formFragments;
+    private final List<ISettingsFormFragment> formFragments;
 
     private ISettingsFormFragment activeFormFragment;
 
@@ -64,13 +62,7 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
         for (final ISettingsFormFragment formFragment : formFragments) {
             if (formFragment.getTable() != null && formFragment.getSelectionProvider() != null) {
                 formFragment.getSelectionProvider().addSelectionChangedListener(wrappingListener);
-                formFragment.getTable().addDisposeListener(new DisposeListener() {
-
-                    @Override
-                    public void widgetDisposed(DisposeEvent e) {
-                        listeners.remove(wrappingListener);
-                    }
-                });
+                formFragment.getTable().addDisposeListener(e -> listeners.remove(wrappingListener));
             }
         }
     }
@@ -122,14 +114,10 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
             final List<Entry> entries = Selections.getElements(structuredSelection, Entry.class);
 
             if (!entries.isEmpty() && entries.size() == size) {
-                return new StructuredSelection(
-                        newArrayList(Iterables.filter(Iterables.transform(entries, new Function<Entry, RobotElement>() {
-
-                            @Override
-                            public RobotElement apply(final Entry entry) {
-                                return (RobotElement) entry.getValue();
-                            }
-                        }), Predicates.notNull())));
+                return new StructuredSelection(entries.stream()
+                        .map(entry -> (RobotElement) entry.getValue())
+                        .filter(Predicates.notNull())
+                        .collect(Collectors.toList()));
             }
             return selection;
         }

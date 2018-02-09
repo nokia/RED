@@ -24,8 +24,6 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -75,12 +73,7 @@ public class TableHyperlinksSupport {
         final Display display = table.getDisplay();
         final HyperlinksKeyListener filter = detector.new HyperlinksKeyListener();
         display.addFilter(SWT.KeyUp, filter);
-        table.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                display.removeFilter(SWT.KeyUp, filter);
-            }
-        });
+        table.addDisposeListener(e -> display.removeFilter(SWT.KeyUp, filter));
         return detector;
     }
 

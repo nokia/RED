@@ -425,14 +425,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     private Runnable tableInputIsReplaced() {
-        return new Runnable() {
-
-            @Override
-            public void run() {
-                dataProvider.setInput(getSection());
-                table.refresh();
-                setDirty();
-            }
+        return () -> {
+            dataProvider.setInput(getSection());
+            table.refresh();
+            setDirty();
         };
     }
 

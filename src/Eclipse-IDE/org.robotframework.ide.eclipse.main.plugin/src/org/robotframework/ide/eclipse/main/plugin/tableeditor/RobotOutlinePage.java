@@ -135,13 +135,9 @@ class RobotOutlinePage extends ContentOutlinePage {
             protected IStatus run(final IProgressMonitor monitor) {
                 final Optional<? extends RobotElement> element = suiteModel.findElement(caretOffset);
                 if (element.isPresent() && !display.isDisposed()) {
-                    display.asyncExec(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            shouldUpdateEditorSelection.set(false);
-                            setSelectionInOutline(element.filter(e -> e != suiteModel));
-                        }
+                    display.asyncExec(() -> {
+                        shouldUpdateEditorSelection.set(false);
+                        setSelectionInOutline(element.filter(e -> e != suiteModel));
                     });
                 }
                 return Status.OK_STATUS;

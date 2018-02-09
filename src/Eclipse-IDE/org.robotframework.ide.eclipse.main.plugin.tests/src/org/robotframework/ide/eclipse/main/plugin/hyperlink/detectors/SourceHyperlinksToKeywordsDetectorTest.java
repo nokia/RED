@@ -329,7 +329,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         when(textViewer.getDocument()).thenReturn(document);
 
         final int[] begins = new int[] { 26, 37, 46, 55, 65 };
-        final int[] prefixLenghts = new int[] { 6, 4, 4, 5, 5 };
+        final int[] prefixLengths = new int[] { 6, 4, 4, 5, 5 };
         assertThat(document.get(begins[0], 8)).isEqualTo("given kw");
         assertThat(document.get(begins[1], 6)).isEqualTo("and kw");
         assertThat(document.get(begins[2], 6)).isEqualTo("but kw");
@@ -340,7 +340,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
         for (int i = 0; i < begins.length; i++) {
             final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begins[i] + 1, 1), true);
-            assertThat(((RegionsHyperlink) hyperlinks[0]).getHyperlinkRegion()).isEqualTo(new Region(begins[i] + prefixLenghts[i], 2));
+            assertThat(((RegionsHyperlink) hyperlinks[0]).getHyperlinkRegion())
+                    .isEqualTo(new Region(begins[i] + prefixLengths[i], 2));
             assertThat(((RegionsHyperlink) hyperlinks[0]).getDestinationRegion()).isEqualTo(new Region(90, 2));
         }
     }

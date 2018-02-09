@@ -5,10 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
@@ -28,19 +26,18 @@ public class SettingProposalsProvider implements RedContentProposalProvider {
     @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
+        if (!areApplicable((NatTableAssistantContext) context)) {
+            return new RedContentProposal[0];
+        }
+
         final String prefix = contents.substring(0, position);
-
-        final List<IContentProposal> proposals = new ArrayList<>();
-
         final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(settingTarget)
                 .getSettingsProposals(prefix);
 
-        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
-        if (tableContext.getColumn() == 0) {
-            for (final AssistProposal proposedSetting : settingsProposals) {
-                proposals.add(new AssistProposalAdapter(proposedSetting));
-            }
-        }
-        return proposals.toArray(new RedContentProposal[0]);
+        return settingsProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
+    }
+
+    private boolean areApplicable(final NatTableAssistantContext tableContext) {
+        return tableContext.getColumn() == 0;
     }
 }
