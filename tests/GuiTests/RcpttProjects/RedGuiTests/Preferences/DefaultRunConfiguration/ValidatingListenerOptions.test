@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _XUivgOobEea0ALtmCcrmfA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/3/17 6:13 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 2/9/18 1:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -57,7 +57,7 @@ with [get-window Preferences] {
         get-property "getChildren().Control[0].getText()" | equals "Additional interpreter arguments:" | verify-true
         get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
         get-property "getChildren().Control[1].getText()" | equals "" | verify-true
-        get-property "getChildren().Control[2].getText()" | equals "Executable file:" | verify-true
+        get-property "getChildren().Control[2].getText()" | equals "Executable file to run Robot Framework tests:" | verify-true
         get-property "getChildren().Control[3].getEditable()" | equals true | verify-true
         get-property "getChildren().Control[3].getText()" | equals "" | verify-true
         get-property "getChildren().Control[4].getText()" | equals "&Browse..." | verify-true
