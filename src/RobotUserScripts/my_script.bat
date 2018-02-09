@@ -4,9 +4,9 @@
 :: see license.txt file for details.
 ::
 
-echo command line from RED
-echo %*
-echo removing script name with SHIFT command
-SHIFT
-echo running Robot
+@ECHO OFF
+echo running scripts with external batch file
+echo script name: %0
+echo script's arguments: %*
+echo running arguments as they consist call to start python scripts:
 %*
