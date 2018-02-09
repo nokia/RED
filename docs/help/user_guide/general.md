@@ -2,11 +2,11 @@
 
 ### Tab key behavior
 
-Tab key behavior is set by default to be aware of the file type. For .tsv
-files each Tab will produce item separator, for text files 4 spaces will
+Tab key press behavior is set by default to be aware of the file type. For
+.tsv files each Tab will produce item separator, for text files 4 spaces will
 generated.  
-In Robot Framework preferences (Window -> Preferences), Tab behavior can be
-changed if needed.  
+In Robot Framework preferences (Window -> Preferences under Source section),
+Tab behavior can be changed if needed.  
   
 ![](general/tab_behaviour.png)  
   
@@ -32,8 +32,7 @@ For now, **code formatting in RED is meant to be proof of functionality, it is
 not configurable.**  
 In near future we will provide a way to include custom rule sets for code
 formatting and check style.  
-It is invoked by clicking in text editor in issuing right click action Format
-source.  
+It is invoked by right click menu in Source editor.  
   
   
 ![](general/gen_5.png)  

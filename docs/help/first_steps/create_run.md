@@ -42,11 +42,14 @@ Eclipse. ![](create_run/simple_project_1.png)
 
 To create sample test you should invoke action: _File -> New -> Other ... ->
 Robot Framework -> Robot Test Suite_. Same action can be accessed by right
-click menu. RED consists of 2 different modes of editing: a Table (Ride-like
-style) and Text style.  Four first tabs in Test Suites are table views. Last
-on is text view (source). By default Source editor is used when Test Suite
-file is opened.  ![](create_run/editors_1.png) Source view displays text
-representation of all table views: ![](create_run/editors_2.png)
+click menu.  
+Double click on file in Project Explorer will open file's editor.  
+RED consists of 2 different modes of editing: a Table (Ride-like style) and
+Text style.  At the bottom of opened editor, there are list of tabs.Rightmost
+opens text editor(Source),others are for Table syles.  
+By default Source editor is used when Test Suite file is opened.
+![](create_run/editors_1.png) Source view displays text representation of all
+table views: ![](create_run/editors_2.png)
 
 #### Content assistant
 
