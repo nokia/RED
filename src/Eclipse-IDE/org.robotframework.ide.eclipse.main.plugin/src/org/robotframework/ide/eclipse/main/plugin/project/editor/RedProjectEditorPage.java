@@ -20,8 +20,6 @@ import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -80,13 +78,7 @@ public abstract class RedProjectEditorPage {
 
     private RedFormToolkit createToolkit(final Composite parent) {
         final RedFormToolkit toolkit = new RedFormToolkit(parent.getDisplay());
-        parent.addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                toolkit.dispose();
-            }
-        });
+        parent.addDisposeListener(e -> toolkit.dispose());
         return toolkit;
     }
 

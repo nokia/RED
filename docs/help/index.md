@@ -8,7 +8,7 @@
   * [First steps with RED](/first_steps/first_steps.md)
     * [Download and install](/first_steps/download_install.md)
     * [Eclipse principles](/first_steps/eclipse_principles.md)
-    * [Establishing environment](/first_steps/establishing_environment.md)
+    * [Setting up environment](/first_steps/setting_up_environment.md)
     * [Create project, add test and run](/first_steps/create_run.md)
     * [Preferences and red.xml](/first_steps/preferences_misc.md)
   * [User guide](/user_guide/user_guide.md)

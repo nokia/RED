@@ -20,8 +20,6 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -83,12 +81,7 @@ class HyperlinkDialog extends PopupDialog {
         viewer.setContentProvider(new HyperlinksContentProvider());
         final IDoubleClickListener doubleClickListener = createDoubleClickListener();
         viewer.addDoubleClickListener(doubleClickListener);
-        viewer.getTable().addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                viewer.removeDoubleClickListener(doubleClickListener);
-            }
-        });
+        viewer.getTable().addDisposeListener(e -> viewer.removeDoubleClickListener(doubleClickListener));
 
         ViewerColumnsFactory.newColumn("")
                 .labelsProvidedBy(new HyperlinksLabelProvider())
@@ -105,7 +98,7 @@ class HyperlinkDialog extends PopupDialog {
 
     private IDoubleClickListener createDoubleClickListener() {
         return new IDoubleClickListener() {
-            
+
             @Override
             public void doubleClick(final DoubleClickEvent event) {
                 final RedHyperlink hyperlinkToFollow = Selections.getSingleElement((IStructuredSelection)event.getSelection(), RedHyperlink.class);
