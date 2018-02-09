@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z-lo8BRiEeeZSZgUeG7ZOA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/9/18 12:20 PM
+Save-Time: 2/9/18 12:30 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -30,13 +30,13 @@ proc "check-buttons-enablement" [val apply_button] [val ok_button]{
 
 proc "check-args-in-run-config"{
 	get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
-	with [get-window "Run Configurations" | get-group "Executable file"] {
+	with [get-window "Run Configurations" | get-group "External script"] {
 	    get-editbox 
-	        -after [get-label "Setup executable file which will be used to run Robot Framework tests instead of interpreter selected above"] 
+	        -after [get-label "Executable file to run Robot Framework tests:"] 
 	        | get-property text 
 	        | equals [os-specific [concat $RED_workspace_path  "\\ExecutorTab\\scripts\\script_win.bat" ]  [concat $RED_workspace_path  "/ExecutorTab/scripts/script_lin.sh" ] ]
 	        | verify-true
-	    get-editbox -after [get-label "Additional executable file arguments:"] | get-property text | equals "a b" 
+	    get-editbox -after [get-label "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords."] | get-property text | equals "a b" 
 	        | verify-true
 	}
 	get-window "Run Configurations" | get-button Close | click
