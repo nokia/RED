@@ -1,10 +1,8 @@
 ## Remotely launched tests
 
-When **Robot Remote** launch configuration is launched it setups a simple
-server inside your RED instance to which execution events can be send from
-running Robot tests. Firstly you need to start this server and then the tests
-has to be executed (either manually or by any other automatic or semi-
-automatic means).
+When **Robot Remote** launch configuration is launched, it setups a simple
+server inside RED instance and listens execution events from remote
+TestRunnerAgent which runs Robot tests on remote host.
 
 ## Remote launch configuration
 
