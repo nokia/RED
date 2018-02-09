@@ -32,13 +32,7 @@ class RedDamagerRepairer extends DefaultDamagerRepairer {
             fixOverlappingRanges(presentation);
         } catch (final UnableToScanTokensException e) {
             // lets try to repaint
-            SwtThread.asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    viewer.invalidateTextPresentation();
-                }
-            });
+            SwtThread.asyncExec(() -> viewer.invalidateTextPresentation());
         }
     }
 

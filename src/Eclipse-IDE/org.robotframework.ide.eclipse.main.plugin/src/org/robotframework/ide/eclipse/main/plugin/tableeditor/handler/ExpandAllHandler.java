@@ -29,13 +29,8 @@ public class ExpandAllHandler extends DIParameterizedHandler<E4ExpandAllHandler>
             final Optional<TreeLayerAccessor> treeLayerAccessor = editor.getTreeLayerAccessor();
 
             if (treeLayerAccessor.isPresent()) {
-                editor.getSelectionLayerAccessor().preserveElementSelectionWhen(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        treeLayerAccessor.get().expandAll();
-                    }
-                });
+                editor.getSelectionLayerAccessor()
+                        .preserveElementSelectionWhen(() -> treeLayerAccessor.get().expandAll());
             }
         }
     }

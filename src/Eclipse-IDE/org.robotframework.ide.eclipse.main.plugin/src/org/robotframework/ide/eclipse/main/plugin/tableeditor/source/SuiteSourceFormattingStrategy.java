@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -23,11 +23,8 @@ import org.eclipse.jface.text.formatter.IFormattingStrategy;
 import org.eclipse.jface.text.formatter.IFormattingStrategyExtension;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 
 /**
  * @author Michal Anglart
@@ -137,7 +134,7 @@ public class SuiteSourceFormattingStrategy implements IFormattingStrategy, IForm
             return content;
         }
 
-        final Map<Integer, Integer> columnsLength = Maps.newHashMap();
+        final Map<Integer, Integer> columnsLength = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new StringReader(tabsFreeContent))) {
             String line = reader.readLine();
             while (line != null) {
@@ -148,7 +145,7 @@ public class SuiteSourceFormattingStrategy implements IFormattingStrategy, IForm
         } catch (final IOException e) {
             return content;
         }
-        
+
         try (BufferedReader reader = new BufferedReader(new StringReader(tabsFreeContent))) {
             final StringBuilder formattedContent = new StringBuilder();
             String line = reader.readLine();
@@ -174,7 +171,7 @@ public class SuiteSourceFormattingStrategy implements IFormattingStrategy, IForm
 
     private void updateCellLengths(final String line, final Map<Integer, Integer> columnsLength) {
         int column = 0;
-        for (final Integer length : getCellLenghts(line)) {
+        for (final Integer length : getCellLengths(line)) {
             final Integer maxLength = columnsLength.get(column);
             if (maxLength == null || maxLength.intValue() < length.intValue()) {
                 columnsLength.put(column, length);
@@ -184,15 +181,9 @@ public class SuiteSourceFormattingStrategy implements IFormattingStrategy, IForm
 
     }
 
-    private List<Integer> getCellLenghts(final String line) {
+    private List<Integer> getCellLengths(final String line) {
         final List<String> cells = Splitter.onPattern("  +").splitToList(line);
-        return newArrayList(Iterables.transform(cells, new Function<String, Integer>() {
-
-            @Override
-            public Integer apply(final String cellContent) {
-                return cellContent.length();
-            }
-        }));
+        return cells.stream().map(String::length).collect(Collectors.toList());
     }
 
     @Override

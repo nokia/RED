@@ -5,11 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
@@ -22,7 +20,6 @@ import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
-
 public class CodeReservedElementsProposalsProvider implements RedContentProposalProvider {
 
     private final IRowDataProvider<?> dataProvider;
@@ -32,7 +29,8 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
     }
 
     @Override
-    public RedContentProposal[] getProposals(final String contents, final int position, final AssistantContext context) {
+    public RedContentProposal[] getProposals(final String contents, final int position,
+            final AssistantContext context) {
         final String prefix = contents.substring(0, position);
 
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = createWordPredicate(
@@ -40,14 +38,12 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
         final List<? extends AssistProposal> reservedWordProposals = new RedCodeReservedWordProposals(
                 predicateWordHasToSatisfy).getReservedWordProposals(prefix);
 
-        final List<IContentProposal> proposals = new ArrayList<>();
-        for (final AssistProposal proposal : reservedWordProposals) {
-
+        return reservedWordProposals.stream().map(proposal -> {
             final String additionalSuffix = RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())
-                    ? " " : "";
-            proposals.add(new AssistProposalAdapter(proposal, additionalSuffix));
-        }
-        return proposals.toArray(new RedContentProposal[0]);
+                    ? " "
+                    : "";
+            return new AssistProposalAdapter(proposal, additionalSuffix);
+        }).toArray(RedContentProposal[]::new);
     }
 
     private AssistProposalPredicate<String> createWordPredicate(final NatTableAssistantContext context) {
