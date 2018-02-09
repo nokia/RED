@@ -24,8 +24,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -111,12 +109,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
 
     private RedFormToolkit createToolkit(final Composite parent) {
         final RedFormToolkit toolkit = new RedFormToolkit(parent.getDisplay());
-        parent.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                toolkit.dispose();
-            }
-        });
+        parent.addDisposeListener(e -> toolkit.dispose());
         return toolkit;
     }
 
@@ -143,12 +136,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
 
         final HeaderFilterSwitchAction filterSwitchAction = new HeaderFilterSwitchAction(filterSupport, isFilteringEnabled, eventBroker);
         ContextInjectionFactory.inject(filterSwitchAction, context);
-        form.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                ContextInjectionFactory.uninject(filterSwitchAction, context);
-            }
-        });
+        form.addDisposeListener(e -> ContextInjectionFactory.uninject(filterSwitchAction, context));
 
         form.getMenuManager().add(filterSwitchAction);
 
