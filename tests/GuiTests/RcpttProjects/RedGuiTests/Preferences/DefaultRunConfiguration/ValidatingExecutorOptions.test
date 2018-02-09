@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z-lo8BRiEeeZSZgUeG7ZOA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/9/18 12:30 PM
+Save-Time: 2/9/18 12:41 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -156,7 +156,7 @@ check-args-in-run-config
 
 //change path to file (simple word)
 get-preferences-menu | click
-get-window Preferences | get-group "Executor tab" | get-editbox -after [get-label "Executable file:"] | set-text hello
+get-window Preferences | get-group "Executor tab" | get-editbox -after [get-label "Executable file to run Robot Framework tests:"] | set-text hello
 get-window Preferences | get-editbox -index 1 | get-property text | equals "Value must be an existing file" 
     | verify-true
 
