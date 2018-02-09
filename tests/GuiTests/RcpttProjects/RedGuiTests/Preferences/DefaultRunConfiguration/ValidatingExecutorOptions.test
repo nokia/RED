@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z-lo8BRiEeeZSZgUeG7ZOA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/9/18 1:18 PM
+Save-Time: 2/9/18 1:30 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -210,7 +210,7 @@ get-window "Run Configurations" | get-group "External script" | get-editbox
     | equals  [format "%s%sExecutorTab%sother scripts%s%s" $RED_workspace_path $sys_sep $sys_sep $sys_sep [os-specific "special script!.bat" "9 9&jk.sh"]]
     | verify-true
 //args    
-get-window "Run Configurations" | get-group "Executable file" | get-editbox 
+get-window "Run Configurations" | get-group "Executable file to run Robot Framework tests:" | get-editbox 
     -after [get-label "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords."] | get-property text | equals "new 1 new2 new3" 
     | verify-true
     
