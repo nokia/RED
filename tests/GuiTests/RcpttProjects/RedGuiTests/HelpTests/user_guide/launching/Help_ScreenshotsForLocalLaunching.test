@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _dCes0BXWEeW05sQKg0mypw
-Element-Name: Help_ScreenshotsForCreate_Run
+Element-Name: Help_ScreenshotsForLocalLaunching
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
-Id: _ECAUoAvuEeiJZpWbsEmUhw
+Id: _YupysAzGEeieTKSIj8B2AQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/9/18 12:02 PM
+Save-Time: 2/9/18 11:54 AM
 Tags: help
 Testcase-Type: ecl
 
@@ -15,10 +15,8 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
- 
-
 global [val screenshot_base_folder[run-process-and-trim  "python" "-c"  "import os;print os.environ['WORKSPACE']" ]]
-[val screenshot_local_folder "/help_scr/first_steps/create_run/"]
+[val screenshot_local_folder [concat $sys_sep "help_scr" $sys_sep "user_guide" $sys_sep "launching" $sys_sep "images" $sys_sep]]
 
 
 proc "gui-view-screenshot" [val activePage] [val scr_path]{
@@ -34,35 +32,26 @@ proc "gui-view-screenshot" [val activePage] [val scr_path]{
   }
   
 }
-
 get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot"
 get-menu -path "Run/Run" | click
 wait  2000
-gui-view-screenshot "Console" "console_1.png"
-gui-view-screenshot "Message Log" "msg_log_1.png"
-
-
-get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" 
-    | double-click
-
-get-eclipse-window | get-object | invoke setSize 1200 750
-gui-view-screenshot "SimpleLoggingTestCase.robot" "editors_2.png"
-
-get-editor "SimpleLoggingTestCase.robot" | get-tab-folder | get-tab-item "Test Cases" | click
-gui-view-screenshot "SimpleLoggingTestCase.robot" "editors_1.png"
-get-eclipse-window | maximize 
-
-get-view "Execution View" | click
-with [get-view "Execution View"] {
-    get-button "Expand All" | click
-}
-gui-view-screenshot "Execution View" "exec_1.png"
 
 get-menu -path "Run/Run Configurations..." | click
 
 with [get-window "Run Configurations" ] {
-    get-object | invoke setSize 950 600 
-    get-object | save-screenshot [concat $screenshot_base_folder $screenshot_local_folder "run_configurations.png"]
+    get-object | invoke setSize 950 720 
+    get-object | save-screenshot [concat $screenshot_base_folder $screenshot_local_folder "local_config_robot.png"]
+}
+
+with [get-window "Run Configurations"] {
+    get-tab-folder | get-tab-item Listener | click
+    get-group "Test Runner Agent" | get-button "Use remote agent connection (custom server parameters)" | click
+    get-object | invoke setSize 950 720
+    get-object | save-screenshot [concat $screenshot_base_folder $screenshot_local_folder "local_config_listener.png"]
+    get-tab-folder | get-tab-item Executor | click
+    get-object | save-screenshot [concat $screenshot_base_folder $screenshot_local_folder "local_config_exec.png"]
+    get-tab-folder | get-tab-item Environment | click
+    get-object | save-screenshot [concat $screenshot_base_folder $screenshot_local_folder "local_config_env.png"]             
 }
 
 with [get-window "Run Configurations"] {

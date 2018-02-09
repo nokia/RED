@@ -1,0 +1,42 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Help_ScreenshotsForRemoteLaunch
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3XP5IA11EeixLZPyze7ymQ
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 2/9/18 11:59 AM
+Tags: help
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+global [val screenshot_base_folder[run-process-and-trim  "python" "-c"  "import os;print os.environ['WORKSPACE']" ]]
+[val screenshot_local_folder [concat  $sys_sep "help_scr" $sys_sep "user_guide" $sys_sep "launching" $sys_sep "images" $sys_sep]]
+
+
+proc "gui-view-screenshot" [val activePage] [val scr_path]{
+  
+  loop [val index [int 0]] {
+    let [val folder [get-tab-folder -index $index]] {
+      let [val folderActivePage [$folder | get-property activePage -raw]] {
+        if [$folderActivePage | eq $activePage] {
+          $folder |get-object| save-screenshot [concat $screenshot_base_folder $screenshot_local_folder $scr_path]   //returning result
+        } -else { recur [$index | plus 1] }
+      }
+    }
+  }
+  
+}
+
+get-menu -path "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot Remote"
+    get-button "New launch configuration" | click
+    get-object | invoke setSize 900 670
+    get-object | save-screenshot [concat $screenshot_base_folder $screenshot_local_folder "remote_config.png"]
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
