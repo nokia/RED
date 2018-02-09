@@ -5,11 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Stream;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedFileLocationProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedLibraryProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -38,26 +37,24 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
     @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
-        final String prefix = contents.substring(0, position);
-
-        final List<IContentProposal> proposals = new ArrayList<>();
-
-        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
-        if (tableContext.getColumn() == 1 && isValidImportSetting(tableContext.getRow())) {
-
-            if (importType == SettingsGroup.LIBRARIES) {
-                new RedLibraryProposals(model).getLibrariesProposals(prefix)
-                        .stream()
-                        .map(AssistProposalAdapter::new)
-                        .forEach(adapter -> proposals.add(adapter));
-            }
-            RedFileLocationProposals.create(importType, model)
-                    .getFilesLocationsProposals(prefix)
-                    .stream()
-                    .map(AssistProposalAdapter::new)
-                    .forEach(adapter -> proposals.add(adapter));
+        if (!areApplicable((NatTableAssistantContext) context)) {
+            return new RedContentProposal[0];
         }
-        return proposals.toArray(new RedContentProposal[0]);
+
+        final String prefix = contents.substring(0, position);
+        final Stream<? extends AssistProposal> librariesProposals = importType == SettingsGroup.LIBRARIES
+                ? new RedLibraryProposals(model).getLibrariesProposals(prefix).stream()
+                : Stream.empty();
+        final Stream<? extends AssistProposal> fileLocationProposals = RedFileLocationProposals
+                .create(importType, model)
+                .getFilesLocationsProposals(prefix)
+                .stream();
+        return Stream.concat(librariesProposals, fileLocationProposals).map(AssistProposalAdapter::new).toArray(
+                RedContentProposal[]::new);
+    }
+
+    private boolean areApplicable(final NatTableAssistantContext tableContext) {
+        return tableContext.getColumn() == 1 && isValidImportSetting(tableContext.getRow());
     }
 
     private boolean isValidImportSetting(final int row) {
@@ -83,8 +80,7 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
 
     public static class LibrariesProposalsProvider extends ImportsProposalsProvider {
 
-        public LibrariesProposalsProvider(final RobotSuiteFile model,
-                final IRowDataProvider<?> dataProvider) {
+        public LibrariesProposalsProvider(final RobotSuiteFile model, final IRowDataProvider<?> dataProvider) {
             super(model, dataProvider, SettingsGroup.LIBRARIES);
         }
     }

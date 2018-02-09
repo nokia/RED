@@ -34,10 +34,10 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
         final String prefix = contents.substring(0, position);
-        final List<? extends AssistProposal> keywordsEntities = new RedKeywordProposals(suiteFile.get())
+        final List<? extends AssistProposal> keywordsProposals = new RedKeywordProposals(suiteFile.get())
                 .getKeywordProposals(prefix);
 
-        return keywordsEntities.stream()
+        return keywordsProposals.stream()
                 .map(proposal -> new AssistProposalAdapter(proposal,
                         () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal)))
                 .toArray(RedContentProposal[]::new);
