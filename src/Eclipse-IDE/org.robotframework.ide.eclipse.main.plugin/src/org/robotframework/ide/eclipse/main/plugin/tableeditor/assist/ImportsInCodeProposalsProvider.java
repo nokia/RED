@@ -27,9 +27,9 @@ public class ImportsInCodeProposalsProvider implements RedContentProposalProvide
             final AssistantContext context) {
 
         final String prefix = contents.substring(0, position);
-        final List<? extends AssistProposal> imports = new RedImportProposals(suiteFile)
+        final List<? extends AssistProposal> importProposals = new RedImportProposals(suiteFile)
                 .getImportsProposals(prefix);
 
-        return imports.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
+        return importProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
     }
 }

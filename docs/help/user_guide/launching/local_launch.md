@@ -1,11 +1,10 @@
 ## Locally launched tests
 
-When **Robot** launch configuration is launched it setups a simple server
-inside your RED instance to which execution events can be send from tests.
-Then it automatically starts the tests choosing suites/tests which has to be
-executed from the configuration. The tests are either started using some kind
-of python interpreter or using [user-defined
-script](local_launch_scripting.md).
+When **Robot** launch configuration is launched, it setups a simple server
+inside RED instance to which execution events can be send from tests. Then it
+automatically starts the tests choosing suites/tests which has to be executed
+from the configuration. The tests are either started using some kind of python
+interpreter or using [user-defined script](local_launch_scripting.md).
 
 ### Robot launch configuration
 
@@ -35,10 +34,10 @@ At this tab following arguments can/have to be specified:
 
 ![](images/local_config_listener.png)
 
-At this tab one can specify how RED will setup the server for execution
-tracking. By default it will use localhost and some currently free port to
-start the server and wait for connection, but other host, port and timeout can
-be specified. This is especially useful when used together with [scripted
+At this tab, one can specify how RED will setup the server for execution
+tracking. By default it will use localhost and random free port to start the
+server and wait for connection, but other host, port and timeout can be
+specified. This is especially useful when used together with [scripted
 launch](local_launch_scripting.md), when the script is setting up agent
 connection in its own way.
 
@@ -52,11 +51,12 @@ file of a project, or in preferences if red.xml does not specify it), or
 interpreter taken from `PATH` environment variable. Additionally freely
 defined arguments can be passed to interpreter.
 
-Moreover the whole call can be passed to a script (or other executable) with
-additional arguments. The script can be for example batch/bash script or any
-other executable. When this option is used whole call is passed to this script
-and it's up to script to properly run tests. This option can be used for
-example in order to integrate 3rd party tools into execution process.
+Moreover, the whole call can be passed to a script (or other executable) with
+additional arguments. The script/executable's command line paramters are the
+same as RED command line during normal test execution (path to python
+interpreter with robot call, parameters for suites/testcases etc.). Such
+script/external executable mechanism can be used to wrap Robot execution into
+other tools.
 
 For more information read [Local launches
 scripting](local_launch_scripting.md) topic in this guide.

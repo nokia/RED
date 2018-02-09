@@ -486,13 +486,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     }
 
     private Runnable tableInputIsReplaced() {
-        return new Runnable() {
-
-            @Override
-            public void run() {
-                refreshTable();
-                setDirty();
-            }
+        return () -> {
+            refreshTable();
+            setDirty();
         };
     }
 

@@ -6,8 +6,6 @@
 package org.robotframework.red.forms;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -63,12 +61,7 @@ public class Sections {
             }
         };
         section.addExpansionListener(expansionListener);
-        section.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                section.removeExpansionListener(expansionListener);
-            }
-        });
+        section.addDisposeListener(e -> section.removeExpansionListener(expansionListener));
     }
 
 }
