@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _FUFBcBYSEeeZSZgUeG7ZOA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/4/17 11:16 AM
+Save-Time: 2/12/18 10:32 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -60,9 +60,9 @@ set-dialog-result File [format "platform:/resource/ExecutorTab/scripts/%s" [os-s
 
 //add args and run test
 with [get-window "Run Configurations"] {
-    with [get-group "Executable file"] {
+    with [get-group "External script"] {
         get-button "Browse..." | click
-        get-editbox -after [get-label "Additional executable file arguments:"] | set-text "arg1 arg2 \"arg 3\" --arg4 sum"
+        get-editbox -after [get-label "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords."] | set-text "arg1 arg2 \"arg 3\" --arg4 sum"
     }
     get-button Apply | click
     get-button Run | click
