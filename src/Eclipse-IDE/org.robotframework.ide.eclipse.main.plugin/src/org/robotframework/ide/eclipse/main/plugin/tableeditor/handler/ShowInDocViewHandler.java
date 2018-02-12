@@ -10,7 +10,10 @@ import java.util.Optional;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -29,7 +32,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ShowInDocViewHandler.E4ShowInDocViewHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationView;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewWrapper;
@@ -59,24 +64,42 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                 return;
             }
 
-            if (selection != null) {
+            if (selection != null) { // some kind of table view open
                 final Optional<RobotFileInternalElement> selectedElement = Selections
                         .getOptionalFirstElement(selection, RobotFileInternalElement.class);
                 if (selectedElement.isPresent()) {
-                    showDoc(view, selectedElement.get());
+                    final SelectionLayerAccessor selectionLayerAccessor = ((RobotFormEditor) (PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage().getActiveEditor())).getSelectionLayerAccessor();
+                    final PositionCoordinate[] coordinates = selectionLayerAccessor.getSelectedPositions();
+                    final String cellLabel = coordinates.length > 0
+                            ? selectionLayerAccessor.getLabelFromCell(coordinates[0].getRowPosition(),
+                                    coordinates[0].getColumnPosition())
+                            : null;
+                    showDoc(view, selectedElement.get(), cellLabel);
                 }
             } else if (editor.getActiveEditor() instanceof SuiteSourceEditor) {
                 final SuiteSourceEditor sourceEditor = (SuiteSourceEditor) editor.getActiveEditor();
                 final int offset = sourceEditor.getViewer().getTextWidget().getCaretOffset();
                 final Optional<? extends RobotElement> element = suiteModel.findElement(offset);
                 if (element.isPresent()) {
-                    showDoc(view, (RobotFileInternalElement) element.get());
+                    String cellLabel = null;
+                    try {
+                        final Optional<IRegion> activeCellRegion = DocumentUtilities
+                                .findCellRegion(sourceEditor.getDocument(), suiteModel.isTsvFile(), offset);
+                        if (activeCellRegion.isPresent()) {
+                            cellLabel = sourceEditor.getDocument().get(activeCellRegion.get().getOffset(),
+                                    activeCellRegion.get().getLength());
+                        }
+                    } catch (final BadLocationException e) {
+                        throw new IllegalStateException("Could not find selected position in document", e);
+                    }
+                    showDoc(view, (RobotFileInternalElement) element.get(), cellLabel);
                 }
             }
-
         }
 
-        private void showDoc(final DocumentationView view, final RobotFileInternalElement robotFileInternalElement) {
+        private void showDoc(final DocumentationView view, final RobotFileInternalElement robotFileInternalElement,
+                final String cellLabel) {
             final Object linkedElement = robotFileInternalElement.getLinkedElement();
             if (linkedElement != null && linkedElement instanceof AModelElement<?>) {
                 final ModelType modelType = ((AModelElement<?>) linkedElement).getModelType();
@@ -84,7 +107,7 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                 if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW
                         || modelType == ModelType.TEST_CASE_EXECUTABLE_ROW) {
                     view.setShowLibdocEnabled();
-                    view.showLibdoc(robotFileInternalElement, "");
+                    view.showLibdoc(robotFileInternalElement, cellLabel);
                 } else if (modelType == ModelType.SUITE_DOCUMENTATION) {
                     view.showDocumentation((IDocumentationHolder) linkedElement,
                             robotFileInternalElement.getSuiteFile());
