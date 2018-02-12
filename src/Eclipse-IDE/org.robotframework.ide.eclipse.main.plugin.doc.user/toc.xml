@@ -67,7 +67,7 @@
           </topic>
           <topic href="doc/user_guide/launching/debug/breakpoints.html" label="Breakpoints">
           </topic>
-          <topic href="doc/user_guide/launching/debug/suspended_execution.html" label="Suspended execution">
+          <topic href="doc/user_guide/launching/debug/hitting_a_breakpoint.html" label="Hitting a breakpoint">
           </topic>
           <topic href="doc/user_guide/launching/debug/variables.html" label="Changing variables">
           </topic>
