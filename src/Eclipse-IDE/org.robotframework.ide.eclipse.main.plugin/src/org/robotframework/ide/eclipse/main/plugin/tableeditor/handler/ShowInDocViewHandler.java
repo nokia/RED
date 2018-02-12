@@ -85,9 +85,9 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                     String cellLabel = null;
                     try {
                         final Optional<IRegion> activeCellRegion = DocumentUtilities
-                                .findCellRegion(editor.getSourceEditor().getDocument(), suiteModel.isTsvFile(), offset);
+                                .findCellRegion(sourceEditor.getDocument(), suiteModel.isTsvFile(), offset);
                         if (activeCellRegion.isPresent()) {
-                            cellLabel = editor.getSourceEditor().getDocument().get(activeCellRegion.get().getOffset(),
+                            cellLabel = sourceEditor.getDocument().get(activeCellRegion.get().getOffset(),
                                     activeCellRegion.get().getLength());
                         }
                     } catch (final BadLocationException e) {
