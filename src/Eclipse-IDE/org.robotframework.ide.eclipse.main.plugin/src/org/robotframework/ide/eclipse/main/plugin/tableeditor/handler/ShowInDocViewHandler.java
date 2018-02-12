@@ -68,8 +68,7 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                 final Optional<RobotFileInternalElement> selectedElement = Selections
                         .getOptionalFirstElement(selection, RobotFileInternalElement.class);
                 if (selectedElement.isPresent()) {
-                    final SelectionLayerAccessor selectionLayerAccessor = ((RobotFormEditor) (PlatformUI.getWorkbench()
-                            .getActiveWorkbenchWindow().getActivePage().getActiveEditor())).getSelectionLayerAccessor();
+                    final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
                     final PositionCoordinate[] coordinates = selectionLayerAccessor.getSelectedPositions();
                     final String cellLabel = coordinates.length > 0
                             ? selectionLayerAccessor.getLabelFromCell(coordinates[0].getRowPosition(),

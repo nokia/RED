@@ -361,14 +361,10 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     }
 
     private NewElementsCreator<RobotElement> newElementsCreator() {
-        return new NewElementsCreator<RobotElement>() {
-
-            @Override
-            public RobotElement createNew(final int addingTokenRowIndex) {
-                final RobotSettingsSection section = dataProvider.getInput();
-                commandsStack.execute(new CreateFreshSettingCommand(section, "Metadata", newArrayList("data")));
-                return section.getChildren().get(section.getChildren().size() - 1);
-            }
+        return addingTokenRowIndex -> {
+            final RobotSettingsSection section = dataProvider.getInput();
+            commandsStack.execute(new CreateFreshSettingCommand(section, "Metadata", newArrayList("data")));
+            return section.getChildren().get(section.getChildren().size() - 1);
         };
     }
 
