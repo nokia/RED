@@ -36,7 +36,7 @@ proc "check-args-in-run-config"{
 	        | get-property text 
 	        | equals [os-specific [concat $RED_workspace_path  "\\ExecutorTab\\scripts\\script_win.bat" ]  [concat $RED_workspace_path  "/ExecutorTab/scripts/script_lin.sh" ] ]
 	        | verify-true
-	    get-editbox -after [get-label "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords."] | get-property text | equals "a b" 
+	    get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] | get-property text | equals "a b" 
 	        | verify-true
 	}
 	get-window "Run Configurations" | get-button Close | click
@@ -78,7 +78,7 @@ proc "compare-console"{
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Launching/Default Launch Configurations"
 
-//check if all boxes by defaul are empty
+//check if all boxes by default are empty
 with [get-window Preferences | get-group "Executor tab"] {
     get-editbox -after [get-label "Executable file to run Robot Framework tests:"] | get-property text | equals "" | verify-true
     get-editbox -after [get-label "Additional executable file arguments:"] | get-property text | equals "" | verify-true
@@ -95,7 +95,7 @@ get-window Preferences | get-group "Executor tab" | get-button "Browse..." | cli
 check-if-no-error-is-shown
 check-buttons-enablement -apply_button true -ok_button true
 
-//add args sepearte by double spaces - no errors
+//add args separated by double spaces - no errors
 get-window Preferences | get-group "Executor tab" | get-editbox 
     -after [get-label "Additional executable file arguments:"] | set-text "a  b"
 check-if-no-error-is-shown
@@ -211,7 +211,7 @@ get-window "Run Configurations" | get-group "External script" | get-editbox
     | verify-true
 //args    
 get-window "Run Configurations" | get-group "External script" | get-editbox 
-    -after [get-label "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords."] | get-property text | equals "new 1 new2 new3" 
+    -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] | get-property text | equals "new 1 new2 new3" 
     | verify-true
     
 //check that old config contains old values    
