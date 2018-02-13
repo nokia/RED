@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -18,8 +17,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertEmptyToSetting extends EditorCommand {
-
-    private final IEventBroker eventBroker;
 
     private final RobotEmptyLine empty;
 
@@ -39,7 +36,7 @@ public class ConvertEmptyToSetting extends EditorCommand {
 
         final int index = empty.getIndex();
         parent.removeChild(empty);
-        newSetting = parent.createSetting(index, settingName, newArrayList(), "");
+        newSetting = parent.createSetting(index, settingName, new ArrayList<>(), "");
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newSetting).send(
                 RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);

@@ -25,7 +25,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     private final int index;
 
     private final String value;
-    
+
     private final List<EditorCommand> undoCommands = new ArrayList<>();
 
     public SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
@@ -39,7 +39,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         final RobotDefinitionSetting setting = definition.getArgumentsSetting();
 
-        final List<String> currentArguments = setting == null ? new ArrayList<String>() : setting.getArguments();
+        final List<String> currentArguments = setting == null ? new ArrayList<>() : setting.getArguments();
         final List<String> newArguments = SetKeywordCallArgumentCommand2.prepareArgumentsList(currentArguments, index,
                 value);
         final boolean areAllEmpty = areAllEmpty(newArguments);
@@ -87,7 +87,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     public List<EditorCommand> getUndoCommands() {
         return undoCommands;
     }
-    
+
     private static class CreateArgumentSettingCommand extends EditorCommand {
 
         private final RobotKeywordDefinition definition;

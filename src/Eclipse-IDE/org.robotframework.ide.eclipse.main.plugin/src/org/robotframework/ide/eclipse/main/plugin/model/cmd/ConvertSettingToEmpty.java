@@ -17,8 +17,6 @@ import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertSettingToEmpty extends EditorCommand {
 
-    private final IEventBroker eventBroker;
-
     private final RobotKeywordCall call;
 
     private final String emptyName;
