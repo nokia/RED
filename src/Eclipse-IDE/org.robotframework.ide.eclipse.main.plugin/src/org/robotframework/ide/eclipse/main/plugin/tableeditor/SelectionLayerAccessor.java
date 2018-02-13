@@ -156,11 +156,12 @@ public class SelectionLayerAccessor {
 
     public void preserveSelectionWhen(final Runnable operation,
             final Function<PositionCoordinate, PositionCoordinate> mapper) {
+        final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
         operation.run();
         // this has to be done separately, because it will hit locks on
         // some layers which can be already locked, so we have to schedule it
         // for later (example: adding element using key press hangs the main thread)
-        SwtThread.asyncExec(() -> reestablishSelection(mapper));
+        SwtThread.asyncExec(() -> reestablishSelection(positions, mapper));
     }
 
     public void preserveElementSelectionWhen(final Runnable operation) {
@@ -184,7 +185,7 @@ public class SelectionLayerAccessor {
         operation.run();
         SwtThread.asyncExec(() -> {
             selectionProvider.setSelection(selectionToRestore);
-            reestablishSelection(Function.identity());
+            reestablishSelection(selectionLayer.getSelectedCellPositions(), Function.identity());
         });
     }
 
@@ -203,7 +204,8 @@ public class SelectionLayerAccessor {
         operation.run();
         SwtThread.asyncExec(() -> {
             selectionProvider.setSelection(new StructuredSelection(elementToSelect));
-            reestablishSelection(coordinate -> new PositionCoordinate(selectionLayer, 0, coordinate.getRowPosition()));
+            reestablishSelection(selectionLayer.getSelectedCellPositions(),
+                    coordinate -> new PositionCoordinate(selectionLayer, 0, coordinate.getRowPosition()));
         });
     }
 
@@ -213,7 +215,7 @@ public class SelectionLayerAccessor {
         SwtThread.asyncExec(() -> {
             final Set<Integer> columns = newHashSet(Ints.asList(selectionLayer.getSelectedColumnPositions()));
             selectionProvider.setSelection(new StructuredSelection(elementToSelect));
-            reestablishSelection(
+            reestablishSelection(selectionLayer.getSelectedCellPositions(),
                     coordinate -> columns.contains(coordinate.getColumnPosition())
                             ? new PositionCoordinate(selectionLayer, coordinate.getColumnPosition(),
                                     coordinate.getRowPosition())
@@ -230,13 +232,14 @@ public class SelectionLayerAccessor {
         }
     }
 
-    private void reestablishSelection(final Function<PositionCoordinate, PositionCoordinate> mapper) {
+    private void reestablishSelection(final PositionCoordinate[] positions,
+            final Function<PositionCoordinate, PositionCoordinate> mapper) {
         final PositionCoordinate anchor = selectionLayer.getSelectionAnchor();
         final int anchorColumn = anchor.getColumnPosition();
         final int anchorRow = anchor.getRowPosition();
 
         // transform, remove nulls, remove duplicates, sort
-        final List<PositionCoordinate> transformedCoordinates = Stream.of(selectionLayer.getSelectedCellPositions())
+        final List<PositionCoordinate> transformedCoordinates = Stream.of(positions)
                 .map(mapper)
                 .filter(notNull())
                 .distinct()
