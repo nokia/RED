@@ -29,7 +29,7 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     private final String comment;
 
     private final int index;
-    
+
     private RobotKeywordCall newKeywordCall;
 
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent) {
@@ -37,7 +37,7 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     }
 
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final int index) {
-        this(parent, index, "", new ArrayList<String>(), "");
+        this(parent, index, "", new ArrayList<>(), "");
     }
 
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final int index,
