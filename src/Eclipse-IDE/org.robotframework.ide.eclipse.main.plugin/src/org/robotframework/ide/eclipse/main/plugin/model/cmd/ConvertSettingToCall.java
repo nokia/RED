@@ -17,8 +17,6 @@ import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertSettingToCall extends EditorCommand {
 
-    private final IEventBroker eventBroker;
-
     private final RobotDefinitionSetting setting;
 
     private final String name;

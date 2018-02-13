@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +21,7 @@ public class DeleteKeywordCallCommand extends EditorCommand {
 
     private final String eventTopic;
 
-    protected List<Integer> deletedCallsIndexes = newArrayList();
+    protected final List<Integer> deletedCallsIndexes = new ArrayList<>();
 
     public DeleteKeywordCallCommand(final List<? extends RobotKeywordCall> callsToDelete) {
         this(callsToDelete, RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED);
@@ -41,7 +40,7 @@ public class DeleteKeywordCallCommand extends EditorCommand {
         for (final RobotKeywordCall call : callsToDelete) {
             deletedCallsIndexes.add(call.getIndex());
         }
-        
+
         final Set<IRobotCodeHoldingElement> parentsWhereRemovalWasPerformed = new HashSet<>();
 
         for (final RobotKeywordCall call : callsToDelete) {
@@ -61,7 +60,7 @@ public class DeleteKeywordCallCommand extends EditorCommand {
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedCalls() {
-        final List<EditorCommand> commands = newArrayList();
+        final List<EditorCommand> commands = new ArrayList<>();
         if (callsToDelete.size() == deletedCallsIndexes.size()) {
             for (int i = 0; i < callsToDelete.size(); i++) {
                 final RobotKeywordCall call = callsToDelete.get(i);
