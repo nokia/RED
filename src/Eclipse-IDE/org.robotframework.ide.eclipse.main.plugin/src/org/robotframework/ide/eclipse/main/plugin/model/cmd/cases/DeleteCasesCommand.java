@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
@@ -18,8 +17,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class DeleteCasesCommand extends EditorCommand {
 
     private final List<RobotCase> casesToDelete;
-    
-    private List<Integer> deletedCasesIndexes = newArrayList();
+
+    private final List<Integer> deletedCasesIndexes = new ArrayList<>();
 
     public DeleteCasesCommand(final List<RobotCase> casesToDelete) {
         this.casesToDelete = casesToDelete;
@@ -33,10 +32,10 @@ public class DeleteCasesCommand extends EditorCommand {
         for (final RobotCase caseToDelete : casesToDelete) {
             deletedCasesIndexes.add(caseToDelete.getIndex());
         }
-        
+
         final RobotSuiteFileSection casesSection = casesToDelete.get(0).getParent();
         casesSection.getChildren().removeAll(casesToDelete);
-        
+
         final TestCaseTable linkedElement = (TestCaseTable) casesSection.getLinkedElement();
         for (final RobotCase caseToDelete : casesToDelete) {
             linkedElement.removeTest(caseToDelete.getLinkedElement());
@@ -44,14 +43,14 @@ public class DeleteCasesCommand extends EditorCommand {
 
         eventBroker.send(RobotModelEvents.ROBOT_CASE_REMOVED, casesSection);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(setupUndoCommandsForDeletedCases());
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedCases() {
-        final List<EditorCommand> commands = newArrayList();
+        final List<EditorCommand> commands = new ArrayList<>();
         if (casesToDelete.size() == deletedCasesIndexes.size()) {
             for (int i = 0; i < casesToDelete.size(); i++) {
                 final RobotCase robotCase = casesToDelete.get(i);

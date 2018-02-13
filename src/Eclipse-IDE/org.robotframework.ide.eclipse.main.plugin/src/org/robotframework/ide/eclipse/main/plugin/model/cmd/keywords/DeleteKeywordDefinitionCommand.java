@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.KeywordTable;
@@ -18,8 +17,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class DeleteKeywordDefinitionCommand extends EditorCommand {
 
     private final List<RobotKeywordDefinition> keywordsToDelete;
-    
-    private final List<Integer> deletedKeywordsIndexes = newArrayList();
+
+    private final List<Integer> deletedKeywordsIndexes = new ArrayList<>();
 
     public DeleteKeywordDefinitionCommand(final List<RobotKeywordDefinition> keywordsToDelete) {
         this.keywordsToDelete = keywordsToDelete;
@@ -34,10 +33,10 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
         for (final RobotKeywordDefinition def : keywordsToDelete) {
             deletedKeywordsIndexes.add(def.getIndex());
         }
-       
+
         final RobotSuiteFileSection keywordsSection = keywordsToDelete.get(0).getParent();
         keywordsSection.getChildren().removeAll(keywordsToDelete);
-        
+
         final KeywordTable keywordsTable = (KeywordTable) keywordsSection.getLinkedElement();
         for (final RobotKeywordDefinition keywordToDelete : keywordsToDelete) {
             keywordsTable.removeKeyword(keywordToDelete.getLinkedElement());
@@ -52,7 +51,7 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedDefinitions() {
-        final List<EditorCommand> commands = newArrayList();
+        final List<EditorCommand> commands = new ArrayList<>();
         if (keywordsToDelete.size() == deletedKeywordsIndexes.size()) {
             for (int i = 0; i < keywordsToDelete.size(); i++) {
                 final RobotKeywordDefinition def = keywordsToDelete.get(i);

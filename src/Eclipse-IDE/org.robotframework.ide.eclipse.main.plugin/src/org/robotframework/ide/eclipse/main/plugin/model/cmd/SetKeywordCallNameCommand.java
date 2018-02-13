@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -136,7 +134,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
     }
 
     private void removeFirstArgument(final RobotKeywordCall actualCall) {
-        final List<String> newArguments = newArrayList(actualCall.getArguments());
+        final List<String> newArguments = new ArrayList<>(actualCall.getArguments());
         if (!newArguments.isEmpty()) {
             newArguments.remove(0);
         }
@@ -152,7 +150,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        final List<EditorCommand> undoCommands = newArrayList();
+        final List<EditorCommand> undoCommands = new ArrayList<>();
         for (final EditorCommand executedCommand : executedCommands) {
             undoCommands.addAll(0, executedCommand.getUndoCommands());
         }
