@@ -353,23 +353,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     }
 
     private NewElementsCreator<RobotElement> newElementsCreator() {
-        return new NewElementsCreator<RobotElement>() {
-
-            @Override
-            public RobotElement createNew(final int addingTokenRowIndex) {
-                final RobotElement createdElement;
-                final AddingToken token = (AddingToken) dataProvider.getRowObject(addingTokenRowIndex);
-                if (token.isNested()) {
-                    final RobotKeywordDefinition keyword = (RobotKeywordDefinition) token.getParent();
-                    commandsStack.execute(new CreateFreshKeywordCallCommand(keyword));
-                    createdElement = keyword.getChildren().get(keyword.getChildren().size() - 1);
-
-                } else {
-                    final RobotKeywordsSection section = dataProvider.getInput();
-                    commandsStack.execute(new CreateFreshKeywordDefinitionCommand(section));
-                    createdElement = section.getChildren().get(section.getChildren().size() - 1);
-                }
-                return createdElement;
+        return addingTokenRowIndex -> {
+            final AddingToken token = (AddingToken) dataProvider.getRowObject(addingTokenRowIndex);
+            if (token.isNested()) {
+                final RobotKeywordDefinition keyword = (RobotKeywordDefinition) token.getParent();
+                commandsStack.execute(new CreateFreshKeywordCallCommand(keyword));
+                return keyword.getChildren().get(keyword.getChildren().size() - 1);
+            } else {
+                final RobotKeywordsSection section = dataProvider.getInput();
+                commandsStack.execute(new CreateFreshKeywordDefinitionCommand(section));
+                return section.getChildren().get(section.getChildren().size() - 1);
             }
         };
     }
