@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -90,7 +88,7 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
 
     public static List<String> prepareArgumentsList(final List<String> originalList, final int index,
             final String value) {
-        final List<String> arguments = newArrayList(originalList);
+        final List<String> arguments = new ArrayList<>(originalList);
         if (index >= arguments.size() && (value == null || value.isEmpty())) {
             return arguments;
         }

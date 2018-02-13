@@ -15,7 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.CommandExecutionException;
 
 public class RobotEditorCommandsStack {
-    
+
     private static final int COMMANDS_STACK_MAX_SIZE = 100;
 
     private final Deque<EditorCommand> _executedCommands = new ArrayDeque<>();
@@ -23,12 +23,11 @@ public class RobotEditorCommandsStack {
     private final Deque<EditorCommand> _toRedoCommands = new ArrayDeque<>();
 
     public void execute(final EditorCommand command) throws CommandExecutionException {
-        final IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class)
-                .getActiveLeaf();
+        final IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class).getActiveLeaf();
         ContextInjectionFactory.inject(command, context);
         command.execute();
-        
-        if(_executedCommands.size() > COMMANDS_STACK_MAX_SIZE) {
+
+        if (_executedCommands.size() > COMMANDS_STACK_MAX_SIZE) {
             _executedCommands.removeLast();
         }
 
@@ -67,8 +66,7 @@ public class RobotEditorCommandsStack {
 
     private void clear(final Deque<EditorCommand> stackToClear) {
         while (!stackToClear.isEmpty()) {
-            final IEclipseContext context = PlatformUI.getWorkbench()
-                    .getService(IEclipseContext.class).getActiveLeaf();
+            final IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class).getActiveLeaf();
             final EditorCommand command = stackToClear.pop();
             ContextInjectionFactory.uninject(command, context);
         }
