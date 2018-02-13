@@ -6,19 +6,19 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Mir2gA9oEeWFTuCZGHkLuQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 4:18 PM
+Save-Time: 2/7/18 11:41 AM
 
 ------=_.parameters.context-2e023de5-3294-36a9-ac1d-6701f05a40ee
 Content-Type: text/properties
 Entry-Name: .parameters.context
 
-#Fri Oct 20 16:18:59 CEST 2017
+#Wed Feb 07 11:41:49 CET 2018
 Save_changes_button=(Yes|Save)
 msg_log_regex_INFO=\\d{8} (\\d\\d\:){2}\\d\\d.\\d{3} \: INFO \: 
 Open_Perspective_button=(OK|Open)
 Apply_and_OK_in_preference=(OK)|(Apply and Close)
 OK_Clean_button=(OK|Clean)
-user_RCPTT_project_path=D\:\\RED_testy\\RcpttProjects\\RedGuiTests
+user_RCPTT_project_path=d\:\\RED-Src-git\\tests\\GuiTests\\RcpttProjects\\RedGuiTests\\
 is_eclipse_oxygen=True
 
 ------=_.parameters.context-2e023de5-3294-36a9-ac1d-6701f05a40ee--
