@@ -36,7 +36,8 @@
 	Bottom part of this path directly corresponds to the tree which can be seen in <b>Execution</b> view as 
 	depicted below:
 	</p>
-	<img src="images/debug_dbgview.png"/>
+	<img src="images/debug_debug_view.png"/><br>
+    <img src="images/debug_execution_view.png"/>
 	
 	<p>The bottom frame corresponds to <code>Project</code> suite (this is a directory in file system, so there is a
 	little directory decoration visible). Next frame corresponds to <code>Calculations</code> suite (which is a
@@ -60,7 +61,7 @@
 	variable the icon have different color assigned as visible on image below:
 	</p>
 	
-	<img src="images/debug_vars_types.png"/>
+	<img src="images/debug_variables.png"/>
 	<p>As you can see some of the variables are displayed under <b>Automatic Variables</b> node. This is a place
 	where all the variables which are built-in into the Robot are gathered together (refer to <a target="_blank" href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables" class="external">
 	RF User Guide</a>). All the user variables are displayed on top-level.
@@ -75,7 +76,7 @@
 	may be visible for all suite frames, however it may have different values as the suites are nested. 
 	</p>
 	
-	<p>For both dictionaries and lists the actual type of the python object is written in<b>Value</b> column. On the picture above
+	<p>For both dictionaries and lists the actual type of the python object is written in <b>Value</b> column. On the picture above
 	<b>DotDict[3]</b> for <code>&amp;{dictionary}</code> variable mean that in python this object has type <b>DotDict</b>, 
 	the rest mean that there are <code>3</code> elements inside it. Lists are labeled in the same way. 
 	Additionally you may display <b>Actual Type</b> column which would also show types of 
@@ -108,7 +109,6 @@
 		</li>
 	</ul>
 	
-	<img src="images/debug_variables.png"/>
 	
 	<h4>Variable types</h4>
 	<p>Scalar variables are assigned with provided value. In case of lists or dictionaries just use usual RobotFramework
@@ -116,11 +116,11 @@
 	</p>
 	<div class="code">1&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;4
 	</div>
-	<p>for list-variable will create a new list consisting 4 elements while writing:
+	<p>for list - variable will create a new list consisting 4 elements while writing:
 	</p>  
 	<div class="code">a=1&nbsp;&nbsp;&nbsp;&nbsp;b=2&nbsp;&nbsp;&nbsp;&nbsp;c=3
 	</div>
-	<p>for dictionary-variable will create a new dictionary consisting 3 key-value pairs. Alternatively list or 
+	<p>for dictionary - variable will create a new dictionary consisting 3 key-value pairs. Alternatively list or 
 	dictionary elements may be provided in comma-separated syntax using brackets: </br>
 	<div class="code">[1,2,3,4]	
 	and:</br>
