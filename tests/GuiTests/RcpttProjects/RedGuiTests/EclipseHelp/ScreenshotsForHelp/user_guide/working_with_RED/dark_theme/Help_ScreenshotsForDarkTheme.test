@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _i5HT0BFhEei5lb3IGvxDdQ
 Element-Name: Help_ScreenshotsForDarkTheme
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _HVhkkBC0EeiccMTRvAu1GQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/13/18 12:59 PM
+Save-Time: 2/14/18 11:46 AM
 Tags: help
 Testcase-Type: ecl
 
@@ -14,23 +15,8 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
-global [val screenshot_base_folder[run-process-and-trim  "python" "-c"  "import os;print os.environ['WORKSPACE']" ]]
-[val screenshot_local_folder [concat $sys_sep "help_scr" $sys_sep "user_guide" $sys_sep "working_with_RED" $sys_sep "dark_theme" $sys_sep ]]
+global [val screenshot_local_folder [concat $sys_sep "help_scr" $sys_sep "user_guide" $sys_sep "working_with_RED" $sys_sep "dark_theme" $sys_sep ]]
 
-
-proc "gui-view-screenshot" [val activePage] [val scr_path]{
-  
-  loop [val index [int 0]] {
-    let [val folder [get-tab-folder -index $index]] {
-      let [val folderActivePage [$folder | get-property activePage -raw]] {
-        if [$folderActivePage | eq $activePage] {
-          $folder |get-object| save-screenshot [concat $screenshot_base_folder $screenshot_local_folder $scr_path]   //returning result
-        } -else { recur [$index | plus 1] }
-      }
-    }
-  }
-  
-}
 
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Editor/Syntax Coloring"
