@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +28,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     public SetKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value) {
         this(keywordCall, index, value, true);
     }
-    
+
     protected SetKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value, final boolean shouldReplaceValue) {
         this.keywordCall = keywordCall;
         this.index = index;
@@ -57,11 +55,11 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
 
     private List<String> prepareArgumentsList(final RobotKeywordCall call, final String value, final int index, final boolean isSetting) {
         final List<String> arguments = createArgumentsList(call, index);
-        
+
         previousValue = index >= 0 && index < arguments.size() ? arguments.get(index) : value;
 
         fillArgumentsList(value, index, arguments, shouldReplaceValue);
-        
+
         checkIfPreviousCommandWasAddingNewValue();
         checkIfUndoCommandShouldAddArgument(arguments.get(index), isSetting);
 
@@ -69,13 +67,13 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     }
 
     public static List<String> createArgumentsList(final RobotKeywordCall call, final int index) {
-        final List<String> arguments = call == null ? new ArrayList<String>() : newArrayList(call.getArguments());
+        final List<String> arguments = call == null ? new ArrayList<>() : new ArrayList<>(call.getArguments());
         for (int i = arguments.size(); i <= index; i++) {
             arguments.add("\\");
         }
         return arguments;
     }
-    
+
     public static void fillArgumentsList(final String value, final int index, final List<String> arguments,
             final boolean shouldReplaceValue) {
         final String newValue = value == null || value.trim().isEmpty() ? "\\" : value;
@@ -91,13 +89,13 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             arguments.set(i, null);
         }
     }
-    
+
     private void checkIfPreviousCommandWasAddingNewValue() {
         if(!shouldReplaceValue) {
             previousValue = null; // when new value was not replaced but added by undo command, then redo command should remove this value
         }
     }
-    
+
     private void checkIfUndoCommandShouldAddArgument(final String currentArgValue, final boolean isSetting) {
         if(currentArgValue != null && currentArgValue.equals("\\") && value == null && !isFirstArgumentInKeywordBasedSetting(isSetting)) {
             shouldReplaceValue = false; // when arg is deleted not on last position, undo command will add new arg on this position and shifts other args to the right
@@ -105,7 +103,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             shouldReplaceValue = true; // reset the flag for future undo commands
         }
     }
-    
+
     private boolean isFirstArgumentInKeywordBasedSetting(final boolean isSetting) {
         if (isSetting && ((RobotDefinitionSetting) keywordCall).isKeywordBased()) {
             return index == 0;
