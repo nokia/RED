@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RTKmUJNnEeWXp4iZQnTw0A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 10:21 AM
+Save-Time: 2/14/18 4:07 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -118,5 +118,5 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     type-text " "
 }
 
-wait-for-zero-items -times 2 -delay 1000
+wait-for-zero-items -times 4 -delay 1000
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
