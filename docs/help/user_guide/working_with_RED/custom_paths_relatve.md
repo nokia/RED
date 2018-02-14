@@ -1,6 +1,6 @@
 ## Custom python/class paths and path relativeness
 
-Settings available in red.xml -> Referenced Libraries.
+Settings available in **red.xml -> Referenced Libraries**
 
 ### Custom python/class paths
 

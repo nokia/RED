@@ -26,11 +26,8 @@ Red.xml can be viewed using default editor by double click on file. It will
 load red.xml with graphical representation of file content. Alternatively, as
 this is xml file, it can be viewed and edited by any text editor.
 
-Red.xml is divided in 4 tabs: General, Referenced Libraries, Variable files,
-Validation.
-
-![](red_xml/red_xml_editor.png)  
-  
+Red.xml is divided in 4 groups,with respectful tabs at the bottom of the
+window: General, Referenced Libraries, Variable files, Validation.
 
 ### General tab
 
