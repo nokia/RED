@@ -30,7 +30,7 @@ with [get-window "Run Configurations"] {
     get-window "Run Configurations" | get-group "External script" | get-button "Browse..." | click
     
     
-    get-group "External script" | get-editbox -after [get-label "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords."] 
+    get-group "External script" | get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] 
         | set-text [format "%s %s" $RED_workspace_path $RED_workspace_path]
     get-button Apply | click
     get-button Run | click
@@ -66,7 +66,7 @@ get-view Console | get-text-viewer | get-property text
 get-view Console | get-text-viewer | get-property text 
     | contains  "This is end of script" | verify-true
 
-// script was run but no result is shown in execution view and messgae log       
+// script was run but no result is shown in execution view and message log       
 get-view "Execution View" | get-tree | get-property itemCount | equals 0 | verify-true
 get-view "Message Log" | click
 get-view "Message Log" | get-editbox | get-property text | equals "" | verify-true

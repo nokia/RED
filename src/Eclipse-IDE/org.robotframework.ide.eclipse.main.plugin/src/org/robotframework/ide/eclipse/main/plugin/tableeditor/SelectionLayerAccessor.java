@@ -6,8 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newIdentityHashSet;
 
@@ -36,7 +34,6 @@ import com.google.common.primitives.Ints;
 
 /**
  * @author Michal Anglart
- *
  */
 public class SelectionLayerAccessor {
 
@@ -47,8 +44,7 @@ public class SelectionLayerAccessor {
     private final ISelectionProvider selectionProvider;
 
     public SelectionLayerAccessor(final IRowDataProvider<? extends Object> dataProvider,
-            final SelectionLayer selectionLayer,
-            final ISelectionProvider selectionProvider) {
+            final SelectionLayer selectionLayer, final ISelectionProvider selectionProvider) {
         this.dataProvider = dataProvider;
         this.selectionLayer = selectionLayer;
         this.selectionProvider = selectionProvider;
@@ -165,7 +161,7 @@ public class SelectionLayerAccessor {
         // this has to be done separately, because it will hit locks on
         // some layers which can be already locked, so we have to schedule it
         // for later (example: adding element using key press hangs the main thread)
-        SwtThread.asyncExec(() -> reestablishSelection(selectionLayer, positions, mapper));
+        SwtThread.asyncExec(() -> reestablishSelection(positions, mapper));
     }
 
     public void preserveElementSelectionWhen(final Runnable operation) {
@@ -175,23 +171,22 @@ public class SelectionLayerAccessor {
     public void preserveElementsParentSelectionWhen(final Class<? extends RobotElement> parentClass,
             final Runnable operation) {
         final ISelection oldSelection = selectionProvider.getSelection();
-
-        final List<Object> elements = Selections.getElements((IStructuredSelection) oldSelection, Object.class);
+        final List<Object> elements = Selections.getElements((IStructuredSelection) oldSelection, Object.class)
+                .stream()
+                .map(element -> getAncestorOfClass(parentClass, element))
+                .filter(notNull())
+                .collect(Collectors.toList());
         final Set<Object> toSelect = newIdentityHashSet();
-        for (final Object element : elements) {
-            toSelect.add(getAncestorOfClass(parentClass, element));
-        }
-        final StructuredSelection selection = new StructuredSelection(newArrayList(filter(toSelect, notNull())));
-
-        preserveElementsSelection(operation, selection);
+        toSelect.addAll(elements);
+        preserveElementsSelection(operation, new StructuredSelection(toSelect.toArray()));
     }
 
     private void preserveElementsSelection(final Runnable operation, final ISelection selectionToRestore) {
         operation.run();
         selectionProvider.setSelection(selectionToRestore);
-
         final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
-        SwtThread.asyncExec(() -> reestablishSelection(selectionLayer, positions, Function.identity()));
+        // this has to be done separately
+        SwtThread.asyncExec(() -> reestablishSelection(positions, Function.identity()));
     }
 
     private Object getAncestorOfClass(final Class<? extends RobotElement> parentClass, final Object element) {
@@ -209,8 +204,7 @@ public class SelectionLayerAccessor {
         operation.run();
         SwtThread.asyncExec(() -> {
             selectionProvider.setSelection(new StructuredSelection(elementToSelect));
-            final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
-            reestablishSelection(selectionLayer, newlySelected,
+            reestablishSelection(selectionLayer.getSelectedCellPositions(),
                     coordinate -> new PositionCoordinate(selectionLayer, 0, coordinate.getRowPosition()));
         });
     }
@@ -221,15 +215,11 @@ public class SelectionLayerAccessor {
         SwtThread.asyncExec(() -> {
             final Set<Integer> columns = newHashSet(Ints.asList(selectionLayer.getSelectedColumnPositions()));
             selectionProvider.setSelection(new StructuredSelection(elementToSelect));
-            final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
-
-            reestablishSelection(selectionLayer, newlySelected, coordinate -> {
-                if (columns.contains(coordinate.getColumnPosition())) {
-                    return new PositionCoordinate(selectionLayer, coordinate.getColumnPosition(),
-                            coordinate.getRowPosition());
-                }
-                return null;
-            });
+            reestablishSelection(selectionLayer.getSelectedCellPositions(),
+                    coordinate -> columns.contains(coordinate.getColumnPosition())
+                            ? new PositionCoordinate(selectionLayer, coordinate.getColumnPosition(),
+                                    coordinate.getRowPosition())
+                            : null);
         });
     }
 
@@ -242,12 +232,11 @@ public class SelectionLayerAccessor {
         }
     }
 
-    private void reestablishSelection(final SelectionLayer layer, final PositionCoordinate[] positions,
+    private void reestablishSelection(final PositionCoordinate[] positions,
             final Function<PositionCoordinate, PositionCoordinate> mapper) {
-        final PositionCoordinate anchor = layer.getSelectionAnchor();
+        final PositionCoordinate anchor = selectionLayer.getSelectionAnchor();
         final int anchorColumn = anchor.getColumnPosition();
         final int anchorRow = anchor.getRowPosition();
-        layer.clear();
 
         // transform, remove nulls, remove duplicates, sort
         final List<PositionCoordinate> transformedCoordinates = Stream.of(positions)
@@ -257,14 +246,16 @@ public class SelectionLayerAccessor {
                 .sorted((o1, o2) -> Integer.compare(o2.getColumnPosition(), o1.getColumnPosition()))
                 .collect(Collectors.toList());
 
+        selectionLayer.clear();
+
         boolean shouldAdd = false;
         for (final PositionCoordinate coordinate : transformedCoordinates) {
-            layer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(),
+            selectionLayer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(),
                     coordinate.getRowPosition(), false, shouldAdd));
             shouldAdd = true;
         }
-        if (layer.isCellPositionSelected(anchorColumn, anchorRow)) {
-            layer.moveSelectionAnchor(anchorColumn, anchorRow);
+        if (selectionLayer.isCellPositionSelected(anchorColumn, anchorRow)) {
+            selectionLayer.moveSelectionAnchor(anchorColumn, anchorRow);
         }
     }
 }

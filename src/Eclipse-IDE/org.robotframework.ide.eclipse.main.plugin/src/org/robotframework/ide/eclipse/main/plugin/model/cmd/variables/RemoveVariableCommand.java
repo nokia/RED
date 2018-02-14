@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +18,7 @@ public class RemoveVariableCommand extends EditorCommand {
 
     private final List<RobotVariable> variablesToDelete;
 
-    private List<Integer> deletedVariablesIndexes = newArrayList();
+    private final List<Integer> deletedVariablesIndexes = new ArrayList<>();
 
     public RemoveVariableCommand(final List<RobotVariable> variablesToDelete) {
         this.variablesToDelete = variablesToDelete;

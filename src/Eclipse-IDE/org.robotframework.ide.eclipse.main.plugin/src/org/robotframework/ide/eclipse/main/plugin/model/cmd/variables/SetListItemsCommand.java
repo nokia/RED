@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +21,8 @@ public class SetListItemsCommand extends EditorCommand {
     private final RobotVariable variable;
 
     private final List<String> newValue;
-    
-    private final List<String> previousValue = newArrayList(); 
+
+    private final List<String> previousValue = new ArrayList<>();
 
     public SetListItemsCommand(final RobotVariable variable, final List<String> newValue) {
         this.variable = variable;
@@ -39,11 +37,11 @@ public class SetListItemsCommand extends EditorCommand {
         for (final RobotToken value : ((ListVariable) variable.getLinkedElement()).getItems()) {
             previousValue.add(value.getText());
         }
-        
+
         new VariableTableModelUpdater().addOrSet(variable.getLinkedElement(), 0, newValue);
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(new SetListItemsCommand(variable, previousValue));

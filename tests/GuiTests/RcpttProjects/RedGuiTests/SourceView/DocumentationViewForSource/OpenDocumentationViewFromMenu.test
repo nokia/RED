@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _cKvDgIbgEeaPRdjThepTww
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/14/16 10:22 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 2/12/18 4:34 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,11 +33,8 @@ with [get-editor "checking_doc.robot" | get-text-viewer] {
     set-caret-pos 7 12
     hover-text 7 15
 }
-get-view "Documentation View" | click
-get-view "Message Log" | click
-get-editor "checking_doc.robot" | click
 get-view "Documentation View" | close
-get-view "Message Log" | click
+
 
 // check kw with empty doc 
 get-editor "checking_doc.robot" | get-text-viewer | get-menu "Show in Doc View" | click
@@ -52,11 +49,9 @@ with [get-editor "checking_doc.robot" | get-text-viewer] {
     set-caret-pos 16 6
     hover-text 16 6
 }
-get-view "Documentation View" | click
-get-view "Message Log" | click
-get-editor "checking_doc.robot" | click
+
 get-view "Documentation View" | close
-get-view "Message Log" | click
+
 
 // check Show in Doc for bultin kw
 get-editor "checking_doc.robot" | get-text-viewer | get-menu "Show in Doc View" | click
@@ -108,5 +103,90 @@ get-view "Documentation View" | get-editbox | get-property text | equals "Name: 
     + "Pprint support when ``repr`` is used is new in Robot Framework 2.8.6,\n"
     + "and it was changed to drop the ``u`` prefix and add the ``b`` prefix\n"
     + "in Robot Framework 2.9." | verify-true
+
+get-view "Documentation View" | close
+    
+//open res file    
+get-view "Project Explorer" | get-tree | select "RobotProject/res.robot" | double-click
+
+//set caret on Get Time - kw not in first cell
+with [get-editor "res.robot" | get-text-viewer] {
+    hover-text 9 18
+    set-caret-pos 9 18
+    get-menu -path "Show in Doc View" | click
+}
+get-view "Documentation View" | get-editbox | get-property text | contains "Name: Get Time\n"
+    + "Source: Library (BuiltIn)\n"
+    + "Arguments: [format=timestamp, time_=NOW]\n\n"
+    + "Returns the given time in the requested format.\n\n"  | verify-true
+   
+//set caret on  Catenate which is arg
+get-view "Documentation View" | close
+    
+with [get-editor "res.robot" | get-text-viewer] {
+    hover-text 10 28
+    set-caret-pos 10 26
+}
+
+get-editor "res.robot" | get-text-viewer | get-menu -path "Show in Doc View" | click
+get-view "Documentation View" | get-editbox | get-property text | contains "Name: Catenate\n"
+    + "Source: Library (BuiltIn)\n"
+    + "Arguments: [*items]\n\n"
+    + "Catenates the given items together and returns the resulted string.\n\n"
+    + "By default, items are catenated with spaces, but if the first item\n"
+    + "contains the string ``SEPARATOR=<sep>``, the separator ``<sep>`` is\n"
+    + "used instead. Items are converted into strings when necessary.\n\n" | verify-true
+   
+
+//=========================================================================================================    
+//go to table view
+get-view "Documentation View" | close    
+
+//go to kw Log which is in second cell
+get-editor "res.robot" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "res.robot/Keywords/kw_from_res_with_no_doc/Log Many" | click
+
+//open view
+with [get-editor "res.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    get-menu -path "Show in Doc View" | click
+}
+get-view "Documentation View" | get-editbox | get-property text | contains "Name: Log\n"
+    + "Source: Library (BuiltIn)\n"
+    + "Arguments: [message, level=INFO, html=False, console=False, repr=False]\n\n" | verify-true
+    
+
+//clsoe view
+get-view "Documentation View" | close
+
+//go to Get time
+with [get-editor "res.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Up
+    get-menu -path "Show in Doc View" | click
+}
+get-view "Documentation View" | get-editbox | get-property text | contains "Name: Get Time\n"
+    + "Source: Library (BuiltIn)\n"
+    + "Arguments: [format=timestamp, time_=NOW]\n\n"
+    + "Returns the given time in the requested format.\n\n"
+    + "*NOTE:* DateTime library added in Robot Framework 2.8.5 contains\n"
+    + "much more flexible keywords for getting the current date and time\n"
+    + "and for date and time handling in general.\n\n"
+    + "How time is returned is determined based on the given ``format``\n"
+    + "string as follows. Note that all checks are case-insensitive.\n\n" | verify-true
+    
+    
+// go to catenate    
+with [get-editor "res.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Down
+}
+get-view "Documentation View" | get-editbox | get-property text | contains "Name: Catenate\n"
+    + "Source: Library (BuiltIn)\n"
+    + "Arguments: [*items]\n\n"
+    + "Catenates the given items together and returns the resulted string.\n\n"
+    + "By default, items are catenated with spaces, but if the first item\n"
+    + "contains the string ``SEPARATOR=<sep>``, the separator ``<sep>`` is\n"
+    + "used instead. Items are converted into strings when necessary.\n\n" | verify-true  
+  
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

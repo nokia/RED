@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,8 +26,8 @@ public class RemoveDictVariableValueElementsCommand extends EditorCommand {
     private final RobotVariable variable;
 
     private final Collection<DictionaryKeyValuePair> elements;
-    
-    private List<Integer> removedElementsIndexes = newArrayList();
+
+    private final List<Integer> removedElementsIndexes = new ArrayList<>();
 
     public RemoveDictVariableValueElementsCommand(final RobotVariable variable,
             final Collection<DictionaryKeyValuePair> elements) {
@@ -47,21 +46,21 @@ public class RemoveDictVariableValueElementsCommand extends EditorCommand {
         for (final DictionaryKeyValuePair pair : elements) {
             removedElementsIndexes.add(dictVariable.getItems().indexOf(pair));
         }
-        
+
         for (final DictionaryKeyValuePair pair : elements) {
             dictVariable.removeKeyValuePair(pair);
         }
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(setupUndoCommandsForRemovedElements());
     }
 
     private List<EditorCommand> setupUndoCommandsForRemovedElements() {
-        final List<EditorCommand> commands = newArrayList();
+        final List<EditorCommand> commands = new ArrayList<>();
         if (elements.size() == removedElementsIndexes.size()) {
             int indexesCounter = 0;
             for (final DictionaryKeyValuePair pair : elements) {
