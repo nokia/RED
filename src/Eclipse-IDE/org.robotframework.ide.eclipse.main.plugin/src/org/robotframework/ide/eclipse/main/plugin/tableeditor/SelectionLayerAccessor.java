@@ -183,10 +183,10 @@ public class SelectionLayerAccessor {
 
     private void preserveElementsSelection(final Runnable operation, final ISelection selectionToRestore) {
         operation.run();
-        SwtThread.asyncExec(() -> {
-            selectionProvider.setSelection(selectionToRestore);
-            reestablishSelection(selectionLayer.getSelectedCellPositions(), Function.identity());
-        });
+        selectionProvider.setSelection(selectionToRestore);
+        final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
+        // this has to be done separately
+        SwtThread.asyncExec(() -> reestablishSelection(positions, Function.identity()));
     }
 
     private Object getAncestorOfClass(final Class<? extends RobotElement> parentClass, final Object element) {
