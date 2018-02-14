@@ -6,17 +6,17 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YLsq8BVSEeeZSZgUeG7ZOA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/12/18 10:34 AM
+Save-Time: 2/13/18 5:19 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
 proc "prepere-run-config"{
-	//export agent to worspace folder
+	//export agent to workspace folder
 	export-agent-to-folder -folder $RED_workspace_path
 	
-	//run test to creat run config
+	//run test to create run config
 	get-view "Project Explorer" | get-tree | select "ScriptProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
 	
 	//set path to bat script
@@ -29,11 +29,11 @@ proc "prepere-run-config"{
 	with [get-window "Run Configurations"] {
 	    with [get-group "External script"] {
 	        get-button "Browse..." | click
-	        get-editbox -after [get-label "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords."] | set-text [format " %s %s" $RED_workspace_path $user_folder] 
+	        get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] | set-text [format " %s %s" $RED_workspace_path $user_folder] 
 	    }
 	    get-button Apply | click
 	    
-	    //got Litner tab end set port to the same as in BAT
+	    //got Listener tab end set port to the same as in BAT
 	    get-tab-folder | get-tab-item Listener | click
 	    get-group "Test Runner Agent" | get-button "Use remote agent connection (custom server parameters)" | click
 	    get-button Apply | click

@@ -62,7 +62,7 @@ set-dialog-result File [format "platform:/resource/ExecutorTab/scripts/%s" [os-s
 with [get-window "Run Configurations"] {
     with [get-group "External script"] {
         get-button "Browse..." | click
-        get-editbox -after [get-label "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords."] | set-text "arg1 arg2 \"arg 3\" --arg4 sum"
+        get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] | set-text "arg1 arg2 \"arg 3\" --arg4 sum"
     }
     get-button Apply | click
     get-button Run | click

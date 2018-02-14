@@ -352,23 +352,16 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     private NewElementsCreator<RobotElement> newElementsCreator() {
-        return new NewElementsCreator<RobotElement>() {
-
-            @Override
-            public RobotElement createNew(final int addingTokenRowIndex) {
-                final RobotElement createdElement;
-                final AddingToken token = (AddingToken) dataProvider.getRowObject(addingTokenRowIndex);
-                if (token.isNested()) {
-                    final RobotCase testCase = (RobotCase) token.getParent();
-                    commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
-                    createdElement = testCase.getChildren().get(testCase.getChildren().size() - 1);
-
-                } else {
-                    final RobotCasesSection section = dataProvider.getInput();
-                    commandsStack.execute(new CreateFreshCaseCommand(section));
-                    createdElement = section.getChildren().get(section.getChildren().size() - 1);
-                }
-                return createdElement;
+        return addingTokenRowIndex -> {
+            final AddingToken token = (AddingToken) dataProvider.getRowObject(addingTokenRowIndex);
+            if (token.isNested()) {
+                final RobotCase testCase = (RobotCase) token.getParent();
+                commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
+                return testCase.getChildren().get(testCase.getChildren().size() - 1);
+            } else {
+                final RobotCasesSection section = dataProvider.getInput();
+                commandsStack.execute(new CreateFreshCaseCommand(section));
+                return section.getChildren().get(section.getChildren().size() - 1);
             }
         };
     }

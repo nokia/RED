@@ -171,7 +171,7 @@ class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab impl
         }, RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executableFileComposite);
 
-        executableFileArgumentsText = createLabeledText(group, "Additional executable file arguments.Python interpeter's and Robot parameters will be added afterwords.");
+        executableFileArgumentsText = createLabeledText(group, "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards.");
     }
 
     private Text createLabeledText(final Composite parent, final String label) {
