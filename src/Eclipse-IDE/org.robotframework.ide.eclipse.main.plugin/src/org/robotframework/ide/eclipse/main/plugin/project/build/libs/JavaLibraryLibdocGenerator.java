@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
@@ -26,8 +27,8 @@ public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
-        runtimeEnvironment.createLibdocForThirdPartyLibrary(libName, jarPath, additionalPaths,
-                targetSpecFile.getLocation().toFile());
+        runtimeEnvironment.createLibdoc(libName, jarPath, additionalPaths, targetSpecFile.getLocation().toFile(),
+                LibdocFormat.XML);
     }
 
     @Override
@@ -35,8 +36,8 @@ public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
             final EnvironmentSearchPaths additionalPaths)
             throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
-        runtimeEnvironment.createLibdocForThirdPartyLibraryForcibly(libName, jarPath, additionalPaths,
-                targetSpecFile.getLocation().toFile());
+        runtimeEnvironment.createLibdocForcibly(libName, jarPath, additionalPaths,
+                targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
     }
 
     @Override
