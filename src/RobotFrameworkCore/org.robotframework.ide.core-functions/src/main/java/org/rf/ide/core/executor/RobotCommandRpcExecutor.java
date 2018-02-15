@@ -39,6 +39,7 @@ import org.apache.xmlrpc.parser.TypeParser;
 import org.apache.xmlrpc.serializer.NullSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializerImpl;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
@@ -291,29 +292,25 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath) {
-        createLibdoc(resultFilePath, libName, libPath, new EnvironmentSearchPaths());
-    }
-
-    @Override
-    public void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName,
+    public void createLibdoc(final String resultFilePath, final LibdocFormat format, final String libName,
             final String libPath, final EnvironmentSearchPaths additionalPaths) {
-        createLibdoc(resultFilePath, libName, libPath, additionalPaths);
-    }
-
-    private void createLibdoc(final String resultFilePath, final String libName, final String libPath,
-            final EnvironmentSearchPaths additionalPaths) {
         try {
+            final File libdocFile = new File(resultFilePath);
+
             final String base64EncodedLibFileContent = (String) callRpcFunction("createLibdoc", libName,
-                    newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+                    format.name().toLowerCase(), newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
             final byte[] bytes = Base64.getDecoder().decode(base64EncodedLibFileContent);
             if (bytes.length > 0) {
-                final File libdocFile = new File(resultFilePath);
                 if (!libdocFile.exists()) {
                     libdocFile.createNewFile();
                 }
                 Files.write(bytes, libdocFile);
+            } else {
+                final String additional = libPath.isEmpty() ? ""
+                        : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
+                throw new RobotEnvironmentException(
+                        "Unable to generate library specification file for library '" + libName + "'" + additional);
             }
 
         } catch (final XmlRpcException e) {

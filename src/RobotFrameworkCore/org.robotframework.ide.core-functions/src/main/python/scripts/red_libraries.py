@@ -21,7 +21,7 @@ def get_standard_library_path(libname):
     return module.__file__
 
 
-def create_libdoc(libname):
+def create_libdoc(libname, format):
     from robot.libdoc import libdoc
     from tempfile import mkstemp
     from base64 import b64encode
@@ -31,7 +31,7 @@ def create_libdoc(libname):
     try:
         f, temp_lib_file_path = mkstemp()
         os.close(f)
-        libdoc(libname, temp_lib_file_path, format='XML')
+        libdoc(libname, temp_lib_file_path, format=format)
         if sys.version_info < (3, 0, 0):
             with open(temp_lib_file_path, 'r') as lib_file:
                 return b64encode(lib_file.read())
@@ -51,7 +51,8 @@ if __name__ == '__main__':
         print(get_standard_library_path(sys.argv[2]))
     elif sys.argv[1] == '-libdoc':
         libname = sys.argv[2]
-        paths = sys.argv[3:]
+        format = sys.argv[3]
+        paths = sys.argv[4:]
 
         sys.path = paths + sys.path
-        print(create_libdoc(libname))
+        print(create_libdoc(libname, format))

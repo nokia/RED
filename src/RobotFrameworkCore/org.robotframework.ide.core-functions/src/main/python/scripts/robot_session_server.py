@@ -274,10 +274,10 @@ def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, add
 @logargs
 @cleanup_modules
 @cleanup_sys_path
-def create_libdoc(libname, python_paths, class_paths):
+def create_libdoc(libname, format, python_paths, class_paths):
     import red_libraries
     __extend_paths(python_paths, class_paths)
-    return red_libraries.create_libdoc(libname)
+    return red_libraries.create_libdoc(libname, format)
 
 
 def __get_robot_version():
