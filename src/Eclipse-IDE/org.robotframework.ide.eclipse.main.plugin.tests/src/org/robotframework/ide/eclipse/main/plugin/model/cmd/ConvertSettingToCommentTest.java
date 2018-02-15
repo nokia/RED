@@ -65,8 +65,8 @@ public class ConvertSettingToCommentTest {
         assertThat(result.getComment()).isEqualTo("# [Teardown] | Log | 1 | #comment");
         assertThat(result).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
-                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE),
+                eq(ImmutableMap.of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -77,12 +77,12 @@ public class ConvertSettingToCommentTest {
                 .appendLine("  [Teardown]  Log  1  #comment")
                 .build();
         final RobotKeywordDefinition keyword = model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
-        final RobotKeywordCall keywordCall = keyword.getChildren().get(0);
-        final KeywordTeardown oldLinked = (KeywordTeardown) keywordCall.getLinkedElement();
+        final RobotDefinitionSetting setting = (RobotDefinitionSetting) keyword.getChildren().get(0);
+        final KeywordTeardown oldLinked = (KeywordTeardown) setting.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new ConvertSettingToComment(eventBroker, keywordCall, "# [Teardown]"))
+                .isInjectedInto(new ConvertSettingToComment(eventBroker, setting, "# [Teardown]"))
                 .execute();
 
         assertThat(keyword.getChildren().size()).isEqualTo(1);
@@ -97,8 +97,8 @@ public class ConvertSettingToCommentTest {
         assertThat(keyword.getLinkedElement().getTeardowns()).doesNotContain(oldLinked);
         assertThat(keyword.getLinkedElement().getExecutionContext().size()).isEqualTo(1);
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
-                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE),
+                eq(ImmutableMap.of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 }
