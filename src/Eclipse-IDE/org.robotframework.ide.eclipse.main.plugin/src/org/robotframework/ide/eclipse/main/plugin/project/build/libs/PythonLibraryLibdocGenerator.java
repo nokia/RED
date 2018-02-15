@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
@@ -31,8 +32,8 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final File libFile = new File(libPath);
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
-        runtimeEnvironment.createLibdocForThirdPartyLibrary(libName, additionalLocation, additionalPaths,
-                targetSpecFile.getLocation().toFile());
+        runtimeEnvironment.createLibdoc(libName, additionalLocation, additionalPaths,
+                targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
     }
 
     @Override
@@ -42,8 +43,8 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final File libFile = new File(libPath);
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
-        runtimeEnvironment.createLibdocForThirdPartyLibraryForcibly(libName, additionalLocation, additionalPaths,
-                targetSpecFile.getLocation().toFile());
+        runtimeEnvironment.createLibdocForcibly(libName, additionalLocation, additionalPaths,
+                targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
     }
 
     @Override
