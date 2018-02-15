@@ -21,6 +21,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.ConvertCallToComment;
@@ -102,7 +103,7 @@ public class ExecutablesRowHolderCommentService {
             if (column == 0) {
                 final EditorCommand convertToComment = callToUse.isExecutable()
                         ? new ConvertCallToComment(eventBroker, callToUse, value)
-                        : new ConvertSettingToComment(eventBroker, callToUse, value);
+                        : new ConvertSettingToComment(eventBroker, (RobotDefinitionSetting) callToUse, value);
                 convertToComment.execute();
                 executedCommands.add(convertToComment);
                 return;

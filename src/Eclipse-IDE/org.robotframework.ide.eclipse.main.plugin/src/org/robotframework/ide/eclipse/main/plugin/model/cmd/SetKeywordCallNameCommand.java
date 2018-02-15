@@ -65,54 +65,55 @@ public class SetKeywordCallNameCommand extends EditorCommand {
     private RobotKeywordCall getConvertedCall(final String nameToSet) {
         final int index = keywordCall.getIndex();
         final IRobotCodeHoldingElement parent = keywordCall.getParent();
-        if (looksLikeSetting(nameToSet)) {
-            changeToSetting(nameToSet);
-        } else if (looksLikeEmpty(nameToSet) && keywordCall.getArguments().isEmpty()
-                && keywordCall.getComment().isEmpty()) {
-            changeToEmpty(nameToSet);
-        } else {
-            changeToCall(nameToSet);
-        }
+        final EditorCommand command = createChangeCommand(nameToSet);
+        command.execute();
+        executedCommands.add(command);
         return parent.getChildren().get(index);
     }
 
-    private void changeToCall(final String nameToSet) {
-        if (keywordCall.isExecutable()) {
-            execute(new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet));
-        } else if (keywordCall instanceof RobotDefinitionSetting) {
-            execute(new ConvertSettingToCall(eventBroker, (RobotDefinitionSetting) keywordCall, nameToSet));
+    private EditorCommand createChangeCommand(final String nameToSet) {
+        if (looksLikeSetting(nameToSet)) {
+            return createChangeToSettingCommand(nameToSet);
+        } else if (looksLikeEmpty(nameToSet) && keywordCall.getArguments().isEmpty()
+                && keywordCall.getComment().isEmpty()) {
+            return createChangeToEmptyCommand(nameToSet);
         } else {
-            execute(new ConvertEmptyToCall(eventBroker, (RobotEmptyLine) keywordCall, nameToSet));
+            return createChangeToCallCommand(nameToSet);
         }
     }
 
-    private void changeToSetting(final String nameToSet) {
+    private EditorCommand createChangeToCallCommand(final String nameToSet) {
         if (keywordCall.isExecutable()) {
-            execute(new ConvertCallToSetting(eventBroker, keywordCall, nameToSet));
+            return new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet);
+        } else if (keywordCall instanceof RobotDefinitionSetting) {
+            return new ConvertSettingToCall(eventBroker, (RobotDefinitionSetting) keywordCall, nameToSet);
+        } else {
+            return new ConvertEmptyToCall(eventBroker, (RobotEmptyLine) keywordCall, nameToSet);
+        }
+    }
+
+    private EditorCommand createChangeToSettingCommand(final String nameToSet) {
+        if (keywordCall.isExecutable()) {
+            return new ConvertCallToSetting(eventBroker, keywordCall, nameToSet);
         } else if (keywordCall instanceof RobotDefinitionSetting) {
             if (isDifferentSetting(nameToSet)) {
-                execute(new ConvertSettingToSetting(eventBroker, keywordCall, nameToSet));
+                return new ConvertSettingToSetting(eventBroker, (RobotDefinitionSetting) keywordCall, nameToSet);
             } else {
-                execute(new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet));
+                return new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet);
             }
         } else {
-            execute(new ConvertEmptyToSetting(eventBroker, (RobotEmptyLine) keywordCall, nameToSet));
+            return new ConvertEmptyToSetting(eventBroker, (RobotEmptyLine) keywordCall, nameToSet);
         }
     }
 
-    private void changeToEmpty(final String nameToSet) {
+    private EditorCommand createChangeToEmptyCommand(final String nameToSet) {
         if (keywordCall.isExecutable()) {
-            execute(new ConvertCallToEmpty(eventBroker, keywordCall, nameToSet));
+            return new ConvertCallToEmpty(eventBroker, keywordCall, nameToSet);
         } else if (keywordCall instanceof RobotDefinitionSetting) {
-            execute(new ConvertSettingToEmpty(eventBroker, keywordCall, nameToSet));
+            return new ConvertSettingToEmpty(eventBroker, (RobotDefinitionSetting) keywordCall, nameToSet);
         } else {
-            execute(new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet));
+            return new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet);
         }
-    }
-
-    private void execute(final EditorCommand command) {
-        command.execute();
-        executedCommands.add(command);
     }
 
     private String extractNameFromArguments(final List<String> arguments) {
