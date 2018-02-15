@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _G53vcAdVEeiksYLFL8zyCg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/1/18 3:02 PM
+Save-Time: 2/15/18 2:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -65,6 +65,7 @@ get-view Problems | get-tree | get-item
 get-menu -path "Project/Clean..." | click
 get-window Clean | get-button Clean | click
 
+wait-for-errors -amount 2 -times 3 -delay 1000
 with [get-view Problems | get-tree] {
     get-item -path "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Library specification file was not generated for 'ZLib' library" | verify-true
