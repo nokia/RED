@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -21,18 +22,17 @@ import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertSettingToComment extends EditorCommand {
 
-    private final RobotKeywordCall settingCall;
-
-    private RobotKeywordCall commentCall;
+    private final RobotDefinitionSetting settingCall;
 
     private final String newName;
 
-    public ConvertSettingToComment(final IEventBroker eventBroker, final RobotKeywordCall settingCall,
+    private RobotKeywordCall commentCall;
+
+    public ConvertSettingToComment(final IEventBroker eventBroker, final RobotDefinitionSetting settingCall,
             final String name) {
         this.eventBroker = eventBroker;
         this.settingCall = settingCall;
         this.newName = name;
-        this.commentCall = null;
     }
 
     @Override

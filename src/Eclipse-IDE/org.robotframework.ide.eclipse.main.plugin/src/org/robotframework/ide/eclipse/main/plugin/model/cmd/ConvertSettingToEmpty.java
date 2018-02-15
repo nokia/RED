@@ -9,32 +9,33 @@ import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertSettingToEmpty extends EditorCommand {
 
-    private final RobotKeywordCall call;
+    private final RobotDefinitionSetting setting;
 
     private final String emptyName;
 
     private RobotEmptyLine newEmpty;
 
-    public ConvertSettingToEmpty(final IEventBroker eventBroker, final RobotKeywordCall call, final String emptyName) {
+    public ConvertSettingToEmpty(final IEventBroker eventBroker, final RobotDefinitionSetting setting,
+            final String emptyName) {
         this.eventBroker = eventBroker;
-        this.call = call;
+        this.setting = setting;
         this.emptyName = emptyName;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) call.getParent();
+        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) setting.getParent();
 
-        final int index = call.getIndex();
-        parent.removeChild(call);
+        final int index = setting.getIndex();
+        parent.removeChild(setting);
         newEmpty = parent.createEmpty(index, emptyName);
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newEmpty).send(
@@ -43,6 +44,6 @@ public class ConvertSettingToEmpty extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new ReplaceRobotKeywordCallCommand(eventBroker, newEmpty, call));
+        return newUndoCommands(new ReplaceRobotKeywordCallCommand(eventBroker, newEmpty, setting));
     }
 }
