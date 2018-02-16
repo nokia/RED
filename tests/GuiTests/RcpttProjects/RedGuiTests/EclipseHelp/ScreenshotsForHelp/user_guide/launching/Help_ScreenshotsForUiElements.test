@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _DywogA1_EeixLZPyze7ymQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/14/18 9:57 AM
+Save-Time: 2/16/18 2:47 PM
 Tags: help
 Testcase-Type: ecl
 
@@ -17,7 +17,7 @@ Entry-Name: .content
 
 
 global [val screenshot_local_folder [concat $sys_sep "help_scr" $sys_sep "user_guide" $sys_sep "launching" $sys_sep "images" $sys_sep]]
-
+create-sub-folders [concat $screenshot_base_folder $sys_sep $screenshot_local_folder]
 
 get-menu -path "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {

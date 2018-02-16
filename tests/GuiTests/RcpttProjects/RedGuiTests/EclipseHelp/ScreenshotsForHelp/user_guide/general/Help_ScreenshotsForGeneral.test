@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m3YB4Ay7EeicQoeBMqwYgA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/14/18 9:37 AM
+Save-Time: 2/16/18 2:46 PM
 Tags: help
 Testcase-Type: ecl
 
@@ -16,7 +16,7 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 global [val screenshot_local_folder [concat $sys_sep "help_scr" $sys_sep "user_guide" $sys_sep "general" $sys_sep]]
-
+create-sub-folders [concat $screenshot_base_folder $sys_sep $screenshot_local_folder]
 
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Editor"

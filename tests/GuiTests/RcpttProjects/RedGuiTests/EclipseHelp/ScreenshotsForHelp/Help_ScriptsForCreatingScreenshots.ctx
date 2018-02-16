@@ -6,11 +6,13 @@ Element-Type: context
 Element-Version: 2.0
 Id: _i5HT0BFhEei5lb3IGvxDdQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/14/18 11:49 AM
+Save-Time: 2/16/18 2:55 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
+
+global [val screenshot_base_folder [run-process-and-trim  "python" "-c"  "import os;print(os.environ['WORKSPACE']) if ('WORKSPACE' in os.environ) else 'd:/help_screens'" ]]
 
 proc "gui-view-screenshot" [val activePage] [val scr_path]{
   
@@ -26,8 +28,9 @@ proc "gui-view-screenshot" [val activePage] [val scr_path]{
 }
 
 proc "create-sub-folders" [val folderPaths]{
-// add python call to create folder tree regardless of Windows or Linux
+	run-process-and-trim "python" "-c" [concat  "import os; a='" [replace $folderPaths -old "\\" -new "/"] "';os.makedirs(a) if  os.path.exists(a) == False else None"]
+
 }
 
-global [val screenshot_base_folder[run-process-and-trim  "python" "-c"  "import os;print os.environ['WORKSPACE']" ]]
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
