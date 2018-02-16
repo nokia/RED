@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 public class InsertCellCommandTest {
 
@@ -62,8 +62,7 @@ public class InsertCellCommandTest {
                 undo_andAssertThat_valueDisappeared_afterUndo(command, allLabels, callAfter);
             }
             verify(eventBroker, times(2 * tokensNumber)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                    eq(ImmutableMap
-                            .<String, Object>of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+                    eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
         }
     }
 
@@ -95,8 +94,7 @@ public class InsertCellCommandTest {
         assertThat(currentLabels).containsExactly("");
 
         verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -133,8 +131,7 @@ public class InsertCellCommandTest {
         }
 
         verify(eventBroker, times(4)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -172,8 +169,7 @@ public class InsertCellCommandTest {
                 .containsExactlyElementsOf(allLabels);
 
         verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -202,9 +198,7 @@ public class InsertCellCommandTest {
                 undo_andAssertThat_valueDisappeared_afterUndo(command, allLabels, callAfter);
             }
             verify(eventBroker, times(2 * tokensNumber)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                    eq(ImmutableMap
-                            .<String, Object>of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA,
-                                    call)));
+                    eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
         }
     }
 
@@ -237,8 +231,7 @@ public class InsertCellCommandTest {
         assertThat(currentLabels).containsExactly("");
 
         verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -276,8 +269,7 @@ public class InsertCellCommandTest {
         }
 
         verify(eventBroker, times(4)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -316,8 +308,7 @@ public class InsertCellCommandTest {
                 .containsExactlyElementsOf(allLabels);
 
         verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -344,9 +335,7 @@ public class InsertCellCommandTest {
                 undo_andAssertThat_valueDisappeared_afterUndo(command, allLabels, callAfter);
             }
             verify(eventBroker, times(2 * (tokensNumber - 2))).send(eq(RobotModelEvents.ROBOT_SETTING_CHANGED),
-                    eq(ImmutableMap
-                            .<String, Object>of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA,
-                                    call)));
+                    eq(ImmutableMap.of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA, call)));
         }
     }
 
@@ -379,9 +368,7 @@ public class InsertCellCommandTest {
                 undo_andAssertThat_valueDisappeared_afterUndo(command, allLabels, callAfter);
             }
             verify(eventBroker, times(2 * (tokensNumber - 2))).send(eq(RobotModelEvents.ROBOT_SETTING_CHANGED),
-                    eq(ImmutableMap
-                            .<String, Object>of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA,
-                                    call)));
+                    eq(ImmutableMap.of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA, call)));
         }
     }
 
@@ -389,7 +376,7 @@ public class InsertCellCommandTest {
             final RobotKeywordCall call, final String value) {
         final List<String> currentLabels = call.getLinkedElement().getElementTokens().stream().map(RobotToken::getText)
                 .collect(Collectors.toList());
-        final List<String> oneMoreLabels = Lists.newArrayList(allLabels);
+        final List<String> oneMoreLabels = new ArrayList<>(allLabels);
         oneMoreLabels.add(insertedPosition, value);
 
         assertThat(currentLabels).containsExactlyElementsOf(oneMoreLabels);
