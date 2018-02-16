@@ -14,13 +14,13 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
-public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
+class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
     private final String libName;
     private final String libPath;
     private final IFile targetSpecFile;
 
-    public PythonLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile) {
+    PythonLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile) {
         this.libName = libName;
         this.libPath = path;
         this.targetSpecFile = targetSpecFile;
@@ -46,12 +46,6 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         runtimeEnvironment.createLibdocForcibly(libName, additionalLocation, additionalPaths,
                 targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
     }
-
-    @Override
-    public String getMessage() {
-        return "generating libdoc for " + libName + " library contained in " + libPath;
-    }
-    
     private String extractLibParent() { //e.g. libPath=Project1/Plib/ca libName=Plib.ca.ab => parent=Project1
         String parent = libPath;
         final String[] libNameElements = libName.split("\\.");
@@ -63,5 +57,15 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
             }
         }
         return parent;
+    }
+
+    @Override
+    public String getMessage() {
+        return "generating libdoc for " + libName + " library contained in " + libPath;
+    }
+
+    @Override
+    public IFile getTargetFile() {
+        return targetSpecFile;
     }
 }
