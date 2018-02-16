@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _h4fPYBh-Eee93KAG-tW51Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/13/18 5:32 PM
+Save-Time: 2/14/18 3:58 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,13 +21,13 @@ proc "check-if-no-error-is-shown"{
 
 proc "set-path-to-exe-file" [val path]{
 	get-window "Run Configurations" | get-group "External script" | get-editbox 
-	    -after [get-label "External script to run Robot Framework tests:"] 
+	    -after [get-label "Executable file to run Robot Framework tests:"] 
 	    | set-text $path
 }	
 
 proc "check-error-for-exe-path"{
 	get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
-	    | get-property text | equals "External script does not exist" | verify-true
+	    | get-property text | equals "Executable file does not exist" | verify-true
 }    
 
 //open run config menu
