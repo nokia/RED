@@ -16,8 +16,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
@@ -60,9 +62,16 @@ public class SetKeywordCallNameCommandTest {
         modelTypes.put(CommonModelTypes.UNKNOWN, RobotCase.class, ModelType.TEST_CASE_SETTING_UNKNOWN);
     }
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @DataPoints
     public static RobotCodeHoldingElement<?>[] codeHolders() {
-        final List<RobotCodeHoldingElement<?>> elements = newArrayList();
+        final List<RobotCodeHoldingElement<?>> elements = new ArrayList<>();
         elements.addAll(createKeywords());
         elements.addAll(createTestCases());
         return elements.toArray(new RobotCodeHoldingElement<?>[0]);
@@ -73,8 +82,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 2;
         final int callIndexAfterCommand = 2;
@@ -87,16 +94,16 @@ public class SetKeywordCallNameCommandTest {
                 .isInjectedInto(new SetKeywordCallNameCommand(call, "new_call"));
 
         command.execute();
-        
+
         final RobotKeywordCall callAfterNameChange = executablesHolder.getChildren().get(callIndexAfterCommand);
         assertThat(constructRow(callAfterNameChange)).containsExactly("new_call", "arg1", "arg2", "arg3", "# comment");
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
-        
+
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        
+
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call", "arg1", "arg2", "arg3", "# comment");
         assertThat(callAfterUndo.getLinkedElement().getModelType())
@@ -112,8 +119,6 @@ public class SetKeywordCallNameCommandTest {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
         final int callIndex = 2;
         final int callIndexAfterCommand = 2;
 
@@ -125,16 +130,16 @@ public class SetKeywordCallNameCommandTest {
                 .isInjectedInto(new SetKeywordCallNameCommand(call, ""));
 
         command.execute();
-        
+
         final RobotKeywordCall callAfterNameChange = executablesHolder.getChildren().get(callIndexAfterCommand);
         assertThat(constructRow(callAfterNameChange)).containsExactly("\\", "arg1", "arg2", "arg3", "# comment");
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
-        
+
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        
+
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call", "arg1", "arg2", "arg3", "# comment");
         assertThat(callAfterUndo.getLinkedElement().getModelType())
@@ -150,8 +155,6 @@ public class SetKeywordCallNameCommandTest {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
         final int callIndex = 1;
         final int callIndexAfterCommand = 1;
 
@@ -162,28 +165,26 @@ public class SetKeywordCallNameCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new SetKeywordCallNameCommand(call, "[Tags]"));
         command.execute();
-        
+
         final RobotKeywordCall callAfterNameChange = executablesHolder.getChildren().get(callIndexAfterCommand);
         assertThat(constructRow(callAfterNameChange)).containsExactly("Tags", "[setup]", "arg1", "arg2", "# comment");
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
-        
+
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        
+
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call_to_setting", "[setup]", "arg1", "arg2",
                 "# comment");
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -191,8 +192,6 @@ public class SetKeywordCallNameCommandTest {
     public void settingChangesNameProperlyToCall(final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 0;
         final int callIndexAfterCommand = 0;
@@ -219,12 +218,10 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -233,8 +230,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 0;
         final int callIndexAfterCommand = 0;
@@ -261,12 +256,10 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -275,8 +268,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 2;
         final int callIndexAfterCommand = 2;
@@ -302,7 +293,7 @@ public class SetKeywordCallNameCommandTest {
         assertThat(constructRow(callAfterUndo)).containsExactly("call", "arg1", "arg2", "arg3", "# comment");
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
-        
+
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_NAME_CHANGE, call);
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, call);
         verifyNoMoreInteractions(eventBroker);
@@ -313,8 +304,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 1;
         final int callIndexAfterCommand = 1;
@@ -342,14 +331,11 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, callAfterNameChange);
-
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -358,8 +344,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 0;
         final int callIndexAfterCommand = 0;
@@ -387,14 +371,11 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, callAfterNameChange);
-
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -403,8 +384,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for specific keyword/case
         assumeTrue(executablesHolder.getName().contains("setting_to_other_setting"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 0;
         final int callIndexAfterCommand = 0;
@@ -431,14 +410,11 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, callAfterNameChange);
-
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -447,8 +423,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for specific keyword/case
         assumeTrue(executablesHolder.getName().contains("setting_to_same_setting"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 0;
         final int callIndexAfterCommand = 0;
@@ -477,7 +451,6 @@ public class SetKeywordCallNameCommandTest {
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_NAME_CHANGE, callAfterNameChange);
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, callAfterNameChange);
-
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -486,8 +459,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for specific keyword/case
         assumeTrue(executablesHolder.getName().contains("_does_not_move"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 1;
         final int callIndexAfterCommand = 1;
@@ -521,13 +492,10 @@ public class SetKeywordCallNameCommandTest {
                 .isEqualTo(modelTypes.get(CommonModelTypes.TEARDOWN, executablesHolder.getClass()));
 
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
-
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -536,8 +504,6 @@ public class SetKeywordCallNameCommandTest {
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for specific keyword/case
         assumeTrue(executablesHolder.getName().contains("_does_not_move"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 5;
         final int callIndexAfterCommand = 5;
@@ -570,23 +536,18 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, executablesHolder,
-                        RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
-
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
         verifyNoMoreInteractions(eventBroker);
     }
-    
+
     @Theory
     public void callChangesNameProperlyToSettingAndThenReturnsToPreviousState(
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for keyword/case without special purpose
         assumeTrue(!executablesHolder.getName().contains("_"));
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 1;
         final int callIndexAfterCommand = 1;
@@ -598,17 +559,17 @@ public class SetKeywordCallNameCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new SetKeywordCallNameCommand(call, "[Tags]"));
         command.execute();
-        
+
         final RobotKeywordCall callAfterNameChange = executablesHolder.getChildren().get(callIndexAfterCommand);
         assertThat(constructRow(callAfterNameChange)).containsExactly("Tags", "[setup]", "arg1", "arg2", "# comment");
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
-        
+
         List<EditorCommand> undoCommands = command.getUndoCommands();
         for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
-        
+
         RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call_to_setting", "[setup]", "arg1", "arg2",
                 "# comment");
@@ -622,12 +583,12 @@ public class SetKeywordCallNameCommandTest {
         for (final EditorCommand redoCommand : redoCommands) {
             redoCommand.execute();
         }
-        
+
         final RobotKeywordCall callAfterRedo = executablesHolder.getChildren().get(callIndexAfterCommand);
         assertThat(constructRow(callAfterRedo)).containsExactly("Tags", "[setup]", "arg1", "arg2", "# comment");
         assertThat(callAfterRedo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
-        
+
         undoCommands = new ArrayList<>();
         for (final EditorCommand redoCommand : redoCommands) {
             undoCommands.addAll(0, redoCommand.getUndoCommands());
@@ -635,20 +596,22 @@ public class SetKeywordCallNameCommandTest {
         for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
-        
+
         callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call_to_setting", "[setup]", "arg1", "arg2",
                 "# comment");
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
+
+        verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterNameChange)));
+        verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .of(IEventBroker.DATA, executablesHolder, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private List<String> actionNames(final RobotCodeHoldingElement<?> executablesHolder) {
-        final List<String> names = newArrayList();
-        for (final RobotKeywordCall call : executablesHolder.getChildren()) {
-            names.add(call.getName());
-        }
-        return names;
+        return executablesHolder.getChildren().stream().map(RobotKeywordCall::getName).collect(Collectors.toList());
     }
 
     private List<String> constructRow(final RobotKeywordCall call) {
