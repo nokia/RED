@@ -13,6 +13,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.n
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -27,12 +28,18 @@ import com.google.common.collect.ImmutableMap;
 
 public class DeleteCasesCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @Test
     public void nothingHappens_whenThereAreNoCasesToRemove() {
         final RobotCasesSection section = createTestCasesSection();
         final List<RobotCase> casesToRemove = newArrayList();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final DeleteCasesCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new DeleteCasesCommand(casesToRemove));
@@ -52,7 +59,6 @@ public class DeleteCasesCommandTest {
         final RobotCasesSection section = createTestCasesSection();
         final List<RobotCase> casesToRemove = newArrayList(section.getChildren().get(1));
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final DeleteCasesCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new DeleteCasesCommand(casesToRemove));
@@ -77,8 +83,7 @@ public class DeleteCasesCommandTest {
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
         verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
-                        casesToRemove)));
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, casesToRemove)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -87,7 +92,6 @@ public class DeleteCasesCommandTest {
         final RobotCasesSection section = createTestCasesSection();
         final List<RobotCase> casesToRemove = newArrayList(section.getChildren().get(0), section.getChildren().get(2));
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final DeleteCasesCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new DeleteCasesCommand(casesToRemove));
@@ -114,12 +118,10 @@ public class DeleteCasesCommandTest {
                 .has(children());
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(section.getChildren().get(0)))));
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(section.getChildren().get(2)))));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap.of(IEventBroker.DATA, section,
+                RobotModelEvents.ADDITIONAL_DATA, newArrayList(section.getChildren().get(0)))));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap.of(IEventBroker.DATA, section,
+                RobotModelEvents.ADDITIONAL_DATA, newArrayList(section.getChildren().get(2)))));
         verifyNoMoreInteractions(eventBroker);
     }
 

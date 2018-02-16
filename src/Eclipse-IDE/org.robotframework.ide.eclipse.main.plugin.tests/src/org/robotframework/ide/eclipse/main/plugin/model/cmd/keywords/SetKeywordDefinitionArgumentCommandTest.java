@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
@@ -43,6 +44,13 @@ import com.google.common.collect.Range;
 @RunWith(Theories.class)
 public class SetKeywordDefinitionArgumentCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @DataPoints
     public static int[] indexes = new int[] { 0, 1, 2, 3, 4, 5, 10, 50, 100 };
 
@@ -50,13 +58,12 @@ public class SetKeywordDefinitionArgumentCommandTest {
     public void nothingHappens_whenThereIsNoArgumentsSettingAndTryingToSetNullAtSomeIndex(final int index) {
         final RobotKeywordDefinition def = createKeywordWithoutArguments();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final SetKeywordDefinitionArgumentCommand command = new SetKeywordDefinitionArgumentCommand(def, index, null);
         command.setEventBroker(eventBroker);
 
         command.execute();
         assertThat(def.getArgumentsSetting()).isNull();
-        
+
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
@@ -69,7 +76,6 @@ public class SetKeywordDefinitionArgumentCommandTest {
     public void nothingHappens_whenThereIsNoArgumentsSettingAndTryingToSetEmptyAtSomeIndex(final int index) {
         final RobotKeywordDefinition def = createKeywordWithoutArguments();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final SetKeywordDefinitionArgumentCommand command = new SetKeywordDefinitionArgumentCommand(def, index, "");
         command.setEventBroker(eventBroker);
 
@@ -89,7 +95,6 @@ public class SetKeywordDefinitionArgumentCommandTest {
             final int index) {
         final RobotKeywordDefinition def = createKeywordWithoutArguments();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final SetKeywordDefinitionArgumentCommand command = new SetKeywordDefinitionArgumentCommand(def, index, "arg");
         command.setEventBroker(eventBroker);
 
@@ -107,10 +112,10 @@ public class SetKeywordDefinitionArgumentCommandTest {
         }
         assertThat(def.getArgumentsSetting()).isNull();
 
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(
-                ImmutableMap.<String, Object> of(IEventBroker.DATA, def, RobotModelEvents.ADDITIONAL_DATA, setting)));
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED), eq(
-                ImmutableMap.<String, Object> of(IEventBroker.DATA, def, RobotModelEvents.ADDITIONAL_DATA, setting)));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.of(IEventBroker.DATA, def, RobotModelEvents.ADDITIONAL_DATA, setting)));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED),
+                eq(ImmutableMap.of(IEventBroker.DATA, def, RobotModelEvents.ADDITIONAL_DATA, setting)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -119,7 +124,6 @@ public class SetKeywordDefinitionArgumentCommandTest {
         final RobotKeywordDefinition def = createKeywordWithArguments(1);
         final RobotDefinitionSetting setting = def.getArgumentsSetting();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final SetKeywordDefinitionArgumentCommand command = new SetKeywordDefinitionArgumentCommand(def, 0, null);
         command.setEventBroker(eventBroker);
 
@@ -132,11 +136,10 @@ public class SetKeywordDefinitionArgumentCommandTest {
         assertThat(def.getArgumentsSetting()).isNotNull();
         assertThat(def.getArgumentsSetting().getArguments()).containsExactly("1");
 
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED), eq(
-                ImmutableMap.<String, Object> of(IEventBroker.DATA, def, RobotModelEvents.ADDITIONAL_DATA, setting)));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED),
+                eq(ImmutableMap.of(IEventBroker.DATA, def, RobotModelEvents.ADDITIONAL_DATA, setting)));
         verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(
-                ImmutableMap.<String, Object> of(IEventBroker.DATA, def, RobotModelEvents.ADDITIONAL_DATA,
-                        def.getArgumentsSetting())));
+                ImmutableMap.of(IEventBroker.DATA, def, RobotModelEvents.ADDITIONAL_DATA, def.getArgumentsSetting())));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -146,7 +149,6 @@ public class SetKeywordDefinitionArgumentCommandTest {
         final RobotDefinitionSetting args = def.getArgumentsSetting();
         final SetKeywordDefinitionArgumentCommand command = new SetKeywordDefinitionArgumentCommand(def, 0, null);
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
         assertThat(def.getArgumentsSetting().getArguments()).containsExactly("2", "3");

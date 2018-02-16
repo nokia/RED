@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 import static org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCallConditions.properlySetParent;
 
@@ -51,7 +52,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 public class InsertKeywordCallsCommandTest {
 
@@ -81,9 +81,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(2).getComment()).isEqualTo("#comment");
         assertThat(testCase.getChildren().get(2)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
-                        Arrays.asList(callsToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -113,9 +113,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(1).getComment()).isEqualTo("#comment");
         assertThat(testCase.getChildren().get(1)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
-                        Arrays.asList(callsToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -130,9 +130,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(transform(testCase.getChildren(), toNames())).containsExactly("tags", "setup", "teardown", "call1",
                 "setting", "call2", "call3");
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
-                        Arrays.asList(callsToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -147,9 +147,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(transform(testCase.getChildren(), toNames())).containsExactly("tags", "action", "setup", "teardown",
                 "call1", "call2", "call3");
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
-                        Arrays.asList(callsToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -171,9 +171,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(0).getComment()).isEqualTo("#comment");
         assertThat(testCase.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
-                        Arrays.asList(callsToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -196,9 +196,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(2).getComment()).isEqualTo("#comment");
         assertThat(keyword.getChildren().get(2)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(executableRow))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, newArrayList(executableRow))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -228,9 +228,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(1).getComment()).isEqualTo("#comment");
         assertThat(keyword.getChildren().get(1)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
-                        Arrays.asList(callsToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -242,12 +242,12 @@ public class InsertKeywordCallsCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(keyword.getChildren(), toNames())).containsExactly("arguments", "tags", "return",
-                "call1", "setting", "call2", "call3");
+        assertThat(transform(keyword.getChildren(), toNames())).containsExactly("arguments", "tags", "return", "call1",
+                "setting", "call2", "call3");
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
-                        Arrays.asList(callsToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -262,9 +262,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(transform(keyword.getChildren(), toNames())).containsExactly("arguments", "action", "tags", "return",
                 "call1", "call2", "call3");
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
-                        Arrays.asList(callsToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -288,110 +288,104 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(0)).has(properlySetParent());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(executableRow))));
+                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, newArrayList(executableRow))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
     public void testCaseTagsSettingIsProperlyInsertedIntoTestCase() {
         testCaseSettingIsProperlyInsertedIntoTestCase(createTestCaseTagsSetting(), ModelType.TEST_CASE_TAGS, "Tags",
-                Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseTagsSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTagsSetting(), ModelType.USER_KEYWORD_TAGS, "Tags",
-                Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseSetupSettingIsProperlyInsertedIntoTestCase() {
         testCaseSettingIsProperlyInsertedIntoTestCase(createTestCaseSetupSetting(), ModelType.TEST_CASE_SETUP, "Setup",
-                Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
+                newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseSetupSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseSetupSetting(),
-                ModelType.USER_KEYWORD_SETTING_UNKNOWN, "Setup", Lists.<String> newArrayList("call", "arg1", "arg2"),
-                "#comment");
+                ModelType.USER_KEYWORD_SETTING_UNKNOWN, "Setup", newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseTeardownSettingIsProperlyInsertedIntoTestCase() {
-        testCaseSettingIsProperlyInsertedIntoTestCase(createTestCaseTeadownSetting(), ModelType.TEST_CASE_TEARDOWN,
-                "Teardown", Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
+        testCaseSettingIsProperlyInsertedIntoTestCase(createTestCaseTeardownSetting(), ModelType.TEST_CASE_TEARDOWN,
+                "Teardown", newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseTeardownSettingIsProperlyInsertedIntoKeyword() {
-        testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTeadownSetting(), ModelType.USER_KEYWORD_TEARDOWN,
-                "Teardown", Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
+        testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTeardownSetting(), ModelType.USER_KEYWORD_TEARDOWN,
+                "Teardown", newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseTemplateSettingIsProperlyInsertedIntoTestCase() {
         testCaseSettingIsProperlyInsertedIntoTestCase(createTestCaseTemplateSetting(), ModelType.TEST_CASE_TEMPLATE,
-                "Template", Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
+                "Template", newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseTemplateSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTemplateSetting(),
-                ModelType.USER_KEYWORD_SETTING_UNKNOWN, "Template", Lists.<String> newArrayList("call", "arg1", "arg2"),
-                "#comment");
+                ModelType.USER_KEYWORD_SETTING_UNKNOWN, "Template", newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseTimeoutSettingIsProperlyInsertedIntoTestCase() {
         testCaseSettingIsProperlyInsertedIntoTestCase(createTestCaseTimeoutSetting(), ModelType.TEST_CASE_TIMEOUT,
-                "Timeout", Lists.<String> newArrayList("10", "arg1", "arg2"), "#comment");
+                "Timeout", newArrayList("10", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseTimeoutSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTimeoutSetting(), ModelType.USER_KEYWORD_TIMEOUT,
-                "Timeout", Lists.<String> newArrayList("10", "arg1", "arg2"), "#comment");
+                "Timeout", newArrayList("10", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseDocumentationSettingIsProperlyInsertedIntoTestCase() {
         testCaseSettingIsProperlyInsertedIntoTestCase(createTestCaseDocumentationSetting(),
-                ModelType.TEST_CASE_DOCUMENTATION, "Documentation", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.TEST_CASE_DOCUMENTATION, "Documentation", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseDocumentationSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseDocumentationSetting(),
-                ModelType.USER_KEYWORD_DOCUMENTATION, "Documentation", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.USER_KEYWORD_DOCUMENTATION, "Documentation", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
-    public void testCaseUnkownSettingIsProperlyInsertedIntoTestCase() {
+    public void testCaseUnknownSettingIsProperlyInsertedIntoTestCase() {
         testCaseSettingIsProperlyInsertedIntoTestCase(createTestCaseUnknownSetting("unknown"),
-                ModelType.TEST_CASE_SETTING_UNKNOWN, "unknown", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.TEST_CASE_SETTING_UNKNOWN, "unknown", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseUnknownSettingIsProperlyInsertedIntoKeyword_1() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseUnknownSetting("unknown"),
-                ModelType.USER_KEYWORD_SETTING_UNKNOWN, "unknown", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.USER_KEYWORD_SETTING_UNKNOWN, "unknown", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseUnknownSettingIsProperlyInsertedIntoKeyword_2() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseUnknownSetting("Arguments"),
-                ModelType.USER_KEYWORD_ARGUMENTS, "Arguments", Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                ModelType.USER_KEYWORD_ARGUMENTS, "Arguments", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void testCaseUnknownSettingIsProperlyInsertedIntoKeyword_3() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseUnknownSetting("Return"),
-                ModelType.USER_KEYWORD_RETURN, "Return", Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                ModelType.USER_KEYWORD_RETURN, "Return", newArrayList("arg1", "arg2"), "#comment");
     }
 
     private void testCaseSettingIsProperlyInsertedIntoTestCase(final RobotDefinitionSetting setting,
@@ -413,9 +407,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(0).getComment()).isEqualTo(expectedComment);
         assertThat(testCase.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(setting))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(
+                ImmutableMap.of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, newArrayList(setting))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private void testCaseSettingIsProperlyInsertedIntoKeyword(final RobotDefinitionSetting setting,
@@ -437,110 +431,105 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(0).getComment()).isEqualTo(expectedComment);
         assertThat(keyword.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(setting))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(
+                ImmutableMap.of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, newArrayList(setting))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
     public void keywordTagsSettingIsProperlyInsertedIntoTestCase() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordTagsSetting(), ModelType.TEST_CASE_TAGS, "Tags",
-                Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordTagsSettingIsProperlyInsertedIntoKeyword() {
         keywordSettingIsProperlyInsertedIntoKeyword(createKeywordTagsSetting(), ModelType.USER_KEYWORD_TAGS, "Tags",
-                Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordArgumentsSettingIsProperlyInsertedIntoTestCase() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordArgumentsSetting(),
-                ModelType.TEST_CASE_SETTING_UNKNOWN, "Arguments", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.TEST_CASE_SETTING_UNKNOWN, "Arguments", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordArgumentsSettingIsProperlyInsertedIntoKeyword() {
         keywordSettingIsProperlyInsertedIntoKeyword(createKeywordArgumentsSetting(), ModelType.USER_KEYWORD_ARGUMENTS,
-                "Arguments", Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                "Arguments", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordTeardownSettingIsProperlyInsertedIntoTestCase() {
-        keywordSettingIsProperlyInsertedIntoTestCase(createKeywordTeadownSetting(), ModelType.TEST_CASE_TEARDOWN,
-                "Teardown", Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
+        keywordSettingIsProperlyInsertedIntoTestCase(createKeywordTeardownSetting(), ModelType.TEST_CASE_TEARDOWN,
+                "Teardown", newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordTeardownSettingIsProperlyInsertedIntoKeyword() {
-        keywordSettingIsProperlyInsertedIntoKeyword(createKeywordTeadownSetting(), ModelType.USER_KEYWORD_TEARDOWN,
-                "Teardown", Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
+        keywordSettingIsProperlyInsertedIntoKeyword(createKeywordTeardownSetting(), ModelType.USER_KEYWORD_TEARDOWN,
+                "Teardown", newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordTimeoutSettingIsProperlyInsertedIntoTestCase() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordTimeoutSetting(), ModelType.TEST_CASE_TIMEOUT,
-                "Timeout", Lists.<String> newArrayList("10", "arg1", "arg2"), "#comment");
+                "Timeout", newArrayList("10", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordTimeoutSettingIsProperlyInsertedIntoKeyword() {
         keywordSettingIsProperlyInsertedIntoKeyword(createKeywordTimeoutSetting(), ModelType.USER_KEYWORD_TIMEOUT,
-                "Timeout", Lists.<String> newArrayList("10", "arg1", "arg2"), "#comment");
+                "Timeout", newArrayList("10", "arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordReturnSettingIsProperlyInsertedIntoTestCase() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordReturnSetting(), ModelType.TEST_CASE_SETTING_UNKNOWN,
-                "Return", Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                "Return", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordReturnSettingIsProperlyInsertedIntoKeyword() {
         keywordSettingIsProperlyInsertedIntoKeyword(createKeywordReturnSetting(), ModelType.USER_KEYWORD_RETURN,
-                "Return", Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                "Return", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordDocumentationSettingIsProperlyInsertedIntoTestCase() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordDocumentationSetting(),
-                ModelType.TEST_CASE_DOCUMENTATION, "Documentation", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.TEST_CASE_DOCUMENTATION, "Documentation", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordDocumentationSettingIsProperlyInsertedIntoKeyword() {
         keywordSettingIsProperlyInsertedIntoKeyword(createKeywordDocumentationSetting(),
-                ModelType.USER_KEYWORD_DOCUMENTATION, "Documentation", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.USER_KEYWORD_DOCUMENTATION, "Documentation", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordUnknownSettingIsProperlyInsertedIntoKeyword() {
         keywordSettingIsProperlyInsertedIntoKeyword(createKeywordUnknownSetting("unknown"),
-                ModelType.USER_KEYWORD_SETTING_UNKNOWN, "unknown", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.USER_KEYWORD_SETTING_UNKNOWN, "unknown", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordUnknownSettingIsProperlyInsertedIntoTestCase_1() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordUnknownSetting("unknown"),
-                ModelType.TEST_CASE_SETTING_UNKNOWN, "unknown", Lists.<String> newArrayList("arg1", "arg2"),
-                "#comment");
+                ModelType.TEST_CASE_SETTING_UNKNOWN, "unknown", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordUnknownSettingIsProperlyInsertedIntoTestCase_2() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordUnknownSetting("Setup"), ModelType.TEST_CASE_SETUP,
-                "Setup", Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                "Setup", newArrayList("arg1", "arg2"), "#comment");
     }
 
     @Test
     public void keywordUnknownSettingIsProperlyInsertedIntoTestCase_3() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordUnknownSetting("Template"),
-                ModelType.TEST_CASE_TEMPLATE, "Template", Lists.<String> newArrayList("arg1", "arg2"), "#comment");
+                ModelType.TEST_CASE_TEMPLATE, "Template", newArrayList("arg1", "arg2"), "#comment");
     }
 
     private void keywordSettingIsProperlyInsertedIntoKeyword(final RobotDefinitionSetting setting,
@@ -562,9 +551,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(0).getComment()).isEqualTo(expectedComment);
         assertThat(keyword.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(setting))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(
+                ImmutableMap.of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, newArrayList(setting))));
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private void keywordSettingIsProperlyInsertedIntoTestCase(final RobotDefinitionSetting setting,
@@ -586,11 +575,11 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(0).getComment()).isEqualTo(expectedComment);
         assertThat(testCase.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(setting))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(
+                ImmutableMap.of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, newArrayList(setting))));
+        verifyNoMoreInteractions(eventBroker);
     }
-    
+
     private static RobotCase createTestCaseForInsertions() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
@@ -674,7 +663,7 @@ public class InsertKeywordCallsCommandTest {
         return new RobotDefinitionSetting(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createTestCaseTeadownSetting() {
+    private static RobotDefinitionSetting createTestCaseTeardownSetting() {
         final TestCaseTeardown linkedElement = new TestCaseTeardown(RobotToken.create("[Teardown]"));
         linkedElement.setKeywordName("call");
         linkedElement.addArgument("arg1");
@@ -734,7 +723,7 @@ public class InsertKeywordCallsCommandTest {
         return new RobotDefinitionSetting(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createKeywordTeadownSetting() {
+    private static RobotDefinitionSetting createKeywordTeardownSetting() {
         final KeywordTeardown linkedElement = new KeywordTeardown(RobotToken.create("[Teardown]"));
         linkedElement.setKeywordName("call");
         linkedElement.addArgument("arg1");

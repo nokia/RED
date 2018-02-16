@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -26,14 +27,19 @@ import com.google.common.collect.ImmutableMap;
 
 public class CreateFreshCaseCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @Test
     public void whenCommandIsUsedWithoutIndex_newCaseIsProperlyAddedAtTheEnd() {
         final RobotCasesSection section = createTestCasesSection();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-        final CreateFreshCaseCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshCaseCommand(section));
+        final CreateFreshCaseCommand command = ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(
+                new CreateFreshCaseCommand(section));
         command.execute();
 
         assertThat(section.getChildren().size()).isEqualTo(4);
@@ -49,8 +55,8 @@ public class CreateFreshCaseCommandTest {
 
         assertThat(section.getChildren().size()).isEqualTo(3);
 
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedCase)));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED),
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedCase)));
         verify(eventBroker).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
     }
@@ -59,10 +65,8 @@ public class CreateFreshCaseCommandTest {
     public void whenCommandIsUsedWithIndex_newCaseIsProperlyAddedAtSpecifiedPlace() {
         final RobotCasesSection section = createTestCasesSection();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-        final CreateFreshCaseCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshCaseCommand(section, 1));
+        final CreateFreshCaseCommand command = ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(
+                new CreateFreshCaseCommand(section, 1));
         command.execute();
 
         assertThat(section.getChildren().size()).isEqualTo(4);
@@ -78,8 +82,8 @@ public class CreateFreshCaseCommandTest {
 
         assertThat(section.getChildren().size()).isEqualTo(3);
 
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedCase)));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED),
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedCase)));
         verify(eventBroker).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
     }

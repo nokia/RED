@@ -13,6 +13,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.c
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -26,12 +27,18 @@ import com.google.common.collect.ImmutableMap;
 
 public class InsertCasesCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @Test
     public void nothingHappens_whenThereAreNoCasesToInsert() {
         final RobotCasesSection section = createTestCasesSection();
         final RobotCase[] casesToInsert = new RobotCase[0];
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final InsertCasesCommand command = new InsertCasesCommand(section, casesToInsert);
         command.setEventBroker(eventBroker);
 
@@ -47,11 +54,10 @@ public class InsertCasesCommandTest {
     }
 
     @Test
-    public void caseAreProperlInsertedAtTheSectionEnd_whenNoIndexIsProvided() {
+    public void caseAreProperlyInsertedAtTheSectionEnd_whenNoIndexIsProvided() {
         final RobotCasesSection section = createTestCasesSection();
         final RobotCase[] casesToInsert = createCasesToInsert();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final InsertCasesCommand command = new InsertCasesCommand(section, casesToInsert);
         command.setEventBroker(eventBroker);
 
@@ -66,19 +72,17 @@ public class InsertCasesCommandTest {
         assertThat(transform(section.getChildren(), toNames())).containsExactly("case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(
-                ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(casesToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap.of(IEventBroker.DATA,
+                section, RobotModelEvents.ADDITIONAL_DATA, newArrayList(casesToInsert))));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
-    public void caseAreProperlInsertedInsideTheSection_whenIndexIsProvided() {
+    public void caseAreProperlyInsertedInsideTheSection_whenIndexIsProvided() {
         final RobotCasesSection section = createTestCasesSection();
         final RobotCase[] casesToInsert = createCasesToInsert();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final InsertCasesCommand command = new InsertCasesCommand(section, 1, casesToInsert);
         command.setEventBroker(eventBroker);
 
@@ -93,9 +97,8 @@ public class InsertCasesCommandTest {
         assertThat(transform(section.getChildren(), toNames())).containsExactly("case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(
-                ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(casesToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap.of(IEventBroker.DATA,
+                section, RobotModelEvents.ADDITIONAL_DATA, newArrayList(casesToInsert))));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
     }
@@ -105,7 +108,6 @@ public class InsertCasesCommandTest {
         final RobotCasesSection section = createTestCasesSection();
         final RobotCase[] casesToInsert = createCasesWithSameNameToInsert();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final InsertCasesCommand command = new InsertCasesCommand(section, casesToInsert);
         command.setEventBroker(eventBroker);
 
@@ -119,9 +121,8 @@ public class InsertCasesCommandTest {
         assertThat(transform(section.getChildren(), toNames())).containsExactly("case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
-                        newArrayList(casesToInsert))));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap.of(IEventBroker.DATA,
+                section, RobotModelEvents.ADDITIONAL_DATA, newArrayList(casesToInsert))));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
     }

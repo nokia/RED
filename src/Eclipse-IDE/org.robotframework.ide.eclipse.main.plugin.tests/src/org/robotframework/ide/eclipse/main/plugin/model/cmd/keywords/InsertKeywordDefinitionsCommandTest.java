@@ -18,6 +18,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.c
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -31,12 +32,18 @@ import com.google.common.collect.ImmutableMap;
 
 public class InsertKeywordDefinitionsCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @Test
     public void nothingHappens_whenThereAreNoCasesToInsert() {
         final RobotKeywordsSection section = createKeywordsSection();
         final RobotKeywordDefinition[] keywordsToInsert = new RobotKeywordDefinition[0];
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final InsertKeywordDefinitionsCommand command = new InsertKeywordDefinitionsCommand(section, keywordsToInsert);
         command.setEventBroker(eventBroker);
 
@@ -52,11 +59,10 @@ public class InsertKeywordDefinitionsCommandTest {
     }
 
     @Test
-    public void keywordsAreProperlInsertedAtTheSectionEnd_whenNoIndexIsProvided() {
+    public void keywordsAreProperlyInsertedAtTheSectionEnd_whenNoIndexIsProvided() {
         final RobotKeywordsSection section = createKeywordsSection();
         final RobotKeywordDefinition[] keywordsToInsert = createKeywordsToInsert();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final InsertKeywordDefinitionsCommand command = new InsertKeywordDefinitionsCommand(section, keywordsToInsert);
         command.setEventBroker(eventBroker);
 
@@ -72,18 +78,17 @@ public class InsertKeywordDefinitionsCommandTest {
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
                         newArrayList(keywordsToInsert))));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
-    public void keywordsAreProperlInsertedInsideTheSection_whenIndexIsProvided() {
+    public void keywordsAreProperlyInsertedInsideTheSection_whenIndexIsProvided() {
         final RobotKeywordsSection section = createKeywordsSection();
         final RobotKeywordDefinition[] keywordsToInsert = createKeywordsToInsert();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final InsertKeywordDefinitionsCommand command = new InsertKeywordDefinitionsCommand(section, 1, keywordsToInsert);
         command.setEventBroker(eventBroker);
 
@@ -99,7 +104,7 @@ public class InsertKeywordDefinitionsCommandTest {
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
                         newArrayList(keywordsToInsert))));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
@@ -110,7 +115,6 @@ public class InsertKeywordDefinitionsCommandTest {
         final RobotKeywordsSection section = createKeywordsSection();
         final RobotKeywordDefinition[] keywordsToInsert = createKeywordsWithSameNameToInsert();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final InsertKeywordDefinitionsCommand command = new InsertKeywordDefinitionsCommand(section, keywordsToInsert);
         command.setEventBroker(eventBroker);
 
@@ -125,7 +129,7 @@ public class InsertKeywordDefinitionsCommandTest {
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
                         newArrayList(keywordsToInsert))));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);

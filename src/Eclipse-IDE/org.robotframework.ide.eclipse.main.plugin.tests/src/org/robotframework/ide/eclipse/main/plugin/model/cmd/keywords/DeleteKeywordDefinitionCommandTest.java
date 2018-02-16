@@ -19,6 +19,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.to
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -32,12 +33,18 @@ import com.google.common.collect.ImmutableMap;
 
 public class DeleteKeywordDefinitionCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @Test
     public void nothingHappens_whenThereAreNoKeywordsToRemove() {
         final RobotKeywordsSection section = createKeywordsSection();
         final List<RobotKeywordDefinition> keywordsToRemove = newArrayList();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final DeleteKeywordDefinitionCommand command = new DeleteKeywordDefinitionCommand(keywordsToRemove);
         command.setEventBroker(eventBroker);
 
@@ -57,7 +64,6 @@ public class DeleteKeywordDefinitionCommandTest {
         final RobotKeywordsSection section = createKeywordsSection();
         final List<RobotKeywordDefinition> keywordsToRemove = newArrayList(section.getChildren().get(1));
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final DeleteKeywordDefinitionCommand command = new DeleteKeywordDefinitionCommand(keywordsToRemove);
         command.setEventBroker(eventBroker);
 
@@ -72,8 +78,8 @@ public class DeleteKeywordDefinitionCommandTest {
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, section);
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, keywordsToRemove)));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED),
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, keywordsToRemove)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -83,7 +89,6 @@ public class DeleteKeywordDefinitionCommandTest {
         final List<RobotKeywordDefinition> keywordsToRemove = newArrayList(section.getChildren().get(0),
                 section.getChildren().get(2));
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final DeleteKeywordDefinitionCommand command = new DeleteKeywordDefinitionCommand(keywordsToRemove);
         command.setEventBroker(eventBroker);
 
@@ -99,10 +104,10 @@ public class DeleteKeywordDefinitionCommandTest {
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, section);
         verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
                         newArrayList(section.getChildren().get(0)))));
         verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
                         newArrayList(section.getChildren().get(2)))));
         verifyNoMoreInteractions(eventBroker);
     }

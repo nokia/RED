@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 public class DeleteCellCommandTest {
 
@@ -61,8 +61,7 @@ public class DeleteCellCommandTest {
                 undo_andAssertThat_valueReturned_afterUndo(command, allLabels, callAfter);
             }
             verify(eventBroker, times(tokensNumber)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                    eq(ImmutableMap
-                            .<String, Object>of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+                    eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
         }
     }
 
@@ -93,8 +92,7 @@ public class DeleteCellCommandTest {
         assertThat(currentLabels).containsExactly("call");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -131,8 +129,7 @@ public class DeleteCellCommandTest {
         }
 
         verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -170,8 +167,7 @@ public class DeleteCellCommandTest {
                 .containsExactlyElementsOf(allLabels);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -199,9 +195,7 @@ public class DeleteCellCommandTest {
                 undo_andAssertThat_valueReturned_afterUndo(command, allLabels, callAfter);
             }
             verify(eventBroker, times(tokensNumber)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                    eq(ImmutableMap
-                            .<String, Object>of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA,
-                                    call)));
+                    eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
         }
     }
 
@@ -233,8 +227,7 @@ public class DeleteCellCommandTest {
         assertThat(currentLabels).containsExactly("call");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -272,8 +265,7 @@ public class DeleteCellCommandTest {
         }
 
         verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -312,8 +304,7 @@ public class DeleteCellCommandTest {
                 .containsExactlyElementsOf(allLabels);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap
-                        .<String, Object>of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
+                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
     @Test
@@ -340,9 +331,7 @@ public class DeleteCellCommandTest {
                 undo_andAssertThat_valueReturned_afterUndo(command, allLabels, callAfter);
             }
             verify(eventBroker, times(tokensNumber - 2)).send(eq(RobotModelEvents.ROBOT_SETTING_CHANGED),
-                    eq(ImmutableMap
-                            .<String, Object>of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA,
-                                    call)));
+                    eq(ImmutableMap.of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA, call)));
         }
     }
 
@@ -375,9 +364,7 @@ public class DeleteCellCommandTest {
                 undo_andAssertThat_valueReturned_afterUndo(command, allLabels, callAfter);
             }
             verify(eventBroker, times(tokensNumber - 2)).send(eq(RobotModelEvents.ROBOT_SETTING_CHANGED),
-                    eq(ImmutableMap
-                            .<String, Object>of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA,
-                                    call)));
+                    eq(ImmutableMap.of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA, call)));
         }
     }
 
@@ -385,7 +372,7 @@ public class DeleteCellCommandTest {
             final RobotKeywordCall call) {
         final List<String> currentLabels = call.getLinkedElement().getElementTokens().stream().map(RobotToken::getText)
                 .collect(Collectors.toList());
-        final List<String> oneLessLabels = Lists.newArrayList(allLabels);
+        final List<String> oneLessLabels = new ArrayList<>(allLabels);
         oneLessLabels.remove(deletedPosition);
 
         assertThat(currentLabels).containsExactlyElementsOf(oneLessLabels);
