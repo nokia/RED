@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
+import java.util.function.Consumer;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -27,11 +29,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement
 import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
 
-import com.google.common.base.Function;
-
 public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
 
-    private Function<PropertyChangeEvent, Void> enablementUpdater;
+    private Consumer<PropertyChangeEvent> enablementUpdater;
 
     @Override
     protected void createFieldEditors() {
@@ -162,7 +162,6 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
                 final SeparatorsMode newMode = SeparatorsMode.valueOf((String) event.getNewValue());
                 separatorEditor.setEnabled(newMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
             }
-            return null;
         };
     }
 
@@ -178,7 +177,7 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
 
     @Override
     public void propertyChange(final PropertyChangeEvent event) {
-        enablementUpdater.apply(event);
+        enablementUpdater.accept(event);
         super.propertyChange(event);
     }
 }
