@@ -18,13 +18,13 @@ import com.google.common.io.Files;
 /**
  * @author Michal Anglart
  */
-public class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
+class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
 
     private final IPath path;
 
     private final IFile targetSpecFile;
 
-    public VirtualLibraryLibdocGenerator(final IPath libPath, final IFile targetSpecFile) {
+    VirtualLibraryLibdocGenerator(final IPath libPath, final IFile targetSpecFile) {
         this.path = libPath;
         this.targetSpecFile = targetSpecFile;
     }
@@ -52,5 +52,10 @@ public class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
     @Override
     public String getMessage() {
         return "linking libdoc for workspace-external virutal library located at " + path.toOSString();
+    }
+
+    @Override
+    public IFile getTargetFile() {
+        return targetSpecFile;
     }
 }
