@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -26,10 +27,15 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshSectionCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @Test(expected = IllegalStateException.class)
     public void exceptionIsThrown_whenTryingToCreateUnknownSection() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
 
         ContextInjector.prepareContext()
@@ -40,8 +46,6 @@ public class CreateFreshSectionCommandTest {
 
     @Test
     public void nothingIsCreated_whenSectionAlreadyExist() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***").build();
         final RobotVariablesSection currentSection = model.findSection(RobotVariablesSection.class).get();
 
@@ -65,8 +69,6 @@ public class CreateFreshSectionCommandTest {
 
     @Test
     public void variablesSectionIsProperlyCreated() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
         final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -93,8 +95,6 @@ public class CreateFreshSectionCommandTest {
 
     @Test
     public void settingsSectionIsProperlyCreated() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
         final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -121,8 +121,6 @@ public class CreateFreshSectionCommandTest {
 
     @Test
     public void keywordsSectionIsProperlyCreated() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
         final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -149,8 +147,6 @@ public class CreateFreshSectionCommandTest {
 
     @Test
     public void testCasesSectionIsProperlyCreated() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
         final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
