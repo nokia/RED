@@ -69,8 +69,6 @@
           </topic>
           <topic href="doc/user_guide/launching/debug/hitting_a_breakpoint.html" label="Hitting a breakpoint">
           </topic>
-          <topic href="doc/user_guide/launching/debug/variables.html" label="Changing variables">
-          </topic>
           <topic href="doc/user_guide/launching/debug/preferences.html" label="Debugger preferences">
           </topic>
           <topic href="doc/user_guide/launching/debug/robot_python_debug.html" label="Debugging Robot &amp; Python with RED &amp; PyDev">
