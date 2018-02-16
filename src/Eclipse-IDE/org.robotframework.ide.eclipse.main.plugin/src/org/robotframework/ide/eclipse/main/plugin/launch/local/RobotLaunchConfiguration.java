@@ -38,7 +38,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguratio
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotPathsNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -253,17 +252,13 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public void setSuitePaths(final Map<String, List<String>> suitesToCases) throws CoreException {
         // test case names should be always in lower case
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(), new Function<String, String>() {
-
-            @Override
-            public String apply(final String path) {
-                final List<String> testSuites = new ArrayList<>();
-                final Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
-                for (final String s : temp) {
-                    testSuites.add(s.toLowerCase());
-                }
-                return String.join("::", testSuites);
+        final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(), path -> {
+            final List<String> testSuites = new ArrayList<>();
+            final Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
+            for (final String s : temp) {
+                testSuites.add(s.toLowerCase());
             }
+            return String.join("::", testSuites);
         });
         launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
     }
