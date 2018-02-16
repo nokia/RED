@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.primitives.Ints;
 
 public class NamesGenerator {
@@ -46,31 +46,26 @@ public class NamesGenerator {
     }
 
     private static int getCurrentMaxNumber(final RobotElement parent, final String prefix) {
-        final Collection<String> currentNames = Collections2.transform(parent.getChildren(), toLowerCaseNames());
-        final Collection<Integer> numbers = Collections2.transform(currentNames, byExtractingNumbersFromSuffixes(prefix));
+        final List<Integer> numbers = parent.getChildren()
+                .stream()
+                .map(toLowerCaseNames())
+                .map(byExtractingNumbersFromSuffixes(prefix))
+                .collect(Collectors.toList());
         return numbers.isEmpty() ? -1 : Collections.max(numbers);
     }
 
     private static Function<String, Integer> byExtractingNumbersFromSuffixes(final String prefix) {
-        return new Function<String, Integer>() {
-            @Override
-            public Integer apply(final String name) {
-                if (name.startsWith(prefix.toLowerCase())) {
-                    final String numberInSuffix = name.substring(prefix.length()).trim();
-                    final Integer num = Ints.tryParse(numberInSuffix);
-                    return num == null ? 0 : num;
-                }
-                return -1;
+        return name -> {
+            if (name.startsWith(prefix.toLowerCase())) {
+                final String numberInSuffix = name.substring(prefix.length()).trim();
+                final Integer num = Ints.tryParse(numberInSuffix);
+                return num == null ? 0 : num;
             }
+            return -1;
         };
     }
 
     private static Function<RobotElement, String> toLowerCaseNames() {
-        return new Function<RobotElement, String>() {
-            @Override
-            public String apply(final RobotElement element) {
-                return element.getName().toLowerCase();
-            }
-        };
+        return element -> element.getName().toLowerCase();
     }
 }
