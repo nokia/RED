@@ -21,16 +21,15 @@ import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertCommentToSetting extends EditorCommand {
 
-    private RobotKeywordCall settingCall;
-
     private final RobotKeywordCall commentCall;
 
     private final String newName;
 
+    private RobotDefinitionSetting settingCall;
+
     public ConvertCommentToSetting(final IEventBroker eventBroker, final RobotKeywordCall commentCall,
             final String name) {
         this.eventBroker = eventBroker;
-        this.settingCall = null;
         this.commentCall = commentCall;
         this.newName = name;
     }
@@ -62,15 +61,13 @@ public class ConvertCommentToSetting extends EditorCommand {
             final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) commentCall.getParent();
             final int index = commentCall.getIndex();
             parent.removeChild(commentCall);
-            final RobotDefinitionSetting setting = parent.createSetting(index, newName,
+            settingCall = parent.createSetting(index, newName,
                     newArgs.stream().map(RobotToken::getText).collect(Collectors.toList()),
                     newComments.stream().map(RobotToken::getText).collect(Collectors.joining(" | ")));
 
-            setting.getLinkedElement().getDeclaration().setFilePosition(firstToken.getFilePosition());
-            setting.getLinkedElement().getDeclaration().getTypes().remove(RobotTokenType.UNKNOWN);
-            setting.getLinkedElement().getDeclaration().markAsDirty();
-
-            settingCall = setting;
+            settingCall.getLinkedElement().getDeclaration().setFilePosition(firstToken.getFilePosition());
+            settingCall.getLinkedElement().getDeclaration().getTypes().remove(RobotTokenType.UNKNOWN);
+            settingCall.getLinkedElement().getDeclaration().markAsDirty();
 
             RedEventBroker.using(eventBroker)
                     .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)

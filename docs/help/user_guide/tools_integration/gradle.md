@@ -28,6 +28,9 @@ moreover Gradle passes arguments mostly using it's own syntax: `-Parg=val`.
 Because of this we need to create own script which will perform arguments
 translation (or modify Gradle Wrapper script).
 
+Script available on GitHub: [
+https://github.com/nokia/RED/tree/master/src/RobotUserScripts](https://github.com/nokia/RED/tree/master/src/RobotUserScripts)
+
   * **Windows batch script** \- `gradlew_robot.bat`
 
 @echo off  
