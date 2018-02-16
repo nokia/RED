@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -41,7 +41,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -81,7 +80,7 @@ class TagsProposalsSupport {
             }
         }
     }
-    
+
     @VisibleForTesting
     List<IContentProposal> getProposals(final String contents) {
         return newArrayList(new TagsContentProposalProvider().getProposals(contents, -1));
@@ -108,7 +107,7 @@ class TagsProposalsSupport {
 
         private Collection<String> extractTagProposals() {
             final Multimap<IPath, SourcedTag> groupedTags = groupTagsBySuites();
-            return newArrayList(transform(groupedTags.values(), SourcedTag.toTag()));
+            return groupedTags.values().stream().map(sourcedTag -> sourcedTag.tag).collect(Collectors.toList());
         }
 
         private Multimap<IPath, SourcedTag> groupTagsBySuites() {
@@ -233,16 +232,6 @@ class TagsProposalsSupport {
         public SourcedTag(final String source, final String tag) {
             this.source = source;
             this.tag = tag;
-        }
-
-        public static Function<SourcedTag, String> toTag() {
-            return new Function<SourcedTag, String>() {
-
-                @Override
-                public String apply(final SourcedTag sourcedTag) {
-                    return sourcedTag.tag;
-                }
-            };
         }
     }
 }
