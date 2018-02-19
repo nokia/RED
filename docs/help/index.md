@@ -39,7 +39,6 @@
         * [User interface](/user_guide/launching/debug/ui_elements.md)
         * [Breakpoints](/user_guide/launching/debug/breakpoints.md)
         * [Hitting a breakpoint](/user_guide/launching/debug/hitting_a_breakpoint.md)
-        * [Changing variables](/user_guide/launching/debug/variables.md)
         * [Debugger preferences](/user_guide/launching/debug/preferences.md)
         * [Debugging Robot & Python with RED & PyDev](/user_guide/launching/debug/robot_python_debug.md)
       * [Launching preferences](/user_guide/launching/launch_prefs.md)

@@ -16,7 +16,6 @@ import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.StructuredContentProvider;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 
@@ -50,12 +49,7 @@ class PathsContentProvider extends StructuredContentProvider {
         final List<String> paths = variableAccessor.getPaths(pathVariableName);
 
         final List<Object> elements = newArrayList();
-        elements.addAll(transform(paths, new Function<String, SearchPath>() {
-            @Override
-            public SearchPath apply(final String path) {
-                return SearchPath.create(path, true);
-            }
-        }));
+        elements.addAll(transform(paths, path -> SearchPath.create(path, true)));
         elements.addAll((List<?>) inputElement);
         if (isEditable) {
             elements.add(new ElementAddingToken("search path", true));

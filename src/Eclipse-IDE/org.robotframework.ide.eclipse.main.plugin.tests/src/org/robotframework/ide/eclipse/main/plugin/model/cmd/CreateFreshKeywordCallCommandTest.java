@@ -11,6 +11,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.n
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.noChildren;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
@@ -33,6 +34,13 @@ import com.google.common.collect.ImmutableMap;
 @RunWith(Theories.class)
 public class CreateFreshKeywordCallCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @DataPoints
     public static RobotCodeHoldingElement<?>[] elements() {
         return new RobotCodeHoldingElement[] { createTestCase(), createTestCaseWithSettings(), createKeywords(),
@@ -50,7 +58,6 @@ public class CreateFreshKeywordCallCommandTest {
 
         final int oldSize = codeHolder.getChildren().size();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final CreateFreshKeywordCallCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new CreateFreshKeywordCallCommand(codeHolder));
@@ -68,8 +75,8 @@ public class CreateFreshKeywordCallCommandTest {
 
         assertThat(codeHolder.getChildren().size()).isEqualTo(oldSize);
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
         verifyNoMoreInteractions(eventBroker);
     }
@@ -77,12 +84,11 @@ public class CreateFreshKeywordCallCommandTest {
     @Theory
     public void whenCommandIsUsedWithIndex_newCallIsProperlyAddedAtSpecifiedPlace(
             final RobotCodeHoldingElement<?> codeHolder, final int index) {
-        
+
         assumeTrue(index >= 0 && index <= codeHolder.getChildren().size());
 
         final int oldSize = codeHolder.getChildren().size();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final CreateFreshKeywordCallCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new CreateFreshKeywordCallCommand(codeHolder, index));
@@ -100,8 +106,8 @@ public class CreateFreshKeywordCallCommandTest {
 
         assertThat(codeHolder.getChildren().size()).isEqualTo(oldSize);
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
         verifyNoMoreInteractions(eventBroker);
     }
