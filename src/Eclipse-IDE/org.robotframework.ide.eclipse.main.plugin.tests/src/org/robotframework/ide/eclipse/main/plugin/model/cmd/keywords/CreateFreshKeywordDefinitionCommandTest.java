@@ -16,6 +16,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.n
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -29,11 +30,17 @@ import com.google.common.collect.ImmutableMap;
 
 public class CreateFreshKeywordDefinitionCommandTest {
 
+    private IEventBroker eventBroker;
+
+    @Before
+    public void beforeTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
+
     @Test
     public void whenCommandIsUsedWithoutIndex_newKeywordIsProperlyAddedAtTheEnd() {
         final RobotKeywordsSection section = createKeywordsSection();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final CreateFreshKeywordDefinitionCommand command = new CreateFreshKeywordDefinitionCommand(section);
         command.setEventBroker(eventBroker);
 
@@ -51,8 +58,8 @@ public class CreateFreshKeywordDefinitionCommandTest {
         }
         assertThat(transform(section.getChildren(), toNames())).containsExactly("Keyword 1", "Keyword 2", "Keyword 3");
 
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedKeyword)));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED),
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedKeyword)));
         verify(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
     }
@@ -61,7 +68,6 @@ public class CreateFreshKeywordDefinitionCommandTest {
     public void whenCommandIsUsedWithIndex_newKeywordIsProperlyAddedAtSpecifiedPlace() {
         final RobotKeywordsSection section = createKeywordsSection();
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final CreateFreshKeywordDefinitionCommand command = new CreateFreshKeywordDefinitionCommand(section, 1);
         command.setEventBroker(eventBroker);
 
@@ -79,8 +85,8 @@ public class CreateFreshKeywordDefinitionCommandTest {
         }
         assertThat(transform(section.getChildren(), toNames())).containsExactly("Keyword 1", "Keyword 2", "Keyword 3");
 
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedKeyword)));
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED),
+                eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedKeyword)));
         verify(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, section);
         verifyNoMoreInteractions(eventBroker);
     }
