@@ -6,11 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.search;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
 
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -19,8 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchLi
 import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchTarget;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 
 /**
  * @author Michal Anglart
@@ -107,25 +105,12 @@ class SearchSettingsPersister {
     }
 
     private String[] getTargets(final SearchSettings settings) {
-        return transform(newArrayList(settings.getTargets()), new Function<SearchTarget, String>() {
-
-            @Override
-            public String apply(final SearchTarget target) {
-                return target.name();
-            }
-        }).toArray(new String[0]);
+        return settings.getTargets().stream().map(target -> target.name()).toArray(String[]::new);
     }
 
     private EnumSet<SearchTarget> getTargets(final String[] array) {
         final EnumSet<SearchTarget> result = EnumSet.noneOf(SearchTarget.class);
-        final Collection<SearchTarget> targets = Collections2.transform(newArrayList(array),
-                new Function<String, SearchTarget>() {
-
-                    @Override
-                    public SearchTarget apply(final String target) {
-                        return SearchTarget.valueOf(target);
-                    }
-                });
+        final List<SearchTarget> targets = Stream.of(array).map(SearchTarget::valueOf).collect(Collectors.toList());
         result.addAll(targets);
         return result;
     }
