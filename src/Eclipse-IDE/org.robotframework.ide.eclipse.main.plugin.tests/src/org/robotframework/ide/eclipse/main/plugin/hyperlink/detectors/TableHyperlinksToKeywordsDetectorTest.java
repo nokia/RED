@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -27,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordDocumentation
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordInLibrarySourceHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileTableElementHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.UserKeywordDocumentationHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -34,7 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -46,8 +47,9 @@ public class TableHyperlinksToKeywordsDetectorTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(TableHyperlinksToKeywordsDetectorTest.class);
 
-    private static ReferencedLibrary lib;
     private static LibrarySpecification libSpec;
+
+    private static Map<LibraryDescriptor, LibrarySpecification> refLibs;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
@@ -56,28 +58,19 @@ public class TableHyperlinksToKeywordsDetectorTest {
                 "res_kw",
                 "  log  10");
 
-        lib = ReferencedLibrary.create(LibraryType.PYTHON, "testlib", projectProvider.getProject().getName());
-
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addReferencedLibrary(lib);
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "testlib", projectProvider.getProject().getName()));
 
         projectProvider.createFile("testlib.py");
         projectProvider.configure(config);
 
-        final KeywordSpecification kwSpec = new KeywordSpecification();
-        kwSpec.setFormat("ROBOT");
-        kwSpec.setName("lib_kw");
-        kwSpec.setArguments(new ArrayList<String>());
-        kwSpec.setDocumentation("");
-
-        libSpec = new LibrarySpecification();
-        libSpec.setName("testlib");
-        libSpec.getKeywords().add(kwSpec);
+        refLibs = Libraries.createRefLib("testlib", "lib_kw");
+        libSpec = refLibs.values().iterator().next();
     }
 
     @AfterClass
     public static void afterSuite() {
-        lib = null;
         libSpec = null;
     }
 
@@ -147,8 +140,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
                 .getChildren().get(0).getChildren().get(0);
 
         final RobotProject project = suiteFile.getProject();
-        project.setStandardLibraries(ImmutableMap.<String, LibrarySpecification> of());
-        project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
+        project.setStandardLibraries(ImmutableMap.<LibraryDescriptor, LibrarySpecification> of());
+        project.setReferencedLibraries(refLibs);
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);
@@ -232,8 +225,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
                 .getChildren().get(0).getChildren().get(0);
 
         final RobotProject project = suiteFile.getProject();
-        project.setStandardLibraries(ImmutableMap.<String, LibrarySpecification> of());
-        project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
+        project.setStandardLibraries(ImmutableMap.<LibraryDescriptor, LibrarySpecification> of());
+        project.setReferencedLibraries(refLibs);
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);

@@ -5,20 +5,21 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -73,15 +74,15 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     }
 
     private LibrarySpecification findSpecification(final IPath candidate) {
-        final Map<ReferencedLibrary, LibrarySpecification> libs = validationContext
+        final Map<LibraryDescriptor, LibrarySpecification> libs = validationContext
                 .getReferencedLibrarySpecifications();
-        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : libs.entrySet()) {
-            final IPath entryPath = new Path(entry.getKey().getFilepath().getPath());
+        for (final LibraryDescriptor descriptor : libs.keySet()) {
+            final IPath entryPath = new Path(descriptor.getFilepath().getPath());
             final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
             final IPath libPath2 = RedWorkspace.Paths
                     .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
             if (candidate.equals(libPath1) || candidate.equals(libPath2)) {
-                return entry.getValue();
+                return libs.get(descriptor);
             }
         }
         return null;
@@ -90,37 +91,10 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     @Override
     protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
             throws CoreException {
-        final String libName = createLibName(name, arguments);
-        final LibrarySpecification specification = validationContext.getLibrarySpecifications(libName);
+        final List<String> args = arguments.stream().map(RobotToken::getText).collect(toList());
+        final LibrarySpecification specification = validationContext.getLibrarySpecifications(name, args);
         validateWithSpec(specification, name, nameToken, arguments, false);
         validateArgumentsForRemoteLibraryImport(name, nameToken, arguments);
-    }
-
-    private String createLibName(final String name, final List<RobotToken> arguments) {
-        if ("Remote".equals(name)) {
-            if (arguments.isEmpty()) {
-                return name + " " + "http://127.0.0.1:8270/RPC2";
-            } else {
-                final String libName = name + " " + arguments.get(0).getText();
-                return findLibraryInAccessibleLibraries(libName);
-            }
-        }
-        return name;
-    }
-
-    private String findLibraryInAccessibleLibraries(final String libName) {
-        final Map<String, LibrarySpecification> accessibleLibraries = validationContext.getAccessibleLibraries();
-
-        for (final String accessibleLibraryName : accessibleLibraries.keySet()) {
-            if (stripLastSlashIfNecessary(accessibleLibraryName).equals(stripLastSlashIfNecessary(libName))) {
-                return accessibleLibraryName;
-            }
-        }
-        return libName;
-    }
-
-    private static String stripLastSlashIfNecessary(final String string) {
-        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
     }
 
     private void validateWithSpec(final LibrarySpecification specification, final String pathOrName,
@@ -142,13 +116,12 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
 
     private void validateArgumentsForRemoteLibraryImport(final String name, final RobotToken nameToken,
             final List<RobotToken> arguments) {
-        if ("Remote".equals(name)) {
-            if (arguments.isEmpty()) {
-                final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS)
-                        .formatMessageWith(name);
-                reporter.handleProblem(problem, validationContext.getFile(), nameToken);
-            }
+        if ("Remote".equals(name) && arguments.isEmpty()) {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(GeneralSettingsProblem.IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS)
+                    .formatMessageWith(name);
+            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
+            reporter.handleProblem(problem, validationContext.getFile(), nameToken, additional);
         }
     }
 }

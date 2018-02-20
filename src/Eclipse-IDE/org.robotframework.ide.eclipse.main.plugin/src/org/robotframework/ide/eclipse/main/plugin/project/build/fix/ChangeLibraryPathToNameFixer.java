@@ -5,7 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +20,9 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -33,14 +34,15 @@ public class ChangeLibraryPathToNameFixer extends RedSuiteMarkerResolution {
             final IPath invalidPath) {
         final RobotModel model = RedPlugin.getModelManager().getModel();
         final RobotProject robotProject = model.createRobotProject(problematicFile.getProject());
-        final List<ChangeLibraryPathToNameFixer> fixers = new ArrayList<>();
+
         final String lastSegmentWithoutExtension = invalidPath.removeFileExtension().lastSegment();
-        for (final ReferencedLibrary refLib : robotProject.getReferencedLibraries().keySet()) {
-            if (refLib.getName().equals(lastSegmentWithoutExtension)) {
-                fixers.add(new ChangeLibraryPathToNameFixer(refLib.getName()));
-            }
-        }
-        return fixers;
+
+        return robotProject.getLibraryDescriptorsStream()
+                .filter(LibraryDescriptor::isReferencedLibrary)
+                .filter(desc -> desc.getName().equals(lastSegmentWithoutExtension))
+                .map(LibraryDescriptor::getName)
+                .map(ChangeLibraryPathToNameFixer::new)
+                .collect(toList());
     }
 
     private final String libraryName;

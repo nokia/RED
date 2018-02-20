@@ -66,10 +66,7 @@ public class AssistProposals {
             final ProposalMatch match) {
 
         final String libraryName = libSpec.getName();
-        final List<String> arguments = new ArrayList<>();
-        if (libSpec.isRemote()) {
-            arguments.add(libSpec.getSecondaryKey());
-        }
+        final List<String> arguments = new ArrayList<>(libSpec.getDescriptor().getArguments());
         final boolean isImported = suiteFile.getImportedLibraries().containsKey(libSpec);
         return new RedLibraryProposal(libraryName, arguments, isImported, libSpec.getDocumentation(), match);
     }

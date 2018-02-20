@@ -37,7 +37,6 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
@@ -239,16 +238,12 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     }
 
     private String getLibraryHoverInfo(final String hoveredText) {
-        LibrarySpecification spec = suiteFile.getProject().getStandardLibraries().get(hoveredText);
-        if (spec == null) {
-            for (final ReferencedLibrary referencedLibrary : suiteFile.getProject().getReferencedLibraries().keySet()) {
-                if (referencedLibrary.getName().equals(hoveredText)) {
-                    spec = suiteFile.getProject().getReferencedLibraries().get(referencedLibrary);
-                    break;
-                }
-            }
-        }
-        return spec == null ? null : spec.getDocumentation();
+        return suiteFile.getProject()
+                .getLibrarySpecificationsStream()
+                .filter(spec -> spec.getName().equalsIgnoreCase(hoveredText))
+                .map(LibrarySpecification::getName)
+                .findFirst()
+                .orElse(null);
     }
 
     private Optional<String> getKeywordHoverInfo(final String keywordName) {

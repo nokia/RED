@@ -17,9 +17,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -91,7 +91,7 @@ public class KeywordProposalsProviderTest {
     public void thereAreOperationsToPerformAfterAccepting_onlyForNotAccessibleKeywordProposals() throws Exception {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
 
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new LinkedHashMap<>();
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new LinkedHashMap<>();
         refLibs.putAll(Libraries.createRefLib("LibImported", "kw1", "kw2"));
         refLibs.putAll(Libraries.createRefLib("LibNotImported", "kw3", "kw4"));
 
