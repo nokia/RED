@@ -388,8 +388,7 @@ public class EclipseElementsLocator implements ElementsLocator {
                         final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                         final RobotSuiteFile exposingFile) {
 
-                    final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
-                            : KeywordScope.STD_LIBRARY;
+                    final KeywordScope scope = libSpec.getDescriptor().getKeywordsScope();
                     for (final Optional<String> libraryAlias : libraryAliases) {
                         addAccessibleKeyword(kwSpec.getName(),
                                 DebuggerKeywordEntity.from(scope, libraryAlias, exposingFile, libSpec, kwSpec));

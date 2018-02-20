@@ -102,7 +102,7 @@ class SearchResultContentProvider extends TreeContentProvider {
             final IProject project = parent.getParent();
             final RobotProject robotProject = model.createRobotProject(project);
             
-            for (final LibrarySpecification libSpec : robotProject.getLibrariesSpecifications()) {
+            for (final LibrarySpecification libSpec : robotProject.getLibrarySpecifications()) {
                 final Match[] libMatches = input.getMatches(new MatchesGroupingElement(project, libSpec));
                 if (libMatches.length > 0) {
                     children.add(new LibraryWithParent(parent, libSpec, newArrayList(libMatches)));
@@ -147,7 +147,7 @@ class SearchResultContentProvider extends TreeContentProvider {
 
     private boolean libsShouldBeShown(final IProject project) {
         final RobotProject robotProject = model.createRobotProject(project);
-        for (final LibrarySpecification libSpec : robotProject.getLibrariesSpecifications()) {
+        for (final LibrarySpecification libSpec : robotProject.getLibrarySpecifications()) {
             if (input.containMatches(new MatchesGroupingElement(project, libSpec))) {
                 return true;
             }

@@ -6,13 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,14 +20,13 @@ import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -46,6 +45,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.io.Files;
 
 /**
@@ -61,9 +62,9 @@ public class ValidationContext {
 
     private RobotProjectConfig projectConfig;
 
-    private final Map<String, LibrarySpecification> accessibleLibraries;
+    private final Multimap<String, LibrarySpecification> accessibleLibraries;
 
-    private final Map<ReferencedLibrary, LibrarySpecification> referencedAccessibleLibraries;
+    private final Map<LibraryDescriptor, LibrarySpecification> referencedAccessibleLibraries;
 
     private BuildLogger logger;
 
@@ -85,7 +86,8 @@ public class ValidationContext {
 
     @VisibleForTesting
     public ValidationContext(final RobotModel model, final RobotVersion version, final SuiteExecutor executor,
-            final Map<String, LibrarySpecification> libs, final Map<ReferencedLibrary, LibrarySpecification> refLibs) {
+            final Multimap<String, LibrarySpecification> libs,
+            final Map<LibraryDescriptor, LibrarySpecification> refLibs) {
         this.model = model;
         this.version = version;
         this.executorInUse = executor;
@@ -93,18 +95,8 @@ public class ValidationContext {
         this.referencedAccessibleLibraries = refLibs;
     }
 
-    private static Map<String, LibrarySpecification> collectLibraries(final RobotProject robotProject) {
-        final Map<String, LibrarySpecification> libs = newLinkedHashMap();
-        libs.putAll(robotProject.getStandardLibraries());
-        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : robotProject.getReferencedLibraries()
-                .entrySet()) {
-            if (entry.getKey().provideType() == LibraryType.VIRTUAL && entry.getValue() != null) {
-                libs.put(entry.getValue().getName(), entry.getValue());
-            } else {
-                libs.put(entry.getKey().getName(), entry.getValue());
-            }
-        }
-        return libs;
+    private static Multimap<String, LibrarySpecification> collectLibraries(final RobotProject robotProject) {
+        return Multimaps.index(robotProject.getLibrarySpecifications(), LibrarySpecification::getName);
     }
 
     BuildLogger getLogger() {
@@ -128,15 +120,31 @@ public class ValidationContext {
         return version;
     }
 
-    public LibrarySpecification getLibrarySpecification(final String libName) {
-        return accessibleLibraries.get(libName);
+    public LibrarySpecification getLibrarySpecification(final String libName, final List<String> arguments) {
+        final Collection<LibrarySpecification> candidates = accessibleLibraries.get(libName);
+        for (final LibrarySpecification candidate : candidates) {
+            final List<String> candidateNormalizedArguments = candidate.getDescriptor()
+                    .getArguments()
+                    .stream()
+                    .map(this::normalizeArg)
+                    .collect(toList());
+            final List<String> normalizedArguments = arguments.stream().map(this::normalizeArg).collect(toList());
+            if (candidateNormalizedArguments.equals(normalizedArguments)) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
-    public Map<String, LibrarySpecification> getAccessibleLibraries() {
-        return accessibleLibraries;
+    private String normalizeArg(final String argument) {
+        return stripLastSlashIfNecessary(argument).toLowerCase();
     }
 
-    public Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrarySpecifications() {
+    private static String stripLastSlashIfNecessary(final String string) {
+        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
+    }
+
+    public Map<LibraryDescriptor, LibrarySpecification> getReferencedLibrarySpecifications() {
         return referencedAccessibleLibraries;
     }
 
@@ -202,7 +210,7 @@ public class ValidationContext {
                     final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                     final RobotSuiteFile exposingFile) {
 
-                final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
+                final KeywordScope scope = libSpec.getDescriptor().getKeywordsScope();
                 for (final Optional<String> libraryAlias : libraryAliases) {
                     final ValidationKeywordEntity keyword = new ValidationKeywordEntity(scope, libSpec.getName(),
                             kwSpec.getName(), libraryAlias, kwSpec.isDeprecated(), exposingFile.getFile().getFullPath(),

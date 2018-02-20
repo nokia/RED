@@ -43,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockR
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ResourceCreator;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Range;
 
 public class GeneralSettingsVariablesImportValidatorTest {
@@ -434,7 +435,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     private FileValidationContext prepareContext(final RobotSuiteFile suiteFile) {
         final ValidationContext parentContext = new ValidationContext(model, RobotVersion.from("0.0"),
-                SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
+                SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
         return new FileValidationContext(parentContext, suiteFile.getFile());
     }
 

@@ -55,7 +55,7 @@ public class AssistProposalPredicates {
     }
 
     public static AssistProposalPredicate<LibrarySpecification> reservedLibraryPredicate() {
-        return spec -> spec.isReferenced() || !spec.getName().equalsIgnoreCase("reserved");
+        return spec -> spec.getDescriptor().isReferencedLibrary() || !spec.getName().equalsIgnoreCase("reserved");
     }
 
     public static AssistProposalPredicate<String> codeReservedWordsPredicate(final int cellIndex,

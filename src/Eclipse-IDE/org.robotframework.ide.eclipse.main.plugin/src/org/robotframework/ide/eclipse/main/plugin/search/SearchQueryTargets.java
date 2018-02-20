@@ -57,7 +57,7 @@ class SearchQueryTargets {
             final IProject project = resourceRoot.getProject();
             if (resourceRoot.getType() == IResource.PROJECT && !librariesToSearch.containsKey(project)) {
                 final RobotProject robotProject = model.createRobotProject(project);
-                librariesToSearch.putAll(project, robotProject.getLibrariesSpecifications());
+                librariesToSearch.putAll(project, robotProject.getLibrarySpecifications());
             }
 
             try {

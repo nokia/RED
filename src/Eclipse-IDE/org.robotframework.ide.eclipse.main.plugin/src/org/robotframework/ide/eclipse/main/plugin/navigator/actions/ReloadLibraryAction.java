@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,6 +16,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
@@ -84,22 +85,29 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
             robotProject.clearKwSources();
         }
 
-        SwtThread.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                ((TreeViewer) selectionProvider).refresh();
-            }
-        });
+        SwtThread.asyncExec(() -> ((TreeViewer) selectionProvider).refresh());
     }
 
     private Multimap<IProject, LibrarySpecification> groupSpecificationsByProject() {
-        final List<LibrarySpecification> specs = Selections
-                .getElements((IStructuredSelection) selectionProvider.getSelection(), LibrarySpecification.class);
+        final ITreeSelection selection = (ITreeSelection) selectionProvider.getSelection();
+
         final Multimap<IProject, LibrarySpecification> groupedSpecifications = LinkedHashMultimap.create();
-        for (final LibrarySpecification specification : specs) {
-            groupedSpecifications.put(specification.getSourceFile().getProject(), specification);
+        for (final TreePath path : selection.getPaths()) {
+            final Object element = path.getLastSegment();
+            if (element instanceof LibrarySpecification) {
+                final IProject project = findProject(path);
+                groupedSpecifications.put(project, (LibrarySpecification) element);
+            }
         }
         return groupedSpecifications;
     }
 
+    private IProject findProject(final TreePath path) {
+        for (int i = 0; i < path.getSegmentCount(); i++) {
+            if (path.getSegment(i) instanceof IProject) {
+                return (IProject) path.getSegment(i);
+            }
+        }
+        return null;
+    }
 }

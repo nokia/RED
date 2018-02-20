@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.VariableOrigin;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -235,6 +236,7 @@ public class AssistProposalsTest {
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setName("library");
         libSpec.setDocumentation("docu");
+        libSpec.setDescriptor(LibraryDescriptor.ofStandardLibrary("library"));
 
         final RedLibraryProposal proposal = AssistProposals.createLibraryProposal(suiteFile, libSpec,
                 ProposalMatch.EMPTY);
@@ -250,17 +252,16 @@ public class AssistProposalsTest {
     public void verifyRemoteLibraryProposalProperties() {
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
         final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setDescriptor(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://location.org")));
         libSpec.setName("library");
-        libSpec.setRemoteLocation(RemoteLocation.create("http://location.org"));
-        libSpec.setSecondaryKey("args");
         libSpec.setDocumentation("docu");
 
         final RedLibraryProposal proposal = AssistProposals.createLibraryProposal(suiteFile, libSpec,
                 ProposalMatch.EMPTY);
         assertThat(proposal.getContent()).isEqualTo("library");
-        assertThat(proposal.getArguments()).containsExactly("args");
+        assertThat(proposal.getArguments()).containsExactly("http://location.org");
         assertThat(proposal.getImage()).isEqualTo(RedImages.getLibraryImage());
-        assertThat(proposal.getStyledLabel().getString()).isEqualTo("library args");
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("library http://location.org");
         assertThat(proposal.hasDescription()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("docu");
     }
