@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -22,13 +23,14 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
-import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -79,14 +81,32 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
                 "Library  ../knownInResource.py");
         projectProvider.createFile("knownInResource.py");
 
-        final Map<ReferencedLibrary, LibrarySpecification> libs = Libraries.createRefLibs("known1", "known2",
-                "knownInResource");
+        final ReferencedLibrary refLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "known1",
+                projectProvider.getProject().getName());
+        final ReferencedLibrary refLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "known2",
+                projectProvider.getProject().getName());
+        final ReferencedLibrary refLib3 = ReferencedLibrary.create(LibraryType.PYTHON, "knownInResource",
+                projectProvider.getProject().getName());
+
+        final LibraryDescriptor desc1 = LibraryDescriptor.ofReferencedLibrary(refLib1);
+        final LibraryDescriptor desc2 = LibraryDescriptor.ofReferencedLibrary(refLib2);
+        final LibraryDescriptor desc3 = LibraryDescriptor.ofReferencedLibrary(refLib3);
+        final LibrarySpecification spec1 = LibrarySpecification.create(refLib1.getName());
+        spec1.setDescriptor(desc1);
+        final LibrarySpecification spec2 = LibrarySpecification.create(refLib2.getName());
+        spec2.setDescriptor(desc2);
+        final LibrarySpecification spec3 = LibrarySpecification.create(refLib3.getName());
+        spec3.setDescriptor(desc3);
+        final Map<LibraryDescriptor, LibrarySpecification> libs = new HashMap<>();
+        libs.put(desc1, spec1);
+        libs.put(desc2, spec2);
+        libs.put(desc3, spec3);
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        libs.keySet().forEach(lib -> {
-            lib.setPath(projectProvider.getProject().getName());
-            config.addReferencedLibrary(lib);
-        });
+        config.addReferencedLibrary(refLib1);
+        config.addReferencedLibrary(refLib2);
+        config.addReferencedLibrary(refLib3);
+
         projectProvider.configure(config);
         projectProvider.addRobotNature();
 

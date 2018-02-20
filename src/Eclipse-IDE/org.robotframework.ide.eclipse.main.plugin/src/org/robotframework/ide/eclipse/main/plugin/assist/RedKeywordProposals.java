@@ -180,8 +180,7 @@ public class RedKeywordProposals {
                                 return ContinueDecision.CONTINUE;
                             }
 
-                            final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
-                                    : KeywordScope.STD_LIBRARY;
+                            final KeywordScope scope = libSpec.getDescriptor().getKeywordsScope();
                             final String keywordName = kwSpec.getName();
                             final String sourcePrefix = libSpec.getName();
 
@@ -204,8 +203,7 @@ public class RedKeywordProposals {
                                 return ContinueDecision.CONTINUE;
                             }
 
-                            final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
-                                    : KeywordScope.STD_LIBRARY;
+                            final KeywordScope scope = libSpec.getDescriptor().getKeywordsScope();
                             final String keywordName = kwSpec.getName();
 
                             for (final Optional<String> alias : libraryAliases) {

@@ -35,6 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockR
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Range;
 
 public class VariablesTableValidatorTest {
@@ -340,7 +341,7 @@ public class VariablesTableValidatorTest {
 
     private static FileValidationContext prepareContext(final Set<String> variables) {
         final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
-                SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
+                SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
         return new FileValidationContext(parentContext, mock(IFile.class), null, variables);
     }
 }

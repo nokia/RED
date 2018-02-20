@@ -5,19 +5,24 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Iterables.filter;
+import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newLinkedHashMap;
-import static com.google.common.collect.Sets.newLinkedHashSet;
+import static com.google.common.collect.Streams.concat;
+import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -37,7 +42,6 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.testdata.RobotParser;
@@ -58,21 +62,18 @@ import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicates;
 
 public class RobotProject extends RobotContainer {
 
     private RobotProjectHolder projectHolder;
 
-    private Map<String, LibrarySpecification> stdLibsSpecs;
+    private RobotProjectConfig configuration;
 
-    private Map<ReferencedLibrary, LibrarySpecification> refLibsSpecs;
+    private Map<LibraryDescriptor, LibrarySpecification> stdLibsSpecs;
+    private Map<LibraryDescriptor, LibrarySpecification> refLibsSpecs;
 
     private List<ReferencedVariableFile> referencedVariableFiles;
-
-    private RobotProjectConfig configuration;
 
     private final LibrariesWatchHandler librariesWatchHandler;
 
@@ -80,7 +81,7 @@ public class RobotProject extends RobotContainer {
 
     RobotProject(final RobotModel model, final IProject project) {
         super(model, project);
-        librariesWatchHandler = new LibrariesWatchHandler(this);
+        this.librariesWatchHandler = new LibrariesWatchHandler(this);
     }
 
     public synchronized RobotProjectHolder getRobotProjectHolder() {
@@ -91,10 +92,6 @@ public class RobotProject extends RobotContainer {
         return projectHolder;
     }
 
-    public RobotParser getEagerRobotParser() {
-        return RobotParser.createEager(getRobotProjectHolder(), createPathsProvider());
-    }
-
     public RobotParser getRobotParser() {
         return RobotParser.create(getRobotProjectHolder(), createPathsProvider());
     }
@@ -103,17 +100,14 @@ public class RobotProject extends RobotContainer {
         return (IProject) container;
     }
 
+    public LibspecsFolder getLibspecsFolder() {
+        return LibspecsFolder.get(getProject());
+    }
+
     public String getVersion() {
         readProjectConfigurationIfNeeded();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
         return env == null ? "???" : env.getVersion();
-    }
-
-    public Collection<LibrarySpecification> getLibrariesSpecifications() {
-        final List<LibrarySpecification> specifications = newArrayList();
-        specifications.addAll(getStandardLibraries().values());
-        specifications.addAll(getReferencedLibraries().values());
-        return newArrayList(filter(specifications, Predicates.notNull()));
     }
 
     public synchronized boolean hasStandardLibraries() {
@@ -124,27 +118,30 @@ public class RobotProject extends RobotContainer {
         return configuration != null;
     }
 
-    public synchronized Map<String, LibrarySpecification> getStandardLibraries() {
+    public synchronized Map<LibraryDescriptor, LibrarySpecification> getStandardLibraries() {
         if (stdLibsSpecs != null) {
             return stdLibsSpecs;
         }
         readProjectConfigurationIfNeeded();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
         if (env == null || configuration == null) {
-            return newLinkedHashMap();
+            return new LinkedHashMap<>();
         }
-        stdLibsSpecs = newLinkedHashMap();
-        for (final String stdLib : env.getStandardLibrariesNames()) {
-            stdLibsSpecs.put(stdLib, stdLibToSpec(getProject()).apply(stdLib));
-        }
-        for (final RemoteLocation location : configuration.getRemoteLocations()) {
-            stdLibsSpecs.put("Remote " + location.getUri(), remoteLibToSpec(getProject()).apply(location));
-        }
+
+        final Stream<LibraryDescriptor> stdLibsDescriptorsStream = env.getStandardLibrariesNames().stream()
+                .map(LibraryDescriptor::ofStandardLibrary);
+        final Stream<LibraryDescriptor> remoteStdLibsDescriptorsStream = configuration.getRemoteLocations().stream()
+                .map(LibraryDescriptor::ofStandardRemoteLibrary);
+
+        stdLibsSpecs = new LinkedHashMap<>();
+        concat(stdLibsDescriptorsStream, remoteStdLibsDescriptorsStream).forEach(descriptor -> {
+            stdLibsSpecs.put(descriptor, libToSpec(this).apply(descriptor));
+        });
         return stdLibsSpecs;
     }
 
     @VisibleForTesting
-    public void setStandardLibraries(final Map<String, LibrarySpecification> libs) {
+    public void setStandardLibraries(final Map<LibraryDescriptor, LibrarySpecification> libs) {
         stdLibsSpecs = libs;
     }
 
@@ -156,32 +153,56 @@ public class RobotProject extends RobotContainer {
         return configuration != null && configuration.hasReferencedLibraries();
     }
 
-    public synchronized Map<ReferencedLibrary, LibrarySpecification> getReferencedLibraries() {
+    public synchronized Map<LibraryDescriptor, LibrarySpecification> getReferencedLibraries() {
         if (refLibsSpecs != null) {
             return refLibsSpecs;
         }
         readProjectConfigurationIfNeeded();
         if (configuration == null) {
-            return newLinkedHashMap();
+            return new LinkedHashMap<>();
         }
 
-        refLibsSpecs = newLinkedHashMap();
+        refLibsSpecs = new LinkedHashMap<>();
         for (final ReferencedLibrary library : configuration.getLibraries()) {
-            final LibrarySpecification spec = reflibToSpec(getProject()).apply(library);
+            final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
+
+            final LibrarySpecification spec = libToSpec(this).apply(descriptor);
+            refLibsSpecs.put(descriptor, spec);
+
             librariesWatchHandler.registerLibrary(library, spec);
-            if (librariesWatchHandler.isLibSpecDirty(spec)) {
-                spec.setIsModified(true);
-            }
-            refLibsSpecs.put(library, spec);
         }
-        removeUnusedLibspecFiles(refLibsSpecs);
 
         return refLibsSpecs;
     }
 
     @VisibleForTesting
-    public void setReferencedLibraries(final Map<ReferencedLibrary, LibrarySpecification> libs) {
+    public void setReferencedLibraries(final Map<LibraryDescriptor, LibrarySpecification> libs) {
         refLibsSpecs = libs;
+    }
+
+    public Stream<Entry<LibraryDescriptor, LibrarySpecification>> getLibraryEntriesStream() {
+        return concat(getStandardLibraries().entrySet().stream(), getReferencedLibraries().entrySet().stream());
+    }
+
+    public Stream<LibraryDescriptor> getLibraryDescriptorsStream() {
+        return concat(getStandardLibraries().keySet().stream(), getReferencedLibraries().keySet().stream());
+    }
+
+    public Stream<LibrarySpecification> getLibrarySpecificationsStream() {
+        return concat(getStandardLibraries().values().stream(), getReferencedLibraries().values().stream())
+                .filter(notNull());
+    }
+
+    public Collection<Entry<LibraryDescriptor, LibrarySpecification>> getLibraryEntries() {
+        return getLibraryEntriesStream().collect(toList());
+    }
+
+    public Collection<LibraryDescriptor> getLibraryDescriptors() {
+        return getLibraryDescriptorsStream().collect(toList());
+    }
+
+    public Collection<LibrarySpecification> getLibrarySpecifications() {
+        return getLibrarySpecificationsStream().collect(toList());
     }
 
     public synchronized void unregisterWatchingOnReferencedLibraries(final List<ReferencedLibrary> libraries) {
@@ -192,55 +213,29 @@ public class RobotProject extends RobotContainer {
         librariesWatchHandler.removeDirtySpecs(libSpecs);
     }
 
-    private static Function<String, LibrarySpecification> stdLibToSpec(final IProject project) {
-        return new Function<String, LibrarySpecification>() {
-
-            @Override
-            public LibrarySpecification apply(final String libraryName) {
-                try {
-                    final IFile file = LibspecsFolder.get(project).getSpecFile(libraryName);
-                    return LibrarySpecificationReader.readStandardLibrarySpecification(file, libraryName);
-                } catch (final CannotReadLibrarySpecificationException e) {
-                    return null;
-                }
-            }
-        };
-    }
-
-    private static Function<RemoteLocation, LibrarySpecification> remoteLibToSpec(final IProject project) {
-        return new Function<RemoteLocation, LibrarySpecification>() {
-
-            @Override
-            public LibrarySpecification apply(final RemoteLocation remoteLocation) {
-                try {
-                    final IFile file = LibspecsFolder.get(project).getSpecFile(remoteLocation.createLibspecFileName());
-                    return LibrarySpecificationReader.readRemoteSpecification(file, remoteLocation);
-                } catch (final CannotReadLibrarySpecificationException e) {
-                    return null;
-                }
-            }
-        };
-    }
-
-    private static Function<ReferencedLibrary, LibrarySpecification> reflibToSpec(final IProject project) {
-        return new Function<ReferencedLibrary, LibrarySpecification>() {
-
-            @Override
-            public LibrarySpecification apply(final ReferencedLibrary lib) {
-                try {
-                    final IPath path = Path.fromPortableString(lib.getPath());
-                    final IResource libspec = project.getParent().findMember(path);
-
-                    final IFile fileToRead;
-                    if (lib.provideType() == LibraryType.VIRTUAL && libspec != null && libspec.exists()) {
-                        fileToRead = (IFile) libspec;
-                    } else {
-                        fileToRead = LibspecsFolder.get(project).getSpecFile(lib.getName());
+    private static Function<LibraryDescriptor, LibrarySpecification> libToSpec(final RobotProject robotProject) {
+        return descriptor -> {
+            try {
+                File fileToRead = null;
+                if (descriptor.getLibraryType() == LibraryType.VIRTUAL) {
+                    final IPath path = Path.fromPortableString(descriptor.getPath());
+                    if (!path.isAbsolute()) {
+                        final IFile file = robotProject.getProject().getParent().getFile(path);
+                        fileToRead = new File(file.getLocationURI());
                     }
-                    return LibrarySpecificationReader.readReferencedSpecification(fileToRead, lib);
-                } catch (final CannotReadLibrarySpecificationException e) {
-                    return null;
                 }
+                if (fileToRead == null) {
+                    final LibspecsFolder libspecsFolder = robotProject.getLibspecsFolder();
+
+                    final String fileName = descriptor.generateLibspecFileName();
+                    fileToRead = new File(libspecsFolder.getXmlSpecFile(fileName).getLocationURI());
+                }
+
+                final LibrarySpecification spec = LibrarySpecificationReader.readSpecification(fileToRead);
+                spec.setDescriptor(descriptor);
+                return spec;
+            } catch (final CannotReadLibrarySpecificationException e) {
+                return null;
             }
         };
     }
@@ -265,6 +260,11 @@ public class RobotProject extends RobotContainer {
         return configuration;
     }
 
+    @VisibleForTesting
+    public void setRobotProjectConfig(final RobotProjectConfig config) {
+        this.configuration = config;
+    }
+
     /**
      * Returns the configuration model from opened editor.
      *
@@ -280,22 +280,17 @@ public class RobotProject extends RobotContainer {
     }
 
     private RedProjectEditorInput findEditorInputIfAlreadyOpened() {
-        return SwtThread.syncEval(new Evaluation<RedProjectEditorInput>() {
-
-            @Override
-            public RedProjectEditorInput runCalculation() {
-                final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                if (window == null) {
-                    // in the meantime window could be destroyed actually..
-                    return null;
-                }
-                final IWorkbenchPage page = window.getActivePage();
-                final FileEditorInput input = new FileEditorInput(getConfigurationFile());
-                final IEditorPart editor = page.findEditor(input);
-                return editor instanceof RedProjectEditor ? ((RedProjectEditor) editor).getRedProjectEditorInput()
-                        : null;
+        return SwtThread.syncEval(Evaluation.of(() -> {
+            final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            if (window == null) {
+                // in the meantime window could be destroyed actually..
+                return null;
             }
-        });
+            final IWorkbenchPage page = window.getActivePage();
+            final FileEditorInput input = new FileEditorInput(getConfigurationFile());
+            final IEditorPart editor = page.findEditor(input);
+            return editor instanceof RedProjectEditor ? ((RedProjectEditor) editor).getRedProjectEditorInput() : null;
+        }));
     }
 
     public void clearCachedData() {
@@ -355,7 +350,7 @@ public class RobotProject extends RobotContainer {
 
     public synchronized List<String> getPythonpath() {
         readProjectConfigurationIfNeeded();
-        final Set<String> pp = newLinkedHashSet();
+        final Set<String> pp = new LinkedHashSet<>();
         if (configuration != null) {
             pp.addAll(getReferenceLibPaths(LibraryType.PYTHON));
             pp.addAll(getAdditionalPaths(configuration.getPythonPath()));
@@ -365,7 +360,7 @@ public class RobotProject extends RobotContainer {
 
     public synchronized List<String> getClasspath() {
         readProjectConfigurationIfNeeded();
-        final Set<String> cp = newLinkedHashSet();
+        final Set<String> cp = new LinkedHashSet<>();
         cp.add(".");
         if (configuration != null) {
             cp.addAll(getReferenceLibPaths(LibraryType.JAVA));
@@ -375,7 +370,7 @@ public class RobotProject extends RobotContainer {
     }
 
     private synchronized List<String> getReferenceLibPaths(final LibraryType libType) {
-        final List<String> paths = newArrayList();
+        final List<String> paths = new ArrayList<>();
         for (final ReferencedLibrary lib : configuration.getLibraries()) {
             if (lib.provideType() == libType) {
                 paths.add(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath()))
@@ -387,7 +382,7 @@ public class RobotProject extends RobotContainer {
 
     private synchronized List<String> getAdditionalPaths(final List<SearchPath> searchPaths) {
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
-        final List<String> paths = newArrayList();
+        final List<String> paths = new ArrayList<>();
         for (final SearchPath searchPath : searchPaths) {
             try {
                 paths.add(redConfig.toAbsolutePath(searchPath, getProject()).getPath());
@@ -399,12 +394,12 @@ public class RobotProject extends RobotContainer {
     }
 
     public synchronized boolean isStandardLibrary(final LibrarySpecification spec) {
-        final Map<String, LibrarySpecification> stdLibs = getStandardLibraries();
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = getStandardLibraries();
         return isLibraryFrom(spec, stdLibs == null ? null : stdLibs.values());
     }
 
     public synchronized boolean isReferencedLibrary(final LibrarySpecification spec) {
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = getReferencedLibraries();
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = getReferencedLibraries();
         return isLibraryFrom(spec, refLibs == null ? null : refLibs.values());
     }
 
@@ -460,7 +455,7 @@ public class RobotProject extends RobotContainer {
         }
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
-            referencedVariableFiles = newArrayList();
+            referencedVariableFiles = new ArrayList<>();
             for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
                 IPath path = new Path(variableFile.getPath());
                 if (!path.isAbsolute()) {
@@ -486,23 +481,6 @@ public class RobotProject extends RobotContainer {
 
     public String resolve(final String expression) {
         return RobotExpressions.resolve(getRobotProjectHolder().getVariableMappings(), expression);
-    }
-
-    private void removeUnusedLibspecFiles(final Map<ReferencedLibrary, LibrarySpecification> refLibsSpecs) {
-        if (!librariesWatchHandler.getRemovedSpecs().isEmpty()) {
-            for (final LibrarySpecification removedSpec : librariesWatchHandler.getRemovedSpecs()) {
-                if (!refLibsSpecs.containsValue(removedSpec)) {
-                    final IFile libspecFile = removedSpec.getSourceFile();
-                    if (libspecFile != null) {
-                        final IPath libspecFileLocation = libspecFile.getLocation();
-                        if (libspecFileLocation != null) {
-                            libspecFileLocation.toFile().delete();
-                        }
-                    }
-                }
-            }
-            librariesWatchHandler.clearRemovedSpecs();
-        }
     }
 
     public void addKeywordSource(final RobotDryRunKeywordSource keywordSource) {

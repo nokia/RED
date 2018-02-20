@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -31,6 +33,7 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
@@ -70,7 +73,10 @@ class ReferenceLibraryImportCollector {
     private RobotSuiteFile currentSuite;
 
     ReferenceLibraryImportCollector(final RobotProject robotProject) {
-        this.standardLibraryNames = robotProject.getStandardLibraries().keySet();
+        this.standardLibraryNames = robotProject.getLibraryDescriptorsStream()
+                .filter(LibraryDescriptor::isStandardLibrary)
+                .map(LibraryDescriptor::getName)
+                .collect(toSet());
         this.libraryLocator = new ReferencedLibraryLocator(robotProject, new DiscoveringLibraryImporter(),
                 new DiscoveringLibraryDetector());
     }

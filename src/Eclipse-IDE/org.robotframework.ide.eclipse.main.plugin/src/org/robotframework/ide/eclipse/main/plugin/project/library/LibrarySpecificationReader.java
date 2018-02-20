@@ -11,19 +11,28 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.eclipse.core.resources.IFile;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
+import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 
 public class LibrarySpecificationReader {
 
-    static LibrarySpecification readSpecification(final IFile libraryFile) {
+    public static LibrarySpecification readLibrarySpecification(final LibspecsFolder libspecsFolder,
+            final LibraryDescriptor descriptor) {
+
+        final String fileName = descriptor.generateLibspecFileName();
+        final File xmlFile = new File(libspecsFolder.getXmlSpecFile(fileName).getLocationURI());
+        final LibrarySpecification spec = readSpecification(xmlFile);
+        spec.setDescriptor(descriptor);
+        return spec;
+    }
+
+    public static LibrarySpecification readSpecification(final File xmlLibspecFile) {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(LibrarySpecification.class);
             final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            final LibrarySpecification specification = (LibrarySpecification) jaxbUnmarshaller.unmarshal(new File(libraryFile.getLocationURI()));
+            final LibrarySpecification specification = (LibrarySpecification) jaxbUnmarshaller
+                    .unmarshal(xmlLibspecFile);
             specification.propagateFormat();
-            specification.setSourceFile(libraryFile);
 
             return specification;
 
@@ -32,29 +41,9 @@ public class LibrarySpecificationReader {
         }
     }
 
-    public static LibrarySpecification readStandardLibrarySpecification(final IFile libraryFile,
-            final String libraryName) {
-        return readSpecification(libraryFile);
-    }
-
-    public static LibrarySpecification readRemoteSpecification(final IFile libraryFile,
-            final RemoteLocation remoteLocation) {
-        final LibrarySpecification spec = readSpecification(libraryFile);
-        spec.setRemoteLocation(remoteLocation);
-        spec.setSecondaryKey(remoteLocation.getUri());
-        return spec;
-    }
-
-    public static LibrarySpecification readReferencedSpecification(final IFile libraryFile,
-            final ReferencedLibrary library) {
-        final LibrarySpecification spec = readSpecification(libraryFile);
-        spec.setReferenced(library);
-        spec.setSecondaryKey(library.getPath());
-        return spec;
-    }
-
-    @SuppressWarnings("serial")
     public static class CannotReadLibrarySpecificationException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
 
         public CannotReadLibrarySpecificationException(final String message, final Throwable cause) {
             super(message, cause);

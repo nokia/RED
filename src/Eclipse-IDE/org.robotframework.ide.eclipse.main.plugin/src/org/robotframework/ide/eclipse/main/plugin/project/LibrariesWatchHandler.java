@@ -67,8 +67,6 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private final Set<LibrarySpecification> dirtySpecs = Collections.synchronizedSet(new HashSet<>());
 
-    private final Set<LibrarySpecification> removedSpecs = new HashSet<>();
-
     private final Map<ReferencedLibrary, String> registeredRefLibraries = Collections.synchronizedMap(new HashMap<>());
 
     private final ConcurrentLinkedQueue<RebuildTask> rebuildTasksQueue = new ConcurrentLinkedQueue<>();
@@ -78,8 +76,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     }
 
     public void registerLibrary(final ReferencedLibrary library, final LibrarySpecification spec) {
-
-        if (spec != null && !registeredLibrarySpecifications.containsKey(spec)) {
+        if (!registeredLibrarySpecifications.containsKey(spec)) {
             final String absolutePathToLibraryFile = findLibraryFileAbsolutePath(library);
             if (absolutePathToLibraryFile != null) {
                 final File libFile = new File(absolutePathToLibraryFile);
@@ -97,6 +94,10 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                     }
                 }
             }
+        }
+
+        if (spec != null) {
+            spec.setIsModified(isLibSpecDirty(spec));
         }
     }
 
@@ -163,11 +164,10 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             for (final LibrarySpecification spec : specsToRemove) {
                 registeredLibrarySpecifications.removeAll(spec);
             }
-            removedSpecs.addAll(specsToRemove);
         }
     }
 
-    public boolean isLibSpecDirty(final LibrarySpecification spec) {
+    boolean isLibSpecDirty(final LibrarySpecification spec) {
         return dirtySpecs.contains(spec);
     }
 
@@ -302,11 +302,9 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         synchronized (dirtySpecs) {
             if (!dirtySpecs.containsAll(specsToRebuild)) {
                 dirtySpecs.addAll(specsToRebuild);
-                final Map<ReferencedLibrary, LibrarySpecification> referencedLibraries = robotProject
-                        .getReferencedLibraries();
-                referencedLibraries.forEach((refLib, librarySpecification) -> {
-                    if (specsToRebuild.contains(librarySpecification)) {
-                        librarySpecification.setIsModified(true);
+                robotProject.getLibrarySpecificationsStream().forEach(spec -> {
+                    if (specsToRebuild.contains(spec)) {
+                        spec.setIsModified(true);
                     }
                 });
             }
@@ -380,14 +378,6 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     private void clearHandler(final String modifiedFileName) {
         removeLibrarySpecification(modifiedFileName);
         registeredRefLibraries.clear();
-    }
-
-    public Set<LibrarySpecification> getRemovedSpecs() {
-        return removedSpecs;
-    }
-
-    public void clearRemovedSpecs() {
-        removedSpecs.clear();
     }
 
     /**

@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -60,8 +60,9 @@ class SimilaritiesAnalyst {
 
     Collection<String> provideSimilarLibraries(final IFile suiteFile, final String libraryName) {
         final RobotProject robotProject = RedPlugin.getModelManager().createProject(suiteFile.getProject());
-        final Collection<String> allLibs = newArrayList(
-                transform(robotProject.getLibrariesSpecifications(), LibrarySpecification::getName));
+        final Collection<String> allLibs = robotProject.getLibrarySpecificationsStream()
+                .map(LibrarySpecification::getName)
+                .collect(toSet());
         return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allLibs, libraryName, maximumDistance));
     }
 
