@@ -5,8 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
+
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,11 +90,12 @@ public class LibrariesBuilder {
 
     private ILibdocGenerator provideGenerator(final LibraryDescriptor libraryDescriptor, final IFile targetFile) {
 
-        if (libraryDescriptor.isStandardRemoteLibrary()) {
-            return new RemoteLibraryLibdocGenerator(URI.create(libraryDescriptor.getArguments().get(0)), targetFile);
+        if (libraryDescriptor.isStandardLibrary()) {
+            final List<String> nameToGenerate = newArrayList(libraryDescriptor.getName());
+            nameToGenerate.addAll(libraryDescriptor.getArguments());
+            final String libName = nameToGenerate.stream().collect(joining("::"));
 
-        } else if (libraryDescriptor.isStandardLibrary()) {
-            return new StandardLibraryLibdocGenerator(targetFile);
+            return new StandardLibraryLibdocGenerator(libName, targetFile);
 
         } else {
             final String path = libraryDescriptor.getPath();
@@ -161,7 +164,7 @@ public class LibrariesBuilder {
                     || !hasSameVersion(new File(xmlSpecFile.getLocationURI()), environment.getVersion())) {
                 // we always want to regenerate standard libraries when RF version have changed
                 // or libdoc does not exist
-                generators.add(new StandardLibraryLibdocGenerator(xmlSpecFile));
+                generators.add(new StandardLibraryLibdocGenerator(stdLib, xmlSpecFile));
             }
         }
         return generators;
@@ -179,9 +182,10 @@ public class LibrariesBuilder {
         for (final RemoteLocation location : configuration.getRemoteLocations()) {
             final String fileName = LibraryDescriptor.ofStandardRemoteLibrary(location).generateLibspecFileName();
 
-            final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
             // we always want to regenerate remote libraries, as something may have changed
-            generators.add(new RemoteLibraryLibdocGenerator(location.getUriAddress(), xmlSpecFile));
+            final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
+            final String libName = "Remote::" + location.getUri();
+            generators.add(new StandardLibraryLibdocGenerator(libName, xmlSpecFile));
         }
         return generators;
     }
