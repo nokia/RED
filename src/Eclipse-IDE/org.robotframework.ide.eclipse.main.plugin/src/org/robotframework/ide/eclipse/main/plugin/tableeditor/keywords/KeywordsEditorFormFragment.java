@@ -205,11 +205,11 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                         rowObject -> rowObject instanceof RobotKeywordCall),
                 new AlternatingRowConfigLabelAccumulator(),
                 new AddingElementLabelAccumulator(dataProvider),
+                new CommentsLabelAccumulator(dataProvider),
                 new KeywordsElementsLabelAccumulator(dataProvider),
                 new ActionNamesLabelAccumulator(dataProvider),
                 new VariablesLabelAccumulator(dataProvider),
-                new SpecialItemsLabelAccumulator(dataProvider),
-                new CommentsLabelAccumulator(dataProvider));
+                new SpecialItemsLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
                 dataProvider.getTreeList());
         final GlazedListTreeData<Object> treeData = new GlazedListTreeData<>(dataProvider.getTreeList());
