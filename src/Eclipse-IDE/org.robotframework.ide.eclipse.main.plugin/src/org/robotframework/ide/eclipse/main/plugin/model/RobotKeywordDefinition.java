@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
+import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
@@ -31,8 +33,6 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 
 import com.google.common.base.Splitter;
 

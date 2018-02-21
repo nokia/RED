@@ -9,8 +9,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.search.ui.text.Match;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 
 
 /**
