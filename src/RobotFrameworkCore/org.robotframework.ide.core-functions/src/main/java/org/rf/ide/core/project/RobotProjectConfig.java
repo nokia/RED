@@ -517,14 +517,6 @@ public class RobotProjectConfig {
             return path;
         }
 
-        public File getFilepath() {
-            if (provideType() == LibraryType.PYTHON) {
-                return new File(path + "/" + name.replaceAll("\\.", "/"));
-            } else {
-                return new File(path);
-            }
-        }
-
         public LibraryType provideType() {
             return LibraryType.valueOf(type);
         }
@@ -608,14 +600,6 @@ public class RobotProjectConfig {
         @Override
         public int hashCode() {
             return uri.hashCode();
-        }
-
-        public String createLibspecFileName() {
-            return "Remote_" + pathWithoutSpecialCharacters(getUri());
-        }
-
-        private static String pathWithoutSpecialCharacters(final String path) {
-            return path.replaceAll("[^A-Za-z0-9]", "_");
         }
     }
 
