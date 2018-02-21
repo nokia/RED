@@ -34,7 +34,6 @@ import org.junit.rules.TemporaryFolder;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.rf.ide.core.watcher.IWatchEventHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -549,12 +548,12 @@ public class LibrariesWatchHandlerTest {
         }
 
         @Override
-        public void registerPath(final java.nio.file.Path dir, final String fileName, final IWatchEventHandler handler) {
+        public void registerPath(final java.nio.file.Path dir, final String fileName) {
             registeredPaths.put(fileName, dir.toString());
         }
 
         @Override
-        public void unregisterFile(final String fileName, final IWatchEventHandler handler) {
+        public void unregisterFile(final String fileName) {
             unregisteredFiles.add(fileName);
         }
 

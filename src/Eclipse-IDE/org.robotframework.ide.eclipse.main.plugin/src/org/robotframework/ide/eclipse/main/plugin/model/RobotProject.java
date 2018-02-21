@@ -169,9 +169,10 @@ public class RobotProject extends RobotContainer {
             final LibrarySpecification spec = libToSpec(this).apply(descriptor);
             refLibsSpecs.put(descriptor, spec);
 
-            librariesWatchHandler.registerLibrary(library, spec);
+            if (spec != null) {
+                librariesWatchHandler.registerLibrary(library, spec);
+            }
         }
-
         return refLibsSpecs;
     }
 
