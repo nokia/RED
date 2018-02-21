@@ -18,8 +18,8 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.ScrolledFormText;
+import org.rf.ide.core.libraries.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
 
 class KeywordDocumentationComposite extends InputLoadingFormComposite {

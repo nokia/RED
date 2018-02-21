@@ -7,8 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.red.viewers.TreeContentProvider;
 
 public class NavigatorKeywordsContentProvider extends TreeContentProvider {
