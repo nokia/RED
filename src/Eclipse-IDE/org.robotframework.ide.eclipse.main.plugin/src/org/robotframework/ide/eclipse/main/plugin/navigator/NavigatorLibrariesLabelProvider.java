@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotProjectDependencies.ErroneousLibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.graphics.ImagesManager;
@@ -52,27 +53,39 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
         } else if (element instanceof ErroneousLibrarySpecification) {
             final ErroneousLibrarySpecification libSpec = (ErroneousLibrarySpecification) element;
 
-            final StyledString label = new StyledString(libSpec.getName(),
-                    mixingStyler(Stylers.Common.STRIKEOUT_STYLER, Stylers.Common.ERROR_STYLER));
+            final StyledString label = new StyledString();
+            label.append(libSpec.getName(), mixingStyler(Stylers.Common.STRIKEOUT_STYLER, Stylers.Common.ERROR_STYLER));
+            label.append(argumentsDecoration(libSpec.getDescriptor()), Stylers.Common.ERROR_STYLER);
             label.append(" (non-accessible)", Stylers.Common.ERROR_STYLER);
             return label;
 
         } else if (element instanceof LibrarySpecification) {
             final LibrarySpecification libSpec = (LibrarySpecification) element;
            
-            final String dirtyLibSpecIndicator = libSpec.isModified() ? "*" : "";
-            final StyledString styled = new StyledString(dirtyLibSpecIndicator + libSpec.getName());
-
-            final List<String> arguments = libSpec.getDescriptor().getArguments();
-            if (!arguments.isEmpty()) {
-                styled.append(arguments.stream().collect(joining(", ", " [", "]")),
-                        Stylers.Common.ECLIPSE_DECORATION_STYLER);
-            }
-
-            final int numberOfKeywords = libSpec.getKeywords() == null ? 0 : libSpec.getKeywords().size();
-            styled.append(" (" + numberOfKeywords + ")", Stylers.Common.ECLIPSE_DECORATION_STYLER);
-            return styled;
+            final StyledString label = new StyledString();
+            label.append(modificationDecoration(libSpec));
+            label.append(libSpec.getName());
+            label.append(argumentsDecoration(libSpec.getDescriptor()), Stylers.Common.ECLIPSE_DECORATION_STYLER);
+            label.append(numberOfKeywordsDecoration(libSpec), Stylers.Common.ECLIPSE_DECORATION_STYLER);
+            return label;
         }
         return new StyledString();
+    }
+
+    private static String modificationDecoration(final LibrarySpecification libSpec) {
+        return libSpec.isModified() ? "*" : "";
+    }
+
+    private static String argumentsDecoration(final LibraryDescriptor descriptor) {
+        final List<String> arguments = descriptor.getArguments();
+        if (arguments.isEmpty()) {
+            return "";
+        }
+        return arguments.stream().collect(joining(", ", " [", "]"));
+    }
+
+    private static String numberOfKeywordsDecoration(final LibrarySpecification libSpec) {
+        final int numberOfKeywords = libSpec.getKeywords() == null ? 0 : libSpec.getKeywords().size();
+        return " (" + numberOfKeywords + ")";
     }
 }

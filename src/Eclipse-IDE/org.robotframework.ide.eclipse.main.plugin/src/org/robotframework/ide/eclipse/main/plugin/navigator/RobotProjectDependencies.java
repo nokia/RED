@@ -33,7 +33,7 @@ class RobotProjectDependencies {
                 libraries.add(entry.getValue());
             } else {
                 final LibraryDescriptor descriptor = entry.getKey();
-                libraries.add(new ErroneousLibrarySpecification(descriptor.getName()));
+                libraries.add(new ErroneousLibrarySpecification(descriptor));
             }
         });
         return libraries;
@@ -71,13 +71,18 @@ class RobotProjectDependencies {
 
     static class ErroneousLibrarySpecification extends LibrarySpecification {
 
-        public ErroneousLibrarySpecification(final String name) {
-            setName(name);
+        public ErroneousLibrarySpecification(final LibraryDescriptor descriptor) {
+            setDescriptor(descriptor);
         }
 
         @Override
         public List<KeywordSpecification> getKeywords() {
             return new ArrayList<>();
+        }
+
+        @Override
+        public String getName() {
+            return getDescriptor().getName();
         }
 
         @Override
@@ -102,7 +107,7 @@ class RobotProjectDependencies {
             }
             if (ErroneousLibrarySpecification.class == obj.getClass()) {
                 final ErroneousLibrarySpecification that = (ErroneousLibrarySpecification) obj;
-                return Objects.equal(this.getName(), that.getName());
+                return Objects.equal(this.getDescriptor(), that.getDescriptor());
             }
             return false;
         }
