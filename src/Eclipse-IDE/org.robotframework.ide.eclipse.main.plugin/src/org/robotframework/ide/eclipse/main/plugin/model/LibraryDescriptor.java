@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,16 +10,19 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 public final class LibraryDescriptor {
 
     public static LibraryDescriptor ofStandardLibrary(final String libraryName) {
-        return new LibraryDescriptor(libraryName);
+        return new LibraryDescriptor(libraryName, LibraryType.PYTHON, null, new ArrayList<>());
     }
 
     public static LibraryDescriptor ofStandardRemoteLibrary(final RemoteLocation remoteLocation) {
-        return new LibraryDescriptor("Remote", newArrayList(remoteLocation.getUri()));
+        return new LibraryDescriptor("Remote", LibraryType.PYTHON, null, newArrayList(remoteLocation.getUri()));
     }
 
     public static LibraryDescriptor ofReferencedLibrary(final ReferencedLibrary refLibrary) {
@@ -36,19 +38,7 @@ public final class LibraryDescriptor {
 
     private final List<String> arguments;
 
-    public LibraryDescriptor(final String name) {
-        this(name, null, null, new ArrayList<>());
-    }
-
-    public LibraryDescriptor(final String name, final List<String> arguments) {
-        this(name, null, null, arguments);
-    }
-
-    public LibraryDescriptor(final String name, final LibraryType type, final String path) {
-        this(name, type, path, new ArrayList<>());
-    }
-
-    public LibraryDescriptor(final String name, final LibraryType type, final String path,
+    private LibraryDescriptor(final String name, final LibraryType type, final String path,
             final List<String> arguments) {
         this.name = name;
         this.type = type;
@@ -68,11 +58,11 @@ public final class LibraryDescriptor {
         return path;
     }
 
-    public File getFilepath() {
-        if (type == LibraryType.PYTHON) {
-            return new File(path + "/" + name.replaceAll("\\.", "/"));
+    public String getFilepath() {
+        if (path != null && type == LibraryType.PYTHON) {
+            return path + "/" + name.replaceAll("\\.", "/");
         } else {
-            return new File(path);
+            return path;
         }
     }
 
@@ -97,11 +87,24 @@ public final class LibraryDescriptor {
     }
 
     public String generateLibspecFileName() {
-        if (isStandardRemoteLibrary()) {
-            return "Remote_" + arguments.get(0).replaceAll("[^A-Za-z0-9]", "_");
-        } else {
+        if (path == null && arguments.isEmpty()) {
             return name;
         }
+
+        @SuppressWarnings("deprecation")
+        final Hasher hasher = Hashing.sha1().newHasher();
+        if (path != null) {
+            hasher.putString(path, Charsets.UTF_8);
+        }
+        for (final String arg : arguments) {
+            hasher.putString(arg, Charsets.UTF_8);
+        }
+
+        // we use 7-digits abbreviation of SHA-1 hash; from approximation formulas of birthday
+        // paradox the probability that two hashes will collide when there are 256 libraries with
+        // the same name in project is < 2 ** (-13) which is around 0.012%
+        final String hashAbbrevieted = hasher.hash().toString().substring(0, 7);
+        return name + "_" + hashAbbrevieted;
     }
 
     @Override

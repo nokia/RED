@@ -77,7 +77,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         final Map<LibraryDescriptor, LibrarySpecification> libs = validationContext
                 .getReferencedLibrarySpecifications();
         for (final LibraryDescriptor descriptor : libs.keySet()) {
-            final IPath entryPath = new Path(descriptor.getFilepath().getPath());
+            final IPath entryPath = new Path(descriptor.getFilepath());
             final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
             final IPath libPath2 = RedWorkspace.Paths
                     .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
