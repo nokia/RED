@@ -105,8 +105,7 @@ public class LibrariesBuilder {
                 return new VirtualLibraryLibdocGenerator(Path.fromPortableString(path), targetFile);
 
             } else if (type == LibraryType.PYTHON) {
-                return new PythonLibraryLibdocGenerator(libraryDescriptor.getName(),
-                        toAbsolute(libraryDescriptor.getPath()), targetFile);
+                return new PythonLibraryLibdocGenerator(libraryDescriptor.getName(), toAbsolute(path), targetFile);
 
             } else if (type == LibraryType.JAVA) {
                 return new JavaLibraryLibdocGenerator(libraryDescriptor.getName(), toAbsolute(path), targetFile);
