@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -27,8 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.collect.Iterables;
 

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.library;
+package org.rf.ide.core.libraries;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,8 +14,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 
 import com.google.common.base.Objects;
 

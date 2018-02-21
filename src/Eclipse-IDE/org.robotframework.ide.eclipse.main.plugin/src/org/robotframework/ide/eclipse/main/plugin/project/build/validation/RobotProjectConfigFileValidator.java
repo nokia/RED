@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -37,7 +38,6 @@ import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigu
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;

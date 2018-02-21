@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.library;
+package org.rf.ide.core.libraries;
 
 import java.io.File;
 
@@ -11,20 +11,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
-
 public class LibrarySpecificationReader {
-
-    public static LibrarySpecification readLibrarySpecification(final LibspecsFolder libspecsFolder,
-            final LibraryDescriptor descriptor) {
-
-        final String fileName = descriptor.generateLibspecFileName();
-        final File xmlFile = new File(libspecsFolder.getXmlSpecFile(fileName).getLocationURI());
-        final LibrarySpecification spec = readSpecification(xmlFile);
-        spec.setDescriptor(descriptor);
-        return spec;
-    }
 
     public static LibrarySpecification readSpecification(final File xmlLibspecFile) {
         try {

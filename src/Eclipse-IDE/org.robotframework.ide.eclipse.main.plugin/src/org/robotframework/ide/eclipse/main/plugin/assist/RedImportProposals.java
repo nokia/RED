@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;

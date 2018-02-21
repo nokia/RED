@@ -37,6 +37,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
@@ -53,7 +54,6 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;

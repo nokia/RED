@@ -8,9 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Objects;
 

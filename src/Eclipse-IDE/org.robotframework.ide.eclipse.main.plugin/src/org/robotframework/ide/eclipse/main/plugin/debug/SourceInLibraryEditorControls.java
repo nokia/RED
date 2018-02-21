@@ -22,6 +22,8 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.ScrolledFormText;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -35,8 +37,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecisio
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.preferences.DebuggerPreferencePage;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;

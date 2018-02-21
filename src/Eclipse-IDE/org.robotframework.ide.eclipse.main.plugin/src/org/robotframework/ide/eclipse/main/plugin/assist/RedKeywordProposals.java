@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -35,8 +37,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecisio
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ListMultimap;

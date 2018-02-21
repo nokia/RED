@@ -15,10 +15,10 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelP
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotProjectDependencies.ErroneousLibrarySpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {

@@ -10,10 +10,12 @@ import static com.google.common.collect.Maps.newHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
-import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
 
 import com.google.common.collect.ImmutableMap;
 

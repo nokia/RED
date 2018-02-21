@@ -23,7 +23,7 @@ import org.rf.ide.core.dryrun.RobotDryRunKeywordEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.robotframework.ide.eclipse.main.plugin.model.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 /**

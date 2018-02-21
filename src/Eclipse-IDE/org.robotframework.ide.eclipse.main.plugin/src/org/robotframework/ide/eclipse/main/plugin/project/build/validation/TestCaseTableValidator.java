@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -56,7 +57,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.DocumentationTestCaseDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PostconditionDeclarationExistenceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PreconditionDeclarationExistenceValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;

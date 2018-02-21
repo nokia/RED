@@ -1,8 +1,9 @@
-package org.robotframework.ide.eclipse.main.plugin.model;
+package org.rf.ide.core.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
