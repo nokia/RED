@@ -6,6 +6,7 @@
 package org.robotframework.red.nattable.configs;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
@@ -23,6 +24,8 @@ public class VariablesLabelAccumulator implements IConfigLabelAccumulator {
 
     public static final String VARIABLE_CONFIG_LABEL = "VARIABLE";
 
+    private static final Pattern varPattern = Pattern.compile("^[$|@|&]\\s*[{].*[}]$");
+
     private final IRowDataProvider<Object> dataProvider;
 
     public VariablesLabelAccumulator(final IRowDataProvider<Object> dataProvider) {
@@ -36,11 +39,17 @@ public class VariablesLabelAccumulator implements IConfigLabelAccumulator {
         if (rowObject instanceof RobotKeywordCall) {
             final List<RobotToken> tokens = ((RobotKeywordCall) rowObject).getLinkedElement().getElementTokens();
             if (tokens.size() > columnPosition) {
-                final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
-                if (types.contains(RobotTokenType.VARIABLE_USAGE)) {
+                final RobotToken token = tokens.get(columnPosition);
+                final List<IRobotTokenType> types = token.getTypes();
+                if (types.contains(RobotTokenType.VARIABLE_USAGE)
+                        || (!token.getRaw().equals(token.getText()) && looksLikeVariable(token.getText()))) {
                     configLabels.addLabel(VARIABLE_CONFIG_LABEL);
                 }
             }
         }
+    }
+
+    private boolean looksLikeVariable(final String text) {
+        return varPattern.matcher(text).matches();
     }
 }
