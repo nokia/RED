@@ -17,9 +17,15 @@ Robot files. Select from top menu bar:
 [File -> New -> Other -> Robot Framework -> Robot
 Project](javascript:executeCommand\('org.eclipse.ui.newWizard\(newWizardId=org.robotframework.ide.eclipse.wizards.newRobotProject\)'\))
 
+Empty Robot Project should looks similar as below:
+![](images/simple_project_1.png)  
+If project doesn't have brown icon or no red.xml file it means that the
+Project is different type than Robot. Fix this by right-click on Project
+name,from Robot Framework select **Configure as Robot project**
+
 ### Import Robot files into project
 
-Import Robot files by drag&drop to created project, alternatively you can
+Import Robot files by drag &drop to created project, alternatively you can
 import folders by right click on project and selecting  
 [Import -> General -> File
 System](javascript:executeCommand\('org.eclipse.ui.file.import\(importWizardId=org.eclipse.ui.wizards.import.FileSystem\)'\))
