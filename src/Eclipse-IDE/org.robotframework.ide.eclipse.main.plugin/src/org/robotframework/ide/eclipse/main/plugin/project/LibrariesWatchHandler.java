@@ -47,6 +47,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.swt.SwtThread;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.ListMultimap;
@@ -84,10 +85,8 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 if (libDir != null && libDir.exists() && libDir.isDirectory()) {
                     if (isPythonModule(absolutePathToLibraryFile)) {
                         final String[] moduleFilesList = extractPythonModuleFiles(libDir);
-                        if (moduleFilesList != null) {
-                            for (int i = 0; i < moduleFilesList.length; i++) {
-                                addLibraryToWatch(moduleFilesList[i], libDir.toPath(), spec);
-                            }
+                        for (int i = 0; i < moduleFilesList.length; i++) {
+                            addLibraryToWatch(moduleFilesList[i], libDir.toPath(), spec);
                         }
                     } else {
                         addLibraryToWatch(libFile.getName(), libDir.toPath(), spec);
@@ -95,31 +94,24 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 }
             }
         }
-
-        if (spec != null) {
-            spec.setIsModified(isLibSpecDirty(spec));
-        }
+        spec.setIsModified(isLibSpecDirty(spec));
     }
 
     public void unregisterLibraries(final List<ReferencedLibrary> libraries) {
-        if (libraries != null) {
-            for (final ReferencedLibrary referencedLibrary : libraries) {
-                final String path = registeredRefLibraries.get(referencedLibrary);
-                if (path != null) {
-                    final File libFile = new File(path);
-                    final File libDir = libFile.getParentFile();
-                    if (isPythonModule(path) && libDir != null && libDir.exists()) {
-                        final String[] moduleFilesList = extractPythonModuleFiles(libDir);
-                        if (moduleFilesList != null) {
-                            for (int i = 0; i < moduleFilesList.length; i++) {
-                                removeLibraryToWatch(moduleFilesList[i]);
-                            }
-                        }
-                    } else {
-                        removeLibraryToWatch(libFile.getName());
+        for (final ReferencedLibrary referencedLibrary : libraries) {
+            final String path = registeredRefLibraries.get(referencedLibrary);
+            if (path != null) {
+                final File libFile = new File(path);
+                final File libDir = libFile.getParentFile();
+                if (isPythonModule(path) && libDir != null && libDir.exists()) {
+                    final String[] moduleFilesList = extractPythonModuleFiles(libDir);
+                    for (int i = 0; i < moduleFilesList.length; i++) {
+                        removeLibraryToWatch(moduleFilesList[i]);
                     }
-                    registeredRefLibraries.remove(referencedLibrary);
+                } else {
+                    removeLibraryToWatch(libFile.getName());
                 }
+                registeredRefLibraries.remove(referencedLibrary);
             }
         }
     }
@@ -129,7 +121,8 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     }
 
     private String[] extractPythonModuleFiles(final File fileDir) {
-        return fileDir.list((dir, name) -> name.endsWith(".py"));
+        final String[] files = fileDir.list((dir, name) -> name.endsWith(".py"));
+        return files == null ? new String[0] : files;
     }
 
     private void addLibraryToWatch(final String fileName, final Path dir, final LibrarySpecification spec) {
@@ -145,12 +138,20 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             }
             registeredLibrarySpecifications.put(spec, fileName);
         }
-        registerPath(dir, fileName, this);
+        registerPath(dir, fileName);
     }
 
     private void removeLibraryToWatch(final String fileName) {
         removeLibrarySpecification(fileName);
-        unregisterFile(fileName, this);
+        unregisterFile(fileName);
+    }
+
+    protected void registerPath(final Path dir, final String fileName) {
+        RedFileWatcher.getInstance().registerPath(dir, fileName, this);
+    }
+
+    protected void unregisterFile(final String fileName) {
+        RedFileWatcher.getInstance().unregisterFile(fileName, this);
     }
 
     private void removeLibrarySpecification(final String fileName) {
@@ -173,16 +174,6 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     public void removeDirtySpecs(final Collection<LibrarySpecification> reloadedSpecs) {
         dirtySpecs.removeAll(reloadedSpecs);
-    }
-
-    @Override
-    public void registerPath(final Path dir, final String fileName, final IWatchEventHandler handler) {
-        RedFileWatcher.getInstance().registerPath(dir, fileName, this);
-    }
-
-    @Override
-    public void unregisterFile(final String fileName, final IWatchEventHandler handler) {
-        RedFileWatcher.getInstance().unregisterFile(fileName, this);
     }
 
     @Override
@@ -211,7 +202,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                     } else {
                         markLibSpecsAsModified(libSpecsToRebuild);
                     }
-                    refreshNavigator(project);
+                    fireSpecificationChangeEvent(project);
                 }
 
                 private List<LibrarySpecification> collectModifiedLibSpecs(final String modifiedFileName) {
@@ -257,6 +248,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
         final Multimap<IProject, LibrarySpecification> groupedSpecifications = LinkedHashMultimap.create();
         groupedSpecifications.putAll(rebuildTask.getProject(), rebuildTask.getSpecsToRebuild());
+
         invokeLibrariesBuilder(monitor, groupedSpecifications);
         robotProject.clearConfiguration();
         robotProject.clearKwSources();
@@ -311,13 +303,11 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         }
     }
 
-    private void refreshNavigator(final IProject project) {
+    private void fireSpecificationChangeEvent(final IProject project) {
         if (eventBroker == null) {
             eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         }
-        if (eventBroker != null) {
-            eventBroker.post(RobotModelEvents.ROBOT_LIBRARY_SPECIFICATION_CHANGE, project);
-        }
+        eventBroker.post(RobotModelEvents.ROBOT_LIBRARY_SPECIFICATION_CHANGE, project);
     }
 
     private String findLibraryFileAbsolutePath(final ReferencedLibrary library) {
@@ -380,24 +370,18 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         registeredRefLibraries.clear();
     }
 
-    /**
-     * for testing purposes only
-     */
-    protected Map<ReferencedLibrary, String> getRegisteredRefLibraries() {
+    @VisibleForTesting
+    Map<ReferencedLibrary, String> getRegisteredRefLibraries() {
         return registeredRefLibraries;
     }
 
-    /**
-     * for testing purposes only
-     */
-    protected ListMultimap<LibrarySpecification, String> getLibrarySpecifications() {
+    @VisibleForTesting
+    ListMultimap<LibrarySpecification, String> getLibrarySpecifications() {
         return registeredLibrarySpecifications;
     }
 
-    /**
-     * for testing purposes only
-     */
-    protected int getRebuildTasksQueueSize() {
+    @VisibleForTesting
+    int getRebuildTasksQueueSize() {
         return rebuildTasksQueue.size();
     }
 
