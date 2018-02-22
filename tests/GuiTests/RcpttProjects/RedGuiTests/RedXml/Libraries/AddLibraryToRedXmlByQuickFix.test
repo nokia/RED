@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/12/17 2:07 PM
+Save-Time: 2/22/18 3:41 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -258,7 +258,8 @@ with [get-editor "Script.robot" | get-text-viewer] {
 
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'here_is_class.Dog' and add to configuration" | click -default
-wait 1000    
+    
+wait-for-discover-window 
 get-window "Discovering libraries summary" | get-tree 
     | get-item "here_is_class.Dog/Status: Added to project configuration" | get-property caption 
     | equals "Status: Added to project configuration" | verify-true
