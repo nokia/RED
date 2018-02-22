@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 /**
@@ -25,7 +26,7 @@ public class LibrariesConfigUpdater {
 
     private final boolean isConfigClosed;
 
-    private final List<ReferencedLibrary> addedLibraries;
+    private final List<Object> addedLibraries;
 
     public LibrariesConfigUpdater(final RobotProject robotProject) {
         this.robotProject = robotProject;
@@ -50,6 +51,12 @@ public class LibrariesConfigUpdater {
         }
     }
 
+    public void addRemoteLocation(final RemoteLocation remoteLocation) {
+        if (config.addRemoteLocation(remoteLocation)) {
+            addedLibraries.add(remoteLocation);
+        }
+    }
+
     public void finalizeLibrariesAdding(final IEventBroker eventBroker) {
         if (!addedLibraries.isEmpty()) {
             if (isConfigClosed) {
@@ -63,7 +70,7 @@ public class LibrariesConfigUpdater {
     }
 
     private void fireEvents(final IEventBroker eventBroker) {
-        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+        final RedProjectConfigEventData<List<Object>> eventData = new RedProjectConfigEventData<>(
                 robotProject.getConfigurationFile(), addedLibraries);
         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
     }

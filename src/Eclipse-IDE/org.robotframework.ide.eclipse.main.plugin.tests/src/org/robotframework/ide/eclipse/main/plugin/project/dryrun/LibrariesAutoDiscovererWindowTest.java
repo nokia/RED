@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -139,6 +140,17 @@ public class LibrariesAutoDiscovererWindowTest {
     }
 
     @Test
+    public void testConvertingToText_forRemoteLibraryImportWithKnownStatusAndSource() throws Exception {
+        final URI remote_uri = URI.create("http://127.0.0.1:9000");
+        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("Remote", remote_uri);
+        libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
+
+        assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
+                .isEqualTo("Status: Not added to project configuration\n" + "Source: "
+                        + libImportElement.getSourcePath().toString() + "\n" + "Importers: Unknown");
+    }
+
+    @Test
     public void testConvertingToText_forLibraryImportWithSingleImporter() throws Exception {
         final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
         libImportElement.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
@@ -231,6 +243,30 @@ public class LibrariesAutoDiscovererWindowTest {
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getName()).isEqualTo("Source:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getValue())
                 .isEqualTo(lib.getLocation().toFile().getAbsolutePath());
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers:");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getValue())
+                .isEqualTo(suite1.getLocation().toFile().getAbsolutePath());
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getName()).isEqualTo("Additional info:");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getValue())
+                .isEqualTo("additional info error");
+    }
+
+    @Test
+    public void elementChildrenAreProvided_whenProviderIsAskedForChildrenDuringForRemoteImport() throws Exception {
+        final URI remote_uri = URI.create("http://127.0.0.1:9000");
+        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("Remote", remote_uri);
+        libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
+        libImportElement.addImporterPath(suite1.getLocationURI());
+        libImportElement.setAdditionalInfo("additional info error");
+
+        final Object[] libImportChildren = contentProvider.getChildren(libImportElement);
+        assertThat(libImportChildren).hasSize(4).allMatch(p -> p instanceof DryRunLibraryImportChildElement);
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[0]).getName()).isEqualTo("Status:");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[0]).getValue())
+                .isEqualTo("Not added to project configuration");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getName()).isEqualTo("Source:");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getValue())
+                .isEqualTo(libImportElement.getSourcePath().toString());
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getValue())
                 .isEqualTo(suite1.getLocation().toFile().getAbsolutePath());

@@ -32,6 +32,15 @@ class LibraryImports {
     }
 
     static RobotDryRunLibraryImport createImport(final DryRunLibraryImportStatus status, final String name,
+            final URI sourcePath, final Set<IFile> importers) {
+        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(name, sourcePath);
+        libImport.setStatus(status);
+        libImport.setImportersPaths(
+                importers.stream().map(importer -> importer.getLocation().toFile().toURI()).collect(toSet()));
+        return libImport;
+    }
+
+    static RobotDryRunLibraryImport createImport(final DryRunLibraryImportStatus status, final String name,
             final IFile source) {
         final URI sourcePath = source.getLocation().toFile().toURI();
         final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(name, sourcePath);
