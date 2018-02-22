@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ij_b0BDGEeiccMTRvAu1GQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/16/18 2:48 PM
+Save-Time: 2/22/18 9:54 AM
 Tags: help
 Testcase-Type: ecl
 
@@ -26,7 +26,8 @@ with [get-editor "SimpleLoggingTestCase.robot"] {
 }
 get-eclipse-window | get-object | invoke setSize 650 450
 gui-view-screenshot "SimpleLoggingTestCase.robot" "add_new_var.png"
-
+wait 500
+gui-view-screenshot "SimpleLoggingTestCase.robot" "add_new_var.png"
 with [get-editor "SimpleLoggingTestCase.robot"] {
     get-tab-folder | get-tab-item Variables | click
     restore
