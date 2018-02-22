@@ -172,7 +172,7 @@ public enum ProblemCategory {
             ProblemCategoryType.IMPORT,
             "Import path outside of workspace",
             "Occurs when imported path points to location not from workspace."),
-    IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS(
+    MISSING_ARGUMENT_FOR_REMOTE_LIBRARY_IMPORT(
             ProblemCategoryType.IMPORT,
             "Import Remote library without arguments",
             "Occurs when Remote library is imported without agruments."),

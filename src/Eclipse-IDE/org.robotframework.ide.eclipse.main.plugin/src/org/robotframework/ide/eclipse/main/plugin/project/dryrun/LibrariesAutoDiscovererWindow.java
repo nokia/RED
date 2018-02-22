@@ -52,6 +52,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
@@ -305,8 +306,13 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         }
 
         if (libraryImport.getSourcePath() != null) {
-            children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME,
-                    new File(libraryImport.getSourcePath()).getAbsolutePath()));
+            if (libraryImport.getType() != DryRunLibraryType.REMOTE) {
+                children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME,
+                        new File(libraryImport.getSourcePath()).getAbsolutePath()));
+            } else {
+                children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME,
+                        libraryImport.getSourcePath().toString()));
+            }
         } else {
             children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, UNKNOWN_ELEMENT_VALUE));
         }

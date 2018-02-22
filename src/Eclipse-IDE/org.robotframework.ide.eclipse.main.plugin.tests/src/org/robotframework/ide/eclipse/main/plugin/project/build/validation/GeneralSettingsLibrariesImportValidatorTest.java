@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,8 +33,10 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
@@ -69,6 +72,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     private MockReporter reporter;
 
+    private RobotProject robotProject;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
         final File root = tempFolder.getRoot();
@@ -84,6 +89,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void beforeTest() {
         model = new RobotModel();
         reporter = new MockReporter();
+        robotProject = model.createRobotProject(projectProvider.getProject());
     }
 
     @Test
@@ -99,10 +105,42 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote");
 
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(26, 32))),
-                new Problem(GeneralSettingsProblem.IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS,
+                new Problem(GeneralSettingsProblem.MISSING_ARGUMENT_FOR_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(26, 32))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithToManyArguments() {
+        validateLibraryImport("Remote  http://127.0.0.1:9000/  http://127.0.0.1:10000/");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, new ProblemPosition(2, Range.closed(26, 32))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryArgumentIsNotAddedToRedXml() {
+        validateLibraryImport("Remote  http://127.0.0.1:9000/");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                        new ProblemPosition(2, Range.closed(34, 56))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryArgumentNotExistsUnderLocationButIsAddedToRedXml() {
+        final RobotProjectConfig robotProjectConfig = robotProject.getRobotProjectConfig();
+        final RemoteLocation remoteLibrary = RemoteLocation.create("http://127.0.0.1:9000/");
+
+        robotProjectConfig.addRemoteLocation(remoteLibrary);
+
+        validateLibraryImport("Remote  http://127.0.0.1:9000/");
+        validateLibraryImport("Remote  http://127.0.0.1:9000");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 56))),
+                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 55))));
     }
 
     @Test
@@ -287,6 +325,33 @@ public class GeneralSettingsLibrariesImportValidatorTest {
                 new ProblemPosition(2, Range.closed(26, 32))));
 
         libFile.delete(true, null);
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryArgumentExistsUnderLocation() throws Exception {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            final RobotProjectConfig robotProjectConfig = robotProject.getRobotProjectConfig();
+            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+
+            final RemoteLocation remoteLocation = RemoteLocation
+                    .create(location);
+
+            robotProjectConfig.addRemoteLocation(remoteLocation);
+
+            final LibraryConstructor constructor = new LibraryConstructor();
+            constructor.setArguments(newArrayList(location));
+
+            final LibrarySpecification spec = createNewLibrarySpecification("Remote", constructor);
+            final Map<RemoteLocation, LibrarySpecification> remoteLibs = new HashMap<>();
+            remoteLibs.put(remoteLocation, spec);
+
+            validateLibraryImport("Remote  " + location, new HashMap<>(), remoteLibs);
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), remoteLibs);
+
+            assertThat(reporter.getReportedProblems()).isEmpty();
+        } finally {
+            // nothing to do, just let the socket close itself
+        }
     }
 
     @Test
@@ -545,15 +610,22 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     private void validateLibraryImport(final String toImport) {
-        validateLibraryImport(toImport, new HashMap<ReferencedLibrary, LibrarySpecification>());
+        validateLibraryImport(toImport, new HashMap<>());
     }
 
     private void validateLibraryImport(final String toImport,
             final Map<ReferencedLibrary, LibrarySpecification> refLibs) {
+        validateLibraryImport(toImport, refLibs, new HashMap<>());
+    }
+
+    private void validateLibraryImport(final String toImport,
+            final Map<ReferencedLibrary, LibrarySpecification> refLibs,
+            final Map<RemoteLocation, LibrarySpecification> remoteLibs) {
+
         final RobotSuiteFile suiteFile = createLibraryImportingSuite(toImport);
         final LibraryImport libImport = getImport(suiteFile);
 
-        final FileValidationContext context = prepareContext(suiteFile, refLibs);
+        final FileValidationContext context = prepareContext(suiteFile, refLibs, remoteLibs);
 
         final GeneralSettingsLibrariesImportValidator validator = new GeneralSettingsLibrariesImportValidator(context,
                 suiteFile, newArrayList(libImport), reporter);
@@ -586,12 +658,23 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     private FileValidationContext prepareContext(final RobotSuiteFile suiteFile,
-            final Map<ReferencedLibrary, LibrarySpecification> refLibs) {
-        final Map<String, LibrarySpecification> specsByName = refLibs.entrySet().stream().collect(
-                Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()));
+            final Map<ReferencedLibrary, LibrarySpecification> refLibs,
+            final Map<RemoteLocation, LibrarySpecification> remoteLibs) {
 
-        final ValidationContext parentContext = new ValidationContext(model, RobotVersion.from("0.0"),
-                SuiteExecutor.Python, specsByName, refLibs);
+        Map<String, LibrarySpecification> specsByName;
+        ValidationContext parentContext;
+        if (!refLibs.isEmpty()) {
+            specsByName = refLibs.entrySet().stream().collect(
+                    Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()));
+            parentContext = new ValidationContext(model, RobotVersion.from("0.0"),
+                    SuiteExecutor.Python, specsByName, refLibs);
+        } else {
+            final RobotProjectConfig config = robotProject.getRobotProjectConfig();
+            specsByName = remoteLibs.entrySet().stream().collect(
+                    Collectors.toMap(e -> e.getKey().getRemoteName(), e -> e.getValue()));
+            parentContext = new ValidationContext(config, model, RobotVersion.from("0.0"), SuiteExecutor.Python,
+                    specsByName);
+        }
         return new FileValidationContext(parentContext, suiteFile.getFile());
     }
 

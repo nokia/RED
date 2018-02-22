@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -54,7 +56,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.LibraryImportColle
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
-class ReferenceLibraryImportCollector {
+class ExternalLibrariesImportCollector {
 
     private final Set<String> standardLibraryNames;
 
@@ -70,7 +72,7 @@ class ReferenceLibraryImportCollector {
 
     private RobotSuiteFile currentSuite;
 
-    ReferenceLibraryImportCollector(final RobotProject robotProject) {
+    ExternalLibrariesImportCollector(final RobotProject robotProject) {
         this.standardLibraryNames = robotProject.getStandardLibraries().keySet();
         this.libraryLocator = new ReferencedLibraryLocator(robotProject, new DiscoveringLibraryImporter(),
                 new DiscoveringLibraryDetector());
@@ -133,6 +135,33 @@ class ReferenceLibraryImportCollector {
                     unknownLibraryNames.put(name, currentSuite);
                 } else if (knownLibraryNames.containsKey(name)) {
                     knownLibraryNames.get(name).forEach(libImport -> libraryImporters.put(libImport, currentSuite));
+                } else if ("Remote".equals(name)) {
+                    if (arguments.size() == 1) {
+                        final String address = RemoteLocation.createRemoteUri(arguments.get(0).getText());
+                        final String remoteLibName = RemoteLocation.createRemoteName(arguments.get(0).getText());
+                        final URI uriAddress = URI.create(address);
+                        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName,
+                                uriAddress);
+                        if (!libraryImports.contains(libImport)) {
+                            libraryImports.add(libImport);
+                            libraryImporters.put(libImport, currentSuite);
+                            knownLibraryNames.put(remoteLibName, libImport);
+                        } else {
+                            libraryImporters.put(libImport, currentSuite);
+                        }
+                    } else if (arguments.isEmpty()) {
+                        final String remoteLibName = name + " " + RemoteLocation.DEFAULT_ADDRESS;
+                        final URI uriAddress = URI.create(RemoteLocation.DEFAULT_ADDRESS);
+                        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName,
+                                uriAddress);
+                        if (!libraryImports.contains(libImport)) {
+                            libraryImports.add(libImport);
+                            libraryImporters.put(libImport, currentSuite);
+                            knownLibraryNames.put(remoteLibName, libImport);
+                        } else {
+                            libraryImporters.put(libImport, currentSuite);
+                        }
+                    }
                 } else {
                     libraryLocator.locateByName(currentSuite, name);
                 }

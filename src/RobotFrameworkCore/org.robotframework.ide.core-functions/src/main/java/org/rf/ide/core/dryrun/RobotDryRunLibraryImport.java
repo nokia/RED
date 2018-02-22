@@ -50,7 +50,7 @@ public class RobotDryRunLibraryImport {
             final List<String> args) {
         this.name = name;
         this.sourcePath = resolveSourcePath(sourcePath);
-        this.type = resolveType(this.sourcePath);
+        this.type = resolveType(this.name, this.sourcePath);
         if (importerPath != null) {
             this.importersPaths.add(importerPath);
         }
@@ -77,13 +77,17 @@ public class RobotDryRunLibraryImport {
         }
     }
 
-    private DryRunLibraryType resolveType(final URI sourcePath) {
-        if (sourcePath != null) {
-            final String path = sourcePath.getPath();
-            if (path.endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
-                return DryRunLibraryType.JAVA;
-            } else {
-                return DryRunLibraryType.PYTHON;
+    private DryRunLibraryType resolveType(final String name, final URI sourcePath) {
+        if (name.equals("Remote") || name.startsWith("Remote ")) {
+            return DryRunLibraryType.REMOTE;
+        } else {
+            if (sourcePath != null) {
+                final String path = sourcePath.getPath();
+                if (path.endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
+                    return DryRunLibraryType.JAVA;
+                } else {
+                    return DryRunLibraryType.PYTHON;
+                }
             }
         }
         return DryRunLibraryType.UNKNOWN;
@@ -180,6 +184,7 @@ public class RobotDryRunLibraryImport {
     public static enum DryRunLibraryType {
         PYTHON,
         JAVA,
-        UNKNOWN
+        UNKNOWN,
+        REMOTE
     }
 }

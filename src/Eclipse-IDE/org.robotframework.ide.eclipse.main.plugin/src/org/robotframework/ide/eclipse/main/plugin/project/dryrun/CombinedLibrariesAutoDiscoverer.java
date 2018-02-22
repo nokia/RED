@@ -20,13 +20,13 @@ public class CombinedLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
 
     private final Collection<RobotSuiteFile> suites;
 
-    private final ReferenceLibraryImportCollector referenceLibraryImportCollector;
+    private final ExternalLibrariesImportCollector referenceLibraryImportCollector;
 
     public CombinedLibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler) {
         super(robotProject, summaryHandler);
         this.suites = suites;
-        this.referenceLibraryImportCollector = new ReferenceLibraryImportCollector(robotProject);
+        this.referenceLibraryImportCollector = new ExternalLibrariesImportCollector(robotProject);
     }
 
     @Override

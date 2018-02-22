@@ -10,6 +10,7 @@ import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -91,6 +92,17 @@ public class ValidationContext {
         this.executorInUse = executor;
         this.accessibleLibraries = libs;
         this.referencedAccessibleLibraries = refLibs;
+    }
+
+    @VisibleForTesting
+    public ValidationContext(final RobotProjectConfig config, final RobotModel model, final RobotVersion version,
+            final SuiteExecutor executor, final Map<String, LibrarySpecification> remoteLibs) {
+        this.projectConfig = config;
+        this.model = model;
+        this.version = version;
+        this.executorInUse = executor;
+        this.accessibleLibraries = remoteLibs;
+        this.referencedAccessibleLibraries = new HashMap<>();
     }
 
     private static Map<String, LibrarySpecification> collectLibraries(final RobotProject robotProject) {

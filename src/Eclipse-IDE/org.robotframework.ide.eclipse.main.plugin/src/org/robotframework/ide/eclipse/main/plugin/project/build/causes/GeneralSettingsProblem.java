@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddRemoteLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeLibraryPathToNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
@@ -196,16 +197,46 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return fixers;
         }
     },
-    IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS {
+    NON_EXISTING_REMOTE_LIBRARY_IMPORT {
 
         @Override
         public String getProblemDescription() {
-            return "'%s' library import without arguments";
+            return "Unknown '%s' library under '%s' location";
+        }
+    },
+    REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML {
+
+        @Override
+        public String getProblemDescription() {
+            return "'%s' library under '%s' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to "
+                    + RobotProjectConfig.FILENAME + " for proper validation";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String path = marker.getAttribute(AdditionalMarkerAttributes.PATH, null);
+            final List<IMarkerResolution> fixers = new ArrayList<>();
+
+            fixers.add(new AddRemoteLibraryToRedXmlFixer(path));
+
+            return fixers;
+        }
+    },
+    MISSING_ARGUMENT_FOR_REMOTE_LIBRARY_IMPORT {
+
+        @Override
+        public String getProblemDescription() {
+            return "'%s' library import without argument";
         }
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS;
+            return ProblemCategory.MISSING_ARGUMENT_FOR_REMOTE_LIBRARY_IMPORT;
         }
 
         @Override

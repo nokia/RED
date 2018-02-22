@@ -23,6 +23,7 @@ import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryI
 import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryImports.hasLibImports;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -44,6 +45,7 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -362,6 +364,62 @@ public class CombinedLibrariesAutoDiscovererTest {
                 createImport(ADDED, "LibWithClasses.ClassC", projectProvider.getFile("libs/LibWithClasses.py"),
                         newHashSet(suite1.getFile())),
                 createImport(NOT_ADDED, "NotExisting.ClassName", newHashSet(suite2.getFile())))));
+        verifyNoMoreInteractions(summaryHandler);
+    }
+
+    @Test
+    public void remoteLibsAreAddedToProjectConfig_whenAdressIsWithOrWithoutSlash() throws Exception {
+        final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000", "*** Test Cases ***"));
+        final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("suite2.robot",
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:8000", "*** Test Cases ***"));
+        final RobotSuiteFile suite3 = model.createSuiteFile(projectProvider.createFile("suite3.robot",
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000/",
+                "Library  Remote  http://127.0.0.1:8000/",
+                "*** Test Cases ***"));
+
+        final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
+                newArrayList(suite1, suite2, suite3), summaryHandler);
+        discoverer.start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getRemoteLocations()).containsExactly(
+                RemoteLocation.create("http://127.0.0.1:8000/"), RemoteLocation.create("http://127.0.0.1:9000/"));
+
+        verify(summaryHandler)
+                .accept(argThat(hasLibImports(
+                        createImport(ADDED, "Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"),
+                                newHashSet(suite1.getFile(), suite3.getFile())),
+                        createImport(ADDED, "Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"),
+                                newHashSet(suite2.getFile(), suite3.getFile())))));
+        verifyNoMoreInteractions(summaryHandler);
+    }
+
+    @Test
+    public void remoteLibsAreAddedToProjectConfig_forSuitesInNestedDirectory() throws Exception {
+        projectProvider.createDir("E");
+        projectProvider.createDir("E/F");
+        projectProvider.createDir("E/F/G");
+        projectProvider.createDir("E/F/G/H");
+        final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("E/suite1.robot",
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000", "*** Test Cases ***"));
+        final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("E/F/G/suite2.robot",
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:8000", "*** Test Cases ***"));
+        final RobotSuiteFile suite3 = model.createSuiteFile(projectProvider.createFile("E/F/G/H/suite3.robot",
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000/",
+                "Library  Remote  http://127.0.0.1:8000/", "*** Test Cases ***"));
+
+        final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
+                newArrayList(suite1, suite2, suite3), summaryHandler);
+        discoverer.start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getRemoteLocations()).containsExactly(
+                RemoteLocation.create("http://127.0.0.1:8000/"), RemoteLocation.create("http://127.0.0.1:9000/"));
+
+        verify(summaryHandler).accept(argThat(hasLibImports(
+                createImport(ADDED, "Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"),
+                        newHashSet(suite1.getFile(), suite3.getFile())),
+                createImport(ADDED, "Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"),
+                        newHashSet(suite2.getFile(), suite3.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }
 

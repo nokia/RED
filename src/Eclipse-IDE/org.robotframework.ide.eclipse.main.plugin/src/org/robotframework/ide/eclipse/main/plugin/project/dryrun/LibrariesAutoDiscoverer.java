@@ -38,6 +38,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -46,6 +47,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
+
+import com.google.common.collect.Sets;
 
 /**
  * @author mmarzec
@@ -169,10 +172,16 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         List<RobotDryRunLibraryImport> getLibraryImportsToAdd(final List<RobotDryRunLibraryImport> libraryImports) {
-            final Set<String> existingLibraryNames = config.getLibraries()
+            final Set<String> existingReferancedLibraryNames = config.getLibraries()
                     .stream()
                     .map(ReferencedLibrary::getName)
                     .collect(toSet());
+            final Set<String> existingRemoteLibraryNames = config.getRemoteLocations()
+                    .stream()
+                    .map(RemoteLocation::getRemoteName)
+                    .collect(toSet());
+            final Set<String> existingLibraryNames = Sets.union(existingReferancedLibraryNames,
+                    existingRemoteLibraryNames);
 
             final List<RobotDryRunLibraryImport> result = new ArrayList<>();
             for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
@@ -193,6 +202,8 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 addJavaLibrary(libraryImport);
             } else if (libraryImport.getType() == DryRunLibraryType.PYTHON) {
                 addPythonLibrary(libraryImport);
+            } else if (libraryImport.getType() == DryRunLibraryType.REMOTE) {
+                addRemoteLibrary(libraryImport);
             }
         }
 
@@ -240,6 +251,11 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                 libraryImport.setAdditionalInfo(e.getMessage());
             }
+        }
+
+        private void addRemoteLibrary(final RobotDryRunLibraryImport libraryImport) {
+            final RemoteLocation remoteLibrary = RemoteLocation.create(libraryImport.getSourcePath());
+            addRemoteLocation(remoteLibrary);
         }
 
         private void addReferencedLibrariesFromClasses(final RobotDryRunLibraryImport libraryImport,
