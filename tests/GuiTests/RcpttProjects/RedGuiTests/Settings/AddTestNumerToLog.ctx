@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _D_9CQCfwEealP8ItBfZANg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/22/18 10:13 AM
+Save-Time: 2/22/18 11:10 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -20,20 +20,19 @@ let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
 	}
 }
 
-if [get-file [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]| get exists]{
-	global [val counter [read-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]]]
-}-else{
-	global [val counter 0]
-}
-
 
 if [get-file [uri-from-path [concat $RCPTT_project_path "/Logs/test_names.txt"]] | get exists] {
+	if [get-file [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]| get exists]{
+		global [val counter [read-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]]]
+	}-else{
+		global [val counter 0]
+	}
+	
 	global [val testsList [list [read-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/test_names.txt"]]]]]
 	global [val testName [$testsList | get [int  $counter ]]]
 	concat "---------------- Test: " $testName " ---------------" |log 
-}-else{
-	concat "---------------- Test: " $counter " ---------------" |log
+	plus $counter 1 | write-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]
 }
 
-plus $counter 1 | write-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]
+Log   "---------------- Test ---------------" 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
