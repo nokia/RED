@@ -15,7 +15,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
@@ -23,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
@@ -93,7 +96,6 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         final String libName = createLibName(name, arguments);
         final LibrarySpecification specification = validationContext.getLibrarySpecifications(libName);
         validateWithSpec(specification, name, nameToken, arguments, false);
-        validateArgumentsForRemoteLibraryImport(name, nameToken, arguments);
     }
 
     private String createLibName(final String name, final List<RobotToken> arguments) {
@@ -101,26 +103,11 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             if (arguments.isEmpty()) {
                 return name + " " + "http://127.0.0.1:8270/RPC2";
             } else {
-                final String libName = name + " " + arguments.get(0).getText();
-                return findLibraryInAccessibleLibraries(libName);
+                final String remoteLibName = RemoteLocation.createRemoteName(arguments.get(0).getText());
+                return remoteLibName;
             }
         }
         return name;
-    }
-
-    private String findLibraryInAccessibleLibraries(final String libName) {
-        final Map<String, LibrarySpecification> accessibleLibraries = validationContext.getAccessibleLibraries();
-
-        for (final String accessibleLibraryName : accessibleLibraries.keySet()) {
-            if (stripLastSlashIfNecessary(accessibleLibraryName).equals(stripLastSlashIfNecessary(libName))) {
-                return accessibleLibraryName;
-            }
-        }
-        return libName;
-    }
-
-    private static String stripLastSlashIfNecessary(final String string) {
-        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
     }
 
     private void validateWithSpec(final LibrarySpecification specification, final String pathOrName,
@@ -132,23 +119,55 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
                     importArguments).validate(new NullProgressMonitor());
         } else {
-            final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
-                    .formatMessageWith(pathOrName);
-            final Map<String, Object> additional = isPath ? ImmutableMap.of(AdditionalMarkerAttributes.PATH, pathOrName)
-                    : ImmutableMap.of(AdditionalMarkerAttributes.NAME, pathOrName);
-            reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
+            if (!pathOrName.equals("Remote")) {
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
+                        .formatMessageWith(pathOrName);
+                final Map<String, Object> additional = isPath
+                        ? ImmutableMap.of(AdditionalMarkerAttributes.PATH, pathOrName)
+                        : ImmutableMap.of(AdditionalMarkerAttributes.NAME, pathOrName);
+                reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
+            } else {
+                validateArgumentsForRemoteLibraryImport(pathOrName, pathOrNameToken, importArguments);
+            }
         }
     }
 
     private void validateArgumentsForRemoteLibraryImport(final String name, final RobotToken nameToken,
             final List<RobotToken> arguments) {
-        if ("Remote".equals(name)) {
-            if (arguments.isEmpty()) {
-                final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS)
-                        .formatMessageWith(name);
-                reporter.handleProblem(problem, validationContext.getFile(), nameToken);
-            }
+        if (arguments.isEmpty()) {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(GeneralSettingsProblem.MISSING_ARGUMENT_FOR_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(name);
+            reporter.handleProblem(problem, validationContext.getFile(), nameToken);
+        } else if (arguments.size() > 1) {
+            final String additionalMsg = "To many arguments for '" + name + "' library import";
+            final RobotProblem problem = RobotProblem
+                    .causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS)
+                    .formatMessageWith(additionalMsg);
+            reporter.handleProblem(problem, validationContext.getFile(), nameToken);
+        } else {
+            validateRemoteLocation(name, arguments);
+        }
+    }
+
+    private void validateRemoteLocation(final String name, final List<RobotToken> arguments) {
+        final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
+        final List<RemoteLocation> remoteLocations = robotProjectConfig.getRemoteLocations();
+        final RobotToken adressToken = arguments.get(0);
+        final String address = RemoteLocation.createRemoteUri(arguments.get(0).getText());
+        final RemoteLocation remoteLibrary = RemoteLocation.create(address);
+
+        if (remoteLocations.contains(remoteLibrary)) {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(name, address);
+            reporter.handleProblem(problem, validationContext.getFile(), adressToken);
+        } else {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML)
+                    .formatMessageWith(name, address);
+            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
+            reporter.handleProblem(problem, validationContext.getFile(), adressToken, additional);
         }
     }
 }

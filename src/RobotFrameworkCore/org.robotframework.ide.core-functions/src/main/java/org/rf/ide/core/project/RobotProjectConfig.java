@@ -314,11 +314,15 @@ public class RobotProjectConfig {
         libraries.removeAll(selectedLibs);
     }
 
-    public void addRemoteLocation(final RemoteLocation remoteLocation) {
+    public boolean addRemoteLocation(final RemoteLocation remoteLocation) {
         if (remoteLocations == null) {
             remoteLocations = new ArrayList<>();
         }
-        remoteLocations.add(remoteLocation);
+        if (!remoteLocations.contains(remoteLocation)) {
+            remoteLocations.add(remoteLocation);
+            return true;
+        }
+        return false;
     }
 
 
@@ -559,7 +563,9 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class RemoteLocation {
 
-        public static final RemoteLocation DEFAULT_LOCATION = RemoteLocation.create("http://127.0.0.1:8270/RPC2");
+        public static final String DEFAULT_ADDRESS = "http://127.0.0.1:8270/RPC2";
+
+        public static final RemoteLocation DEFAULT_LOCATION = RemoteLocation.create(DEFAULT_ADDRESS);
 
         public static RemoteLocation create(final String path) {
             final RemoteLocation location = new RemoteLocation();
@@ -594,6 +600,24 @@ public class RobotProjectConfig {
 
         public String getUri() {
             return uri.toString();
+        }
+
+        public String getRemoteName() {
+            return "Remote " + getUri();
+        }
+
+        public static String createRemoteUri(final String address) {
+            final String newAddress = stripLastSlashIfNecessary(address) + "/";
+            return newAddress;
+        }
+
+        private static String stripLastSlashIfNecessary(final String string) {
+            return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
+        }
+
+        public static String createRemoteName(final String address) {
+            final String remoteLibName = "Remote " + createRemoteUri(address);
+            return remoteLibName;
         }
 
         @Override
