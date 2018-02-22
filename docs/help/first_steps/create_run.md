@@ -29,14 +29,18 @@ relevant to a group of files. In order to work with RED, **Robot Project** has
 to be created.  
 Creating new Project can be done by:
 
-  * _File->New-> Robot Project_ (item can be found also under selection _New -> Project .. -> Robot Framework -> Robot Project_ )
+  * **_File->New-> Robot Project_ (item can be found also under selection _New -> Project .. -> Robot Framework -> Robot Project_ )**
   * Right click menu on Project Explorer with selection as above
 
 If you wish to import anything into Workspace (i.e. already existing Project)
 or into Project (existing test cases), menu _Import ..._ will open up wizard.
 Upon creating Project, you should have see similar structure in Project
 Explorer tree, which will also indicate that RobotFramework is visible to
-Eclipse. ![](create_run/simple_project_1.png)
+Eclipse. ![](create_run/simple_project_1.png)  
+If the project doesn't look like above (there is no brown icon or no red.xml
+file) it means that the Project is different type than Robot. Fix this by
+right-click on Project name,from Robot Framework select **Configure as Robot
+project**
 
 ### Create TestSuite
 
