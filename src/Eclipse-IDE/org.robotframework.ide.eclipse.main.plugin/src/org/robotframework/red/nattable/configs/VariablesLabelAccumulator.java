@@ -49,7 +49,7 @@ public class VariablesLabelAccumulator implements IConfigLabelAccumulator {
         }
     }
 
-    private boolean looksLikeVariable(final String text) {
+    public static boolean looksLikeVariable(final String text) {
         return varPattern.matcher(text).matches();
     }
 }
