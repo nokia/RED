@@ -132,9 +132,11 @@ import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
 import org.robotframework.red.nattable.TableCellsStrings;
+import org.robotframework.red.nattable.configs.ActionNamesStyleConfiguration;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
 import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
+import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
@@ -142,9 +144,15 @@ import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.configs.SettingsActionNamesLabelAccumulator;
+import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
+import org.robotframework.red.nattable.configs.SettingsItemsLabelAccumulator;
+import org.robotframework.red.nattable.configs.SettingsItemsStyleConfiguration;
+import org.robotframework.red.nattable.configs.SettingsVariablesLabelAccumulator;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
+import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -514,7 +522,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                         position -> position.getColumnPosition() < dataProvider.getColumnCount() - 1,
                         Predicates.alwaysTrue()),
                 new AlternatingRowConfigLabelAccumulator(),
-                new EmptyGeneralSettingLabelAccumulator(dataProvider));
+                new EmptyGeneralSettingLabelAccumulator(dataProvider),
+                new SettingsCommentsLabelAccumulator(dataProvider),
+                new SettingsVariablesLabelAccumulator(dataProvider),
+                new SettingsActionNamesLabelAccumulator(dataProvider),
+                new SettingsItemsLabelAccumulator());
         final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -618,6 +630,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(inactiveSettingsStyle(theme));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
+        table.addConfiguration(new CommentsStyleConfiguration(theme));
+        table.addConfiguration(new VariablesStyleConfiguration(theme));
+        table.addConfiguration(new ActionNamesStyleConfiguration(theme));
+        table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {

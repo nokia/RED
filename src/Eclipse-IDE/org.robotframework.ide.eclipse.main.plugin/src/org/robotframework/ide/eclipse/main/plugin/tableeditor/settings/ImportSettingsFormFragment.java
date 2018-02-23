@@ -93,6 +93,7 @@ import org.robotframework.red.nattable.TableCellsStrings;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
 import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
+import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
@@ -100,9 +101,14 @@ import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
+import org.robotframework.red.nattable.configs.SettingsItemsLabelAccumulator;
+import org.robotframework.red.nattable.configs.SettingsItemsStyleConfiguration;
+import org.robotframework.red.nattable.configs.SettingsVariablesLabelAccumulator;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
+import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -208,7 +214,10 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                         rowObject -> rowObject instanceof RobotElement),
                 new AlternatingRowConfigLabelAccumulator(),
                 new AddingElementLabelAccumulator(dataProvider),
-                new ImportTypesLabelAccumulator(dataProvider));
+                new ImportTypesLabelAccumulator(dataProvider),
+                new SettingsCommentsLabelAccumulator(dataProvider),
+                new SettingsVariablesLabelAccumulator(dataProvider),
+                new SettingsItemsLabelAccumulator());
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -312,6 +321,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.addConfiguration(new ImportTypesStyleConfiguration(theme, wrapCells));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
+        table.addConfiguration(new CommentsStyleConfiguration(theme));
+        table.addConfiguration(new VariablesStyleConfiguration(theme));
+        table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {
