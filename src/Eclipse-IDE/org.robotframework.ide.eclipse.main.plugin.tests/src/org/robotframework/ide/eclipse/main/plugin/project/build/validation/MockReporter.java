@@ -15,8 +15,9 @@ import java.util.Objects;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
 import com.google.common.collect.Range;
@@ -43,6 +44,11 @@ public class MockReporter extends ValidationReportingStrategy {
 
     public Collection<Problem> getReportedProblems() {
         return problems;
+    }
+
+    @Override
+    public void handleTask(final RobotTask task, final IFile file) {
+        // nothing to do
     }
 
     @Override
