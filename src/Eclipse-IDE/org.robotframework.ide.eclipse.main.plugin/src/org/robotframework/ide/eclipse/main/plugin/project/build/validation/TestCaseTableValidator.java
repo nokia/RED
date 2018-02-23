@@ -45,7 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
@@ -68,10 +68,10 @@ class TestCaseTableValidator implements ModelUnitValidator {
 
     private final Optional<RobotCasesSection> testCaseSection;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     TestCaseTableValidator(final FileValidationContext validationContext, final Optional<RobotCasesSection> section,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.testCaseSection = section;
         this.reporter = reporter;
@@ -196,7 +196,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
     }
 
     static void reportKeywordUsageProblemsInSetupAndTeardownSetting(final FileValidationContext validationContext,
-            final ProblemsReportingStrategy reporter, final RobotToken keywordNameToken,
+            final ValidationReportingStrategy reporter, final RobotToken keywordNameToken,
             final Optional<List<RobotToken>> arguments) {
         final MappingResult variablesExtraction = new VariableExtractor().extract(keywordNameToken,
                 validationContext.getFile().getName());
@@ -212,7 +212,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
     }
 
     static void reportKeywordUsageProblems(final FileValidationContext validationContext,
-            final ProblemsReportingStrategy reporter, final List<? extends RobotExecutableRow<?>> executables,
+            final ValidationReportingStrategy reporter, final List<? extends RobotExecutableRow<?>> executables,
             final Optional<String> templateKeyword) {
 
         for (final RobotExecutableRow<?> executable : executables) {
@@ -255,7 +255,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
     }
 
     static void validateExistingKeywordCall(final FileValidationContext validationContext,
-            final ProblemsReportingStrategy reporter, final RobotToken keywordName,
+            final ValidationReportingStrategy reporter, final RobotToken keywordName,
             final Optional<List<RobotToken>> arguments) {
         final ListMultimap<String, KeywordEntity> keywordProposal = validationContext
                 .findPossibleKeywords(keywordName.getText());
@@ -323,7 +323,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
     }
 
     private static KeywordCallArgumentsValidator createKeywordCallArgumentsValidator(
-            final FileValidationContext validationContext, final ProblemsReportingStrategy reporter,
+            final FileValidationContext validationContext, final ValidationReportingStrategy reporter,
             final RobotToken definingToken, final ArgumentsDescriptor argumentsDescriptor,
             final List<RobotToken> arguments) {
         final BuiltinKeyword builtinKw = BuiltinKeyword.from(definingToken, validationContext);
@@ -372,7 +372,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
     }
 
     static void validateTimeoutSetting(final FileValidationContext validationContext,
-            final ProblemsReportingStrategy reporter, final Set<String> variables, final RobotToken timeoutToken) {
+            final ValidationReportingStrategy reporter, final Set<String> variables, final RobotToken timeoutToken) {
         final String timeout = timeoutToken.getText();
         if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
 
@@ -403,14 +403,14 @@ class TestCaseTableValidator implements ModelUnitValidator {
     }
 
     static void reportUnknownVariables(final FileValidationContext validationContext,
-            final ProblemsReportingStrategy reporter, final List<? extends RobotExecutableRow<?>> executables,
+            final ValidationReportingStrategy reporter, final List<? extends RobotExecutableRow<?>> executables,
             final Set<String> variables) {
 
         final Set<String> definedVariables = newHashSet(variables);
 
         final Map<String, Object> additionalMarkerAttributes = ImmutableMap
                 .of(AdditionalMarkerAttributes.DEFINE_VAR_LOCALLY, Boolean.TRUE);
-        final ProblemsReportingStrategy reportingStrategy = AttributesAugmentingReportingStrategy.create(reporter,
+        final ValidationReportingStrategy reportingStrategy = AttributesAugmentingReportingStrategy.create(reporter,
                 additionalMarkerAttributes);
 
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reportingStrategy);

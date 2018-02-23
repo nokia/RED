@@ -31,7 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ExcludedResources;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
@@ -158,7 +158,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         }
     }
 
-    private static class UnknownLibraryDetectingReportingStrategy extends ProblemsReportingStrategy {
+    private static class UnknownLibraryDetectingReportingStrategy extends ValidationReportingStrategy {
 
         private boolean detectedLibraryProblem = false;
 

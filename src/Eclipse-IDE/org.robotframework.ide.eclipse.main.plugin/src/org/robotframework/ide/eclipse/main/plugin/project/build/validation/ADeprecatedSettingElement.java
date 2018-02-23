@@ -11,7 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
@@ -20,11 +20,11 @@ public abstract class ADeprecatedSettingElement implements ModelUnitValidator {
 
     private final IFile file;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     private final String representation;
 
-    public ADeprecatedSettingElement(final IFile file, final ProblemsReportingStrategy reporter,
+    public ADeprecatedSettingElement(final IFile file, final ValidationReportingStrategy reporter,
             final String representation) {
         this.file = file;
         this.reporter = reporter;

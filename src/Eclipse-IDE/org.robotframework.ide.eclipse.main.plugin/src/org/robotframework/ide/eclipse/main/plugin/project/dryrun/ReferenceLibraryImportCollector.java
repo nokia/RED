@@ -35,7 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
@@ -120,7 +120,7 @@ class ReferenceLibraryImportCollector {
     private class DiscoveringImportValidator extends GeneralSettingsLibrariesImportValidator {
 
         DiscoveringImportValidator(final FileValidationContext validationContext, final List<LibraryImport> imports,
-                final ProblemsReportingStrategy reporter) {
+                final ValidationReportingStrategy reporter) {
             super(validationContext, currentSuite, imports, reporter);
         }
 
@@ -146,7 +146,7 @@ class ReferenceLibraryImportCollector {
 
     }
 
-    private class DiscoveringReportingStrategy extends ProblemsReportingStrategy {
+    private class DiscoveringReportingStrategy extends ValidationReportingStrategy {
 
         DiscoveringReportingStrategy() {
             super(false);

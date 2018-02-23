@@ -44,7 +44,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 
@@ -68,7 +68,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     private BuildLogger logger;
 
-    private ProblemsReportingStrategy reporter;
+    private ValidationReportingStrategy reporter;
 
     private RobotFileValidator rfv;
 
@@ -488,7 +488,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
     private static class MockRobotFileValidator extends RobotFileValidator {
 
         public MockRobotFileValidator(final ValidationContext context, final IFile file,
-                final ProblemsReportingStrategy reporter) {
+                final ValidationReportingStrategy reporter) {
             super(context, file, reporter);
         }
     }

@@ -27,7 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
@@ -328,7 +328,7 @@ public class VariablesTableValidatorTest {
             @Override
             public Iterable<VersionDependentModelUnitValidator> getVariableValidators(
                     final FileValidationContext validationContext, final IVariableHolder variable,
-                    final ProblemsReportingStrategy reporter) {
+                    final ValidationReportingStrategy reporter) {
                 return newArrayList(validators);
             }
         };
