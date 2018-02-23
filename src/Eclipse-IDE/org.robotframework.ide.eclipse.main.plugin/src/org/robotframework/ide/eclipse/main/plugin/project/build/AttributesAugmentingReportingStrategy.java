@@ -30,6 +30,11 @@ public class AttributesAugmentingReportingStrategy extends ValidationReportingSt
     }
 
     @Override
+    public void handleTask(final RobotTask task, final IFile file) {
+        wrappedStrategy.handleTask(task, file);
+    }
+
+    @Override
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
             final Map<String, Object> additionalAttributes) {
         final Map<String, Object> attributes = new HashMap<>();

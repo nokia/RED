@@ -110,6 +110,7 @@ public class RobotArtifactsValidator {
             public void validate(final IProgressMonitor monitor) throws CoreException {
                 synchronized (getLock(resource)) {
                     resource.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
+                    resource.deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_ONE);
                     validator.validate(monitor);
                     VALIDATION_LOCKS.remove(resource);
                 }
@@ -290,6 +291,7 @@ public class RobotArtifactsValidator {
                         }
                     });
                     project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+                    project.deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_INFINITE);
                     return validators;
                 }
             };

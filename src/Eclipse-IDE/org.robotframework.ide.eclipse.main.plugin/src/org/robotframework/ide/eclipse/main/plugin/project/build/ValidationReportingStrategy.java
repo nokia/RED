@@ -32,6 +32,10 @@ public class ValidationReportingStrategy {
         this.shouldPanic = shouldPanic;
     }
 
+    public void handleTask(final RobotTask task, final IFile file) {
+        task.createMarker(file);
+    }
+
     public void handleProblem(final RobotProblem problem, final IFile file, final int line) throws ReportingInterruptedException {
         handleProblem(problem, file, new ProblemPosition(line), new HashMap<String, Object>());
     }

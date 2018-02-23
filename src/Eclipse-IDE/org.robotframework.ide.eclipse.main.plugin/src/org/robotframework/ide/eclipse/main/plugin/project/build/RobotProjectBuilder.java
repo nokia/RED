@@ -110,6 +110,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
     public static void clean(final RobotProject project) throws CoreException {
         project.getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+        project.getProject().deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_INFINITE);
         project.clearConfiguration();
         project.clearKwSources();
 
