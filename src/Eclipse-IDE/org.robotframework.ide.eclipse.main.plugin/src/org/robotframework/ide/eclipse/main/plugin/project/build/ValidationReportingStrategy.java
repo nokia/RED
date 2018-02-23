@@ -16,19 +16,19 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 
 import com.google.common.collect.Range;
 
-public class ProblemsReportingStrategy {
+public class ValidationReportingStrategy {
 
-    static ProblemsReportingStrategy reportOnly() {
-        return new ProblemsReportingStrategy(false);
+    static ValidationReportingStrategy reportOnly() {
+        return new ValidationReportingStrategy(false);
     }
 
-    static ProblemsReportingStrategy reportAndPanic() {
-        return new ProblemsReportingStrategy(true);
+    static ValidationReportingStrategy reportAndPanic() {
+        return new ValidationReportingStrategy(true);
     }
 
     protected final boolean shouldPanic;
 
-    protected ProblemsReportingStrategy(final boolean shouldPanic) {
+    protected ValidationReportingStrategy(final boolean shouldPanic) {
         this.shouldPanic = shouldPanic;
     }
 

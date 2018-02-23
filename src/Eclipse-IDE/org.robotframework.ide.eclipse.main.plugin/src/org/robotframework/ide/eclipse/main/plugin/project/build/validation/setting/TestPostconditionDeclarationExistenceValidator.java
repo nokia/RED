@@ -13,7 +13,7 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADeprecatedSettingElement;
@@ -22,7 +22,7 @@ public class TestPostconditionDeclarationExistenceValidator extends ADeprecatedS
 
     private final RobotSettingsSection section;
 
-    public TestPostconditionDeclarationExistenceValidator(final IFile file, final ProblemsReportingStrategy reporter,
+    public TestPostconditionDeclarationExistenceValidator(final IFile file, final ValidationReportingStrategy reporter,
             final RobotSettingsSection section) {
         super(file, reporter, "Test Postcondition");
         this.section = section;
