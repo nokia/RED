@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.validation;
 
+import org.eclipse.core.resources.IFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 
 /**
@@ -33,5 +35,10 @@ public class ProblemsReportingStrategyFactory {
         abstract void projectValidationStarted(final String projectName);
 
         abstract void projectValidationFinished(final String projectName);
+
+        @Override
+        public void handleTask(final RobotTask task, final IFile file) {
+            // not interested in tasks reporting
+        }
     }
 }

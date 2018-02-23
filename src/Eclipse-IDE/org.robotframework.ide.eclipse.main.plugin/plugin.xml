@@ -5964,6 +5964,17 @@
       </persistent>
    </extension>
    <extension
+         id="robotTask"
+         name="Robot Task"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.taskmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
          id="org.robotframework.ide.texteditor.occurrencesMark"
          name="Robot TextEditor Mark Occurrences"
          point="org.eclipse.core.resources.markers">
