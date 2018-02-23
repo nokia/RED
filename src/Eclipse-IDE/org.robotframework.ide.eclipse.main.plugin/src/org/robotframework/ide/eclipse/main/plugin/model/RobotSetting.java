@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -90,6 +91,13 @@ public class RobotSetting extends RobotKeywordCall {
 
     public boolean isImportSetting() {
         return SettingsGroup.getImportsGroupsSet().contains(getGroup());
+    }
+
+    public boolean isKeywordBased() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return modelType == ModelType.SUITE_TEARDOWN || modelType == ModelType.SUITE_TEST_TEARDOWN
+                || modelType == ModelType.SUITE_SETUP || modelType == ModelType.SUITE_TEST_SETUP
+                || modelType == ModelType.SUITE_TEST_TEMPLATE;
     }
 
     public Optional<String> extractLibraryAlias() {
