@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDeprecatedDeclarationValidator;
@@ -24,7 +24,7 @@ public class DocumentationTestCaseDeclarationSettingValidator extends ADocumentD
     private final RobotCasesSection section;
 
     public DocumentationTestCaseDeclarationSettingValidator(final IFile file, final RobotCasesSection section,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         super(file, reporter);
         this.section = section;
     }

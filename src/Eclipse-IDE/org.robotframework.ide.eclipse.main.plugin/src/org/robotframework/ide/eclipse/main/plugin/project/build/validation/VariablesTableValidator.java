@@ -28,7 +28,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
@@ -44,20 +44,20 @@ class VariablesTableValidator implements ModelUnitValidator {
 
     private final Optional<RobotVariablesSection> variablesSection;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     private final VersionDependentValidators versionDependentValidators;
 
     private static final Pattern VARIABLE_WITHOUT_NAME_PATTERN = Pattern.compile("^[$&@]\\{\\}=?$");
 
     VariablesTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotVariablesSection> variablesSection, final ProblemsReportingStrategy reportingStrategy) {
+            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reportingStrategy) {
         this(validationContext, variablesSection, reportingStrategy, new VersionDependentValidators());
     }
 
     @VisibleForTesting
     VariablesTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotVariablesSection> variablesSection, final ProblemsReportingStrategy reportingStrategy,
+            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reportingStrategy,
             final VersionDependentValidators versionDependentValidators) {
         this.validationContext = validationContext;
         this.variablesSection = variablesSection;

@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.validation;
 
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 
 /**
  * @author Michal Anglart
@@ -22,7 +22,7 @@ public class ProblemsReportingStrategyFactory {
         return new CheckstyleReportingStrategy(false, reportFilepath, logger);
     }
 
-    static abstract class HeadlessValidationReportingStrategy extends ProblemsReportingStrategy {
+    static abstract class HeadlessValidationReportingStrategy extends ValidationReportingStrategy {
 
         HeadlessValidationReportingStrategy(final boolean shouldPanic) {
             super(shouldPanic);

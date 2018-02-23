@@ -64,7 +64,7 @@ public class RobotArtifactsValidator {
 
             try {
                 final Optional<? extends ModelUnitValidator> validator = ModelUnitValidatorConfigFactory
-                        .createValidator(context, file, ProblemsReportingStrategy.reportOnly(), true);
+                        .createValidator(context, file, ValidationReportingStrategy.reportOnly(), true);
                 if (validator.isPresent()) {
                     final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
 
@@ -231,11 +231,11 @@ public class RobotArtifactsValidator {
     public static class ModelUnitValidatorConfigFactory {
 
         public static ModelUnitValidatorConfig create(final IProject project) {
-            return createForWholeProject(project, ProblemsReportingStrategy.reportOnly());
+            return createForWholeProject(project, ValidationReportingStrategy.reportOnly());
         }
 
         public static ModelUnitValidatorConfig create(final IProject project, final IResourceDelta delta,
-                final int kind, final ProblemsReportingStrategy reporter) {
+                final int kind, final ValidationReportingStrategy reporter) {
             if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
                 return createForWholeProject(project, reporter);
             } else {
@@ -256,7 +256,7 @@ public class RobotArtifactsValidator {
                                 @Override
                                 public boolean visit(final IResource resource) throws CoreException {
                                     final Optional<? extends ModelUnitValidator> validator = createValidator(context,
-                                            resource, ProblemsReportingStrategy.reportOnly(), false);
+                                            resource, ValidationReportingStrategy.reportOnly(), false);
                                     if (validator.isPresent()) {
                                         validators.add(createSynchronizedValidator(resource, validator.get()));
                                     }
@@ -271,7 +271,7 @@ public class RobotArtifactsValidator {
         }
 
         private static ModelUnitValidatorConfig createForWholeProject(final IProject project,
-                final ProblemsReportingStrategy reporter) {
+                final ValidationReportingStrategy reporter) {
             return new ModelUnitValidatorConfig() {
 
                 @Override
@@ -296,7 +296,7 @@ public class RobotArtifactsValidator {
         }
 
         private static ModelUnitValidatorConfig createForChangedFiles(final IResourceDelta delta,
-                final ProblemsReportingStrategy reporter) {
+                final ValidationReportingStrategy reporter) {
             return new ModelUnitValidatorConfig() {
 
                 @Override
@@ -326,7 +326,7 @@ public class RobotArtifactsValidator {
         }
 
         private static Optional<? extends ModelUnitValidator> createValidator(final ValidationContext context,
-                final IResource resource, final ProblemsReportingStrategy reporter, final boolean isRevalidating)
+                final IResource resource, final ValidationReportingStrategy reporter, final boolean isRevalidating)
                 throws CoreException {
             return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating)
                     ? createProperValidator(context, (IFile) resource, reporter)
@@ -342,7 +342,7 @@ public class RobotArtifactsValidator {
         }
 
         private static Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext context,
-                final IFile file, final ProblemsReportingStrategy reporter) {
+                final IFile file, final ValidationReportingStrategy reporter) {
 
             if (ASuiteFileDescriber.isSuiteFile(file)) {
                 return Optional.of(new RobotSuiteFileValidator(context, file, reporter));

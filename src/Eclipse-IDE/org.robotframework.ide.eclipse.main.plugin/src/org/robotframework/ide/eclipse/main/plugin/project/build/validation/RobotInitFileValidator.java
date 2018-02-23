@@ -16,7 +16,7 @@ import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
@@ -25,7 +25,7 @@ import com.google.common.collect.Range;
 public class RobotInitFileValidator extends RobotFileValidator {
 
     public RobotInitFileValidator(final ValidationContext context, final IFile file,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         super(context, file, reporter);
     }
 

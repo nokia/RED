@@ -13,9 +13,9 @@ import org.junit.Test;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
-public class ProblemsReportingStrategyTest {
+public class ValidationReportingStrategyTest {
 
-    private final ProblemsReportingStrategy strategy = ProblemsReportingStrategy.reportOnly();
+    private final ValidationReportingStrategy strategy = ValidationReportingStrategy.reportOnly();
 
     @Test
     public void ignoredProblemsShouldNotBeReported() {

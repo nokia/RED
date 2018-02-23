@@ -12,7 +12,7 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
@@ -23,12 +23,12 @@ public class MetaDeclarationSettingValidator implements ModelUnitValidator {
 
     private final RobotSettingsSection section;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     private final OldMetaSynataxHelper oldMetaSyntaxHelper;
 
     public MetaDeclarationSettingValidator(final IFile file, final RobotSettingsSection section,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         this.file = file;
         this.section = section;
         this.reporter = reporter;
