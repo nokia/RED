@@ -2,7 +2,6 @@
 <toc label="RED - Robot Editor User Guide" topic="user_guide.html">
    <topic href="doc/about.html" label="About this Guide">
    </topic>
-	<topic href="doc/red_overview.html" label="RED Overview" >	</topic>
 	<topic href="doc/legal.html" label="Legal">	</topic>
 	<topic href="doc/first_steps/first_steps.html" label="First steps with RED">
     <topic href="doc/first_steps/download_install.html" label="Download and install">
