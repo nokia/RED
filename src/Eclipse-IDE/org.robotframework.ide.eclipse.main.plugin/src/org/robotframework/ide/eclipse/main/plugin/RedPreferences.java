@@ -9,7 +9,9 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -25,11 +27,13 @@ import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.red.graphics.ColorsManager;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Streams;
 
 public class RedPreferences {
 
@@ -92,6 +96,11 @@ public class RedPreferences {
     public static final String RFLINT_RULES_FILES = "red.validation.rflint.rulesFiles";
 
     public static final String TURN_OFF_VALIDATION = "red.validation.turnOff";
+
+    public static final String TASKS_DETECTION_ENABLED = "red.tasks.enabled";
+
+    public static final String TASKS_TAGS = "red.tasks.tags";
+    public static final String TASKS_PRIORITIES = "red.tasks.priorities";
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -273,6 +282,21 @@ public class RedPreferences {
     
     public boolean isValidationTurnedOff() {
         return store.getBoolean(TURN_OFF_VALIDATION);
+    }
+
+    public boolean isTasksDetectionEnabled() {
+        return store.getBoolean(TASKS_DETECTION_ENABLED);
+    }
+
+    public Map<String, Priority> getTaskTagsWithPriorities() {
+        final Stream<String> tags = Splitter.on(";").splitToList(store.getString(TASKS_TAGS)).stream();
+        final Stream<String> priorites = Splitter.on(";").splitToList(store.getString(TASKS_PRIORITIES)).stream();
+        
+        final Map<String, Priority> mapping = new LinkedHashMap<>();
+        Streams.forEachPair(tags, priorites, (tag, priority) -> {
+            mapping.put(tag, Priority.valueOf(priority));
+        });
+        return mapping;
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
