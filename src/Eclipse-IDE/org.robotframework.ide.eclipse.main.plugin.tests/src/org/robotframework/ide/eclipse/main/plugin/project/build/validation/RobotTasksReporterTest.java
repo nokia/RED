@@ -6,11 +6,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask;
@@ -25,6 +27,9 @@ public class RobotTasksReporterTest {
     @Test
     public void nothingIsReportedWhenThereIsNoTaskFound() {
         final Map<String, Priority> keywords = ImmutableMap.of("TASK", Priority.HIGH);
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.isTasksDetectionEnabled()).thenReturn(true);
+        when(preferences.getTaskTagsWithPriorities()).thenReturn(keywords);
         
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
@@ -32,7 +37,7 @@ public class RobotTasksReporterTest {
                 .build();
         
         final ValidationReportingStrategy markersReporter = mock(ValidationReportingStrategy.class);
-        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, keywords);
+        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, preferences);
         
         reporter.reportTasks();
         
@@ -42,6 +47,9 @@ public class RobotTasksReporterTest {
     @Test
     public void simpleTaskIsProperlyReported() {
         final Map<String, Priority> keywords = ImmutableMap.of("TASK", Priority.HIGH);
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.isTasksDetectionEnabled()).thenReturn(true);
+        when(preferences.getTaskTagsWithPriorities()).thenReturn(keywords);
         
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
@@ -49,7 +57,7 @@ public class RobotTasksReporterTest {
                 .build();
         
         final ValidationReportingStrategy markersReporter = mock(ValidationReportingStrategy.class);
-        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, keywords);
+        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, preferences);
         
         reporter.reportTasks();
 
@@ -61,6 +69,9 @@ public class RobotTasksReporterTest {
     @Test
     public void multipleTasksAreProperlyReported() {
         final Map<String, Priority> keywords = ImmutableMap.of("TASK", Priority.HIGH, "TODO", Priority.LOW);
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.isTasksDetectionEnabled()).thenReturn(true);
+        when(preferences.getTaskTagsWithPriorities()).thenReturn(keywords);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
@@ -69,7 +80,7 @@ public class RobotTasksReporterTest {
                 .build();
 
         final ValidationReportingStrategy markersReporter = mock(ValidationReportingStrategy.class);
-        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, keywords);
+        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, preferences);
 
         reporter.reportTasks();
 
@@ -83,6 +94,9 @@ public class RobotTasksReporterTest {
     @Test
     public void mulitpleTasksAreProperlyReported_whenDefinedInSingleLine() {
         final Map<String, Priority> keywords = ImmutableMap.of("TASK", Priority.HIGH, "TODO", Priority.LOW);
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.isTasksDetectionEnabled()).thenReturn(true);
+        when(preferences.getTaskTagsWithPriorities()).thenReturn(keywords);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
@@ -90,7 +104,7 @@ public class RobotTasksReporterTest {
                 .build();
 
         final ValidationReportingStrategy markersReporter = mock(ValidationReportingStrategy.class);
-        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, keywords);
+        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, preferences);
 
         reporter.reportTasks();
 
@@ -102,6 +116,9 @@ public class RobotTasksReporterTest {
     @Test
     public void taskDescriptionOnlyContainTextFromSameLine() {
         final Map<String, Priority> keywords = ImmutableMap.of("TASK", Priority.HIGH, "TODO", Priority.LOW);
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.isTasksDetectionEnabled()).thenReturn(true);
+        when(preferences.getTaskTagsWithPriorities()).thenReturn(keywords);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
@@ -110,7 +127,7 @@ public class RobotTasksReporterTest {
                 .build();
 
         final ValidationReportingStrategy markersReporter = mock(ValidationReportingStrategy.class);
-        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, keywords);
+        final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, preferences);
 
         reporter.reportTasks();
 

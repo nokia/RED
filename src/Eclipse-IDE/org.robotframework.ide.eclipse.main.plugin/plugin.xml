@@ -5894,6 +5894,12 @@
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.TasksPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.tasks"
+            name="Task Tags">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.SuiteEditorPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
             name="Editor">
