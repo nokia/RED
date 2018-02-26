@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <toc label="RED - Robot Editor User Guide" topic="user_guide.html">
-   <topic href="doc/about.html" label="About this Guide">
-   </topic>
+   <topic href="doc/about.html" label="About this Guide"></topic>
 	<topic href="doc/legal.html" label="Legal">	</topic>
+    <topic href="doc/keys.html" label="RED key shortcuts cheatsheet">    </topic>
 	<topic href="doc/first_steps/first_steps.html" label="First steps with RED">
     <topic href="doc/first_steps/download_install.html" label="Download and install">
     </topic>
@@ -90,8 +90,7 @@
        <topic href="doc/user_guide/tools_integration/rflint.html" label="Robot Framework Lint">
        </topic>
     </topic>
-    <topic href="doc/user_guide/keys.html" label="RED key shortcuts cheatsheet">
-    </topic>
+   
     <topic href="doc/user_guide/known_issues.html" label="Known issues and problems">
     </topic>
   
