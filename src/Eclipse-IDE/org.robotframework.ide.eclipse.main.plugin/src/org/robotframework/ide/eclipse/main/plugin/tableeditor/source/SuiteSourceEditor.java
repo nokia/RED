@@ -7,6 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -65,6 +68,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.Tog
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.SourceDocumentationSelectionChangedListener;
 import org.robotframework.red.swt.StyledTextWrapper;
 import org.robotframework.red.swt.SwtThread;
+
+import com.google.common.base.Splitter;
 
 public class SuiteSourceEditor extends TextEditor {
 
@@ -243,7 +248,32 @@ public class SuiteSourceEditor extends TextEditor {
 
                 final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
                 config.getColoringTokens().refresh(category, newPref);
-                SwtThread.asyncExec(() -> viewer.invalidateTextPresentation());
+                SwtThread.asyncExec(() -> {
+                    config.resetTokensStore();
+                    viewer.invalidateTextPresentation();
+                });
+
+            } else if (RedPreferences.TASKS_DETECTION_ENABLED.equals(event.getKey())) {
+                final boolean isEnabled = Boolean.parseBoolean((String) event.getNewValue());
+
+                final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
+                config.getColoringTokens().refreshTasksAttributes(isEnabled);
+                SwtThread.asyncExec(() -> {
+                    config.resetTokensStore();
+                    viewer.invalidateTextPresentation();
+                });
+
+            } else if (RedPreferences.TASKS_TAGS.equals(event.getKey())) {
+                final String newValue = (String) event.getNewValue();
+                final Set<String> newTags = newValue == null ? new HashSet<>()
+                        : new HashSet<>(Splitter.on(';').splitToList(newValue));
+
+                final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
+                config.getColoringTokens().refreshTasksAttributes(newTags);
+                SwtThread.asyncExec(() -> {
+                    config.resetTokensStore();
+                    viewer.invalidateTextPresentation();
+                });
 
             } else if (newHashSet(RedPreferences.FOLDABLE_CASES, RedPreferences.FOLDABLE_KEYWORDS,
                     RedPreferences.FOLDABLE_SECTIONS, RedPreferences.FOLDABLE_DOCUMENTATION,
