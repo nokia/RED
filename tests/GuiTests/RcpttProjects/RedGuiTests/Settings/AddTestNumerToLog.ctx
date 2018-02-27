@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _D_9CQCfwEealP8ItBfZANg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/22/18 11:10 AM
+Save-Time: 2/27/18 12:02 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -32,7 +32,7 @@ if [get-file [uri-from-path [concat $RCPTT_project_path "/Logs/test_names.txt"]]
 	global [val testName [$testsList | get [int  $counter ]]]
 	concat "---------------- Test: " $testName " ---------------" |log 
 	plus $counter 1 | write-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]
-}
-
-Log   "---------------- Test ---------------" 
+}-else{
+	Log   "---------------- Test ---------------" 
+}	
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

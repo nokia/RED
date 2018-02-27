@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/27/18 11:07 AM
+Save-Time: 2/27/18 11:21 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -36,11 +36,6 @@ proc "restore-interpreters"{
 		}
 }
 restore-interpreters
-
-try -command{
-	get-view Help | close
-}-catch{}
-
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 proc "run-process-and-trim"  [val process ""] [val arg1 ""] [val arg2 ""] [val ignoreStderr false ] [val ignoreExitCode false] {
