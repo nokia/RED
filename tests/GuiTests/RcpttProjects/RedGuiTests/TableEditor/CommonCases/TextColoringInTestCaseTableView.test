@@ -1,0 +1,205 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Rf0sgBvEEeiKtdHLCpPQQg
+Element-Name: TextColoringInTestCaseTableView
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _yqwroBr5EeiKtdHLCpPQQg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 2/27/18 2:49 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//set test content
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test1\n"
+    + "    [Teardown]    my kw\n"
+    + "    Log  ${x}\n"
+    + "    Catenate    text     @{list_1}[0]\n"
+    + "test2\n"
+    + "    ${x}=  Set Variable    6777   ${new}  #abc\n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    ${x}=  Set Variable    6777\n"
+    + "    # no kw    here is\n"
+    + "    Should Be Equal    55    66    # never equal\n"
+    + "    [Return]    ${x}\n"
+    + "    \n"
+    + "abc\n"
+    + "    [Arguments]    ${y}  &{dict2}\n"
+    + "    log  ${y.ipper()}" 
+ 
+
+//go to test name
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type "M1+s"
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+    
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test1" | click
+wait 300
+
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Right
+    key-type Left
+    key-type Enter
+}
+check-black-color "Test Cases"
+
+//go to Teardown
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type ESC
+    key-type Down
+    key-type Enter
+}
+
+check-setting-color "Test Cases"
+
+//go to "my_kw" kw name
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+check-kw-color "Test Cases"
+
+//go to varaible in Log kw
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Left
+        key-type Enter
+    }
+}
+check-var-color "Test Cases"
+
+//add values to variables (between brackets)
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+//        set-text "${x}value"
+		click-text 4
+        type-text "value"
+        key-type Enter
+    }
+    //go back to variable and checf if color is the same
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Left
+        key-type F2
+    }
+}
+check-var-color "Test Cases"
+
+//go to Log kw
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Left
+        key-type Enter
+    }
+}
+//go to catenate kw
+check-kw-color "Test Cases"
+ with [get-editor "TestFile.robot"] {   
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+}
+check-kw-color "Test Cases"
+
+//go to argument "text"
+with [get-editor "TestFile.robot"] {   
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+}
+check-black-color "Test Cases"
+
+//go to variable @{list}[0]
+with [get-editor "TestFile.robot"] {   
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+}
+check-var-color "Test Cases"
+ 
+
+//------------------------------------------- test 2 ---------------------------------
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test2"
+
+//check variable color in first cell
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+}
+check-var-color "Test Cases"
+
+//check Kw color and change kw text
+with [get-editor "TestFile.robot"] {   
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+}
+check-kw-color "Test Cases"
+
+//change kw name
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "Set Variable new text"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Left
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+}
+check-kw-color "Test Cases"
+
+//change argument value
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text 888
+        key-type Enter
+    }
+    //change varaible name
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "${new}000"
+        key-type Enter
+    }
+}
+//focus is on comment
+check-comment-color "Test Cases"
+
+//add some text to comment
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | type-text "#abc def"
+check-comment-color "Test Cases"
+
+get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+
+//go to varaible name
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Left -times 2
+        key-type Enter
+    }
+}
+check-black-color "Test Cases"
+
+get-button "Save (M1+S)" | click
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+check-var-color "Test Cases"
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
