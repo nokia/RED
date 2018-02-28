@@ -1,10 +1,39 @@
 <html>
 <head>
 <link
-	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	
+    href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
 	rel="stylesheet" type="text/css" />
+    <style>
+        table {
+            border-collapse: collapse ;
+            width: auto;
+        }
+
+        tr {
+            border: 1px solid #ccc ;
+            border-left: none;
+            border-right: none;
+            }
+        
+        th {
+            text-align: left ;    
+
+        }
+        table tbody td {
+            border:none !important;
+
+            }
+        table   {
+            border-left: none; 
+            border-right: none;
+            }
+        
+    </style>
 </head>
+
 <body>
+
 	<h2>Useful RED key shortcuts</h2>
 
 	<dl class="note">
@@ -12,49 +41,31 @@
 		<dd>Key bindings can be configured in Preferences (<i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.ui.preferencePages.Keys)')">Window-&gt;Preferences-&gt;General-&gt;Keys</a></i>).</dd>
 	</dl>
     <h3>Key shortcuts in editors</h3>
-    <ul>
-    <li><b>Quick Fix</b> - <kbd>Ctrl+1</kbd>
-			<p>Quick Fix allows to perform predefined actions for common
+    <table>
+    <tr><td><kbd>Ctrl+1</kbd></td><td><p><b>Quick Fix</b> allows to perform predefined actions for common
 				problems. It can be activated on item only when light bulb icon is
-				present next to line number.</p></li>
-		<li><b>Code assistance</b> - <kbd>Ctrl+Space</kbd>
-			<p>Provides Robot Framework test items assist. Cycle through
+				present next to line number.</p></td></tr>
+    <tr><td><kbd>Ctrl+Space</kbd></td><td><p><b>Code assistance</b> provides Robot Framework test items assist. Cycle through
 				modes with CTRL+SPACE. Working modes are customizable in
-				Preferences.</p></li>
-		<li><b>Block comment</b> - <kbd>Ctrl+/</kbd>
-			<p>Sets multi-line comments on the selected text in Source
-				editor.</p></li>
-		<li><b>Automatic source formatting</b> - <kbd>Ctrl+Shift+F</kbd>
-			<p>Apply simple source code reformat in Source editor.</p></li>
-        <li><b>Jump to keyword definition</b> - <kbd>F3</kbd> or <kbd>CTRL+LeftMouseButton</kbd>
-			<p>Jumps to keyword definition selected by cursor or mouse.</p></li>
-        <li><b>Show selected element in other editor</b> - <kbd>F4</kbd> 
-			<p>Open Table editor if in Source or other way around, with the selected element.</p></li>
-        <li><b>Run selected testcase</b> - <kbd>Alt+R</kbd> 
-			<p>Run testcase under the cursor</p></li>
-        <li><b>Debug selected testcase</b> - <kbd>Ctrl+Alt+R</kbd> 
-			<p>Debug testcase under the cursor</p></li>
-        <li><b>Show element's referenes</b> - <kbd>Ctrl+Shift+G</kbd> </li>   
-        <li><b>Move line one/down in Source editor</b> - <kbd>Alt+Up/Down</kbd> </li>
-        <li><b>Move line one/down in Table editors</b> - <kbd>Ctrl+Up/Down</kbd> </li>  
-        <li><b>Add indent in Source - Shift Right</b> - <kbd>TAB</kbd> </li>
-        <li><b>Remove indent in Source - Shift Left</b> - <kbd>Shift+TAB</kbd> </li>
-        
-        <li><b>Add new testcase in Table editors</b> - <kbd>Ctrl+N</kbd> </li>
-        <li><b>Add new line in Table editors</b> - <kbd>Ctrl+L</kbd> </li>
-        
-    </ul>
-    
-    <h3>Other key shortcuts</h3>
-	<ul>
-		
-		<li><b>Revalidate selected resources</b> - <kbd>Ctrl+F5</kbd>
-			<p>Revalidate selected resources in Project Explorer.</p></li>
-		<li><b>Revalidate current file</b> - <kbd>Ctrl+F5</kbd>
-			<p>Revalidate current file in Source editor.</p></li>
-		<li><b>Revalidate current project</b> - <kbd>Ctrl+Shift+F5</kbd>
-			<p>Revalidate current project in Source editor.</p></li>
-	</ul>
+				Preferences.</p></td></tr>
+    <tr><td><kbd>Ctrl+/</kbd></td><td><p><b>Block comment</b> sets multi-line comments on the selected text in Source editor.</p></td></tr>
+    <tr><td><kbd>Ctrl+Shift+F</kbd></td><td><p><b>Automatic source formatting</b> applies simple source code reformat in Source editor.</p></td></tr>
+    <tr><td><kbd>F3</kbd><br><kbd>CTRL+LeftMouseButton</kbd></td><td><p><b>Jumps to keyword definition</b> selected by cursor or mouse.</p></td></tr>
+    <tr><td><kbd>F4</kbd></td><td><p><b>Show selected element in other editor.</b></p></td></tr>
+    <tr><td><kbd>Alt+R</kbd>  </td><td><p><b>Run selected testcase</b> under the cursor.</p> </td></tr>
+    <tr><td><kbd>Ctrl+Alt+R</kbd> </td><td><p><b>Debug testcase under the cursor.</b></p> </td></tr>
+    <tr><td><kbd>Ctrl+Shift+G</kbd> </td><td><p><b>Find referenes</b> of selected element.</p> </td></tr>
+    <tr><td><kbd>Alt+Up/Down</kbd>  </td><td><p><b>Move line one/down</b> in Source editor.</p></td></tr>
+    <tr><td><kbd>Ctrl+Up/Down</kbd> </td><td><p><b>Move line one/down</b> in Table editors.</p> </td></tr>
+    <tr><td><kbd>TAB</kbd> </td><td><p><b>Add indent in Source</b> - Shift Right.</p> </td></tr>
+    <tr><td><kbd>Shift+TAB</kbd> </td><td><p><b>Remove indent in Source</b> - Shift Left.</p> </td></tr>
+    <tr><td><kbd>Ctrl+N</kbd>  </td><td><p><b>Add new testcase</b> in Table editors.</p> </td></tr>
+    <tr><td><kbd>Ctrl+L</kbd> </td><td><p><b>Add new line</b> in Table editors.</p> </td></tr>
+    <tr><td><kbd>Ctrl+F5</kbd> </td><td><p><b>Revalidate selected file/folder</b> in Project Explorer.</p><p><b>Revalidate current file</b> in Source editor.</p> </td></tr>
+    <tr><td><kbd>Ctrl+Shift+F5</kbd> </td><td><p><b>Revalidate current project.<b></p> </td></tr>
+
+    </table>
+
 
 </body>
 </html>
