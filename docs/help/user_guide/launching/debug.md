@@ -32,7 +32,7 @@ Execution may be suspended due to couple of reasons:
   * **end of step** \- when suspended due to one of reasons above user may ask debugger to perform a step (e.g. step over current keyword call), such step will result in another suspension just after current instruction. 
 
 For more information about suspending execution and working with it please
-refer to [ Suspended execution](debug/suspended_execution.md) topic.
+refer to [ Suspended execution](debug/hitting_a_breakpoint.md) topic.
 
 ### Starting debugging session
 
@@ -42,10 +42,9 @@ First thing when working with debugger is to place at least one breakpoint.
 This allows RED to pause the execution and activate stepping options. You may
 add breakpoint inside the editor at **Source** page either by double clicking
 on left-side ruler, choosing **Toggle breakpoint** option from context menu of
-this ruler or by hitting ` Ctrl`+`Shift`+`B` shortcut (this will add
-breakpoint for the line in which the caret is located). When successful, blue
-ball icon will appear next to it and new breakpoint entry will be visible in
-Breakpoint view.
+this ruler or by hitting  Ctrl+Shift+B shortcut (this will add breakpoint for
+the line in which the caret is located). When successful, blue ball icon will
+appear next to it and new breakpoint entry will be visible in Breakpoint view.
 
 #### Start Debug
 
