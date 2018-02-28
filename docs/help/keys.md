@@ -6,60 +6,81 @@ Note
 
 ### Key shortcuts in editors
 
-  * **Quick Fix** \- ` Ctrl+1`
+`Ctrl+1`|
 
-Quick Fix allows to perform predefined actions for common problems. It can be
-activated on item only when light bulb icon is present next to line number.
+ **Quick Fix** allows to perform predefined actions for common problems. It
+can be activated on item only when light bulb icon is present next to line
+number.  
+  
+---|---  
+` Ctrl+Space`|
 
-  * **Code assistance** \- ` Ctrl+Space`
+ **Code assistance** provides Robot Framework test items assist. Cycle through
+modes with CTRL+SPACE. Working modes are customizable in Preferences.  
+  
+` Ctrl+/`|
 
-Provides Robot Framework test items assist. Cycle through modes with
-CTRL+SPACE. Working modes are customizable in Preferences.
+ **Block comment** sets multi-line comments on the selected text in Source
+editor.  
+  
+` Ctrl+Shift+F`|
 
-  * **Block comment** \- ` Ctrl+/`
+ **Automatic source formatting** applies simple source code reformat in Source
+editor.  
+  
+` F3`  
+`CTRL+LeftMouseButton`|
 
-Sets multi-line comments on the selected text in Source editor.
+ **Jumps to keyword definition** selected by cursor or mouse.  
+  
+` F4`|
 
-  * **Automatic source formatting** \- ` Ctrl+Shift+F`
+ **Show selected element in other editor.**  
+  
+` Alt+R` |
 
-Apply simple source code reformat in Source editor.
+**Run selected testcase** under the cursor.  
+  
+` Ctrl+Alt+R` |
 
-  * **Jump to keyword definition** \- ` F3` or `CTRL+LeftMouseButton`
+**Debug testcase under the cursor.**  
+  
+` Ctrl+Shift+G` |
 
-Jumps to keyword definition selected by cursor or mouse.
+**Find referenes** of selected element.  
+  
+` Alt+Up/Down` |
 
-  * **Show selected element in other editor** \- ` F4`
+**Move line one/down** in Source editor.  
+  
+` Ctrl+Up/Down` |
 
-Open Table editor if in Source or other way around, with the selected element.
+**Move line one/down** in Table editors.  
+  
+` TAB` |
 
-  * **Run selected testcase** \- ` Alt+R`
+**Add indent in Source** \- Shift Right.  
+  
+` Shift+TAB` |
 
-Run testcase under the cursor
+**Remove indent in Source** \- Shift Left.  
+  
+` Ctrl+N` |
 
-  * **Debug selected testcase** \- ` Ctrl+Alt+R`
+**Add new testcase** in Table editors.  
+  
+` Ctrl+L` |
 
-Debug testcase under the cursor
+**Add new line** in Table editors.  
+  
+` Ctrl+F5` |
 
-  * **Show element's referenes** \- ` Ctrl+Shift+G`
-  * **Move line one/down in Source editor** \- ` Alt+Up/Down`
-  * **Move line one/down in Table editors** \- ` Ctrl+Up/Down`
-  * **Add indent in Source - Shift Right** \- ` TAB`
-  * **Remove indent in Source - Shift Left** \- ` Shift+TAB`
-  * **Add new testcase in Table editors** \- ` Ctrl+N`
-  * **Add new line in Table editors** \- ` Ctrl+L`
+**Revalidate selected file/folder** in Project Explorer.
 
-### Other key shortcuts
+ **Revalidate current file** in Source editor.  
+  
+` Ctrl+Shift+F5` |
 
-  * **Revalidate selected resources** \- ` Ctrl+F5`
-
-Revalidate selected resources in Project Explorer.
-
-  * **Revalidate current file** \- ` Ctrl+F5`
-
-Revalidate current file in Source editor.
-
-  * **Revalidate current project** \- ` Ctrl+Shift+F5`
-
-Revalidate current project in Source editor.
+**Revalidate current project. **
 
 [Return to Help index](http://nokia.github.io/RED/help/)
