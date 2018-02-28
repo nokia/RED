@@ -6,13 +6,13 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/15/18 5:01 PM
+Save-Time: 2/27/18 11:21 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
-//--------------------------- settings -----------------------------------------------------------------------------------------------------------------------
+//--------------------------- settings actions -----------------------------------------------------------------------------------------------------------------------
 //make full screen
 get-eclipse-window | maximize 
 

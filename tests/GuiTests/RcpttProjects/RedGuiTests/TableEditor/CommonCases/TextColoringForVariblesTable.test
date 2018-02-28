@@ -1,0 +1,128 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Rf0sgBvEEeiKtdHLCpPQQg
+Element-Name: TextColoringForVariblesTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Rt2W4BvDEeiKtdHLCpPQQg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 2/27/18 4:37 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Setting ***\n"
+    + "Suite Setup    log    22    #rty\n"
+    + "Suite Teardown    ${s}    1212\n"
+    + "Test Setup    Catenate    ${x}[0]    def    ${var with space}\n"
+    + "Test Template    \\    \\    arg2\n\n"
+    + "*** Variables ***\n"
+    + "${newScalar}    5\n"
+    + "@{newList}    item    item2   #double comment   # ghi\n"
+    + "&{newDict}    key=value   key2=value2\n\n"
+    + "${var with space}    5  #jkl        \n"
+    + "        \n"
+    + "*** Test cases ***\n"
+    + "test1\n"
+    + "    [Teardown]    my kw\n"
+    + "    log  ${x}" 
+    
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type "M1+s"
+    get-tab-folder | get-tab-item Variables | click
+    
+}
+//check variable color
+get-view Outline | get-tree | select "TestFile.robot/Variables/newScalar"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Left
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+}
+check-var-color "Variables"
+
+//go right to arg and check color
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label Variables] -index 1 | key-type Esc
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+}
+check-black-color "Variables"
+
+//go down and check list args
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label Variables] -index 1 | key-type Esc
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+}
+check-black-color "Variables"
+
+//close window and go to comment
+get-editor "TestFile.robot" |  get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+check-comment-color "Variables"
+
+//go down to dictionary name
+get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+check-var-color "Variables"
+
+//check dict args colors
+get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+check-black-color "Variables"
+
+//add comment
+get-editor "TestFile.robot" |  get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "here is comment"
+}
+}
+
+check-comment-color "Variables"
+
+
+//change variable name
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label Variables] -index 1] {
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    get-editbox -after [get-label Variables] -index 1 | type-text "new name"
+}
+
+check-var-color "Variables"
+
+//change varibale text - now text is variable
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label Variables] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+    get-editbox -after [get-label Variables] -index 1 | type-text "${d}"
+}
+check-black-color "Variables"
+
+//edit comment - add variable
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label Variables] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+    get-editbox -after [get-label Variables] -index 1 | type-text "${d}"
+}
+
+get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1 | key-type Enter
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Up
+        key-type Right -times 2
+        key-type Enter
+    }
+}
+
+check-comment-color "Variables"
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

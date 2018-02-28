@@ -3,8 +3,8 @@
 ### Contents
 
   * [About this Guide](/about.md)
-  * [RED Overview](/red_overview.md)
   * [Legal](/legal.md)
+  * [RED key shortcuts cheatsheet](/keys.md)
   * [First steps with RED](/first_steps/first_steps.md)
     * [Download and install](/first_steps/download_install.md)
     * [Eclipse principles](/first_steps/eclipse_principles.md)
@@ -49,6 +49,25 @@
       * [Robot Framework Maven plugin](/user_guide/tools_integration/maven.md)
       * [Running tests using Gradle](/user_guide/tools_integration/gradle.md)
       * [Robot Framework Lint](/user_guide/tools_integration/rflint.md)
-    * [RED key shortcuts cheatsheet](/user_guide/keys.md)
     * [Known issues and problems](/user_guide/known_issues.md)
+
+### About
+
+RED is modern editor based on Eclipse IDE to allow quick and comfortable work
+with Robot testware.
+
+### What RED provides:
+
+  * text editor with validation and code coloring
+  * table editors like in Ride fully synced with source
+  * debug&remote debug with breakpoints, testcase stepping (step into, step over), runtime variable lookup & modification
+  * code assistance & completion for variables, keywords, testcases, resources and libraries
+  * real time testcase validation
+  * execution view
+  * support for plugins via Eclipse mechanisms
+  * support for Robot formats: .txt, .robot, .tsv (HTML format is not supported)
+
+### Look & feel
+
+![](images/basic_run.gif)
 
