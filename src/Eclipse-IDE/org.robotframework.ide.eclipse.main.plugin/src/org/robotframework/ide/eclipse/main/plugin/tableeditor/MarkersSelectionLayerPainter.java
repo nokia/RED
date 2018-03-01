@@ -38,22 +38,25 @@ public class MarkersSelectionLayerPainter extends GridLineCellLayerPainter {
                 final ILayerCell currentCell = natLayer.getCellByPosition(column, row);
                 if (currentCell != null) {
                     final Rectangle currentCellBounds = currentCell.getBounds();
-
-                    Image image = null;
                     final LabelStack labels = natLayer.getConfigLabelsByPosition(column, row);
-                    if (labels.hasLabel(MarkersLabelAccumulator.ERROR_MARKER_LABEL)) {
-                        image = ImagesManager.getImage(RedImages.getErrorImage());
-                    } else if (labels.hasLabel(MarkersLabelAccumulator.WARNING_MARKER_LABEL)) {
-                        image = ImagesManager.getImage(RedImages.getWarningImage());
+
+                    if (labels.hasLabel(MarkersLabelAccumulator.TASK_LABEL)) {
+                        draw(gc, currentCellBounds, ImagesManager.getImage(RedImages.getTaskImage()));
                     }
 
-                    if (image != null) {
-                        final Rectangle imageBounds = image.getBounds();
-                        gc.drawImage(image, currentCellBounds.x + (currentCellBounds.width - imageBounds.width) / 2 - 2,
-                                currentCellBounds.y + (currentCellBounds.height - imageBounds.height) / 2 - 1);
+                    if (labels.hasLabel(MarkersLabelAccumulator.ERROR_MARKER_LABEL)) {
+                        draw(gc, currentCellBounds, ImagesManager.getImage(RedImages.getErrorImage()));
+                    } else if (labels.hasLabel(MarkersLabelAccumulator.WARNING_MARKER_LABEL)) {
+                        draw(gc, currentCellBounds, ImagesManager.getImage(RedImages.getWarningImage()));
                     }
                 }
             }
         }
+    }
+
+    private static void draw(final GC gc, final Rectangle currentCellBounds, final Image image) {
+        final Rectangle imageBounds = image.getBounds();
+        gc.drawImage(image, currentCellBounds.x + (currentCellBounds.width - imageBounds.width) / 2 - 2,
+                currentCellBounds.y + (currentCellBounds.height - imageBounds.height) / 2 - 1);
     }
 }
