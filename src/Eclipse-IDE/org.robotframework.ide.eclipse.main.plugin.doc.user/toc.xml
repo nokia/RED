@@ -50,6 +50,8 @@
        </topic>
        <topic href="doc/user_guide/validation/headless.html" label="Running validation in command line">
        </topic>
+       <topic href="doc/user_guide/validation/tasks.html" label="Tasks detecting">
+       </topic>
     </topic>
     <topic href="doc/user_guide/launching.html" label="Launching Tests">
        <topic href="doc/user_guide/launching/ui_elements.html" label="User interface">
