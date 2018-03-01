@@ -5,14 +5,12 @@
  */
 package org.robotframework.red.nattable.painter;
 
-import static com.google.common.base.Predicates.notNull;
-import static java.util.stream.Collectors.toList;
+import static org.eclipse.jface.viewers.Stylers.mixingStyler;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -41,9 +39,11 @@ import org.robotframework.red.nattable.TableCellsStrings;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
-import com.google.common.collect.Lists;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
 import com.google.common.collect.RangeSet;
+import com.google.common.collect.TreeRangeMap;
 import com.google.common.collect.TreeRangeSet;
 
 /**
@@ -105,9 +105,11 @@ public class RedTableTextPainter extends TextPainter {
 
             final Supplier<HeaderFilterMatchesCollection> matchesSupplier = configRegistry
                     .getConfigAttribute(ITableStringsDecorationsSupport.MATCHES_SUPPLIER, DisplayMode.NORMAL);
+            final Function<String, RangeMap<Integer, Styler>> stylesSupplier = cellStyle
+                    .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
 
-            final StyledString styledString = highlightMatches(new StyledString(text), originalText, data,
-                    Stylers.withFont(gc.getFont()), matchesSupplier);
+            final StyledString styledString = highlightMatches(new StyledString(text), originalText,
+                    Stylers.withFont(gc.getFont()), data, matchesSupplier, stylesSupplier);
             final TextLayout layout = new TextLayout(gc.getDevice());
             layout.setText(text);
             for (final StyleRange range : styledString.getStyleRanges()) {
@@ -130,87 +132,114 @@ public class RedTableTextPainter extends TextPainter {
     }
 
     @VisibleForTesting
-    final StyledString highlightMatches(final StyledString label, final String orignalText,
-            final TableCellStringData data, final Styler defaultStyler,
-            final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
+    final StyledString highlightMatches(final StyledString label, final String originalText,
+            final Styler defaultStyler, final TableCellStringData data,
+            final Supplier<HeaderFilterMatchesCollection> matchesSupplier,
+            final Function<String, RangeMap<Integer, Styler>> stylesSupplier) {
+
         if (label == null || label.length() == 0) {
             return new StyledString();
         }
-        final RangeSet<Integer> hyperlinks = getHyperlinks(data, label.getString(), orignalText);
-        final RangeSet<Integer> matches = getMatches(label.getString(), orignalText, matchesSupplier);
+        final String text = label.getString();
 
-        final Map<CellTextRegions, Styler> stylersByRegion = stylersByRegion(defaultStyler);
+        final Supplier<int[]> mappingSupplier = originalToWrappedMapping(text, originalText);
 
-        Styler previous = null;
+        final RangeSet<Integer> hyperlinks = getHyperlinks(mappingSupplier, data, text);
+        final RangeSet<Integer> matches = getMatches(mappingSupplier, matchesSupplier, text, originalText);
+        final RangeMap<Integer, Styler> additionalStyles = getAdditionalStyles(mappingSupplier, stylesSupplier, text,
+                originalText);
+
+        List<Styler> previousStylers = new ArrayList<>();
         for (int i = 0, start = 0; i <= label.length(); i++) {
-            Styler styler;
-            if (hyperlinks.contains(i) && matches.contains(i)) {
-                styler = stylersByRegion.get(CellTextRegions.HYPERLINK_MATCH);
-            } else if (hyperlinks.contains(i)) {
-                styler = stylersByRegion.get(CellTextRegions.HYPERLINK);
-            } else if (matches.contains(i)) {
-                styler = stylersByRegion.get(CellTextRegions.MATCH);
-            } else {
-                styler = stylersByRegion.get(CellTextRegions.NORMAL);
+
+            final List<Styler> stylers = new ArrayList<>();
+
+            stylers.add(defaultStyler);
+            if (hyperlinks.contains(i)) {
+                stylers.add(Stylers.Common.HYPERLINK_STYLER);
+            }
+            if (matches.contains(i)) {
+                stylers.add(Stylers.Common.MATCH_STYLER);
+            }
+            if (additionalStyles.get(i) != null) {
+                stylers.add(additionalStyles.get(i));
             }
 
-            if (i == label.length() || previous != null && previous != styler) {
-                label.setStyle(start, i - start, previous);
+            if (!containsSameObjects(stylers, previousStylers) || i == label.length()) {
+                label.setStyle(start, i - start, mixingStyler(previousStylers));
                 start = i;
             }
-            previous = styler;
+            previousStylers = stylers;
         }
         return label;
     }
 
-    private Map<CellTextRegions, Styler> stylersByRegion(final Styler defaultStyler) {
-        final EnumMap<CellTextRegions, Styler> stylers = new EnumMap<>(CellTextRegions.class);
-        stylers.put(CellTextRegions.NORMAL, defaultStyler);
-        stylers.put(CellTextRegions.HYPERLINK, Stylers.mixingStyler(defaultStyler, Stylers.Common.HYPERLINK_STYLER));
-        stylers.put(CellTextRegions.MATCH, Stylers.mixingStyler(defaultStyler, Stylers.Common.MATCH_STYLER));
-        stylers.put(CellTextRegions.HYPERLINK_MATCH,
-                Stylers.mixingStyler(defaultStyler, Stylers.Common.MATCH_STYLER, Stylers.Common.HYPERLINK_STYLER));
-        return stylers;
+    private static <T> boolean containsSameObjects(final List<T> l, final List<T> r) {
+        if (l.size() != r.size()) {
+            return false;
+        }
+        for (int i = 0; i < l.size(); i++) {
+            if (l.get(i) != r.get(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    private RangeSet<Integer> getHyperlinks(final TableCellStringData data, final String text,
+    private RangeSet<Integer> getHyperlinks(final Supplier<int[]> originalToWrappedMapping,
+            final TableCellStringData data, final String text) {
+        final RangeSet<Integer> hyperlinkRanges = TreeRangeSet.create();
+        if (data != null && data.getHyperlinkRegion() != null) {
+            hyperlinkRanges.add(data.getHyperlinkRegion());
+        }
+
+        return mapOriginalRangesToCurrentLabel(hyperlinkRanges, originalToWrappedMapping, text);
+    }
+
+    private RangeSet<Integer> getMatches(final Supplier<int[]> originalToWrappedMapping,
+            final Supplier<HeaderFilterMatchesCollection> matchesSupplier, final String text,
             final String originalText) {
-        final List<TableCellStringData> datas = data == null ? new ArrayList<>()
-                : Lists.<TableCellStringData> newArrayList(data);
-        final List<Range<Integer>> hyperlinkRanges = datas.stream()
-                .map(TableCellStringData::getHyperlinkRegion)
-                .filter(notNull())
-                .collect(toList());
-
-        final RangeSet<Integer> hyperlinksRanges = mapOriginalRangesToCurrentLabel(hyperlinkRanges, text, originalText);
-        if (hyperlinksRanges.isEmpty()) {
-            hyperlinksRanges.add(Range.closed(-1, -1));
-        }
-        return hyperlinksRanges;
-    }
-
-    private RangeSet<Integer> getMatches(final String text, final String originalText,
-            final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
         final HeaderFilterMatchesCollection matches = matchesSupplier.get();
-        final Collection<Range<Integer>> matchRanges = matches == null ? new ArrayList<>()
-                : matches.getRanges(originalText);
+        final RangeSet<Integer> matchRanges = matches == null ? TreeRangeSet.create() : matches.getRanges(originalText);
 
-        return mapOriginalRangesToCurrentLabel(matchRanges, text, originalText);
+        return mapOriginalRangesToCurrentLabel(matchRanges, originalToWrappedMapping, text);
     }
 
-    private RangeSet<Integer> mapOriginalRangesToCurrentLabel(final Collection<Range<Integer>> ranges,
-            final String text, final String originalText) {
-        final RangeSet<Integer> mappedRanges = TreeRangeSet.create();
+    private RangeMap<Integer, Styler> getAdditionalStyles(final Supplier<int[]> originalToWrappedMapping,
+            final Function<String, RangeMap<Integer, Styler>> stylesSupplier, final String text,
+            final String originalText) {
+        final RangeMap<Integer, Styler> additionalStylesRanges = stylesSupplier == null ? TreeRangeMap.create()
+                : stylesSupplier.apply(originalText);
+
+        return mapOriginalRangesToCurrentLabel(additionalStylesRanges, originalToWrappedMapping, text);
+    }
+
+    private RangeSet<Integer> mapOriginalRangesToCurrentLabel(final RangeSet<Integer> ranges,
+            final Supplier<int[]> originalToWrappedMapping, final String text) {
         if (wrapText && calculateByTextLength) {
-            mappedRanges
-                    .addAll(ranges.stream()
-                            .flatMap(r -> splitRangesForWrappedLabel(
-                                    calculateOriginalToWrappedLabelMapping(text, originalText), text, r))
-                            .collect(toList()));
+            final RangeSet<Integer> mappedRanges = TreeRangeSet.create();
+            for (final Range<Integer> range : ranges.asRanges()) {
+                splitRangesForWrappedLabel(originalToWrappedMapping.get(), text, range)
+                        .forEach(r -> mappedRanges.add(r));
+            }
+            return mappedRanges;
         } else {
-            mappedRanges.addAll(ranges);
+            return ranges;
         }
-        return mappedRanges;
+    }
+
+    private RangeMap<Integer, Styler> mapOriginalRangesToCurrentLabel(final RangeMap<Integer, Styler> ranges,
+            final Supplier<int[]> originalToWrappedMapping, final String text) {
+        if (wrapText && calculateByTextLength) {
+            final TreeRangeMap<Integer, Styler> mappedRanges = TreeRangeMap.create();
+            for (final Entry<Range<Integer>, Styler> range : ranges.asMapOfRanges().entrySet()) {
+                splitRangesForWrappedLabel(originalToWrappedMapping.get(), text, range.getKey())
+                        .forEach(r -> mappedRanges.put(r, range.getValue()));
+            }
+            return mappedRanges;
+        } else {
+            return ranges;
+        }
     }
 
     private Stream<Range<Integer>> splitRangesForWrappedLabel(final int[] map, final String text,
@@ -234,9 +263,14 @@ public class RedTableTextPainter extends TextPainter {
         return transformedRanges.stream();
     }
 
+    private static Supplier<int[]> originalToWrappedMapping(final String text, final String originalText) {
+        // we use memoized supplier so that the mapping is not recalculated all the time
+        return Suppliers.memoize(() -> calculateOriginalToWrappedLabelMapping(text, originalText));
+    }
+
     // returned array maps indexes of characters in original text into indexes of characters in
     // wrapped text
-    private int[] calculateOriginalToWrappedLabelMapping(final String text, final String originalText) {
+    private static int[] calculateOriginalToWrappedLabelMapping(final String text, final String originalText) {
         final int[] map = new int[originalText.length()];
         for (int i = 0, j = 0; i < map.length; i++, j++) {
             // there is either \r\n or \n\r
@@ -248,20 +282,11 @@ public class RedTableTextPainter extends TextPainter {
                 if (originalText.charAt(i) == ' ') {
                     map[i] = -1;
                     i++;
-                } else if (originalText.charAt(i) == '\n') {
-
                 }
                 j++;
             }
             map[i] = j;
         }
         return map;
-    }
-
-    private static enum CellTextRegions {
-        NORMAL,
-        MATCH,
-        HYPERLINK,
-        HYPERLINK_MATCH
     }
 }
