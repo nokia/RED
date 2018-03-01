@@ -38,7 +38,8 @@ public class RedNatTableContentTooltip extends NatTableContentTooltip {
             final LabelStack labels = cell.getConfigLabels();
 
             if (labels.hasLabel(MarkersLabelAccumulator.ERROR_MARKER_LABEL)
-                    || labels.hasLabel(MarkersLabelAccumulator.WARNING_MARKER_LABEL)) {
+                    || labels.hasLabel(MarkersLabelAccumulator.WARNING_MARKER_LABEL)
+                    || labels.hasLabel(MarkersLabelAccumulator.TASK_LABEL)) {
                 // substracting -1 due to columns header row
                 final Optional<RobotFileInternalElement> rowObject = getRowModelObject(row - 1);
 
