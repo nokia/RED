@@ -31,7 +31,7 @@ public class VariablesMatchesCollectionTest {
 
         assertThat(matches.getNumberOfAllMatches()).isEqualTo(1);
         assertThat(matches.contains("${scalar10}")).isTrue();
-        assertThat(matches.getRanges("${scalar10}")).containsOnly(Range.closedOpen(2, 9));
+        assertThat(matches.getRanges("${scalar10}").asRanges()).containsOnly(Range.closedOpen(2, 9));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class VariablesMatchesCollectionTest {
 
         assertThat(matches.getNumberOfAllMatches()).isEqualTo(1);
         assertThat(matches.contains("100")).isTrue();
-        assertThat(matches.getRanges("100")).containsOnly(Range.closedOpen(0, 3));
+        assertThat(matches.getRanges("100").asRanges()).containsOnly(Range.closedOpen(0, 3));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class VariablesMatchesCollectionTest {
 
         assertThat(matches.getNumberOfAllMatches()).isEqualTo(1);
         assertThat(matches.contains("#comment0")).isTrue();
-        assertThat(matches.getRanges("#comment0")).containsOnly(Range.closedOpen(7, 9));
+        assertThat(matches.getRanges("#comment0").asRanges()).containsOnly(Range.closedOpen(7, 9));
     }
 
     @Test
@@ -83,11 +83,11 @@ public class VariablesMatchesCollectionTest {
         assertThat(matches.getNumberOfAllMatches()).isEqualTo(4);
 
         assertThat(matches.contains("${scalar10}")).isTrue();
-        assertThat(matches.getRanges("${scalar10}")).containsOnly(Range.closedOpen(9, 10));
+        assertThat(matches.getRanges("${scalar10}").asRanges()).containsOnly(Range.closedOpen(9, 10));
         assertThat(matches.contains("100")).isTrue();
-        assertThat(matches.getRanges("100")).containsOnly(Range.closedOpen(1, 2), Range.closedOpen(2, 3));
+        assertThat(matches.getRanges("100").asRanges()).containsOnly(Range.closedOpen(1, 3));
         assertThat(matches.contains("#comment0")).isTrue();
-        assertThat(matches.getRanges("#comment0")).containsOnly(Range.closedOpen(8, 9));
+        assertThat(matches.getRanges("#comment0").asRanges()).containsOnly(Range.closedOpen(8, 9));
     }
 
     @Test
@@ -105,13 +105,13 @@ public class VariablesMatchesCollectionTest {
         assertThat(matches.getNumberOfAllMatches()).isEqualTo(4);
 
         assertThat(matches.contains("${scalar10}")).isTrue();
-        assertThat(matches.getRanges("${scalar10}")).containsOnly(Range.closedOpen(8, 9));
+        assertThat(matches.getRanges("${scalar10}").asRanges()).containsOnly(Range.closedOpen(8, 9));
         assertThat(matches.contains("100")).isTrue();
-        assertThat(matches.getRanges("100")).containsOnly(Range.closedOpen(0, 1));
+        assertThat(matches.getRanges("100").asRanges()).containsOnly(Range.closedOpen(0, 1));
         assertThat(matches.contains("${scalar21}")).isTrue();
-        assertThat(matches.getRanges("${scalar21}")).containsOnly(Range.closedOpen(9, 10));
+        assertThat(matches.getRanges("${scalar21}").asRanges()).containsOnly(Range.closedOpen(9, 10));
         assertThat(matches.contains("#comment1")).isTrue();
-        assertThat(matches.getRanges("#comment1")).containsOnly(Range.closedOpen(8, 9));
+        assertThat(matches.getRanges("#comment1").asRanges()).containsOnly(Range.closedOpen(8, 9));
     }
 
     private RobotVariablesSection createModelForTest() {
