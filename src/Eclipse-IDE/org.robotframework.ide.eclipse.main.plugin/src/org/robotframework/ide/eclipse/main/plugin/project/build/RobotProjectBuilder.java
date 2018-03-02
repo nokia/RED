@@ -25,14 +25,14 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
     private final BuildLogger logger;
-    private final ProblemsReportingStrategy reporter;
-    private final ProblemsReportingStrategy fatalReporter;
+    private final ValidationReportingStrategy reporter;
+    private final ValidationReportingStrategy fatalReporter;
 
     public RobotProjectBuilder() {
-        this(ProblemsReportingStrategy.reportOnly(), ProblemsReportingStrategy.reportAndPanic(), new BuildLogger());
+        this(ValidationReportingStrategy.reportOnly(), ValidationReportingStrategy.reportAndPanic(), new BuildLogger());
     }
 
-    public RobotProjectBuilder(final ProblemsReportingStrategy reporter, final ProblemsReportingStrategy fatalReporter,
+    public RobotProjectBuilder(final ValidationReportingStrategy reporter, final ValidationReportingStrategy fatalReporter,
             final BuildLogger logger) {
         this.reporter = reporter;
         this.fatalReporter = fatalReporter;
@@ -110,6 +110,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
     public static void clean(final RobotProject project) throws CoreException {
         project.getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+        project.getProject().deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_INFINITE);
         project.clearConfiguration();
         project.clearKwSources();
 

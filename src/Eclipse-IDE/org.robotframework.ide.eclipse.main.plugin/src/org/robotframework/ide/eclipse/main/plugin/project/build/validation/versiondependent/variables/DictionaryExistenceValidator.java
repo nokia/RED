@@ -21,7 +21,7 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
@@ -34,10 +34,10 @@ public class DictionaryExistenceValidator extends VersionDependentModelUnitValid
 
     private final IVariableHolder variable;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     public DictionaryExistenceValidator(final IFile file, final IVariableHolder variable,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         this.file = file;
         this.variable = variable;
         this.reporter = reporter;

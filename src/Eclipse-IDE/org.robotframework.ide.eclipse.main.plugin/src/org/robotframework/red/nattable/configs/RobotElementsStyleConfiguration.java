@@ -22,13 +22,17 @@ public abstract class RobotElementsStyleConfiguration extends AbstractRegistryCo
 
     private final TableTheme theme;
 
-    RobotElementsStyleConfiguration(final TableTheme theme) {
+    protected final RedPreferences preferences;
+
+    RobotElementsStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
         this.theme = theme;
+        this.preferences = preferences;
     }
 
-    Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {
-        final Style style = new Style();
+    protected final Style createStyle(final SyntaxHighlightingCategory category) {
         final ColoringPreference syntaxColoring = preferences.getSyntaxColoring(category);
+
+        final Style style = new Style();
         style.setAttributeValue(CellStyleAttributes.FONT,
                 FontsManager.transformFontWithStyle(theme.getFont(), syntaxColoring.getFontStyle()));
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, syntaxColoring.getColor());

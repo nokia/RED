@@ -43,6 +43,8 @@ import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 
 public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
 
+    public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.validation";
+
     private static final String HELP_CONTEXT_ID = RedPlugin.PLUGIN_ID + ".validation_preferences_page_context";
 
     private static final String PROBLEM_PREFERENCES = "problemPreferences";

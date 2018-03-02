@@ -20,7 +20,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 
@@ -31,9 +31,9 @@ class UnknownVariables {
 
     private final FileValidationContext validationContext;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
-    UnknownVariables(final FileValidationContext validationContext, final ProblemsReportingStrategy reporter) {
+    UnknownVariables(final FileValidationContext validationContext, final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.reporter = reporter;
     }

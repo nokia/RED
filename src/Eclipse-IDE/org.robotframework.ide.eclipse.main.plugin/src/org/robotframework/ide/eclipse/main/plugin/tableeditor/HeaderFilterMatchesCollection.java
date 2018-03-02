@@ -14,6 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
+import com.google.common.collect.TreeRangeSet;
 
 public class HeaderFilterMatchesCollection {
 
@@ -41,8 +42,8 @@ public class HeaderFilterMatchesCollection {
         }
     }
     
-    public Collection<Range<Integer>> getRanges(final String label) {
-        return matches.get(label);
+    public TreeRangeSet<Integer> getRanges(final String label) {
+        return TreeRangeSet.create(matches.get(label));
     }
 
     public boolean contains(final String label) {
