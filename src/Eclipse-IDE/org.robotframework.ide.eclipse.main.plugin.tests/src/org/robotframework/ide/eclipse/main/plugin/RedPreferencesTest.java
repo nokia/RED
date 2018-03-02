@@ -22,6 +22,7 @@ import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 
 import com.google.common.collect.Iterables;
 
@@ -156,6 +157,40 @@ public class RedPreferencesTest {
         final RedPreferences preferences = new RedPreferences(store);
 
         assertThat(preferences.isValidationTurnedOff()).isFalse();
+    }
+
+    @Test
+    public void taskDetectionEnablemementIsTakenFromStore_1() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getBoolean(RedPreferences.TASKS_DETECTION_ENABLED)).thenReturn(false);
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.isTasksDetectionEnabled()).isFalse();
+    }
+
+    @Test
+    public void taskDetectionEnablemementIsTakenFromStore_2() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getBoolean(RedPreferences.TASKS_DETECTION_ENABLED)).thenReturn(true);
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.isTasksDetectionEnabled()).isTrue();
+    }
+
+    @Test
+    public void tasksPrioritiesAreTakenFromStore() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.TASKS_TAGS)).thenReturn("X;Y;Z");
+        when(store.getString(RedPreferences.TASKS_PRIORITIES)).thenReturn("LOW;NORMAL;HIGH");
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.getTaskTagsWithPriorities()).hasSize(3)
+                .containsEntry("X", Priority.LOW)
+                .containsEntry("Y", Priority.NORMAL)
+                .containsEntry("Z", Priority.HIGH);
     }
 
     @Test

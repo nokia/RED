@@ -23,7 +23,7 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
@@ -38,10 +38,10 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
 
     private final TestCase testCase;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     TestCaseSettingsValidator(final FileValidationContext validationContext, final TestCase testCase,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.testCase = testCase;
         this.reporter = reporter;

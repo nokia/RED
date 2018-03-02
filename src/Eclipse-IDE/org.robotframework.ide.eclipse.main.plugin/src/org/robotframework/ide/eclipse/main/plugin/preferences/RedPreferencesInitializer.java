@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStr
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.IssuesStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -46,7 +47,8 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeProblemSeverityPreferences(preferences);
         initializeDefaultLaunchConfigurationPreferences(preferences);
         initializeRfLintPreferences(preferences);
-        initializeValidationPreference(preferences);
+        initializeValidationPreferences(preferences);
+        initializeTasksPreferences(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -130,7 +132,13 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.RFLINT_RULES_CONFIG_ARGS, "");
     }
 
-    private void initializeValidationPreference(final IEclipsePreferences preferences) {
+    private void initializeValidationPreferences(final IEclipsePreferences preferences) {
         preferences.putBoolean(RedPreferences.TURN_OFF_VALIDATION, false);
+    }
+
+    private void initializeTasksPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.TASKS_DETECTION_ENABLED, false);
+        preferences.put(RedPreferences.TASKS_TAGS, "FIXME;TODO");
+        preferences.put(RedPreferences.TASKS_PRIORITIES, Priority.HIGH.name() + ";" + Priority.NORMAL.name());
     }
 }

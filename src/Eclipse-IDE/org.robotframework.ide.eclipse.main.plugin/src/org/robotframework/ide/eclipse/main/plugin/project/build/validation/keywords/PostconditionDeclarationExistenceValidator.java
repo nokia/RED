@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADeprecatedSettingElement;
@@ -23,7 +23,7 @@ public class PostconditionDeclarationExistenceValidator extends ADeprecatedSetti
 
     private final RobotKeywordsSection section;
 
-    public PostconditionDeclarationExistenceValidator(final IFile file, final ProblemsReportingStrategy reporter,
+    public PostconditionDeclarationExistenceValidator(final IFile file, final ValidationReportingStrategy reporter,
             final RobotKeywordsSection section) {
         super(file, reporter, "Postcondition");
         this.section = section;

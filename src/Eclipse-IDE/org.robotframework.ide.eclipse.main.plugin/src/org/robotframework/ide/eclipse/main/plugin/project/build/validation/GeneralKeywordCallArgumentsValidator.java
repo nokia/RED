@@ -20,7 +20,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
@@ -33,7 +33,7 @@ import com.google.common.collect.ArrayListMultimap;
 class GeneralKeywordCallArgumentsValidator extends KeywordCallArgumentsValidator {
 
     GeneralKeywordCallArgumentsValidator(final IFile file, final RobotToken definingToken,
-            final ProblemsReportingStrategy reporter, final ArgumentsDescriptor descriptor,
+            final ValidationReportingStrategy reporter, final ArgumentsDescriptor descriptor,
             final List<RobotToken> arguments) {
         super(file, definingToken, reporter, descriptor, arguments);
     }

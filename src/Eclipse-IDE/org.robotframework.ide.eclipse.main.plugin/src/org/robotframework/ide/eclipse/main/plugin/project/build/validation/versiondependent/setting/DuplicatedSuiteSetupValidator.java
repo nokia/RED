@@ -11,14 +11,14 @@ import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 
 import com.google.common.collect.Range;
 
 public class DuplicatedSuiteSetupValidator extends ADuplicatedValidator<SuiteSetup> {
 
     public DuplicatedSuiteSetupValidator(final IFile file, final RobotSettingsSection section,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         super(file, section, reporter);
     }
 
