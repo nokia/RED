@@ -67,6 +67,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Vari
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.WithNameAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule.ITodoTaskToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableRowCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.GherkinPrefixRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
@@ -99,6 +100,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private ColoringTokens coloringTokens;
 
+    private RedTokensStore store;
+
     public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor,
             final KeySequence contentAssistActivationTrigger) {
         this.editor = editor;
@@ -107,6 +110,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     ColoringTokens getColoringTokens() {
         return coloringTokens;
+    }
+
+    void resetTokensStore() {
+        if (store != null) {
+            store.reset();
+        }
     }
 
     @Override
@@ -386,9 +395,13 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
             coloringTokens = new ColoringTokens(RedPlugin.getDefault().getPreferences());
             coloringTokens.initialize();
         }
+        if (store == null) {
+            store = new RedTokensStore();
+        }
 
         final IToken section = coloringTokens.get(SyntaxHighlightingCategory.SECTION_HEADER);
         final IToken comment = coloringTokens.get(SyntaxHighlightingCategory.COMMENT);
+        final ITodoTaskToken tasks = (ITodoTaskToken) coloringTokens.get(SyntaxHighlightingCategory.TASKS);
         final IToken definition = coloringTokens.get(SyntaxHighlightingCategory.DEFINITION);
         final IToken variable = coloringTokens.get(SyntaxHighlightingCategory.VARIABLE);
         final IToken call = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL);
@@ -398,31 +411,31 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final IToken defaultSection = coloringTokens.get(SyntaxHighlightingCategory.DEFAULT_SECTION);
 
         final ISyntaxColouringRule[] defaultRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new CommentRule(comment), new MatchEverythingRule(defaultSection) };
-        final RedTokensStore store = new RedTokensStore();
+                new CommentRule(comment, tasks), new MatchEverythingRule(defaultSection) };
         sourceViewer.addTextInputListener(store);
 
         createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, store, defaultRules);
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new TestCaseSettingsCallRule(call),
-                new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call), new CommentRule(comment),
+                new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new InTokenRule(specialToken) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, store, testCasesRules);
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
                 new KeywordSettingsCallRule(call), new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call),
-                new CommentRule(comment), new VariableUsageRule(variable), new InTokenRule(specialToken) };
+                new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(specialToken) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, store, keywordsRules);
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new SettingRule(setting), new SettingsCallRule(call), new CommentRule(comment),
+                new SettingRule(setting), new SettingsCallRule(call), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new WithNameRule(specialToken) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, store, settingsRules);
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new VariableDefinitionRule(variable), new CommentRule(comment), new VariableUsageRule(variable) };
+                new VariableDefinitionRule(variable), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, store, variablesRules);
 
         return reconciler;

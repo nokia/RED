@@ -12,7 +12,6 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 
@@ -23,14 +22,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 public class ActionNamesStyleConfiguration extends RobotElementsStyleConfiguration {
 
     public ActionNamesStyleConfiguration(final TableTheme theme) {
-        super(theme);
+        super(theme, RedPlugin.getDefault().getPreferences());
     }
 
     @Override
-    public void configureRegistry(IConfigRegistry configRegistry) {
-        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-
-        final Style actionStyle = createStyle(preferences, SyntaxHighlightingCategory.KEYWORD_CALL);
+    public void configureRegistry(final IConfigRegistry configRegistry) {
+        final Style actionStyle = createStyle(SyntaxHighlightingCategory.KEYWORD_CALL);
 
         Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
             configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, actionStyle, mode,

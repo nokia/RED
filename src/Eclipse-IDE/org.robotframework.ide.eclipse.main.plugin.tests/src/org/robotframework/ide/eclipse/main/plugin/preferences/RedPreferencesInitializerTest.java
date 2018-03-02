@@ -131,11 +131,30 @@ public class RedPreferencesInitializerTest {
     }
 
     @Test
-    public void byDefaultValidationIsNotTurnedOff() {
+    public void byDefaultValidationIsTurnedOn() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
         verify(preferences).putBoolean(RedPreferences.TURN_OFF_VALIDATION, false);
+    }
+
+    @Test
+    public void byDefaultTasksAreTurnedOff() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).putBoolean(RedPreferences.TASKS_DETECTION_ENABLED, false);
+    }
+
+    @Test
+    public void byDefaultTasksAreTaggedWithTodoAndFixmeOfProperPriorities() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).put(RedPreferences.TASKS_TAGS, "FIXME;TODO");
+        verify(preferences).put(RedPreferences.TASKS_PRIORITIES, "HIGH;NORMAL");
     }
 }

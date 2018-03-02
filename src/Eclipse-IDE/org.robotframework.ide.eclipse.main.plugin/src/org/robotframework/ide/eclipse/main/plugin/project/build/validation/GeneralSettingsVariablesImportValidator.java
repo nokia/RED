@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
@@ -17,7 +17,7 @@ class GeneralSettingsVariablesImportValidator extends GeneralSettingsImportsVali
 
     GeneralSettingsVariablesImportValidator(final FileValidationContext validationContext,
             final RobotSuiteFile suiteFile, final List<VariablesImport> imports,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         super(validationContext, suiteFile, imports, reporter);
     }
 

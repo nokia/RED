@@ -28,7 +28,7 @@ import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
@@ -53,12 +53,12 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private final Optional<RobotSettingsSection> settingsSection;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     private final VersionDependentValidators versionDependentValidators;
 
     GeneralSettingsTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotSettingsSection> settingSection, final ProblemsReportingStrategy reporter) {
+            final Optional<RobotSettingsSection> settingSection, final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.settingsSection = settingSection;
         this.reporter = reporter;

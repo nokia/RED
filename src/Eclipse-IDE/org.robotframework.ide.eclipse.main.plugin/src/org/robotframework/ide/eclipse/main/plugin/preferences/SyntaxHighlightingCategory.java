@@ -24,7 +24,8 @@ public enum SyntaxHighlightingCategory {
     SETTING("setting", new ColoringPreference(new RGB(149, 0, 85), SWT.NORMAL), new ColoringPreference(new RGB(255, 255, 128), SWT.NORMAL), "Settings"),
     SPECIAL("special", new ColoringPreference(new RGB(128, 128, 64), SWT.BOLD), new ColoringPreference(new RGB(128, 255, 255), SWT.BOLD), "Special items"),
     DEFAULT_SECTION("default", new ColoringPreference(new RGB(255, 200, 100), SWT.ITALIC), new ColoringPreference(new RGB(113, 193, 2), SWT.ITALIC), "Undefined tables"),
-    VARIABLE("var", new ColoringPreference(new RGB(0, 128, 0), SWT.NORMAL), new ColoringPreference(new RGB(160, 245, 46), SWT.NORMAL), "Variables");
+    VARIABLE("var", new ColoringPreference(new RGB(0, 128, 0), SWT.NORMAL), new ColoringPreference(new RGB(160, 245, 46), SWT.NORMAL), "Variables"),
+    TASKS("tasks", new ColoringPreference(new RGB(182,115,204), SWT.BOLD), new ColoringPreference(new RGB(150,140,124), SWT.BOLD), "Tasks");
 
     private String id;
 
@@ -69,6 +70,8 @@ public enum SyntaxHighlightingCategory {
         } else if (VARIABLE.getPreferenceId().equals(key)) {
             return VARIABLE;
 
+        } else if (TASKS.getPreferenceId().equals(key)) {
+            return TASKS;
         } else {
             throw new IllegalStateException("Unrecognized preference key: " + key);
         }

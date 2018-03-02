@@ -50,6 +50,25 @@ public class MarkersLabelAccumulatorTest {
     }
 
     @Test
+    public void taskLabelsAreAddedForElementsWithTask() {
+        final IRowDataProvider<RobotVariable> dataProvider = mock(IRowDataProvider.class);
+
+        final RobotVariable variable = createVariable();
+
+        final SuiteFileMarkersContainerMock markersContainer = new SuiteFileMarkersContainerMock();
+        markersContainer.registerMarkerTask(variable);
+
+        when(dataProvider.getRowObject(0)).thenReturn(variable);
+
+        final MarkersLabelAccumulator accumulator = new MarkersLabelAccumulator(markersContainer, dataProvider);
+        for (int col = 0; col < 5; col++) {
+            final LabelStack configLabels = new LabelStack();
+            accumulator.accumulateConfigLabels(configLabels, col, 0);
+            assertThat(configLabels.getLabels()).containsExactly(MarkersLabelAccumulator.TASK_LABEL);
+        }
+    }
+
+    @Test
     public void infoLabelsAreAddedForElementWithInfoMarker() {
         testLabelAccumulating(Severity.INFO, MarkersLabelAccumulator.INFO_MARKER_LABEL);
     }
@@ -70,7 +89,7 @@ public class MarkersLabelAccumulatorTest {
         final RobotVariable variable = createVariable();
 
         final SuiteFileMarkersContainerMock markersContainer = new SuiteFileMarkersContainerMock();
-        markersContainer.registerMarker(variable, severityOfMarker);
+        markersContainer.registerMarkerSeverity(variable, severityOfMarker);
 
         when(dataProvider.getRowObject(0)).thenReturn(variable);
 

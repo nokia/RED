@@ -11,22 +11,27 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.validation.ProblemPosition;
 
-public class AttributesAugmentingReportingStrategy extends ProblemsReportingStrategy {
+public class AttributesAugmentingReportingStrategy extends ValidationReportingStrategy {
 
-    public static ProblemsReportingStrategy create(final ProblemsReportingStrategy wrappedStrategy,
+    public static ValidationReportingStrategy create(final ValidationReportingStrategy wrappedStrategy,
             final Map<String, Object> additionalMarkerAttributes) {
         return new AttributesAugmentingReportingStrategy(wrappedStrategy, additionalMarkerAttributes);
     }
 
-    private final ProblemsReportingStrategy wrappedStrategy;
+    private final ValidationReportingStrategy wrappedStrategy;
 
     private final Map<String, Object> additionalMarkerAttributes;
 
-    private AttributesAugmentingReportingStrategy(final ProblemsReportingStrategy wrappedStrategy,
+    private AttributesAugmentingReportingStrategy(final ValidationReportingStrategy wrappedStrategy,
             final Map<String, Object> additionalMarkerAttributes) {
         super(wrappedStrategy.shouldPanic);
         this.wrappedStrategy = wrappedStrategy;
         this.additionalMarkerAttributes = additionalMarkerAttributes;
+    }
+
+    @Override
+    public void handleTask(final RobotTask task, final IFile file) {
+        wrappedStrategy.handleTask(task, file);
     }
 
     @Override

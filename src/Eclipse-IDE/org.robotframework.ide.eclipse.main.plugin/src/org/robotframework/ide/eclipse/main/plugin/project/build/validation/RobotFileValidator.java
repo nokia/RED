@@ -19,9 +19,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 
 public abstract class RobotFileValidator implements ModelUnitValidator {
@@ -30,10 +30,10 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
 
     protected final IFile file;
 
-    protected final ProblemsReportingStrategy reporter;
+    protected final ValidationReportingStrategy reporter;
 
     public RobotFileValidator(final ValidationContext context, final IFile file,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         this.context = context;
         this.file = file;
         this.reporter = reporter;
@@ -76,30 +76,36 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
                 .validate(null);
 
         checkRobotFileOutputStatus(fileModel);
+
+        new RobotTasksReporter(fileModel, reporter).reportTasks();
     }
     
     private void checkRobotFileOutputStatus(final RobotSuiteFile fileModel) {
         final RobotFile linkedElement = fileModel.getLinkedElement();
-        if (linkedElement != null) {
-            final RobotFileOutput robotFileOutput = linkedElement.getParent();
-            if (robotFileOutput != null) {
-                if (robotFileOutput.getStatus() == Status.FAILED) {
-                    reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.FILE_PARSING_FAILED)
-                            .formatMessageWith(file.getName()), file, -1);
-                }
-                for (final BuildMessage buildMessage : robotFileOutput.getBuildingMessages()) {
-                    if (buildMessage.getType() == LogLevel.ERROR) {
-                        final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.BUILD_ERROR_MESSAGE)
-                                .formatMessageWith(buildMessage.getMessage());
-                        final ProblemPosition position = ProblemPosition.fromRegion(buildMessage.getFileRegion());
-                        reporter.handleProblem(problem, file, position);
-                    } else if (buildMessage.getType() == LogLevel.WARN) {
-                        final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.BUILD_WARNING_MESSAGE)
-                                .formatMessageWith(buildMessage.getMessage());
-                        final ProblemPosition position = ProblemPosition.fromRegion(buildMessage.getFileRegion());
-                        reporter.handleProblem(problem, file, position);
-                    }
-                }
+        if (linkedElement == null) {
+            return;
+        }
+        final RobotFileOutput robotFileOutput = linkedElement.getParent();
+        if (robotFileOutput == null) {
+            return;
+        }
+        if (robotFileOutput.getStatus() == Status.FAILED) {
+            final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.FILE_PARSING_FAILED)
+                    .formatMessageWith(file.getName());
+            reporter.handleProblem(problem, file, -1);
+        }
+        for (final BuildMessage buildMessage : robotFileOutput.getBuildingMessages()) {
+            if (buildMessage.getType() == LogLevel.ERROR) {
+                final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.BUILD_ERROR_MESSAGE)
+                        .formatMessageWith(buildMessage.getMessage());
+                final ProblemPosition position = ProblemPosition.fromRegion(buildMessage.getFileRegion());
+                reporter.handleProblem(problem, file, position);
+
+            } else if (buildMessage.getType() == LogLevel.WARN) {
+                final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.BUILD_WARNING_MESSAGE)
+                        .formatMessageWith(buildMessage.getMessage());
+                final ProblemPosition position = ProblemPosition.fromRegion(buildMessage.getFileRegion());
+                reporter.handleProblem(problem, file, position);
             }
         }
     }

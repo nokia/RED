@@ -15,7 +15,7 @@ import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
@@ -24,11 +24,11 @@ public class LibraryAliasesDeclarationUpperCaseValidator implements ModelUnitVal
 
     private final IFile file;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     private final RobotSettingsSection section;
 
-    public LibraryAliasesDeclarationUpperCaseValidator(final IFile file, final ProblemsReportingStrategy reporter,
+    public LibraryAliasesDeclarationUpperCaseValidator(final IFile file, final ValidationReportingStrategy reporter,
             final RobotSettingsSection section) {
         this.file = file;
         this.reporter = reporter;
