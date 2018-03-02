@@ -91,10 +91,12 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
     @Override
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
+        final String lineDelimiter = getLineDelimiter(document);
+        final String cellSeparator = getSeparator(suiteModel);
+
+        final String lineToInsert = lineDelimiter + "Library" + cellSeparator + libName;
 
         final Optional<RobotSettingsSection> section = suiteModel.findSection(RobotSettingsSection.class);
-        final String lineDelimiter = getLineDelimiter(document);
-        final String lineToInsert = lineDelimiter + "Library    " + libName;
         if (section.isPresent()) {
             final int line = section.get().getHeaderLine();
             try {
@@ -110,15 +112,6 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
             final String toInsert = "*** Settings ***" + lineToInsert + lineDelimiter + lineDelimiter;
             return Optional.of(new CompletionProposal(toInsert, 0, 0, toInsert.length(),
                     ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null));
-        }
-    }
-
-    private static String getLineDelimiter(final IDocument document) {
-        try {
-            final String delimiter = document.getLineDelimiter(0);
-            return delimiter == null ? "\n" : delimiter;
-        } catch (final BadLocationException e) {
-            return "\n";
         }
     }
 }
