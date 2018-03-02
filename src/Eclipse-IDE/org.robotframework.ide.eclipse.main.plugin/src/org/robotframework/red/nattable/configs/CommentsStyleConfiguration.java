@@ -5,7 +5,6 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import static java.util.stream.Collectors.joining;
 import static org.eclipse.jface.viewers.Stylers.mixingStyler;
 
 import java.util.HashSet;
@@ -64,7 +63,7 @@ public class CommentsStyleConfiguration extends RobotElementsStyleConfiguration 
         final ColoringPreference tasksColoring = preferences.getSyntaxColoring(SyntaxHighlightingCategory.TASKS);
         if (!tags.isEmpty()) {
             commentStyle.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
-                    findTaskTags(Pattern.compile(tags.stream().collect(joining("|"))), tasksColoring));
+                    findTaskTags(Pattern.compile(String.join("|", tags)), tasksColoring));
         }
         return commentStyle;
     }

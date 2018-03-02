@@ -115,7 +115,7 @@ public class RobotTasksReporterTest {
 
     @Test
     public void taskDescriptionOnlyContainTextFromSameLine() {
-        final Map<String, Priority> keywords = ImmutableMap.of("TASK", Priority.HIGH, "TODO", Priority.LOW);
+        final Map<String, Priority> keywords = ImmutableMap.of("TASK", Priority.HIGH);
         final RedPreferences preferences = mock(RedPreferences.class);
         when(preferences.isTasksDetectionEnabled()).thenReturn(true);
         when(preferences.getTaskTagsWithPriorities()).thenReturn(keywords);
