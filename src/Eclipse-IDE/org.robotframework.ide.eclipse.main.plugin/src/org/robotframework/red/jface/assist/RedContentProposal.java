@@ -25,10 +25,12 @@ public interface RedContentProposal extends IContentProposal {
 
     Collection<Runnable> getOperationsToPerformAfterAccepting();
 
-    public static interface ModificationStrategy {
+    public interface ModificationStrategy {
 
         void insert(final Text text, final IContentProposal proposal);
 
         void insert(final Combo control, final IContentProposal proposal);
+
+        boolean shouldCommitAfterInsert();
     }
 }

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
+import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ShellProvider;
@@ -96,6 +98,27 @@ public class KeywordProposalsInSettingsProviderTest {
                 "Test Teardown",
                 "Test Template",
                 "Library  LibImported");
+        projectProvider.createFile("kw_based_settings_with_keywords_with_args.robot",
+                "*** Settings ***",
+                "Suite Setup",
+                "Suite Teardown",
+                "Test Setup",
+                "Test Teardown",
+                "Test Template",
+                "*** Keywords ***",
+                "kw_no_args",
+                "kw_with_args",
+                "  [Arguments]  ${arg1}  ${arg2}");
+        projectProvider.createFile("kw_based_settings_with_keywords_with_embedded_args.robot",
+                "*** Settings ***",
+                "Suite Setup",
+                "Suite Teardown",
+                "Test Setup",
+                "Test Teardown",
+                "Test Template",
+                "*** Keywords ***",
+                "kw_no_arg",
+                "kw_with_${arg}");
     }
 
     @AfterClass
@@ -218,6 +241,82 @@ public class KeywordProposalsInSettingsProviderTest {
         }
     }
 
+    @Test
+    public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArguments() throws Exception {
+        final RobotSuiteFile suiteFile = robotModel
+                .createSuiteFile(projectProvider.getFile("kw_based_settings_with_keywords_with_args.robot"));
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+
+        final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings, 5);
+        final KeywordProposalsInSettingsProvider provider = new KeywordProposalsInSettingsProvider(suiteFile,
+                dataProvider);
+
+        for (int row = 0; row < settings.size(); row++) {
+            final AssistantContext context = new NatTableAssistantContext(1, row);
+            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+            assertThat(proposals).hasSize(2);
+
+            assertThat(proposals[0].getLabel())
+                    .isEqualTo("kw_no_args - kw_based_settings_with_keywords_with_args.robot");
+            assertThat(proposals[0].getOperationsToPerformAfterAccepting()).isEmpty();
+            assertThat(proposals[1].getLabel())
+                    .isEqualTo("kw_with_args - kw_based_settings_with_keywords_with_args.robot");
+            assertThat(proposals[1].getOperationsToPerformAfterAccepting()).hasSize(1);
+        }
+    }
+
+    @Test
+    public void thereAreNoOperationsToPerformAfterAccepting_whenColumnCountIsToSmall() throws Exception {
+        final RobotSuiteFile suiteFile = robotModel
+                .createSuiteFile(projectProvider.getFile("kw_based_settings_with_keywords_with_args.robot"));
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+
+        final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings, 4);
+        final KeywordProposalsInSettingsProvider provider = new KeywordProposalsInSettingsProvider(suiteFile,
+                dataProvider);
+
+        for (int row = 0; row < settings.size(); row++) {
+            final AssistantContext context = new NatTableAssistantContext(1, row);
+            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+            assertThat(proposals).hasSize(2);
+
+            assertThat(proposals[0].getLabel())
+                    .isEqualTo("kw_no_args - kw_based_settings_with_keywords_with_args.robot");
+            assertThat(proposals[0].getOperationsToPerformAfterAccepting()).isEmpty();
+            assertThat(proposals[1].getLabel())
+                    .isEqualTo("kw_with_args - kw_based_settings_with_keywords_with_args.robot");
+            assertThat(proposals[1].getOperationsToPerformAfterAccepting()).isEmpty();
+        }
+    }
+
+    @Test
+    public void keywordsWithEmbeddedArgumentsShouldBeInsertedWithoutCommitting() throws Exception {
+        final RobotSuiteFile suiteFile = robotModel
+                .createSuiteFile(projectProvider.getFile("kw_based_settings_with_keywords_with_embedded_args.robot"));
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+
+        final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings, 5);
+        final KeywordProposalsInSettingsProvider provider = new KeywordProposalsInSettingsProvider(suiteFile,
+                dataProvider);
+
+        for (int row = 0; row < settings.size(); row++) {
+            final AssistantContext context = new NatTableAssistantContext(1, row);
+            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+            assertThat(proposals).hasSize(2);
+
+            assertThat(proposals[0].getLabel())
+                    .isEqualTo("kw_no_arg - kw_based_settings_with_keywords_with_embedded_args.robot");
+            assertThat(proposals[0].getModificationStrategy()).isInstanceOfSatisfying(
+                    SubstituteTextModificationStrategy.class,
+                    strategy -> assertThat(strategy.shouldCommitAfterInsert()).isTrue());
+            assertThat(proposals[1].getLabel())
+                    .isEqualTo("kw_with_${arg} - kw_based_settings_with_keywords_with_embedded_args.robot");
+            assertThat(proposals[1].getModificationStrategy()).isInstanceOfSatisfying(
+                    SubstituteTextModificationStrategy.class,
+                    strategy -> assertThat(strategy.shouldCommitAfterInsert()).isFalse());
+        }
+    }
+
     private static IRowDataProvider<Object> prepareSettingsProvider(final List<RobotKeywordCall> settings) {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
@@ -228,6 +327,14 @@ public class KeywordProposalsInSettingsProviderTest {
 
             when(dataProvider.getRowObject(i)).thenReturn(entry);
         }
+        return dataProvider;
+    }
+
+    private static IRowDataProvider<Object> prepareSettingsProvider(final List<RobotKeywordCall> settings,
+            final int columnCount) {
+        final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
+        when(dataProvider.getColumnCount()).thenReturn(columnCount);
+        when(dataProvider.getDataValue(anyInt(), anyInt())).thenReturn("");
         return dataProvider;
     }
 }

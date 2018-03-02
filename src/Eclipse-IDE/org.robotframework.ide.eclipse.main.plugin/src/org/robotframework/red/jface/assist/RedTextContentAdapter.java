@@ -15,7 +15,6 @@ import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrate
 
 public class RedTextContentAdapter implements RedControlContentAdapter {
 
-
     @Override
     public String getControlContents(final Control control) {
         return ((Text) control).getText();
@@ -65,7 +64,7 @@ public class RedTextContentAdapter implements RedControlContentAdapter {
         ((Text) control).setSelection(range);
     }
 
-    public static class SubstituteTextModificationStrategy implements ModificationStrategy {
+    public abstract static class SubstituteTextModificationStrategy implements ModificationStrategy {
 
         @Override
         public void insert(final Text text, final IContentProposal proposal) {

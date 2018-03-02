@@ -18,7 +18,6 @@ import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
-
 public class WithNameElementsProposalsProvider implements RedContentProposalProvider {
 
     private final IRowDataProvider<?> dataProvider;
@@ -28,7 +27,8 @@ public class WithNameElementsProposalsProvider implements RedContentProposalProv
     }
 
     @Override
-    public RedContentProposal[] getProposals(final String contents, final int position, final AssistantContext context) {
+    public RedContentProposal[] getProposals(final String contents, final int position,
+            final AssistantContext context) {
         final String prefix = contents.substring(0, position);
 
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = createWordPredicate(
@@ -36,7 +36,8 @@ public class WithNameElementsProposalsProvider implements RedContentProposalProv
         final List<? extends AssistProposal> withNameProposals = new RedWithNameProposals(predicateWordHasToSatisfy)
                 .getWithNameProposals(prefix);
 
-        return withNameProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
+        return withNameProposals.stream().map(proposal -> new AssistProposalAdapter(proposal, p -> true)).toArray(
+                RedContentProposal[]::new);
     }
 
     private AssistProposalPredicate<String> createWordPredicate(final NatTableAssistantContext context) {

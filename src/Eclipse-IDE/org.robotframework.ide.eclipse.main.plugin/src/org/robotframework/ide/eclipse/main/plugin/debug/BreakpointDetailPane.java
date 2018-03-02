@@ -213,7 +213,7 @@ public class BreakpointDetailPane implements IDetailPane3 {
     private void activateContentAssistant() {
         final RobotSuiteFile currentModel = RedPlugin.getModelManager()
                 .createSuiteFile((IFile) currentBreakpoint.getMarker().getResource());
-        final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel);
+        final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel, null);
         proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider);
     }
 
