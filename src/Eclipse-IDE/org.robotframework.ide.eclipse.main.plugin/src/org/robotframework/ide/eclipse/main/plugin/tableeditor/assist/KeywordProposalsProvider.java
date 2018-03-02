@@ -7,8 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -17,17 +21,21 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ImportLibraryTable
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
+import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
 public class KeywordProposalsProvider implements RedContentProposalProvider {
 
     private final Supplier<RobotSuiteFile> suiteFile;
 
-    public KeywordProposalsProvider(final RobotSuiteFile suiteFile) {
-        this(() -> suiteFile);
+    private final Optional<IRowDataProvider<?>> dataProvider;
+
+    public KeywordProposalsProvider(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider) {
+        this(() -> suiteFile, dataProvider);
     }
 
-    public KeywordProposalsProvider(final Supplier<RobotSuiteFile> suiteFile) {
+    public KeywordProposalsProvider(final Supplier<RobotSuiteFile> suiteFile, final IRowDataProvider<?> dataProvider) {
         this.suiteFile = suiteFile;
+        this.dataProvider = Optional.ofNullable(dataProvider);
     }
 
     @Override
@@ -37,17 +45,33 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> keywordsProposals = new RedKeywordProposals(suiteFile.get())
                 .getKeywordProposals(prefix);
 
+        if (!dataProvider.isPresent()) {
+            return keywordsProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
+        }
+
+        final Predicate<AssistProposal> shouldCommitAfterAccepting = proposal -> !EmbeddedKeywordNamesSupport
+                .hasEmbeddedArguments(proposal.getContent());
+
         return keywordsProposals.stream()
-                .map(proposal -> new AssistProposalAdapter(proposal,
-                        () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal)))
+                .map(proposal -> new AssistProposalAdapter(proposal, shouldCommitAfterAccepting,
+                        () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal,
+                                (NatTableAssistantContext) context)))
                 .toArray(RedContentProposal[]::new);
     }
 
-    private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword) {
+    private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword,
+            final NatTableAssistantContext tableContext) {
         final List<Runnable> operations = new ArrayList<>();
+
+        final SelectedKeywordTableUpdater updater = new SelectedKeywordTableUpdater(tableContext, dataProvider.get());
+        if (updater.shouldInsertWithArgs(proposedKeyword, values -> true)) {
+            operations.add(() -> updater.insertCallWithArgs(proposedKeyword));
+        }
+
         if (!proposedKeyword.isAccessible()) {
             operations.add(() -> new ImportLibraryTableFixer(proposedKeyword.getSourceName()).apply(suiteFile.get()));
         }
+
         return operations;
     }
 }

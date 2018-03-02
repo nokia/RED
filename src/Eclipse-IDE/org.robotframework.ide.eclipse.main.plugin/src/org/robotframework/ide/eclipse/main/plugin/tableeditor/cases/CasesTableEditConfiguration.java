@@ -36,7 +36,7 @@ public class CasesTableEditConfiguration extends AbstractRegistryConfiguration {
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new SettingProposalsProvider(SettingTarget.TEST_CASE),
                 new CodeReservedElementsProposalsProvider(dataProvider),
-                new KeywordProposalsProvider(suiteFile),
+                new KeywordProposalsProvider(suiteFile, dataProvider),
                 new ImportsInCodeProposalsProvider(suiteFile),
                 new VariableProposalsProvider(suiteFile, dataProvider));
 

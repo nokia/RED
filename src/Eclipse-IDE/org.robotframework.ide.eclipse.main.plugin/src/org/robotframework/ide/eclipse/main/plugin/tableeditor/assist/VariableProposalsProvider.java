@@ -132,5 +132,10 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
             }
             return currentTextAfterSelection;
         }
+
+        @Override
+        public boolean shouldCommitAfterInsert() {
+            return false;
+        }
     }
 }

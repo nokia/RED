@@ -49,8 +49,9 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
                 .create(importType, model)
                 .getFilesLocationsProposals(prefix)
                 .stream();
-        return Stream.concat(librariesProposals, fileLocationProposals).map(AssistProposalAdapter::new).toArray(
-                RedContentProposal[]::new);
+        return Stream.concat(librariesProposals, fileLocationProposals)
+                .map(proposal -> new AssistProposalAdapter(proposal, p -> true))
+                .toArray(RedContentProposal[]::new);
     }
 
     private boolean areApplicable(final NatTableAssistantContext tableContext) {

@@ -598,6 +598,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
+    private void whenColumnCountIsExceeded(@UIEventTopic(RobotModelEvents.COLUMN_COUNT_EXCEEDED) final Event event) {
+        final RobotKeywordCall keywordCall = Events.get(event, IEventBroker.DATA, RobotKeywordCall.class);
+        if (keywordCall != null && keywordCall.getParent() instanceof RobotKeywordDefinition
+                && keywordCall.getSuiteFile() == fileModel) {
+            tableInputIsReplaced().run();
+        }
+    }
+
+    @Inject
+    @Optional
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel && dataProvider.getInput() == null) {
