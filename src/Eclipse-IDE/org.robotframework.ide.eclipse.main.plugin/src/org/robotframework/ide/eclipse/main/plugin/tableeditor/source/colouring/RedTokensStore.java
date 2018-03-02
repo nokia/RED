@@ -81,6 +81,12 @@ public class RedTokensStore implements ITextInputListener, IDocumentListener, IR
         }
     }
 
+    public void reset() {
+        synchronized (this) {
+            tokens.clear();
+        }
+    }
+
     List<PositionedTextToken> tokensAt(final int offset) {
         final Range<Integer> range = entriesAt(offset);
         final ArrayList<PositionedTextToken> entries = new ArrayList<>();

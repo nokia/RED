@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
@@ -27,9 +27,9 @@ class UnknownTablesValidator implements ModelUnitValidator {
 
     private final RobotSuiteFile fileModel;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
-    UnknownTablesValidator(final RobotSuiteFile fileModel, final ProblemsReportingStrategy reporter) {
+    UnknownTablesValidator(final RobotSuiteFile fileModel, final ValidationReportingStrategy reporter) {
         this.fileModel = fileModel;
         this.reporter = reporter;
     }

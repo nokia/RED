@@ -5,7 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.validation;
 
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.eclipse.core.resources.IFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 
 /**
  * @author Michal Anglart
@@ -22,7 +24,7 @@ public class ProblemsReportingStrategyFactory {
         return new CheckstyleReportingStrategy(false, reportFilepath, logger);
     }
 
-    static abstract class HeadlessValidationReportingStrategy extends ProblemsReportingStrategy {
+    static abstract class HeadlessValidationReportingStrategy extends ValidationReportingStrategy {
 
         HeadlessValidationReportingStrategy(final boolean shouldPanic) {
             super(shouldPanic);
@@ -33,5 +35,10 @@ public class ProblemsReportingStrategyFactory {
         abstract void projectValidationStarted(final String projectName);
 
         abstract void projectValidationFinished(final String projectName);
+
+        @Override
+        public void handleTask(final RobotTask task, final IFile file) {
+            // not interested in tasks reporting
+        }
     }
 }

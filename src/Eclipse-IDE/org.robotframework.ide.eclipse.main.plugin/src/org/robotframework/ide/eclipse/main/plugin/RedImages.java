@@ -13,6 +13,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 @SuppressWarnings("PMD.GodClass")
@@ -93,6 +94,10 @@ public class RedImages {
 
     public static ImageDescriptor getPasteImage() {
         return getWorkbenchSharedImage(ISharedImages.IMG_TOOL_PASTE);
+    }
+
+    public static ImageDescriptor getTaskImage() {
+        return getWorkbenchSharedImage(IDE.SharedImages.IMG_OBJS_TASK_TSK);
     }
 
     public static ImageDescriptor getRobotImage() {

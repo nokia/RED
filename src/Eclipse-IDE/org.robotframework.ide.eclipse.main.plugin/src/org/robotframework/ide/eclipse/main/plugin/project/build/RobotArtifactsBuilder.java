@@ -22,7 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy.ReportingInterruptedException;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy.ReportingInterruptedException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 
@@ -36,7 +36,7 @@ public class RobotArtifactsBuilder {
         this.logger = logger;
     }
 
-    public Job createBuildJob(final boolean rebuildNeeded, final ProblemsReportingStrategy fatalReporter) {
+    public Job createBuildJob(final boolean rebuildNeeded, final ValidationReportingStrategy fatalReporter) {
         if (rebuildNeeded) {
             logger.log("BUILDING: refreshing project");
             try {
@@ -86,7 +86,7 @@ public class RobotArtifactsBuilder {
     }
 
     private void buildArtifacts(final IProject project, final IProgressMonitor monitor,
-            final ProblemsReportingStrategy fatalReporter) {
+            final ValidationReportingStrategy fatalReporter) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -117,7 +117,7 @@ public class RobotArtifactsBuilder {
     }
 
     private RobotProjectConfig provideConfiguration(final RobotProject robotProject,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         try {
             if (!robotProject.getConfigurationFile().exists()) {
                 final RobotProblem problem = RobotProblem
@@ -135,7 +135,7 @@ public class RobotArtifactsBuilder {
     }
 
     private RobotRuntimeEnvironment provideRuntimeEnvironment(final RobotProject robotProject,
-            final RobotProjectConfig configuration, final ProblemsReportingStrategy reporter) {
+            final RobotProjectConfig configuration, final ValidationReportingStrategy reporter) {
 
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         if (runtimeEnvironment == null) {

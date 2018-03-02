@@ -198,7 +198,7 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
     private void refreshPreview() {
         final List<StyleRange> ranges = newArrayList(Iterables.concat(getSectionHeaderRanges(), getCommentsRanges(),
                 getSettingRanges(), getDefinitionRanges(), getKeywordCallRanges(), getVariableRanges(),
-                getGherkinRanges(), getSpecialTokenRanges()));
+                getGherkinRanges(), getSpecialTokenRanges(), getTasksRanges()));
         Collections.sort(ranges, (range1, range2) -> Integer.compare(range1.start, range2.start));
         previewText.setStyleRanges(ranges.toArray(new StyleRange[0]));
     }
@@ -255,10 +255,10 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
                 new StyleRange(755, 9, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(772, 15, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(808, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(853, 19, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(879, 19, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(904, 25, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(936, 17, preference.getColor(), null, preference.getFontStyle()));
+                new StyleRange(878, 19, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(904, 19, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(929, 25, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(961, 17, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getVariableRanges() {
@@ -291,10 +291,16 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
     private List<StyleRange> getGherkinRanges() {
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.GHERKIN);
 
-        return newArrayList(new StyleRange(847, 5, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(874, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(900, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(931, 4, preference.getColor(), null, preference.getFontStyle()));
+        return newArrayList(new StyleRange(872, 5, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(899, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(925, 3, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(956, 4, preference.getColor(), null, preference.getFontStyle()));
+    }
+
+    private List<StyleRange> getTasksRanges() {
+        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.TASKS);
+
+        return newArrayList(new StyleRange(849, 4, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getSpecialTokenRanges() {
