@@ -36,7 +36,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
@@ -51,14 +51,14 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private final Optional<RobotKeywordsSection> keywordSection;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     private final FileValidationContext validationContext;
 
     private static final Pattern VARIABLES_ONLY_PATTERN = Pattern.compile("^([$&@]\\{[^{}]+\\})+$");
 
     KeywordTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotKeywordsSection> keywordSection, final ProblemsReportingStrategy reporter) {
+            final Optional<RobotKeywordsSection> keywordSection, final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.keywordSection = keywordSection;
         this.reporter = reporter;

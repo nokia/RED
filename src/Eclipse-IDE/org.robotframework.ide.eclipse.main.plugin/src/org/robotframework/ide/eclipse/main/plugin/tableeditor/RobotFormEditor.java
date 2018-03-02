@@ -98,7 +98,7 @@ public class RobotFormEditor extends FormEditor {
 
     private boolean isEditable;
 
-    private SuiteFileValidationListener validationListener;
+    private SuiteFileMarkersListener validationListener;
 
     private final OnSaveLibrariesAutodiscoveryTrigger saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger();
 
@@ -112,7 +112,7 @@ public class RobotFormEditor extends FormEditor {
             super.init(site, input);
 
             clipboard = new RedClipboard(site.getShell().getDisplay());
-            validationListener = new SuiteFileValidationListener();
+            validationListener = new SuiteFileMarkersListener();
 
             prepareEclipseContext();
 

@@ -10,5 +10,8 @@ public interface SuiteFileMarkersContainer {
 
     Optional<Severity> getHighestSeverityMarkerFor(Optional<? extends RobotFileInternalElement> element);
 
+    boolean hasTaskMarkerFor(Optional<RobotFileInternalElement> rowObject);
+
     List<String> getMarkersMessagesFor(Optional<? extends RobotFileInternalElement> element);
+
 }

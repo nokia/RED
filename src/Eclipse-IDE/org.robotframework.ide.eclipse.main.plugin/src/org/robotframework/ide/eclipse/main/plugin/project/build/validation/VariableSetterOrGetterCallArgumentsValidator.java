@@ -11,7 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
@@ -19,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescr
 class VariableSetterOrGetterCallArgumentsValidator extends KeywordCallArgumentsValidator {
 
     VariableSetterOrGetterCallArgumentsValidator(final IFile file, final RobotToken definingToken,
-            final ProblemsReportingStrategy reporter, final ArgumentsDescriptor descriptor,
+            final ValidationReportingStrategy reporter, final ArgumentsDescriptor descriptor,
             final List<RobotToken> arguments) {
         super(file, definingToken, reporter, descriptor, arguments);
     }

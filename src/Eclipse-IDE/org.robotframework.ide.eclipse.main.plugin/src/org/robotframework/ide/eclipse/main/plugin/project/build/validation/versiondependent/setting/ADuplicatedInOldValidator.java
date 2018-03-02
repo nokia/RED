@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
@@ -29,10 +29,10 @@ abstract class ADuplicatedInOldValidator<T extends AModelElement<?>> extends Ver
 
     protected final RobotSettingsSection section;
 
-    private final ProblemsReportingStrategy reporter;
+    private final ValidationReportingStrategy reporter;
 
     ADuplicatedInOldValidator(final IFile file, final RobotSettingsSection section,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         this.file = file;
         this.section = section;
         this.reporter = reporter;

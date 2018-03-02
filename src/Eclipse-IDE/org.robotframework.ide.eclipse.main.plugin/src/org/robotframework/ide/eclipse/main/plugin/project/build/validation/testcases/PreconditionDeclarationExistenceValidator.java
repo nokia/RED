@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADeprecatedSettingElement;
@@ -23,7 +23,7 @@ public class PreconditionDeclarationExistenceValidator extends ADeprecatedSettin
 
     private final RobotCasesSection section;
 
-    public PreconditionDeclarationExistenceValidator(final IFile file, final ProblemsReportingStrategy reporter,
+    public PreconditionDeclarationExistenceValidator(final IFile file, final ValidationReportingStrategy reporter,
             final RobotCasesSection section) {
         super(file, reporter, "Precondition");
         this.section = section;

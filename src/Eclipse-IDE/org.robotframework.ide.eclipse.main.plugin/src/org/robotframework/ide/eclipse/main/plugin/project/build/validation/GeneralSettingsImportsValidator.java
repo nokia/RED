@@ -31,7 +31,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
@@ -52,11 +52,11 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     private final List<? extends AImported> imports;
 
-    protected final ProblemsReportingStrategy reporter;
+    protected final ValidationReportingStrategy reporter;
 
     public GeneralSettingsImportsValidator(final FileValidationContext validationContext,
             final RobotSuiteFile suiteFile, final List<? extends AImported> imports,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.suiteFile = suiteFile;
         this.imports = imports;

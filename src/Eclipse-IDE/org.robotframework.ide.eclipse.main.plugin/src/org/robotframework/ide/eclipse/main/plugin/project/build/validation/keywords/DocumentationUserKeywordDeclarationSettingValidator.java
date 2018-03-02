@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDeprecatedDeclarationValidator;
@@ -24,7 +24,7 @@ public class DocumentationUserKeywordDeclarationSettingValidator extends ADocume
     private final RobotKeywordsSection section;
 
     public DocumentationUserKeywordDeclarationSettingValidator(final IFile file, final RobotKeywordsSection section,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         super(file, reporter);
         this.section = section;
     }

@@ -9,6 +9,7 @@ IEclipsePreferences#org-robotframework-ide-eclipse-main-plugin {
         'red.editor.syntaxColoring.special=128,255,255,1'
         'red.editor.syntaxColoring.default=113,193,2,2'
         'red.editor.syntaxColoring.var=160,245,46,0'
+        'red.editor.syntaxColoring.tasks=150,140,124,1'
 }
 
 IEclipsePreferences#org-eclipse-ui-editors:org-robotframework-ide-eclipse-main-plugin {
