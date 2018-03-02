@@ -36,7 +36,7 @@ public class KeywordsTableEditConfiguration extends AbstractRegistryConfiguratio
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new SettingProposalsProvider(SettingTarget.KEYWORD),
                 new CodeReservedElementsProposalsProvider(dataProvider),
-                new KeywordProposalsProvider(suiteFile),
+                new KeywordProposalsProvider(suiteFile, dataProvider),
                 new ImportsInCodeProposalsProvider(suiteFile),
                 new VariableProposalsProvider(suiteFile, dataProvider));
 

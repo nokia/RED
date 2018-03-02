@@ -34,7 +34,8 @@ public class SettingProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(settingTarget)
                 .getSettingsProposals(prefix);
 
-        return settingsProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
+        return settingsProposals.stream().map(proposal -> new AssistProposalAdapter(proposal, p -> true)).toArray(
+                RedContentProposal[]::new);
     }
 
     private boolean areApplicable(final NatTableAssistantContext tableContext) {

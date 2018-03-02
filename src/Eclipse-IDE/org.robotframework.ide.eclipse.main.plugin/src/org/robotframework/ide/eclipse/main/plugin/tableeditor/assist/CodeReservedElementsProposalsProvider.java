@@ -38,12 +38,11 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
         final List<? extends AssistProposal> reservedWordProposals = new RedCodeReservedWordProposals(
                 predicateWordHasToSatisfy).getReservedWordProposals(prefix);
 
-        return reservedWordProposals.stream().map(proposal -> {
-            final String additionalSuffix = RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())
-                    ? " "
-                    : "";
-            return new AssistProposalAdapter(proposal, additionalSuffix);
-        }).toArray(RedContentProposal[]::new);
+        return reservedWordProposals.stream()
+                .map(proposal -> RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())
+                        ? new AssistProposalAdapter(proposal, " ")
+                        : new AssistProposalAdapter(proposal, p -> true))
+                .toArray(RedContentProposal[]::new);
     }
 
     private AssistProposalPredicate<String> createWordPredicate(final NatTableAssistantContext context) {

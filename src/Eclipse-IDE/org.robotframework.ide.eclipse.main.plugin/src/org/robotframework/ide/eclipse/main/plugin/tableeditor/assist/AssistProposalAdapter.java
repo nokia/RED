@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -29,30 +30,41 @@ public class AssistProposalAdapter implements RedContentProposal {
     // lambda, which is calculated only when proposal is chosen
     private final Supplier<Collection<Runnable>> operationsAfterAccepting;
 
+    // it is calculated only when proposal is chosen
+    private final Predicate<AssistProposal> shouldCommitAfterAccepting;
+
     public AssistProposalAdapter(final AssistProposal wrappedProposal) {
-        this(wrappedProposal, null, "", () -> new ArrayList<>());
+        this(wrappedProposal, null, "", ArrayList::new, p -> false);
+    }
+
+    public AssistProposalAdapter(final AssistProposal wrappedProposal,
+            final Predicate<AssistProposal> shouldCommitAfterAccepting) {
+        this(wrappedProposal, null, "", ArrayList::new, shouldCommitAfterAccepting);
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal,
             final ModificationStrategy modificationStrategy) {
-        this(wrappedProposal, modificationStrategy, "", () -> new ArrayList<>());
+        this(wrappedProposal, modificationStrategy, "", ArrayList::new, p -> false);
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal, final String additionalSuffix) {
-        this(wrappedProposal, null, additionalSuffix, () -> new ArrayList<>());
+        this(wrappedProposal, null, additionalSuffix, ArrayList::new, p -> false);
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal,
+            final Predicate<AssistProposal> shouldCommitAfterAccepting,
             final Supplier<Collection<Runnable>> operationsAfterAccepting) {
-        this(wrappedProposal, null, "", operationsAfterAccepting);
+        this(wrappedProposal, null, "", operationsAfterAccepting, shouldCommitAfterAccepting);
     }
 
     private AssistProposalAdapter(final AssistProposal wrappedProposal, final ModificationStrategy modificationStrategy,
-            final String additionalSuffix, final Supplier<Collection<Runnable>> operationsAfterAccepting) {
+            final String additionalSuffix, final Supplier<Collection<Runnable>> operationsAfterAccepting,
+            final Predicate<AssistProposal> shouldCommitAfterAccepting) {
         this.wrappedProposal = wrappedProposal;
         this.modificationStrategy = Optional.ofNullable(modificationStrategy);
         this.additionalSuffix = additionalSuffix;
         this.operationsAfterAccepting = operationsAfterAccepting;
+        this.shouldCommitAfterAccepting = shouldCommitAfterAccepting;
     }
 
     @Override
@@ -92,7 +104,13 @@ public class AssistProposalAdapter implements RedContentProposal {
 
     @Override
     public ModificationStrategy getModificationStrategy() {
-        return modificationStrategy.orElse(new SubstituteTextModificationStrategy());
+        return modificationStrategy.orElse(new SubstituteTextModificationStrategy() {
+
+            @Override
+            public boolean shouldCommitAfterInsert() {
+                return shouldCommitAfterAccepting.test(wrappedProposal);
+            }
+        });
     }
 
     @Override

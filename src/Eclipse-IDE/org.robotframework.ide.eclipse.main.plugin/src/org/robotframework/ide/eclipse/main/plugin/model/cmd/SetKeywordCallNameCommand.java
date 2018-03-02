@@ -28,7 +28,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     private final String oldName;
 
-    private List<EditorCommand> executedCommands;
+    private final List<EditorCommand> executedCommands = new ArrayList<>();
 
     public SetKeywordCallNameCommand(final IEventBroker eventBroker, final RobotKeywordCall keywordCall,
             final String name) {
@@ -49,7 +49,6 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         if (oldName.equals(newName)) {
             return;
         }
-        executedCommands = new ArrayList<>();
 
         final boolean shouldShiftNameFromArgs = newName == null;
         String nameToSet = shouldShiftNameFromArgs ? extractNameFromArguments(keywordCall.getArguments()) : newName;

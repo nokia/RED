@@ -269,6 +269,16 @@ public class RedTextCellEditor extends TextCellEditor {
             for (final Runnable operation : proposal.getOperationsToPerformAfterAccepting()) {
                 operation.run();
             }
+            if (proposal.getModificationStrategy().shouldCommitAfterInsert()) {
+                commit(getCommitMoveDirection());
+            }
+        }
+
+        private MoveDirectionEnum getCommitMoveDirection() {
+            return RedPlugin.getDefault()
+                    .getPreferences()
+                    .getCellCommitBehavior() == CellCommitBehavior.STAY_IN_SAME_CELL ? MoveDirectionEnum.NONE
+                            : MoveDirectionEnum.RIGHT;
         }
     }
 }

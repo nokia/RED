@@ -5,23 +5,26 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabels;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 
 public class RedCodeReservedWordProposals {
 
     static final String FOR_LOOP_1 = ":FOR";
+
     static final String FOR_LOOP_2 = ": FOR";
 
-    public static final List<String> GHERKIN_ELEMENTS = newArrayList("Given", "When", "And", "But", "Then");
-    private static final List<String> LOOP_ELEMENTS = newArrayList("IN", "IN ENUMERATE", "IN RANGE", "IN ZIP");
+    public static final List<String> GHERKIN_ELEMENTS = ImmutableList.of("Given", "When", "And", "But", "Then");
+
+    private static final List<String> LOOP_ELEMENTS = ImmutableList.of("IN", "IN ENUMERATE", "IN RANGE", "IN ZIP");
 
     private final ProposalMatcher matcher;
 
@@ -51,7 +54,7 @@ public class RedCodeReservedWordProposals {
         // match against both variants, but add only one proposal
         if (predicateWordHasToSatisfy.test(FOR_LOOP_1)) {
 
-            final Optional<ProposalMatch> forLoopMatch = newArrayList(FOR_LOOP_1, FOR_LOOP_2).stream()
+            final Optional<ProposalMatch> forLoopMatch = Stream.of(FOR_LOOP_1, FOR_LOOP_2)
                     .map(variant -> matcher.matches(userContent, variant))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
