@@ -15,11 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -72,29 +68,6 @@ public class MetadataKeyInSameColumnFixer extends RedSuiteMarkerResolution {
                 metadataDec.getRaw().length(), offset, ImagesManager.getImage(RedImages.getUserKeywordImage()),
                 getLabel(), null, null);
         return Optional.of(proposal);
-    }
-
-    private String getSeparator(final RobotSuiteFile suiteModel, final int offset) {
-        String separator = "  ";
-
-        final RobotFile fileModel = suiteModel.getLinkedElement();
-        final FileFormat fileFormat = fileModel.getParent().getFileFormat();
-        if (fileFormat == FileFormat.TSV) {
-            separator = "\t";
-        } else {
-            final Optional<Integer> line = fileModel.getRobotLineIndexBy(offset);
-            if (line.isPresent()) {
-                final RobotLine robotLine = fileModel.getFileContent().get(line.get());
-                final SeparatorType separatorForLine = robotLine.getSeparatorForLine().get();
-                if (separatorForLine == SeparatorType.PIPE) {
-                    separator = " | ";
-                } else {
-                    separator = "  ";
-                }
-            }
-        }
-
-        return separator;
     }
 
     private Range<Integer> getRange(final IMarker marker) {
