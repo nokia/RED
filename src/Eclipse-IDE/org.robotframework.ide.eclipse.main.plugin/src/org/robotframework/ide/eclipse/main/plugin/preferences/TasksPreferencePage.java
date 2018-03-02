@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.robotframework.red.swt.Listeners.keyPressedAdapter;
 import static org.robotframework.red.swt.Listeners.menuShownAdapter;
@@ -80,7 +79,7 @@ public class TasksPreferencePage extends RedPreferencePage {
 
         final String text = "Strings indicating tasks in Robot code comments. Make sure that <a href=\""
                 + ValidationPreferencePage.ID
-                + "\">validation</a> is turned on since tasks are detected during build/validation proccess.";
+                + "\">validation</a> is turned on since tasks are detected during build/validation process.";
         link.setText(text);
         link.addSelectionListener(widgetSelectedAdapter(e -> {
             if (ValidationPreferencePage.ID.equals(e.text)) {
@@ -348,8 +347,7 @@ public class TasksPreferencePage extends RedPreferencePage {
                         indexes.stream()
                                 .map(Priority::name)
                                 .map(priority -> CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, priority))
-                                .collect(toList())
-                                .toArray(new String[0]));
+                                .toArray(String[]::new));
             }
             return super.getCellEditor(element);
         }
