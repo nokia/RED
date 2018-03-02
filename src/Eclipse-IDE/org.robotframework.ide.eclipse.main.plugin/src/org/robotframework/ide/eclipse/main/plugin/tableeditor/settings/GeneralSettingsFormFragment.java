@@ -32,6 +32,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
@@ -125,7 +126,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
-import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
@@ -160,6 +160,7 @@ import org.robotframework.services.event.Events;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Range;
+import com.google.common.collect.TreeRangeSet;
 
 public class GeneralSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
@@ -764,11 +765,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private void setDocumentationMatches(final HeaderFilterMatchesCollection settingsMatches) {
         clearDocumentationMatches();
-        final Collection<Range<Integer>> ranges = settingsMatches.getRanges(documentation.getText());
-        for (final Range<Integer> range : ranges) {
-            final Color bg = ColorsManager.getColor(255, 255, 175);
-            documentation.setStyleRange(
-                    new StyleRange(range.lowerEndpoint(), range.upperEndpoint() - range.lowerEndpoint(), null, bg));
+        final TreeRangeSet<Integer> ranges = settingsMatches.getRanges(documentation.getText());
+        for (final Range<Integer> range : ranges.asRanges()) {
+            final StyleRange styleRange = new StyleRange(range.lowerEndpoint(), range.upperEndpoint() - range.lowerEndpoint(), null, null);
+            Stylers.Common.MATCH_STYLER.applyStyles(styleRange);
+            documentation.setStyleRange(styleRange);
         }
     }
 

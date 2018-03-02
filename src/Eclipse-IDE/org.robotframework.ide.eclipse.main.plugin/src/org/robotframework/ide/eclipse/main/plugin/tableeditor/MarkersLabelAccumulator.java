@@ -11,6 +11,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 
 public class MarkersLabelAccumulator implements IConfigLabelAccumulator {
 
+    public static final String TASK_LABEL = "TASK";
+
     public static final String WARNING_MARKER_LABEL = "WARNING";
     public static final String ERROR_MARKER_LABEL = "ERROR";
     public static final String INFO_MARKER_LABEL = "INFO";
@@ -29,13 +31,18 @@ public class MarkersLabelAccumulator implements IConfigLabelAccumulator {
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         final Optional<RobotFileInternalElement> rowObject = getRowModelObject(rowPosition);
 
-        final Optional<Severity> severity = markersContainer.getHighestSeverityMarkerFor(rowObject);
-        if (severity.isPresent() && severity.get() == Severity.INFO) {
-            configLabels.addLabel(INFO_MARKER_LABEL);
-        } else if (severity.isPresent() && severity.get() == Severity.WARNING) {
-            configLabels.addLabel(WARNING_MARKER_LABEL);
-        } else if (severity.isPresent()) {
-            configLabels.addLabel(ERROR_MARKER_LABEL);
+        markersContainer.getHighestSeverityMarkerFor(rowObject).ifPresent(s -> {
+            if (s == Severity.INFO) {
+                configLabels.addLabel(INFO_MARKER_LABEL);
+            } else if (s == Severity.WARNING) {
+                configLabels.addLabel(WARNING_MARKER_LABEL);
+            } else {
+                configLabels.addLabel(ERROR_MARKER_LABEL);
+            }
+        });
+
+        if (markersContainer.hasTaskMarkerFor(rowObject)) {
+            configLabels.addLabel(TASK_LABEL);
         }
     }
 

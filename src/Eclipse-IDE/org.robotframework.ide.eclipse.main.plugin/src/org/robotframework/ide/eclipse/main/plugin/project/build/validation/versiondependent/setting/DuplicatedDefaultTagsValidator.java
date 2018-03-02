@@ -11,14 +11,14 @@ import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 
 import com.google.common.collect.Range;
 
 public class DuplicatedDefaultTagsValidator extends ADuplicatedValidator<DefaultTags> {
 
     public DuplicatedDefaultTagsValidator(final IFile file, final RobotSettingsSection section,
-            final ProblemsReportingStrategy parameter) {
+            final ValidationReportingStrategy parameter) {
         super(file, section, parameter);
     }
 

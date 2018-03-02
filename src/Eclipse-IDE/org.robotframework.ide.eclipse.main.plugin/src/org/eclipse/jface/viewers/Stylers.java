@@ -5,6 +5,8 @@
  */
 package org.eclipse.jface.viewers;
 
+import java.util.Collection;
+
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
@@ -17,6 +19,8 @@ import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
+
+import com.google.common.collect.Iterables;
 
 public class Stylers {
 
@@ -103,6 +107,20 @@ public class Stylers {
     }
 
     public static Styler mixingStyler(final Styler... stylers) {
+        return new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                for (final Styler styler : stylers) {
+                    styler.applyStyles(textStyle);
+                }
+            }
+        };
+    }
+
+    public static Styler mixingStyler(final Collection<Styler> stylers) {
+        if (stylers.size() == 1) {
+            return Iterables.getFirst(stylers, null);
+        }
         return new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {

@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
 import com.google.common.base.Function;
@@ -24,7 +24,7 @@ import com.google.common.collect.Range;
 public class DuplicatedDefaultTagsInOlderValidator extends ADuplicatedInOldValidator<DefaultTags> {
 
     public DuplicatedDefaultTagsInOlderValidator(final IFile file, final RobotSettingsSection section,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         super(file, section, reporter);
     }
 

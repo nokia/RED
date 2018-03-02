@@ -42,10 +42,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.red.junit.ProjectProvider;
 
-public class SuiteFileValidationListenerTest {
+public class SuiteFileMarkersListenerTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SuiteFileValidationListenerTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(SuiteFileMarkersListenerTest.class);
 
     private static RobotSuiteFile varsSuiteModel;
     private static RobotSuiteFile settingsSuiteModel;
@@ -130,10 +130,10 @@ public class SuiteFileValidationListenerTest {
     @Test
     public void markersAreLoaded_whenInitializationIsDone() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final SuiteFileValidationListener listener = ContextInjector.prepareContext()
+        final SuiteFileMarkersListener listener = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .inWhich(casesSuiteModel)
-                .isInjectedInto(new SuiteFileValidationListener());
+                .isInjectedInto(new SuiteFileMarkersListener());
         listener.init();
 
         assertThat(listener.getMarkers()).hasSize(6);
@@ -146,10 +146,10 @@ public class SuiteFileValidationListenerTest {
         final List<RobotVariable> variables = section.getChildren();
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final SuiteFileValidationListener listener = ContextInjector.prepareContext()
+        final SuiteFileMarkersListener listener = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .inWhich(varsSuiteModel)
-                .isInjectedInto(new SuiteFileValidationListener());
+                .isInjectedInto(new SuiteFileMarkersListener());
         listener.init();
 
         assertThat(severityFor(listener, variables.get(0))).isNull();
@@ -176,10 +176,10 @@ public class SuiteFileValidationListenerTest {
         final List<RobotKeywordCall> settings = section.getChildren();
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final SuiteFileValidationListener listener = ContextInjector.prepareContext()
+        final SuiteFileMarkersListener listener = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .inWhich(settingsSuiteModel)
-                .isInjectedInto(new SuiteFileValidationListener());
+                .isInjectedInto(new SuiteFileMarkersListener());
         listener.init();
 
         assertThat(severityFor(listener, settings.get(0))).isNull();
@@ -203,10 +203,10 @@ public class SuiteFileValidationListenerTest {
         final List<RobotCase> cases = section.getChildren();
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final SuiteFileValidationListener listener = ContextInjector.prepareContext()
+        final SuiteFileMarkersListener listener = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .inWhich(casesSuiteModel)
-                .isInjectedInto(new SuiteFileValidationListener());
+                .isInjectedInto(new SuiteFileMarkersListener());
         listener.init();
 
         assertThat(severityFor(listener, cases.get(0))).isNull();
@@ -238,10 +238,10 @@ public class SuiteFileValidationListenerTest {
         final List<RobotKeywordDefinition> keywords = section.getChildren();
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final SuiteFileValidationListener listener = ContextInjector.prepareContext()
+        final SuiteFileMarkersListener listener = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .inWhich(keywordsSuiteModel)
-                .isInjectedInto(new SuiteFileValidationListener());
+                .isInjectedInto(new SuiteFileMarkersListener());
         listener.init();
 
         assertThat(severityFor(listener, keywords.get(0))).isNull();
@@ -271,12 +271,12 @@ public class SuiteFileValidationListenerTest {
                 "Variable 'x' is used, but not defined");
     }
 
-    private static Severity severityFor(final SuiteFileValidationListener listener,
+    private static Severity severityFor(final SuiteFileMarkersListener listener,
             final RobotFileInternalElement element) {
         return listener.getHighestSeverityMarkerFor(Optional.of(element)).orElse(null);
     }
 
-    private static List<String> messageFor(final SuiteFileValidationListener listener,
+    private static List<String> messageFor(final SuiteFileMarkersListener listener,
             final RobotFileInternalElement element) {
         return listener.getMarkersMessagesFor(Optional.of(element));
     }

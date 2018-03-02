@@ -13,7 +13,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDefaultTagsInOlderValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDefaultTagsValidator;
@@ -43,7 +43,7 @@ public class VersionDependentValidators {
 
     public Iterable<VersionDependentModelUnitValidator> getVariableValidators(
             final FileValidationContext validationContext, final IVariableHolder variable,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         final IFile file = validationContext.getFile();
 
         final List<VersionDependentModelUnitValidator> allValidators = newArrayList(
@@ -56,7 +56,7 @@ public class VersionDependentValidators {
 
     public Iterable<VersionDependentModelUnitValidator> getGeneralSettingsValidators(
             final FileValidationContext validationContext, final RobotSettingsSection section,
-            final ProblemsReportingStrategy reporter) {
+            final ValidationReportingStrategy reporter) {
         final IFile file = validationContext.getFile();
         final List<VersionDependentModelUnitValidator> allValidators = newArrayList(
                 new DuplicatedTemplateInOlderValidator(file, section, reporter),
