@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _I3FgsGXzEeayWasF5RXANg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/11/17 4:25 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/5/18 4:07 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -97,13 +97,12 @@ check-content-assist-for-keywords-for-table
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
 with [get-editbox -after [get-label "User Keywords"] -index 1] {
 
-	//add first kw - Call Method and accept
+	//add first kw - Catenate and accept
     key-type "M1+SPACE"
     wait 300
-    key-type Down -times 12
+    key-type Down -times 13
     key-type Enter
-    wait 200
-    key-type Enter
+
 }
 //check if info about content assist is shown in next cell
 get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1 
@@ -126,7 +125,6 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1 |  key-type "M1+SPACE"
 	check-content-list
 	get-window -class ContentProposalPopup | get-table | select "Continue For Loop - BuiltIn" | double-click
-	get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1 |  key-type Enter
 		
 }-else{	
 	//open on  more time cell and select KW from list (continue loop)
@@ -140,8 +138,9 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    
 	//selecting by double click close cell for editing    
 	get-window -class ContentProposalPopup | get-table | select "Continue For Loop - BuiltIn" | double-click
-	get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Right
 }
+wait 500
+
 //add variable from list
 with [get-editor "TestFile.robot"] {
     get-canvas -after [get-label "User Keywords"] -index 1 |key-type Enter
@@ -159,10 +158,8 @@ with [get-editor "TestFile.robot"] {
         type-text LM
         key-type "M1+SPACE"
         wait 200
-//        key-type Down
         key-type Enter
-        wait 200
-        key-type Enter
+
     }
     //add user varaible: ${a1111}
     with [get-editbox -after [get-label "User Keywords"] -index 1] {        
@@ -195,7 +192,6 @@ with [get-editor "TestFile.robot"] {
 		key-type Down -times 6
         key-type Enter
         wait 200
-        key-type Enter
     }
     
  	//go down and add [return]
@@ -234,13 +230,12 @@ with [get-editor "TestFile.robot"] {
         key-type "M1+SPACE"
         key-type Enter
         wait 200
-        key-type Enter
     }
  	
 }
 
 check-keyword-row -file "TestFile.robot" -row 1 -kw "no CA" 
-check-keyword-row -file "TestFile.robot" -row 2 -kw "Call Method"  -c1 "Continue For Loop" -c2 "&{SUITE_METADATA}" -c3 "Log Many" -c4 "${a1111}"  -c5 "@{myList}"
+check-keyword-row -file "TestFile.robot" -row 2 -kw "Catenate"  -c1 "Continue For Loop" -c2 "&{SUITE_METADATA}" -c3 "Log Many" -c4 "${a1111}"  -c5 "@{myList}"
 check-keyword-row -file "TestFile.robot" -row 3 -kw ":FOR"
 check-keyword-row -file "TestFile.robot" -row 4 -kw "[Return]" 
 check-keyword-row -file "TestFile.robot" -row 5 -kw "..."
@@ -254,7 +249,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "&{list22}    key=value    \n\n"
     + "*** Keyword ***\n"
     + "no CA\n"
-    + "    Call Method    Continue For Loop    &{SUITE_METADATA}    Log Many    ${a1111}    @{myList}\n"
+    + "    Catenate    Continue For Loop    &{SUITE_METADATA}    Log Many    ${a1111}    @{myList}\n"
     + "    :FOR\n"
     + "    [Return]" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
