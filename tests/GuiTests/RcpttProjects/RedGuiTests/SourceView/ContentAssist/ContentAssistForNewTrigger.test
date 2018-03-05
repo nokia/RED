@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qngh8HH3Eee3fMF6qScr4Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 3:07 PM
+Save-Time: 3/5/18 2:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -87,27 +87,25 @@ with [get-window -class ContentProposalPopup | get-table] {
     click -default
 }
 
-//go to second cell and type cat to filter
-if [get-by-os -linux "Linux" -win "Windows" | eq Linux] {
-	with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-	    key-type Right
-	    key-type Enter
-	}
-}-else{
-
-	with [get-editor "TestFile.robot"] {
-	    with [get-editbox -after [get-label "Test Cases"] -index 1] {
-	        set-focus
-	        key-type Enter
-	    }
-	}
-} 
+////go to second cell and type cat to filter
+//if [get-by-os -linux "Linux" -win "Windows" | eq Linux] {
+//	with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+//	    key-type Right
+//	    key-type Enter
+//	}
+//}-else{
+//
+//	with [get-editor "TestFile.robot"] {
+//	    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+//	        set-focus
+//	        key-type Enter
+//	    }
+//	}
+//} 
 with [get-editor "TestFile.robot"] {   
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
         type-text cat
         key-type "M3+g"
-        key-type Enter
-        wait 200
         key-type Enter
     }
     get-tab-folder | get-tab-item Keywords | click
@@ -121,15 +119,11 @@ with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Down
         key-type Enter
-        wait 200
-        key-type Enter
     }
     //add kw Continue For Loop If
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
         key-type "M3+g"
 		key-type Down -times 16       
-        key-type Enter
-        wait 200
         key-type Enter
     }
     //add None shall pass using filtering
@@ -137,8 +131,6 @@ with [get-editor "TestFile.robot"] {
         type-text non
         key-type "M3+g"
         wait 200
-        key-type Enter
-   		wait 200
         key-type Enter
     }
     get-tab-folder | get-tab-item Variables | click
@@ -158,8 +150,6 @@ with [get-editor "TestFile.robot"] {
         key-type "M3+g"
         key-type Down -times 4    
         key-type Enter 
-        wait 300
-        key-type Enter
     }
     get-tab-folder | get-tab-item Source | click
 }
@@ -172,7 +162,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "*** Keywords ***\n"
     + "my kw\n"
     + "    log  8\n"
-    + "    Continue For Loop If    None Shall Pass\n"
+    + "    Continue For Loop If    None Shall Pass    who\n"
     + "*** Variables ***\n"
     + "${newScalar}     5\n"
     + "${var}    ${\\n"
@@ -181,15 +171,15 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     
 
 
+//--------------------------------------------------------------------------------------------------------------------
 
 
 
-
-//open Ca by pressing 9 - the restart is not required
+//open CA by pressing 9 - the restart is not required
 change_trigger-for-content-assist "9"
 
 with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 11 44
+    set-caret-pos 11 51
     key-type Enter
     type-text 9
 }
@@ -231,7 +221,7 @@ with [get-editor "TestFile.robot"] {
         key-type F4
     }
     wait 500
-    //add new KW convert to bolean
+    //add new KW "convert to bolean" to second cell
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
         key-type Down
         key-type Up
@@ -242,31 +232,27 @@ with [get-editor "TestFile.robot"] {
     	key-type 9
     	key-type Down -times 6
         key-type Enter
-        wait 300
-        key-type Enter 
     }
 }
 
-//check deocrato if is with new name
+//check decorator if is with new name
 get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
     | get-property "decorators[0].description" | equals "Press 9 for content assist" | verify-true
     
-get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
 
 
-
+//--------------------------------------------------------------------------------------------------------------------
 
 change_trigger-for-content-assist "P"
 
-//add kw Contiunue if loop
+//add kw Contiunue for loop
 with [get-editor "TestFile.robot"] {
     get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
 		key-type "p"
 		wait 300
 		key-type Down -times 3
-        key-type Enter
-        wait 300
         key-type Enter
     }
 }
@@ -276,16 +262,16 @@ with [get-editor "TestFile.robot"] {
     	key-type "p"
         key-type Up -times 4
         key-type Enter
-        wait 300
-        key-type Enter
     }
 }
 //check if new label is shown
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Esc
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
 get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
     | get-property "decorators[0].description" | equals "Press P for content assist" | verify-true
     
 //go to source    
-get-editor "TestFile.robot" |get-editbox -after [get-label "Test Cases"] -index 1 |key-type "TRAVERSE_ESCAPE"
+get-editor "TestFile.robot" |get-editbox -after [get-label "Test Cases"] -index 1 |key-type Esc
 
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
@@ -303,16 +289,16 @@ with [get-editor "TestFile.robot"] {
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "test 1\n"
     + "    log\n"
-    + "    [Teardown]    Catenate    Convert To Boolean    Continue For Loop    @{EMPTY}  Call Method    object    method_name    \n"
+    + "    [Teardown]    Catenate    Convert To Boolean    item    Continue For Loop    @{EMPTY}  Call Method    object    method_name    \n"
     + "test 2\n"
     + "     \n\n"
     + "*** Keywords ***\n"
     + "my kw\n"
     + "    log  8\n"
-    + "    Continue For Loop If    None Shall Pass\n"
+    + "    Continue For Loop If    None Shall Pass    who\n"
     + "    [Arguments]\n"
     + "*** Variables ***\n"
     + "${newScalar}     5\n"
-    + "${var}    ${\\n"
-    + "}" | verify-true
+    + "${var}    ${\\n}" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
