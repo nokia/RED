@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _srvewJQcEeWNpL9oeriwCw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 3:00 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/5/18 2:41 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,7 +20,7 @@ get-window Preferences | get-tree | get-item "Robot Framework" | expand-all
 
 //check list of all Robot preferences
 with [get-window Preferences | get-tree] {
-    get-item "Robot Framework" | get-property childCount | equals 5 | verify-true
+    get-item "Robot Framework" | get-property childCount | equals 6 | verify-true
     get-item "Robot Framework" | get-property "getItems().TreeItem[0].getText()" | equals Autodiscovering | verify-true
     get-item "Robot Framework" | get-property "getItems().TreeItem[1].getItems().length" | equals 3 | verify-true
     
@@ -46,6 +46,9 @@ with [get-window Preferences | get-tree] {
     get-item "Robot Framework" | get-property "getItems().TreeItem[4].getItems().TreeItem[1].getText()" 
         | equals "Default Launch Configurations" | verify-true
     get-item "Robot Framework" | get-property "getItems().TreeItem[4].getText()" | equals Launching | verify-true
+    
+    get-window Preferences | get-tree | get-item -path "Robot Framework" | get-property "getItems().TreeItem[5].getText()" 
+    	| equals "Task Tags" | verify-true
 }
 //check Autodiscovery prefernces
 get-window Preferences | get-tree | select "Robot Framework/Autodiscovering"
