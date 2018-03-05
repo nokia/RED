@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _mnMpkGhbEeahDKoeWWpvig
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/1/17 10:31 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/5/18 3:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -192,20 +192,23 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
 
 //write shou.. abd use content assist
 with [get-editor "TestFile.robot"] {
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
         type-text SBEAI
         key-type "M1+SPACE"
-        wait 200
-//        key-type Down
-//        wait 200
         key-type Enter
-        wait 200
-        key-type Enter
+       
     }
 }
+
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Down
+}
+
 //add gherkin again in new line
 with [get-editor "TestFile.robot"] {
     get-canvas -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
@@ -218,18 +221,15 @@ with [get-editor "TestFile.robot"] {
         key-type "M1+SPACE"
         key-type Down
         key-type Enter 
-        wait 300
-        key-type Enter
+		wait 500
     }
     
-    //go down to  new line
+    //go down to new line
     get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
         key-type Down
         key-type Left
-        key-type Enter
-        wait 200
-        key-type Enter
+        key-type Enter -times 2
     }
     
     //add teardown
@@ -237,8 +237,7 @@ with [get-editor "TestFile.robot"] {
         key-type "M1+SPACE"
         key-type Down -times 3
         key-type Enter
-        wait 200
-        key-type Enter
+
     }
     get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
 }
@@ -292,10 +291,11 @@ with [get-editor "TestFile.robot"] {
 }
 
 check-test_case-row -file "TestFile.robot" -row 1 -tc "new test" 
-check-test_case-row -file "TestFile.robot" -row 2 -tc "And this is my kw"  -c1 "Convert To Bytes" -c2 "${CURDIR}" -c3 "&{EMPTY}" -c4 "${TEST_NAME}" -c5 "Should Be Equal As Integers"
-check-test_case-row -file "TestFile.robot" -row 3 -tc "But Catenate" 
-check-test_case-row -file "TestFile.robot" -row 4 -tc "[Teardown]" 
-check-test_case-row -file "TestFile.robot" -row 5 -tc "This is ${a1} and next ${DEBUG_FILE}&{myDict}" -c1 "arg ${:}"
-check-test_case-row -file "TestFile.robot" -row 6 -tc "..." 
+check-test_case-row -file "TestFile.robot" -row 2 -tc "And this is my kw"  -c1 "Convert To Bytes" -c2 "input" -c3 "${CURDIR}" -c4 "&{EMPTY}" -c5 "${TEST_NAME}" 
+check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be Equal As Integers" -c1 "first" -c2 "second"
+check-test_case-row -file "TestFile.robot" -row 4 -tc "But Catenate" 
+check-test_case-row -file "TestFile.robot" -row 5 -tc "[Teardown]" 
+check-test_case-row -file "TestFile.robot" -row 6 -tc "This is ${a1} and next ${DEBUG_FILE}&{myDict}" -c1 "arg ${:}"
+check-test_case-row -file "TestFile.robot" -row 7 -tc "..." 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
