@@ -8,8 +8,6 @@
 def get_classes_from_module(module_location):
     import os
     from robot import pythonpathsetter
-    import importlib
-    import pkgutil
 
     module_directory = os.path.dirname(module_location)
     module_name = _find_module_name_by_path(module_location)
@@ -17,34 +15,33 @@ def get_classes_from_module(module_location):
 
     if module_location.endswith('__init__.py'):
         pythonpathsetter.add_path(os.path.dirname(module_directory))
-        module = importlib.import_module(module_name)
+        module = _import_module(os.path.basename(module_directory), module_name)
         class_names.extend(_find_names_in_module(module, module_name))
-        for loader, name, _ in pkgutil.walk_packages([module_directory]):
-            try:
-                module = loader.find_module(name).load_module(name)
-                class_names.extend(_find_names_in_module(module, name))
-            except:
-                pass  # some modules can't be loaded  separately
+        class_names.extend(_find_names_in_path([module_directory], _find_names_in_module))
         class_names = [n if n.startswith(module_name) else module_name + "." + n for n in class_names]
 
     elif module_location.endswith('.py'):
         pythonpathsetter.add_path(module_directory)
-        module = importlib.import_module(module_name)
+        module = _import_module(os.path.basename(module_location)[:-3], module_name)
         class_names.extend(_find_names_in_module(module, module_name))
 
     elif module_location.endswith(".zip") or module_location.endswith(".jar"):
         pythonpathsetter.add_path(module_location)
-        for loader, name, _ in pkgutil.walk_packages([module_location]):
-            try:
-                module = loader.find_module(name).load_module(name)
-                class_names.extend(_find_names_in_archive_module(module, name))
-            except:
-                pass  # some modules can't be loaded  separately
+        class_names.extend(_find_names_in_path([module_location], _find_names_in_archive_module))
 
     else:
         raise Exception('Unrecognized library path: ' + module_location)
 
     return sorted(set(class_names))
+
+
+def _import_module(module_name_from_location, module_name):
+    import importlib
+
+    try:
+        return importlib.import_module(module_name_from_location)
+    except:
+        return importlib.import_module(module_name)
 
 
 def _find_module_path(start_path):
@@ -83,6 +80,20 @@ def _find_module_name_by_path(start_path):
             else:
                 _, start_path_extension = os.path.splitext(start_path)
                 result = result[:-len(start_path_extension)]
+
+    return result
+
+
+def _find_names_in_path(path, names_finder):
+    import pkgutil
+
+    result = list()
+    for loader, name, _ in pkgutil.walk_packages(path):
+        try:
+            module = loader.find_module(name).load_module(name)
+            result.extend(names_finder(module, name))
+        except:
+            pass  # some modules can't be loaded  separately
 
     return result
 

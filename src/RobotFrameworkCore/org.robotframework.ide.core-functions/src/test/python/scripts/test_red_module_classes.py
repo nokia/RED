@@ -60,6 +60,14 @@ class ClassesRetrievingTests(unittest.TestCase):
         self.assertEqual(result, ['several_classes_and_methods', 'several_classes_and_methods.First', 'several_classes_and_methods.Second',
                                   'several_classes_and_methods.Third'])
 
+    def test_retrieving_classes_from_file_inside_module(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'module', 'ModuleClass.py')
+
+        result = get_classes_from_module(module_location)
+
+        self.assertEqual(result, ['ModuleClass'])
+
     def test_retrieving_classes_from_module_with_relative_iports(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'relative_import', '__init__.py')
@@ -68,7 +76,7 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         self.assertEqual(result, ['relative_import', 'relative_import.non_relative'])
 
-    def test_retrieving_classes_from_python_module_with_init_1(self):
+    def test_retrieving_classes_from_python_module_with_init_only(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'init', '__init__.py')
 
@@ -76,7 +84,7 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         self.assertEqual(result, ['init', 'init.InitClass', 'init.OtherInitClass'])
 
-    def test_retrieving_classes_from_python_module_with_init_2(self):
+    def test_retrieving_classes_from_python_module_with_empty_init_and_classes(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'module', '__init__.py')
 
@@ -85,7 +93,7 @@ class ClassesRetrievingTests(unittest.TestCase):
         self.assertEqual(result, ['module', 'module.ModuleClass', 'module.ModuleClass.ModuleClass', 'module.OtherModuleClass',
                                   'module.OtherModuleClass.DifferentModuleClass', 'module.OtherModuleClass.OtherModuleClass'])
 
-    def test_retrieving_classes_from_python_module_with_init_3(self):
+    def test_retrieving_classes_from_python_module_with_init_and_classes(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'init_and_module', '__init__.py')
 
