@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _rIRz0JRoEeaAWer3wBFETA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/24/17 3:31 PM
+Save-Time: 3/5/18 11:41 AM
 Testcase-Type: ecl
 Verifications: _yvhKoJRrEeaAWer3wBFETA
 
@@ -30,7 +30,7 @@ with [get-window Preferences] {
         get-property "getChildren().length" | equals 6 | verify-true
         
         //check all items to color
-        get-property "getChildren().Control[0].getItems().length" | equals 9 | verify-true
+        get-property "getChildren().Control[0].getItems().length" | equals 10 | verify-true
         get-property "getChildren().Control[0].getItems().String[0]" | equals Comments | verify-true
         get-property "getChildren().Control[0].getItems().String[1]" | equals "Given/When/And/Then" | verify-true
         get-property "getChildren().Control[0].getItems().String[2]" | equals "Keyword calls" | verify-true
@@ -41,6 +41,7 @@ with [get-window Preferences] {
         get-property "getChildren().Control[0].getItems().String[6]" | equals "Special items" | verify-true
         get-property "getChildren().Control[0].getItems().String[7]" | equals "Undefined tables" | verify-true
         get-property "getChildren().Control[0].getItems().String[8]" | equals Variables | verify-true
+        get-property "getChildren().Control[0].getItems().String[9]" | equals Tasks | verify-true
         
         //check 3 options: color, bold, italic
         get-property "getChildren().Control[1].getChildren().length" | equals 4 | verify-true
@@ -66,37 +67,8 @@ with [get-window Preferences] {
             
        //check text     
         get-property "getChildren().Control[2].getText()" | equals "Preview:" | verify-true
-        get-property "getChildren().Control[3].getText()" | equals "*** Settings ***\n"
-            + "Library          String    WITH NAME    alias\n"
-            + "Test Setup       Log       test started\n"
-            + "Test Teardown    Log       test ended\n\n"
-            + "*** Variables ***\n"
-            + "${INTERESTING_TAXI_NUMBER}     1729\n"
-            + "@{SOME_INTERESTING_NUMBERS}    42      ${INTERESTING_TAXI_NUMBER}\n\n"
-            + "*** Keywords ***\n"
-            + "Fibonacci\n"
-            + "\\9[Arguments]    ${n}\n"
-            + "\\9[Documentation]    Returns n-th fibonacci number\n\n"
-            + "\\9${prev}       Set Variable    ${0}\n"
-            + "\\9${current}    Set Variable    ${1}\n"
-            + "\\9\n"
-            + "\\9:FOR    ${i}    IN RANGE    ${n}\n"
-            + "\\9\\    ${temp}       Set Variable    ${prev}\n"
-            + "\\9\\    ${prev}       Set Variable    ${current}\n"
-            + "\\9\\    ${current}    Evaluate        ${current} + ${temp}\n"
-            + "\\9[Return]    ${prev}\n\n"
-            + "*** Test Cases ***\n"
-            + "test case 1\n"
-            + "\\9[Timeout]    60\n"
-            + "\\9# this string argument will be automatically converted\n"
-            + "\\9${fib}    Fibonacci    10\n"
-            + "\\9Should Be Equal    ${55}    ${fib}\n"
-            + "\\9Log    ${SOME_NUMBERS}\n\n"
-            + "test case BDD\n"
-            + "\\9Given Precondition Is Met\n"
-            + "\\9When Action Is Performed\n"
-            + "\\9And Other Action Is Performed\n"
-            + "\\9Then Result Is Checked" | verify-true
+
+         
         get-property "getChildren().Control[4].getText()" | equals "" | verify-true
         
         //check buttons
@@ -152,5 +124,7 @@ check-bold-and-italic-preference -bold true
 get-window Preferences | get-list | select Variables
 check-bold-and-italic-preference
 
+get-window Preferences | get-list | select Tasks
+check-bold-and-italic-preference -bold true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
