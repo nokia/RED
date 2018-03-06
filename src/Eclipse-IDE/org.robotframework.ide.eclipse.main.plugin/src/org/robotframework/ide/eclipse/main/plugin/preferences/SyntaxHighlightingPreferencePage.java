@@ -206,7 +206,9 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
     private List<StyleRange> getCommentsRanges() {
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.COMMENT);
 
-        return newArrayList(new StyleRange(689, 54, preference.getColor(), null, preference.getFontStyle()));
+        return newArrayList(new StyleRange(689, 54, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(847, 2, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(853, 17, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getSectionHeaderRanges() {
