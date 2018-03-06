@@ -81,6 +81,14 @@ Ctrl+F5 |
   
 Ctrl+Shift+F5 |
 
-**Revalidate current project. **
+**Revalidate current project. **  
+  
+Ctrl+PLUS |
+
+**Zoom In in source editor. **  
+  
+Ctrl+MINUS |
+
+**Zoom Out in source editor. **
 
 [Return to Help index](http://nokia.github.io/RED/help/)
