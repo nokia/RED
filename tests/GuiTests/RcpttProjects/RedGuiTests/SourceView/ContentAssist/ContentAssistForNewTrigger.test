@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qngh8HH3Eee3fMF6qScr4Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/5/18 2:17 PM
+Save-Time: 3/6/18 5:33 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -86,7 +86,7 @@ with [get-window -class ContentProposalPopup | get-table] {
     select "\\[Teardown\\]" | key-type Enter
     click -default
 }
-
+wait 300
 ////go to second cell and type cat to filter
 //if [get-by-os -linux "Linux" -win "Windows" | eq Linux] {
 //	with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
