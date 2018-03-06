@@ -1,0 +1,206 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _PfX6oCFJEeinqtYRmpba-Q,_VzYJ0KEAEea9Cvae3yWo1A
+Element-Name: ContentAssistWithArgsForKeyword
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _hk4Q0CEwEeinqtYRmpba-Q
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/6/18 4:16 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "ContentAssist/TestFile.robot" | double-click
+    
+//go to kw table    
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Keywords | click
+}
+
+//add new kw below Log
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw/log"
+wait 300
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    //add Should be equal
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text SHoul
+        key-type "M1+SPACE"
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "TRAVERSE_ESCAPE"
+    }
+    //go down and add Comment kw that doesn't have args
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Left
+        key-type Enter -times 2
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text Comm
+        key-type "M1+SPACE"
+        key-type Enter
+    }
+    //add varibales - here edit mode is not closed
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "$"
+        key-type "M1+SPACE"
+        key-type Enter
+        type-text "abc"
+        wait 200
+        key-type Enter
+    }
+}
+//add kew in 3rd column
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type Right -times 2
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+SPACE"
+}
+
+// add Convert To Bytes - yhos kw contains one arg
+with [get-window -class ContentProposalPopup | get-table] {
+    select "Convert To Binary - BuiltIn" | key-type Up
+    select "Continue For Loop If - BuiltIn" | key-type Down
+    select "Convert To Binary - BuiltIn" | key-type Down
+    select "Convert To Boolean - BuiltIn" | key-type Down
+    select "Convert To Bytes - BuiltIn" | key-type Enter
+    click -default
+}
+get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+
+
+
+
+// go to second kw
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw 2" | click
+wait 300
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    //add my kw - kw with 2 args and one dict
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "my "
+        key-type "M1+SPACE"
+        key-type Enter
+    }
+    //change second arg to text
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Enter -times 2
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "second arg here"
+        key-type Enter
+    }
+}
+
+
+//go down and add new kw
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Home
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "my k"
+        key-type "M1+SPACE"
+        key-type Down -times 2
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type Enter
+        wait 1000
+//        key-type "TRAVERSE_ESCAPE"
+    }
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+        wait 300
+        key-type Enter
+    }
+    
+    //add kw from python lib - last has default arg
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text kw
+        key-type "M1+SPACE"
+        key-type Enter
+
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "TRAVERSE_ESCAPE"
+    }
+    
+    //go two cell right and add kw in the same row
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right -times 2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text kw
+        key-type "M1+SPACE"
+        key-type Down
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Enter
+}
+
+
+//change first kw Log to kw with 2 args - should be equal as integer
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw/log" | click
+wait 200
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Up
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text shou
+        key-type "M1+SPACE"
+        key-type Down -times 2
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Enter
+}
+
+
+get-editor "TestFile.robot" | maximize
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    get-property "getLayer().getBodyLayer().getRowCount()" | equals 12 | verify-true
+    get-property "getLayer().getBodyLayer().getColumnCount()" | equals 8 | verify-true
+}
+
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 1 -ref_table [list "my kw" "${x1}" "${x2}" "@{last item}" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 2 -ref_table [list "Should Be Equal As Integers" "6" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 3 -ref_table [list "Should Be Equal" "first" "second" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 4 -ref_table [list "Comment" "${x1}abc" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 5 -ref_table [list "\\" "\\" "Convert To Bytes" "input" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 6 -ref_table [list "..." "" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 7 -ref_table [list "my kw 2" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 8 -ref_table [list "my kw" "x1" "second arg here" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 9 -ref_table [list "my kw from res" "x1" "x2" "x3" "x4" "x5" "x6" "x7" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 10 -ref_table [list "Kw With Default Arg" "first_arg" "y" "Kw With Kwarg" "x" "second_arg" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 11 -ref_table [list "..." "" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 8 -row 12 -ref_table [list "...add new keyword" "" "" "" "" "" "" "" ]
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
