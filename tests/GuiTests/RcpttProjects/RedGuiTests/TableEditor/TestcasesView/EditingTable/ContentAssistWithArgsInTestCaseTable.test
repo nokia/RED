@@ -1,0 +1,142 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _VzYJ0KEAEea9Cvae3yWo1A
+Element-Name: ContentAssistWithArgsInTestCaseTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _godo4CFREeinqtYRmpba-Q
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/6/18 4:52 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add .tsv file
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu 
+    -path "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text new
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+
+//add test
+get-editor "new.tsv" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "\t\n"
+    + "\t\n"
+    + "*** Keywords ***\t\n"
+    + "my kw from res\n"
+    + "\t[Arguments]\t${x1}\t${x2}\t${x3}\t${x4}\t${x5}\t${x6}\t${x7}\n"
+    + "\tlog\t8" 
+       
+get-editor "new.tsv" | get-text-viewer | key-type "M1+s"
+
+//go to fist test
+get-editor "new.tsv" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "new.tsv/Test Cases/test 1" | click
+wait 300
+
+
+//add new kw frok kw section
+with [get-editor "new.tsv"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text my
+        key-type "M1+SPACE"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter -times 2
+    
+    //change second arg
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "second arg"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    
+    //go down and add catenate kw - no args
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+    	key-type Down
+        key-type Left -times 3
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text Cat
+        key-type "M1+SPACE"
+        key-type Enter
+    }
+    //add ${CURDIR}${/}
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "$"
+        key-type "M1+SPACE"
+        key-type Down -times 3
+        key-type Enter
+        type-text "$"
+        key-type "M1+SPACE"
+        key-type Enter
+        wait 300
+        key-type Enter 
+    }
+    
+    //add new kw "Convert To Bytes"
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Down -times 5
+        key-type Enter
+    }
+}
+
+compare-row-with-list -file "new.tsv" -table "Test Cases" -col_amount 6 -row 1 -ref_table [list "test 1" "" "" "" "" "" ]
+compare-row-with-list -file "new.tsv" -table "Test Cases" -col_amount 6 -row 2 -ref_table [list "my kw from res" "x1" "second arg" "x3" "x4" "x5" ]
+compare-row-with-list -file "new.tsv" -table "Test Cases" -col_amount 6 -row 3 -ref_table [list "Catenate" "${CURDIR}${/}" "Convert To Binary" "item" "" "" ]
+compare-row-with-list -file "new.tsv" -table "Test Cases" -col_amount 6 -row 4 -ref_table [list "..." "" "" "" "" "" ]
+
+//change preference - now separator is \t
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor"
+    get-group Source | get-button "the tab character .* should be used" | click
+    get-button "Apply and Close" | click
+}
+
+//open file ad add test2
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 1 19
+        key-type "NUMPAD_ENTER" "\\u000D"
+        type-text test2
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test2" | click
+wait 200
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Enter -times 2
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "Get Cou"
+        key-type "M1+SPACE"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test2\n"
+    + "\tGet Count\titem1\titem2" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _2aQkYF4XEeWeit3EM6sPPA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/22/18 10:39 AM
+Save-Time: 3/6/18 5:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -51,7 +51,11 @@ with [get-view "Execution View"] {
 get-view "Project Explorer" | get-tree | select "ExecutionViewProject/stopped_tests.robot" 
     | get-menu "Run As/1 Robot Test" | click
 
-wait-for-console    
+wait-for-console  
+try -times 4 -delay 500 -command{
+	get-view "Execution View" | get-label "Tests: 7/7" | get-property caption | equals "Tests: 7/7" | verify-true
+}  
+
 //click on test with error - text box will be filled    
 with [get-view "Execution View"] {
     get-tree | select "ExecutionViewProject \(.*s\)/Stopped Tests \(.* s\)/here is fatal error \(.* s\)"
