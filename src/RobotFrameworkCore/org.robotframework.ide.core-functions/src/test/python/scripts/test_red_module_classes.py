@@ -60,13 +60,21 @@ class ClassesRetrievingTests(unittest.TestCase):
         self.assertEqual(result, ['several_classes_and_methods', 'several_classes_and_methods.First', 'several_classes_and_methods.Second',
                                   'several_classes_and_methods.Third'])
 
-    def test_retrieving_classes_from_file_inside_module(self):
+    def test_retrieving_classes_from_file_with_same_name_inside_module(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'module', 'ModuleClass.py')
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'module_diff_names', 'SameModuleClassName.py')
 
         result = get_classes_from_module(module_location)
 
-        self.assertEqual(result, ['ModuleClass'])
+        self.assertEqual(result, ['module_diff_names.SameModuleClassName', 'module_diff_names.SameModuleClassName.SameModuleClassName'])
+
+    def test_retrieving_classes_from_file_with_different_name_inside_module(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'module_diff_names', 'DifferentModuleClassName.py')
+
+        result = get_classes_from_module(module_location)
+
+        self.assertEqual(result, ['module_diff_names.DifferentModuleClassName', 'module_diff_names.DifferentModuleClassName.OtherClassName'])
 
     def test_retrieving_classes_from_module_with_relative_iports(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
