@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/27/17 12:18 PM
+Save-Time: 3/6/18 4:12 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -95,8 +95,26 @@ proc "generate-list" [val file] [val table] [val col_amount] [val row_amount]
 		} ] "]" "\n"
 	} ]
 }
-
 //generate-list -file "kw.robot" -table "User Keywords" -col_amount 6  -row_amount 15 | log
+
+
+proc "generate-list2" [val file] [val table] [val col_amount] [val row_amount]{	
+	get-editor $file | get-canvas -after [get-label $table] -index 1 | get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | let [val col_amount -input]{
+		get-editor $file | get-canvas -after [get-label $table] -index 1 |get-property "getLayer().getBodyLayer().getRowCount()" -raw | int | let [val row_amount -input]{
+			concat [
+				repeat [val index1] -times $row_amount -command{	
+				concat "compare-row-with-list -file \"" $file "\" -table \"" $table "\" -col_amount " $col_amount" -row " $index1  " -ref_table [list "[
+					repeat [val index2] -times $col_amount -command{		
+							concat "\""  [get-editor $file | get-canvas -after [get-label $table] -index 1 | get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
+					} ] "]" "\n"
+				} ]
+		 }		
+	}
+}
+
+//generate-list2 -file "TestFile.robot" -table "User Keywords"| log
+
+
 
 
 //rows starts from 0
