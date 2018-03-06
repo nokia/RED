@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TkwYoPCWEeePD6aU90_GvA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/15/18 2:16 PM
+Save-Time: 3/6/18 5:32 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -187,6 +187,7 @@ with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 9 10
     type-text "..\\"
     key-type "M1+s"
+    wait 300
     key-type "M1+1"
 }
 // verify QF again
