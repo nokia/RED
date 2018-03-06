@@ -8,11 +8,13 @@ import static org.robotframework.red.swt.Listeners.menuShownAdapter;
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -49,9 +51,13 @@ import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.StructuredContentProvider;
 
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 
 
 public class TasksPreferencePage extends RedPreferencePage {
+
+    private static final Pattern TAG_SYNTAX_PATTERN = Pattern.compile("\\w+");
 
     private final List<TaskTag> taskTags = new ArrayList<>();
     private TableViewer viewer;
@@ -177,6 +183,40 @@ public class TasksPreferencePage extends RedPreferencePage {
         viewer.setInput(taskTags);
         viewer.getTable().setEnabled(tasksEnabled);
         tagsEnabledButton.setSelection(tasksEnabled);
+
+        validate();
+    }
+
+    private void validate() {
+        final Set<String> invalidSyntax = new LinkedHashSet<>();
+        for (final TaskTag tag : taskTags) {
+            final Matcher matcher = TAG_SYNTAX_PATTERN.matcher(tag.getName());
+            if (!matcher.matches()) {
+                invalidSyntax.add(tag.getName());
+            }
+        }
+        if (!invalidSyntax.isEmpty()) {
+            setValid(false);
+            setErrorMessage("There are tags with invalid syntax. "
+                    + "Tag should be only written using letters, digits or underscore characters");
+            return;
+        }
+
+        final List<String> duplicates = new ArrayList<>();
+        final Multiset<TaskTag> tags = HashMultiset.create(taskTags);
+        for (final TaskTag tag : tags.elementSet()) {
+            if (tags.count(tag) > 1) {
+                duplicates.add(tag.getName());
+            }
+        }
+        if (!duplicates.isEmpty()) {
+            setValid(false);
+            setErrorMessage("There are duplicated tags definitions");
+            return;
+        }
+
+        setValid(true);
+        setErrorMessage(null);
     }
 
     @Override
@@ -305,14 +345,10 @@ public class TasksPreferencePage extends RedPreferencePage {
         @Override
         protected void setValue(final Object element, final Object value) {
             if (element instanceof TaskTag) {
-                final boolean hasTagWithGivenName = taskTags.stream()
-                        .anyMatch(tag -> tag.getName().equals(value) && tag != element);
-                if (hasTagWithGivenName) {
-                    MessageDialog.openError(getShell(), "Duplicated tag", "The tag " + value + " is already defined.");
-                } else {
-                    ((TaskTag) element).setName((String) value);
-                    getViewer().refresh(element);
-                }
+                ((TaskTag) element).setName((String) value);
+
+                validate();
+                getViewer().refresh();
             } else {
                 super.setValue(element, value);
             }
