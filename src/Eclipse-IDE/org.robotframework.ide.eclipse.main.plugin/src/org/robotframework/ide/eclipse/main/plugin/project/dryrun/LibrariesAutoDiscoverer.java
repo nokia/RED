@@ -35,6 +35,7 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -64,7 +65,10 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         super(robotProject);
         this.summaryHandler = summaryHandler;
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
-                robotProject.getStandardLibraries().keySet());
+                robotProject.getLibraryDescriptorsStream()
+                        .filter(LibraryDescriptor::isStandardLibrary)
+                        .map(LibraryDescriptor::getName)
+                        .collect(toSet()));
     }
 
     @Override

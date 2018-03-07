@@ -23,11 +23,11 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.search.ui.text.Match;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.viewers.TreeContentProvider;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -102,7 +102,7 @@ class SearchResultContentProvider extends TreeContentProvider {
             final IProject project = parent.getParent();
             final RobotProject robotProject = model.createRobotProject(project);
             
-            for (final LibrarySpecification libSpec : robotProject.getLibrariesSpecifications()) {
+            for (final LibrarySpecification libSpec : robotProject.getLibrarySpecifications()) {
                 final Match[] libMatches = input.getMatches(new MatchesGroupingElement(project, libSpec));
                 if (libMatches.length > 0) {
                     children.add(new LibraryWithParent(parent, libSpec, newArrayList(libMatches)));
@@ -147,7 +147,7 @@ class SearchResultContentProvider extends TreeContentProvider {
 
     private boolean libsShouldBeShown(final IProject project) {
         final RobotProject robotProject = model.createRobotProject(project);
-        for (final LibrarySpecification libSpec : robotProject.getLibrariesSpecifications()) {
+        for (final LibrarySpecification libSpec : robotProject.getLibrarySpecifications()) {
             if (input.containMatches(new MatchesGroupingElement(project, libSpec))) {
                 return true;
             }

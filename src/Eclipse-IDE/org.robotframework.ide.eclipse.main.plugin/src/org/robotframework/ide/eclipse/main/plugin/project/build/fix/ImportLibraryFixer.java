@@ -21,6 +21,8 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IMarkerResolution;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -31,8 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**

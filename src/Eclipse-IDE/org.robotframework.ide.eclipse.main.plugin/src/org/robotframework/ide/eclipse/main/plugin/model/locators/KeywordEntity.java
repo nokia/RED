@@ -8,9 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.model.locators;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher.SearchableKeyword;
-import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
 import com.google.common.base.Objects;
 

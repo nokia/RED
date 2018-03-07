@@ -9,12 +9,12 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Optional;
 
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 public class AssistProposalPredicates {
 
@@ -55,7 +55,7 @@ public class AssistProposalPredicates {
     }
 
     public static AssistProposalPredicate<LibrarySpecification> reservedLibraryPredicate() {
-        return spec -> spec.isReferenced() || !spec.getName().equalsIgnoreCase("reserved");
+        return spec -> spec.getDescriptor().isReferencedLibrary() || !spec.getName().equalsIgnoreCase("reserved");
     }
 
     public static AssistProposalPredicate<String> codeReservedWordsPredicate(final int cellIndex,

@@ -7,14 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
-import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Objects;
 
@@ -29,36 +28,28 @@ class RobotProjectDependencies {
     List<LibrarySpecification> getLibraries() {
         final List<LibrarySpecification> libraries = new ArrayList<>();
 
-        final LibspecsFolder libspecsFolder = LibspecsFolder.get(project.getProject());
-
-        final Map<String, LibrarySpecification> libs = project.getStandardLibraries();
-        for (final Entry<String, LibrarySpecification> entry : libs.entrySet()) {
+        getLibrariesStream().forEach(entry -> {
             if (entry.getValue() != null) {
                 libraries.add(entry.getValue());
             } else {
-                final LibrarySpecification specification = new ErroneousLibrarySpecification(entry.getKey());
-                if (entry.getKey().startsWith("Remote")) {
-                    final RemoteLocation remoteLocation = RemoteLocation
-                            .create(entry.getKey().substring("Remote".length()).trim());
-
-                    specification.setRemoteLocation(remoteLocation);
-                    specification.setSourceFile(libspecsFolder.getSpecFile(remoteLocation.createLibspecFileName()));
-                } else {
-                    specification.setSourceFile(libspecsFolder.getSpecFile(entry.getKey()));
-                }
-                libraries.add(specification);
+                final LibraryDescriptor descriptor = entry.getKey();
+                libraries.add(new ErroneousLibrarySpecification(descriptor));
             }
-        }
+        });
         return libraries;
+    }
+
+    Stream<Entry<LibraryDescriptor, LibrarySpecification>> getLibrariesStream() {
+        return project.getLibraryEntriesStream().filter(entry -> entry.getKey().isStandardLibrary());
+    }
+
+    String getName() {
+        return "Robot Standard libraries";
     }
 
     String getAdditionalInformation() {
         final String version = project.getVersion();
         return version == null ? "[???]" : "[" + version + "]";
-    }
-
-    String getName() {
-        return "Robot Standard libraries";
     }
 
     @Override
@@ -80,13 +71,18 @@ class RobotProjectDependencies {
 
     static class ErroneousLibrarySpecification extends LibrarySpecification {
 
-        public ErroneousLibrarySpecification(final String name) {
-            setName(name);
+        public ErroneousLibrarySpecification(final LibraryDescriptor descriptor) {
+            setDescriptor(descriptor);
         }
 
         @Override
         public List<KeywordSpecification> getKeywords() {
             return new ArrayList<>();
+        }
+
+        @Override
+        public String getName() {
+            return getDescriptor().getName();
         }
 
         @Override
@@ -111,7 +107,7 @@ class RobotProjectDependencies {
             }
             if (ErroneousLibrarySpecification.class == obj.getClass()) {
                 final ErroneousLibrarySpecification that = (ErroneousLibrarySpecification) obj;
-                return Objects.equal(this.getName(), that.getName());
+                return Objects.equal(this.getDescriptor(), that.getDescriptor());
             }
             return false;
         }

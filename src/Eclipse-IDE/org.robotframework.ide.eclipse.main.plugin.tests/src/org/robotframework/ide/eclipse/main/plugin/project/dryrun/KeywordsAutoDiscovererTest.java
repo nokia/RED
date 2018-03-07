@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -18,12 +19,13 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -143,11 +145,7 @@ public class KeywordsAutoDiscovererTest {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, name,
                 sourceFile.getFullPath().makeRelative().removeLastSegments(1).toPortableString());
 
-        final LibrarySpecification libSpec = new LibrarySpecification();
-        libSpec.setName(name);
-        libSpec.setSourceFile(sourceFile);
-
-        return ImmutableMap.of(library, libSpec);
+        return ImmutableMap.of(library, LibrarySpecification.create(name));
     }
 
     private void configureProject(final Map<ReferencedLibrary, LibrarySpecification> libraries)
@@ -157,7 +155,8 @@ public class KeywordsAutoDiscovererTest {
             config.addReferencedLibrary(referencedLibrary);
         }
         projectProvider.configure(config);
-        robotProject.setReferencedLibraries(libraries);
+        robotProject.setReferencedLibraries(libraries.entrySet().stream().collect(
+                toMap(entry -> LibraryDescriptor.ofReferencedLibrary(entry.getKey()), entry -> entry.getValue())));
     }
 
     private Consumer<RobotDryRunKeywordSource> equalSource(final String expectedFilePath, final int expectedLine,

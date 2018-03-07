@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.rflint.RfLintRule;
@@ -132,24 +133,16 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath) {
-        try {
-            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
-            final List<String> cmdLine = createCommandLine(scriptFile, "-libdoc", libName);
-
-            final byte[] decodedFileContent = runLibdoc(libName, cmdLine);
-            writeLibdocToFile(resultFilePath, decodedFileContent);
-        } catch (final IOException e) {
-            // simply libdoc will not be generated
-        }
-    }
-
-    @Override
-    public void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName,
+    public void createLibdoc(final String resultFilePath, final LibdocFormat format, final String libName,
             final String libPath, final EnvironmentSearchPaths additionalPaths) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
-            final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, "-libdoc", libName, libPath);
+            final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, "-libdoc", libName,
+                    format.name().toLowerCase());
+            if (!libPath.isEmpty()) {
+                cmdLine.add(libPath);
+            }
+
             cmdLine.addAll(additionalPaths.getExtendedPythonPaths(interpreterType));
             cmdLine.addAll(additionalPaths.getClassPaths());
 
