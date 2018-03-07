@@ -289,8 +289,13 @@ public class RedPreferences {
     }
 
     public Map<String, Priority> getTaskTagsWithPriorities() {
-        final Stream<String> tags = Splitter.on(";").splitToList(store.getString(TASKS_TAGS)).stream();
-        final Stream<String> priorites = Splitter.on(";").splitToList(store.getString(TASKS_PRIORITIES)).stream();
+        final String taskTags = store.getString(TASKS_TAGS);
+        final String taskPriorities = store.getString(TASKS_PRIORITIES);
+
+        final Stream<String> tags = taskTags.isEmpty() ? Stream.empty()
+                : Splitter.on(";").splitToList(taskTags).stream();
+        final Stream<String> priorites = taskPriorities.isEmpty() ? Stream.empty()
+                : Splitter.on(";").splitToList(taskPriorities).stream();
         
         final Map<String, Priority> mapping = new LinkedHashMap<>();
         Streams.forEachPair(tags, priorites, (tag, priority) -> {
