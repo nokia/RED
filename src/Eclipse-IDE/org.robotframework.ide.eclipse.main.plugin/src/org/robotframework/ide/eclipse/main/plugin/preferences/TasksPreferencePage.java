@@ -150,6 +150,7 @@ public class TasksPreferencePage extends RedPreferencePage {
                     TaskTag.class);
             taskTags.removeAll(tagsToRemove);
             viewer.refresh();
+            validate();
         };
         final Menu menu = new Menu(viewer.getTable());
         final MenuItem deleteMenuItem = new MenuItem(menu, SWT.PUSH);
