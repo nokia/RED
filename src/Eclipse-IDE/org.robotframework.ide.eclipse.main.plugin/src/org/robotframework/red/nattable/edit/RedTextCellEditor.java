@@ -44,8 +44,6 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class RedTextCellEditor extends TextCellEditor {
 
-    public static final String DETAILS_EDITING_CONTEXT_ID = "org.robotframework.ide.eclipse.details.context";
-
     private final int selectionStartShift;
 
     private final int selectionEndShift;
