@@ -24,12 +24,13 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -621,7 +622,7 @@ public class RedKeywordProposalsTest {
     public void onlyKeywordsFromImportedLibrariesOrAccessibleWithoutImportAreProvided_whenKeywordFromNotImportedLibraryPreferenceIsDisabled()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = new HashMap<>();
         stdLibs.putAll(Libraries.createStdLib("BuiltIn", "a_kw1"));
         stdLibs.putAll(Libraries.createStdLib("stdLib", "a_lib_kw1"));
         stdLibs.putAll(Libraries.createStdLib("otherLib", "a_other_kw1"));
@@ -648,7 +649,7 @@ public class RedKeywordProposalsTest {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
 
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = new HashMap<>();
         stdLibs.putAll(Libraries.createStdLib("BuiltIn", "a_kw1"));
         stdLibs.putAll(Libraries.createStdLib("stdLib", "a_lib_kw1"));
         stdLibs.putAll(Libraries.createStdLib("otherLib", "a_other_kw1"));

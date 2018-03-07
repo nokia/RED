@@ -5,9 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -22,7 +23,7 @@ import org.rf.ide.core.dryrun.RobotDryRunKeywordEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 /**
@@ -66,11 +67,9 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     void startDiscovering(final IProgressMonitor monitor) throws InterruptedException, CoreException {
-        final Set<String> libraryNames = new HashSet<>();
-        libraryNames.addAll(robotProject.getStandardLibraries().keySet());
-        for (final ReferencedLibrary referencedLibrary : robotProject.getReferencedLibraries().keySet()) {
-            libraryNames.add(referencedLibrary.getName());
-        }
+        final Set<String> libraryNames = robotProject.getLibraryDescriptorsStream()
+                .map(LibraryDescriptor::getName)
+                .collect(toSet());
         startDryRunDiscovering(monitor, libraryNames);
     }
 

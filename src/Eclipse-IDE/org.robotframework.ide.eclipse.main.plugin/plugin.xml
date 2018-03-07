@@ -694,12 +694,12 @@
           name="Library Keywords">
        <triggerPoints>
           <instanceof
-                value="org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification">
+                value="org.rf.ide.core.libraries.LibrarySpecification">
           </instanceof>
        </triggerPoints>
        <possibleChildren>
           <instanceof
-                value="org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification">
+                value="org.rf.ide.core.libraries.KeywordSpecification">
           </instanceof>
        </possibleChildren>
        <actionProvider

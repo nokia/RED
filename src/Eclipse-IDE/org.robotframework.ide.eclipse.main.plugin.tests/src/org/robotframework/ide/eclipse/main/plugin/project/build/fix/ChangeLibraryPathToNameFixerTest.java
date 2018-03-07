@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.project.build.fix.Fixers.byApplyingToDocument;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -21,12 +21,13 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
@@ -43,7 +44,9 @@ public class ChangeLibraryPathToNameFixerTest {
     @BeforeClass
     public static void beforeSuite() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setLibraries(new ArrayList<>(Libraries.createRefLibs("LibName", "OtherLibName", "Different").keySet()));
+        config.setLibraries(newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "LibName", ""),
+                ReferencedLibrary.create(LibraryType.PYTHON, "OtherLibName", ""),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Different", "")));
         projectProvider.configure(config);
 
         suite = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  ../../LibName.py",

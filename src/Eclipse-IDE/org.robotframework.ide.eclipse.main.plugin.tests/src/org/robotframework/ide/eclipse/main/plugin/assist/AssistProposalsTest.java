@@ -23,6 +23,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
@@ -36,9 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class AssistProposalsTest {
@@ -235,6 +236,7 @@ public class AssistProposalsTest {
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setName("library");
         libSpec.setDocumentation("docu");
+        libSpec.setDescriptor(LibraryDescriptor.ofStandardLibrary("library"));
 
         final RedLibraryProposal proposal = AssistProposals.createLibraryProposal(suiteFile, libSpec,
                 ProposalMatch.EMPTY);
@@ -250,17 +252,16 @@ public class AssistProposalsTest {
     public void verifyRemoteLibraryProposalProperties() {
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
         final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setDescriptor(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://location.org")));
         libSpec.setName("library");
-        libSpec.setRemoteLocation(RemoteLocation.create("http://location.org"));
-        libSpec.setSecondaryKey("args");
         libSpec.setDocumentation("docu");
 
         final RedLibraryProposal proposal = AssistProposals.createLibraryProposal(suiteFile, libSpec,
                 ProposalMatch.EMPTY);
         assertThat(proposal.getContent()).isEqualTo("library");
-        assertThat(proposal.getArguments()).containsExactly("args");
+        assertThat(proposal.getArguments()).containsExactly("http://location.org");
         assertThat(proposal.getImage()).isEqualTo(RedImages.getLibraryImage());
-        assertThat(proposal.getStyledLabel().getString()).isEqualTo("library args");
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("library http://location.org");
         assertThat(proposal.hasDescription()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("docu");
     }

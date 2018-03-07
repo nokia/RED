@@ -55,7 +55,8 @@ public class VersionDependentValidatorsTest {
     }
 
     private static FileValidationContext prepareContext(final String version) {
-        final ValidationContext context = new ValidationContext(null, RobotVersion.from(version), null, null, null);
+        final ValidationContext context = new ValidationContext(null, null, RobotVersion.from(version), null, null,
+                null);
         return new FileValidationContext(context, mock(IFile.class));
     }
 }

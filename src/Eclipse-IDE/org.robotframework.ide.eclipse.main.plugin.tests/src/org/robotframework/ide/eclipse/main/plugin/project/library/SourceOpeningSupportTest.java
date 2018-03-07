@@ -22,6 +22,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -55,16 +58,20 @@ public class SourceOpeningSupportTest {
         config.addReferencedLibrary(lib);
         projectProvider.configure(config);
 
-        library = projectProvider.createFile("testlib.py", "#comment", "def defined_kw():", "  print(\"kw\")",
-                "def discovered_kw():", "  print(\"kw\")");
+        library = projectProvider.createFile("testlib.py",
+                "#comment",
+                "def defined_kw():",
+                "  print(\"kw\")",
+                "def discovered_kw():",
+                "  print(\"kw\")");
 
-        libSpec = new LibrarySpecification();
-        libSpec.setName("testlib");
-        libSpec.setSourceFile(library);
+        final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
+        libSpec = LibrarySpecification.create("testlib");
+        libSpec.setDescriptor(libDesc);
 
         project = model.createRobotProject(projectProvider.getProject());
-        project.setStandardLibraries(new HashMap<String, LibrarySpecification>());
-        project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
+        project.setStandardLibraries(new HashMap<>());
+        project.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
     }
 
     @After
