@@ -3108,7 +3108,7 @@
           <with
                 variable="selection">
              <iterate
-                   ifEmpty="true"
+                   ifEmpty="false"
                    operator="and">
                 <or>
                    <instanceof
@@ -4865,14 +4865,14 @@
           id="org.robotframework.editorContextIsActive">
        <with
              variable="activeContexts">
-          <iterate
-                ifEmpty="false"
-                operator="or">
-             <equals
-                   value="org.robotframework.ide.eclipse.tableeditor.context">
-             </equals>
-          </iterate>
           <and>
+	         <iterate
+	               ifEmpty="false"
+	               operator="or">
+	            <equals
+	                  value="org.robotframework.ide.eclipse.tableeditor.context">
+	            </equals>
+	         </iterate>
              <not>
                 <iterate
                       ifEmpty="false"
@@ -4903,14 +4903,14 @@
           id="org.robotframework.casesPartIsActive">
        <with
              variable="activeContexts">
-          <iterate
-                ifEmpty="false"
-                operator="or">
-             <equals
-                   value="org.robotframework.ide.eclipse.tableeditor.cases.context">
-             </equals>
-          </iterate>
           <and>
+	         <iterate
+	               ifEmpty="false"
+	               operator="or">
+	            <equals
+	                  value="org.robotframework.ide.eclipse.tableeditor.cases.context">
+	            </equals>
+	         </iterate>
              <not>
                 <iterate
                       ifEmpty="false"
@@ -4928,22 +4928,24 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.tableeditor.cases.context">
-                </equals>
-             </iterate>
-             <not>
-                <iterate
-                      ifEmpty="false"
-                      operator="or">
-                   <equals
-                         value="org.robotframework.ide.eclipse.details.context">
-                   </equals>
-                </iterate>
-             </not>
+	          <and>
+	             <iterate
+	                   ifEmpty="false"
+	                   operator="or">
+	                <equals
+	                      value="org.robotframework.ide.eclipse.tableeditor.cases.context">
+	                </equals>
+	             </iterate>
+	             <not>
+	                <iterate
+	                      ifEmpty="false"
+	                      operator="or">
+	                   <equals
+	                         value="org.robotframework.ide.eclipse.details.context">
+	                   </equals>
+	                </iterate>
+	             </not>
+	          </and>
           </with>
           <with
                 variable="activeEditor">
@@ -4958,14 +4960,14 @@
           id="org.robotframework.keywordsPartIsActive">
       <with
             variable="activeContexts">
-         <iterate
-               ifEmpty="false"
-               operator="or">
-            <equals
-                  value="org.robotframework.ide.eclipse.tableeditor.keywords.context">
-            </equals>
-         </iterate>
          <and>
+	        <iterate
+	              ifEmpty="false"
+	              operator="or">
+	           <equals
+	                 value="org.robotframework.ide.eclipse.tableeditor.keywords.context">
+	           </equals>
+	        </iterate>
             <not>
                <iterate
                      ifEmpty="false"
@@ -4983,14 +4985,14 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.tableeditor.keywords.context">
-                </equals>
-             </iterate>
              <and>
+	            <iterate
+	                  ifEmpty="false"
+	                  operator="or">
+	               <equals
+	                     value="org.robotframework.ide.eclipse.tableeditor.keywords.context">
+	               </equals>
+	            </iterate>
                 <not>
                    <iterate
                          ifEmpty="false"
@@ -5015,22 +5017,24 @@
           id="org.robotframework.settingsPartIsActive">
       <with
             variable="activeContexts">
-         <iterate
-               ifEmpty="false"
-               operator="or">
-            <equals
-                  value="org.robotframework.ide.eclipse.tableeditor.settings.context">
-            </equals>
-         </iterate>
-         <not>
-            <iterate
-                  ifEmpty="false"
-                  operator="or">
-               <equals
-                     value="org.robotframework.ide.eclipse.details.context">
-               </equals>
-            </iterate>
-         </not>
+         <and>
+	         <iterate
+	               ifEmpty="false"
+	               operator="or">
+	            <equals
+	                  value="org.robotframework.ide.eclipse.tableeditor.settings.context">
+	            </equals>
+	         </iterate>
+	         <not>
+	            <iterate
+	                  ifEmpty="false"
+	                  operator="or">
+	               <equals
+	                     value="org.robotframework.ide.eclipse.details.context">
+	               </equals>
+	            </iterate>
+	         </not>
+         </and>
       </with>
     </definition>
     <definition
@@ -5038,6 +5042,7 @@
        <and>
           <with
                 variable="activeContexts">
+         	<and>
              <iterate
                    ifEmpty="false"
                    operator="or">
@@ -5054,6 +5059,7 @@
                     </equals>
                  </iterate>
               </not>
+         	</and>
           </with>
           <with
                 variable="activeEditor">
@@ -5068,14 +5074,14 @@
           id="org.robotframework.variablesPartIsActive">
       <with
             variable="activeContexts">
-         <iterate
-               ifEmpty="false"
-               operator="or">
-            <equals
-                  value="org.robotframework.ide.eclipse.tableeditor.variables.context">
-            </equals>
-         </iterate>
          <and>
+	        <iterate
+	              ifEmpty="false"
+	              operator="or">
+	           <equals
+	                 value="org.robotframework.ide.eclipse.tableeditor.variables.context">
+	           </equals>
+	        </iterate>
             <not>
                <iterate
                      ifEmpty="false"
@@ -5093,14 +5099,14 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.tableeditor.variables.context">
-                </equals>
-             </iterate>
              <and>
+	            <iterate
+	                  ifEmpty="false"
+	                  operator="or">
+	               <equals
+	                     value="org.robotframework.ide.eclipse.tableeditor.variables.context">
+	               </equals>
+	            </iterate>
                 <not>
                    <iterate
                          ifEmpty="false"
@@ -5478,22 +5484,24 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.redxmleditor.varmapping.context">
-                </equals>
-             </iterate>
-             <not>
-                <iterate
-                      ifEmpty="false"
-                      operator="or">
-                   <equals
-                         value="org.robotframework.ide.eclipse.details.context">
-                   </equals>
-                </iterate>
-             </not>
+             <and>
+	             <iterate
+	                   ifEmpty="false"
+	                   operator="or">
+	                <equals
+	                      value="org.robotframework.ide.eclipse.redxmleditor.varmapping.context">
+	                </equals>
+	             </iterate>
+	             <not>
+	                <iterate
+	                      ifEmpty="false"
+	                      operator="or">
+	                   <equals
+	                         value="org.robotframework.ide.eclipse.details.context">
+	                   </equals>
+	                </iterate>
+	             </not>
+             </and>
           </with>
           <with
                 variable="activeEditor">
@@ -5509,50 +5517,24 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.redxmleditor.varfiles.context">
-                </equals>
-             </iterate>
-             <not>
-                <iterate
-                      ifEmpty="false"
-                      operator="or">
-                   <equals
-                         value="org.robotframework.ide.eclipse.details.context">
-                   </equals>
-                </iterate>
-             </not>
-          </with>
-          <with
-                variable="activeEditor">
-             <test
-                   property="org.robotframework.redXmlIsEditable"
-                   value="true">
-             </test>
-          </with>
-       </and>
-    </definition>
-    <definition
-          id="org.robotframework.redxml.remoteLocationsPartIsActiveAndEditable">
-       <and>
-          <with
-                variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.redxmleditor.remotelocations.context">
-                </equals></iterate>
-             <not>
-                <iterate>
-                   <equals
-                         value="org.robotframework.ide.eclipse.details.context">
-                   </equals>
-                </iterate>
-             </not>
+             <and>
+	             <iterate
+	                   ifEmpty="false"
+	                   operator="or">
+	                <equals
+	                      value="org.robotframework.ide.eclipse.redxmleditor.varfiles.context">
+	                </equals>
+	             </iterate>
+	             <not>
+	                <iterate
+	                      ifEmpty="false"
+	                      operator="or">
+	                   <equals
+	                         value="org.robotframework.ide.eclipse.details.context">
+	                   </equals>
+	                </iterate>
+	             </not>
+             </and>
           </with>
           <with
                 variable="activeEditor">
@@ -5568,20 +5550,22 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.redxmleditor.libraries.context">
-                </equals>
-             </iterate>
-             <not>
-                <iterate>
-                   <equals
-                         value="org.robotframework.ide.eclipse.details.context">
-                   </equals>
-                </iterate>
-             </not>
+             <and>
+	             <iterate
+	                   ifEmpty="false"
+	                   operator="or">
+	                <equals
+	                      value="org.robotframework.ide.eclipse.redxmleditor.libraries.context">
+	                </equals>
+	             </iterate>
+	             <not>
+	                <iterate>
+	                   <equals
+	                         value="org.robotframework.ide.eclipse.details.context">
+	                   </equals>
+	                </iterate>
+	             </not>
+             </and>
           </with>
           <with
                 variable="activeEditor">
@@ -5597,20 +5581,22 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.redxmleditor.validation.context">
-                </equals>
-             </iterate>
-             <not>
-                <iterate>
-                   <equals
-                         value="org.robotframework.ide.eclipse.details.context">
-                   </equals>
-                </iterate>
-             </not>
+             <and>
+	             <iterate
+	                   ifEmpty="false"
+	                   operator="or">
+	                <equals
+	                      value="org.robotframework.ide.eclipse.redxmleditor.validation.context">
+	                </equals>
+	             </iterate>
+	             <not>
+	                <iterate>
+	                   <equals
+	                         value="org.robotframework.ide.eclipse.details.context">
+	                   </equals>
+	                </iterate>
+	             </not>
+             </and>
           </with>
           <with
                 variable="activeEditor">
@@ -5626,20 +5612,22 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.redxmleditor.classpath.context">
-                </equals>
-             </iterate>
-             <not>
-                <iterate>
-                   <equals
-                         value="org.robotframework.ide.eclipse.details.context">
-                   </equals>
-                </iterate>
-             </not>
+             <and>
+	             <iterate
+	                   ifEmpty="false"
+	                   operator="or">
+	                <equals
+	                      value="org.robotframework.ide.eclipse.redxmleditor.classpath.context">
+	                </equals>
+	             </iterate>
+	             <not>
+	                <iterate>
+	                   <equals
+	                         value="org.robotframework.ide.eclipse.details.context">
+	                   </equals>
+	                </iterate>
+	             </not>
+             </and>
           </with>
           <with
                 variable="activeEditor">
@@ -5655,20 +5643,22 @@
        <and>
           <with
                 variable="activeContexts">
-             <iterate
-                   ifEmpty="false"
-                   operator="or">
-                <equals
-                      value="org.robotframework.ide.eclipse.redxmleditor.pythonpath.context">
-                </equals>
-             </iterate>
-             <not>
-                <iterate>
-                   <equals
-                         value="org.robotframework.ide.eclipse.details.context">
-                   </equals>
-                </iterate>
-             </not>
+             <and>
+	             <iterate
+	                   ifEmpty="false"
+	                   operator="or">
+	                <equals
+	                      value="org.robotframework.ide.eclipse.redxmleditor.pythonpath.context">
+	                </equals>
+	             </iterate>
+	             <not>
+	                <iterate>
+	                   <equals
+	                         value="org.robotframework.ide.eclipse.details.context">
+	                   </equals>
+	                </iterate>
+	             </not>
+             </and>
           </with>
           <with
                 variable="activeEditor">
