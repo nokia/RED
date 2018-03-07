@@ -5,8 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
-import java.util.Map;
+import static java.util.stream.Collectors.toSet;
 
+import java.util.Map;
+import java.util.Set;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -16,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -103,17 +108,32 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         }
     }
 
+
     @Override
     protected void clean(final IProgressMonitor monitor) throws CoreException {
-        clean(RedPlugin.getModelManager().createProject(getProject()));
+        final IProject project = getProject();
+        project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+        project.deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_INFINITE);
+        clean(RedPlugin.getModelManager().createProject(project));
     }
 
     public static void clean(final RobotProject project) throws CoreException {
-        project.getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-        project.getProject().deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_INFINITE);
         project.clearConfiguration();
         project.clearKwSources();
 
-        LibspecsFolder.get(project.getProject()).removeNonSpecResources();
+        removeAllUnusedLibspecsFiles(project);
+    }
+
+    private static void removeAllUnusedLibspecsFiles(final RobotProject project) {
+        final LibspecsFolder libspecsFolder = project.getLibspecsFolder();
+        final Set<IFile> filesToPreserve = project.getLibraryDescriptorsStream()
+                .map(LibraryDescriptor::generateLibspecFileName)
+                .map(libspecsFolder::getXmlSpecFile)
+                .collect(toSet());
+        try {
+            libspecsFolder.preserveOnly(filesToPreserve);
+        } catch (final CoreException e) {
+            // ok, so the unused files are still there
+        }
     }
 }

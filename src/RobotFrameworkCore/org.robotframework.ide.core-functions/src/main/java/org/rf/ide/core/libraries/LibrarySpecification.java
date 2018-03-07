@@ -3,8 +3,9 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.library;
+package org.rf.ide.core.libraries;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,17 +15,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.eclipse.core.resources.IFile;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
-
 import com.google.common.base.Objects;
 
 @XmlRootElement(name = "keywordspec")
 public class LibrarySpecification {
 
-    public static String getVersion(final IFile libspecFile) {
-        return LibrarySpecificationReader.readSpecification(libspecFile).getVersion();
+    public static String getVersion(final File file) {
+        return LibrarySpecificationReader.readSpecification(file).getVersion();
     }
 
     public static LibrarySpecification create(final String name, final KeywordSpecification... keywords) {
@@ -37,13 +34,7 @@ public class LibrarySpecification {
     }
 
     @XmlTransient
-    private IFile sourceFile;
-
-    @XmlTransient
-    private RemoteLocation remoteLocation;
-
-    @XmlTransient
-    private ReferencedLibrary referencedLibrary;
+    private LibraryDescriptor descriptor; // descriptor used to generate this spec
     
     @XmlTransient
     private boolean isModified;
@@ -61,8 +52,6 @@ public class LibrarySpecification {
     private String documentation;
 
     private List<KeywordSpecification> keywords = new ArrayList<>();
-
-    private String secondaryKey = "";
 
     public String getName() {
         return name;
@@ -135,14 +124,6 @@ public class LibrarySpecification {
         }
     }
 
-    public String getSecondaryKey() {
-        return secondaryKey;
-    }
-
-    public void setSecondaryKey(final String key) {
-        this.secondaryKey = key;
-    }
-
     public boolean isAccessibleWithoutImport() {
         return Arrays.asList("BuiltIn", "Easter", "Reserved").contains(name);
     }
@@ -162,53 +143,15 @@ public class LibrarySpecification {
         throw new IllegalArgumentException("Only ROBOT format can be converted to HTML");
     }
 
-    public KeywordSpecification getKeywordSpecification(final String keywordName) {
-        if (keywords == null) {
-            return null;
-        }
-        for (final KeywordSpecification keywordSpec : keywords) {
-            if (keywordSpec.getName().equals(keywordName)) {
-                return keywordSpec;
-            }
-        }
-        return null;
-    }
-
     @XmlTransient
-    public void setSourceFile(final IFile sourceFile) {
-        this.sourceFile = sourceFile;
+    public void setDescriptor(final LibraryDescriptor descriptor) {
+        this.descriptor = descriptor;
     }
 
-    public IFile getSourceFile() {
-        return sourceFile;
+    public LibraryDescriptor getDescriptor() {
+        return descriptor;
     }
 
-    @XmlTransient
-    public void setRemoteLocation(final RemoteLocation location) {
-        this.remoteLocation = location;
-    }
-
-    public RemoteLocation getRemoteLocation() {
-        return remoteLocation;
-    }
-
-    public boolean isRemote() {
-        return remoteLocation != null;
-    }
-
-    @XmlTransient
-    public void setReferenced(final ReferencedLibrary library) {
-        this.referencedLibrary = library;
-    }
-
-    public ReferencedLibrary getReferencedLibrary() {
-        return referencedLibrary;
-    }
-
-    public boolean isReferenced() {
-        return referencedLibrary != null;
-    }
-    
     public boolean isModified() {
         return isModified;
     }
@@ -224,10 +167,8 @@ public class LibrarySpecification {
         }
         if (LibrarySpecification.class == obj.getClass()) {
             final LibrarySpecification that = (LibrarySpecification) obj;
-            return Objects.equal(this.name, that.name) && Objects.equal(this.secondaryKey, that.secondaryKey)
-                    && Objects.equal(this.version, that.version)
-                    && Objects.equal(this.referencedLibrary, that.referencedLibrary)
-                    && Objects.equal(this.remoteLocation, that.remoteLocation);
+            return Objects.equal(this.name, that.name) && Objects.equal(this.version, that.version)
+                    && Objects.equal(this.descriptor, that.descriptor);
         }
         return false;
     }
@@ -239,16 +180,14 @@ public class LibrarySpecification {
         }
         if (LibrarySpecification.class == obj.getClass()) {
             final LibrarySpecification that = (LibrarySpecification) obj;
-            return Objects.equal(this.name, that.name) && Objects.equal(this.secondaryKey, that.secondaryKey)
-                    && Objects.equal(this.keywords, that.keywords) && Objects.equal(this.version, that.version)
-                    && Objects.equal(this.referencedLibrary, that.referencedLibrary)
-                    && Objects.equal(this.remoteLocation, that.remoteLocation);
+            return Objects.equal(this.name, that.name) && Objects.equal(this.keywords, that.keywords)
+                    && Objects.equal(this.version, that.version) && Objects.equal(this.descriptor, that.descriptor);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name, secondaryKey, keywords, version, referencedLibrary, remoteLocation);
+        return Objects.hashCode(name, keywords, version, descriptor);
     }
 }

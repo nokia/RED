@@ -9,7 +9,7 @@ import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
 import org.robotframework.red.jface.dialogs.RobotPopupDialog;
 

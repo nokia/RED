@@ -8,15 +8,16 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
-public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
+class JavaLibraryLibdocGenerator implements ILibdocGenerator {
 
     private final String libName;
     private final String jarPath;
     private final IFile targetSpecFile;
 
-    public JavaLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile) {
+    JavaLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile) {
         this.libName = libName;
         this.jarPath = path;
         this.targetSpecFile = targetSpecFile;
@@ -26,8 +27,8 @@ public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
-        runtimeEnvironment.createLibdocForThirdPartyLibrary(libName, jarPath, additionalPaths,
-                targetSpecFile.getLocation().toFile());
+        runtimeEnvironment.createLibdoc(libName, jarPath, additionalPaths, targetSpecFile.getLocation().toFile(),
+                LibdocFormat.XML);
     }
 
     @Override
@@ -35,12 +36,17 @@ public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
             final EnvironmentSearchPaths additionalPaths)
             throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
-        runtimeEnvironment.createLibdocForThirdPartyLibraryForcibly(libName, jarPath, additionalPaths,
-                targetSpecFile.getLocation().toFile());
+        runtimeEnvironment.createLibdocForcibly(libName, jarPath, additionalPaths,
+                targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
     }
 
     @Override
     public String getMessage() {
         return "generating libdoc for " + libName + " library contained in " + jarPath;
+    }
+
+    @Override
+    public IFile getTargetFile() {
+        return targetSpecFile;
     }
 }

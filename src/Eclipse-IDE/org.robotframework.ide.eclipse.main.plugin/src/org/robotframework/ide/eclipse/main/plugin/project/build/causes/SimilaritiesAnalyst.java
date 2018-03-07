@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -27,8 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.collect.Iterables;
 
@@ -60,8 +60,9 @@ class SimilaritiesAnalyst {
 
     Collection<String> provideSimilarLibraries(final IFile suiteFile, final String libraryName) {
         final RobotProject robotProject = RedPlugin.getModelManager().createProject(suiteFile.getProject());
-        final Collection<String> allLibs = newArrayList(
-                transform(robotProject.getLibrariesSpecifications(), LibrarySpecification::getName));
+        final Collection<String> allLibs = robotProject.getLibrarySpecificationsStream()
+                .map(LibrarySpecification::getName)
+                .collect(toSet());
         return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allLibs, libraryName, maximumDistance));
     }
 

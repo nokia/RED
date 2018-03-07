@@ -18,6 +18,6 @@ class LibrariesRetrievingTests(unittest.TestCase):
         self.assertTrue(len(result) > 0)
 
     def test_if_libdoc_is_returned(self):        
-        result = create_libdoc('BuiltIn')
+        result = create_libdoc('BuiltIn', 'XML')
 
         self.assertTrue(len(result) > 0)
