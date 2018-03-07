@@ -49,7 +49,7 @@ public class RobotTasksReporter {
     }
 
     public void reportTasks() {
-        if (!tasksDetectingEnabled) {
+        if (!tasksDetectingEnabled || tasksTags.isEmpty()) {
             return;
         }
 

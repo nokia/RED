@@ -99,7 +99,8 @@ public class ColoringTokens {
 
         @Override
         public boolean isTaskDetectionEnabled() {
-            return ((TodoTaskTextAttribute) getData()).isEnabled();
+            final TodoTaskTextAttribute tokenData = (TodoTaskTextAttribute) getData();
+            return tokenData.isEnabled() && !tokenData.getTags().isEmpty();
         }
 
         @Override
