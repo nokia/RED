@@ -76,6 +76,14 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         self.assertEqual(result, ['module_diff_names.DifferentModuleClassName', 'module_diff_names.DifferentModuleClassName.OtherClassName'])
 
+    def test_retrieving_classes_from_file_in_directory_with_same_name_like_sys_module(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'robot', 'CustomRobotClassName.py')
+
+        result = get_classes_from_module(module_location)
+
+        self.assertEqual(result, ['CustomRobotClassName', 'CustomRobotClassName.CustomRobotClassName'])
+
     def test_retrieving_classes_from_module_with_relative_iports(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'relative_import', '__init__.py')
