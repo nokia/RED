@@ -46,6 +46,7 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         runtimeEnvironment.createLibdocForcibly(libName, additionalLocation, additionalPaths,
                 targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
     }
+
     private String extractLibParent() { //e.g. libPath=Project1/Plib/ca libName=Plib.ca.ab => parent=Project1
         String parent = libPath;
         final String[] libNameElements = libName.split("\\.");
