@@ -14,7 +14,6 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
@@ -48,16 +47,14 @@ public class CreateVariableFixer extends RedSuiteMarkerResolution {
         }
 
         final String lineDelimiter = DocumentUtilities.getDelimiter(document);
-
-        final boolean isTsvFile = suiteModel.getFileExtension().equals("tsv");
-        final String separator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
+        final String cellSeparator = getSeparator(suiteModel);
 
         final Optional<RobotVariablesSection> section = suiteModel.findSection(RobotVariablesSection.class);
 
         final String toInsert;
         int offsetOfChange;
 
-        final String variableDefinition = lineDelimiter + variableName + separator;
+        final String variableDefinition = lineDelimiter + variableName + cellSeparator;
         if (section.isPresent()) {
             try {
                 toInsert = variableDefinition;

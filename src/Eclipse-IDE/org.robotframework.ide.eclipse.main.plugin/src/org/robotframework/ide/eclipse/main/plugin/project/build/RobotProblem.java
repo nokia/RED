@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Range;
 
 public class RobotProblem {
 
@@ -35,6 +36,15 @@ public class RobotProblem {
         final int end = marker.getAttribute(IMarker.CHAR_END, -1);
 
         return new Region(start, end - start);
+    }
+
+    public static Range<Integer> getRangeOf(final IMarker marker) {
+        try {
+            return Range.closed((Integer) marker.getAttribute(IMarker.CHAR_START),
+                    (Integer) marker.getAttribute(IMarker.CHAR_END));
+        } catch (final CoreException e) {
+            throw new IllegalStateException("Given marker should have offsets defined", e);
+        }
     }
 
     public static RobotProblem causedBy(final IProblemCause cause) {

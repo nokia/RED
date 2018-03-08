@@ -10,7 +10,6 @@ import java.util.Optional;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IEditorDescriptor;
@@ -62,15 +61,6 @@ public abstract class RedSuiteMarkerResolution implements IMarkerResolution {
             }
         } catch (final CoreException e) {
             // oh well, we won't fix this...
-        }
-    }
-
-    protected final String getLineDelimiter(final IDocument document) {
-        try {
-            final String delimiter = document.getLineDelimiter(0);
-            return delimiter == null ? System.lineSeparator() : delimiter;
-        } catch (final BadLocationException e) {
-            return System.lineSeparator();
         }
     }
 
