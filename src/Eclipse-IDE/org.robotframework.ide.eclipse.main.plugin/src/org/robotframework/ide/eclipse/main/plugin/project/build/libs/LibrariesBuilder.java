@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -23,9 +23,9 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
-import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
@@ -64,6 +64,7 @@ public class LibrariesBuilder {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
+            MultiStatus status = null;
             for (final ILibdocGenerator generator : groupedGenerators.get(project)) {
                 monitor.subTask(generator.getMessage());
                 try {
@@ -73,16 +74,23 @@ public class LibrariesBuilder {
                                         .createEnvironmentSearchPaths(project));
                     }
                 } catch (final RobotEnvironmentException e) {
+                    if (status == null) {
+                        status = new MultiStatus(RedPlugin.PLUGIN_ID, IStatus.ERROR, e.getMessage(), e);
+                    } else {
+                        status.add(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e));
+                    }
 
-                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e),
-                            StatusManager.SHOW);
                     try {
                         generator.getTargetFile().delete(true, new NullProgressMonitor());
                     } catch (final CoreException e1) {
-                        StatusManager.getManager().handle(e1, RedPlugin.PLUGIN_ID);
+                        status.add(e1.getStatus());
                     }
                 }
                 monitor.worked(1);
+            }
+
+            if (status != null) {
+                StatusManager.getManager().handle(status, StatusManager.BLOCK);
             }
         }
         monitor.done();
@@ -93,9 +101,8 @@ public class LibrariesBuilder {
         if (libraryDescriptor.isStandardLibrary()) {
             final List<String> nameToGenerate = newArrayList(libraryDescriptor.getName());
             nameToGenerate.addAll(libraryDescriptor.getArguments());
-            final String libName = nameToGenerate.stream().collect(joining("::"));
 
-            return new StandardLibraryLibdocGenerator(libName, targetFile);
+            return new StandardLibraryLibdocGenerator(String.join("::", nameToGenerate), targetFile);
 
         } else {
             final String path = libraryDescriptor.getPath();

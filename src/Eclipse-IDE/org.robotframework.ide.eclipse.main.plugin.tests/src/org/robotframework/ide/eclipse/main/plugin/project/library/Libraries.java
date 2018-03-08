@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.library;
 
-import static com.google.common.collect.Maps.newHashMap;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +38,7 @@ public class Libraries {
             kwSpec.setName(kwName);
             libSpec.getKeywords().add(kwSpec);
         }
-        return newHashMap(ImmutableMap.of(descriptor, libSpec));
+        return new HashMap<>(ImmutableMap.of(descriptor, libSpec));
     }
 
     public static Map<LibraryDescriptor, LibrarySpecification> createRemoteLib(final String path,
