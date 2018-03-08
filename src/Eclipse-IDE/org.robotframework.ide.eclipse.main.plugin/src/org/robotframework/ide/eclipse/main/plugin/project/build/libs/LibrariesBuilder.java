@@ -97,12 +97,10 @@ public class LibrariesBuilder {
     }
 
     private ILibdocGenerator provideGenerator(final LibraryDescriptor libraryDescriptor, final IFile targetFile) {
+        final String nameForLibdoc = createLibraryName(libraryDescriptor);
 
         if (libraryDescriptor.isStandardLibrary()) {
-            final List<String> nameToGenerate = newArrayList(libraryDescriptor.getName());
-            nameToGenerate.addAll(libraryDescriptor.getArguments());
-
-            return new StandardLibraryLibdocGenerator(String.join("::", nameToGenerate), targetFile);
+            return new StandardLibraryLibdocGenerator(nameForLibdoc, targetFile);
 
         } else {
             final String path = libraryDescriptor.getPath();
@@ -112,13 +110,20 @@ public class LibrariesBuilder {
                 return new VirtualLibraryLibdocGenerator(Path.fromPortableString(path), targetFile);
 
             } else if (type == LibraryType.PYTHON) {
-                return new PythonLibraryLibdocGenerator(libraryDescriptor.getName(), toAbsolute(path), targetFile);
+                return new PythonLibraryLibdocGenerator(nameForLibdoc, toAbsolute(path), targetFile);
 
             } else if (type == LibraryType.JAVA) {
-                return new JavaLibraryLibdocGenerator(libraryDescriptor.getName(), toAbsolute(path), targetFile);
+                return new JavaLibraryLibdocGenerator(nameForLibdoc, toAbsolute(path), targetFile);
             }
             throw new IllegalStateException("Unknown library type: " + type);
         }
+    }
+
+    private static String createLibraryName(final LibraryDescriptor libraryDescriptor) {
+        // libdoc tool requires arguments to be provided with name: Lib::arg1::arg2
+        final List<String> nameToGenerate = newArrayList(libraryDescriptor.getName());
+        nameToGenerate.addAll(libraryDescriptor.getArguments());
+        return String.join("::", nameToGenerate);
     }
 
     public void buildLibraries(final RobotProject robotProject, final RobotRuntimeEnvironment environment,
