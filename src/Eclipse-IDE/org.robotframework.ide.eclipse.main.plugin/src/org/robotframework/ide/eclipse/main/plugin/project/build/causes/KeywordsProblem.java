@@ -13,18 +13,11 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddPrefixToKeywordUsage;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeKeywordNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywordFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.TableHeaderDepracatedAliasesReplacer;
 
 import com.google.common.base.Splitter;
 
@@ -48,10 +41,10 @@ public enum KeywordsProblem implements IProblemCause {
             final IFile suiteFile = (IFile) marker.getResource();
 
             final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
-            fixers.addAll(ImportLibraryFixer.createFixers(suiteFile, keywordName));
+            fixers.addAll(KeywordsImportsFixes.changeByImportingLibraryWithMissingKeyword(suiteFile, keywordName));
             fixers.addAll(CreateKeywordFixer.createFixers(keywordOriginalName));
-            fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
-                    new SimilaritiesAnalyst().provideSimilarAccessibleKeywords(suiteFile, keywordName)));
+            fixers.addAll(ChangeToFixer
+                    .createFixers(new SimilaritiesAnalyst().provideSimilarAccessibleKeywords(suiteFile, keywordName)));
 
             return fixers;
         }
@@ -205,9 +198,18 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeKeywordNameFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null),
-                    marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null),
-                    marker.getAttribute(AdditionalMarkerAttributes.SOURCES, "")));
+            final String keywordOccurrence = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final String keywordDef = marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null);
+            final String keywordSource = marker.getAttribute(AdditionalMarkerAttributes.SOURCES, "");
+
+            String keywordDefinition;
+            if (keywordOccurrence != null && keywordDef != null && !keywordSource.isEmpty()
+                    && keywordOccurrence.startsWith(keywordSource) && !keywordOccurrence.equals(keywordSource)) {
+                keywordDefinition = keywordSource + "." + keywordDef;
+            } else {
+                keywordDefinition = keywordDef;
+            }
+            return newArrayList(new ChangeToFixer(keywordDefinition));
         }
     },
     KEYWORD_NAME_WITH_DOTS {
@@ -254,7 +256,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotKeywordsSection.class));
+            return newArrayList(new ChangeToFixer("[Documentation]"));
         }
     },
     POSTCONDITION_SYNONYM {
@@ -276,7 +278,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new SettingSimpleWordReplacer(RobotKeywordsSection.class, "Postcondition", "Teardown"));
+            return newArrayList(new ChangeToFixer("[Teardown]"));
         }
     },
     USER_KEYWORD_TABLE_HEADER_SYNONYM {
@@ -298,8 +300,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(
-                    new TableHeaderDepracatedAliasesReplacer(RobotKeywordsSection.class, "User Keyword", "Keyword"));
+            return newArrayList(new ChangeToFixer("*** Keywords ***"));
         }
     },
     UNKNOWN_KEYWORD_SETTING {
@@ -337,8 +338,7 @@ public enum KeywordsProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
 
             final ArrayList<IMarkerResolution> fixers = newArrayList();
-            fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
-                    newArrayList("IN", "IN RANGE", "IN ENUMERATE", "IN ZIP")));
+            fixers.addAll(ChangeToFixer.createFixers(newArrayList("IN", "IN RANGE", "IN ENUMERATE", "IN ZIP")));
 
             return fixers;
         }

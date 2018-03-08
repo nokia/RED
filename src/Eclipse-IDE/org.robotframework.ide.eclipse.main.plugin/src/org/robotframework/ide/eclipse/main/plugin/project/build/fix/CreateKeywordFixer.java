@@ -19,7 +19,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IMarkerResolution;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
@@ -67,9 +66,7 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
         }
 
         final String lineDelimiter = DocumentUtilities.getDelimiter(document);
-
-        final boolean isTsvFile = suiteModel.getFileExtension().equals("tsv");
-        final String separator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
+        final String separator = getSeparator(suiteModel);
 
         final String toInsert;
         final int offset;
