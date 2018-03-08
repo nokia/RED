@@ -8,16 +8,20 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.contentassist.CompletionProposal;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.collect.Range;
@@ -46,7 +50,7 @@ public class RemoveWhitespacesFromVariableNameFixer extends RedSuiteMarkerResolu
             return Optional.empty();
         }
         for (final RobotVariable variable : section.get().getChildren()) {
-            final Range<Integer> defRange = getRange(marker);
+            final Range<Integer> defRange = RobotProblem.getRangeOf(marker);
             if (defRange.contains(variable.getDefinitionPosition().getOffset())) {
                 try {
                     return createProposal(document, variable);
@@ -61,21 +65,24 @@ public class RemoveWhitespacesFromVariableNameFixer extends RedSuiteMarkerResolu
     private Optional<ICompletionProposal> createProposal(final IDocument document, final RobotVariable variable)
             throws BadLocationException {
 
-        final RobotToken varDeclaration = variable.getLinkedElement().getDeclaration();
-        final int offset = varDeclaration.getStartOffset();
-        final String varText = varDeclaration.getRaw().toString();
-        final String correctedVariable = new StringBuilder().append(varText.charAt(0)).append(varText.substring(varText.indexOf('{'))).toString();  
-        final ICompletionProposal proposal = new CompletionProposal(correctedVariable, offset, varText.length(), offset + correctedVariable.length(),
-                ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null);
-        return Optional.of(proposal);
-    }
+        final AVariable var = variable.getLinkedElement();
 
-    private Range<Integer> getRange(final IMarker marker) {
-        try {
-            return Range.closed((Integer) marker.getAttribute(IMarker.CHAR_START),
-                    (Integer) marker.getAttribute(IMarker.CHAR_END));
-        } catch (final CoreException e) {
-            throw new IllegalStateException("Given marker should have offsets defined", e);
-        }
+        final RobotToken varDeclaration = var.getDeclaration();
+        final int offset = varDeclaration.getStartOffset();
+        final String varText = varDeclaration.getRaw();
+        final String correctedVariable = varText.charAt(0) + varText.substring(varText.indexOf('{'));
+
+        final IRegion toChange = new Region(offset, varDeclaration.getEndOffset() - offset);
+
+        final String info = Snippets.createSnippetInfo(document, toChange, correctedVariable);
+        final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
+                .willPut(correctedVariable)
+                .byReplacingRegion(toChange)
+                .secondaryPopupShouldBeDisplayedUsingHtml(info)
+                .thenCursorWillStopAtTheEndOfInsertion()
+                .displayedLabelShouldBe(getLabel())
+                .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getRobotVariableImage()))
+                .create();
+        return Optional.of(proposal);
     }
 }

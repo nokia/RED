@@ -12,9 +12,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 
 /**
  * @author Michal Anglart
@@ -65,7 +63,7 @@ public enum TestCasesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotCasesSection.class));
+            return newArrayList(new ChangeToFixer("[Documentation]"));
         }
     },
     PRECONDITION_SYNONYM {
@@ -87,7 +85,7 @@ public enum TestCasesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new SettingSimpleWordReplacer(RobotCasesSection.class, "Precondition", "Setup"));
+            return newArrayList(new ChangeToFixer("[Setup]"));
         }
     },
     POSTCONDITION_SYNONYM {
@@ -109,7 +107,7 @@ public enum TestCasesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new SettingSimpleWordReplacer(RobotCasesSection.class, "Postcondition", "Teardown"));
+            return newArrayList(new ChangeToFixer("[Teardown]"));
         }
     },
     UNKNOWN_TEST_CASE_SETTING {
