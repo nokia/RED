@@ -241,7 +241,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         return suiteFile.getProject()
                 .getLibrarySpecificationsStream()
                 .filter(spec -> spec.getName().equalsIgnoreCase(hoveredText))
-                .map(LibrarySpecification::getName)
+                .map(LibrarySpecification::getDocumentation)
                 .findFirst()
                 .orElse(null);
     }
