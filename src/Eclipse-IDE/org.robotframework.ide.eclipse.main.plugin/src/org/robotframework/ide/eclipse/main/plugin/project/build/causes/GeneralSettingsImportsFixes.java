@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -56,7 +55,7 @@ class GeneralSettingsImportsFixes {
                 .filter(path -> !invalidPath.equals(path))
                 .map(path -> new ChangeToFixer(RobotProblem.getRegionOf(marker), path.toString(),
                         RedImages.getImageForFileWithExtension(path.getFileExtension())))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     private static List<IPath> findFilePathsWithSameLastSegment(final String lastSegment) {

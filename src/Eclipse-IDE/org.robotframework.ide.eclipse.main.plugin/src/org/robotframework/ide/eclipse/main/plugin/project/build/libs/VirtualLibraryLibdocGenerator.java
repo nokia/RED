@@ -32,10 +32,15 @@ class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
     @Override
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        try {
-            Files.copy(path.toFile(), targetSpecFile.getLocation().toFile());
-        } catch (final IOException e) {
-            throw new RobotEnvironmentException("Unable to create link to " + path.toOSString() + " libspec file", e);
+        if (path.isAbsolute()) {
+            // we only copy virtual libraries from outside of workspace; those contained inside will
+            // be read directly
+            try {
+                Files.copy(path.toFile(), targetSpecFile.getLocation().toFile());
+            } catch (final IOException e) {
+                throw new RobotEnvironmentException("Unable to create link to " + path.toOSString() + " libspec file",
+                        e);
+            }
         }
     }
 
