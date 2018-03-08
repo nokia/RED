@@ -58,7 +58,7 @@ public class KeywordDocumentationHyperlinkTest {
         kwSpec = libSpec.getKeywords().get(0);
 
         final RobotProject project = model.createRobotProject(projectProvider.getProject());
-        project.setStandardLibraries(new HashMap<LibraryDescriptor, LibrarySpecification>());
+        project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
     }
 
