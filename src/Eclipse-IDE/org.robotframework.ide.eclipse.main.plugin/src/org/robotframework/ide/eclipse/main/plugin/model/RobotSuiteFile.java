@@ -502,7 +502,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 .filter(entry -> entry.getValue() != null)
                 .filter(entry -> entry.getKey().isReferencedLibrary())
                 .filter(entry -> {
-                    final IPath entryPath = new Path(entry.getKey().getPath());
+                    final IPath entryPath = new Path(entry.getKey().getFilepath());
                     final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
                     final IPath libPath2 = RedWorkspace.Paths
                             .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));

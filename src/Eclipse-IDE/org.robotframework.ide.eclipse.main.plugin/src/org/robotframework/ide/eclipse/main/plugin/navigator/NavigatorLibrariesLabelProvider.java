@@ -56,6 +56,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
             final StyledString label = new StyledString();
             label.append(libSpec.getName(), mixingStyler(Stylers.Common.STRIKEOUT_STYLER, Stylers.Common.ERROR_STYLER));
             label.append(argumentsDecoration(libSpec.getDescriptor()), Stylers.Common.ERROR_STYLER);
+            label.append(pathDecoration(libSpec.getDescriptor()), Stylers.Common.ERROR_STYLER);
             label.append(" (non-accessible)", Stylers.Common.ERROR_STYLER);
             return label;
 
@@ -66,6 +67,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
             label.append(modificationDecoration(libSpec));
             label.append(libSpec.getName());
             label.append(argumentsDecoration(libSpec.getDescriptor()), Stylers.Common.ECLIPSE_DECORATION_STYLER);
+            label.append(pathDecoration(libSpec.getDescriptor()), Stylers.Common.ECLIPSE_DECORATION_STYLER);
             label.append(numberOfKeywordsDecoration(libSpec), Stylers.Common.ECLIPSE_DECORATION_STYLER);
             return label;
         }
@@ -82,6 +84,11 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
             return "";
         }
         return arguments.stream().collect(joining(", ", " [", "]"));
+    }
+
+    private static String pathDecoration(final LibraryDescriptor descriptor) {
+        final String path = descriptor.getPath();
+        return path == null ? "" : " " + path;
     }
 
     private static String numberOfKeywordsDecoration(final LibrarySpecification libSpec) {
