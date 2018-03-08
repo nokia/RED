@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +39,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.collect.ImmutableMap;
 
 @SuppressWarnings("unchecked")
 public class TableHyperlinksToKeywordsDetectorTest {
@@ -140,7 +139,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
                 .getChildren().get(0).getChildren().get(0);
 
         final RobotProject project = suiteFile.getProject();
-        project.setStandardLibraries(ImmutableMap.<LibraryDescriptor, LibrarySpecification> of());
+        project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
@@ -225,7 +224,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
                 .getChildren().get(0).getChildren().get(0);
 
         final RobotProject project = suiteFile.getProject();
-        project.setStandardLibraries(ImmutableMap.<LibraryDescriptor, LibrarySpecification> of());
+        project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);

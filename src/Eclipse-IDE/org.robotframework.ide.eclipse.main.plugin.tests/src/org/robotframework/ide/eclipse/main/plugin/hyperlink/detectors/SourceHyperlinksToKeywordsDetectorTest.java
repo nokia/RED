@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -193,7 +193,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final Document document = new Document(getContent(file));
 
         final RobotProject project = suiteFile.getProject();
-        project.setStandardLibraries(ImmutableMap.<LibraryDescriptor, LibrarySpecification> of());
+        project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
 
         final ITextViewer textViewer = mock(ITextViewer.class);
@@ -281,7 +281,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final Document document = new Document(getContent(file));
 
         final RobotProject project = suiteFile.getProject();
-        project.setStandardLibraries(ImmutableMap.<LibraryDescriptor, LibrarySpecification> of());
+        project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
 
         final ITextViewer textViewer = mock(ITextViewer.class);
