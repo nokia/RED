@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -24,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.collect.Iterables;
 
@@ -53,14 +54,14 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenLibraryIsReferenced_reservedLibPredicateIsSatisfied() {
+    public void whenLibraryIsReferencedOrNotReserved_reservedLibPredicateIsSatisfied() {
         final LibrarySpecification spec1 = new LibrarySpecification();
-        spec1.setReferenced(mock(ReferencedLibrary.class));
+        spec1.setDescriptor(LibraryDescriptor.ofReferencedLibrary(mock(ReferencedLibrary.class)));
         spec1.setName("foo");
 
         final LibrarySpecification spec2 = new LibrarySpecification();
-        spec2.setReferenced(mock(ReferencedLibrary.class));
-        spec2.setName("reserved");
+        spec2.setDescriptor(LibraryDescriptor.ofStandardLibrary("build"));
+        spec2.setName("build");
 
         final AssistProposalPredicate<LibrarySpecification> predicate = AssistProposalPredicates
                 .reservedLibraryPredicate();
@@ -72,6 +73,7 @@ public class AssistProposalPredicatesTest {
     @Test
     public void whenLibraryIsStandardOtherThanReserved_reservedLibPredicateIsSatisfied() {
         final LibrarySpecification spec = new LibrarySpecification();
+        spec.setDescriptor(LibraryDescriptor.ofStandardLibrary("foo"));
         spec.setName("foo");
 
         final AssistProposalPredicate<LibrarySpecification> predicate = AssistProposalPredicates
@@ -83,6 +85,7 @@ public class AssistProposalPredicatesTest {
     @Test
     public void whenLibraryIsStandardReserved_reservedLibPredicateIsNotSatisfied() {
         final LibrarySpecification spec = new LibrarySpecification();
+        spec.setDescriptor(LibraryDescriptor.ofStandardLibrary("reserved"));
         spec.setName("reserved");
 
         final AssistProposalPredicate<LibrarySpecification> predicate = AssistProposalPredicates

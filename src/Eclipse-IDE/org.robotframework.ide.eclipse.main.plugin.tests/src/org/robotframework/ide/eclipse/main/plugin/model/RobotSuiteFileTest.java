@@ -1,12 +1,11 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLibs;
 import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRemoteLib;
 import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createStdLibs;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
@@ -14,10 +13,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 
 public class RobotSuiteFileTest {
@@ -56,6 +56,7 @@ public class RobotSuiteFileTest {
         assertThat(imported.keySet().stream().map(LibrarySpecification::getName)).containsOnly("Collections", "myLib");
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void librarySpecsAreReturned_whenSuiteImportsMultipleDifferentRemoteLibraries() throws Exception {
         final IFile file = projectProvider.createFile("suite.robot",
@@ -65,24 +66,19 @@ public class RobotSuiteFileTest {
         final RobotSuiteFile fileModel = robotModel.createSuiteFile(file);
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
-        robotProject.setStandardLibraries(merge(
-                createRemoteLib("http://1.2.3.4/mylib"),
-                createRemoteLib("http://5.6.7.8/mylib2")));
+        final ImmutableMap<LibraryDescriptor, LibrarySpecification> stdLibs = ImmutableMap
+                .<LibraryDescriptor, LibrarySpecification> builder()
+                .putAll(createRemoteLib("http://1.2.3.4/mylib"))
+                .putAll(createRemoteLib("http://5.6.7.8/mylib2"))
+                .build();
+        robotProject.setStandardLibraries(stdLibs);
 
         final Multimap<LibrarySpecification, Optional<String>> imported = fileModel.getImportedLibraries();
 
         assertThat(imported.keySet()).hasSize(2);
         assertThat(imported.keySet().stream().map(LibrarySpecification::getName)).containsOnly("Remote");
-        assertThat(imported.keySet().stream().map(LibrarySpecification::getRemoteLocation)).containsOnly(
-                RemoteLocation.create("http://1.2.3.4/mylib"), RemoteLocation.create("http://5.6.7.8/mylib2"));
-    }
-
-    @SafeVarargs
-    private static Map<String, LibrarySpecification> merge(final Map<String, LibrarySpecification>... libs) {
-        final Map<String, LibrarySpecification> merged = new HashMap<>();
-        for (final Map<String, LibrarySpecification> lib : libs) {
-            merged.putAll(lib);
-        }
-        return merged;
+        assertThat(imported.keySet().stream().map(LibrarySpecification::getDescriptor).map(
+                LibraryDescriptor::getArguments)).containsOnly(newArrayList("http://1.2.3.4/mylib"),
+                        newArrayList("http://5.6.7.8/mylib2"));
     }
 }

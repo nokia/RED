@@ -19,9 +19,15 @@ import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
+
+import com.google.common.base.Strings;
 
 /**
  * @author Michal Anglart
@@ -56,6 +62,27 @@ public abstract class RedSuiteMarkerResolution implements IMarkerResolution {
         } catch (final CoreException e) {
             // oh well, we won't fix this...
         }
+    }
+
+    protected final String getSeparator(final RobotSuiteFile suiteModel, final int offset) {
+        final RobotFile fileModel = suiteModel.getLinkedElement();
+        final FileFormat fileFormat = fileModel.getParent().getFileFormat();
+        if (fileFormat == FileFormat.TSV) {
+            return "\t";
+        } else {
+            return fileModel.getRobotLineIndexBy(offset)
+                    .map(l -> fileModel.getFileContent().get(l))
+                    .flatMap(RobotLine::getSeparatorForLine)
+                    .filter(sep -> sep == SeparatorType.PIPE)
+                    .map(sep -> " | ")
+                    .orElse(Strings.repeat(" ", 4));
+        }
+    }
+
+    protected final String getSeparator(final RobotSuiteFile suiteModel) {
+        final RobotFile fileModel = suiteModel.getLinkedElement();
+        final FileFormat fileFormat = fileModel.getParent().getFileFormat();
+        return fileFormat == FileFormat.TSV ? "\t" : Strings.repeat(" ", 4);
     }
 
     public abstract Optional<ICompletionProposal> asContentProposal(IMarker marker, IDocument document,

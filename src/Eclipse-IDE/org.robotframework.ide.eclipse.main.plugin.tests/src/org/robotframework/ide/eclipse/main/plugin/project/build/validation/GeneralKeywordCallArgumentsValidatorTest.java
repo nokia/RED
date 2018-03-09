@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -23,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
 import com.google.common.collect.Range;
 

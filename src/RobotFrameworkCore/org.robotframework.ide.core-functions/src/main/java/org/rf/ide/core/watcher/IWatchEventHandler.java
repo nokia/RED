@@ -5,18 +5,12 @@
  */
 package org.rf.ide.core.watcher;
 
-import java.nio.file.Path;
-
 /**
  * @author mmarzec
  */
 public interface IWatchEventHandler {
 
-    void registerPath(final Path dir, final String fileName, final IWatchEventHandler handler);
-
-    void unregisterFile(final String fileName, final IWatchEventHandler handler);
+    void handleModifyEvent(final String fileName);
 
     void watchServiceInterrupted();
-
-    void handleModifyEvent(final String fileName);
 }

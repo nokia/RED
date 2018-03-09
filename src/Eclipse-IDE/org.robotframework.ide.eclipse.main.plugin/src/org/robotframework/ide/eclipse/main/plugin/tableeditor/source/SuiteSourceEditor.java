@@ -265,7 +265,7 @@ public class SuiteSourceEditor extends TextEditor {
 
             } else if (RedPreferences.TASKS_TAGS.equals(event.getKey())) {
                 final String newValue = (String) event.getNewValue();
-                final Set<String> newTags = newValue == null ? new HashSet<>()
+                final Set<String> newTags = newValue == null || newValue.isEmpty() ? new HashSet<>()
                         : new HashSet<>(Splitter.on(';').splitToList(newValue));
 
                 final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();

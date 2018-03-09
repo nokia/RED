@@ -22,8 +22,8 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.ScrolledFormText;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
 import org.robotframework.red.swt.Listeners;
 

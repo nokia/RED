@@ -33,6 +33,8 @@ import org.rf.ide.core.execution.debug.contexts.KeywordOfUserContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordUnknownContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
 import org.rf.ide.core.execution.debug.contexts.TestCaseContext;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -54,8 +56,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -388,8 +388,7 @@ public class EclipseElementsLocator implements ElementsLocator {
                         final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                         final RobotSuiteFile exposingFile) {
 
-                    final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
-                            : KeywordScope.STD_LIBRARY;
+                    final KeywordScope scope = libSpec.getDescriptor().getKeywordsScope();
                     for (final Optional<String> libraryAlias : libraryAliases) {
                         addAccessibleKeyword(kwSpec.getName(),
                                 DebuggerKeywordEntity.from(scope, libraryAlias, exposingFile, libSpec, kwSpec));

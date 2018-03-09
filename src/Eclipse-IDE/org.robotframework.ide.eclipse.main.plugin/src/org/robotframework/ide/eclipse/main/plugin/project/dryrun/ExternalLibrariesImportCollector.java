@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +29,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
@@ -73,7 +76,10 @@ class ExternalLibrariesImportCollector {
     private RobotSuiteFile currentSuite;
 
     ExternalLibrariesImportCollector(final RobotProject robotProject) {
-        this.standardLibraryNames = robotProject.getStandardLibraries().keySet();
+        this.standardLibraryNames = robotProject.getLibraryDescriptorsStream()
+                .filter(LibraryDescriptor::isStandardLibrary)
+                .map(LibraryDescriptor::getName)
+                .collect(toSet());
         this.libraryLocator = new ReferencedLibraryLocator(robotProject, new DiscoveringLibraryImporter(),
                 new DiscoveringLibraryDetector());
     }

@@ -38,7 +38,7 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
         return getValidPathToCreate(marker)
                 .map(path -> new CreateResourceFileFixer(
                         CreateResourceFileFixer.createProposal(marker, path, nonExistingFile),
-                        "Create missing " + nonExistingFile + " file"))
+                        "Create missing '" + nonExistingFile + "' file"))
                 .orElseGet(() -> new CreateResourceFileFixer(CreateResourceFileFixer.createEmptyProposal(),
                         "Missing resource file cannot be auto-created"));
     }
@@ -100,7 +100,7 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
     private static Optional<ICompletionProposal> createProposal(final IMarker marker, final IPath path,
             final String res) {
         final MissingResourceFileCompletionProposal proposal = new MissingResourceFileCompletionProposal(
-                "Create missing " + res + " file",
+                "Create missing '" + res + "' file",
                 "<b>" + res
                         + "</b><br> file will be created and opened for edition.<br><br>Resource path must be valid, "
                         + "inside project directory and must include robot resource extension. Any missing parent directories will be also created.",

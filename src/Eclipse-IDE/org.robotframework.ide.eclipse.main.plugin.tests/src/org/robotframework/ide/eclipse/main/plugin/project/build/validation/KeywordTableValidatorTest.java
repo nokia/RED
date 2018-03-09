@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -35,8 +36,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 
@@ -412,8 +413,8 @@ public class KeywordTableValidatorTest {
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector) {
-        final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
-                SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
+        final ValidationContext parentContext = new ValidationContext(null, new RobotModel(), RobotVersion.from("0.0"),
+                SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
         return new FileValidationContext(parentContext, mock(IFile.class), collector, new HashSet<>());
     }
 }

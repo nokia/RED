@@ -11,7 +11,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.red.viewers.Selections;
 
 @SuppressWarnings("restriction")

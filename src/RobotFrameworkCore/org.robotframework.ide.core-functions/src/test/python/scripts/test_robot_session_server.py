@@ -17,18 +17,20 @@ class RobotSessionServerTests(unittest.TestCase):
         self.assertEqual(response['exception'], None)
 
     def test_encode_exception(self):
-        response = create_libdoc()
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        response = create_libdoc("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [])
 
         self.assertEqual(response['result'], None)
-        self.assertTrue('TypeError: ' in response['exception'])
+        self.assertTrue('Unable to generate library specification file for library: \'LibError\'' in response['exception'])
 
 
 class LibdocGenerationTests(unittest.TestCase):
     def test_subsequent_calls_for_same_lib_name_under_different_paths_return_different_libdocs(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
 
-        response1 = create_libdoc("lib", [os.path.join(parent_path, 'res_test_robot_session_server', 'a')], [])
-        response2 = create_libdoc("lib", [os.path.join(parent_path, 'res_test_robot_session_server', 'b')], [])
+        response1 = create_libdoc("lib", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'a')], [])
+        response2 = create_libdoc("lib", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'b')], [])
 
         self.assertNotEqual(response1, response2)
 
@@ -39,7 +41,7 @@ class LibdocGenerationTests(unittest.TestCase):
         class_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'b')]
         old_sys_path = sorted(sys.path)
 
-        create_libdoc("lib", python_paths, class_paths)
+        create_libdoc("lib", 'XML', python_paths, class_paths)
 
         self.assertEqual(old_sys_path, sorted(sys.path))
 

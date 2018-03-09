@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TkwYoPCWEeePD6aU90_GvA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/6/18 5:32 PM
+Save-Time: 3/9/18 1:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -44,9 +44,9 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property itemCount | equals 2 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "Discover '../../calculator.py' and add to configuration" 
         | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "Change to calculator.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to 'calculator.py'" | verify-true
 }
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to calculator.py" 
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to 'calculator.py'" 
     | click -default
 // 2 --------------------------------------------------------------
 with [get-editor "Script.robot" | get-text-viewer] {
@@ -57,10 +57,10 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property itemCount | equals 2 | verify-true
     get-property "getItems().TableItem[0].getText()" 
         | equals "Discover '../emptyfile/empty.py' and add to configuration" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "Change to empty_file/empty.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to 'empty_file/empty.py'" | verify-true
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Change to empty_file\\/empty.py" | click -default
+    | select "Change to 'empty_file\\/empty.py'" | click -default
 // 3 --------------------------------------------------------------
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 4 33
@@ -70,9 +70,9 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property itemCount | equals 2 | verify-true
     get-property "getItems().TableItem[0].getText()" 
         | equals "Discover 'folder/only_function.py' and add to configuration" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "Change to only_function.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to 'only_function.py'" | verify-true
 }
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to only_function.py" 
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to 'only_function.py'" 
     | click -default
 // 4 --------------------------------------------------------------
 with [get-editor "Script.robot" | get-text-viewer] {
@@ -83,9 +83,9 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property itemCount | equals 2 | verify-true
     get-property "getItems().TableItem[0].getText()" 
         | equals "Discover 'not/existing/path/here_is_class.py' and add to configuration" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "Change to here_is_class.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to 'here_is_class.py'" | verify-true
 }
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to here_is_class.py" 
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to 'here_is_class.py'" 
     | click -default
 // 5 --------------------------------------------------------------
 with [get-editor "Script.robot" | get-text-viewer] {
