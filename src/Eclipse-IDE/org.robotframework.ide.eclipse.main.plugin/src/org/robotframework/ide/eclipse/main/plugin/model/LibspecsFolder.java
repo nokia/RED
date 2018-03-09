@@ -5,9 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -18,13 +16,12 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 public class LibspecsFolder {
+    
+    private static final String FOLDER_NAME = "libspecs";
 
     private static final String LIBSPEC_FILE_EXTENSION = ".libspec";
-
-    private static final String FOLDER_NAME = "libspecs";
 
     private final IFolder folder;
 
@@ -52,33 +49,22 @@ public class LibspecsFolder {
         return folder.exists();
     }
 
-    public void removeNonSpecResources() throws CoreException {
-        if (!folder.exists()) {
-            return;
-        }
-        for (final IResource resource : folder.members(IContainer.INCLUDE_HIDDEN)) {
-            if (resource.exists() && !resource.getName().endsWith(LIBSPEC_FILE_EXTENSION)) {
-                resource.delete(true, null);
-            }
-        }
-    }
-
-    public void removeContent() throws CoreException {
-        if (!folder.exists()) {
-            return;
-        }
-        for (final IResource resource : folder.members(IContainer.INCLUDE_HIDDEN)) {
-            if (resource.exists()) {
-                resource.delete(true, null);
-            }
-        }
-    }
-
     public void remove() throws CoreException {
         if (exists()) {
             final IResource project = folder.getProject();
             folder.delete(true, null);
             project.refreshLocal(IResource.DEPTH_INFINITE, null);
+        }
+    }
+
+    public void preserveOnly(final Set<IFile> filesToPreserve) throws CoreException {
+        if (!folder.exists()) {
+            return;
+        }
+        for (final IResource resource : folder.members(IContainer.INCLUDE_HIDDEN)) {
+            if (!filesToPreserve.contains(resource)) {
+                resource.delete(true, null);
+            }
         }
     }
 
@@ -104,18 +90,7 @@ public class LibspecsFolder {
         return false;
     }
 
-    public List<IFile> collectLibspecsToRegenerate(final List<String> libraryNames, final String version) {
-        return libraryNames.stream()
-                .map(this::getSpecFile)
-                .filter(specFile -> !specFile.exists() || !hasSameVersion(specFile, version))
-                .collect(toList());
-    }
-
-    private static boolean hasSameVersion(final IFile specFile, final String version) {
-        return version.startsWith(String.format("Robot Framework %s (", LibrarySpecification.getVersion(specFile)));
-    }
-
-    public IFile getSpecFile(final String libraryName) {
+    public IFile getXmlSpecFile(final String libraryName) {
         return getFile(libraryName + LIBSPEC_FILE_EXTENSION);
     }
 

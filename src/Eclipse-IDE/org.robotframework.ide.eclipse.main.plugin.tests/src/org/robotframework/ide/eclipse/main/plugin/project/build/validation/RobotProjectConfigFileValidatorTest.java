@@ -24,6 +24,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -37,7 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class RobotProjectConfigFileValidatorTest {
@@ -111,9 +113,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenLibspecForStandardLibraryIsMissing_notGeneratedProblemIsReported() throws Exception {
-        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
-        stdLibs.put("StdLib1", LibrarySpecification.create("StdLib1"));
-        stdLibs.put("StdLib2", null);
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = Libraries.createStdLib("StdLib1");
+        stdLibs.put(LibraryDescriptor.ofStandardLibrary("StdLib2"), null);
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(stdLibs);
@@ -134,15 +135,20 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenLibspecForStandardRemoteLibraryIsMissing_notGeneratedProblemIsReported() throws Exception {
-        final String address = "http://127.0.0.1:" + findFreePort() + "/";
+        final String path = "http://127.0.0.1:" + findFreePort() + "/";
 
-        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
-        stdLibs.put("Remote " + address, null);
+        final LibrarySpecification libSpec = new LibrarySpecification();
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create(path));
+        libSpec.setDescriptor(descriptor);
+        libSpec.setName("Remote");
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = new HashMap<>();
+        stdLibs.put(descriptor, null);
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(stdLibs);
+        robotProject.setReferencedLibraries(new HashMap<>());
 
-        final RemoteLocation remoteLocation = RemoteLocation.create(address);
+        final RemoteLocation remoteLocation = RemoteLocation.create(path);
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addRemoteLocation(remoteLocation);
 
@@ -160,17 +166,19 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenLibspecForReferencedLibraryIsMissing_notGeneratedProblemIsReported() throws CoreException {
-        final ReferencedLibrary refLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "ref", "/some/path");
-        final ReferencedLibrary refLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "missing", "/some/other/path");
-
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(refLib1, LibrarySpecification.create("ref"));
-        refLibs.put(refLib2, null);
+        final ReferencedLibrary refLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "ref", "");
+        final ReferencedLibrary refLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "missing", "");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib1), LibrarySpecification.create("ref"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib2), null);
+        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 
         final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addReferencedLibrary(refLib1);
+        config.addReferencedLibrary(refLib2);
 
         final Map<Object, FilePosition> locations = new HashMap<>();
         locations.put(refLib1, new FilePosition(1728, 0));

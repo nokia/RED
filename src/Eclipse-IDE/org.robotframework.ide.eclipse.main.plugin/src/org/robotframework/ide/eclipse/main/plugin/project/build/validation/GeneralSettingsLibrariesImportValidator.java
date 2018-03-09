@@ -5,31 +5,32 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
-import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -76,15 +77,15 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     }
 
     private LibrarySpecification findSpecification(final IPath candidate) {
-        final Map<ReferencedLibrary, LibrarySpecification> libs = validationContext
+        final Map<LibraryDescriptor, LibrarySpecification> libs = validationContext
                 .getReferencedLibrarySpecifications();
-        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : libs.entrySet()) {
-            final IPath entryPath = new Path(entry.getKey().getFilepath().getPath());
+        for (final LibraryDescriptor descriptor : libs.keySet()) {
+            final IPath entryPath = new Path(descriptor.getFilepath());
             final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
             final IPath libPath2 = RedWorkspace.Paths
                     .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
             if (candidate.equals(libPath1) || candidate.equals(libPath2)) {
-                return entry.getValue();
+                return libs.get(descriptor);
             }
         }
         return null;
@@ -93,21 +94,9 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     @Override
     protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
             throws CoreException {
-        final String libName = createLibName(name, arguments);
-        final LibrarySpecification specification = validationContext.getLibrarySpecifications(libName);
+        final List<String> args = arguments.stream().map(RobotToken::getText).collect(toList());
+        final LibrarySpecification specification = validationContext.getLibrarySpecifications(name, args);
         validateWithSpec(specification, name, nameToken, arguments, false);
-    }
-
-    private String createLibName(final String name, final List<RobotToken> arguments) {
-        if ("Remote".equals(name)) {
-            if (arguments.isEmpty()) {
-                return name + " " + "http://127.0.0.1:8270/RPC2";
-            } else {
-                final String remoteLibName = RemoteLocation.createRemoteName(arguments.get(0).getText());
-                return remoteLibName;
-            }
-        }
-        return name;
     }
 
     private void validateWithSpec(final LibrarySpecification specification, final String pathOrName,

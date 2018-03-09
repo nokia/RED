@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.library;
+package org.rf.ide.core.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
+import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;

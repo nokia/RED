@@ -10,8 +10,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -40,7 +40,7 @@ public class RedLibraryProposals {
 
         final List<RedLibraryProposal> proposals = new ArrayList<>();
 
-        for (final LibrarySpecification libSpec : suiteFile.getProject().getLibrariesSpecifications()) {
+        for (final LibrarySpecification libSpec : suiteFile.getProject().getLibrarySpecifications()) {
             final Optional<ProposalMatch> match = matcher.matches(userContent, libSpec.getName());
 
             if (match.isPresent()) {

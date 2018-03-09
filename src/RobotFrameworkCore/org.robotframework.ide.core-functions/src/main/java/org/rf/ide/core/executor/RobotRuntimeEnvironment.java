@@ -340,7 +340,7 @@ public class RobotRuntimeEnvironment {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getModulePath(moduleName, additionalPaths).map(this::tryToCanonical);
+            return Optional.of(executor.getModulePath(moduleName, additionalPaths)).map(this::tryToCanonical);
         }
         return Optional.empty();
     }
@@ -363,39 +363,32 @@ public class RobotRuntimeEnvironment {
         }
     }
 
-    public void createLibdocForStdLibrary(final String libName, final File outputFile)
+    public void createLibdoc(final String libName, final File outputFile, final LibdocFormat format)
             throws RobotEnvironmentException {
+        createLibdoc(libName, "", new EnvironmentSearchPaths(), outputFile, format);
+    }
+
+    public void createLibdocForcibly(final String libName, final File outputFile, final LibdocFormat format)
+            throws RobotEnvironmentException {
+        createLibdocForcibly(libName, "", new EnvironmentSearchPaths(), outputFile, format);
+    }
+
+    public void createLibdoc(final String libName, final String libPath, final EnvironmentSearchPaths additionalPaths,
+            final File outputFile, final LibdocFormat format) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForStdLibrary(outputFile.getAbsolutePath(), libName, "");
+            executor.createLibdoc(outputFile.getAbsolutePath(), format, libName, libPath, additionalPaths);
         }
     }
 
-    public void createLibdocForStdLibraryForcibly(final String libName, final File outputFile)
+    public void createLibdocForcibly(final String libName, final String libPath,
+            final EnvironmentSearchPaths additionalPaths, final File outputFile, final LibdocFormat format)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForStdLibrary(outputFile.getAbsolutePath(), libName, "");
-        }
-    }
-
-    public void createLibdocForThirdPartyLibrary(final String libName, final String libPath,
-            final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForThirdPartyLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
-        }
-    }
-
-    public void createLibdocForThirdPartyLibraryForcibly(final String libName, final String libPath,
-            final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForThirdPartyLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
+            executor.createLibdoc(outputFile.getAbsolutePath(), format, libName, libPath, additionalPaths);
         }
     }
 
@@ -621,5 +614,10 @@ public class RobotRuntimeEnvironment {
         public int hashCode() {
             return 31 * super.hashCode() + ((interpreter == null) ? 0 : interpreter.hashCode());
         }
+    }
+
+    public static enum LibdocFormat {
+        XML,
+        HTML
     }
 }

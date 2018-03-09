@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
+import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
@@ -18,5 +19,7 @@ interface ILibdocGenerator {
             throws RobotEnvironmentException;
 
     String getMessage();
+
+    IFile getTargetFile();
 
 }

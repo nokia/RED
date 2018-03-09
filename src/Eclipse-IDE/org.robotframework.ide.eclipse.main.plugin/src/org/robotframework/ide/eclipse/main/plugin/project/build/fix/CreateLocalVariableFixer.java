@@ -16,7 +16,6 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
@@ -42,11 +41,13 @@ public class CreateLocalVariableFixer extends RedSuiteMarkerResolution {
     @Override
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
-        final String cellSeparator = getCellsSeparator(suiteModel);
+
+        final String lineDelimiter = DocumentUtilities.getDelimiter(document);
+        final String cellSeparator = getSeparator(suiteModel);
 
         String toInsert = name + cellSeparator;
         final int cursorOffset = toInsert.length();
-        toInsert += DocumentUtilities.getDelimiter(document);
+        toInsert += lineDelimiter;
 
         final Image image = ImagesManager.getImage(RedImages.getRobotVariableImage());
         try {
@@ -73,11 +74,6 @@ public class CreateLocalVariableFixer extends RedSuiteMarkerResolution {
         } catch (final CoreException | BadLocationException e) {
             return Optional.empty();
         }
-    }
-
-    private static String getCellsSeparator(final RobotSuiteFile suiteModel) {
-        final boolean isTsvFile = suiteModel.getFileExtension().equals("tsv");
-        return RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
     }
 
     private int findFirstCharacter(final IDocument document, final int offset) throws BadLocationException {

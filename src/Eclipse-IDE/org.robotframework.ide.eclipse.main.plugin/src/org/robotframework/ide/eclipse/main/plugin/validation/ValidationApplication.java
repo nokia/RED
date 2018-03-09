@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProjectBuilder;
@@ -92,8 +91,7 @@ public class ValidationApplication implements IApplication {
                 logger.log("Project '" + projectName + "' validation was SKIPPED (is closed)");
             } else {
                 final RobotProject robotProject = new RobotModel().createRobotProject(project);
-                robotProject.clearConfiguration();
-                LibspecsFolder.get(project.getProject()).removeNonSpecResources();
+                RobotProjectBuilder.clean(robotProject);
 
                 final RobotProjectBuilder builder = new RobotProjectBuilder(reporter, fatalReporter, logger);
 

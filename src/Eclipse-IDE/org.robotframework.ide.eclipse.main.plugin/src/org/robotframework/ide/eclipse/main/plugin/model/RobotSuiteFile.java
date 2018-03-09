@@ -36,12 +36,12 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.ResolvedImportPath;
 import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.RobotExpressions;
@@ -52,11 +52,10 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
@@ -410,7 +409,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public Set<LibrarySpecification> getNotImportedLibraries() {
-        final Set<LibrarySpecification> allLibraries = new HashSet<>(getProject().getLibrariesSpecifications());
+        final Set<LibrarySpecification> allLibraries = new HashSet<>(getProject().getLibrarySpecifications());
         allLibraries.removeAll(getImportedLibraries().keySet());
         return allLibraries;
     }
@@ -425,19 +424,21 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 .collect(toList());
 
         final ImmutableListMultimap<String, LibrarySpecification> specs = Multimaps
-                .index(project.getLibrariesSpecifications(), LibrarySpecification::getName);
+                .index(project.getLibrarySpecifications(), LibrarySpecification::getName);
 
-        final SetMultimap<LibrarySpecification, Optional<String>> imported = HashMultimap.create();
+        final SetMultimap<LibrarySpecification, Optional<String>> imported = LinkedHashMultimap.create();
         for (final RobotSetting setting : nonEmptyLibraryImports) {
 
             final String libNameOrPath = RobotExpressions.unescapeSpaces(setting.getArguments().get(0));
 
-            if (specs.containsKey(libNameOrPath) && !specs.get(libNameOrPath).get(0).isRemote()) {
+            if (specs.containsKey(libNameOrPath)
+                    && !specs.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
                 // by-name import of non-remote; only remote libraries are currently used multiple
                 // times
                 imported.put(specs.get(libNameOrPath).get(0), setting.extractLibraryAlias());
 
-            } else if (specs.containsKey(libNameOrPath) && specs.get(libNameOrPath).get(0).isRemote()) {
+            } else if (specs.containsKey(libNameOrPath)
+                    && specs.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
                 // by-name import of remote library
                 // empty were filtered out, so here size() > 0
                 final RemoteLocation remoteLocation = setting.getArguments().size() == 1
@@ -446,7 +447,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 final String remote = stripLastSlashIfNecessary(remoteLocation.getUri());
 
                 for (final LibrarySpecification spec : specs.get(libNameOrPath)) {
-                    if (remote.equals(stripLastSlashIfNecessary(spec.getRemoteLocation().getUri()))) {
+                    if (remote.equals(stripLastSlashIfNecessary(spec.getDescriptor().getArguments().get(0)))) {
                         imported.put(spec, setting.extractLibraryAlias());
                         break;
                     }
@@ -462,7 +463,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 }
             }
         }
-        project.getLibrariesSpecifications().stream().filter(LibrarySpecification::isAccessibleWithoutImport).forEach(
+        project.getLibrarySpecificationsStream().filter(LibrarySpecification::isAccessibleWithoutImport).forEach(
                 spec -> {
                     if (!imported.containsKey(spec)) {
                         imported.put(spec, Optional.empty());
@@ -497,19 +498,18 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             possiblePath = new Path(markedUri.get().getPath());
         }
 
-        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : project.getReferencedLibraries().entrySet()) {
-            if (entry.getValue() == null) {
-                continue;
-            }
-            final IPath entryPath = new Path(entry.getKey().getFilepath().getPath());
-            final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
-            final IPath libPath2 = RedWorkspace.Paths
-                    .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
-            if (possiblePath.equals(libPath1) || possiblePath.equals(libPath2)) {
-                return Optional.of(entry.getValue());
-            }
-        }
-        return Optional.empty();
+        return project.getLibraryEntriesStream()
+                .filter(entry -> entry.getValue() != null)
+                .filter(entry -> entry.getKey().isReferencedLibrary())
+                .filter(entry -> {
+                    final IPath entryPath = new Path(entry.getKey().getFilepath());
+                    final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
+                    final IPath libPath2 = RedWorkspace.Paths
+                            .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
+                    return possiblePath.equals(libPath1) || possiblePath.equals(libPath2);
+                })
+                .map(Entry::getValue)
+                .findFirst();
     }
 
     private Optional<ResolvedImportPath> getResolvedPath(final ImportPath importPath, final RobotProject project) {

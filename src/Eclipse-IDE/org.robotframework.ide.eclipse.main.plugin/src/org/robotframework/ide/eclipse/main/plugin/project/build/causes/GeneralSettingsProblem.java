@@ -16,21 +16,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IMarkerResolution;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddRemoteLibraryToRedXmlFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeLibraryPathToNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResourceFileFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingMetaSynonymFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.TableHeaderDepracatedAliasesReplacer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -124,8 +116,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
             final List<String> fixedPaths = new ArrayList<>();
             fixedPaths.add(path.replace('\\', '/'));
             fixedPaths.add(path.replaceAll("\\\\", "\\${/}"));
-            return (List<? extends IMarkerResolution>) ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
-                    fixedPaths);
+            return (List<? extends IMarkerResolution>) ChangeToFixer.createFixers(fixedPaths);
         }
     },
     IMPORT_PATH_ABSOLUTE {
@@ -185,14 +176,16 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
             final List<IMarkerResolution> fixers = new ArrayList<>();
             if (path != null) {
-                fixers.add(new AddLibraryToRedXmlFixer(path, true));
                 final IPath invalidPath = Path.fromPortableString(path);
-                fixers.addAll(ChangeImportedPathFixer.createFixersForSameFile(suiteFile, invalidPath));
-                fixers.addAll(ChangeLibraryPathToNameFixer.createFixersForSameFile(suiteFile, invalidPath));
+
+                fixers.add(new AddLibraryToRedXmlFixer(path, true));
+                fixers.addAll(
+                        GeneralSettingsImportsFixes.changeByPathImportToOtherPathWithSameFileName(marker, invalidPath));
+                fixers.addAll(GeneralSettingsImportsFixes.changeByPathImportToByName(marker, invalidPath));
             } else if (name != null) {
                 fixers.add(new AddLibraryToRedXmlFixer(name, false));
-                fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
-                        new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, name)));
+                fixers.addAll(
+                        ChangeToFixer.createFixers(new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, name)));
             }
             return fixers;
         }
@@ -246,16 +239,9 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final IFile suiteFile = (IFile) marker.getResource();
             final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
 
-            final List<IMarkerResolution> fixers = new ArrayList<>();
-            if (name.equals("Remote")) {
-                fixers.add(new AddLibraryToRedXmlFixer(name, false));
-                fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
-                        new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, name)));
-            }
-            return fixers;
+            return newArrayList(new AddLibraryToRedXmlFixer(name, false));
         }
     },
     NON_EXISTING_RESOURCE_IMPORT {
@@ -275,7 +261,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
             final IPath path = Path.fromPortableString(marker.getAttribute(AdditionalMarkerAttributes.PATH, null));
             final List<IMarkerResolution> fixers = new ArrayList<>();
             fixers.add(CreateResourceFileFixer.createFixer(path.toPortableString(), marker));
-            fixers.addAll(ChangeImportedPathFixer.createFixersForSameFile((IFile) marker.getResource(), path));
+            fixers.addAll(GeneralSettingsImportsFixes.changeByPathImportToOtherPathWithSameFileName(marker, path));
             return fixers;
         }
     },
@@ -495,7 +481,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new SettingMetaSynonymFixer());
+            return newArrayList(new ChangeToFixer("Metadata"));
         }
     },
     DOCUMENT_SYNONYM {
@@ -517,7 +503,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
+            return newArrayList(new ChangeToFixer("Documentation"));
         }
     },
     SUITE_PRECONDITION_SYNONYM {
@@ -539,8 +525,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(
-                    new SettingSimpleWordReplacer(RobotSettingsSection.class, "Suite Precondition", "Suite Setup"));
+            return newArrayList(new ChangeToFixer("Suite Setup"));
         }
     },
     SUITE_POSTCONDITION_SYNONYM {
@@ -562,8 +547,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(
-                    new SettingSimpleWordReplacer(RobotSettingsSection.class, "Suite Postcondition", "Suite Teardown"));
+            return newArrayList(new ChangeToFixer("Suite Teardown"));
         }
     },
     TEST_PRECONDITION_SYNONYM {
@@ -585,8 +569,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(
-                    new SettingSimpleWordReplacer(RobotSettingsSection.class, "Test Precondition", "Test Setup"));
+            return newArrayList(new ChangeToFixer("Test Setup"));
         }
     },
     TEST_POSTCONDITION_SYNONYM {
@@ -608,8 +591,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(
-                    new SettingSimpleWordReplacer(RobotSettingsSection.class, "Test Postcondition", "Test Teardown"));
+            return newArrayList(new ChangeToFixer("Test Teardown"));
         }
     },
     METADATA_TABLE_HEADER_SYNONYM {
@@ -631,8 +613,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(
-                    new TableHeaderDepracatedAliasesReplacer(RobotSettingsSection.class, "Metadata", "Settings"));
+            return newArrayList(new ChangeToFixer("*** Settings ***"));
         }
     },
     LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION {
@@ -654,8 +635,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(
-                    ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker), newArrayList("WITH NAME")));
+            return newArrayList(ChangeToFixer.createFixers(newArrayList("WITH NAME")));
         }
     },
     VARIABLE_AS_KEYWORD_USAGE_IN_SETTING {

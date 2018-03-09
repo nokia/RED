@@ -104,7 +104,7 @@ public enum VariablesProblem implements IProblemCause {
                 fixers.add(new CreateLocalVariableFixer(varName));
             }
             fixers.add(new CreateVariableFixer(varName));
-            fixers.addAll(ChangeToFixer.createFixers(problemRegion, new SimilaritiesAnalyst()
+            fixers.addAll(ChangeToFixer.createFixers(new SimilaritiesAnalyst()
                     .provideSimilarAccessibleVariables(suiteFile, problemRegion.getOffset(), varName)));
             return fixers;
         }
@@ -123,12 +123,11 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final IRegion problemRegion = RobotProblem.getRegionOf(marker);
             final String value = marker.getAttribute(AdditionalMarkerAttributes.VALUE, null);
 
             final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
             if (value != null) {
-                fixers.addAll(ChangeToFixer.createFixers(problemRegion, newArrayList(value + "=value")));
+                fixers.addAll(ChangeToFixer.createFixers(newArrayList(value + "=value")));
             }
             return fixers;
         }

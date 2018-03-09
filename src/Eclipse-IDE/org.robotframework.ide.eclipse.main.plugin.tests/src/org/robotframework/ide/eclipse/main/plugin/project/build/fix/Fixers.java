@@ -12,9 +12,9 @@ import org.eclipse.jface.text.IDocument;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
-class Fixers {
+public class Fixers {
 
-    static Function<RedSuiteMarkerResolution, IDocument> byApplyingToDocument(final IMarker marker,
+    public static Function<RedSuiteMarkerResolution, IDocument> byApplyingToDocument(final IMarker marker,
             final IDocument document, final RobotSuiteFile model) {
         return new Function<RedSuiteMarkerResolution, IDocument>() {
 
