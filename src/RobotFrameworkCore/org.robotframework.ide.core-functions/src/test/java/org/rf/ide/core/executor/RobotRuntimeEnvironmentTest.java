@@ -36,8 +36,7 @@ public class RobotRuntimeEnvironmentTest {
         final EnvironmentSearchPaths searchPaths = new EnvironmentSearchPaths();
 
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
-        when(executor.getModulePath("module", searchPaths))
-                .thenReturn(Optional.of(new File(folder.getRoot(), "module")));
+        when(executor.getModulePath("module", searchPaths)).thenReturn(new File(folder.getRoot(), "module"));
 
         final PythonInstallationDirectory location = new PythonInstallationDirectory(
                 URI.create("file:///path/to/python"), SuiteExecutor.Python);
@@ -61,8 +60,7 @@ public class RobotRuntimeEnvironmentTest {
         final EnvironmentSearchPaths searchPaths = new EnvironmentSearchPaths();
 
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
-        when(executor.getModulePath("module2", searchPaths))
-                .thenReturn(Optional.of(new File(folder.getRoot(), "module2")));
+        when(executor.getModulePath("module2", searchPaths)).thenReturn(new File(folder.getRoot(), "module2"));
 
         final PythonInstallationDirectory location = new PythonInstallationDirectory(
                 URI.create("file:///path/to/python"), SuiteExecutor.Python);
@@ -79,7 +77,7 @@ public class RobotRuntimeEnvironmentTest {
     }
 
     @Test
-    public void modulesSearchPathsAreCononicalized() {
+    public void modulesSearchPathsAreCanonicalized() {
         // this test only makes sense on case-insensitive platforms like windows
         assumeTrue(RedSystemProperties.isWindowsPlatform());
 

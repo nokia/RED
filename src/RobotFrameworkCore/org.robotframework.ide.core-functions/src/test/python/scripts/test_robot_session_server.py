@@ -17,10 +17,12 @@ class RobotSessionServerTests(unittest.TestCase):
         self.assertEqual(response['exception'], None)
 
     def test_encode_exception(self):
-        response = create_libdoc()
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        response = create_libdoc("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [])
 
         self.assertEqual(response['result'], None)
-        self.assertTrue('TypeError: ' in response['exception'])
+        self.assertTrue('Unable to generate library specification file for library: \'LibError\'' in response['exception'])
 
 
 class LibdocGenerationTests(unittest.TestCase):
