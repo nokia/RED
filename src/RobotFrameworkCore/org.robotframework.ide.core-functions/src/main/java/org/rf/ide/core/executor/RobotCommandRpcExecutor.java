@@ -22,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -300,18 +299,11 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             final String base64EncodedLibFileContent = (String) callRpcFunction("createLibdoc", libName,
                     format.name().toLowerCase(), newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
-            final byte[] bytes = Base64.getDecoder().decode(base64EncodedLibFileContent);
-            if (bytes.length > 0) {
-                if (!libdocFile.exists()) {
-                    libdocFile.createNewFile();
-                }
-                Files.write(bytes, libdocFile);
-            } else {
-                final String additional = libPath.isEmpty() ? ""
-                        : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
-                throw new RobotEnvironmentException(
-                        "Unable to generate library specification file for library '" + libName + "'" + additional);
+            final byte[] decodedFileContent = Base64.getDecoder().decode(base64EncodedLibFileContent);
+            if (!libdocFile.exists()) {
+                libdocFile.createNewFile();
             }
+            Files.write(decodedFileContent, libdocFile);
 
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
@@ -340,12 +332,12 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
+    public File getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
         try {
             final String path = (String) callRpcFunction("getModulePath", moduleName,
                     newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
-            return Optional.of(new File(path));
+            return new File(path);
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
