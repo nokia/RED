@@ -156,7 +156,7 @@ public class CreateResourceFileFixerTest {
     public void testCreateFixer_whenCorrectMarkerAndName() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "res.robot");
         final CreateResourceFileFixer fixer = CreateResourceFileFixer.createFixer("res.robot", marker);
-        assertThat(fixer.getLabel()).isEqualTo("Create missing res.robot file");
+        assertThat(fixer.getLabel()).isEqualTo("Create missing 'res.robot' file");
     }
 
     @Test
