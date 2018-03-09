@@ -19,7 +19,6 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy.ReportingInterruptedException;
@@ -39,17 +38,6 @@ public class RobotArtifactsBuilder {
     public Job createBuildJob(final boolean rebuildNeeded, final ValidationReportingStrategy fatalReporter) {
         if (rebuildNeeded) {
             logger.log("BUILDING: refreshing project");
-            try {
-                project.refreshLocal(IResource.DEPTH_INFINITE, null);
-                final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
-                for (final IResource resource : libspecsFolder.members()) {
-                    if (resource.getType() == IResource.FILE && resource.getName().startsWith("Remote_")) {
-                        resource.delete(true, null);
-                    }
-                }
-            } catch (final CoreException e) {
-                // that's fine
-            }
 
             return new Job("Building") {
                 @Override

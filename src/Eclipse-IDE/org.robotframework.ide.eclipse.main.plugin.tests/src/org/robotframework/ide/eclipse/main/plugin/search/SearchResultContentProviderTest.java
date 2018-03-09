@@ -20,10 +20,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchResultContentProvider.KeywordWithParent;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchResultContentProvider.LibraryWithParent;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchResultContentProvider.Libs;
@@ -120,13 +121,13 @@ public class SearchResultContentProviderTest {
 
     @Test
     public void projectChildrenAreLibsElementIfThereIsALibraryDocMatch() {
-        final LibrarySpecification libSpec = new LibrarySpecification();
+        final LibrarySpecification libSpec = LibrarySpecification.create("StdLib");
 
         final IProject project = projectProvider.getProject();
         final RobotProject robotProject = model.createRobotProject(project);
-        final Map<String, LibrarySpecification> libs = new HashMap<>();
-        libs.put("StdLib", libSpec);
-        libs.put("OtherStdLib", new LibrarySpecification());
+        final Map<LibraryDescriptor, LibrarySpecification> libs = new HashMap<>();
+        libs.put(LibraryDescriptor.ofStandardLibrary("StdLib"), libSpec);
+        libs.put(LibraryDescriptor.ofStandardLibrary("OtherStdLib"), LibrarySpecification.create("OtherStdLib"));
         robotProject.setStandardLibraries(libs);
 
         final SearchResult result = createResult();
@@ -345,8 +346,9 @@ public class SearchResultContentProviderTest {
         assertThat(provider.getParent(new Object())).isNull();
     }
 
-    private static Map<String, LibrarySpecification> stdLibsMap(final LibrarySpecification... libSpec) {
-        return Stream.of(libSpec).collect(toMap(LibrarySpecification::getName, identity()));
+    private static Map<LibraryDescriptor, LibrarySpecification> stdLibsMap(final LibrarySpecification... libSpec) {
+        return Stream.of(libSpec)
+                .collect(toMap(spec -> LibraryDescriptor.ofStandardLibrary(spec.getName()), identity()));
     }
 
     private static SearchResult createResult() {

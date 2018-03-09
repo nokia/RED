@@ -122,78 +122,70 @@ public class RedFileWatcher {
 
     private void setupWatchEventProducerThread() {
         if (!isEventProducerThreadStarted.getAndSet(true)) {
-            new Thread(new Runnable() {
+            new Thread(() -> {
 
-                @Override
-                public void run() {
+                while (true) {
+                    if (watcher == null) {
+                        break;
+                    }
+                    WatchKey key;
+                    try {
+                        key = watcher.take();
+                    } catch (InterruptedException | ClosedWatchServiceException e) {
+                        break;
+                    }
+                    for (final WatchEvent<?> eventFromKey : key.pollEvents()) {
+                        final WatchEvent.Kind<?> kind = eventFromKey.kind();
+                        final Path eventContext = (Path) eventFromKey.context();
 
-                    while (true) {
-                        if (watcher == null) {
-                            break;
-                        }
-                        WatchKey key;
-                        try {
-                            key = watcher.take();
-                        } catch (InterruptedException | ClosedWatchServiceException e) {
-                            break;
-                        }
-                        for (final WatchEvent<?> eventFromKey : key.pollEvents()) {
-                            final WatchEvent.Kind<?> kind = eventFromKey.kind();
-                            final Path eventContext = (Path) eventFromKey.context();
+                        if (kind == StandardWatchEventKinds.OVERFLOW) {
+                            continue;
+                        } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
 
-                            if (kind == StandardWatchEventKinds.OVERFLOW) {
-                                continue;
-                            } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-
-                                final String fileName = eventContext.getFileName().toString();
-                                if (registeredFiles.get(fileName) != null) {
-                                    try {
-                                        if (!modifiedFilesQueue.contains(fileName)) {
-                                            modifiedFilesQueue.put(fileName);
-                                        }
-                                    } catch (final InterruptedException e) {
-                                        break;
+                            final String fileName = eventContext.getFileName().toString();
+                            if (registeredFiles.get(fileName) != null) {
+                                try {
+                                    if (!modifiedFilesQueue.contains(fileName)) {
+                                        modifiedFilesQueue.put(fileName);
                                     }
+                                } catch (final InterruptedException e) {
+                                    break;
                                 }
                             }
                         }
-                        final boolean valid = key.reset();
-                        if (!valid) {
-                            break;
-                        }
                     }
-                    isEventProducerThreadStarted.set(false);
-                    closeWatchService();
-                    sendWatchServiceInterruptedEvent();
+                    final boolean valid = key.reset();
+                    if (!valid) {
+                        break;
+                    }
                 }
+                isEventProducerThreadStarted.set(false);
+                closeWatchService();
+                sendWatchServiceInterruptedEvent();
             }).start();
         }
     }
 
     private void setupWatchEventConsumerThread() {
         if (!isEventConsumerThreadStarted.getAndSet(true)) {
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    while (true) {
-                        try {
-                            final String fileName = modifiedFilesQueue.take();
-                            final Collection<IWatchEventHandler> eventHandlers = registeredFiles.get(fileName);
-                            if (eventHandlers != null && !eventHandlers.isEmpty()) {
-                                for (final IWatchEventHandler watchEventHandler : eventHandlers) {
-                                    watchEventHandler.handleModifyEvent(fileName);
-                                }
+            new Thread(() -> {
+                while (true) {
+                    try {
+                        final String fileName = modifiedFilesQueue.take();
+                        final Collection<IWatchEventHandler> eventHandlers = registeredFiles.get(fileName);
+                        if (eventHandlers != null && !eventHandlers.isEmpty()) {
+                            for (final IWatchEventHandler watchEventHandler : eventHandlers) {
+                                watchEventHandler.handleModifyEvent(fileName);
                             }
-                            waitForAndRemovePossibleDuplicatedEvents(fileName);
-                        } catch (final InterruptedException e) {
-                            break;
                         }
+                        waitForAndRemovePossibleDuplicatedEvents(fileName);
+                    } catch (final InterruptedException e) {
+                        break;
                     }
-                    isEventConsumerThreadStarted.set(false);
-                    closeWatchService();
-                    sendWatchServiceInterruptedEvent();
                 }
+                isEventConsumerThreadStarted.set(false);
+                closeWatchService();
+                sendWatchServiceInterruptedEvent();
             }).start();
         }
     }

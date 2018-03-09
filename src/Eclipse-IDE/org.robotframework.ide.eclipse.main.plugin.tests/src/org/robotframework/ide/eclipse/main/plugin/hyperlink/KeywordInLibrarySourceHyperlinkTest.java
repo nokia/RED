@@ -7,8 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IFileEditorInput;
@@ -18,17 +18,17 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.collect.ImmutableMap;
 
 public class KeywordInLibrarySourceHyperlinkTest {
 
@@ -52,19 +52,13 @@ public class KeywordInLibrarySourceHyperlinkTest {
         projectProvider.createFile("testlib.py");
         projectProvider.configure(config);
 
-        kwSpec = new KeywordSpecification();
-        kwSpec.setFormat("ROBOT");
-        kwSpec.setName("keyword");
-        kwSpec.setArguments(new ArrayList<String>());
-        kwSpec.setDocumentation("");
-
-        libSpec = new LibrarySpecification();
-        libSpec.setName("testlib");
-        libSpec.getKeywords().add(kwSpec);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = Libraries.createRefLib("testlib", "keyword");
+        libSpec = refLibs.values().iterator().next();
+        kwSpec = libSpec.getKeywords().get(0);
 
         final RobotProject project = model.createRobotProject(projectProvider.getProject());
-        project.setStandardLibraries(new HashMap<String, LibrarySpecification>());
-        project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
+        project.setStandardLibraries(new HashMap<>());
+        project.setReferencedLibraries(refLibs);
     }
 
     @AfterClass

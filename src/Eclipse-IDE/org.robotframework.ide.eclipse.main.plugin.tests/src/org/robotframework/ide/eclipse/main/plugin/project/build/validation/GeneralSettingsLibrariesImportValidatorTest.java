@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
@@ -33,6 +32,9 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.libraries.LibraryConstructor;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -48,11 +50,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibraryConstructor;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ResourceCreator;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Range;
 
 public class GeneralSettingsLibrariesImportValidatorTest {
@@ -295,11 +299,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final LibraryConstructor constructor = new LibraryConstructor();
         constructor.setArguments(newArrayList("x", "y", "*ls"));
 
-        final LibrarySpecification spec = createNewLibrarySpecification(libName, constructor);
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport(libName, refLibs);
+        validateLibraryImport(libName, new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).contains(new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS,
                 new ProblemPosition(2, Range.closed(26, 29))));
 
@@ -316,11 +321,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final LibraryConstructor constructor = new LibraryConstructor();
         constructor.setArguments(newArrayList("x", "y", "*ls"));
 
-        final LibrarySpecification spec = createNewLibrarySpecification(libPath, constructor);
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("lib.py", refLibs);
+        validateLibraryImport("lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).contains(new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS,
                 new ProblemPosition(2, Range.closed(26, 32))));
 
@@ -330,27 +336,22 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void noMarkerIsReported_whenRemoteLibraryArgumentExistsUnderLocation() throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final RobotProjectConfig robotProjectConfig = robotProject.getRobotProjectConfig();
             final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
 
-            final RemoteLocation remoteLocation = RemoteLocation
-                    .create(location);
+            final RemoteLocation remoteLocation = RemoteLocation.create(location);
+            final RobotProjectConfig config = robotProject.getRobotProjectConfig();
+            config.addRemoteLocation(remoteLocation);
 
-            robotProjectConfig.addRemoteLocation(remoteLocation);
-
+            final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardRemoteLibrary(remoteLocation);
             final LibraryConstructor constructor = new LibraryConstructor();
             constructor.setArguments(newArrayList(location));
-
-            final LibrarySpecification spec = createNewLibrarySpecification("Remote", constructor);
-            final Map<RemoteLocation, LibrarySpecification> remoteLibs = new HashMap<>();
-            remoteLibs.put(remoteLocation, spec);
+            final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
+            final Map<LibraryDescriptor, LibrarySpecification> remoteLibs = ImmutableMap.of(descriptor, spec);
 
             validateLibraryImport("Remote  " + location, new HashMap<>(), remoteLibs);
             validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), remoteLibs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
-        } finally {
-            // nothing to do, just let the socket close itself
         }
     }
 
@@ -361,11 +362,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final IFile libFile = projectProvider.createFile("lib.py");
 
-        final LibrarySpecification spec = createNewLibrarySpecification(libName);
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport(libName, refLibs);
+        validateLibraryImport(libName, new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).isEmpty();
 
         libFile.delete(true, null);
@@ -378,11 +380,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final IFile libFile = projectProvider.createFile("lib.py");
 
-        final LibrarySpecification spec = createNewLibrarySpecification(libName);
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("lib.py", refLibs);
+        validateLibraryImport("lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).isEmpty();
 
         libFile.delete(true, null);
@@ -396,11 +399,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final IFolder dir = projectProvider.createDir("directory");
         projectProvider.createFile("directory/lib.py");
 
-        final LibrarySpecification spec = createNewLibrarySpecification(libName);
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport(libName, refLibs);
+        validateLibraryImport(libName, new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).isEmpty();
 
         dir.delete(true, null);
@@ -414,11 +418,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final IFolder dir = projectProvider.createDir("directory");
         projectProvider.createFile("directory/lib.py");
 
-        final LibrarySpecification spec = createNewLibrarySpecification(libName);
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("directory/lib.py", refLibs);
+        validateLibraryImport("directory/lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).isEmpty();
 
         dir.delete(true, null);
@@ -434,11 +439,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final IFile libFile = projectProvider.createFile("lib.py");
         final String absPath = libFile.getLocation().toString();
 
-        final LibrarySpecification spec = createNewLibrarySpecification(libName);
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport(absPath, refLibs);
+        validateLibraryImport(absPath, new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_ABSOLUTE));
 
         libFile.delete(true, null);
@@ -453,11 +459,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         resourceCreator.createLink(tmpFile.toURI(), projectProvider.getFile("link.py"));
 
-        final LibrarySpecification spec = createNewLibrarySpecification(libName);
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport(tmpFile.getAbsolutePath().replaceAll("\\\\", "/"), refLibs);
+        validateLibraryImport(tmpFile.getAbsolutePath().replaceAll("\\\\", "/"), new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_ABSOLUTE));
     }
 
@@ -471,11 +478,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
 
-        final LibrarySpecification spec = createNewLibrarySpecification("lib");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, "lib", libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("lib.py", refLibs);
+        validateLibraryImport("lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH));
 
@@ -489,11 +497,13 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setModuleSearchPaths(newArrayList(dir));
 
-        final LibrarySpecification spec = createNewLibrarySpecification("external_nested_lib");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", dir.getAbsolutePath()), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib",
+                dir.getAbsolutePath());
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("external_nested_lib.py", refLibs);
+        validateLibraryImport("external_nested_lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
                         GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE));
@@ -510,11 +520,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setModuleSearchPaths(newArrayList(dir));
 
-        final LibrarySpecification spec = createNewLibrarySpecification("external_nested_lib");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("external_nested_lib.py", refLibs);
+        validateLibraryImport("external_nested_lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH));
     }
@@ -532,11 +543,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getLocation().toString()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
 
-        final LibrarySpecification spec = createNewLibrarySpecification("lib");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, "lib", libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("lib.py", refLibs);
+        validateLibraryImport("lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH));
 
@@ -553,11 +565,13 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
 
-        final LibrarySpecification spec = createNewLibrarySpecification("external_nested_lib");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", dir.getAbsolutePath()), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib",
+                dir.getAbsolutePath());
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("external_nested_lib.py", refLibs);
+        validateLibraryImport("external_nested_lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
                         GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE));
@@ -577,11 +591,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
 
-        final LibrarySpecification spec = createNewLibrarySpecification("external_nested_lib");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", libPath), spec);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("external_nested_lib.py", refLibs);
+        validateLibraryImport("external_nested_lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH));
     }
@@ -597,35 +612,32 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         };
     }
 
-    private LibrarySpecification createNewLibrarySpecification(final String libName) {
-        return createNewLibrarySpecification(libName, null);
+    private LibrarySpecification createNewLibrarySpecification(final LibraryDescriptor descriptor) {
+        return createNewLibrarySpecification(descriptor, null);
     }
 
-    private LibrarySpecification createNewLibrarySpecification(final String libName,
+    private LibrarySpecification createNewLibrarySpecification(final LibraryDescriptor descriptor,
             final LibraryConstructor constructor) {
         final LibrarySpecification spec = new LibrarySpecification();
-        spec.setName(libName);
+        spec.setName(descriptor.getName());
         spec.setConstructor(constructor);
+        spec.setDescriptor(descriptor);
         return spec;
     }
 
     private void validateLibraryImport(final String toImport) {
-        validateLibraryImport(toImport, new HashMap<>());
+        validateLibraryImport(toImport, new HashMap<>(), new HashMap<>());
     }
 
     private void validateLibraryImport(final String toImport,
-            final Map<ReferencedLibrary, LibrarySpecification> refLibs) {
-        validateLibraryImport(toImport, refLibs, new HashMap<>());
-    }
-
-    private void validateLibraryImport(final String toImport,
-            final Map<ReferencedLibrary, LibrarySpecification> refLibs,
-            final Map<RemoteLocation, LibrarySpecification> remoteLibs) {
+            final Map<LibraryDescriptor, LibrarySpecification> stdLibs,
+            final Map<LibraryDescriptor, LibrarySpecification> refLibs) {
 
         final RobotSuiteFile suiteFile = createLibraryImportingSuite(toImport);
         final LibraryImport libImport = getImport(suiteFile);
 
-        final FileValidationContext context = prepareContext(suiteFile, refLibs, remoteLibs);
+        final FileValidationContext context = prepareContext(robotProject.getRobotProjectConfig(), suiteFile, stdLibs,
+                refLibs);
 
         final GeneralSettingsLibrariesImportValidator validator = new GeneralSettingsLibrariesImportValidator(context,
                 suiteFile, newArrayList(libImport), reporter);
@@ -657,24 +669,21 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         }
     }
 
-    private FileValidationContext prepareContext(final RobotSuiteFile suiteFile,
-            final Map<ReferencedLibrary, LibrarySpecification> refLibs,
-            final Map<RemoteLocation, LibrarySpecification> remoteLibs) {
+    private FileValidationContext prepareContext(final RobotProjectConfig config, final RobotSuiteFile suiteFile,
+            final Map<LibraryDescriptor, LibrarySpecification> stdLibs,
+            final Map<LibraryDescriptor, LibrarySpecification> refLibs) {
 
-        Map<String, LibrarySpecification> specsByName;
-        ValidationContext parentContext;
-        if (!refLibs.isEmpty()) {
-            specsByName = refLibs.entrySet().stream().collect(
-                    Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()));
-            parentContext = new ValidationContext(model, RobotVersion.from("0.0"),
-                    SuiteExecutor.Python, specsByName, refLibs);
-        } else {
-            final RobotProjectConfig config = robotProject.getRobotProjectConfig();
-            specsByName = remoteLibs.entrySet().stream().collect(
-                    Collectors.toMap(e -> e.getKey().getRemoteName(), e -> e.getValue()));
-            parentContext = new ValidationContext(config, model, RobotVersion.from("0.0"), SuiteExecutor.Python,
-                    specsByName);
-        }
+        final Multimap<String, LibrarySpecification> stdSpecsByName = Multimaps.index(stdLibs.values(),
+                LibrarySpecification::getName);
+        final Multimap<String, LibrarySpecification> refSpecsByName = Multimaps.index(refLibs.values(),
+                LibrarySpecification::getName);
+
+        final Multimap<String, LibrarySpecification> allLibsByNames = ArrayListMultimap.create();
+        allLibsByNames.putAll(stdSpecsByName);
+        allLibsByNames.putAll(refSpecsByName);
+
+        final ValidationContext parentContext = new ValidationContext(config, model, RobotVersion.from("0.0"),
+                SuiteExecutor.Python, allLibsByNames, refLibs);
         return new FileValidationContext(parentContext, suiteFile.getFile());
     }
 

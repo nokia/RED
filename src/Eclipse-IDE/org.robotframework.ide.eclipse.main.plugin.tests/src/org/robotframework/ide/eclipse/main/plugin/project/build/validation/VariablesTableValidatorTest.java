@@ -27,14 +27,15 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Range;
 
 public class VariablesTableValidatorTest {
@@ -339,8 +340,8 @@ public class VariablesTableValidatorTest {
     }
 
     private static FileValidationContext prepareContext(final Set<String> variables) {
-        final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
-                SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
+        final ValidationContext parentContext = new ValidationContext(null, new RobotModel(), RobotVersion.from("0.0"),
+                SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
         return new FileValidationContext(parentContext, mock(IFile.class), null, variables);
     }
 }

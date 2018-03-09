@@ -16,7 +16,6 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -27,6 +26,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -48,7 +48,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -124,37 +123,26 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
         final RobotProject robotProject = context.getModel().createRobotProject(configFile.getProject());
 
-        final Map<String, LibrarySpecification> stdLibs = robotProject.getStandardLibraries();
-        for (final Entry<String, LibrarySpecification> entry : stdLibs.entrySet()) {
-            if (entry.getValue() == null) {
-                final RobotProblem problem;
-                final ProblemPosition position;
+        robotProject.getLibraryEntriesStream().filter(entry -> entry.getValue() == null).forEach(entry -> {
+            final ProblemPosition position;
 
-                if (entry.getKey().startsWith("Remote")) {
-                    problem = RobotProblem.causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
-                            .formatMessageWith("Remote");
-                    final RemoteLocation remoteLocation = RemoteLocation
-                            .create(entry.getKey().substring("Remote".length()).trim());
-                    position = new ProblemPosition(config.getLineFor(remoteLocation));
-                } else {
-                    problem = RobotProblem.causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
-                            .formatMessageWith(entry.getKey());
-                    position = new ProblemPosition(config.getLineFor(config.getConfigurationModel()));
-                }
+            final LibraryDescriptor descriptor = entry.getKey();
+            if (descriptor.isStandardRemoteLibrary()) {
+                final RemoteLocation remoteLocation = RemoteLocation.create(descriptor.getArguments().get(0));
+                position = new ProblemPosition(config.getLineFor(remoteLocation));
 
-                reporter.handleProblem(problem, configFile, position);
+            } else if (descriptor.isStandardLibrary()) {
+                position = new ProblemPosition(config.getLineFor(config.getConfigurationModel()));
+
+            } else {
+                final ReferencedLibrary refLib = ReferencedLibrary.create(descriptor.getLibraryType(),
+                        descriptor.getName(), descriptor.getPath());
+                position = new ProblemPosition(config.getLineFor(refLib));
             }
-        }
-
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = robotProject.getReferencedLibraries();
-        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : refLibs.entrySet()) {
-            if (entry.getValue() == null) {
-                final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
-                        .formatMessageWith(entry.getKey().getName());
-                final ProblemPosition position = new ProblemPosition(config.getLineFor(entry.getKey()));
-                reporter.handleProblem(problem, configFile, position);
-            }
-        }
+            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
+                    .formatMessageWith(descriptor.getName());
+            reporter.handleProblem(problem, configFile, position);
+        });
     }
 
     private void validateRemoteLocation(final IProgressMonitor monitor, final RemoteLocation location,

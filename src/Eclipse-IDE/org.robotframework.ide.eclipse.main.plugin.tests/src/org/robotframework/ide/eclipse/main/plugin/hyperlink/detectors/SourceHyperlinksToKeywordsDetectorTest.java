@@ -12,7 +12,9 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -23,6 +25,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -38,12 +42,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -53,8 +55,9 @@ public class SourceHyperlinksToKeywordsDetectorTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(SourceHyperlinksToKeywordsDetectorTest.class);
 
-    private static ReferencedLibrary lib;
     private static LibrarySpecification libSpec;
+
+    private static Map<LibraryDescriptor, LibrarySpecification> refLibs;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
@@ -63,28 +66,19 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "res_kw",
                 "  log  10");
 
-        lib = ReferencedLibrary.create(LibraryType.PYTHON, "testlib", projectProvider.getProject().getName());
-
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addReferencedLibrary(lib);
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "testlib",
+                projectProvider.getProject().getName()));
 
         projectProvider.createFile("testlib.py");
         projectProvider.configure(config);
 
-        final KeywordSpecification kwSpec = new KeywordSpecification();
-        kwSpec.setFormat("ROBOT");
-        kwSpec.setName("lib_kw");
-        kwSpec.setArguments(new ArrayList<String>());
-        kwSpec.setDocumentation("");
-
-        libSpec = new LibrarySpecification();
-        libSpec.setName("testlib");
-        libSpec.getKeywords().add(kwSpec);
+        refLibs = Libraries.createRefLib("testlib", "lib_kw");
+        libSpec = refLibs.values().iterator().next();
     }
 
     @AfterClass
     public static void afterSuite() {
-        lib = null;
         libSpec = null;
     }
 
@@ -199,8 +193,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final Document document = new Document(getContent(file));
 
         final RobotProject project = suiteFile.getProject();
-        project.setStandardLibraries(ImmutableMap.<String, LibrarySpecification> of());
-        project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
+        project.setStandardLibraries(new HashMap<>());
+        project.setReferencedLibraries(refLibs);
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -287,8 +281,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final Document document = new Document(getContent(file));
 
         final RobotProject project = suiteFile.getProject();
-        project.setStandardLibraries(ImmutableMap.<String, LibrarySpecification> of());
-        project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
+        project.setStandardLibraries(new HashMap<>());
+        project.setReferencedLibraries(refLibs);
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
