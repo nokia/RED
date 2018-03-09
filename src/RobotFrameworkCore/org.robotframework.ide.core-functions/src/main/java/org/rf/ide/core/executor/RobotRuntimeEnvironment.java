@@ -340,7 +340,7 @@ public class RobotRuntimeEnvironment {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getModulePath(moduleName, additionalPaths).map(this::tryToCanonical);
+            return Optional.of(executor.getModulePath(moduleName, additionalPaths)).map(this::tryToCanonical);
         }
         return Optional.empty();
     }
