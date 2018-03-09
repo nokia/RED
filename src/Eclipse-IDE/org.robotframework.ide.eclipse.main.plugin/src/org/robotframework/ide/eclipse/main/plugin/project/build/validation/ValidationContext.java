@@ -45,6 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.io.Files;
@@ -123,18 +124,26 @@ public class ValidationContext {
 
     public LibrarySpecification getLibrarySpecification(final String libName, final List<String> arguments) {
         final Collection<LibrarySpecification> candidates = accessibleLibraries.get(libName);
-        for (final LibrarySpecification candidate : candidates) {
-            final List<String> candidateNormalizedArguments = candidate.getDescriptor()
-                    .getArguments()
-                    .stream()
-                    .map(this::normalizeArg)
-                    .collect(toList());
-            final List<String> normalizedArguments = arguments.stream().map(this::normalizeArg).collect(toList());
-            if (candidateNormalizedArguments.equals(normalizedArguments)) {
-                return candidate;
+
+        if (candidates.isEmpty()) {
+            return null;
+        } else if (candidates.size() == 1) {
+            return Iterables.getOnlyElement(candidates);
+        } else {
+            // TODO : the specification should be chosen from possible candidates
+            for (final LibrarySpecification candidate : candidates) {
+                final List<String> candidateNormalizedArguments = candidate.getDescriptor()
+                        .getArguments()
+                        .stream()
+                        .map(this::normalizeArg)
+                        .collect(toList());
+                final List<String> normalizedArguments = arguments.stream().map(this::normalizeArg).collect(toList());
+                if (candidateNormalizedArguments.equals(normalizedArguments)) {
+                    return candidate;
+                }
             }
+            return null;
         }
-        return null;
     }
 
     private String normalizeArg(final String argument) {
