@@ -22,14 +22,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
-import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
@@ -62,14 +60,10 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
         try {
             new ProgressMonitorDialog(shell).run(true, true, monitor -> rebuildLibraries(monitor));
         } catch (InvocationTargetException | InterruptedException e) {
-            if (e.getCause() instanceof RobotEnvironmentDetailedException) {
-                final RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
-                DetailedErrorDialog.openErrorDialog(exc.getReason(), exc.getDetails());
-            } else {
-                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                        "Problems occurred during library specification generation:\n" + e.getCause().getMessage(),
-                        e.getCause()), StatusManager.SHOW);
-            }
+            StatusManager.getManager()
+                    .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "Problems occurred during library specification generation:\n", e.getCause()),
+                            StatusManager.SHOW);
         }
     }
 
