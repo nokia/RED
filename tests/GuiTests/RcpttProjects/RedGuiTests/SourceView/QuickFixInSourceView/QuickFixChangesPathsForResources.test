@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ZhFIANchEeazM-DbDmejpA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/9/18 1:41 PM
+Save-Time: 3/9/18 5:38 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -73,7 +73,7 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
 
 //accept changing by using Enter button
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    select "Create 'missing simple_res.robot' file" | key-type Down
+    select "Create missing 'simple_res.robot' file" | key-type Down
     select "Change to 'res1\\/simple_res.robot'" | key-type Enter
     click -default
 }
@@ -252,7 +252,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property itemCount | equals 2 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "Create missing 'normal.robot file'" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing 'normal.robot' file" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "Change to 'two  spaces/normal.robot'" | verify-true
 }
 
@@ -273,7 +273,7 @@ with [get-window "Quick Fix" | get-table] {
     get-property itemCount | equals 3 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "Change to '../SecondProject/report.html'" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "Change to 'report.html'" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "Create 'missing not_existing/folder/report.html' file" 
+    get-property "getItems().TableItem[2].getText()" | equals "Create missing 'not_existing/folder/report.html' file" 
         | verify-true
 }
 
