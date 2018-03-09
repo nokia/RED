@@ -74,13 +74,13 @@ def LocalPythonDebug(pathToPyDevD,pydevdIp,pydevdPort):
     pydevdArgs='--multiprocess --print-in-debugger-startup --vm_type python --client '+pydevdIp+' --port '+pydevdPort+' --file '+runPath
 
     argumentList = sys.argv
+    argumentList=['"' + arg_item + '"' for arg_item in argumentList] #wrap argument lists in quotes to avoid problems with spaces in paths 
     argumentList.pop(0) # remove path to current interpreter
     argumentList[1]='-u' #Force stdin, stdout and stderr to be totally unbuffered. On systems where it matters, also put stdin, stdout and stderr in binary mode.
     argumentList.insert(2,pydevdPath+' '+pydevdArgs)
 
     argumentList.pop(3)  # remove robot.run from command
     command = ' '.join(argumentList)
-
     run_process(command)
 
 
