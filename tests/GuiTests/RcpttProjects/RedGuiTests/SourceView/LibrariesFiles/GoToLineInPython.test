@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _H31jIOhpEeaQF4EqtSuP0w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/14/18 4:04 PM
+Save-Time: 3/9/18 5:32 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -105,7 +105,7 @@ with [get-editor "test.robot" | get-text-viewer] {
     hover-text 19 12
     key-type F3
 }
-check-python-file -python_file_name "ClassWithDecorators.py" -line 13 -col 30 -selected_text "MY_KW_WITH_DECORATOR2"
+check-python-file -python_file_name "few_kw.py" -line 13 -col 20 -selected_text "I_am_in_2_files"
 
 //Daisy_Flower
 open-definition -editor "test.robot" -line 23 -col 14
@@ -158,7 +158,7 @@ get-editor "String.py" | get-text-viewer |get-property "getSelectionText()" | eq
 
 
 with [get-view Problems | get-tree] {
-    get-item "Errors \\(2 items\\)/Ambiguous keyword 'I am in 2 files' reference. Matching keywords are defined in: \\[ClassWithDecorators, few_kw\\]" 
+    get-item "Errors \\(2 items\\)/Ambiguous keyword 'I am in 2 files' reference. Matching keywords are defined in: \\[few_kw, ClassWithDecorators\\]" 
         | get-property index | equals 0 | verify-true
     get-item "Errors \\(2 items\\)/Unknown keyword 'jazz'" | get-property index | equals 1 | verify-true
 }
