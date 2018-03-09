@@ -1,0 +1,170 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: TaskTags
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _pXnYICCSEeinqtYRmpba-Q
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/9/18 12:01 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "add-new-tag" [val tag_name] [val prio]{
+	with [get-window Preferences] {   
+	    with [get-table] {
+	        get-item "...add new tag" | double-click
+	        select "TODO_1" | double-click
+	        select "TODO_1" | activate-cell-edit -type MouseDoubleClickSelection
+	        with [get-editbox] {
+	            set-text $tag_name
+	            key-type "NUMPAD_ENTER" "\\u000D"
+	        }
+	        apply-cell-edit -deactivate
+	        get-item $tag_name | double-click
+	        select  $tag_name | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+	        get-combo | select $prio
+	        apply-cell-edit -deactivate
+	    }
+	} 
+}	
+
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test\n"
+    + "    #FIXME! after some time.\n"
+    + "    log  8   # here is TODO\n\n"
+    + "test 2\n"
+    + "    #    TODO and FIXME in the same time\n"
+    + "    Should Be Equal As Numbers    first    second      \n"
+    + "    Catenate    #MY_tag with low prio  \n"
+    + "    #todo with small letters - To Do\n"
+    + "    # the same with FixMe - or fixme\n"
+    + "    #  My_tag with FIXME\n"
+    + "    #double space!\n"
+    + "    # text before tag 999 \n"
+    + "    # 7 55  ${S}\n\n"
+    + "*** Keywords ***\n"
+    + "my kw  # i think that TODO is needed here\n"
+    + "    log  8      #todo TODO" 
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+  
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Task Tags"
+with [get-window Preferences | get-control Any -after [get-label "Task Tags"] -index 9] {
+    get-property "getChildren().length" | equals 4 | verify-true
+    get-property "getChildren().Control[0].getText()" 
+        | equals "Strings indicating tasks in Robot code comments. Make sure that <a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.validation\">validation</a> is turned on since tasks are detected during build/validation process." 
+        | verify-true
+    get-property "getChildren().Control[1].getText()" | equals "Enable tasks detection" | verify-true
+    get-property "getChildren().Control[2].getItems().length" | equals 3 | verify-true
+    get-property "getChildren().Control[2].getItems().TableItem[0].getText()" | equals FIXME | verify-true
+    get-property "getChildren().Control[2].getItems().TableItem[1].getText()" | equals TODO | verify-true
+    get-property "getChildren().Control[2].getItems().TableItem[2].getText()" | equals "...add new tag" | verify-true
+    get-property "getChildren().Control[3].getChildren().length" | equals 2 | verify-true
+    get-property "getChildren().Control[3].getChildren().Control[0].getText()" | equals "Restore &Defaults" 
+        | verify-true
+    get-property "getChildren().Control[3].getChildren().Control[1].getText()" | equals "&Apply" | verify-true
+}
+get-window Preferences 
+    | get-link "Strings indicating tasks in Robot code comments. Make sure that <a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.validation\">validation</a> is turned on since tasks are detected during build/validation process." 
+    | click-link
+get-window Preferences | get-label "Errors/Warnings" | get-property caption | equals "Errors/Warnings" | verify-true
+get-window Preferences | get-tree | select "Robot Framework/Task Tags"
+with [get-window Preferences] {
+    with [get-button "Enable tasks detection"] {
+        get-property selected | equals false | verify-true
+        get-property kind | equals Check | verify-true
+    }
+    with [get-table] {
+        get-item -path FIXME | get-property "values['Priority']" | equals High | verify-true
+        get-item -path FIXME | get-property "values['Tag']" | equals FIXME | verify-true
+        get-item -path TODO | get-property "values['Priority']" | equals Normal | verify-true
+        get-item -path TODO | get-property "values['Tag']" | equals TODO | verify-true
+    }
+}
+
+get-window Preferences | get-button Cancel | click
+
+//check fix me if it is not colored
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "styles[4].text" | equals "#FIXME! after some time." | verify-true
+    get-property "styles[4].fontStyle" | equals normal | verify-true
+    get-property "styles[4].foregroundColor" | equals "#C0C0C0" | verify-true
+}   
+
+
+////remove all taks
+//get-preferences-menu | click
+//with [get-window Preferences] {
+//    get-button "Enable tasks detection" | check
+//    with [get-table] {
+//        select TODO | key-type Del
+//        select FIXME | key-type Del
+//    }
+//    get-button "Apply and Close" | click
+//}
+
+//go back to preference
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Task Tags"
+
+//check that no item is in table
+//with [get-window Preferences | get-table] {
+//    get-property "getItems().length" | equals 1 | verify-true
+//    get-property "getItems().TableItem[0].getText()" | equals "...add new tag" | verify-true
+//}
+
+//restore to default
+get-window Preferences | get-button "Restore Defaults" | click
+with [get-window Preferences] {
+    get-button "Enable tasks detection" | get-property selected | equals false | verify-true
+    get-table | get-property enablement | equals false | verify-true
+}
+
+get-window Preferences | get-button "Enable tasks detection" | check
+
+//add new tags
+add-new-tag -tag_name "MY_tag" -prio Low
+add-new-tag -tag_name "999" -prio Normal
+
+//wrong tags
+add-new-tag -tag_name "tag with space" -prio Normal
+
+//check that error is shown
+with [get-window Preferences | get-editbox -index 1] {
+    get-property text | equals "There are tags with invali...s or underscore characters" | verify-true
+    get-property "getToolTipText()" 
+        | equals "There are tags with invalid syntax. Tag should be only written using letters, digits or underscore characters" 
+        | verify-true
+}
+//check tha Apllay button is disabled
+get-window Preferences | get-button "Apply and Close" | get-property enablement | equals false | verify-true
+
+//remove wrong task
+get-window Preferences | get-table | select "tag with space" | key-type Del
+
+//no button is enabled
+with [get-window Preferences] {
+    get-label "Task Tags" | get-property caption | equals "Task Tags" | verify-true
+    get-button "Apply and Close" | get-property enablement | equals true | verify-true
+}
+
+get-window Preferences | get-button "Apply and Close" | click
+
+//open task view
+get-menu -path "Window/Show View/Other..." | click
+with [get-window "Show View"] {
+    get-editbox | set-text task
+    get-tree | select "General/Tasks" | double-click
+}
+
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
