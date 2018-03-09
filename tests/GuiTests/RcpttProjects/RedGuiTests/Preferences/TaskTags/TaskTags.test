@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pXnYICCSEeinqtYRmpba-Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/9/18 3:50 PM
+Save-Time: 3/9/18 5:29 PM
 Testcase-Type: ecl
 Verifications: _0n05ICOoEeicH9aAish9QQ,_6KrdsCOoEeicH9aAish9QQ
 
@@ -140,7 +140,6 @@ add-new-tag -tag_name "tag with space" -prio Normal
 
 //check that error is shown
 with [get-window Preferences | get-editbox -index 1] {
-    get-property text | equals "There are tags with invali...s or underscore characters" | verify-true
     get-property "getToolTipText()" 
         | equals "There are tags with invalid syntax. Tag should be only written using letters, digits or underscore characters" 
         | verify-true
