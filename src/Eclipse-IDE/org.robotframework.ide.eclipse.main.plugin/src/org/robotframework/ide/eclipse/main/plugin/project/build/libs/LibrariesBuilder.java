@@ -75,9 +75,11 @@ public class LibrariesBuilder {
                     }
                 } catch (final RobotEnvironmentException e) {
                     if (status == null) {
-                        status = new MultiStatus(RedPlugin.PLUGIN_ID, IStatus.ERROR, e.getMessage(), e);
+                        status = new MultiStatus(RedPlugin.PLUGIN_ID, IStatus.ERROR,
+                                "Problems occurred during library specification generation:\n", e);
                     } else {
-                        status.add(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e));
+                        status.add(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                                "Problems occurred during library specification generation:\n", e));
                     }
 
                     try {
@@ -227,7 +229,7 @@ public class LibrariesBuilder {
 
         configuration.getLibraries().stream().filter(lib -> lib.provideType() == LibraryType.PYTHON).forEach(lib -> {
             final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
-            
+
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
             if (!xmlSpecFile.exists()) {
                 generators.add(new PythonLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile));
