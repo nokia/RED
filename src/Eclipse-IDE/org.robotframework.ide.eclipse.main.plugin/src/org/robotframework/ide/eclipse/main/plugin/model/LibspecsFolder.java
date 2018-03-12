@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rf.ide.core.project.RobotProjectConfig;
 
 public class LibspecsFolder {
@@ -39,6 +40,8 @@ public class LibspecsFolder {
 
     public static LibspecsFolder createIfNeeded(final IProject project) throws CoreException {
         final LibspecsFolder libspecsFolder = get(project);
+
+        libspecsFolder.folder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
         if (!libspecsFolder.exists()) {
             libspecsFolder.folder.create(IResource.FORCE | IResource.DERIVED, true, null);
         }
