@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -207,6 +208,11 @@ public class RobotRuntimeEnvironment {
             }
         }
         return null;
+    }
+
+    public static File createTemporaryFile() throws IOException {
+        final Path tempDir = createTemporaryDirectory();
+        return File.createTempFile("red_", null, tempDir.toFile());
     }
 
     public static File createTemporaryFile(final String filename) throws IOException {
@@ -390,6 +396,15 @@ public class RobotRuntimeEnvironment {
                     .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdoc(outputFile.getAbsolutePath(), format, libName, libPath, additionalPaths);
         }
+    }
+
+    public String createHtmlDoc(final String doc, final DocFormat format) {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = executors
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            return executor.createHtmlDoc(doc, format);
+        }
+        return "";
     }
 
     public List<String> getStandardLibrariesNames() {
