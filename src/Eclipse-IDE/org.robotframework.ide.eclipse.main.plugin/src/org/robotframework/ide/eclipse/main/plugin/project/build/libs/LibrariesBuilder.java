@@ -173,7 +173,7 @@ public class LibrariesBuilder {
             final String fileName = LibraryDescriptor.ofStandardLibrary(stdLib).generateLibspecFileName();
 
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-            if (!xmlSpecFile.exists()
+            if (!fileExist(xmlSpecFile)
                     || !hasSameVersion(new File(xmlSpecFile.getLocationURI()), environment.getVersion())) {
                 // we always want to regenerate standard libraries when RF version have changed
                 // or libdoc does not exist
@@ -215,7 +215,7 @@ public class LibrariesBuilder {
                 final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
 
                 final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-                if (!xmlSpecFile.exists()) {
+                if (!fileExist(xmlSpecFile)) {
                     generators.add(new VirtualLibraryLibdocGenerator(libPath, xmlSpecFile));
                 }
             }
@@ -231,7 +231,7 @@ public class LibrariesBuilder {
             final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
 
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-            if (!xmlSpecFile.exists()) {
+            if (!fileExist(xmlSpecFile)) {
                 generators.add(new PythonLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile));
             }
         });
@@ -246,11 +246,15 @@ public class LibrariesBuilder {
             final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
 
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-            if (!xmlSpecFile.exists()) {
+            if (!fileExist(xmlSpecFile)) {
                 generators.add(new JavaLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile));
             }
         });
         return generators;
+    }
+
+    private static boolean fileExist(final IFile file) {
+        return file.exists() && file.getLocation().toFile().exists();
     }
 
     private static String toAbsolute(final String path) {
