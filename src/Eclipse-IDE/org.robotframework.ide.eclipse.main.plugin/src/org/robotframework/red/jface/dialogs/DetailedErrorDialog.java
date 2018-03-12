@@ -1,3 +1,8 @@
+/*
+* Copyright 2017 Nokia Solutions and Networks
+* Licensed under the Apache License, Version 2.0,
+* see license.txt file for details.
+*/
 package org.robotframework.red.jface.dialogs;
 
 import org.eclipse.core.runtime.IStatus;
