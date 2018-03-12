@@ -20,8 +20,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
@@ -138,14 +140,14 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             cmdLine.addAll(additionalPaths.getExtendedPythonPaths(interpreterType));
             cmdLine.addAll(additionalPaths.getClassPaths());
 
-            final byte[] decodedFileContent = runLibdoc(libName, cmdLine);
+            final byte[] decodedFileContent = runLibdoc(cmdLine);
             writeLibdocToFile(resultFilePath, decodedFileContent);
         } catch (final IOException e) {
             // simply libdoc will not be generated
         }
     }
 
-    private byte[] runLibdoc(final String libName, final List<String> cmdLine) throws IOException {
+    private byte[] runLibdoc(final List<String> cmdLine) throws IOException {
         final List<String> output = runExternalProcess(cmdLine);
 
         // when properly finished there is encoded file content in last line
@@ -159,6 +161,32 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             libdocFile.createNewFile();
         }
         Files.write(decodedFileContent, libdocFile);
+    }
+
+    @Override
+    public String createHtmlDoc(final String doc, final DocFormat format) {
+        File docFile = null;
+        try {
+            docFile = RobotRuntimeEnvironment.createTemporaryFile();
+        } catch (final IOException e) {
+            return "";
+        }
+
+        try {
+            Files.asCharSink(docFile, Charsets.UTF_8).write(doc);
+
+            final File scriptFile = RobotRuntimeEnvironment.createTemporaryFile("red_libraries.py");
+            final List<String> cmdLine = createCommandLine(scriptFile, new EnvironmentSearchPaths(), "-htmldoc",
+                    format.name(), docFile.getAbsolutePath());
+
+            final List<String> docLines = new ArrayList<>();
+            RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> docLines.add(line));
+            return String.join("\n", docLines);
+        } catch (final IOException e) {
+            return "";
+        } finally {
+            docFile.delete();
+        }
     }
 
     @Override

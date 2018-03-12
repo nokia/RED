@@ -50,6 +50,13 @@ def _encode_libdoc(temp_lib_file_path):
             return str(b64encode(bytes(lib_file.read(), 'utf-8')), 'utf-8')
 
 
+def create_html_doc(doc, format):
+    from robot.libdocpkg.htmlwriter import DocToHtml
+    
+    formatter = DocToHtml(format)
+    return formatter(doc)
+
+
 if __name__ == '__main__':
     import sys
     import json
@@ -65,3 +72,15 @@ if __name__ == '__main__':
 
         sys.path = paths + sys.path
         print(create_libdoc(libname, format))
+    elif sys.argv[1] == '-htmldoc':
+        format = sys.argv[2]
+        filepath = sys.argv[3]
+
+        if sys.version_info < (3, 0, 0):
+            with open(filepath, 'r') as lib_file:
+                doc = lib_file.read()
+                print(create_html_doc(doc, format))
+        else:
+            with open(temp_lib_file_path, 'r', encoding='utf-8') as lib_file:
+                doc = lib_file.read()
+                print(create_html_doc(doc, format))

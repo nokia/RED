@@ -42,6 +42,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -312,6 +313,15 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
             throw new RobotEnvironmentException(
                     "Unable to generate library specification file for library '" + libName + "'" + additional, e);
+        }
+    }
+
+    @Override
+    public String createHtmlDoc(final String doc, final DocFormat format) {
+        try {
+            return (String) callRpcFunction("createHtmlDoc", doc, format.name());
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 

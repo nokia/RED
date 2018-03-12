@@ -13,6 +13,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.rf.ide.core.libraries.Documentation.DocFormat;
+
 import com.google.common.base.Objects;
 
 @XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification")
@@ -85,6 +87,10 @@ public class KeywordSpecification {
                     && Pattern.compile("^\\*deprecated[^\\n\\r]*\\*.*").matcher(documentation.toLowerCase()).find());
         }
         return isDeprecated.booleanValue();
+    }
+
+    public Documentation createDocumentation() {
+        return new Documentation(DocFormat.valueOf(format), documentation);
     }
 
     @Override
