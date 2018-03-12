@@ -15,6 +15,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.rf.ide.core.libraries.Documentation.DocFormat;
+
 import com.google.common.base.Objects;
 
 @XmlRootElement(name = "keywordspec")
@@ -159,6 +161,10 @@ public class LibrarySpecification {
     @XmlTransient
     public void setIsModified(final boolean isModified) {
         this.isModified = isModified;
+    }
+
+    public Documentation createDocumentation() {
+        return new Documentation(DocFormat.valueOf(format), documentation);
     }
     
     public boolean equalsIgnoreKeywords(final Object obj) {
