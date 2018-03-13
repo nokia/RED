@@ -64,7 +64,7 @@ public class LibrariesBuilder {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
-            MultiStatus status = null;
+            MultiStatus multiStatus = null;
             for (final ILibdocGenerator generator : groupedGenerators.get(project)) {
                 monitor.subTask(generator.getMessage());
                 try {
@@ -74,25 +74,26 @@ public class LibrariesBuilder {
                                         .createEnvironmentSearchPaths(project));
                     }
                 } catch (final RobotEnvironmentException e) {
-                    if (status == null) {
-                        status = new MultiStatus(RedPlugin.PLUGIN_ID, IStatus.ERROR,
-                                "Problems occurred during library specification generation:\n", e);
+                    final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "\nProblem occurred during " + generator.getMessage() + ".", e);
+                    if (multiStatus == null) {
+                        multiStatus = new MultiStatus(RedPlugin.PLUGIN_ID, IStatus.ERROR, new Status[] { status },
+                                "Library specification generation problem", null);
                     } else {
-                        status.add(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                                "Problems occurred during library specification generation:\n", e));
+                        multiStatus.add(status);
                     }
 
                     try {
                         generator.getTargetFile().delete(true, new NullProgressMonitor());
                     } catch (final CoreException e1) {
-                        status.add(e1.getStatus());
+                        multiStatus.add(e1.getStatus());
                     }
                 }
                 monitor.worked(1);
             }
 
-            if (status != null) {
-                StatusManager.getManager().handle(status, StatusManager.BLOCK);
+            if (multiStatus != null) {
+                StatusManager.getManager().handle(multiStatus, StatusManager.BLOCK);
             }
         }
         monitor.done();
