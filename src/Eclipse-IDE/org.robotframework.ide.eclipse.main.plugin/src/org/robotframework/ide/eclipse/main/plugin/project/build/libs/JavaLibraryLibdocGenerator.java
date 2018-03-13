@@ -42,7 +42,7 @@ class JavaLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public String getMessage() {
-        return "generating libdoc for " + libName + " library contained in " + jarPath;
+        return "generating libdoc for '" + libName + "' library located at '" + jarPath + "'";
     }
 
     @Override
