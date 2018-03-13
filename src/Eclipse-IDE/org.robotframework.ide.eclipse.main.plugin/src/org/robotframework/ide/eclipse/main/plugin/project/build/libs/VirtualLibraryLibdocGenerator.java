@@ -56,7 +56,7 @@ class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public String getMessage() {
-        return "linking libdoc for workspace-external virutal library located at " + path.toOSString();
+        return "linking libdoc for workspace-external virtual library located at '" + path.toOSString() + "'";
     }
 
     @Override
