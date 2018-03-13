@@ -35,7 +35,7 @@ class StandardLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public String getMessage() {
-        return "generating libdoc for " + libName + " library";
+        return "generating libdoc for '" + libName + "' library";
     }
 
     @Override

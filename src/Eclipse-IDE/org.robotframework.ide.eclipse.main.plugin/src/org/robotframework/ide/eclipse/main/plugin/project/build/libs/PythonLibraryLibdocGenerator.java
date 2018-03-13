@@ -62,7 +62,7 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public String getMessage() {
-        return "generating libdoc for " + libName + " library contained in " + libPath;
+        return "generating libdoc for '" + libName + "' library located at '" + libPath + "'";
     }
 
     @Override
