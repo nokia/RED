@@ -1,9 +1,8 @@
-## Detecting tasks defined in comments
+## Detecting tasks/TODO defined in comments
 
 It is a common practice to put notes in comments describing some kind of tasks
 which needs to be done in future. RED offers possibility to detect such tasks
-and overview them in single place. Tasks detecting is disabled by default but
-can be turned on in preferences.
+and overview them in single place.
 
 Tasks detection is done during validation phase, so the validation itself has
 to be enabled too. Once everything is enabled RED will start reporting special
@@ -16,11 +15,15 @@ case
     Should Be Equal    1    2    # FIXME this assertion does not pass  
     ... 
 
+![](images/editor_tasks.png)  
+
 The detection is based on tags. When defined tag is found by RED inside the
 comment it will be reported as a **task**. By default there are two tags which
 RED recognizes: **TODO** and **FIXME** : the first one has normal priority
 while the latter is reported with high priority. The tags and their priorities
 can be specified in preferences.
+
+![](images/tasks.png)  
 
 Detected tasks are visible in RED in couple of places:
 
