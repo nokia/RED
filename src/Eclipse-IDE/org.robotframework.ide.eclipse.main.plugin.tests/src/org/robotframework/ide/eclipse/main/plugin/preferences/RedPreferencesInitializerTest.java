@@ -140,12 +140,12 @@ public class RedPreferencesInitializerTest {
     }
 
     @Test
-    public void byDefaultTasksAreTurnedOff() {
+    public void byDefaultTasksAreTurnedOn() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
-        verify(preferences).putBoolean(RedPreferences.TASKS_DETECTION_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.TASKS_DETECTION_ENABLED, true);
     }
 
     @Test
