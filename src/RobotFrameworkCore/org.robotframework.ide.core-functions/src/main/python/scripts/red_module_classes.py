@@ -35,7 +35,23 @@ def get_classes_from_module(module_location):
     else:
         raise Exception('Unrecognized library path: ' + module_location)
 
+    class_names.extend(_find_missing_names(class_names, module_name))
     return sorted(set(class_names))
+
+
+def _find_missing_names(names, module_name):
+    result = list()
+
+    if names != [module_name]:
+        module_names = module_name.split('.')[:-1]
+        if len(module_names) > 0:
+            for mod_index in range(len(module_names) - 1, -1, -1):
+                pre_index = '.'.join(module_names[mod_index:])
+                for get_index in range(0, len(names)):
+                    if not names[get_index].startswith(pre_index) and not pre_index + '.' + names[get_index] in result:
+                        result.append(pre_index + '.' + names[get_index])
+
+    return result
 
 
 def _try_to_find_names_in_module(module_name):
