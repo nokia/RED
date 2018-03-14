@@ -29,7 +29,7 @@
       * [Limiting validation scope](/user_guide/validation/scope.md)
       * [Configuring problems severity](/user_guide/validation/validation_preferences.md)
       * [Running validation in command line](/user_guide/validation/headless.md)
-      * [Tasks detecting](/user_guide/validation/tasks.md)
+      * [Tasks/TODO](/user_guide/validation/tasks.md)
     * [Launching Tests](/user_guide/launching.md)
       * [User interface](/user_guide/launching/ui_elements.md)
       * [Local launches](/user_guide/launching/local_launch.md)
