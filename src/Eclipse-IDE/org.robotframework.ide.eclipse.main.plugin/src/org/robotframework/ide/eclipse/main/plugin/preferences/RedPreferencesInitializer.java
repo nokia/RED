@@ -137,7 +137,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeTasksPreferences(final IEclipsePreferences preferences) {
-        preferences.putBoolean(RedPreferences.TASKS_DETECTION_ENABLED, false);
+        preferences.putBoolean(RedPreferences.TASKS_DETECTION_ENABLED, true);
         preferences.put(RedPreferences.TASKS_TAGS, "FIXME;TODO");
         preferences.put(RedPreferences.TASKS_PRIORITIES, Priority.HIGH.name() + ";" + Priority.NORMAL.name());
     }
