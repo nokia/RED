@@ -82,7 +82,8 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         result = get_classes_from_module(module_location)
 
-        self.assertEqual(result, ['CustomRobotClassName', 'CustomRobotClassName.CustomRobotClassName'])
+        self.assertEqual(result, ['CustomRobotClassName', 'CustomRobotClassName.CustomRobotClassName', 'robot.CustomRobotClassName',
+                                  'robot.CustomRobotClassName.CustomRobotClassName'])
 
     def test_retrieving_classes_from_module_with_relative_iports(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
