@@ -62,7 +62,7 @@ public class WithNameRuleTest {
         for (final RobotToken token : TokensSource.createTokens()) {
             final int positionInsideToken = new Random().nextInt(token.getText().length());
             final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, positionInsideToken,
-                    new ArrayList<IRobotLineElement>());
+                    new ArrayList<>());
 
             if (token.getText().equals("WITH NAME")) {
                 thereWasName = true;
