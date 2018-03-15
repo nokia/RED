@@ -1,0 +1,44 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: LibspecErrorProc
+Element-Type: context
+Element-Version: 2.0
+Id: _VwgyEChbEeiftdZfQXkTXA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/15/18 4:25 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "check-error-for-libspec" [val file_name] [val lib_name] [val path] [val problem]{
+	exec-with-options {
+	    get-editor $file_name | get-text-viewer | key-type "M1+s"
+	    get-window "Progress Information" | get-window "Problem Occurred" 
+	        | get-label "Library specification generation problem" | get-property caption 
+	        | equals "Library specification generation problem" | verify-true
+	        
+	    get-window "Progress Information" | get-window "Problem Occurred" | get-label "See 'Details' for more information." 
+	        | get-property caption | equals "See 'Details' for more information." | verify-true
+	        
+	    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+	    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
+	        -after [get-label "See 'Details' for more information."] | get-property text 
+	        | equals [format "Library specification generation problem\n\n"
+	        + "Problem occurred during generating libdoc for '%s' library located at '.*%s'.\n"
+	        + "RED python session problem. Following exception has been thrown by python service:\n"
+	        + "            %s\n"
+	        + "(.*\n)*"
+	        + "            \n"
+	        + "            Try --help for usage information.\n"
+	        + "            Traceback \(most recent call last\):\n"
+	        + "(.*\n)*"
+	        + "            Exception: Unable to generate library specification file for library: '%s'" $lib_name $path $problem $lib_name ]
+	        | verify-true
+	    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
+	} -allowStatusDialog
+}
+
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
