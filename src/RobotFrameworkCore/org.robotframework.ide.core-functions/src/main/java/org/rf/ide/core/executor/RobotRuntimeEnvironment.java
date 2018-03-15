@@ -561,30 +561,6 @@ public class RobotRuntimeEnvironment {
     }
 
     @SuppressWarnings("serial")
-    public static class RobotEnvironmentDetailedException extends RobotEnvironmentException {
-
-        private final String details;
-
-        public RobotEnvironmentDetailedException(final String details, final String reason) {
-            super(reason);
-            this.details = details;
-        }
-
-        public RobotEnvironmentDetailedException(final String details, final String reason, final Throwable cause) {
-            super(reason, cause);
-            this.details = details;
-        }
-
-        public String getReason() {
-            return getMessage();
-        }
-
-        public String getDetails() {
-            return details;
-        }
-    }
-
-    @SuppressWarnings("serial")
     public static class PythonInstallationDirectory extends File {
 
         private final SuiteExecutor interpreter;
