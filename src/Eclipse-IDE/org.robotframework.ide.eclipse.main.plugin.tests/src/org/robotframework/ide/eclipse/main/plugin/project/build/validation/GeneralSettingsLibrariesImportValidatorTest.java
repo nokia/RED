@@ -105,12 +105,41 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void markerIsReported_whenRemoteLibraryIsImportedWithoutArguments() {
+    public void markerIsReported_whenRemoteLibraryIsImportedWithoutArgumentsAndDefaultLocationIsNotInConfig() {
         validateLibraryImport("Remote");
 
-        assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.MISSING_ARGUMENT_FOR_REMOTE_LIBRARY_IMPORT,
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
                         new ProblemPosition(2, Range.closed(26, 32))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithoutArgumentsAndDefaultLocationIsInConfigButWithoutLibSpec() {
+        final RobotProjectConfig robotProjectConfig = robotProject.getRobotProjectConfig();
+        final RemoteLocation remoteLibrary = RemoteLocation.create("http://127.0.0.1:8270/RPC2/");
+        robotProjectConfig.addRemoteLocation(remoteLibrary);
+        validateLibraryImport("Remote");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(26, 32))));
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithoutArgumentsAndDefaultLocationIsInConfigWithLibSpec()
+            throws Exception {
+        final RemoteLocation remoteLibrary = RemoteLocation.create("http://127.0.0.1:8270/RPC2/");
+        final LibraryConstructor constructor = new LibraryConstructor();
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardRemoteLibrary(remoteLibrary);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
+        final Map<LibraryDescriptor, LibrarySpecification> libs = ImmutableMap.of(descriptor, spec);
+
+        final RobotProjectConfig robotProjectConfig = robotProject.getRobotProjectConfig();
+        robotProjectConfig.addRemoteLocation(remoteLibrary);
+
+        validateLibraryImport("Remote", libs, new HashMap<>());
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test

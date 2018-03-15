@@ -194,14 +194,14 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Unknown '%s' library under '%s' location";
+            return "Unknown 'Remote' library under '%s' location. Unable to connect";
         }
     },
     REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML {
 
         @Override
         public String getProblemDescription() {
-            return "'%s' library under '%s' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to "
+            return "'Remote' library under '%s' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to "
                     + RobotProjectConfig.FILENAME + " for proper validation";
         }
 
@@ -218,30 +218,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
             fixers.add(new AddRemoteLibraryToRedXmlFixer(path));
 
             return fixers;
-        }
-    },
-    MISSING_ARGUMENT_FOR_REMOTE_LIBRARY_IMPORT {
-
-        @Override
-        public String getProblemDescription() {
-            return "'%s' library import without argument";
-        }
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.MISSING_ARGUMENT_FOR_REMOTE_LIBRARY_IMPORT;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
-
-            return newArrayList(new AddLibraryToRedXmlFixer(name, false));
         }
     },
     NON_EXISTING_RESOURCE_IMPORT {

@@ -156,8 +156,9 @@ class ExternalLibrariesImportCollector {
                             libraryImporters.put(libImport, currentSuite);
                         }
                     } else if (arguments.isEmpty()) {
-                        final String remoteLibName = name + " " + RemoteLocation.DEFAULT_ADDRESS;
-                        final URI uriAddress = URI.create(RemoteLocation.DEFAULT_ADDRESS);
+                        final String remoteLibName = RemoteLocation.createRemoteName(RemoteLocation.DEFAULT_ADDRESS);
+                        final URI uriAddress = URI
+                                .create(RemoteLocation.createRemoteUri(RemoteLocation.DEFAULT_ADDRESS));
                         final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName,
                                 uriAddress);
                         if (!libraryImports.contains(libImport)) {

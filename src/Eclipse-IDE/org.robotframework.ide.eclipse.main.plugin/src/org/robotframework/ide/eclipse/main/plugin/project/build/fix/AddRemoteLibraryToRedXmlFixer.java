@@ -80,7 +80,7 @@ public class AddRemoteLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution 
 
         @Override
         public Image getImage() {
-            return ImagesManager.getImage(RedImages.getMagnifierImage());
+            return ImagesManager.getImage(RedImages.getLibraryImage());
         }
     }
 }
