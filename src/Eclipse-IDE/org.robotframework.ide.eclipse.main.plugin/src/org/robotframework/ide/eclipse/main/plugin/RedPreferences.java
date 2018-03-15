@@ -279,7 +279,7 @@ public class RedPreferences {
     public boolean shouldDebuggerOmitLibraryKeywords() {
         return store.getBoolean(DEBUGGER_OMIT_LIB_KEYWORDS);
     }
-    
+
     public boolean isValidationTurnedOff() {
         return store.getBoolean(TURN_OFF_VALIDATION);
     }
@@ -294,11 +294,11 @@ public class RedPreferences {
 
         final Stream<String> tags = taskTags.isEmpty() ? Stream.empty()
                 : Splitter.on(";").splitToList(taskTags).stream();
-        final Stream<String> priorites = taskPriorities.isEmpty() ? Stream.empty()
+        final Stream<String> priorities = taskPriorities.isEmpty() ? Stream.empty()
                 : Splitter.on(";").splitToList(taskPriorities).stream();
-        
+
         final Map<String, Priority> mapping = new LinkedHashMap<>();
-        Streams.forEachPair(tags, priorites, (tag, priority) -> {
+        Streams.forEachPair(tags, priorities, (tag, priority) -> {
             mapping.put(tag, Priority.valueOf(priority));
         });
         return mapping;
@@ -378,8 +378,8 @@ public class RedPreferences {
 
         public static ColoringPreference fromPreferenceString(final String coloringValue) {
             final String[] rgbWithStyle = coloringValue.split(",");
-            return new ColoringPreference(new RGB(Integer.valueOf(rgbWithStyle[0]), Integer.valueOf(rgbWithStyle[1]),
-                    Integer.valueOf(rgbWithStyle[2])), Integer.valueOf(rgbWithStyle[3]));
+            return new ColoringPreference(new RGB(Integer.parseInt(rgbWithStyle[0]), Integer.parseInt(rgbWithStyle[1]),
+                    Integer.parseInt(rgbWithStyle[2])), Integer.parseInt(rgbWithStyle[3]));
         }
 
         private final RGB color;

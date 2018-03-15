@@ -72,7 +72,7 @@ public class EndOfLineBuilder {
         if (constant.size() == 1) {
             final Constant myEol = constant.get(0);
             if (myEol == Constant.CR) {
-                eol = new CarritageReturnEndOfLine(startOffset, lineNumber, startColumn);
+                eol = new CarriageReturnEndOfLine(startOffset, lineNumber, startColumn);
             } else if (myEol == Constant.LF) {
                 eol = new LineFeedEndOfLine(startOffset, lineNumber, startColumn);
             } else if (myEol == Constant.EOF) {
@@ -125,9 +125,9 @@ public class EndOfLineBuilder {
 
     }
 
-    private static class CarritageReturnEndOfLine extends AEndOfLine {
+    private static class CarriageReturnEndOfLine extends AEndOfLine {
 
-        public CarritageReturnEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
+        public CarriageReturnEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.CR, startOffset, lineNumber, startColumn);
         }
 
@@ -217,7 +217,7 @@ public class EndOfLineBuilder {
         public VersionAvailabilityInfo getVersionInformation() {
             VersionAvailabilityInfo var = null;
             if (!types.isEmpty()) {
-                var = types.get(0).findVersionAvailablilityInfo(getRaw());
+                var = types.get(0).findVersionAvailabilityInfo(getRaw());
             }
 
             return var;
@@ -296,7 +296,7 @@ public class EndOfLineBuilder {
         }
 
         @Override
-        public VersionAvailabilityInfo findVersionAvailablilityInfo(final String text) {
+        public VersionAvailabilityInfo findVersionAvailabilityInfo(final String text) {
             VersionAvailabilityInfo vaiResult = null;
             for (final VersionAvailabilityInfo vai : representation) {
                 if (vai.getRepresentation().equals(text)) {

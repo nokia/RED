@@ -38,8 +38,7 @@ public class VariableUsageRuleTest {
     public void nothingIsDetected_whenThereIsNoVariableUsage() {
         final RobotToken token = RobotToken.create("${variable}");
 
-        final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0,
-                new ArrayList<IRobotLineElement>());
+        final Optional<PositionedTextToken> evaluatedToken = evaluate(token);
         assertThat(evaluatedToken).isNotPresent();
     }
 
@@ -47,7 +46,7 @@ public class VariableUsageRuleTest {
     public void variableUsageIsDetected_forSimpleVariable() {
         final RobotToken token = createToken("${variable}");
 
-        final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0, new ArrayList<IRobotLineElement>());
+        final Optional<PositionedTextToken> evaluatedToken = evaluate(token);
 
         assertThat(evaluatedToken).isPresent();
         assertThat(evaluatedToken.get().getPosition())
@@ -72,8 +71,7 @@ public class VariableUsageRuleTest {
 
         for (final Position position : varPositions) {
             for (int i = position.getOffset(); i < position.getLength(); i++) {
-                final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, i,
-                        new ArrayList<IRobotLineElement>());
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, i);
                 assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
@@ -99,8 +97,7 @@ public class VariableUsageRuleTest {
 
         for (final Position position : varPositions) {
             for (int i = position.getOffset(); i < position.getLength(); i++) {
-                final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, i,
-                        new ArrayList<IRobotLineElement>());
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, i);
                 assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
                 assertThat(evaluatedToken.get().getToken()).isSameAs(ISyntaxColouringRule.DEFAULT_TOKEN);
@@ -116,4 +113,11 @@ public class VariableUsageRuleTest {
         return token;
     }
 
+    private Optional<PositionedTextToken> evaluate(final RobotToken token) {
+        return evaluate(token, 0);
+    }
+
+    private Optional<PositionedTextToken> evaluate(final RobotToken token, final int position) {
+        return testedRule.evaluate(token, position, new ArrayList<>());
+    }
 }
