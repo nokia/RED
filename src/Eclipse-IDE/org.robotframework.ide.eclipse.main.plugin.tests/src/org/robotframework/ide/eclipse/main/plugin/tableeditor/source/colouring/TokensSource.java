@@ -22,8 +22,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
-import com.google.common.base.Function;
-
 public class TokensSource {
 
     static List<RobotToken> createTokens() {
@@ -112,16 +110,6 @@ public class TokensSource {
         }
         line.setEndOfLine(newArrayList(Constant.LF), firstOffset + currentColumn, currentColumn);
         return line;
-    }
-
-    static Function<IRobotLineElement, String> toTokenContents() {
-        return new Function<IRobotLineElement, String>() {
-
-            @Override
-            public String apply(final IRobotLineElement element) {
-                return element.getText();
-            }
-        };
     }
 
     static class LineElement implements IRobotLineElement {

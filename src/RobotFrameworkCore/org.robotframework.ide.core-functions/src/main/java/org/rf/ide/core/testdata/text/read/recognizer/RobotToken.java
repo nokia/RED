@@ -196,7 +196,7 @@ public class RobotToken implements IRobotLineElement, Serializable {
     public VersionAvailabilityInfo getVersionInformation() {
         VersionAvailabilityInfo vai = null;
         if (types != null && !types.isEmpty()) {
-            vai = types.get(0).findVersionAvailablilityInfo(getRaw());
+            vai = types.get(0).findVersionAvailabilityInfo(getRaw());
         }
         return vai;
     }
