@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qngh8HH3Eee3fMF6qScr4Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/15/18 5:33 PM
+Save-Time: 3/15/18 5:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -77,6 +77,10 @@ with [get-window -class ContentProposalPopup | get-table] {
     get-property "getItems().TableItem[0].getText()" | equals "[Documentation]" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "[Setup]" | verify-true
 }
+
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1| key-type "TRAVERSE_ESCAPE"
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M3+g"
 
 //select teardown
 with [get-window -class ContentProposalPopup | get-table] {
