@@ -1,19 +1,45 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _hArNQOVGEeWkVpqnVhTYmg
+Contexts: _VwgyEChbEeiftdZfQXkTXA,_hArNQOVGEeWkVpqnVhTYmg
 Element-Name: AutomaticReloadLibspec
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/15/17 1:44 PM
+Save-Time: 3/15/18 4:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+//proc "check-error-for-libspec" [val lib_name]{
+//	exec-with-options {
+//	    get-editor "here_is_class.py" | get-text-viewer | key-type "M1+s"
+//	    get-window "Progress Information" | get-window "Problem Occurred" 
+//	        | get-label "Library specification generation problem" | get-property caption 
+//	        | equals "Library specification generation problem" | verify-true
+//	        
+//	    get-window "Progress Information" | get-window "Problem Occurred" | get-label "See 'Details' for more information." 
+//	        | get-property caption | equals "See 'Details' for more information." | verify-true
+//	        
+//	    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+//	    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
+//	        -after [get-label "See 'Details' for more information."] | get-property text 
+//	        | equals [format "Library specification generation problem\n\n"
+//	        + "Problem occurred during generating libdoc for 'here_is_class.Dog' library located at '.*NewProject'.\n"
+//	        + "RED python session problem. Following exception has been thrown by python service:\n"
+//	        + "            Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'.\n"
+//	        + "            \n"
+//	        + "            Try --help for usage information.\n"
+//	        + "            Traceback \(most recent call last\):\n"
+//	        + "(.*\n)*"
+//	        + "            Exception: Unable to generate library specification file for library: '%s'"  $lib_name ]
+//	        | verify-true
+//	    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
+//	} -allowStatusDialog
+//}
 // open red.xml
 with [get-view "Project Explorer" | get-tree] {
     select NewProject | double-click
@@ -151,19 +177,7 @@ with [get-editor "here_is_class.py" | get-text-viewer] {
 
 }
 
-exec-with-options {
-    get-editor "here_is_class.py" | get-text-viewer | key-type "M1+s"
-    get-window "Problem Occurred" 
-        | get-label "Unable to generate library specification file for library 'here_is_class.Dog'" 
-        | get-property caption | equals "Unable to generate library specification file for library 'here_is_class.Dog'" 
-        | verify-true
-    get-window "Problem Occurred" | get-button "Details >>" | click
-    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
-        | get-property text | equals "Unable to generate library specification file for library 'here_is_class.Dog'\n"
-        + "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'.\n\n"
-        + "Try --help for usage information." | verify-true
-    get-window "Problem Occurred" | get-button OK | click
-} -allowStatusDialog
+check-error-for-libspec -lib_name  "here_is_class.Dog" -path "NewProject" -file_name "here_is_class.py" -problem "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'."
 
 with [get-editor "here_is_class.py" | get-text-viewer] {
     set-caret-pos 12 22
@@ -175,24 +189,12 @@ with [get-editor "here_is_class.py" | get-text-viewer] {
     set-caret-pos 13 9
     type-text " "
 }
-exec-with-options {
-    get-editor "here_is_class.py" | get-text-viewer | key-type "M1+s"
-    get-window "Problem Occurred" 
-        | get-label "Unable to generate library specification file for library 'here_is_class.Dog'" 
-        | get-property caption | equals "Unable to generate library specification file for library 'here_is_class.Dog'" 
-        | verify-true
-    get-window "Problem Occurred" | get-button "Details >>" | click
-    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
-        | get-property text | equals "Unable to generate library specification file for library 'here_is_class.Dog'\n"
-        + "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'.\n\n"
-        + "Try --help for usage information." | verify-true
-    get-window "Problem Occurred" | get-button OK | click
-} -allowStatusDialog
+check-error-for-libspec -lib_name  "here_is_class.Dog" -path "NewProject" -file_name "here_is_class.py" -problem "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'."
 
 
 //check that libery is not-accesible
 get-view "Project Explorer" | get-tree 
-    | get-item "NewProject/Robot Referenced libraries/here_is_class.Dog \\(non-accessible\\)" | get-property index 
+    | get-item "NewProject/Robot Referenced libraries/here_is_class.Dog NewProject \\(non-accessible\\)"  | get-property index 
     | equals 0 | verify-true
     
 // revert to class name Dog 
@@ -293,15 +295,10 @@ with [get-editor "MainClass.py" | get-text-viewer] {
     set-caret-pos 11 20
     key-type "NUMPAD_ENTER" "\\u000D"
 }
+
+
 get-editor "MainClass.py" | get-text-viewer | set-caret-pos 12 7
-exec-with-options {
-    get-editor "MainClass.py" | get-text-viewer | key-type "M1+s"
-    get-window "Problem Occurred" | get-label "Unable to generate library specification file for library 'MainClass'" 
-        | get-property caption | equals "Unable to generate library specification file for library 'MainClass'" 
-        | verify-true
-    get-window "Problem Occurred" | get-button "Details >>" | click
-    get-window "Problem Occurred" | get-button OK | click
-} -allowStatusDialog
+check-error-for-libspec -lib_name  "MainClass" -path "imports" -file_name "MainClass.py" -problem "Importing test library 'MainClass' failed: ImportError: cannot import name SimpleClass"
 
 
 
