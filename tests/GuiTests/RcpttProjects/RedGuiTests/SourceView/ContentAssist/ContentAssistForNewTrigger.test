@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qngh8HH3Eee3fMF6qScr4Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/16/18 10:11 AM
+Save-Time: 3/16/18 5:50 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -84,6 +84,7 @@ with [get-window -class ContentProposalPopup | get-table] {
 with [get-editbox -after [get-label "Test Cases"] -index 1] {
         key-type "TRAVERSE_ESCAPE"
         key-type "M3+g"
+        wait 300
 		key-type Down -times 3       
         key-type Enter
     }
