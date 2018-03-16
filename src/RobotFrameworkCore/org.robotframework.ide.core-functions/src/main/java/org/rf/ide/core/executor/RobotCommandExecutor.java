@@ -37,7 +37,7 @@ interface RobotCommandExecutor {
             EnvironmentSearchPaths additionalPaths);
 
     void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean recursiveInVirtualenv,
-            List<String> excludedPaths);
+            List<String> excludedPaths, EnvironmentSearchPaths additionalPaths);
 
     void startKeywordAutoDiscovering(int port, File dataSource, EnvironmentSearchPaths additionalPaths);
 
