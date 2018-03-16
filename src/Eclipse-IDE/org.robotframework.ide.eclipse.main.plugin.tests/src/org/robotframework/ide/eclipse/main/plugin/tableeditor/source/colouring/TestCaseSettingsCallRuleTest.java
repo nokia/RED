@@ -79,6 +79,6 @@ public class TestCaseSettingsCallRuleTest {
     }
 
     private Optional<PositionedTextToken> evaluate(final RobotToken token, final int position) {
-        return testedRule.evaluate(token, position, new ArrayList<IRobotLineElement>());
+        return testedRule.evaluate(token, position, new ArrayList<>());
     }
 }
