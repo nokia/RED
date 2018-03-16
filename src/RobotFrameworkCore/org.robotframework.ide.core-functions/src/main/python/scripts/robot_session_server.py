@@ -201,7 +201,7 @@ def get_robot_version():
 @encode_result_or_exception
 @logargs
 def start_library_auto_discovering(port, data_source_path, project_location_path, recursiveInVirtualenv,
-                                   excluded_paths):
+                                   excluded_paths, python_paths, class_paths):
     import subprocess
     import os
 
@@ -211,7 +211,10 @@ def start_library_auto_discovering(port, data_source_path, project_location_path
     command.append(__encode_unicode_if_needed(data_source_path))
     command.append(__encode_unicode_if_needed(project_location_path))
     command.append(str(recursiveInVirtualenv))
-    command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
+    if excluded_paths:
+        command.append('-excluded')
+        command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
+    command.append(';'.join(__encode_unicode_if_needed(python_paths + class_paths)))
 
     RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
 
@@ -227,7 +230,7 @@ def start_keyword_auto_discovering(port, data_source_path, python_paths, class_p
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_keyword_autodiscover.py'))
     command.append(str(port))
     command.append(__encode_unicode_if_needed(data_source_path))
-    command.append(';'.join(__encode_unicode_if_needed(python_paths + class_paths)))    
+    command.append(';'.join(__encode_unicode_if_needed(python_paths + class_paths)))
 
     RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
 
