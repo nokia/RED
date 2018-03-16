@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: https://jira3.int.net.nokia.com/projects/RED/issues/RED-1060
 Id: _aCLYsB0wEeirJIfaEnmyJw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/5/18 4:36 PM
+Save-Time: 3/16/18 11:46 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -33,6 +33,16 @@ get-editor "Lib/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" 
 set-dialog-result File "platform:/resource/Lib/libraries/moduleLib/newlib.py"
 exec-with-options {
     get-editor "Lib/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+    
+    //I cannot get by RCPPT to table - verification made by children
+	 with [get-window "Select library class" | get-control Any -index 1] {
+	    get-property "getChildren().Control[2].getTabList().Control[0].getItems().length" | equals 2 | verify-true
+	    get-property "getChildren().Control[2].getTabList().Control[0].getItems().TableItem[0].getText()" 
+	        | equals "moduleLib.newlib" | verify-true
+	    get-property "getChildren().Control[2].getTabList().Control[0].getItems().TableItem[1].getText()" | equals newlib 
+	        | verify-true
+	}
+	get-window "Select library class" | get-button OK | click
 } -allowStatusDialog
 
 
@@ -45,6 +55,20 @@ with [get-window "Select library class"] {
 
 get-editor "Lib/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
 
+//check libspecs
 get-view "Project Explorer" | get-tree | get-item -path "Lib/Robot Referenced libraries" | get-property childCount 
     | equals 2 | verify-true
+
+//first doesn't have children
+get-view "Project Explorer" | get-tree | get-item 
+    -path "Lib/Robot Referenced libraries/moduleLib.api Lib\\/libraries \\(0\\)" | get-property childCount | equals 0 
+    | verify-true
+    
+//one kw    
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries\\/moduleLib \\(1\\)" 
+        | get-property "getItems().length" | equals 1 | verify-true
+    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries\\/moduleLib \\(1\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals Keyword | verify-true
+}    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
