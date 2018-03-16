@@ -631,7 +631,7 @@ public enum RobotTokenType implements IRobotTokenType {
     }
 
     @Override
-    public VersionAvailabilityInfo findVersionAvailablilityInfo(final String text) {
+    public VersionAvailabilityInfo findVersionAvailabilityInfo(final String text) {
         VersionAvailabilityInfo vaiResult = null;
         for (final VersionAvailabilityInfo vInfo : representation) {
             if (vInfo.getRepresentation().equalsIgnoreCase(text)) {

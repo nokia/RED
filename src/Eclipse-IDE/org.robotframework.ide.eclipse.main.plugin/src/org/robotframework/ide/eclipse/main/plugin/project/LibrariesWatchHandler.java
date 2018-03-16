@@ -31,7 +31,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -44,7 +43,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
-import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -230,14 +228,9 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             try {
                 new ProgressMonitorDialog(shell).run(true, true, monitor -> handleRebuildTask(monitor, newRebuildTask));
             } catch (InvocationTargetException | InterruptedException e) {
-                if (e.getCause() instanceof RobotEnvironmentDetailedException) {
-                    final RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
-                    DetailedErrorDialog.openErrorDialog(exc.getReason(), exc.getDetails());
-                } else {
-                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "Problems occurred during library specification generation:\n" + e.getCause().getMessage(),
-                            e.getCause()), StatusManager.SHOW);
-                }
+                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                        "Problems occurred during library specification generation:\n" + e.getCause().getMessage(),
+                        e.getCause()), StatusManager.SHOW);
             }
         } else {
             rebuildTasksQueue.add(newRebuildTask);

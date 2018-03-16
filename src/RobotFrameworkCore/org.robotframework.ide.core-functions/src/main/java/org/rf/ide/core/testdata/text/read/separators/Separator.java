@@ -68,7 +68,7 @@ public class Separator implements IRobotLineElement {
         }
 
         @Override
-        public VersionAvailabilityInfo findVersionAvailablilityInfo(final String text) {
+        public VersionAvailabilityInfo findVersionAvailabilityInfo(final String text) {
             VersionAvailabilityInfo vaiResult = null;
             for (final VersionAvailabilityInfo vInfo : representation) {
                 if (vInfo.getRepresentation().equals(text)) {
@@ -190,7 +190,7 @@ public class Separator implements IRobotLineElement {
 
         Separator separator = null;
         for (final SeparatorType sep : SeparatorType.values()) {
-            final VersionAvailabilityInfo info = sep.findVersionAvailablilityInfo(toCheck);
+            final VersionAvailabilityInfo info = sep.findVersionAvailabilityInfo(toCheck);
 
             if (info != null) {
                 separator = new Separator();
