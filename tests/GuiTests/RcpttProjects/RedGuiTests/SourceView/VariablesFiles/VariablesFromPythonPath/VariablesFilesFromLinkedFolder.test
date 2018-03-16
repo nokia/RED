@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _wEuMwKzfEea8FqgKy4fLvA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/30/18 12:15 PM
+Save-Time: 3/16/18 12:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -80,6 +80,7 @@ replace -input $user_folder -old "\\" -new "/" | let [val user_folder_unix_style
 	with [get-view Problems] {
 	    click
 	}
+	wait-for-warnings -amount 3 -times 6 -delay 500
 	with [get-view Problems | get-tree] {
 	    get-item -path "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[0].getText()" 
 	        | equals  [format "Path '%s/external_variables/external/file_in_linked_folder/linked_vars.py' is absolute. It is preferred to use relative paths" $user_folder_unix_style]
