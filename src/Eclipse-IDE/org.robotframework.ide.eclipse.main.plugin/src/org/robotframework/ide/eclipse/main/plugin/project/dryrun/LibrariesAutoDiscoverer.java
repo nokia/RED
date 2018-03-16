@@ -136,9 +136,11 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 .stream()
                 .map(ExcludedFolderPath::getPath)
                 .collect(toList());
+        final EnvironmentSearchPaths additionalPaths = new EnvironmentSearchPaths(robotProject.getClasspath(),
+                robotProject.getPythonpath());
 
         robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSource, projectLocation,
-                recursiveInVirtualenv, excludedPaths);
+                recursiveInVirtualenv, excludedPaths, additionalPaths);
     }
 
     void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> collection) {
@@ -176,7 +178,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         List<RobotDryRunLibraryImport> getLibraryImportsToAdd(final List<RobotDryRunLibraryImport> libraryImports) {
-            final Set<String> existingReferancedLibraryNames = config.getLibraries()
+            final Set<String> existingReferencedLibraryNames = config.getLibraries()
                     .stream()
                     .map(ReferencedLibrary::getName)
                     .collect(toSet());
@@ -184,7 +186,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     .stream()
                     .map(RemoteLocation::getRemoteName)
                     .collect(toSet());
-            final Set<String> existingLibraryNames = Sets.union(existingReferancedLibraryNames,
+            final Set<String> existingLibraryNames = Sets.union(existingReferencedLibraryNames,
                     existingRemoteLibraryNames);
 
             final List<RobotDryRunLibraryImport> result = new ArrayList<>();
