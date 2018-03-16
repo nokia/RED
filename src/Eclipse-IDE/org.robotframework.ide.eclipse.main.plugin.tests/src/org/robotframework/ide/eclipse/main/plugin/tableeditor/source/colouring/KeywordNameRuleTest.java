@@ -94,8 +94,7 @@ public class KeywordNameRuleTest {
 
         for (final Position position : varPositions) {
             for (int i = position.getOffset(); i < position.getLength(); i++) {
-                final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, i,
-                        new ArrayList<IRobotLineElement>());
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, i);
                 assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("var_token");
@@ -121,8 +120,7 @@ public class KeywordNameRuleTest {
 
         for (final Position position : varPositions) {
             for (int i = position.getOffset(); i < position.getLength(); i++) {
-                final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, i,
-                        new ArrayList<IRobotLineElement>());
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, i);
                 assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("name_token");
@@ -144,6 +142,6 @@ public class KeywordNameRuleTest {
     }
 
     private Optional<PositionedTextToken> evaluate(final RobotToken token, final int position) {
-        return testedRule.evaluate(token, position, new ArrayList<IRobotLineElement>());
+        return testedRule.evaluate(token, position, new ArrayList<>());
     }
 }

@@ -7,14 +7,11 @@ package org.rf.ide.core.testdata.text.read;
 
 import java.util.List;
 
-
 public interface IRobotTokenType {
 
     List<String> getRepresentation();
 
-
     List<VersionAvailabilityInfo> getVersionAvailabilityInfos();
 
-
-    VersionAvailabilityInfo findVersionAvailablilityInfo(final String text);
+    VersionAvailabilityInfo findVersionAvailabilityInfo(final String text);
 }
