@@ -29,6 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -37,8 +38,10 @@ import org.robotframework.red.junit.ProjectProvider;
 @RunWith(MockitoJUnitRunner.class)
 public class SimpleLibrariesAutoDiscovererTest {
 
+    private static final String PROJECT_NAME = SimpleLibrariesAutoDiscovererTest.class.getSimpleName();
+
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SimpleLibrariesAutoDiscovererTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Mock
     private Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler;
@@ -55,6 +58,10 @@ public class SimpleLibrariesAutoDiscovererTest {
         projectProvider.createFile("ErrorLib.py", "error():");
         projectProvider.createDir("excluded");
         projectProvider.createFile("excluded/ExcludedLib.py", "def kw():", " pass");
+        projectProvider.createDir("python_path");
+        projectProvider.createDir("python_path/module");
+        projectProvider.createFile("python_path/module/__init__.py");
+        projectProvider.createFile("python_path/module/ModuleLib.py", "def kw():", " pass");
 
         // this should not be found in any case
         projectProvider.createFile("notUsedLib.py", "def kw():", " pass");
@@ -89,7 +96,7 @@ public class SimpleLibrariesAutoDiscovererTest {
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(
-                ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLib", projectProvider.getProject().getName()));
+                ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLib", PROJECT_NAME));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLib",
                 projectProvider.getFile("CorrectLib.py"), newHashSet(suite.getFile())))));
@@ -108,10 +115,33 @@ public class SimpleLibrariesAutoDiscovererTest {
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(ReferencedLibrary
-                .create(LibraryType.PYTHON, "CorrectLibWithClasses.ClassB", projectProvider.getProject().getName()));
+                .create(LibraryType.PYTHON, "CorrectLibWithClasses.ClassB", PROJECT_NAME));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLibWithClasses.ClassB",
                 projectProvider.getFile("CorrectLibWithClasses.py"), newHashSet(suite.getFile())))));
+        verifyNoMoreInteractions(summaryHandler);
+    }
+
+    @Test
+    public void libsAreAddedToProjectConfig_whenExistingLibFromModuleFromPythonPathIsFoundByQualifiedName()
+            throws Exception {
+        final String pythonPath = projectProvider.getDir("python_path").getLocation().toFile().getAbsolutePath();
+        robotProject.getRobotProjectConfig().addPythonPath(SearchPath.create(pythonPath));
+
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  module.ModuleLib",
+                "*** Test Cases ***"));
+
+        final SimpleLibrariesAutoDiscoverer discoverer = new SimpleLibrariesAutoDiscoverer(robotProject, suite,
+                "module.ModuleLib", summaryHandler);
+        discoverer.start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(ReferencedLibrary
+                .create(LibraryType.PYTHON, "module.ModuleLib", PROJECT_NAME + "/python_path/module"));
+
+        verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "module.ModuleLib",
+                projectProvider.getFile("python_path/module/ModuleLib.py"), newHashSet(suite.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }
 

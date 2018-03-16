@@ -78,13 +78,23 @@ if __name__ == '__main__':
     data_source_path = sys.argv[2]
     project_location_path = sys.argv[3]
     recursiveInVirtualenv = sys.argv[4]
-    excluded_paths = sys.argv[5].split(';') if len(sys.argv) > 5 else []
+    excluded_paths = []
+    additional_paths = []
+
+    if len(sys.argv) > 5:
+        if sys.argv[5] == '-excluded':
+            excluded_paths = sys.argv[6].split(';')
+            if len(sys.argv) > 7:
+                additional_paths = sys.argv[7].split(';')
+        else:
+            additional_paths = sys.argv[5].split(';')
 
     start_path = __decode_unicode_if_needed(project_location_path)
     recursive = not _is_virtualenv() or recursiveInVirtualenv
     excluded_paths = __decode_unicode_if_needed(excluded_paths)
     python_paths, class_paths = _collect_source_paths(start_path, recursive, excluded_paths)
 
+    sys.path.extend(__decode_unicode_if_needed(additional_paths))
     sys.path.extend(python_paths + class_paths)
     if 'Jython' in platform.python_implementation():
         for class_path in class_paths:
@@ -92,4 +102,4 @@ if __name__ == '__main__':
             cp_updater = ClassPathUpdater()
             cp_updater.add_file(class_path)
 
-    start_auto_discovering(port, data_source_path)
+    start_auto_discovering(port, __decode_unicode_if_needed(data_source_path))
