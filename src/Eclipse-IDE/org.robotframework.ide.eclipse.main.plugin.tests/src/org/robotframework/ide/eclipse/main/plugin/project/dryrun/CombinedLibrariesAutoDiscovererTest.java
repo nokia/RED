@@ -368,7 +368,7 @@ public class CombinedLibrariesAutoDiscovererTest {
     }
 
     @Test
-    public void remoteLibsAreAddedToProjectConfig_whenAdressIsWithOrWithoutSlash() throws Exception {
+    public void remoteLibsAreAddedToProjectConfig_whenAddressIsWithOrWithoutSlash() throws Exception {
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
                 "*** Settings ***", "Library  Remote  http://127.0.0.1:9000", "*** Test Cases ***"));
         final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("suite2.robot",
