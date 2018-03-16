@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _bWrqQPbgEeeAutaDcoLQIQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/16/18 2:25 PM
+Save-Time: 3/16/18 4:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,12 +20,18 @@ get-view "Project Explorer" | get-tree | select "normal_name"
 
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
-    verify-error {get-window "Problem Occurred"}
+    try -command{
+    	get-window "Problem Occurred" | get-button "Details >>" | click
+    }-catch{
+    }-finally{    
+    	verify-error {get-window "Problem Occurred"}
+    } 	
 } -allowStatusDialog
 
 get-view "Project Explorer" | get-tree | select "żółć"
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+    try 
     verify-error {get-window "Problem Occurred"}
 } -allowStatusDialog
 
