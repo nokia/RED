@@ -17,7 +17,7 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 
 class VariableMappingsResolver {
 
-    private static final Pattern SCALAR_PATTERN = Pattern.compile("\\$\\{[^\\$\\{}]+}");
+    private static final Pattern MAPPING_PATTERN = Pattern.compile("[\\$%]\\{[^\\$\\{}]+}");
 
     static Map<String, String> resolve(final List<VariableMapping> variableMappings,
             final File projectLocation) {
@@ -31,22 +31,22 @@ class VariableMappingsResolver {
         }
 
         for (final VariableMapping mapping : variableMappings) {
-            if (isScalarDefinition(mapping.getName())) {
+            if (isValidDefinition(mapping)) {
                 final String unifiedName = VariableNamesSupport.extractUnifiedVariableName(mapping.getName());
-                final String resolvedValue = replaceKnownScalarVariables(mapping.getValue(), resolvedMappings);
+                final String resolvedValue = replaceKnownVariables(mapping.getValue(), resolvedMappings);
                 resolvedMappings.put(unifiedName, resolvedValue);
             }
         }
         return resolvedMappings;
     }
 
-    private static boolean isScalarDefinition(final String name) {
-        return Pattern.matches("^" + SCALAR_PATTERN.pattern() + "$", name);
+    public static boolean isValidDefinition(final VariableMapping mapping) {
+        return Pattern.matches("^" + MAPPING_PATTERN.pattern() + "$", mapping.getName());
     }
 
-    private static String replaceKnownScalarVariables(final String value, final Map<String, String> resolvedVariables) {
+    private static String replaceKnownVariables(final String value, final Map<String, String> resolvedVariables) {
         final StringBuffer result = new StringBuffer();
-        final Matcher matcher = SCALAR_PATTERN.matcher(value);
+        final Matcher matcher = MAPPING_PATTERN.matcher(value);
         while (matcher.find()) {
             final String matchedUnifiedName = VariableNamesSupport.extractUnifiedVariableName(matcher.group());
             final String replacement = resolvedVariables.getOrDefault(matchedUnifiedName, matcher.group());
