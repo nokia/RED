@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m_EhUNmiEeeKxYJgF2NTmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/19/18 8:31 AM
+Save-Time: 3/19/18 8:59 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -106,12 +106,7 @@ with [get-editor "TestFile.robot"] {
         key-type "M1+s"
     }
 }
-// varify one warrning
-wait-for-warnings -amount 1 -times 2 -delay 500
-with [get-view Problems] {
-    get-tree | get-item -path "Warnings \\(1 item\\)/'Remote' library import without arguments" | get-property caption 
-        | equals "'Remote' library import without arguments" | verify-true
-}
+
 // use quick fix to add host name again
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 2 18
@@ -160,6 +155,5 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 // run test to kill remote server
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
     | get-menu -path "Run As/1 Robot Test" | click
-// check if connection to server is broken
-get-view "Message Log" | get-editbox | get-property text | contains "FAIL : Connection to remote server broken: "| verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
