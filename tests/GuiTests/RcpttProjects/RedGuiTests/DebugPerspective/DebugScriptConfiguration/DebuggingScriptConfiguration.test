@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _k_D1QBU9EeeZSZgUeG7ZOA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/15/18 4:53 PM
+Save-Time: 3/19/18 8:12 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -59,6 +59,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	get-button "Resume (F8)" | click
 }
+wait-for-console
 
 //check messge log
 wait-for-message-log -last_line "ScriptProject.TestFile.test"
