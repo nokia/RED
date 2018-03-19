@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Brg00CufEeikWYhBbRs9Qw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/19/18 7:16 PM
+Save-Time: 3/19/18 8:22 PM
 Testcase-Type: ecl
 Verifications: _mlPDsCuhEeikWYhBbRs9Qw
 
@@ -38,7 +38,6 @@ wait-for-discover-window
 
 with [get-window "Discovering libraries summary" | get-tree] {
     get-property "getItems().length" | equals 8 | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals CalculatorLibrary | verify-true
     get-item -path CalculatorLibrary | get-property "image.path" 
         | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
     get-item -path "external_lib" | get-property "image.path" 
