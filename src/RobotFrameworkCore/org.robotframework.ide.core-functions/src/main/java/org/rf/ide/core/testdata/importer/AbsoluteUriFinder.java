@@ -26,7 +26,7 @@ class AbsoluteUriFinder {
         final ImportPath importPath = ImportPath.from(dependencyImportPath);
         final Optional<ResolvedImportPath> resolvedImportPath = ResolvedImportPath.from(importPath, variableMappings);
         if (!resolvedImportPath.isPresent()) {
-            throw new IllegalStateException("Unable to resolve parameterized import path '" + importPath + "'");
+            throw new IllegalStateException("Unable to resolve parameterized import path");
         }
         return new ImportSearchPaths(pathsProvider).findAbsoluteUri(importingFile.toURI(), resolvedImportPath.get());
     }
