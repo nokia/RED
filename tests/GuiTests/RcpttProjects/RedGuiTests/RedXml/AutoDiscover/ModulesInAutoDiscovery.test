@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Brg00CufEeikWYhBbRs9Qw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/19/18 8:22 PM
+Save-Time: 3/19/18 8:38 PM
 Testcase-Type: ecl
 Verifications: _mlPDsCuhEeikWYhBbRs9Qw
 
@@ -22,7 +22,7 @@ get-editor "ManyModules/red.xml" | get-tab-folder | get-tab-item "Referenced lib
 get-editor "ManyModules/red.xml" | get-section Paths | get-table | get-item "...add new search path" | double-click
 with [get-window "Add new search path"] {
     get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
-        | type-text [concat $user_folder "\ext_lib\external_lib.py"]
+        | type-text [concat $user_folder "/ext_lib/external_lib.py"]
     get-button OK | click
 }
 get-button "Save (M1+S)" | click
