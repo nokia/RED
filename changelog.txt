@@ -1,3 +1,23 @@
+RED 0.8.4 - 2018/03/19
+Enhancement
+
+    [RED-998] - Adding remote libraries during AutoDiscovery
+    [RED-1024] - Provide coloring for table editors for keywords the same as in source editors
+    [RED-1025] - table editor - add arguments after selecting/using kw
+    [RED-1038] - job to recreate Help screenshots to have is up to date.
+    [RED-1045] - GitHub #177 - Support for TODO / Tasks
+    [RED-1073] - Variable mappings for env vars %{ENV_VARS}
+
+Bug
+
+    [RED-1023] - in tables, doc view does not show libdoc from kw not in the first cell
+    [RED-1039] - in TSV, QuickFix for adding library does not use TAB as separator
+    [RED-1060] - GitHub #189_init__.py in lib folder breaks QuickFix/autodicovery
+    [RED-1062] - GitHub #188 - python library module and class name different, cannot be added to red.xml
+    [RED-1066] - GitHub #191 - calling robot logger with also_console=True in init breaks lib refreash
+    [RED-1067] - Unit tests for - Lib in folder "keyword" cannot be added to red.xml in RED 0.8.3 - is fixed in trunk
+
+
 RED 0.8.3 - 2018/02/06
 Enhancement
 

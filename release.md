@@ -1,3 +1,33 @@
+# RED - Robot Editor v0.8.4
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- table contents are colored in the same manner as in source
+- adding mandatory arguments proposals for Keywords in Table editors
+- remote librarires are taken into Autodiscovery process and added to red.xml
+- #177 TODO/Tasks implemented - check http://nokia.github.io/RED/help/user_guide/validation/tasks.md
+- Library autodiscovery fixes #188 #189 #191
+
+## GitHub issues updates
+ - #177 - TODO/Tasks support - by default TODO and FIXME are handled - http://nokia.github.io/RED/help/user_guide/validation/tasks.md
+ - #188 - python library module and class name different, cannot be added to red.xml
+ - #189 - _init__.py in lib folder breaks QuickFix/autodicovery
+ - #191 - calling robot logger with also_console=True in init breaks lib refreash
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.3
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
