@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _cr2voLk0EeWzJthH3JoEWQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/31/17 9:43 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/19/18 7:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -184,9 +184,12 @@ get-view Problems | get-tree | select "Errors \\(1 item\\)" | double-click
 
 //check Problems
 try -times 5 -delay 1000 -command{
-	 get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" -raw
-        | contains "Problem with importing variable file 'space in name/after  .py'. Details: RED python session problem. Following exception has been thrown by python service:"
-        | verify-true
+	with [get-view Problems | get-tree] {
+	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+	        | contains "Problem importing variable file 'space in name/after  .py'. RED python session problem. Following exception has been thrown by python service:\n"
+	        + "            Traceback (most recent call last):\n"  | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "Errors (1 item)" | verify-true
+	}
 }        
 //check text
 get-editor "tsv_test.tsv" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
