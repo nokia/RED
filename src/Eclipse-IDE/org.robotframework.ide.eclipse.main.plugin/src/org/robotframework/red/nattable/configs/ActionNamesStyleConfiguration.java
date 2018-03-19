@@ -12,8 +12,11 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author lwlodarc
@@ -23,6 +26,11 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
 
     public ActionNamesStyleConfiguration(final TableTheme theme) {
         super(theme, RedPlugin.getDefault().getPreferences());
+    }
+
+    @VisibleForTesting
+    ActionNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
+        super(theme, preferences);
     }
 
     @Override
