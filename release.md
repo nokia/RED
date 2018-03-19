@@ -16,7 +16,7 @@ For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform:
 ## Notable updates
 - table contents are colored in the same manner as in source
 - adding mandatory arguments proposals for Keywords in Table editors
-- remote librarires are taken into Autodiscovery process and added to red.xml
+- remote libraries are taken into Autodiscovery process and added to red.xml
 - #177 TODO/Tasks implemented - check http://nokia.github.io/RED/help/user_guide/validation/tasks.md
 - Library autodiscovery fixes #188 #189 #191
 
