@@ -48,6 +48,8 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
 
     @Override
     public void initialReconcile() {
+        reparseModel(); // to make sure the model is in sync with this, which is hold reparsed by document
+
         getFoldingSupport().reset();
         getFoldingSupport().updateFoldingStructure(getSuiteModel(), document);
     }
@@ -55,8 +57,6 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     @Override
     public void reconcile(final DirtyRegion dirtyRegion, final IRegion subRegion) {
         reconcile();
-
-        editor.notifyDocSelectionChangedListener(dirtyRegion, true);
     }
 
     @Override
