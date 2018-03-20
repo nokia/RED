@@ -39,7 +39,7 @@ public class RobotToken implements IRobotLineElement, Serializable {
     }
 
     public static RobotToken create(final String rawAndText) {
-        return create(rawAndText, new ArrayList<IRobotTokenType>());
+        return create(rawAndText, new ArrayList<>());
     }
 
     public static RobotToken create(final String rawAndText, final Collection<? extends IRobotTokenType> types) {
