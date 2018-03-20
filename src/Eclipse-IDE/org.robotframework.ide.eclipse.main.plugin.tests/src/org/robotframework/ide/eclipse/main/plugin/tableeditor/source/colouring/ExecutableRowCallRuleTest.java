@@ -42,7 +42,7 @@ public class ExecutableRowCallRuleTest {
                     previousTokens);
 
             if (token.getText().equals("call") || token.getText().equals(":FOR") || token.getText().equals("\\")
-                    || token.getText().equals("given call") || token.getText().equals("when then call")) {
+                    || token.getText().contains("gherkin_call")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();
@@ -69,7 +69,7 @@ public class ExecutableRowCallRuleTest {
                     previousTokens);
 
             if (token.getText().equals("call") || token.getText().equals(":FOR") || token.getText().equals("\\")
-                    || token.getText().equals("given call") || token.getText().equals("when then call")) {
+                    || token.getText().contains("gherkin_call")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();
