@@ -44,7 +44,7 @@ public class ExecutableRowCallRule extends VariableUsageRule {
         return Optional.empty();
     }
 
-    private boolean shouldBeColored(final IRobotLineElement token, final List<IRobotLineElement> analyzedTokens) {
+    static boolean shouldBeColored(final IRobotLineElement token, final List<IRobotLineElement> analyzedTokens) {
         final IRobotTokenType type = token.getTypes().get(0);
 
         if (isAction(type) || isActionArgument(type)) {
@@ -63,15 +63,15 @@ public class ExecutableRowCallRule extends VariableUsageRule {
         return false;
     }
 
-    private boolean isActionArgument(final IRobotTokenType type) {
+    private static boolean isActionArgument(final IRobotTokenType type) {
         return type == RobotTokenType.KEYWORD_ACTION_ARGUMENT || type == RobotTokenType.TEST_CASE_ACTION_ARGUMENT;
     }
 
-    private boolean isAction(final IRobotTokenType type) {
+    private static boolean isAction(final IRobotTokenType type) {
         return type == RobotTokenType.KEYWORD_ACTION_NAME || type == RobotTokenType.TEST_CASE_ACTION_NAME;
     }
 
-    private List<RobotToken> getTokensFromLine(final List<IRobotLineElement> analyzedTokens, final int line) {
+    private static List<RobotToken> getTokensFromLine(final List<IRobotLineElement> analyzedTokens, final int line) {
         final List<RobotToken> tokens = new ArrayList<>();
         for (int i = analyzedTokens.size() - 1; i >= 0; i--) {
             final IRobotLineElement element = analyzedTokens.get(i);
