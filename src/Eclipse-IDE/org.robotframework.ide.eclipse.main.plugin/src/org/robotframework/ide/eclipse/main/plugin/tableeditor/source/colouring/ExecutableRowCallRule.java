@@ -17,7 +17,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class ExecutableRowCallRule implements ISyntaxColouringRule {
 
-    protected final IToken textToken;
+    private final IToken textToken;
 
     public ExecutableRowCallRule(final IToken textToken) {
         this.textToken = textToken;
@@ -39,17 +39,17 @@ public class ExecutableRowCallRule implements ISyntaxColouringRule {
         return Optional.empty();
     }
 
-    protected boolean shouldBeColored(final IRobotLineElement token, final List<IRobotLineElement> analyzedTokens) {
+    private boolean shouldBeColored(final IRobotLineElement token, final List<IRobotLineElement> analyzedTokens) {
         final IRobotTokenType type = token.getTypes().get(0);
 
         if ((isAction(type) || isActionArgument(type)) && !token.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
-            final List<RobotToken> tokensBeforeInLine = getTokensFromLine(analyzedTokens, token.getLineNumber());            
+            final List<RobotToken> tokensBeforeInLine = getTokensFromLine(analyzedTokens, token.getLineNumber());
             for (final RobotToken prevToken : tokensBeforeInLine) {
                 if (!prevToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
-                        && !prevToken.getTypes().contains(RobotTokenType.ASSIGNMENT) 
+                        && !prevToken.getTypes().contains(RobotTokenType.ASSIGNMENT)
                         && !prevToken.getText().isEmpty()
                         && !prevToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
-                        && !prevToken.getText().equals("\\")) {
+                        && !prevToken.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
                     return false;
                 }
             }

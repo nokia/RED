@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.jface.text.Position;
@@ -61,7 +61,7 @@ public class VariableUsageRuleTest {
 
         final String content = "abc" + var1 + "def" + var2 + "[0]ghi" + var3 + "[key]jkl";
 
-        final Collection<Position> varPositions = new ArrayList<>();
+        final List<Position> varPositions = new ArrayList<>();
         varPositions.add(new Position(content.indexOf(var1), var1.length()));
         varPositions.add(new Position(content.indexOf(var2), var2.length()));
         varPositions.add(new Position(content.indexOf(var3), var3.length()));
@@ -88,7 +88,7 @@ public class VariableUsageRuleTest {
         final String text4 = "jkl";
         final String content = text1 + "${var}" + text2 + "@{list}" + index1 + text3 + "&{dir}" + index2 + text4;
 
-        final Collection<Position> nonVarPositions = new ArrayList<>();
+        final List<Position> nonVarPositions = new ArrayList<>();
         nonVarPositions.add(new Position(content.indexOf(text1), text1.length()));
         nonVarPositions.add(new Position(content.indexOf(text2), text2.length()));
         nonVarPositions.add(new Position(content.indexOf(index1), index1.length()));
@@ -102,7 +102,10 @@ public class VariableUsageRuleTest {
             for (int offset = 0; offset < position.getLength(); offset++) {
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position.getOffset() + offset);
                 assertThat(evaluatedToken).isPresent();
-                assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
+                final Position expectedPosition = nonVarPositions.indexOf(position) == 0
+                        ? new Position(position.getOffset() + offset, position.getLength() - offset)
+                        : position;
+                assertThat(evaluatedToken.get().getPosition()).isEqualTo(expectedPosition);
                 assertThat(evaluatedToken.get().getToken()).isSameAs(ISyntaxColouringRule.DEFAULT_TOKEN);
             }
         }
