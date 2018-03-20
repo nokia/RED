@@ -29,12 +29,14 @@ public class Libraries {
 
     public static Map<LibraryDescriptor, LibrarySpecification> createStdLib(final String libName,
             final String... kwNames) {
-        final LibrarySpecification libSpec = new LibrarySpecification();
         final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardLibrary(libName);
+        final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setFormat("ROBOT");
         libSpec.setDescriptor(descriptor);
         libSpec.setName(libName);
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();
+            kwSpec.setFormat("ROBOT");
             kwSpec.setName(kwName);
             libSpec.getKeywords().add(kwSpec);
         }
@@ -43,12 +45,14 @@ public class Libraries {
 
     public static Map<LibraryDescriptor, LibrarySpecification> createRemoteLib(final String path,
             final String... kwNames) {
-        final LibrarySpecification libSpec = new LibrarySpecification();
         final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create(path));
+        final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setFormat("ROBOT");
         libSpec.setDescriptor(descriptor);
         libSpec.setName("Remote");
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();
+            kwSpec.setFormat("ROBOT");
             kwSpec.setName(kwName);
             libSpec.getKeywords().add(kwSpec);
         }
@@ -68,10 +72,12 @@ public class Libraries {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, libName, "");
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
         final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setFormat("ROBOT");
         libSpec.setName(libName);
         libSpec.setDescriptor(descriptor);
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();
+            kwSpec.setFormat("ROBOT");
             kwSpec.setName(kwName);
             libSpec.getKeywords().add(kwSpec);
         }
