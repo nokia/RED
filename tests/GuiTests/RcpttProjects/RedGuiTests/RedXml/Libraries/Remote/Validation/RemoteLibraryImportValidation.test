@@ -5,9 +5,9 @@ Element-Name: RemoteLibraryImportValidation
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
-Id: _m_EhUNmiEeeKxYJgF2NTmg
+Id: _gntrECtOEei6wOJtueYdHQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/19/18 8:59 AM
+Save-Time: 3/19/18 3:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,7 +15,7 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 //
-//                          before test install: pip install robotremoteserver
+//                          before test install: pip install robotremoteserver   
 //
 //
 // run PythonRemoteServer
@@ -26,7 +26,7 @@ with [get-view "Project Explorer" | get-tree] {
 }
 // verify if there is 3 errors
 get-view Problems | click
-wait-for-errors -amount 3 -times 2 -delay 500
+wait-for-errors -amount 3 -times 4 -delay 500
 // go to red.xml and add default host name for remote server 
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml"] {
@@ -73,10 +73,10 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 2 43
     key-type BackSpace -times 25
 }
-// verify 3 error and 1 warning
-wait-for-errors -amount 3 -times 2 -delay 500
+// verify 3 errors
+wait-for-errors -amount 3 -times 4 -delay 500
 
-// use quick fix to add host name
+// use content assist to add host name
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 2 18
     key-type "M1+SPACE"
@@ -85,75 +85,56 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 // verify if there is no problems
 wait-for-zero-items -times 2 -delay 500
-// add another remote location to red.xml (without "/" at the and - it should add if with "/RPC2" at the end)
+// remove remote location from red.xml
 with [get-editor "RobotProject/red.xml"] {
     click
-    get-section "Referenced libraries" | get-button "Add Remote location" | click
-}
-with [get-window "Add Remote location"] {
-    get-editbox -after [get-label URI] | set-text "http://127.0.0.1:8270"
-    get-button OK | click
-}
-// save red.xml
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Remote location" 
-    | key-type "M1+s"
-// remove host name from import
-with [get-editor "TestFile.robot"] {
-    click
-    with [get-text-viewer] {
-        select-range 2 44 2 18
-        key-type BackSpace
+    with [get-section "Referenced libraries" | get-table] {
+        select "http:\\/\\/127.0.0.1:8270\\/ - Remote" | key-type Del
         key-type "M1+s"
     }
 }
-
-// use quick fix to add host name again
+// revalidate Source
 with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 2 18
-    key-type "M1+SPACE"
-}
-// verify quich fix
-with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[1].getText()" | equals "Remote http://127.0.0.1:8270/RPC2 (already imported)" | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "Remote http://127.0.0.1:8270/" 
-        | verify-true
-}
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Remote http:\\/\\/127.0.0.1:8270\\/RPC2 (already imported)" | click -default
-// add "/" at the and of host name
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 2 48
-    type-text "/"
-    key-type "M1+s"
-}
-
-// verify if there is no problems
-wait-for-zero-items -times 2 -delay 500
-// change host name to the same, which was at the beginning of this test
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 7 37
-    key-type "M1+s"
-    set-caret-pos 2 49
-    key-type BackSpace -times 5
-    key-type "M1+s"
-}
-// verify if there is no problems
-wait-for-zero-items -times 2 -delay 500
-// add second "Stop Remote Server" KW
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 8 36
-    select-range 8 37 8 5
-    key-type "M1+c"
-    set-caret-pos 8 37
-    key-type Enter -times 2
-    key-type "M1+v"
+    click
+    set-caret-pos 3 1
     key-type Enter
-    key-type "M1+v"
     key-type "M1+s"
-    set-caret-pos 10 37
 }
-// run test to kill remote server
+// verify 3 errors
+wait-for-errors -amount 3 -times 2 -delay 500
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(3 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8270\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+    | get-property caption 
+    | equals "'Remote' library under 'http://127.0.0.1:8270/' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+    | verify-true
+// check marker position and message
+get-editor "TestFile.robot" | get-text-viewer | get-property "markers['2'][0].text" 
+    | equals "'Remote' library under 'http://127.0.0.1:8270/' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+    | verify-true
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 44
+    key-type "M1+1"
+}
+// verify QF
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | get-property "getItems().TableItem[0].getText()" | equals "Add 'Remote http://127.0.0.1:8270/' to configuration" 
+    | verify-true
+// add location to red.xml with QF and save
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Add 'Remote http:\\/\\/127.0.0.1:8270\\/' to configuration" | click -default
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+// verify red.xml
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table 
+    | get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8270/ - Remote" | verify-true
+// go to Source and verifyy if there is no items in Problems
+get-editor "TestFile.robot" | click
+wait-for-zero-items -times 4 -delay 500
+// run tests to stop remote server
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
     | get-menu -path "Run As/1 Robot Test" | click
-
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 1
+    key-type Enter
+    key-type "M1+s"
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
