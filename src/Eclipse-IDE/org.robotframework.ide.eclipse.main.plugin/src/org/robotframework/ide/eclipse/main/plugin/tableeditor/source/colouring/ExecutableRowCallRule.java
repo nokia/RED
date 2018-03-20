@@ -1,8 +1,8 @@
 /*
-* Copyright 2016 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2016 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import java.util.ArrayList;
@@ -15,11 +15,12 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class ExecutableRowCallRule implements ISyntaxColouringRule {
+public class ExecutableRowCallRule extends VariableUsageRule {
 
-    protected final IToken textToken;
+    private final IToken textToken;
 
-    public ExecutableRowCallRule(final IToken textToken) {
+    public ExecutableRowCallRule(final IToken textToken, final IToken embeddedVariablesToken) {
+        super(embeddedVariablesToken);
         this.textToken = textToken;
     }
 
@@ -31,25 +32,29 @@ public class ExecutableRowCallRule implements ISyntaxColouringRule {
     @Override
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<IRobotLineElement> analyzedTokens) {
-
         if (shouldBeColored(token, analyzedTokens)) {
+            final Optional<PositionedTextToken> evaluated = super.evaluate(token, offsetInToken, analyzedTokens);
+            if (evaluated.isPresent()) {
+                return evaluated;
+            }
+
             return Optional.of(new PositionedTextToken(textToken, token.getStartOffset() + offsetInToken,
                     token.getText().length() - offsetInToken));
         }
         return Optional.empty();
     }
 
-    protected boolean shouldBeColored(final IRobotLineElement token, final List<IRobotLineElement> analyzedTokens) {
+    private boolean shouldBeColored(final IRobotLineElement token, final List<IRobotLineElement> analyzedTokens) {
         final IRobotTokenType type = token.getTypes().get(0);
 
-        if ((isAction(type) || isActionArgument(type)) && !token.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
-            final List<RobotToken> tokensBeforeInLine = getTokensFromLine(analyzedTokens, token.getLineNumber());            
+        if (isAction(type) || isActionArgument(type)) {
+            final List<RobotToken> tokensBeforeInLine = getTokensFromLine(analyzedTokens, token.getLineNumber());
             for (final RobotToken prevToken : tokensBeforeInLine) {
                 if (!prevToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
-                        && !prevToken.getTypes().contains(RobotTokenType.ASSIGNMENT) 
+                        && !prevToken.getTypes().contains(RobotTokenType.ASSIGNMENT)
                         && !prevToken.getText().isEmpty()
                         && !prevToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
-                        && !prevToken.getText().equals("\\")) {
+                        && !prevToken.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
                     return false;
                 }
             }
@@ -77,5 +82,10 @@ public class ExecutableRowCallRule implements ISyntaxColouringRule {
             }
         }
         return tokens;
+    }
+
+    @Override
+    protected IToken getTokenForNonVariablePart() {
+        return textToken;
     }
 }
