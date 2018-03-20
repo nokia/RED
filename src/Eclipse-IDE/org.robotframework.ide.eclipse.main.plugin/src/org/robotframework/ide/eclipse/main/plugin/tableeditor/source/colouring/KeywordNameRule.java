@@ -29,12 +29,12 @@ public class KeywordNameRule extends VariableUsageRule {
         final IRobotTokenType type = token.getTypes().get(0);
 
         if (type == RobotTokenType.KEYWORD_NAME) {
-            Optional<PositionedTextToken> evaluated = super.evaluate(token, offsetInToken, analyzedTokens);
-            if (!evaluated.isPresent()) {
-                evaluated = Optional
-                        .of(new PositionedTextToken(nameToken, token.getStartOffset(), token.getText().length()));
+            final Optional<PositionedTextToken> evaluated = super.evaluate(token, offsetInToken, analyzedTokens);
+            if (evaluated.isPresent()) {
+                return evaluated;
             }
-            return evaluated;
+
+            return Optional.of(new PositionedTextToken(nameToken, token.getStartOffset(), token.getText().length()));
         }
         return Optional.empty();
     }
