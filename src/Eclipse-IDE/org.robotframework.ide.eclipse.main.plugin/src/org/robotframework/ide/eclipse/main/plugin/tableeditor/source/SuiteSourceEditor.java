@@ -24,7 +24,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -65,7 +64,6 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlighting
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.SourceDocumentationSelectionChangedListener;
 import org.robotframework.red.swt.StyledTextWrapper;
 import org.robotframework.red.swt.SwtThread;
 
@@ -74,8 +72,6 @@ import com.google.common.base.Splitter;
 public class SuiteSourceEditor extends TextEditor {
 
     private static final String SOURCE_PART_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.sources.context";
-
-    private SourceDocumentationSelectionChangedListener sourceDocSelectionChangedListener = null;
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -127,7 +123,7 @@ public class SuiteSourceEditor extends TextEditor {
         installProjectionAndFolding(viewer);
 
         if (fileModel.getFile() != null) {
-            new SuiteSourceCurrentCellHighlighter(this, fileModel, viewer.getDocument()).install(viewer);
+            new SuiteSourceCurrentCellHighlighter(fileModel, viewer.getDocument()).install(viewer);
             new SuiteSourceOccurrenceMarksHighlighter(fileModel, viewer.getDocument()).install(viewer);
         }
         installBreakpointTogglingOnDoubleClick();
@@ -396,19 +392,5 @@ public class SuiteSourceEditor extends TextEditor {
     public void disableReconcilation() {
         final IReconciler reconciler = getSourceViewerConfiguration().getReconciler(getSourceViewer());
         reconciler.uninstall();
-    }
-
-    public void notifyDocSelectionChangedListener(final IRegion region, final boolean isEditing) {
-        if (sourceDocSelectionChangedListener != null) {
-            sourceDocSelectionChangedListener.positionChanged(getDocument(), getFileModel(), region, isEditing);
-        }
-    }
-
-    public void setSourceDocSelectionChangedListener(final SourceDocumentationSelectionChangedListener listener) {
-        this.sourceDocSelectionChangedListener = listener;
-    }
-
-    public void removeSourceDocSelectionChangedListener() {
-        this.sourceDocSelectionChangedListener = null;
     }
 }
