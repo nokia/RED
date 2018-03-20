@@ -43,14 +43,13 @@ public class VariableUsageRule implements ISyntaxColouringRule {
             final List<IElementDeclaration> elements = extract.getMappedElements();
 
             for (final IElementDeclaration declaration : elements) {
-                final int declarationOffset = declaration.getStartFromFile().getOffset();
-                if (declarationOffset >= token.getStartOffset() + offsetInToken
-                        || (declarationOffset < token.getStartOffset() + offsetInToken && token.getStartOffset()
-                                + offsetInToken <= declaration.getEndFromFile().getOffset())) {
+                final int startOffset = declaration.getStartFromFile().getOffset();
+                final int endOffset = declaration.getEndFromFile().getOffset();
+                final int currentOffset = token.getStartOffset() + offsetInToken;
+                if (currentOffset <= startOffset || currentOffset <= endOffset) {
                     final IToken tokenToUse = declaration instanceof VariableDeclaration ? textToken
                             : getTokenForNonVariablePart();
-                    return Optional.of(new PositionedTextToken(tokenToUse, declarationOffset,
-                            declaration.getEndFromFile().getOffset() - declarationOffset + 1));
+                    return Optional.of(new PositionedTextToken(tokenToUse, startOffset, endOffset - startOffset + 1));
                 }
             }
         }
