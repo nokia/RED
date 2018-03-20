@@ -1,0 +1,117 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YDbWsNnJEeeKxYJgF2NTmg,_I3098NnDEeeKxYJgF2NTmg
+Element-Name: RemoteLibraryArgumentsValidation
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _khwPUCKpEei2ypVbzE5QqA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/15/18 3:00 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+// remote import without arguments
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 44
+    key-type Backspace -times 24
+    key-type "M1+s"
+    set-caret-pos 5 1
+    key-type "M2+ARROW_DOWN" -times 3
+    key-type "M1+/"
+    key-type "M1+s"
+}
+// verify one error
+wait-for-errors -amount 1 -times 2 -delay 500
+get-view Problems | click
+with [get-view Problems] {
+    get-tree | get-item 
+    -path "Errors \\(1 item\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8270\\/RPC2\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+    | get-property caption 
+    | equals "'Remote' library under 'http://127.0.0.1:8270/RPC2/' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+    | verify-true
+}
+// use QF to add default remote address to red.xml
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 18
+    key-type "M1+1"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item 
+    -path "Add 'Remote http:\\/\\/127.0.0.1:8270\\/RPC2\\/' to configuration" | get-property caption 
+    | equals "Add 'Remote http://127.0.0.1:8270/RPC2/' to configuration" | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Add 'Remote http:\\/\\/127.0.0.1:8270\\/RPC2\\/' to configuration" | click -default
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+// go back to Source
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    click
+    set-caret-pos 2 20
+    type-text "   "
+    key-type "M1+s"
+}
+// verify errors
+wait-for-errors -amount 3 -times 2 -delay 500
+get-view Problems | click
+with [get-view Problems] {
+    get-tree | get-item -path "Errors \\(3 items\\)/Unknown 'Remote' library under 'http:\\/\\/127.0.0.1:8270\\/RPC2\\/' location. Unable to connect" 
+    | get-property caption 
+    | equals "Unknown 'Remote' library under 'http://127.0.0.1:8270/RPC2/' location. Unable to connect" | verify-true
+}
+// run PythonRemoteServer
+run-python-remote-server-in-background -lib_name my_remote_lib.py -timeout 10
+// go to red.xml - remove default addres and add it again
+with [get-editor "RobotProject/red.xml"] {
+    click
+    with [get-section "Referenced libraries"] {
+        with [get-table] {
+            select "http:\\/\\/127.0.0.1:8270\\/RPC2\\/ - Remote" | key-type Del
+            key-type "M1+s"
+        }
+        get-button "Add Remote location" | click
+    }
+}
+with [get-window "Add Remote location"] {
+    with [get-editbox -after [get-label URI]] {
+        set-text-offset 22 0
+        type-text "RPC2"
+    }
+    get-button OK | click
+}
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Remote location" 
+    | key-type "M1+s"
+get-editor "TestFile.robot" | click
+// verify errors - there sholudn't be any errors
+wait-for-zero-items -times 4 -delay 500
+
+// add Remote import with two arguments
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	click
+	set-caret-pos 3 1
+    type-text "Library    Remote    http://127.0.0.1:9000/    http://127.0.0.1:10000/"
+    key-type "M1+s"
+}
+// verify if there is one warning and one error
+wait-for-errors -amount 1 -times 2 -delay 500
+with [get-view Problems] {
+    get-tree | get-item -path "Errors \\(1 item\\)/Invalid number of arguments. Keyword 'Remote' expects from 0 to 1 arguments, but 2 are provided" 
+    | get-property caption 
+    | equals "Invalid number of arguments. Keyword 'Remote' expects from 0 to 1 arguments, but 2 are provided" 
+    | verify-true
+}
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 1
+    key-type "M2+ARROW_DOWN" -times 3
+    key-type "M1+/"
+    set-caret-pos 7 33
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
+    | click
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
