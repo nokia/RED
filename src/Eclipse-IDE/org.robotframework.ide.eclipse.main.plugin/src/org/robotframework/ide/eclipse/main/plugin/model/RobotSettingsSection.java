@@ -5,9 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -207,29 +209,20 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     }
 
     public List<String> getResourcesPaths() {
-        final List<RobotSetting> resources = getResourcesSettings();
-        final List<String> paths = newArrayList();
-        for (final RobotSetting setting : resources) {
-            final List<String> args = setting.getArguments();
-            if (!args.isEmpty()) {
-                final String escapedPath = RobotExpressions.unescapeSpaces(args.get(0));
-                paths.add(escapedPath);
-            }
-        }
-        return paths;
+        return getImportPaths(getResourcesSettings());
     }
 
     public List<String> getVariablesPaths() {
-        final List<RobotSetting> variables = getVariablesSettings();
-        final List<String> paths = newArrayList();
-        for (final RobotSetting setting : variables) {
-            final List<String> args = setting.getArguments();
-            if (!args.isEmpty()) {
-                final String escapedPath = RobotExpressions.unescapeSpaces(args.get(0));
-                paths.add(escapedPath);
-            }
-        }
-        return paths;
+        return getImportPaths(getVariablesSettings());
+    }
+
+    private static List<String> getImportPaths(final List<RobotSetting> importSettings) {
+        return importSettings.stream()
+                .map(RobotSetting::getArguments)
+                .filter(not(Collection::isEmpty))
+                .map(l -> l.get(0))
+                .map(RobotExpressions::unescapeSpaces)
+                .collect(toList());
     }
 
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {
