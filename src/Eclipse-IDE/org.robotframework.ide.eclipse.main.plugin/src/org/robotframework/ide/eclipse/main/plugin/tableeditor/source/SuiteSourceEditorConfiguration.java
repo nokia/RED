@@ -418,14 +418,15 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new TestCaseSettingsCallRule(call),
-                new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new InTokenRule(specialToken) };
+                new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call, variable),
+                new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(specialToken) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, store, testCasesRules);
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
-                new KeywordSettingsCallRule(call), new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call),
-                new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(specialToken) };
+                new KeywordSettingsCallRule(call), new GherkinPrefixRule(gherkin),
+                new ExecutableRowCallRule(call, variable), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new InTokenRule(specialToken) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, store, keywordsRules);
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
