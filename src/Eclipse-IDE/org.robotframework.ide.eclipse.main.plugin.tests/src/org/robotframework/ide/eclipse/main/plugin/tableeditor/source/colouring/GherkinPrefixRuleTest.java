@@ -41,12 +41,12 @@ public class GherkinPrefixRuleTest {
             final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0,
                     previousTokens);
 
-            if (token.getText().equals("given call") || token.getText().equals("when then call")) {
+            if (token.getText().contains("gherkin_call")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();
-                assertThat(evaluatedToken.get().getPosition())
-                        .isEqualTo(new Position(token.getStartOffset(), token.getText().length() - "call".length()));
+                assertThat(evaluatedToken.get().getPosition()).isEqualTo(
+                        new Position(token.getStartOffset(), token.getText().length() - "gherkin_call".length()));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
 
             } else {
