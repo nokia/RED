@@ -272,7 +272,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public void runRfLint(final String host, final int port, final File projectLocation,
             final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
-            final List<String> rulesFiles) {
+            final List<String> rulesFiles, final List<String> additionalArguments) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("rflint_integration.py");
 
@@ -285,39 +285,13 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
                 cmdLine.add("-exclude");
                 cmdLine.add(String.join(";", excludedPaths));
             }
-            for (final String path : rulesFiles) {
-                cmdLine.add("-R");
-                cmdLine.add(path);
-            }
-            for (final RfLintRule rule : rules) {
-                if (rule.hasChangedSeverity()) {
-                    cmdLine.add("-" + rule.getSeverity().severitySwitch());
-                    cmdLine.add(rule.getRuleName());
-                }
-                if (rule.hasConfigurationArguments()) {
-                    cmdLine.add("-c");
-                    cmdLine.add(rule.getRuleName() + ":" + rule.getConfiguration());
-                }
-            }
+            cmdLine.addAll(RobotCommandRpcExecutor.createRfLintArguments(rules, rulesFiles, additionalArguments));
             cmdLine.add("-r");
             cmdLine.add(filepath.getAbsolutePath());
 
             runExternalProcess(cmdLine);
         } catch (final IOException | NumberFormatException e) {
             throw new RobotEnvironmentException("Unable to start RfLint");
-        }
-    }
-
-    static String severitySwitch(final String severity) {
-        switch (severity.toLowerCase()) {
-            case "error":
-                return "-e";
-            case "warning":
-                return "-w";
-            case "ignore":
-                return "-i";
-            default:
-                throw new IllegalStateException();
         }
     }
 
