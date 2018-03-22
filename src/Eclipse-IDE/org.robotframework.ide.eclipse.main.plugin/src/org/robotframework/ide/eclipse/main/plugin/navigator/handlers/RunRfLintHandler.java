@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
@@ -110,9 +111,11 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
             final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
             final List<RfLintRule> rules = preferences.getRfLintRules();
             final List<String> rulesFiles = preferences.getRfLintRulesFiles();
+            final List<String> additionalArguments = newArrayList(
+                    DebugPlugin.parseArguments(preferences.getRfLintAdditionalArguments()));
 
             robotProject.getRuntimeEnvironment().runRfLint(server.getHost(), server.getPort(), projectLocation,
-                    excludedPaths, filepath, rules, rulesFiles);
+                    excludedPaths, filepath, rules, rulesFiles, additionalArguments);
         }
     }
 
