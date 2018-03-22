@@ -260,8 +260,13 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         private void addRemoteLibrary(final RobotDryRunLibraryImport libraryImport) {
-            final RemoteLocation remoteLibrary = RemoteLocation.create(libraryImport.getSourcePath());
-            addRemoteLocation(remoteLibrary);
+            if (!(libraryImport.getSourcePath() == null)) {
+                final RemoteLocation remoteLibrary = RemoteLocation.create(libraryImport.getSourcePath());
+                addRemoteLocation(remoteLibrary);
+            } else {
+                libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
+                libraryImport.setAdditionalInfo("Invalid number of arguments during Remote library import");
+            }
         }
 
         private void addReferencedLibrariesFromClasses(final RobotDryRunLibraryImport libraryImport,
