@@ -136,39 +136,29 @@ class ExternalLibrariesImportCollector {
         @Override
         protected void validateNameImport(final String name, final RobotToken nameToken,
                 final List<RobotToken> arguments) throws CoreException {
-            if (!name.isEmpty() && !standardLibraryNames.contains(name)) {
+            if (name.equals("Remote")) {
+                if (!(arguments.size() > 1)) {
+                    final String address = RemoteLocation
+                            .createRemoteUri(arguments.stream().findFirst().map(RobotToken::getText).orElse(
+                                    RemoteLocation.DEFAULT_ADDRESS));
+                    final String remoteLibName = RemoteLocation.createRemoteName(address);
+                    final URI uriAddress = URI.create(address);
+                    final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName, uriAddress);
+                    if (!libraryImports.contains(libImport)) {
+                        libraryImports.add(libImport);
+                        libraryImporters.put(libImport, currentSuite);
+                        knownLibraryNames.put(remoteLibName, libImport);
+                    } else {
+                        libraryImporters.put(libImport, currentSuite);
+                    }
+                 } else  {
+                     libraryLocator.locateByName(currentSuite, name);
+                }
+            } else if (!name.isEmpty() && !standardLibraryNames.contains(name)) {
                 if (unknownLibraryNames.containsKey(name)) {
                     unknownLibraryNames.put(name, currentSuite);
                 } else if (knownLibraryNames.containsKey(name)) {
                     knownLibraryNames.get(name).forEach(libImport -> libraryImporters.put(libImport, currentSuite));
-                } else if ("Remote".equals(name)) {
-                    if (arguments.size() == 1) {
-                        final String address = RemoteLocation.createRemoteUri(arguments.get(0).getText());
-                        final String remoteLibName = RemoteLocation.createRemoteName(arguments.get(0).getText());
-                        final URI uriAddress = URI.create(address);
-                        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName,
-                                uriAddress);
-                        if (!libraryImports.contains(libImport)) {
-                            libraryImports.add(libImport);
-                            libraryImporters.put(libImport, currentSuite);
-                            knownLibraryNames.put(remoteLibName, libImport);
-                        } else {
-                            libraryImporters.put(libImport, currentSuite);
-                        }
-                    } else if (arguments.isEmpty()) {
-                        final String remoteLibName = RemoteLocation.createRemoteName(RemoteLocation.DEFAULT_ADDRESS);
-                        final URI uriAddress = URI
-                                .create(RemoteLocation.createRemoteUri(RemoteLocation.DEFAULT_ADDRESS));
-                        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName,
-                                uriAddress);
-                        if (!libraryImports.contains(libImport)) {
-                            libraryImports.add(libImport);
-                            libraryImporters.put(libImport, currentSuite);
-                            knownLibraryNames.put(remoteLibName, libImport);
-                        } else {
-                            libraryImporters.put(libImport, currentSuite);
-                        }
-                    }
                 } else {
                     libraryLocator.locateByName(currentSuite, name);
                 }
