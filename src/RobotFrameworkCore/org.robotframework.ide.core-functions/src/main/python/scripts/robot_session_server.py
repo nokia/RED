@@ -265,7 +265,7 @@ def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, add
     if excluded_paths:
         command.append('-exclude')
         command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
-    command.extend(additional_arguments)
+    command.extend(__encode_unicode_if_needed(additional_arguments))
     command.append('-r')
     command.append(__encode_unicode_if_needed(filepath))
 
