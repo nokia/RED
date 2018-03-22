@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -69,6 +70,8 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     private final List<RulesFile> rulesFiles = new ArrayList<>();
     private TableViewer rulesFilesViewer;
 
+    private StringFieldEditor argumentsEditor;
+
     public RfLintValidationPreferencePage() {
         super("RfLint validation settings");
     }
@@ -82,6 +85,8 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         final Label desc2 = new Label(parent, SWT.NONE);
         desc2.setText("Additional rules files");
         rulesFilesViewer = createRulesFilesViewer(parent);
+
+        argumentsEditor = createAdditionalArgumentsEditor(parent);
 
         initializeValues();
         return parent;
@@ -204,6 +209,20 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         return viewer;
     }
 
+    private StringFieldEditor createAdditionalArgumentsEditor(final Composite parent) {
+        final Composite group = new Composite(parent, SWT.NONE);
+        final StringFieldEditor argumentsEditor = new StringFieldEditor(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS,
+                "Additional arguments", group);
+        argumentsEditor.setPreferenceStore(getPreferenceStore());
+        argumentsEditor.setPage(this);
+
+        GridDataFactory.fillDefaults().applyTo(group);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(argumentsEditor.getLabelControl(group));
+        GridDataFactory.fillDefaults().indent(10, 0).grab(true, false).applyTo(argumentsEditor.getTextControl(group));
+
+        return argumentsEditor;
+    }
+
     private void initializeValues() {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         rulesFiles.addAll(preferences.getRfLintRulesFiles().stream().map(RulesFile::new).collect(toList()));
@@ -211,6 +230,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         rulesViewer.setInput(rules);
         rulesFilesViewer.setInput(rulesFiles);
+        argumentsEditor.setStringValue(preferences.getRfLintAdditionalArguments());
     }
 
     @Override
@@ -222,11 +242,13 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                 .map(RfLintViolationSeverity::name)
                 .collect(joining(";"));
         final String allRulesArgs = rules.stream().map(RfLintRule::getConfiguration).collect(joining(";"));
+        final String additionalArguments = argumentsEditor.getStringValue();
 
         getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_FILES, allRulesFiles);
         getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_CONFIG_NAMES, allRulesNames);
         getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, allRulesSeverities);
         getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_CONFIG_ARGS, allRulesArgs);
+        getPreferenceStore().putValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, additionalArguments);
         return true;
     }
 
@@ -234,14 +256,9 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     protected void performDefaults() {
         rules.clear();
         rulesFiles.clear();
-
-        getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_FILES, "");
-        getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "");
-        getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "");
-        getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_CONFIG_ARGS, "");
-
         rulesViewer.refresh();
         rulesFilesViewer.refresh();
+        argumentsEditor.loadDefault();
         super.performDefaults();
     }
 

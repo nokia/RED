@@ -120,6 +120,24 @@ public class RedPreferencesTest {
     }
 
     @Test
+    public void rfLintRulesAdditionalArgumentsAreTakenFromStore_1() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS)).thenReturn("");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getRfLintAdditionalArguments()).isEmpty();
+    }
+
+    @Test
+    public void rfLintRulesAdditionalArgumentsAreTakenFromStore_2() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS)).thenReturn("abc");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getRfLintAdditionalArguments()).isEqualTo("abc");
+    }
+
+    @Test
     public void messageLogOutputLimitIsTakenFromStore_1() {
         final IPreferenceStore store = mock(IPreferenceStore.class);
         when(store.getBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT)).thenReturn(false);
@@ -160,7 +178,7 @@ public class RedPreferencesTest {
     }
 
     @Test
-    public void taskDetectionEnablemementIsTakenFromStore_1() {
+    public void taskDetectionEnablementIsTakenFromStore_1() {
         final IPreferenceStore store = mock(IPreferenceStore.class);
         when(store.getBoolean(RedPreferences.TASKS_DETECTION_ENABLED)).thenReturn(false);
 
@@ -170,7 +188,7 @@ public class RedPreferencesTest {
     }
 
     @Test
-    public void taskDetectionEnablemementIsTakenFromStore_2() {
+    public void taskDetectionEnablementIsTakenFromStore_2() {
         final IPreferenceStore store = mock(IPreferenceStore.class);
         when(store.getBoolean(RedPreferences.TASKS_DETECTION_ENABLED)).thenReturn(true);
 
