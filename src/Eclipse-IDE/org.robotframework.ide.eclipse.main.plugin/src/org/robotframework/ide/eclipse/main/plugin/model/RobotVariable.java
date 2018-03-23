@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
+import static java.util.stream.Collectors.joining;
 
 import java.io.Serializable;
 import java.util.List;
@@ -26,7 +26,6 @@ import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
 public class RobotVariable implements RobotFileInternalElement, Serializable {
@@ -98,22 +97,24 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
         } else if (getType() == VariableType.SCALAR_AS_LIST) {
             final ScalarVariable variable = (ScalarVariable) holder;
             final List<RobotToken> values = variable.getValues();
-            return "[" + Joiner.on(", ").join(transform(values, TokenFunctions.tokenToString())) + "]";
+
+            return values.stream().map(RobotToken::getText).collect(joining(", ", "[", "]"));
 
         } else if (getType() == VariableType.LIST) {
             final ListVariable variable = (ListVariable) holder;
             final List<RobotToken> values = variable.getItems();
-            return "[" + Joiner.on(", ").join(transform(values, TokenFunctions.tokenToString())) + "]";
+            return values.stream().map(RobotToken::getText).collect(joining(", ", "[", "]"));
 
         } else if (getType() == VariableType.DICTIONARY) {
             final DictionaryVariable variable = (DictionaryVariable) holder;
             final List<DictionaryKeyValuePair> values = variable.getItems();
-            return "{" + Joiner.on(", ").join(transform(values, TokenFunctions.pairToString(" = "))) + "}";
+            return values.stream().map(pair -> pair.getKey().getText() + " = " + pair.getValue().getText()).collect(
+                    joining(", ", "{", "}"));
 
         } else if (getType() == VariableType.INVALID) {
             final UnknownVariable variable = (UnknownVariable) holder;
             final List<RobotToken> values = variable.getItems();
-            return "[" + Joiner.on(", ").join(transform(values, TokenFunctions.tokenToString())) + "]";
+            return values.stream().map(RobotToken::getText).collect(joining(", ", "[", "]"));
         }
         throw new IllegalStateException("Variable defined in variables table cannot have type " + getType().name());
     }

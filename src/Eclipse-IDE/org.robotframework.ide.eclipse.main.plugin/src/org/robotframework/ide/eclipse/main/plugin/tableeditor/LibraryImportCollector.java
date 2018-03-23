@@ -17,13 +17,11 @@ import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.ResourceImportsPathsResolver;
 
 public class LibraryImportCollector {
 
@@ -47,18 +45,16 @@ public class LibraryImportCollector {
 
     private static List<IFile> findResourceImportFiles(final RobotSuiteFile suite,
             final Set<IResource> alreadyVisited) {
-        final IWorkspaceRoot workspaceRoot = suite.getFile().getWorkspace().getRoot();
-        return ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(suite)
+        return suite.getImportedResources()
                 .stream()
                 .distinct()
-                .map(path -> workspaceRoot.findMember(path))
                 .filter(res -> isExistingFile(res) && !alreadyVisited.contains(res))
                 .map(IFile.class::cast)
                 .collect(Collectors.toList());
     }
 
     private static boolean isExistingFile(final IResource res) {
-        return res != null && res.exists() && res.getType() == IResource.FILE;
+        return res.exists() && res.getType() == IResource.FILE;
     }
 
     private static Map<RobotSuiteFile, List<LibraryImport>> collectLibraryImports(final RobotSuiteFile currentModel) {
