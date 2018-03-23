@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -21,12 +24,18 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -57,6 +66,7 @@ public class DocumentationView {
         parent.setLayout(new FillLayout());
 
         browser = new Browser(parent, SWT.NONE);
+        browser.addLocationListener(new LinksListener());
 
         createToolbarActions(partService, part.getViewSite().getActionBars().getToolBarManager(), page);
     }
@@ -144,6 +154,53 @@ public class DocumentationView {
         } else if (keywordCall instanceof RobotSetting && ((RobotSetting) keywordCall).isDocumentation()
                 && currentInput.contains(keywordCall)) {
             scheduleInputLoadingJob(currentInput);
+        }
+    }
+
+    private final class LinksListener implements LocationListener {
+
+        @Override
+        public void changing(final LocationEvent event) {
+            if (event.location.equals("about:blank")) {
+                // moving to generated site set by Browser#setText method
+                return;
+
+            } else if (event.location.startsWith("about:blank#")) {
+                // local link at non-existing generated site - scroll to the element using
+                // javascript
+                final String id = event.location.substring(event.location.indexOf("#"));
+                browser.execute("document.getElementById('" + id + "').scrollIntoView();");
+
+            } else if (event.location.startsWith("file://")) {
+
+            } else {
+                // all other links
+                event.doit = false;
+
+                try {
+                    final URI uriToOpen = new URI(event.location);
+                    SwtThread.asyncExec(event.display, () -> {
+                        final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
+                                .getBrowserSupport();
+                        try {
+                            final IWebBrowser wbBrowser = browserSupport.createBrowser(null);
+                            wbBrowser.openURL(uriToOpen.toURL());
+                        } catch (PartInitException | MalformedURLException e) {
+                            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                                    "Unable to open hyperlink: " + event.location, e), StatusManager.BLOCK);
+                        }
+                    });
+                } catch (final URISyntaxException e) {
+                    // this should not happen, as location is prepared to be passed as URI
+                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "Unable to open hyperlink: " + event.location, e), StatusManager.BLOCK);
+                }
+            }
+        }
+
+        @Override
+        public void changed(final LocationEvent event) {
+            // nothing to do
         }
     }
 
