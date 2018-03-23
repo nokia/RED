@@ -11,13 +11,17 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.rf.ide.core.libraries.Documentation;
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -78,6 +82,18 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     @Override
     public void removeUnitSettings(final RobotKeywordCall call) {
         getLinkedElement().removeElement((AModelElement<TestCase>) call.getLinkedElement());
+    }
+
+    public String getDocumentation() {
+        return findSetting(ModelType.TEST_CASE_DOCUMENTATION).map(RobotKeywordCall::getLinkedElement)
+                .map(TestDocumentation.class::cast)
+                .map(DocumentationServiceHandler::toShowConsolidated)
+                .orElse("<not documented>");
+    }
+
+    public Documentation createDocumentation() {
+        // TODO : provide format depending on source
+        return new Documentation(DocFormat.ROBOT, getDocumentation());
     }
     
     public Optional<String> getTemplateInUse() {

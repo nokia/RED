@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
+import org.rf.ide.core.libraries.Documentation;
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -98,6 +100,11 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
                 .map(KeywordDocumentation.class::cast)
                 .map(DocumentationServiceHandler::toShowConsolidated)
                 .orElse("<not documented>");
+    }
+
+    public Documentation createDocumentation() {
+        // TODO : provide format depending on source
+        return new Documentation(DocFormat.ROBOT, getDocumentation());
     }
 
     public ArgumentsDescriptor createArgumentsDescriptor() {
