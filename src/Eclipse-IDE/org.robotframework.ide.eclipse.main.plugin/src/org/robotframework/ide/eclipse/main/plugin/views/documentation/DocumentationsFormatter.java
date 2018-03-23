@@ -5,12 +5,21 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
+import static java.util.stream.Collectors.joining;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.swt.graphics.RGB;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 
 public class DocumentationsFormatter {
+
+    private static final Pattern HEADER_PATTERN = Pattern.compile("<h(\\d)>([\\w\\d _]+)</h\\d>");
 
     private final RobotRuntimeEnvironment env;
 
@@ -53,6 +62,55 @@ public class DocumentationsFormatter {
     }
 
     private String writeBody(final String header, final String doc) {
-        return "<body>" + header + doc + "</body>";
+        return "<body>" + header + identifyHeaders(doc) + "</body>";
+    }
+
+    private static String identifyHeaders(final String doc) {
+        final Collection<String> headersIds = new HashSet<>();
+
+        final Matcher matcher = HEADER_PATTERN.matcher(doc);
+
+        int previousEnd = 0;
+        final StringBuilder docBuilder = new StringBuilder();
+        while (matcher.find()) {
+            docBuilder.append(doc.substring(previousEnd, matcher.start()));
+
+            final String hLevel = matcher.group(1);
+            final String headerName = matcher.group(2);
+            headersIds.add(headerName);
+
+            docBuilder.append("<h" + hLevel + " id=\"" + headerName + "\">");
+            docBuilder.append(headerName);
+            docBuilder.append("</h" + hLevel + ">");
+
+            previousEnd = matcher.end();
+        }
+        docBuilder.append(doc.substring(previousEnd, doc.length()));
+        return createHyperlinks(docBuilder.toString(), headersIds);
+    }
+
+    private static String createHyperlinks(final String doc, final Collection<String> headersIds) {
+        if (headersIds.isEmpty()) {
+            return doc;
+        }
+        final String regex = headersIds.stream().map(name -> "`\\Q" + name + "\\E`").collect(joining("|"));
+        final Matcher matcher = Pattern.compile(regex).matcher(doc);
+
+        int previousEnd = 0;
+        final StringBuilder docBuilder = new StringBuilder();
+        while (matcher.find()) {
+            docBuilder.append(doc.substring(previousEnd, matcher.start()));
+
+            String name = matcher.group(0);
+            name = name.substring(1, name.length() - 1); // cut off enclosing ` characters
+            
+            docBuilder.append("<a href=\"#" + name + "\">");
+            docBuilder.append(name);
+            docBuilder.append("</a>");
+            
+            previousEnd = matcher.end();
+        }
+        docBuilder.append(doc.substring(previousEnd, doc.length()));
+        return docBuilder.toString();
     }
 }
