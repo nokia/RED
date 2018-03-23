@@ -84,6 +84,14 @@ public abstract class RobotContainer implements RobotElement {
         return parent;
     }
 
+    public RobotProject getRobotProject() {
+        RobotElement current = parent;
+        while (!(current instanceof RobotProject)) {
+            current = current.getParent();
+        }
+        return (RobotProject) current;
+    }
+
     public IContainer getContainer() {
         return container;
     }

@@ -483,8 +483,10 @@ public class AssistProposalsTest {
 
     private RedKeywordProposal kwProposal(final String name, final String source) {
         final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setFormat("ROBOT");
         libSpec.setName(source);
         final KeywordSpecification kwSpec = new KeywordSpecification();
+        kwSpec.setFormat("ROBOT");
         kwSpec.setName(name);
         return AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "", KeywordScope.REF_LIBRARY,
                 Optional.empty(), new Path("test.robot"), AssistProposalPredicates.alwaysTrue(), ProposalMatch.EMPTY);

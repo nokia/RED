@@ -33,7 +33,7 @@ public class SuiteSourceCurrentCellHighlighterTest {
         final IDocument document = new Document("abc  def  ghi");
 
         final SuiteSourceCurrentCellHighlighter highlighter = new SuiteSourceCurrentCellHighlighter(
-                mock(SuiteSourceEditor.class), new RobotSuiteFileCreator().build(), document);
+                new RobotSuiteFileCreator().build(), document);
         highlighter.install(viewer);
 
         assertThat(annotationModel.isEmpty()).isTrue();
@@ -47,7 +47,7 @@ public class SuiteSourceCurrentCellHighlighterTest {
         final IDocument document = new Document("abc  def  ghi");
 
         final SuiteSourceCurrentCellHighlighter highlighter = new SuiteSourceCurrentCellHighlighter(
-                mock(SuiteSourceEditor.class), new RobotSuiteFileCreator().build(), document);
+                new RobotSuiteFileCreator().build(), document);
         highlighter.install(viewer);
         highlighter.refreshCurrentCell(1);
 
@@ -62,7 +62,7 @@ public class SuiteSourceCurrentCellHighlighterTest {
         final IDocument document = new Document("abc  def  ghi");
 
         final SuiteSourceCurrentCellHighlighter highlighter = new SuiteSourceCurrentCellHighlighter(
-                mock(SuiteSourceEditor.class), new RobotSuiteFileCreator().build(), document);
+                new RobotSuiteFileCreator().build(), document);
         highlighter.install(viewer);
         highlighter.refreshCurrentCell(5);
 
@@ -77,7 +77,7 @@ public class SuiteSourceCurrentCellHighlighterTest {
         final IDocument document = new Document("abc  def  ghi");
 
         final SuiteSourceCurrentCellHighlighter highlighter = new SuiteSourceCurrentCellHighlighter(
-                mock(SuiteSourceEditor.class), new RobotSuiteFileCreator().build(), document);
+                new RobotSuiteFileCreator().build(), document);
         highlighter.install(viewer);
         highlighter.refreshCurrentCell(8);
 
@@ -92,7 +92,7 @@ public class SuiteSourceCurrentCellHighlighterTest {
         final IDocument document = new Document("abc  def  ghi");
 
         final SuiteSourceCurrentCellHighlighter highlighter = new SuiteSourceCurrentCellHighlighter(
-                mock(SuiteSourceEditor.class), new RobotSuiteFileCreator().build(), document);
+                new RobotSuiteFileCreator().build(), document);
         highlighter.install(viewer);
         highlighter.refreshCurrentCell(4);
 
@@ -107,7 +107,7 @@ public class SuiteSourceCurrentCellHighlighterTest {
         final IDocument document = new Document("abc  def  ghi");
 
         final SuiteSourceCurrentCellHighlighter highlighter = new SuiteSourceCurrentCellHighlighter(
-                mock(SuiteSourceEditor.class), new RobotSuiteFileCreator().build(), document);
+                new RobotSuiteFileCreator().build(), document);
         highlighter.install(viewer);
         highlighter.refreshCurrentCell(2);
         highlighter.refreshCurrentCell(4);
@@ -123,7 +123,7 @@ public class SuiteSourceCurrentCellHighlighterTest {
         final IDocument document = new Document("abc  def  ghi");
 
         final SuiteSourceCurrentCellHighlighter highlighter = new SuiteSourceCurrentCellHighlighter(
-                mock(SuiteSourceEditor.class), new RobotSuiteFileCreator().build(), document);
+                new RobotSuiteFileCreator().build(), document);
         highlighter.install(viewer);
         highlighter.refreshCurrentCell(4);
         highlighter.refreshCurrentCell(2);
@@ -139,7 +139,7 @@ public class SuiteSourceCurrentCellHighlighterTest {
         final IDocument document = new Document("abc  def  ghi");
 
         final SuiteSourceCurrentCellHighlighter highlighter = new SuiteSourceCurrentCellHighlighter(
-                mock(SuiteSourceEditor.class), new RobotSuiteFileCreator().build(), document);
+                new RobotSuiteFileCreator().build(), document);
         highlighter.install(viewer);
         highlighter.refreshCurrentCell(1);
         highlighter.refreshCurrentCell(2);

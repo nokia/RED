@@ -5,9 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
@@ -16,8 +14,6 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Predicate;
 
 public class RobotDefinitionSetting extends RobotKeywordCall {
 
@@ -37,31 +33,25 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
     @Override
     public List<String> getArguments() {
         if (arguments == null) {
-            final List<RobotToken> allTokens = getLinkedElement().getElementTokens();
-            final Iterable<RobotToken> tokensWithoutComments = filter(allTokens, new Predicate<RobotToken>() {
-
-                @Override
-                public boolean apply(final RobotToken token) {
-                    final List<IRobotTokenType> types = token.getTypes();
-                    final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
-                    return type != RobotTokenType.START_HASH_COMMENT && type != RobotTokenType.COMMENT_CONTINUE
-                            && type != RobotTokenType.TEST_CASE_SETTING_SETUP
-                            && type != RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION
-                            && type != RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION
-                            && type != RobotTokenType.TEST_CASE_SETTING_TEARDOWN
-                            && type != RobotTokenType.TEST_CASE_SETTING_TEMPLATE
-                            && type != RobotTokenType.TEST_CASE_SETTING_TIMEOUT
-                            && type != RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION
-                            && type != RobotTokenType.KEYWORD_SETTING_ARGUMENTS
-                            && type != RobotTokenType.KEYWORD_SETTING_DOCUMENTATION
-                            && type != RobotTokenType.KEYWORD_SETTING_TAGS
-                            && type != RobotTokenType.KEYWORD_SETTING_TEARDOWN
-                            && type != RobotTokenType.KEYWORD_SETTING_RETURN
-                            && type != RobotTokenType.KEYWORD_SETTING_TIMEOUT
-                            && type != RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION;
-                }
-            });
-            arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
+            arguments = getLinkedElement().getElementTokens().stream().filter(token -> {
+                final List<IRobotTokenType> types = token.getTypes();
+                final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
+                return type != RobotTokenType.START_HASH_COMMENT && type != RobotTokenType.COMMENT_CONTINUE
+                        && type != RobotTokenType.TEST_CASE_SETTING_SETUP
+                        && type != RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION
+                        && type != RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION
+                        && type != RobotTokenType.TEST_CASE_SETTING_TEARDOWN
+                        && type != RobotTokenType.TEST_CASE_SETTING_TEMPLATE
+                        && type != RobotTokenType.TEST_CASE_SETTING_TIMEOUT
+                        && type != RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION
+                        && type != RobotTokenType.KEYWORD_SETTING_ARGUMENTS
+                        && type != RobotTokenType.KEYWORD_SETTING_DOCUMENTATION
+                        && type != RobotTokenType.KEYWORD_SETTING_TAGS
+                        && type != RobotTokenType.KEYWORD_SETTING_TEARDOWN
+                        && type != RobotTokenType.KEYWORD_SETTING_RETURN
+                        && type != RobotTokenType.KEYWORD_SETTING_TIMEOUT
+                        && type != RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION;
+            }).map(RobotToken::getText).collect(toList());
         }
         return arguments;
     }
@@ -101,7 +91,7 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
     }
 
     @Override
-    public RobotKeywordCall insertCellAt(int position, String newValue) {
+    public RobotKeywordCall insertCellAt(final int position, final String newValue) {
         if (position > 0) {
             return super.insertCellAt(position, newValue);
         }
