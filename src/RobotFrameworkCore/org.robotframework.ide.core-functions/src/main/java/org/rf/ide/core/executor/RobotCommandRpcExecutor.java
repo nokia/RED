@@ -397,29 +397,35 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     @Override
     public void runRfLint(final String host, final int port, final File projectLocation,
             final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
-            final List<String> rulesFiles) {
+            final List<String> rulesFiles, final List<String> additionalArguments) {
         try {
-            final List<String> additionalArgs = new ArrayList<>();
-            for (final String path : rulesFiles) {
-                additionalArgs.add("-R");
-                additionalArgs.add(path);
-            }
-            for (final RfLintRule rule : rules) {
-                if (rule.hasChangedSeverity()) {
-                    additionalArgs.add("-" + rule.getSeverity().severitySwitch());
-                    additionalArgs.add(rule.getRuleName());
-                }
-                if (rule.hasConfigurationArguments()) {
-                    additionalArgs.add("-c");
-                    additionalArgs.add(rule.getRuleName() + ":" + rule.getConfiguration());
-                }
-            }
             callRpcFunction("runRfLint", host, port, projectLocation.getAbsolutePath(), excludedPaths,
-                    filepath.getAbsolutePath(), additionalArgs);
+                    filepath.getAbsolutePath(), createRfLintArguments(rules, rulesFiles, additionalArguments));
 
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
+    }
+
+    static List<String> createRfLintArguments(final List<RfLintRule> rules, final List<String> rulesFiles,
+            final List<String> additionalArguments) {
+        final List<String> arguments = new ArrayList<>();
+        for (final String path : rulesFiles) {
+            arguments.add("-R");
+            arguments.add(path);
+        }
+        for (final RfLintRule rule : rules) {
+            if (rule.hasChangedSeverity()) {
+                arguments.add("-" + rule.getSeverity().severitySwitch());
+                arguments.add(rule.getRuleName());
+            }
+            if (rule.hasConfigurationArguments()) {
+                arguments.add("-c");
+                arguments.add(rule.getRuleName() + ":" + rule.getConfiguration());
+            }
+        }
+        arguments.addAll(additionalArguments);
+        return arguments;
     }
 
     private Object callRpcFunction(final String functionName, final Object... arguments) throws XmlRpcException {
