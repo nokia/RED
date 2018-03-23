@@ -94,6 +94,7 @@ public class RedPreferences {
     public static final String RFLINT_RULES_CONFIG_SEVERITIES = "red.validation.rflint.rulesConfig.severities";
     public static final String RFLINT_RULES_CONFIG_ARGS = "red.validation.rflint.rulesConfig.arguments";
     public static final String RFLINT_RULES_FILES = "red.validation.rflint.rulesFiles";
+    public static final String RFLINT_ADDITIONAL_ARGUMENTS = "red.validation.rflint.additionalArguments";
 
     public static final String TURN_OFF_VALIDATION = "red.validation.turnOff";
 
@@ -372,6 +373,10 @@ public class RedPreferences {
             rules.add(new RfLintRule(names.get(i), RfLintViolationSeverity.valueOf(severities.get(i)), args.get(i)));
         }
         return rules;
+    }
+
+    public String getRfLintAdditionalArguments() {
+        return store.getString(RFLINT_ADDITIONAL_ARGUMENTS);
     }
 
     public static class ColoringPreference {

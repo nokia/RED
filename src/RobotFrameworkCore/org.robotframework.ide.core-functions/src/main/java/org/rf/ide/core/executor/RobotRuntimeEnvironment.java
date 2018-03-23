@@ -467,11 +467,12 @@ public class RobotRuntimeEnvironment {
 
     public void runRfLint(final String host, final int port, final File projectLocation,
             final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
-            final List<String> rulesFiles) {
+            final List<String> rulesFiles, final List<String> additionalArguments) {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.runRfLint(host, port, projectLocation, excludedPaths, filepath, rules, rulesFiles);
+            executor.runRfLint(host, port, projectLocation, excludedPaths, filepath, rules, rulesFiles,
+                    additionalArguments);
         }
     }
 
