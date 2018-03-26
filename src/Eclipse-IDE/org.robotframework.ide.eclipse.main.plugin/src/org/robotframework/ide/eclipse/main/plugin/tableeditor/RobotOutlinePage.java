@@ -259,7 +259,7 @@ class RobotOutlinePage extends ContentOutlinePage {
         LinkWithEditorAction(final ISelectionProvider editorSelectionProvider,
                 final StyledText editorSourceWidget) {
             super("Link with Editor", IAction.AS_CHECK_BOX);
-            setImageDescriptor(RedImages.getLinkImage());
+            setImageDescriptor(RedImages.getSyncedImage());
             this.editorSelectionProvider = editorSelectionProvider;
             this.editorSourceWidget = editorSourceWidget;
             setChecked(true);
