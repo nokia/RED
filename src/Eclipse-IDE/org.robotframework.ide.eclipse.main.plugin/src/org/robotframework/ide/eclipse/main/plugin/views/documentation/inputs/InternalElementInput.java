@@ -5,12 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
@@ -18,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
 
 abstract class InternalElementInput<T extends RobotFileInternalElement> extends DocumentationViewInput {
@@ -43,6 +46,33 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> extends 
         return wrappedInput == element;
     }
 
+    @Override
+    public void prepare() {
+        // nothing to prepare
+    }
+
+    @Override
+    public final String provideHtml() {
+        final RobotRuntimeEnvironment environment = element.getSuiteFile().getProject().getRuntimeEnvironment();
+        final String header = createHeader();
+        final Documentation doc = createDocumentation();
+
+        return new DocumentationsFormatter(environment).format(header, doc, this::localKeywordsLinker);
+    }
+
+    protected abstract String createHeader();
+
+    protected abstract Documentation createDocumentation();
+
+    protected String localKeywordsLinker(final String name) {
+        try {
+            final IFile file = element.getSuiteFile().getFile();
+            return WorkspaceFileUri.createShowKeywordDocUri(file, name).toString();
+        } catch (final URISyntaxException e) {
+            return "#";
+        }
+    }
+
     private static <T extends RobotFileInternalElement> List<Integer> createIndexesPath(final T element) {
         final List<Integer> address = new ArrayList<>();
 
@@ -55,32 +85,19 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> extends 
     }
 
     @Override
-    public void prepare() {
-        // nothing to prepare
-    }
-
-    @Override
-    public String provideHtml() {
-        final RobotRuntimeEnvironment environment = element.getSuiteFile().getProject().getRuntimeEnvironment();
-        final String header = createHeader();
-        final Documentation doc = createDocumentation();
-
-        return new DocumentationsFormatter(environment).format(header, doc);
-    }
-
-    protected abstract String createHeader();
-
-    protected abstract Documentation createDocumentation();
-
-    @Override
-    public void showInput(final IWorkbenchPage page) {
+    public final void showInput(final IWorkbenchPage page) {
         final boolean stillExist = elementStillExists();
         if (stillExist) {
             element.getOpenRobotEditorStrategy().run(page, selectedLabel);
         } else {
-            final Supplier<? extends DocumentationInputOpenException> exceptionSupplier = () -> new DocumentationInputOpenException(
-                    "Unable to open given input. It looks like element '" + element.getName()
-                            + "' does no longer exist");
+            // the file could have been reparsed, so that the element is no longer part
+            // of the actual model; we are trying to find something that has the same
+            // indexes path in same RobotSuiteModel, or throw an exception if it is
+            // not possible
+
+            final Supplier<? extends DocumentationInputOpenException> exceptionSupplier =
+                    () -> new DocumentationInputOpenException("Unable to open given input. It looks like element '"
+                            + element.getName() + "' does no longer exist");
             final RobotFileInternalElement elementWithSameAddress = findElementWithSameAddress()
                     .orElseThrow(exceptionSupplier);
 
@@ -93,8 +110,6 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> extends 
     }
 
     private boolean elementStillExists() {
-        // the elements may no longer exist when for example user removed them, or even when
-        // reparsing was done
         RobotElement current = element;
         while (!(current instanceof RobotSuiteFile)) {
             if (!containsExactlyThisInstance(current)) {

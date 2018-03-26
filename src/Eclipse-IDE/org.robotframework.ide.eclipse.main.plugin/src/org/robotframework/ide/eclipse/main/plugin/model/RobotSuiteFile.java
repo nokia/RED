@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 import java.io.ByteArrayInputStream;
@@ -448,27 +449,23 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public List<RobotKeywordDefinition> getUserDefinedKeywords() {
-        final Optional<RobotKeywordsSection> optionalKeywords = findSection(RobotKeywordsSection.class);
-        if (optionalKeywords.isPresent()) {
-            return optionalKeywords.get().getUserDefinedKeywords();
-        }
-        return new ArrayList<>();
+        return findSection(RobotKeywordsSection.class).map(RobotKeywordsSection::getUserDefinedKeywords)
+                .orElseGet(() -> new ArrayList<>());
+    }
+
+    public List<RobotCase> getTestCases() {
+        return findSection(RobotCasesSection.class).map(RobotCasesSection::getTestCases)
+                .orElseGet(() -> new ArrayList<>());
     }
 
     public List<String> getResourcesPaths() {
-        final Optional<RobotSettingsSection> optionalSettings = findSection(RobotSettingsSection.class);
-        if (optionalSettings.isPresent()) {
-            return optionalSettings.get().getResourcesPaths();
-        }
-        return new ArrayList<>();
+        return findSection(RobotSettingsSection.class).map(RobotSettingsSection::getResourcesPaths)
+                .orElseGet(() -> new ArrayList<>());
     }
 
     public List<String> getVariablesPaths() {
-        final Optional<RobotSettingsSection> optionalSettings = findSection(RobotSettingsSection.class);
-        if (optionalSettings.isPresent()) {
-            return optionalSettings.get().getVariablesPaths();
-        }
-        return new ArrayList<>();
+        return findSection(RobotSettingsSection.class).map(RobotSettingsSection::getVariablesPaths)
+                .orElseGet(() -> new ArrayList<>());
     }
 
     public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {
@@ -489,7 +486,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     public Documentation createDocumentation() {
         // TODO : provide format depending on source
-        return new Documentation(DocFormat.ROBOT, getDocumentation());
+        final Set<String> keywords = getSuiteFile().getUserDefinedKeywords()
+                .stream()
+                .map(RobotKeywordDefinition::getName)
+                .collect(toCollection(() -> new HashSet<>()));
+        return new Documentation(DocFormat.ROBOT, getDocumentation(), keywords);
     }
 
     public static IFile createRobotInitializationFile(final IFolder folder, final String extension)
