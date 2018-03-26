@@ -5,408 +5,290 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.IDocumentationHolder;
-import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
-import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputGenerationException;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputOpenException;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 import org.robotframework.red.swt.SwtThread;
 
-/**
- * @author mmarzec
- */
 public class DocumentationView {
 
     public static final String ID = "org.robotframework.ide.DocumentationView";
 
-    public static final String REFRESH_DOC_EVENT_TOPIC = "DocumentationView/Refresh";
+    private Browser browser;
 
-    private StyledText styledText;
+    private DocumentationViewInput currentInput;
+    private Job documentationJob;
 
-    private DocumentationViewPartListener documentationViewPartListener;
-
-    private CurrentlyDisplayedDocElement currentlyDisplayedDocElement;
-
-    private String labelForWhichDocIsDisplayed;
-
-    private final AtomicBoolean hasShowLibdocEnabled = new AtomicBoolean();
-
-    private ShowLibdocAction showLibdocAction;
+    private LinkWithSelectionAction linkSelectionAction;
+    private OpenInputAction openInputAction;
 
     @PostConstruct
-    public void postConstruct(final Composite parent, final IViewPart part) {
+    public void postConstruct(final Composite parent, final IWorkbenchPage page, final IViewPart part,
+            final IPartService partService) {
         parent.setLayout(new FillLayout());
 
-        styledText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-        styledText.setMargins(5, 5, 5, 5);
-        styledText.setBackground(ColorsManager.getColor(SWT.COLOR_INFO_BACKGROUND));
-        styledText.setFont(JFaceResources.getDefaultFont());
-        styledText.setEditable(false);
+        browser = new Browser(parent, SWT.NONE);
+        browser.addLocationListener(new LinksListener());
 
-        createToolbarActions(part.getViewSite().getActionBars().getToolBarManager());
+        createToolbarActions(partService, part.getViewSite().getActionBars().getToolBarManager(), page);
+    }
 
-        documentationViewPartListener = new DocumentationViewPartListener(this);
-        PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow()
-                .getActivePage()
-                .addPartListener(documentationViewPartListener);
+    private void createToolbarActions(final IPartService partService, final IToolBarManager manager,
+            final IWorkbenchPage page) {
+        linkSelectionAction = new LinkWithSelectionAction(partService);
+        openInputAction = new OpenInputAction(page);
+
+        manager.add(linkSelectionAction);
+        manager.add(openInputAction);
     }
 
     @Focus
     public void onFocus() {
-        styledText.setFocus();
+        browser.setFocus();
     }
 
     @PreDestroy
     public void dispose() {
-        if (documentationViewPartListener != null) {
-            documentationViewPartListener.dispose();
-            PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow()
-                    .getActivePage()
-                    .removePartListener(documentationViewPartListener);
+        if (linkSelectionAction != null) {
+            linkSelectionAction.dispose();
         }
     }
 
-    public void showDocumentation(final RobotFileInternalElement element) {
-        if (element == null) {
-            clearView();
+    void markSynced() {
+        linkSelectionAction.switchToSynced();
+    }
+
+    void markSyncBroken() {
+        linkSelectionAction.switchToBrokenSync();
+    }
+
+    public synchronized void displayDocumentation(final DocumentationViewInput input) {
+        if (Objects.equals(currentInput, input)) {
+            markSynced();
             return;
         }
-
-        initCurrentlyDisplayedDocElement();
-
-        if (!currentlyDisplayedDocElement.isEqualTo(element)) {
-            currentlyDisplayedDocElement.setRobotFileInternalElement(element);
-            showDocumentationText();
-        }
+        scheduleInputLoadingJob(input);
     }
 
-    public void showDocumentation(final IDocumentationHolder documentationHolder, final RobotSuiteFile suiteFile) {
-        if (documentationHolder == null) {
-            clearView();
-            return;
+    private void scheduleInputLoadingJob(final DocumentationViewInput input) {
+        if (documentationJob != null && documentationJob.getState() == Job.SLEEPING) {
+            documentationJob.cancel();
         }
-
-        initCurrentlyDisplayedDocElement();
-
-        if (!currentlyDisplayedDocElement.isEqualTo(documentationHolder)) {
-            currentlyDisplayedDocElement.setDocumentationHolder(documentationHolder, suiteFile);
-            showDocumentationText();
-        }
+        documentationJob = createDocumentationJob(input);
+        documentationJob.schedule(100);
     }
 
-    private void showDocumentationText() {
-        if (currentlyDisplayedDocElement != null && currentlyDisplayedDocElement.getDocumentationHolder() != null) {
-            final String documentationText = DocumentationServiceHandler
-                    .toShowConsolidated(currentlyDisplayedDocElement.getDocumentationHolder());
-            final String parentName = currentlyDisplayedDocElement.getParentName();
-            final String fileName = currentlyDisplayedDocElement.getSuiteFileName();
+    private Job createDocumentationJob(final DocumentationViewInput input) {
+        return Job.create("Generating documentation", monitor -> {
+            try {
+                input.prepare();
+                final String html = input.provideHtml();
 
-            SwtThread.asyncExec(new DocTextSetter(documentationText, parentName, fileName));
-        }
-    }
+                currentInput = input;
+                openInputAction.setEnabled(true);
+                SwtThread.asyncExec(() -> {
+                    browser.setText(html);
+                    markSynced();
+                });
 
-    public void showLibdoc(final RobotFileInternalElement element, final String label) {
-        if (element == null || label == null) {
-            clearView();
-            return;
-        }
+            } catch (final DocumentationInputGenerationException e) {
+                // nothing to do yet
 
-        initCurrentlyDisplayedDocElement();
-
-        if (!currentlyDisplayedDocElement.isEqualTo(element) || !label.equals(labelForWhichDocIsDisplayed)) {
-            currentlyDisplayedDocElement.setRobotFileInternalElement(element);
-            labelForWhichDocIsDisplayed = label;
-            showLibdocText(label, element.getSuiteFile());
-        }
-    }
-
-    public void showLibdoc(final String elementName, final RobotSuiteFile suiteFile) {
-        if (elementName == null) {
-            clearView();
-            return;
-        }
-        resetCurrentlyDisplayedElement();
-        showLibdocText(elementName, suiteFile);
-    }
-
-    private void showLibdocText(final String elementName, final RobotSuiteFile suiteFile) {
-        final Optional<RedKeywordProposal> bestMatch = new RedKeywordProposals(suiteFile)
-                .getBestMatchingKeywordProposal(elementName);
-        bestMatch.ifPresent(proposal -> SwtThread.asyncExec(new DocTextSetter(proposal.getDescription(), "", "")));
+            } catch (final RuntimeException e) {
+                StatusManager.getManager().handle(
+                        new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, IStatus.OK, "Error displaying documentation", e),
+                        StatusManager.SHOW);
+            }
+            return Status.OK_STATUS;
+        });
     }
 
     @Inject
-    @org.eclipse.e4.core.di.annotations.Optional
-    private void refreshEvent(@UIEventTopic(REFRESH_DOC_EVENT_TOPIC) final RobotFileInternalElement element) {
-        resetCurrentlyDisplayedElement();
-        showDocumentation(element);
-    }
-
-    private void initCurrentlyDisplayedDocElement() {
-        if (currentlyDisplayedDocElement == null) {
-            currentlyDisplayedDocElement = new CurrentlyDisplayedDocElement();
+    @Optional
+    private void whenKeywordCallDetailIsChanged(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotKeywordCall keywordCall) {
+        if (currentInput == null) {
+            return;
+        }
+        if (keywordCall instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) keywordCall).isDocumentation()
+                && currentInput.contains(keywordCall)) {
+            scheduleInputLoadingJob(currentInput);
+        } else if (keywordCall instanceof RobotSetting && ((RobotSetting) keywordCall).isDocumentation()
+                && currentInput.contains(keywordCall)) {
+            scheduleInputLoadingJob(currentInput);
         }
     }
 
-    private void clearView() {
-        resetCurrentlyDisplayedElement();
-        SwtThread.asyncExec(new DocTextSetter());
-    }
+    private final class LinksListener implements LocationListener {
 
-    public void resetCurrentlyDisplayedElement() {
-        if (currentlyDisplayedDocElement != null) {
-            currentlyDisplayedDocElement.reset();
-        }
-        labelForWhichDocIsDisplayed = null;
-    }
+        @Override
+        public void changing(final LocationEvent event) {
+            if (event.location.equals("about:blank")) {
+                // moving to generated site set by Browser#setText method
+                return;
 
-    public boolean hasShowLibdocEnabled() {
-        return hasShowLibdocEnabled.get();
-    }
+            } else if (event.location.startsWith("about:blank#")) {
+                // local link at non-existing generated site - scroll to the element using
+                // javascript
+                final String id = event.location.substring(event.location.indexOf("#"));
+                browser.execute("document.getElementById('" + id + "').scrollIntoView();");
 
-    public void setShowLibdocEnabled() {
-        hasShowLibdocEnabled.set(true);
-        showLibdocAction.setChecked(true);
-    }
+            } else if (event.location.startsWith("file://")) {
 
-    private void createToolbarActions(final IToolBarManager toolBarManager) {
-        final ShowInSourceAction showInSourceAction = new ShowInSourceAction();
-        showInSourceAction.setText("Show In Source");
-        showInSourceAction.setImageDescriptor(RedImages.getGoToImage());
-        toolBarManager.add(showInSourceAction);
-        final ToggleWordWrapAction toggleWordWrapAction = new ToggleWordWrapAction();
-        toggleWordWrapAction.setChecked(false);
-        toggleWordWrapAction.setText("Word Wrap");
-        toggleWordWrapAction.setImageDescriptor(RedImages.getWordwrapImage());
-        toolBarManager.add(toggleWordWrapAction);
-        showLibdocAction = new ShowLibdocAction();
-        showLibdocAction.setChecked(false);
-        showLibdocAction.setText("Show Libdoc");
-        showLibdocAction.setImageDescriptor(RedImages.getBookImage());
-        toolBarManager.add(showLibdocAction);
-    }
+            } else {
+                // all other links
+                event.doit = false;
 
-    class DocTextSetter implements Runnable {
-
-        private final String documentationText;
-
-        private final String documentationSettingParentName;
-
-        private final String fileName;
-
-        public DocTextSetter() {
-            this("", "", "");
-        }
-
-        public DocTextSetter(final String documentationText, final String documentationSettingParentName,
-                final String fileName) {
-            this.documentationText = documentationText;
-            this.documentationSettingParentName = documentationSettingParentName;
-            this.fileName = fileName;
+                try {
+                    final URI uriToOpen = new URI(event.location);
+                    SwtThread.asyncExec(event.display, () -> {
+                        final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
+                                .getBrowserSupport();
+                        try {
+                            final IWebBrowser wbBrowser = browserSupport.createBrowser(null);
+                            wbBrowser.openURL(uriToOpen.toURL());
+                        } catch (PartInitException | MalformedURLException e) {
+                            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                                    "Unable to open hyperlink: " + event.location, e), StatusManager.BLOCK);
+                        }
+                    });
+                } catch (final URISyntaxException e) {
+                    // this should not happen, as location is prepared to be passed as URI
+                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "Unable to open hyperlink: " + event.location, e), StatusManager.BLOCK);
+                }
+            }
         }
 
         @Override
-        public void run() {
-            if (!styledText.isDisposed()) {
-                styledText.setText("");
-
-                if (!documentationSettingParentName.isEmpty() && !fileName.isEmpty()) {
-                    styledText.append(documentationSettingParentName + "\n");
-                    styledText.append(fileName + "\n\n");
-
-                    styledText.setStyleRange(
-                            new StyleRange(0, documentationSettingParentName.length(), null, null, SWT.BOLD));
-                    styledText.setStyleRange(new StyleRange(documentationSettingParentName.length() + 1,
-                            fileName.length(), null, null, SWT.ITALIC));
-                }
-                styledText.append(documentationText);
-            }
-        }
-
-    }
-
-    class CurrentlyDisplayedDocElement {
-
-        private Optional<RobotFileInternalElement> robotFileInternalElement = Optional.empty();
-
-        private Optional<IDocumentationHolder> documentationHolder = Optional.empty();
-
-        private String suiteFileName = "";
-
-        public void setRobotFileInternalElement(final RobotFileInternalElement robotFileInternalElement) {
-            this.robotFileInternalElement = Optional.of(robotFileInternalElement);
-            this.suiteFileName = robotFileInternalElement.getSuiteFile().getName();
-            this.documentationHolder = Optional.empty();
-        }
-
-        public void setDocumentationHolder(final IDocumentationHolder documentationHolder,
-                final RobotSuiteFile suiteFile) {
-            this.documentationHolder = Optional.of(documentationHolder);
-            this.suiteFileName = suiteFile.getName();
-            this.robotFileInternalElement = Optional.empty();
-        }
-
-        public IDocumentationHolder getDocumentationHolder() {
-            if (robotFileInternalElement.isPresent()) {
-                final Object linkedElement = robotFileInternalElement.get().getLinkedElement();
-                if (linkedElement != null && linkedElement instanceof IDocumentationHolder) {
-                    return (IDocumentationHolder) linkedElement;
-                }
-            } else if (documentationHolder.isPresent()) {
-                return documentationHolder.get();
-            }
-
-            return null;
-        }
-
-        public String getParentName() {
-            if (robotFileInternalElement.isPresent()) {
-                final RobotElement parent = robotFileInternalElement.get().getParent();
-                if (parent != null) {
-                    return parent.getName();
-                }
-            } else if (documentationHolder.isPresent()) {
-                final AModelElement<?> modelElement = (AModelElement<?>) documentationHolder.get();
-                if (modelElement.getParent() instanceof IExecutableStepsHolder) {
-                    return ((IExecutableStepsHolder<?>) modelElement.getParent()).getName().getText();
-                }
-            }
-            return "";
-        }
-
-        public String getSuiteFileName() {
-            return suiteFileName;
-        }
-
-        public Optional<DefinitionPosition> getDefinitionPosition() {
-            if (robotFileInternalElement.isPresent()) {
-                return Optional.of(robotFileInternalElement.get().getDefinitionPosition());
-            }
-            return Optional.empty();
-        }
-
-        public boolean isEqualTo(final RobotFileInternalElement other) {
-            if (robotFileInternalElement.isPresent()) {
-                return robotFileInternalElement.get() == other;
-            }
-            return false;
-        }
-
-        public boolean isEqualTo(final IDocumentationHolder other) {
-            if (documentationHolder.isPresent()) {
-                return documentationHolder.get() == other;
-            }
-            return false;
-        }
-
-        public void reset() {
-            this.robotFileInternalElement = Optional.empty();
-            this.documentationHolder = Optional.empty();
+        public void changed(final LocationEvent event) {
+            // nothing to do
         }
     }
 
-    class ShowInSourceAction extends Action implements IWorkbenchAction {
+    private class LinkWithSelectionAction extends Action implements IWorkbenchAction {
 
-        private static final String ID = "org.robotframework.action.documentationView.ShowInSourceAction";
+        private static final String ID = "org.robotframework.action.views.documentation.LinkWithSelection";
 
-        public ShowInSourceAction() {
+        private final IPartService partService;
+
+        private DocumentationViewPartListener partsListener;
+
+        public LinkWithSelectionAction(final IPartService partService) {
+            this.partService = partService;
             setId(ID);
+            setText("Link with Selection");
+            setImageDescriptor(RedImages.getSyncedImage());
+
+            setChecked(false);
+        }
+
+        private void switchToSynced() {
+            if (isChecked()) {
+                setText("Link with Selection");
+                setImageDescriptor(RedImages.getSyncedImage());
+            }
+        }
+
+        private void switchToBrokenSync() {
+            if (isChecked()) {
+                setText("Link with Selection (showing last valid input)");
+                setImageDescriptor(RedImages.getSyncBrokenImage());
+            }
         }
 
         @Override
         public void run() {
-            if (currentlyDisplayedDocElement != null) {
-                final IEditorPart activeEditor = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .getActiveEditor();
-                if (activeEditor instanceof RobotFormEditor) {
-                    final RobotFormEditor editor = (RobotFormEditor) activeEditor;
-                    final SuiteSourceEditor suiteEditor = editor.activateSourcePage();
-                    final ISelectionProvider selectionProvider = suiteEditor.getSite().getSelectionProvider();
-
-                    final Optional<DefinitionPosition> position = currentlyDisplayedDocElement.getDefinitionPosition();
-                    if (position.isPresent()) {
-                        final DefinitionPosition definitionPosition = position.get();
-                        selectionProvider.setSelection(
-                                new TextSelection(definitionPosition.getOffset(), definitionPosition.getLength()));
-                    }
-                }
+            if (isChecked()) {
+                createPartsListener();
+            } else {
+                removePartsListener();
             }
         }
 
         @Override
         public void dispose() {
+            removePartsListener();
+        }
+
+        private void createPartsListener() {
+            partsListener = new DocumentationViewPartListener();
+            partService.addPartListener(partsListener);
+        }
+
+        private void removePartsListener() {
+            if (partsListener != null) {
+                partService.removePartListener(partsListener);
+                partsListener.dispose();
+                partsListener = null;
+            }
         }
     }
 
-    class ToggleWordWrapAction extends Action implements IWorkbenchAction {
+    private class OpenInputAction extends Action {
 
-        private static final String ID = "org.robotframework.action.documentationView.ToggleWordWrapAction";
+        private static final String ID = "org.robotframework.action.views.documentation.OpenInput";
 
-        public ToggleWordWrapAction() {
+        private final IWorkbenchPage page;
+
+        public OpenInputAction(final IWorkbenchPage page) {
+            this.page = page;
             setId(ID);
+            setText("Open Input");
+            setImageDescriptor(RedImages.getGoToImage());
+
+            setEnabled(false);
         }
 
         @Override
         public void run() {
-            styledText.setWordWrap(!styledText.getWordWrap());
-        }
-
-        @Override
-        public void dispose() {
-        }
-    }
-
-    class ShowLibdocAction extends Action implements IWorkbenchAction {
-
-        private static final String ID = "org.robotframework.action.documentationView.ShowLibdocAction";
-
-        public ShowLibdocAction() {
-            setId(ID);
-        }
-
-        @Override
-        public void run() {
-            hasShowLibdocEnabled.set(!hasShowLibdocEnabled.get());
-        }
-
-        @Override
-        public void dispose() {
+            if (currentInput != null) {
+                try {
+                    currentInput.showInput(page);
+                } catch (final DocumentationInputOpenException e) {
+                    StatusManager.getManager().handle(
+                            new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, IStatus.OK, "Error opening input", e),
+                            StatusManager.SHOW);
+                }
+            }
         }
     }
 }

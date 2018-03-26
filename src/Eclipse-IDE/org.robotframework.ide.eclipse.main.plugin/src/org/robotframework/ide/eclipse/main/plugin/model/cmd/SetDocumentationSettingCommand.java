@@ -13,7 +13,6 @@ import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationView;
 
 
 public class SetDocumentationSettingCommand extends EditorCommand {
@@ -37,7 +36,6 @@ public class SetDocumentationSettingCommand extends EditorCommand {
         if (!Objects.equals(value, oldDoc)) {
             DocumentationServiceHandler.update(docHolder, value);
 
-            eventBroker.post(DocumentationView.REFRESH_DOC_EVENT_TOPIC, docSetting);
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, docSetting);
         }
     }

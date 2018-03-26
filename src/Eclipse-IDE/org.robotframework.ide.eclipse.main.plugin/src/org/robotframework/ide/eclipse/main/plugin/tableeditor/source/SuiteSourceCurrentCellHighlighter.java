@@ -17,7 +17,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
-import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
@@ -35,8 +34,6 @@ class SuiteSourceCurrentCellHighlighter {
 
     private static final String ANNOTATION_ID = "org.robotframework.red.cellHighlighting";
 
-    private final SuiteSourceEditor editor;
-
     private final RobotSuiteFile fileModel;
 
     private final IDocument document;
@@ -45,9 +42,7 @@ class SuiteSourceCurrentCellHighlighter {
 
     private IAnnotationModel annotationModel;
 
-    SuiteSourceCurrentCellHighlighter(final SuiteSourceEditor editor, final RobotSuiteFile fileModel,
-            final IDocument document) {
-        this.editor = editor;
+    SuiteSourceCurrentCellHighlighter(final RobotSuiteFile fileModel, final IDocument document) {
         this.fileModel = fileModel;
         this.document = document;
         this.currentCell = null;
@@ -77,7 +72,6 @@ class SuiteSourceCurrentCellHighlighter {
                 annotationsToRemove = getAnnotationsToRemove();
                 annotationsToAdd = new HashMap<>();
                 currentCell = null;
-                editor.notifyDocSelectionChangedListener(new Region(offset, 1), false);
 
                 ((IAnnotationModelExtension) annotationModel).replaceAnnotations(annotationsToRemove, annotationsToAdd);
 
@@ -86,7 +80,6 @@ class SuiteSourceCurrentCellHighlighter {
                 annotationsToRemove = getAnnotationsToRemove();
                 annotationsToAdd = getAnnotationsToAdd(newRegion.get());
                 currentCell = newRegion.get();
-                editor.notifyDocSelectionChangedListener(currentCell, false);
 
                 ((IAnnotationModelExtension) annotationModel).replaceAnnotations(annotationsToRemove, annotationsToAdd);
             }
