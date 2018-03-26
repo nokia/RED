@@ -12,13 +12,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -31,27 +30,23 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
+import org.rf.ide.core.libraries.Documentation;
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.LibrarySpecification;
-import org.rf.ide.core.project.ImportPath;
-import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
-import org.rf.ide.core.project.ResolvedImportPath;
-import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
-import org.rf.ide.core.testdata.model.RobotExpressions;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
+import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableListMultimap;
@@ -415,109 +410,41 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public Multimap<LibrarySpecification, Optional<String>> getImportedLibraries() {
-        final RobotProject project = getProject();
+        final Collection<LibrarySpecification> specifications = getProject().getLibrarySpecifications();
+        final ImmutableListMultimap<String, LibrarySpecification> specs = Multimaps.index(specifications,
+                LibrarySpecification::getName);
 
-        final List<RobotSetting> nonEmptyLibraryImports = findSection(RobotSettingsSection.class).map(Stream::of)
+        final List<RobotSetting> libraryImports = findSection(RobotSettingsSection.class).map(Stream::of)
                 .orElseGet(Stream::empty)
-                .flatMap(section -> section.getLibrariesSettings().stream())
-                .filter(setting -> !setting.getArguments().isEmpty())
+                .map(RobotSettingsSection::getLibrariesSettings)
+                .flatMap(Collection::stream)
                 .collect(toList());
 
-        final ImmutableListMultimap<String, LibrarySpecification> specs = Multimaps
-                .index(project.getLibrarySpecifications(), LibrarySpecification::getName);
-
-        final SetMultimap<LibrarySpecification, Optional<String>> imported = LinkedHashMultimap.create();
-        for (final RobotSetting setting : nonEmptyLibraryImports) {
-
-            final String libNameOrPath = RobotExpressions.unescapeSpaces(setting.getArguments().get(0));
-
-            if (specs.containsKey(libNameOrPath)
-                    && !specs.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
-                // by-name import of non-remote; only remote libraries are currently used multiple
-                // times
-                imported.put(specs.get(libNameOrPath).get(0), setting.extractLibraryAlias());
-
-            } else if (specs.containsKey(libNameOrPath)
-                    && specs.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
-                // by-name import of remote library
-                // empty were filtered out, so here size() > 0
-                final RemoteLocation remoteLocation = setting.getArguments().size() == 1
-                        ? RemoteLocation.DEFAULT_LOCATION
-                        : RemoteLocation.create(RobotExpressions.unescapeSpaces(setting.getArguments().get(1)));
-                final String remote = stripLastSlashIfNecessary(remoteLocation.getUri());
-
-                for (final LibrarySpecification spec : specs.get(libNameOrPath)) {
-                    if (remote.equals(stripLastSlashIfNecessary(spec.getDescriptor().getArguments().get(0)))) {
-                        imported.put(spec, setting.extractLibraryAlias());
-                        break;
-                    }
-                }
-
-            } else {
-                // maybe it's a by-path import
-                try {
-                    findSpecForPath(libNameOrPath, this)
-                            .ifPresent(spec -> imported.put(spec, setting.extractLibraryAlias()));
-                } catch (final PathResolvingException e) {
-                    // ok we won't provide any spec, since we can't resolve uri
-                }
-            }
+        final SetMultimap<LibrarySpecification, Optional<String>> importedLibs = LinkedHashMultimap.create();
+        for (final RobotSetting setting : libraryImports) {
+            setting.getImportedLibrary(specs)
+                    .ifPresent(importedLib -> importedLibs.put(importedLib.getSpecification(), importedLib.getAlias()));
         }
-        project.getLibrarySpecificationsStream().filter(LibrarySpecification::isAccessibleWithoutImport).forEach(
+
+        // some libs are accessible always even when not imported explicitely
+        specifications.stream().filter(LibrarySpecification::isAccessibleWithoutImport).forEach(
                 spec -> {
-                    if (!imported.containsKey(spec)) {
-                        imported.put(spec, Optional.empty());
+                    if (!importedLibs.containsKey(spec)) {
+                        importedLibs.put(spec, Optional.empty());
                     }
                 });
-        return imported;
+        return importedLibs;
     }
 
-    private static String stripLastSlashIfNecessary(final String string) {
-        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
-    }
-
-    private Optional<LibrarySpecification> findSpecForPath(final String pathOrName, final RobotSuiteFile file) {
-        final RobotProject project = file.getProject();
-
-        final ImportPath importPath = ImportPath.from(pathOrName);
-        final Optional<ResolvedImportPath> resolvedImportPath = getResolvedPath(importPath, project);
-        if (!resolvedImportPath.isPresent()) {
-            return Optional.empty();
-        }
-
-        final IPath possiblePath;
-        if (importPath.isAbsolute()) {
-            possiblePath = new Path(resolvedImportPath.get().getUri().getPath());
-        } else {
-            final PathsProvider pathsProvider = project.createPathsProvider();
-            final Optional<URI> markedUri = new ImportSearchPaths(pathsProvider)
-                    .findAbsoluteUri(file.getFile().getLocationURI(), resolvedImportPath.get());
-            if (!markedUri.isPresent()) {
-                return Optional.empty();
-            }
-            possiblePath = new Path(markedUri.get().getPath());
-        }
-
-        return project.getLibraryEntriesStream()
-                .filter(entry -> entry.getValue() != null)
-                .filter(entry -> entry.getKey().isReferencedLibrary())
-                .filter(entry -> {
-                    final IPath entryPath = new Path(entry.getKey().getFilepath());
-                    final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
-                    final IPath libPath2 = RedWorkspace.Paths
-                            .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
-                    return possiblePath.equals(libPath1) || possiblePath.equals(libPath2);
-                })
-                .map(Entry::getValue)
-                .findFirst();
-    }
-
-    private Optional<ResolvedImportPath> getResolvedPath(final ImportPath importPath, final RobotProject project) {
-        try {
-            return ResolvedImportPath.from(importPath, project.getRobotProjectHolder().getVariableMappings());
-        } catch (final MalformedPathImportException e) {
-            return Optional.empty();
-        }
+    public List<IResource> getImportedResources() {
+        return findSection(RobotSettingsSection.class).map(Stream::of)
+                .orElseGet(Stream::empty)
+                .map(RobotSettingsSection::getResourcesSettings)
+                .flatMap(Collection::stream)
+                .map(RobotSetting::getImportedResource)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
     }
 
     public List<RobotKeywordDefinition> getUserDefinedKeywords() {
@@ -549,6 +476,20 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         final PathsProvider pathsProvider = getProject().createPathsProvider();
         return fileOutput != null ? fileOutput.getVariablesImportReferences(projectHolder, pathsProvider)
                 : new ArrayList<>();
+    }
+
+    public String getDocumentation() {
+        return findSection(RobotSettingsSection.class)
+                .flatMap(section -> section.getSetting(ModelType.SUITE_DOCUMENTATION))
+                .map(RobotKeywordCall::getLinkedElement)
+                .map(SuiteDocumentation.class::cast)
+                .map(DocumentationServiceHandler::toShowConsolidated)
+                .orElse("<not documented>");
+    }
+
+    public Documentation createDocumentation() {
+        // TODO : provide format depending on source
+        return new Documentation(DocFormat.ROBOT, getDocumentation());
     }
 
     public static IFile createRobotInitializationFile(final IFolder folder, final String extension)

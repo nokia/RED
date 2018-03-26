@@ -139,7 +139,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
                 arguments = tokensWithoutComments.map(tokenViaExecutableView(view)).collect(toList());
             } else {
-                arguments = tokensWithoutComments.map(TokenFunctions.tokenToString()).collect(toList());
+                arguments = tokensWithoutComments.map(RobotToken::getText).collect(toList());
             }
         }
         return arguments;
