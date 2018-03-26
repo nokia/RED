@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _XE7KQB3QEeeaa6EbsZptdA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/7/17 1:31 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/26/18 4:25 PM
 Tags: Debug, Quick
 Testcase-Type: ecl
 
@@ -74,6 +74,7 @@ try -times 3 -delay 1000 -command{
 }
 
 //check Message log
+wait-for-message-log
 get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.firstTest\n" 
 [concat_str_with_regex [list  "1\\n"  "\\$\\{variable\\} = 10\\n"  "10"]] "\nEnding test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.firstTest\n\n" 
 "Starting test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.secondTest\n" [concat_str_with_regex [list "Length is 6"]] 
@@ -81,5 +82,6 @@ get-view "Message Log" | get-editbox | get-property text | matches [concat "Star
 | verify-true
 
 //check if test is finished
-get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
+wait-for-console
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
