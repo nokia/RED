@@ -5,10 +5,15 @@
  */
 package org.rf.ide.core.libraries;
 
+import static java.util.stream.Collectors.toCollection;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -104,6 +109,10 @@ public class LibrarySpecification {
         return keywords;
     }
 
+    public Stream<KeywordSpecification> getKeywordsStream() {
+        return keywords == null ? Stream.empty() : keywords.stream();
+    }
+
     @XmlElement(name = "kw", required = false)
     public void setKeywords(final List<KeywordSpecification> keywords) {
         this.keywords = keywords;
@@ -164,7 +173,12 @@ public class LibrarySpecification {
     }
 
     public Documentation createDocumentation() {
-        return new Documentation(DocFormat.valueOf(format), documentation);
+        return new Documentation(DocFormat.valueOf(format), documentation,
+                getKeywordNames());
+    }
+
+    public Collection<String> getKeywordNames() {
+        return getKeywordsStream().map(KeywordSpecification::getName).collect(toCollection(() -> new HashSet<>()));
     }
     
     public boolean equalsIgnoreKeywords(final Object obj) {
