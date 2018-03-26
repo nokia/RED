@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.libraries;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -89,8 +90,8 @@ public class KeywordSpecification {
         return isDeprecated.booleanValue();
     }
 
-    public Documentation createDocumentation() {
-        return new Documentation(DocFormat.valueOf(format), documentation);
+    public Documentation createDocumentation(final Collection<String> localKeywords) {
+        return new Documentation(DocFormat.valueOf(format), documentation, localKeywords);
     }
 
     @Override

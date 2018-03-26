@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.libraries;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
@@ -15,9 +17,16 @@ public final class Documentation {
 
     private final String rawDocumentation;
 
+    private final Collection<String> localSymbols;
+
     public Documentation(final DocFormat format, final String rawDocumentation) {
+        this(format, rawDocumentation, Collections.emptySet());
+    }
+
+    public Documentation(final DocFormat format, final String rawDocumentation, final Collection<String> localSymbols) {
         this.format = format;
         this.rawDocumentation = rawDocumentation;
+        this.localSymbols = localSymbols;
     }
 
     public DocFormat getFormat() {
@@ -26,6 +35,10 @@ public final class Documentation {
 
     public String getRawDocumentation() {
         return rawDocumentation;
+    }
+
+    public Collection<String> getLocalSymbols() {
+        return localSymbols;
     }
 
     public String provideFormattedDocumentation(final RobotRuntimeEnvironment env) {

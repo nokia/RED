@@ -12,7 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-class Headers {
+class Formatters {
+
+    static String formatHyperlink(final URI href, final String label) {
+        return formatHyperlink(href.toString(), label);
+    }
+
+    static String formatHyperlink(final String href, final String label) {
+        return "<a href=\"" + href + "\">" + label + "</a>";
+    }
 
     @SafeVarargs
     static String formatSimpleHeader(final Optional<URI> imgUri, final String title,
