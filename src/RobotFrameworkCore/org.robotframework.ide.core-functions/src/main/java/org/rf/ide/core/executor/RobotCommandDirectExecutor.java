@@ -179,8 +179,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final List<String> cmdLine = createCommandLine(scriptFile, new EnvironmentSearchPaths(), "-htmldoc",
                     format.name(), docFile.getAbsolutePath());
 
-            final List<String> docLines = new ArrayList<>();
-            RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> docLines.add(line));
+            final List<String> docLines = runExternalProcess(cmdLine);
             return String.join("\n", docLines);
         } catch (final IOException e) {
             return "";

@@ -5,9 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -17,24 +14,19 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -65,10 +57,15 @@ public class DocumentationView {
             final IPartService partService) {
         parent.setLayout(new FillLayout());
 
+        final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
         browser = new Browser(parent, SWT.NONE);
-        browser.addLocationListener(new LinksListener());
+        browser.addLocationListener(new DocumentationViewLinksListener(page, browserSupport, this));
 
         createToolbarActions(partService, part.getViewSite().getActionBars().getToolBarManager(), page);
+    }
+
+    Browser getBrowser() {
+        return browser;
     }
 
     private void createToolbarActions(final IPartService partService, final IToolBarManager manager,
@@ -142,7 +139,7 @@ public class DocumentationView {
     }
 
     @Inject
-    @Optional
+    @org.eclipse.e4.core.di.annotations.Optional
     private void whenKeywordCallDetailIsChanged(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotKeywordCall keywordCall) {
         if (currentInput == null) {
@@ -154,53 +151,6 @@ public class DocumentationView {
         } else if (keywordCall instanceof RobotSetting && ((RobotSetting) keywordCall).isDocumentation()
                 && currentInput.contains(keywordCall)) {
             scheduleInputLoadingJob(currentInput);
-        }
-    }
-
-    private final class LinksListener implements LocationListener {
-
-        @Override
-        public void changing(final LocationEvent event) {
-            if (event.location.equals("about:blank")) {
-                // moving to generated site set by Browser#setText method
-                return;
-
-            } else if (event.location.startsWith("about:blank#")) {
-                // local link at non-existing generated site - scroll to the element using
-                // javascript
-                final String id = event.location.substring(event.location.indexOf("#"));
-                browser.execute("document.getElementById('" + id + "').scrollIntoView();");
-
-            } else if (event.location.startsWith("file://")) {
-
-            } else {
-                // all other links
-                event.doit = false;
-
-                try {
-                    final URI uriToOpen = new URI(event.location);
-                    SwtThread.asyncExec(event.display, () -> {
-                        final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
-                                .getBrowserSupport();
-                        try {
-                            final IWebBrowser wbBrowser = browserSupport.createBrowser(null);
-                            wbBrowser.openURL(uriToOpen.toURL());
-                        } catch (PartInitException | MalformedURLException e) {
-                            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                                    "Unable to open hyperlink: " + event.location, e), StatusManager.BLOCK);
-                        }
-                    });
-                } catch (final URISyntaxException e) {
-                    // this should not happen, as location is prepared to be passed as URI
-                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "Unable to open hyperlink: " + event.location, e), StatusManager.BLOCK);
-                }
-            }
-        }
-
-        @Override
-        public void changed(final LocationEvent event) {
-            // nothing to do
         }
     }
 

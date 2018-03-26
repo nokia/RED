@@ -6,10 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toCollection;
 
 import java.io.ObjectStreamException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -104,7 +107,11 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
 
     public Documentation createDocumentation() {
         // TODO : provide format depending on source
-        return new Documentation(DocFormat.ROBOT, getDocumentation());
+        final Set<String> keywords = getSuiteFile().getUserDefinedKeywords()
+                .stream()
+                .map(RobotKeywordDefinition::getName)
+                .collect(toCollection(() -> new HashSet<>()));
+        return new Documentation(DocFormat.ROBOT, getDocumentation(), keywords);
     }
 
     public ArgumentsDescriptor createArgumentsDescriptor() {
