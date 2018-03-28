@@ -105,10 +105,12 @@ import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.SettingsVariablesLabelAccumulator;
+import org.robotframework.red.nattable.configs.SpecialItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
 import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
+import org.robotframework.red.nattable.configs.WithNameLabelAccumulator;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -217,7 +219,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 new ImportTypesLabelAccumulator(dataProvider),
                 new SettingsCommentsLabelAccumulator(dataProvider),
                 new SettingsVariablesLabelAccumulator(dataProvider),
-                new SettingsItemsLabelAccumulator());
+                new SettingsItemsLabelAccumulator(),
+                new WithNameLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -324,6 +327,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new VariablesStyleConfiguration(theme));
         table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
+        table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {

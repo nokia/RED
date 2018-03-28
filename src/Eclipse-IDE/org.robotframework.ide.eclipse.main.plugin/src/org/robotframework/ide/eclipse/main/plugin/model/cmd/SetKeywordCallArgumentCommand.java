@@ -15,7 +15,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationView;
 
 public class SetKeywordCallArgumentCommand extends EditorCommand {
 
@@ -46,9 +45,6 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             updateModelElement(arguments);
             keywordCall.resetStored();
 
-            if (isSetting && ((RobotDefinitionSetting) keywordCall).isDocumentation()) {
-                eventBroker.post(DocumentationView.REFRESH_DOC_EVENT_TOPIC, keywordCall);
-            }
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
         }
     }

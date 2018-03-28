@@ -38,10 +38,16 @@ public class CommentsLabelAccumulator implements IConfigLabelAccumulator {
             if (tokens.size() > columnPosition) {
                 final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
                 if (types.contains(RobotTokenType.START_HASH_COMMENT)
-                        || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+                        || types.contains(RobotTokenType.COMMENT_CONTINUE)
+                        || isFirstTokenInDirtyWholeLineComment(tokens, columnPosition)) {
                     configLabels.addLabel(COMMENT_CONFIG_LABEL);
                 }
             }
         }
+    }
+
+    private boolean isFirstTokenInDirtyWholeLineComment(final List<RobotToken> tokens, final int column) {
+        return (column == 0 && tokens.size() > 1 && tokens.get(0).getText().isEmpty()
+                && tokens.get(1).getText().startsWith("#"));
     }
 }

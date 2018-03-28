@@ -20,8 +20,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
@@ -138,14 +140,14 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             cmdLine.addAll(additionalPaths.getExtendedPythonPaths(interpreterType));
             cmdLine.addAll(additionalPaths.getClassPaths());
 
-            final byte[] decodedFileContent = runLibdoc(libName, cmdLine);
+            final byte[] decodedFileContent = runLibdoc(cmdLine);
             writeLibdocToFile(resultFilePath, decodedFileContent);
         } catch (final IOException e) {
             // simply libdoc will not be generated
         }
     }
 
-    private byte[] runLibdoc(final String libName, final List<String> cmdLine) throws IOException {
+    private byte[] runLibdoc(final List<String> cmdLine) throws IOException {
         final List<String> output = runExternalProcess(cmdLine);
 
         // when properly finished there is encoded file content in last line
@@ -159,6 +161,32 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             libdocFile.createNewFile();
         }
         Files.write(decodedFileContent, libdocFile);
+    }
+
+    @Override
+    public String createHtmlDoc(final String doc, final DocFormat format) {
+        File docFile = null;
+        try {
+            docFile = RobotRuntimeEnvironment.createTemporaryFile();
+        } catch (final IOException e) {
+            return "";
+        }
+
+        try {
+            Files.asCharSink(docFile, Charsets.UTF_8).write(doc);
+
+            final File scriptFile = RobotRuntimeEnvironment.createTemporaryFile("red_libraries.py");
+            final List<String> cmdLine = createCommandLine(scriptFile, new EnvironmentSearchPaths(), "-htmldoc",
+                    format.name(), docFile.getAbsolutePath());
+
+            final List<String> docLines = new ArrayList<>();
+            RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> docLines.add(line));
+            return String.join("\n", docLines);
+        } catch (final IOException e) {
+            return "";
+        } finally {
+            docFile.delete();
+        }
     }
 
     @Override
@@ -272,7 +300,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public void runRfLint(final String host, final int port, final File projectLocation,
             final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
-            final List<String> rulesFiles) {
+            final List<String> rulesFiles, final List<String> additionalArguments) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("rflint_integration.py");
 
@@ -285,39 +313,13 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
                 cmdLine.add("-exclude");
                 cmdLine.add(String.join(";", excludedPaths));
             }
-            for (final String path : rulesFiles) {
-                cmdLine.add("-R");
-                cmdLine.add(path);
-            }
-            for (final RfLintRule rule : rules) {
-                if (rule.hasChangedSeverity()) {
-                    cmdLine.add("-" + rule.getSeverity().severitySwitch());
-                    cmdLine.add(rule.getRuleName());
-                }
-                if (rule.hasConfigurationArguments()) {
-                    cmdLine.add("-c");
-                    cmdLine.add(rule.getRuleName() + ":" + rule.getConfiguration());
-                }
-            }
+            cmdLine.addAll(RobotCommandRpcExecutor.createRfLintArguments(rules, rulesFiles, additionalArguments));
             cmdLine.add("-r");
             cmdLine.add(filepath.getAbsolutePath());
 
             runExternalProcess(cmdLine);
         } catch (final IOException | NumberFormatException e) {
             throw new RobotEnvironmentException("Unable to start RfLint");
-        }
-    }
-
-    static String severitySwitch(final String severity) {
-        switch (severity.toLowerCase()) {
-            case "error":
-                return "-e";
-            case "warning":
-                return "-w";
-            case "ignore":
-                return "-i";
-            default:
-                throw new IllegalStateException();
         }
     }
 

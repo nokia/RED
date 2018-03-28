@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aovVQG3GEeaFMpJxhF5ZTQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/16/17 11:18 AM
+Save-Time: 3/27/18 11:25 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -190,7 +190,7 @@ proc "check-menu-for-tc" [val is_move_enabled true]{
 	    get-property "getMenu().getItems().MenuItem[3].isEnabled()" | equals true | verify-true
 	    get-property "getMenu().getItems().MenuItem[3].getText()" | equals "Show in source\\9F4" | verify-true
 	    
-	    get-property "getMenu().getItems().MenuItem[4].getText()" | equals "Show in Doc View" | verify-true
+	    get-property "getMenu().getItems().MenuItem[4].getText()" | equals "Show documentation" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[5].getStyle()" | equals "[SEPARATOR]" | verify-true
 	    

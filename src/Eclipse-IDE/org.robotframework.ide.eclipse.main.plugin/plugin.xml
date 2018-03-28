@@ -1272,7 +1272,7 @@
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.showInDocView"
-          name="Show in Doc View">
+          name="Show documentation">
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
@@ -3801,7 +3801,7 @@
        <command
              commandId="org.robotframework.ide.eclipse.showInDocView"
              icon="resources/book.png"
-             label="Show in Doc View"
+             label="Show documentation"
              style="push">
           <visibleWhen
                 checkEnabled="true">
@@ -3998,7 +3998,7 @@
        <command
              commandId="org.robotframework.ide.eclipse.showInDocView"
              icon="resources/book.png"
-             label="Show in Doc View"
+             label="Show documentation"
              style="push">
           <visibleWhen
                 checkEnabled="true">
@@ -4687,7 +4687,7 @@
          <command
                commandId="org.robotframework.ide.eclipse.showInDocView"
                icon="resources/book.png"
-               label="Show in Doc View"
+               label="Show documentation"
                style="push">
             <visibleWhen
                   checkEnabled="false">
