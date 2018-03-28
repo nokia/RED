@@ -9,6 +9,7 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
 
 public class RedTheme {
@@ -18,7 +19,7 @@ public class RedTheme {
     public static final String RED_SOURCE_EDITOR_FONT = "org.robotframework.red.textfont";
     private static final String RED_TABLE_EDITOR_FONT = "org.robotframework.red.tablefont";
 
-
+    private static final String ECLIPSE_INFO_BACKGROUND_COLOR = "org.eclipse.ui.workbench.HOVER_BACKGROUND";
     private static final String ECLIPSE_DECORATION_COLOR = "DECORATIONS_COLOR";
     private static final String ECLIPSE_SEARCH_MATCH_COLOR = "org.eclipse.search.ui.match.highlight";
 
@@ -66,6 +67,10 @@ public class RedTheme {
     }
 
     public static class Colors {
+
+        public static RGB getEclipseInfoBackgroundColor() {
+            return getColorRegistry().getRGB(ECLIPSE_INFO_BACKGROUND_COLOR);
+        }
 
         public static Color getEclipseDecorationColor() {
             return getColorRegistry().get(ECLIPSE_DECORATION_COLOR);

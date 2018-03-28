@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5GosELXwEeWiPpdsqt1XOg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 5:16 PM
+Save-Time: 3/19/18 8:14 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -28,9 +28,13 @@ exec-with-options -disableJobWaiting -command {
 	
 	wait-for-specified_line-in-first-thread -line 3 -nr_of_frames 3
 	
-	get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5
+	//get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5
+	get-button "Step Into (F5)" | click
 	wait-for-specified_line-in-first-thread -line 4 -nr_of_frames 3
-	get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5 
+	
+	
+	//get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5 
+	get-button "Step Into (F5)" | click
 	
 	//verify if res_master is open as this indicates that debug can handle dyn path to resource
 	try -times 5 -delay 1000 -command{
@@ -39,10 +43,13 @@ exec-with-options -disableJobWaiting -command {
 	check-debug-marker-on-ruler -line 2 -script_name "res_master.robot"
 	
 	// press F5 to do last step of Debug 
-	get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5 
+	//get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5 
+	get-button "Step Into (F5)" | click
 	wait 500
-	get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5 
+	//get-editor "TestImportDynamic.robot" | get-text-viewer | key-type F5 
+	get-button "Step Into (F5)" | click
 }
+wait-for-console
 
 // start debug secound script - resource with parameter
 get-button Robot | click
@@ -57,17 +64,20 @@ exec-with-options -disableJobWaiting -command {
 	//get-button "Debug RobotViaParameters.robot" | click
 	wait-for-specified_line-in-first-thread -line 7 -nr_of_frames 3
 	
-	get-editor "RobotViaParameters.robot" | get-text-viewer | key-type F5
+//	get-editor "RobotViaParameters.robot" | get-text-viewer | key-type F5
+	get-button "Step Into (F5)" | click
 	
 	try -times 5 -delay 1000 -command{
 		get-tab-folder -index 2 | get-property activePage | equals "res_master.robot" | verify-true
 	}
 	check-debug-marker-on-ruler -line 2 -script_name "res_master.robot"
 	wait 500
-	get-editor "res_master.robot" | get-text-viewer | key-type F5
-	
+	//get-editor "res_master.robot" | get-text-viewer | key-type F5
+	get-button "Step Into (F5)" | click
 	wait 500
-	get-editor "res_master.robot" | get-text-viewer | key-type F5
+	
+	//get-editor "res_master.robot" | get-text-viewer | key-type F5
+	get-button "Step Into (F5)" | click
 }
 wait-for-console
 

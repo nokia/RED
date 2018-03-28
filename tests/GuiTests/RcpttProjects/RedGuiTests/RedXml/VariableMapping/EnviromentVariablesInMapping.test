@@ -1,0 +1,158 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _PWaRoCtqEeikWYhBbRs9Qw
+Element-Name: EnviromentVariablesInMapping
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _wbtl8CtnEeikWYhBbRs9Qw
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/19/18 2:55 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file and check QF for enviroment variables
+get-view "Project Explorer" | get-tree | select "EnvVars/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 2 19
+    set-caret-pos 2 18
+    key-type "M1+1"
+}
+// add folder name
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define '%{res_folder}' variable" | click -default
+with [get-window "Add variable mapping"] {
+    get-editbox -after [get-label Value] | type-text res
+    get-button OK | click
+}
+
+//check if new variable is added
+with [get-editor "EnvVars/red.xml" | get-section "Variables mappings" | get-table] {
+    get-property "getItems().length" | equals 4 | verify-true
+    get-property "getItems().TableItem[0].getData().getName()" | equals "%{my_var}" | verify-true
+    get-property "getItems().TableItem[0].getData().getValue()" | equals "var1.py" | verify-true
+    
+    get-property "getItems().TableItem[1].getData().getName()" | equals "%{res2}" | verify-true
+    get-property "getItems().TableItem[1].getData().getValue()" | equals "%{res_folder}/res2.robot" | verify-true
+    
+    get-property "getItems().TableItem[2].getData().getName()" | equals "%{res_folder}" | verify-true
+    get-property "getItems().TableItem[2].getData().getValue()" | equals res | verify-true
+    
+    get-property "getItems().TableItem[3].getText()" | equals "...add new mapping" | verify-true
+}
+
+//add variable in red.xml
+with [get-editor "EnvVars/red.xml"] {
+    click
+    get-section "Variables mappings" | get-table | get-item "...add new mapping" | double-click
+}
+
+//add full path
+with [get-window "Add variable mapping"] {
+    get-editbox -after [get-label Name] | type-text "%{my_lib1}"
+    with [get-editbox -after [get-label Value]] {
+        set-text-offset 5 0
+        key-type BackSpace -times 5
+        type-text [concat $RED_workspace_path_unix_style "/EnvVars/lib/lib1.py"]
+    }
+    get-button OK | click
+}
+
+get-button "Save All (M1+M2+S)" | click
+get-editor "TestFile.robot" | click
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
+
+//save and check that is one error for lib
+get-view Problems | click
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(3 items\\)/Unknown '.*' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+    | get-property caption 
+    | equals [format "Unknown '%s/EnvVars/lib/lib1.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" $RED_workspace_path_unix_style]
+    | verify-true
+
+//use QF to autodiscover lib 
+get-view "Project Explorer" | get-tree | select "EnvVars/TestFile.robot"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 3 17
+    set-caret-pos 3 19
+    key-type "M1+1"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover '.*\\/EnvVars\\/lib\\/lib1.py' and add to configuration" | click 
+    -default
+    
+//check that lib was added to red.xml    
+with [get-editor "EnvVars/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "lib1 - EnvVars/lib" | verify-true
+}
+get-button "Save (M1+S)" | click
+
+
+//check that variable definde below is not visible
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 5 7
+        key-type "M1+/"
+        key-type "M1+s"
+    }
+}
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(2 items\\)/The import name\\/path '%{res2}' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+    | get-property caption 
+    | equals "The import name/path '%{res2}' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+    | verify-true
+    
+// go to red.xml and remove res2    
+with [get-editor "EnvVars/red.xml"] {
+    click
+    get-tab-folder | get-tab-item General | click
+}
+with [get-editor "EnvVars/red.xml" | get-section "Variables mappings" | get-table] {
+    select "%{res2}" | key-type Del
+    get-item "...add new mapping" | double-click
+}
+
+//add one more time by at the and of file
+with [get-window "Add variable mapping"] {
+    get-editbox -after [get-label Name] | type-text "%{res2}"
+    with [get-editbox -after [get-label Value]] {
+        key-type Del -times 5
+        type-text "%{res_folder}/res2.robot"
+    }
+    get-button OK | click
+}
+//add new default var and add to value env var
+get-editor "EnvVars/red.xml" | get-section "Variables mappings" | get-table | get-item "...add new mapping" | double-click
+with [get-window "Add variable mapping"] {
+    with [get-editbox -after [get-label Value]] {
+        key-type Del -times 5
+        type-text "%{my_var}"
+    }
+    get-button OK | click
+}
+
+//change env vRIBALE TO normal variable and make mistake to check path
+get-button "Save All (M1+M2+S)" | click
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 4 24
+        key-type BackSpace -times 5
+        type-text "${"
+        set-caret-pos 4 18
+        type-text 2
+        key-type "M1+s"
+    }
+}
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(2 items\\)/Resource import 'vars2\\/var1.py' is invalid: file does not exist. Check file name and path." 
+    | get-property caption 
+    | equals "Resource import 'vars2/var1.py' is invalid: file does not exist. Check file name and path." | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

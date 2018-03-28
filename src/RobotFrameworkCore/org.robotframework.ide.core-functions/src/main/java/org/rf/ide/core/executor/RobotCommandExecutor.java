@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
 
 /**
@@ -36,6 +37,8 @@ interface RobotCommandExecutor {
     void createLibdoc(String resultFilePath, LibdocFormat format, String libName, String libPath,
             EnvironmentSearchPaths additionalPaths);
 
+    String createHtmlDoc(String doc, DocFormat format);
+
     void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean recursiveInVirtualenv,
             List<String> excludedPaths, EnvironmentSearchPaths additionalPaths);
 
@@ -44,5 +47,5 @@ interface RobotCommandExecutor {
     void stopAutoDiscovering();
 
     void runRfLint(String host, int port, File projectLocation, List<String> excludedPaths, File filepath,
-            List<RfLintRule> rules, List<String> rulesFiles);
+            List<RfLintRule> rules, List<String> rulesFiles, List<String> additionalArguments);
 }

@@ -145,6 +145,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             validateRemoteLocation(markerToken, RemoteLocation.createRemoteUri(address));
         }
 
+        // TODO: add timeout argument to descriptor - RED-1080
         new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
                 ArgumentsDescriptor.createDescriptor("uri=" + RemoteLocation.DEFAULT_ADDRESS), arguments)
                         .validate(new NullProgressMonitor());

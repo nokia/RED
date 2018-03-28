@@ -1,0 +1,224 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YDbWsNnJEeeKxYJgF2NTmg,_G6oOwCuDEei6wOJtueYdHQ
+Element-Name: AutodiscoveringForRemoteLibraries
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _O7bj0CuAEei6wOJtueYdHQ
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/26/18 5:49 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//
+//                          before test install: pip install robotremoteserver   
+//
+//
+// run PythonRemoteServer
+run-python-remote-server-in-background -project_name RemoteProject -lib_name my_remote_lib.py -timeout 10
+// run PythonRemoteServer
+run-python-remote-server-in-background -project_name RemoteProject -lib_name my_second_remote_lib.py -timeout 10
+// go to .robot file
+with [get-view "Project Explorer" | get-tree] {
+    select "RemoteProject/TestFile.robot" | double-click
+}
+// simply autodiscovering from one suite
+get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+// verify summary window
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals "Remote http://127.0.0.1:10000/" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "Remote http://127.0.0.1:8000/" | verify-true
+    get-property "getItems().TreeItem[2].getText()" | equals "Remote http://127.0.0.1:9000/" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+//// run autodicovery again
+get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+// verify images
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path "Remote http:\\/\\/127.0.0.1:10000\\/" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:8000\\/" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:9000\\/" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+// verify if it is added to red.xml
+with [get-view "Project Explorer" | get-tree] {
+    select "RemoteProject/red.xml" | double-click
+}
+get-editor "RemoteProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+with [get-editor "RemoteProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/ - Remote" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8000/ - Remote" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "http://127.0.0.1:9000/ - Remote" | verify-true
+}
+// clear red.xml
+with [get-editor "RemoteProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "http:\\/\\/127.0.0.1:9000\\/ - Remote" "http:\\/\\/127.0.0.1:8000\\/ - Remote" "http:\\/\\/127.0.0.1:10000\\/ - Remote"
+    key-type Del
+    key-type "M1+s"
+}
+// autodiscover on project (also from nested structure in A)
+get-editor "TestFile.robot" | click
+get-view "Project Explorer" | get-tree | select RemoteProject | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+// verify importers
+//get-window "Discovering libraries summary" | get-tree | get-item -path "Remote http:\\/\\/127.0.0.1:10000\\/" | click
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path "Remote http:\\/\\/127.0.0.1:10000\\//Importers:" | get-property "getItems().TreeItem[0].getText()" 
+        | equals [format "%s%sRemoteProject%sA%sB%sC%sD%sTestFileD.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep $sys_sep $sys_sep]| verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:10000\\//Importers:" | get-property "getItems().TreeItem[1].getText()" 
+        | equals [format "%s%sRemoteProject%sA%sB%sC%sTestFileC.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep $sys_sep] | verify-true
+}
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path "Remote http:\\/\\/127.0.0.1:8000\\//Importers:" | get-property "getItems().TreeItem[0].getText()" 
+        | equals [format "%s%sRemoteProject%sA%sB%sC%sD%sTestFileD.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep $sys_sep $sys_sep]| verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:8000\\//Importers:" | get-property "getItems().TreeItem[1].getText()" 
+        | equals [format "%s%sRemoteProject%sA%sB%sTestFileB.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep] | verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:8000\\//Importers:" | get-property "getItems().TreeItem[2].getText()" 
+        | equals [format "%s%sRemoteProject%sA%sTestFileA.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep] | verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:8000\\//Importers:" | get-property "getItems().TreeItem[3].getText()" 
+        | equals [format "%s%sRemoteProject%sTestFile.robot" $RED_workspace_path $sys_sep $sys_sep] | verify-true
+}
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path "Remote http:\\/\\/127.0.0.1:9000\\//Importers:" | get-property "getItems().TreeItem[0].getText()" 
+        | equals [format "%s%sRemoteProject%sA%sB%sC%sTestFileC.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep $sys_sep]| verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:9000\\//Importers:" | get-property "getItems().TreeItem[1].getText()" 
+        | equals [format "%s%sRemoteProject%sA%sB%sTestFileB.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep] | verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:9000\\//Importers:" | get-property "getItems().TreeItem[2].getText()" 
+        | equals [format "%s%sRemoteProject%sTestFile.robot" $RED_workspace_path $sys_sep $sys_sep] | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+// run autodicovery again
+get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+// verify images
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path "Remote http:\\/\\/127.0.0.1:10000\\/" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:8000\\/" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:9000\\/" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+// verifi red.xml
+with [get-editor "RemoteProject/red.xml"] {
+    click
+    get-section "Referenced libraries" | get-table | key-type "M1+s"
+}
+with [get-editor "RemoteProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/ - Remote" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8000/ - Remote" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "http://127.0.0.1:9000/ - Remote" | verify-true
+}
+// clear red.xml
+with [get-editor "RemoteProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "http:\\/\\/127.0.0.1:9000\\/ - Remote" "http:\\/\\/127.0.0.1:8000\\/ - Remote" "http:\\/\\/127.0.0.1:10000\\/ - Remote"
+    key-type Del
+    key-type "M1+s"
+}
+get-editor "TestFile.robot" | click
+// change Source, first import without arg, second with two args, thrid with one arg
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 36
+    select-range 2 44 2 22
+    hover-text 2 33
+    key-type "M1+x"
+    set-caret-pos 3 44
+    key-type Tab
+    key-type "M1+v"
+    key-type "M1+s"
+}
+// autodicover on one suite
+get-editor "TestFile.robot" | click
+get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+    
+wait-for-discover-window    
+// verify summary window
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals "Remote http://127.0.0.1:10000/" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "Remote http://127.0.0.1:8270/RPC2/" | verify-true
+    get-property "getItems().TreeItem[2].getText()" | equals "Remote" | verify-true
+}
+// verify also images
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path "Remote http:\\/\\/127.0.0.1:10000\\/" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "Remote http:\\/\\/127.0.0.1:8270\\/RPC2\\/" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "Remote" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error_fatal.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+// verify red.xml
+with [get-editor "RemoteProject/red.xml"] {
+    click
+    get-section "Referenced libraries" | get-table | key-type "M1+s"
+}
+with [get-editor "RemoteProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/ - Remote" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2/ - Remote" | verify-true
+}
+// change Source to close servers: first with 8000, second with 9000 and third with 10000
+get-editor "TestFile.robot" | click
+get-editor "RemoteProject/red.xml" | close
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 3 61
+        select-range 3 70 3 48
+        key-type "M1+x"
+        set-caret-pos 2 22
+        key-type "M1+v"
+        key-type "M1+s"
+        set-caret-pos 3 46
+        key-type BackSpace -times 2
+        key-type "M1+1"
+        key-type Enter
+        key-type "M1+s"
+    }
+    click
+    with [get-text-viewer] {
+        set-caret-pos 3 46
+        type-text " W"
+        key-type "M1+SPACE"
+        key-type Enter
+        key-type Right
+        type-text 1
+        key-type Down
+        key-type Tab
+        type-text W
+        key-type "M1+SPACE"
+        key-type Enter
+        key-type Right
+        type-text 2
+        key-type "M1+s"
+        key-type Down -times 2
+        key-type Enter
+        type-text tc
+        key-type Enter
+        type-text "alias1."
+        key-type "M1+SPACE"
+        key-type Down -times 2
+        key-type Enter -times 2
+        type-text alias
+        key-type "M1+SPACE"
+        key-type Down
+        key-type Enter
+        key-type Down -times 2
+        key-type Enter
+        key-type "M1+s"
+    }
+}
+// run test to close
+get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
+    | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -75,6 +75,14 @@ public class SelectionLayerAccessor {
         return selectionLayer.isRowPositionSelected(row) ? dataProvider.getRowObject(row) : null;
     }
 
+    public Stream<Object> getSelectedElements() {
+        return Stream.of(selectionLayer.getSelectedCellPositions())
+                .map(PositionCoordinate::getRowPosition)
+                .distinct()
+                .map(this::getElementSelectedAt)
+                .filter(elem -> elem != null);
+    }
+
     public boolean onlyFullRowsAreSelected() {
         if (selectionLayer.getSelectedCellPositions().length == 0) {
             return false;
@@ -144,6 +152,10 @@ public class SelectionLayerAccessor {
                 return;
             }
         }
+    }
+
+    public String getLabelFromCell(final PositionCoordinate cellPosition) {
+        return (String) dataProvider.getDataValue(cellPosition.getColumnPosition(), cellPosition.getRowPosition());
     }
 
     public String getLabelFromCell(final int row, final int column) {

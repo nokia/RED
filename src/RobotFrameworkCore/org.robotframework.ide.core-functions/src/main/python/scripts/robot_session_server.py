@@ -265,7 +265,7 @@ def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, add
     if excluded_paths:
         command.append('-exclude')
         command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
-    command.extend(additional_arguments)
+    command.extend(__encode_unicode_if_needed(additional_arguments))
     command.append('-r')
     command.append(__encode_unicode_if_needed(filepath))
 
@@ -281,6 +281,14 @@ def create_libdoc(libname, format, python_paths, class_paths):
     import red_libraries
     __extend_paths(python_paths, class_paths)
     return red_libraries.create_libdoc(libname, format)
+
+
+@logresult
+@encode_result_or_exception
+@logargs
+def create_html_doc(doc, format):
+    import red_libraries
+    return red_libraries.create_html_doc(doc, format)
 
 
 def __get_robot_version():
@@ -358,6 +366,7 @@ if __name__ == '__main__':
     server.register_function(stop_auto_discovering, 'stopAutoDiscovering')
     server.register_function(run_rf_lint, "runRfLint")
     server.register_function(create_libdoc, 'createLibdoc')
+    server.register_function(create_html_doc, 'createHtmlDoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
 
     red_checking_thread = Thread(target=__shutdown_server_when_parent_process_becomes_unavailable, args=(server,))
