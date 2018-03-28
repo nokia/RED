@@ -1,0 +1,62 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _UfzXECubEeikWYhBbRs9Qw,_BRZyQPy3EeW7_PzjO98BIw
+Element-Name: ModulesInAutoDiscovery
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Brg00CufEeikWYhBbRs9Qw
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/19/18 8:38 PM
+Testcase-Type: ecl
+Verifications: _mlPDsCuhEeikWYhBbRs9Qw
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add folder in user folder
+get-view "Project Explorer" | get-tree | select "ManyModules/red.xml" | double-click
+wait-for-loading-red-xml -editor_name "ManyModules/red.xml"
+get-editor "ManyModules/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+get-editor "ManyModules/red.xml" | get-section Paths | get-table | get-item "...add new search path" | double-click
+with [get-window "Add new search path"] {
+    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
+        | type-text [concat $user_folder "/ext_lib/external_lib.py"]
+    get-button OK | click
+}
+get-button "Save (M1+S)" | click
+
+//add space to run autodiscovery
+get-view "Project Explorer" | get-tree | select "ManyModules/Script.robot" | double-click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 17 13
+    type-text " "
+    key-type "M1+s"
+}
+wait-for-discover-window
+
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-property "getItems().length" | equals 8 | verify-true
+    get-item -path CalculatorLibrary | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "external_lib" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "import_with_functions" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path module1 | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path module2 | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path Multiply | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "wrong_module" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "nested_module.module3" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error_fatal.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+get-editor "ManyModules/red.xml" | click
+get-button "Save (M1+S)" | click
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

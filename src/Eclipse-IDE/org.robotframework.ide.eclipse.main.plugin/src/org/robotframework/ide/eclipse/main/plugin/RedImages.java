@@ -5,10 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.ISharedImages;
@@ -76,12 +83,16 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/refresh.png");
     }
 
-    public static ImageDescriptor getLinkImage() {
+    public static ImageDescriptor getSyncedImage() {
         return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_SYNCED);
     }
 
-    public static ImageDescriptor getDisabledLinkImage() {
-        return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_SYNCED_DISABLED);
+    public static ImageDescriptor getSyncBrokenImage() {
+        return RedPlugin.getImageDescriptor("resources/sync_broken.png");
+    }
+
+    public static ImageDescriptor getOpenInBrowserImage() {
+        return RedPlugin.getImageDescriptor("resources/open_browser.png");
     }
 
     public static ImageDescriptor getCutImage() {
@@ -156,12 +167,24 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/file_robot.png");
     }
 
+    public static Optional<URI> getRobotFileImageUri() {
+        return getImageUri("resources/file_robot.png");
+    }
+
     public static ImageDescriptor getTestCaseImage() {
         return RedPlugin.getImageDescriptor("resources/case.png");
     }
 
+    public static Optional<URI> getTestCaseImageUri() {
+        return getImageUri("resources/case.png");
+    }
+
     public static ImageDescriptor getTemplatedTestCaseImage() {
         return RedPlugin.getImageDescriptor("resources/case_templated.png");
+    }
+
+    public static Optional<URI> getTemplatedTestCaseImageUri() {
+        return getImageUri("resources/case_templated.png");
     }
 
     public static ImageDescriptor getTestCaseSettingImage() {
@@ -236,6 +259,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/book.png");
     }
 
+    public static Optional<URI> getBookImageUri() {
+        return getImageUri("resources/book.png");
+    }
+
     public static ImageDescriptor getBigKeywordImage() {
         return RedPlugin.getImageDescriptor("resources/big_keyword.png");
     }
@@ -244,8 +271,16 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/keyword.png");
     }
 
+    public static Optional<URI> getKeywordImageUri() {
+        return getImageUri("resources/keyword.png");
+    }
+
     public static ImageDescriptor getUserKeywordImage() {
         return RedPlugin.getImageDescriptor("resources/keyword_user.png");
+    }
+
+    public static Optional<URI> getUserKeywordImageUri() {
+        return getImageUri("resources/keyword_user.png");
     }
 
     public static ImageDescriptor getRobotProjectConfigFile() {
@@ -438,6 +473,15 @@ public class RedImages {
 
     private static ImageDescriptor getWorkbenchSharedImage(final String symbolicName) {
         return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(symbolicName);
+    }
+
+    private static Optional<URI> getImageUri(final String path) {
+        try {
+            final URL url = FileLocator.find(RedPlugin.getDefault().getBundle(), new Path(path), null);
+            return Optional.of(FileLocator.resolve(url).toURI().normalize());
+        } catch (final IOException | URISyntaxException e) {
+            return Optional.empty();
+        }
     }
 
     public static class VariableImages {
