@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.red.swt.Listeners.keyReleasedAdapter;
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,12 +21,6 @@ import org.eclipse.jface.layout.RowDataFactory;
 import org.eclipse.jface.layout.RowLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -64,20 +60,12 @@ class TagsComposite extends Composite {
     private void createDefinitionText() {
         tagNameText = new Text(this, SWT.BORDER);
         RowDataFactory.swtDefaults().hint(60, 17).applyTo(tagNameText);
-        tagNameText.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(final KeyEvent e) {
-                if (e.character == SWT.CR) {
-                    addTag();
-                }
+        tagNameText.addKeyListener(keyReleasedAdapter(e -> {
+            if (e.character == SWT.CR) {
+                addTag();
             }
-        });
-        tagNameText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                listener.newTagIsEdited();
-            }
-        });
+        }));
+        tagNameText.addModifyListener(e -> listener.newTagIsEdited());
         tagsSupport.install(tagNameText);
     }
 
@@ -103,12 +91,7 @@ class TagsComposite extends Composite {
         newTagRemoveBtn.setImage(ImagesManager.getImage(RedImages.getRemoveTagImage()));
         newTagRemoveBtn.setToolTipText("Remove tag");
         GridDataFactory.fillDefaults().hint(18, 16).applyTo(newTagRemoveBtn);
-        newTagRemoveBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                removeTag(tag);
-            }
-        });
+        newTagRemoveBtn.addSelectionListener(widgetSelectedAdapter(e -> removeTag(tag)));
         return newTag;
     }
 
@@ -117,12 +100,7 @@ class TagsComposite extends Composite {
         addTagButton.setImage(ImagesManager.getImage(RedImages.getAddImage()));
         addTagButton.setToolTipText("Add new tag");
         RowDataFactory.swtDefaults().hint(22, 22).applyTo(addTagButton);
-        addTagButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                addTag();
-            }
-        });
+        addTagButton.addSelectionListener(widgetSelectedAdapter(e -> addTag()));
     }
 
     @Override

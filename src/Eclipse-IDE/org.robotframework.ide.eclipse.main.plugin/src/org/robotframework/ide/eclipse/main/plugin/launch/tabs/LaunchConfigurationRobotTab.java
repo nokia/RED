@@ -17,21 +17,17 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationException;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationFatalException;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuitesListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.TagsComposite.TagsListener;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
@@ -41,7 +37,7 @@ import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
  */
 class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
-    private Text robotArgumentsText;
+    private AdditionalArgumentsComposite robotArgumentsComposite;
 
     private IncludeExcludeTagsComposite includeExcludeTagsComposite;
 
@@ -69,7 +65,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
             includeExcludeTagsComposite.setInput(robotConfig.isIncludeTagsEnabled(), robotConfig.getIncludedTags(),
                     robotConfig.isExcludeTagsEnabled(), robotConfig.getExcludedTags());
             includeExcludeTagsComposite.switchTo(robotConfig.getProjectName(), robotConfig.collectSuitesToRun());
-            robotArgumentsText.setText(robotConfig.getRobotArguments());
+            robotArgumentsComposite.setInput(robotConfig.getRobotArguments());
         } catch (final CoreException e) {
             includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
@@ -87,7 +83,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
             robotConfig.setIncludedTags(includeExcludeTagsComposite.getIncludedTags());
             robotConfig.setIsExcludeTagsEnabled(includeExcludeTagsComposite.isExcludeTagsEnabled());
             robotConfig.setExcludedTags(includeExcludeTagsComposite.getExcludedTags());
-            robotConfig.setRobotArguments(robotArgumentsText.getText().trim());
+            robotConfig.setRobotArguments(robotArgumentsComposite.getArguments());
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
                     "RED was unable to load the working copy of Launch Configuration.");
@@ -163,24 +159,12 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
 
-        robotArgumentsText = createLabeledText(group, "Additional Robot Framework arguments:");
-    }
+        final Label robotArgumentsDescription = new Label(group, SWT.WRAP);
+        robotArgumentsDescription.setText("Additional Robot Framework arguments:");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(robotArgumentsDescription);
 
-    private Text createLabeledText(final Composite parent, final String label) {
-        final Label lbl = new Label(parent, SWT.NONE);
-        lbl.setText(label);
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(lbl);
-
-        final Text txt = new Text(parent, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(txt);
-        txt.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
-        return txt;
+        robotArgumentsComposite = new AdditionalArgumentsComposite(group, e -> updateLaunchConfigurationDialog());
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(robotArgumentsComposite);
     }
 
     private void createTagsGroup(final Composite parent) {
@@ -221,13 +205,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
 
-        projectComposite = new ProjectComposite(group, new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
+        projectComposite = new ProjectComposite(group, e -> updateLaunchConfigurationDialog());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(projectComposite);
     }
 
@@ -237,13 +215,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
         GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
         GridLayoutFactory.fillDefaults().applyTo(group);
 
-        suitesToRunComposite = new SuitesToRunComposite(group, new SuitesListener() {
-
-            @Override
-            public void suitesChanged() {
-                updateLaunchConfigurationDialog();
-            }
-        });
+        suitesToRunComposite = new SuitesToRunComposite(group, () -> updateLaunchConfigurationDialog());
         GridDataFactory.fillDefaults().grab(true, true).applyTo(suitesToRunComposite);
     }
 
