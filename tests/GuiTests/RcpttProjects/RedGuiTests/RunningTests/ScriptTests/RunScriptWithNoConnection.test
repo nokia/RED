@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _g-OVcBhQEee93KAG-tW51Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/9/18 12:29 PM
+Save-Time: 3/29/18 5:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,7 +27,7 @@ get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
     get-tab-folder | get-tab-item Executor | click
     set-dialog-result File [format"platform:/resource/ScriptProject/scripts/%s"  [os-specific "script_win.bat" "script_lin.sh"]]
-    get-window "Run Configurations" | get-group "External script" | get-button "Browse..." | click
+    get-window "Run Configurations" | get-group "External script" | get-button "File system..." | click
     
     
     get-group "External script" | get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] 
