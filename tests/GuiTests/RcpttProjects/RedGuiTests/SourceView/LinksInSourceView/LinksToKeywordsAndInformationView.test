@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _x5njgJeDEeaa4JtzzKMFzw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/12/17 4:33 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/29/18 5:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -269,7 +269,7 @@ check-information-window -expectedText "Name: kw 3\n"
 //open doc view    
 with [get-editor "res2.tsv" | get-text-viewer] {
     set-caret-pos 4 26
-    get-menu "Show in Doc View" | click
+    get-menu "Show documentation" | click
 }
 check-documentation-view -expectedText "kw 3\n"
     + "res2.tsv\n\n"
