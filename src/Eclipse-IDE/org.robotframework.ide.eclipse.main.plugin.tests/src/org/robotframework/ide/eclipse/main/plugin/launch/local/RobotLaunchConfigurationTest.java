@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
-import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.red.junit.ProjectProvider;
@@ -137,8 +136,8 @@ public class RobotLaunchConfigurationTest {
         robotConfig.setAgentConnectionHostValue("1.2.3.4");
         robotConfig.setAgentConnectionPortValue("987");
         robotConfig.setAgentConnectionTimeoutValue("123");
-
         robotConfig.setInterpreter(SuiteExecutor.PyPy);
+        robotConfig.setInterpreterArguments("-a");
         robotConfig.setExecutableFilePath("path");
         robotConfig.setExecutableFileArguments("-new");
 
@@ -161,6 +160,7 @@ public class RobotLaunchConfigurationTest {
 
         assertThat(robotConfig.isUsingInterpreterFromProject()).isTrue();
         assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
+        assertThat(robotConfig.getInterpreterArguments()).isEqualTo("");
         assertThat(robotConfig.getExecutableFilePath()).isEqualTo("");
         assertThat(robotConfig.getExecutableFileArguments()).isEqualTo("");
     }
@@ -315,14 +315,6 @@ public class RobotLaunchConfigurationTest {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
         assertThat(robotConfig.getResourcesUnderDebug()).containsOnly(res1, res2);
-    }
-
-    @Test
-    public void systemDependentExecutableFileExtensionsAreRetrieved() {
-        final String[] expectedScriptExtensions = RedSystemProperties.isWindowsPlatform()
-                ? new String[] { "*.bat;*.com;*.exe", "*.*" } : new String[] { "*.sh", "*.*" };
-        assertThat(RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions())
-                .containsExactly(expectedScriptExtensions);
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {

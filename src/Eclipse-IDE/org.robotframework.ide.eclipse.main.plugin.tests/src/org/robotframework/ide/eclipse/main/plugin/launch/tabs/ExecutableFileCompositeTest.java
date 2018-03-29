@@ -5,13 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.Condition;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -29,11 +31,14 @@ public class ExecutableFileCompositeTest {
     @Test
     public void executableFileCompositeComposite_inputSettingTest() {
         final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(),
-                mock(ModifyListener.class), new String[] {});
+                mock(ModifyListener.class));
         composite.setInput(" path ");
 
         assertThat(executableFilePathText(composite)).is(enabled());
-        assertThat(checkBrowseButton(composite)).is(enabled());
+        final List<Button> browseButtons = getBrowseButtons(composite);
+        assertThat(browseButtons.stream().map(Button::getText)).containsExactly("Workspace...", "File system...",
+                "Variables...");
+        assertThat(browseButtons).allSatisfy(button -> assertThat(button).is(enabled()));
 
         assertThat(composite.getSelectedExecutableFilePath()).isEqualTo("path");
     }
@@ -41,21 +46,17 @@ public class ExecutableFileCompositeTest {
     @Test
     public void whenExecutableFilePathIsSelected_listenerIsNotified() {
         final AtomicBoolean listenerWasCalled = new AtomicBoolean(false);
-        final ModifyListener listener = new ModifyListener() {
+        final ModifyListener listener = e -> listenerWasCalled.set(true);
 
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                listenerWasCalled.set(true);
-            }
-        };
-
-        final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(), listener,
-                new String[] {});
+        final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(), listener);
 
         executableFilePathText(composite).setText("selected");
 
         assertThat(executableFilePathText(composite)).is(enabled());
-        assertThat(checkBrowseButton(composite)).is(enabled());
+        final List<Button> browseButtons = getBrowseButtons(composite);
+        assertThat(browseButtons.stream().map(Button::getText)).containsExactly("Workspace...", "File system...",
+                "Variables...");
+        assertThat(browseButtons).allSatisfy(button -> assertThat(button).is(enabled()));
 
         assertThat(composite.getSelectedExecutableFilePath()).isEqualTo("selected");
 
@@ -63,25 +64,21 @@ public class ExecutableFileCompositeTest {
     }
 
     private static Text executableFilePathText(final Composite composite) {
-        for (final Control control : composite.getChildren()) {
-            if (control instanceof Text) {
-                return (Text) control;
-            }
-        }
-        return null;
+        return Stream.of(composite.getChildren())
+                .filter(Text.class::isInstance)
+                .map(Text.class::cast)
+                .findFirst()
+                .get();
     }
 
-    private static Button checkBrowseButton(final Composite composite) {
-        for (final Control control : composite.getChildren()) {
-            if (control instanceof Button) {
-                final Button button = (Button) control;
-                final String text = button.getText().toLowerCase();
-                if (text.contains("browse...")) {
-                    return button;
-                }
-            }
-        }
-        return null;
+    private static List<Button> getBrowseButtons(final Composite composite) {
+        return Stream.of(composite.getChildren())
+                .filter(Composite.class::isInstance)
+                .map(Composite.class::cast)
+                .flatMap(c -> Stream.of(c.getChildren()))
+                .filter(Button.class::isInstance)
+                .map(Button.class::cast)
+                .collect(toList());
     }
 
     private static Condition<? super Control> enabled() {
