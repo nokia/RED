@@ -1,3 +1,10 @@
+#/*
+#* Copyright 2017 Nokia Solutions and Networks
+#* Licensed under the Apache License, Version 2.0,
+# * see license.txt file for details.
+# */
+
+import argparse
 import os
 import paramiko
 import select
@@ -6,7 +13,9 @@ import zipfile
 
 def mkdir_p(sftp, remote_directory):
     """Change to this directory, recursively making new folders if needed.
-    Returns True if any folders were created."""
+    Returns True if any folders were created.
+    https://stackoverflow.com/questions/14819681/upload-files-using-sftp-in-python-but-create-directories-if-path-doesnt-exist
+    """
     if remote_directory == '/':
         # absolute path so change directory to root
         sftp.chdir('/')
@@ -63,8 +72,6 @@ def zipReports(ssh,archivePath):
 
 def getReportsFromRemote(ssh,archivePath,localFile):
     sftp = ssh.open_sftp()
-    print(archivePath)
-    print(localFile)
     sftp.get(archivePath, localFile)
     sftp.close()
 
@@ -74,12 +81,17 @@ def unzipReports(archivePath,archiveFilename):
     zip_ref.close()
     os.remove(archivePath+archiveFilename)
 
+def printReportsPath(localpath):
+    #RED converts links to output files to clickable urls in Console view
+    #Let's print links to reports which were copied to localpath folder
+    sys.__stdout__.write('Output:  '+localpath+'output.xml\n')
+    sys.__stdout__.write('Log:     '+localpath + 'log.html\n')
+    sys.__stdout__.write('Report:  '+ localpath + 'report.html\n')
+    sys.stdout.flush()
 def runSshCommand(ssh,command):
     channel = ssh.get_transport().open_session()
     channel.exec_command(command)
-    # console_buffer=''
-    # as output is non buffered on server, small buffer needs to be done on client side.
-    # it is to ensure properly printing recv buffers with \n in the middle of string
+
 
     while True:
         if channel.exit_status_ready():
@@ -89,50 +101,55 @@ def runSshCommand(ssh,command):
             command_output = (channel.recv(48).decode('utf-8'))
             sys.__stdout__.write(command_output)
             sys.stdout.flush()
-            # if '\n' not in command_output:
-            #     console_buffer += command_output
-            # else:
-            #     index=command_output.find('\n')
-            #     sys.__stdout__.write(console_buffer+command_output[0:index]+'\n')
-            #     sys.stdout.flush()
-            #     console_buffer=command_output[index+1:]
 
-server=sys.argv[1]
-username=sys.argv[2]
-password=sys.argv[3]
 
-# use data model path for local folder as it is path to project
-# if Launching preference is set to send robot command as one string,this param needs to be used
+parser = argparse.ArgumentParser()
+requiredNamed = parser.add_argument_group('required parameters')
+requiredNamed.add_argument('-s','--host', help='remote host address',required=True)
+requiredNamed.add_argument('-u','--username', help='username to login to remote host',required=True)
+requiredNamed.add_argument('-r','--remotepath', help='path on remote host where robot suite will be copied and executed',required=True)
+requiredNamed.add_argument('-c','--robotcommand', help='robot command to be executed',nargs=argparse.REMAINDER,required=True)
 
-remotepath=sys.argv[4]+'/'
-remoteinterpreter=sys.argv[5]
-remoteinterpreter='python -u'
+group = parser.add_mutually_exclusive_group()
+group.add_argument('-p','--password', help='password to login to remote host')
+group.add_argument('-k','--keyfile', help='path to keyfile to login to remote host')
 
-if len(sys.argv)>7:
-    robotcommand=sys.argv[6:]
+parser.add_argument('-l','--localpath', help='Local path to robot files/folder')
+parser.add_argument('-i','--remoteinterpreter', default="python",help='command to start python interpreter on remote host.Default: "python"')
+
+args = parser.parse_args()
+server=args.host
+username=args.username
+password=args.password
+
+if args.keyfile:
+    key=paramiko.RSAKey.from_private_key_file(args.keyfile.replace('\\','/'))
 else:
-    robotcommand=sys.argv[7].split()
-localpath=robotcommand[-1].replace('\\','/')+'/'
+    key=None
+remotepath=args.remotepath.replace('\\','/')+'/'
+remoteinterpreter=args.remoteinterpreter
+if len(args.robotcommand)>1:
+   robotcommand=args.robotcommand
+else:
+   robotcommand=args.robotcommand.split()
+
+if args.localpath:
+    localpath=args.localpath.replace('\\','/')+'/'
+else:
+    localpath=robotcommand[-1].replace('\\','/')+'/'
+
 robotcommand[0]=remoteinterpreter
-robotcommand[3]='' # remove --listener parameter, #FIXME
-robotcommand[4]='' # remove path to listener, #FIXME
+robotcommand[3]='' # remove --listener parameter, #FIXME add listener file locally and copy it together with other files
+robotcommand[4]='' # remove path to listener, #FIXME change listener path to remotepath
 robotcommand[-1]=remotepath
 robotcommand=' '.join(robotcommand)
 robotcommand='cd '+remotepath+';'+robotcommand
 
-print('server',server)
-print('username',username)
-print('password',password)
-print('localpath',localpath)
-print('remotepath',remotepath)
-print('remoteinterpreter',remoteinterpreter)
-print('robotcommand',robotcommand)
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
 ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
-ssh.connect(server, username=username, password=password)
+ssh.connect(server, username=username, password=password,pkey=key)
 
 copyToRemote(ssh,localpath,remotepath)
 unzipOnRemote(ssh,remotepath)
@@ -140,8 +157,8 @@ runRemoteRobot(ssh,robotcommand)
 zipReports(ssh,remotepath)
 getReportsFromRemote(ssh,remotepath+'reports.zip',localpath+'reports.zip')
 unzipReports(localpath,'reports.zip')
-
+printReportsPath(localpath)
 ssh.close()
+
 sys.__stdout__.write('Remote execution completed')
 sys.stdout.flush()
-
