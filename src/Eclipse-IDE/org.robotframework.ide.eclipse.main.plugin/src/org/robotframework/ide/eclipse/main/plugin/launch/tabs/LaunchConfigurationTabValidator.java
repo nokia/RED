@@ -16,6 +16,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.variables.IStringVariableManager;
+import org.eclipse.core.variables.VariablesPlugin;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
@@ -131,9 +133,14 @@ class LaunchConfigurationTabValidator {
 
     private void validateExecutableFile(final String filePath) {
         if (!filePath.isEmpty()) {
-            final File file = new File(filePath);
-            if (!file.exists()) {
-                throw new LaunchConfigurationValidationFatalException("Executable file does not exist");
+            final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+            try {
+                final File file = new File(variableManager.performStringSubstitution(filePath));
+                if (!file.exists()) {
+                    throw new LaunchConfigurationValidationFatalException("Executable file does not exist");
+                }
+            } catch (final CoreException e) {
+                throw new LaunchConfigurationValidationFatalException("Executable file does not exist", e);
             }
         }
     }
@@ -141,7 +148,7 @@ class LaunchConfigurationTabValidator {
     private void validateSuitesToRun(final Map<IResource, List<String>> suitesToRun) {
         final List<String> problematicSuites = new ArrayList<>();
         final List<String> problematicTests = new ArrayList<>();
-        for (final IResource resource : suitesToRun.keySet()) {
+        suitesToRun.forEach((resource, caseNames) -> {
             if (!resource.exists()) {
                 problematicSuites.add(resource.getFullPath().toString());
             } else if (resource.getType() == IResource.FILE) {
@@ -151,20 +158,13 @@ class LaunchConfigurationTabValidator {
                 if (section.isPresent()) {
                     cases.addAll(section.get().getChildren());
                 }
-                for (final String caseName : suitesToRun.get(resource)) {
-                    boolean exist = false;
-                    for (final RobotCase test : cases) {
-                        if (test.getName().equalsIgnoreCase(caseName)) {
-                            exist = true;
-                            break;
-                        }
-                    }
-                    if (!exist) {
+                for (final String caseName : caseNames) {
+                    if (cases.stream().noneMatch(test -> test.getName().equalsIgnoreCase(caseName))) {
                         problematicTests.add(caseName);
                     }
                 }
             }
-        }
+        });
         if (!problematicSuites.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
                     "Following suites does not exist: " + String.join(", ", problematicSuites));
@@ -175,24 +175,24 @@ class LaunchConfigurationTabValidator {
         }
     }
 
-    class LaunchConfigurationValidationException extends RuntimeException {
+    static class LaunchConfigurationValidationException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
 
-        public LaunchConfigurationValidationException(final String message) {
+        LaunchConfigurationValidationException(final String message) {
             super(message);
         }
     }
 
-    class LaunchConfigurationValidationFatalException extends RuntimeException {
+    static class LaunchConfigurationValidationFatalException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
 
-        public LaunchConfigurationValidationFatalException(final String message) {
+        LaunchConfigurationValidationFatalException(final String message) {
             super(message);
         }
 
-        public LaunchConfigurationValidationFatalException(final String message, final Exception e) {
+        LaunchConfigurationValidationFatalException(final String message, final Exception e) {
             super(message, e);
         }
     }

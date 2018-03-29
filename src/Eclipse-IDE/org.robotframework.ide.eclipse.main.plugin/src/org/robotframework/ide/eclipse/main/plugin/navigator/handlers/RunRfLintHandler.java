@@ -11,16 +11,20 @@ import static java.util.stream.Collectors.toList;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.variables.IStringVariableManager;
+import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -37,6 +41,8 @@ import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RunRfLintHa
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.viewers.Selections;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler> {
 
@@ -87,7 +93,7 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
             return server;
         }
 
-        static void killServer(final RfLintIntegrationServer server) {
+        private static void killServer(final RfLintIntegrationServer server) {
             try {
                 server.stop();
             } catch (final IOException e) {
@@ -95,12 +101,19 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
             }
         }
 
-        static void showErrorDialog(final Exception e) {
+        private static void showErrorDialog(final Exception e) {
             DetailedErrorDialog.openErrorDialog("Error occurred when trying to run RfLint analysis", e.getMessage());
         }
 
-        private void runRfLint(final IResource resource, final RfLintIntegrationServer server) {
+        private static void runRfLint(final IResource resource, final RfLintIntegrationServer server) {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(resource.getProject());
+            final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+            runRfLint(robotProject, resource, server, preferences);
+        }
+
+        @VisibleForTesting
+        static void runRfLint(final RobotProject robotProject, final IResource resource,
+                final RfLintIntegrationServer server, final RedPreferences preferences) {
             final File projectLocation = robotProject.getProject().getLocation().toFile();
             final List<String> excludedPaths = robotProject.getRobotProjectConfig()
                     .getExcludedPath()
@@ -108,14 +121,22 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
                     .map(ExcludedFolderPath::getPath)
                     .collect(toList());
             final File filepath = resource.getLocation().toFile();
-            final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
             final List<RfLintRule> rules = preferences.getRfLintRules();
             final List<String> rulesFiles = preferences.getRfLintRulesFiles();
-            final List<String> additionalArguments = newArrayList(
-                    DebugPlugin.parseArguments(preferences.getRfLintAdditionalArguments()));
-
+            final List<String> additionalArguments = parseArguments(preferences.getRfLintAdditionalArguments());
             robotProject.getRuntimeEnvironment().runRfLint(server.getHost(), server.getPort(), projectLocation,
                     excludedPaths, filepath, rules, rulesFiles, additionalArguments);
+        }
+
+        private static List<String> parseArguments(final String arguments) {
+            final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+            return Stream.of(DebugPlugin.parseArguments(arguments)).map(argument -> {
+                try {
+                    return variableManager.performStringSubstitution(argument);
+                } catch (final CoreException e) {
+                    return argument;
+                }
+            }).collect(toList());
         }
     }
 

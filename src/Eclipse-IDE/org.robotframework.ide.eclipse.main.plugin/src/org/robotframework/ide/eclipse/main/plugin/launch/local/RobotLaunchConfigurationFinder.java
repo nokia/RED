@@ -65,8 +65,7 @@ public class RobotLaunchConfigurationFinder {
     }
 
     public static ILaunchConfigurationWorkingCopy findLaunchConfigurationForSelectedTestCases(
-            final List<IResource> resources)
-            throws CoreException {
+            final List<IResource> resources) throws CoreException {
 
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationType launchConfigurationType = launchManager
@@ -85,8 +84,7 @@ public class RobotLaunchConfigurationFinder {
     }
 
     public static ILaunchConfigurationWorkingCopy findLaunchConfigurationExceptSelectedTestCases(
-            final List<IResource> resources)
-            throws CoreException {
+            final List<IResource> resources) throws CoreException {
 
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationType launchConfigurationType = launchManager
@@ -121,8 +119,7 @@ public class RobotLaunchConfigurationFinder {
     }
 
     public static ILaunchConfigurationWorkingCopy getLaunchConfigurationExceptSelectedTestCases(
-            final List<IResource> resources)
-            throws CoreException {
+            final List<IResource> resources) throws CoreException {
         ILaunchConfigurationWorkingCopy configuration = findLaunchConfigurationExceptSelectedTestCases(resources);
         if (configuration == null) {
             configuration = RobotLaunchConfiguration.prepareDefault(resources);
