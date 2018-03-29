@@ -145,7 +145,7 @@ class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab impl
 
     private void createExecutableFileGroup(final Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
-        group.setText("Execution wrapper");
+        group.setText("External script");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
 
