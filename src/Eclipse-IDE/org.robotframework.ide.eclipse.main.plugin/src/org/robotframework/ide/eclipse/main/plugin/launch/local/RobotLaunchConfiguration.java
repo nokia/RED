@@ -28,7 +28,6 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -72,11 +71,6 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     private static final String EXECUTABLE_FILE_ARGUMENTS_ATTRIBUTE = "Executable file arguments";
 
     public static final String CURRENT_CONFIGURATION_VERSION = "1";
-
-    public static String[] getSystemDependentExecutableFileExtensions() {
-        return RedSystemProperties.isWindowsPlatform() ? new String[] { "*.bat;*.com;*.exe", "*.*" }
-                : new String[] { "*.sh", "*.*" };
-    }
 
     static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
         final Map<IResource, List<String>> suitesMapping = new HashMap<>();

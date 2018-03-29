@@ -50,6 +50,7 @@ import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.BrowseButtons;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.red.graphics.ImagesManager;
@@ -211,14 +212,17 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     private StringFieldEditor createAdditionalArgumentsEditor(final Composite parent) {
         final Composite group = new Composite(parent, SWT.NONE);
+        GridDataFactory.fillDefaults().applyTo(group);
+
         final StringFieldEditor argumentsEditor = new StringFieldEditor(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS,
                 "Additional arguments", group);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(argumentsEditor.getLabelControl(group));
+        GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).indent(10, 0).applyTo(
+                argumentsEditor.getTextControl(group));
         argumentsEditor.setPreferenceStore(getPreferenceStore());
         argumentsEditor.setPage(this);
 
-        GridDataFactory.fillDefaults().applyTo(group);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(argumentsEditor.getLabelControl(group));
-        GridDataFactory.fillDefaults().indent(10, 0).grab(true, false).applyTo(argumentsEditor.getTextControl(group));
+        BrowseButtons.selectVariableButton(group, argumentsEditor.getTextControl(group));
 
         return argumentsEditor;
     }
