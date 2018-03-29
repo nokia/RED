@@ -7,10 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
@@ -19,7 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.BrowseButtons;
 import org.robotframework.red.jface.dialogs.ScriptExportDialog;
 
 public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPreferencePage {
@@ -45,10 +43,11 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
 
         final StringFieldEditor additionalRobotArguments = new StringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "Additional Robot Framework arguments:", group);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalRobotArguments.getLabelControl(group));
         additionalRobotArguments.load();
         addField(additionalRobotArguments);
 
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(additionalRobotArguments.getLabelControl(group));
+        BrowseButtons.selectVariableButton(group, additionalRobotArguments.getTextControl(group));
     }
 
     private void createListenerLaunchConfigurationPreferences(final Composite parent) {
@@ -78,7 +77,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         addField(remoteTimeout);
 
         final Button exportBtn = new Button(group, SWT.PUSH);
-        GridDataFactory.swtDefaults().indent(25, 5).applyTo(exportBtn);
+        GridDataFactory.swtDefaults().applyTo(exportBtn);
         exportBtn.setText("Export Client Script");
         exportBtn.addSelectionListener(
                 widgetSelectedAdapter(e -> new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open()));
@@ -92,23 +91,42 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
 
         final StringFieldEditor additionalInterpreterArguments = new StringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "Additional interpreter arguments:", group);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalInterpreterArguments.getLabelControl(group));
         additionalInterpreterArguments.load();
         addField(additionalInterpreterArguments);
 
-        final FileFieldEditor scriptPathEditor = new FileFieldEditor(RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH,
-                "Executable file to run Robot Framework tests:", true, StringFieldEditor.VALIDATE_ON_KEY_STROKE, group);
-        scriptPathEditor.setFileExtensions(RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions());
-        scriptPathEditor.setFilterPath(ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile());
+        BrowseButtons.selectVariableButton(group, additionalInterpreterArguments.getTextControl(group));
+
+        final StringFieldEditor scriptPathEditor = new StringFieldEditor(
+                RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS,
+                "Executable file to run Robot Framework tests:", group);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getLabelControl(group));
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getTextControl(group));
         scriptPathEditor.load();
         addField(scriptPathEditor);
+
+        final Composite buttonsParent = new Composite(group, SWT.NONE);
+        GridLayoutFactory.fillDefaults().numColumns(3).applyTo(buttonsParent);
+        GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(buttonsParent);
+        BrowseButtons.selectWorkspaceFileButton(buttonsParent, scriptPathEditor.getTextControl(group),
+                "Select executor file to run Robot Framework tests:");
+        BrowseButtons.selectSystemFileButton(buttonsParent, scriptPathEditor.getTextControl(group),
+                BrowseButtons.getSystemDependentExecutableFileExtensions());
+        BrowseButtons.selectVariableButton(buttonsParent, scriptPathEditor.getTextControl(group));
 
         final StringFieldEditor additionalScriptArguments = new StringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS, "Additional executable file arguments:",
                 group);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalScriptArguments.getLabelControl(group));
         additionalScriptArguments.load();
         addField(additionalScriptArguments);
 
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getLabelControl(group));
+        BrowseButtons.selectVariableButton(group, additionalScriptArguments.getTextControl(group));
+    }
+
+    @Override
+    protected void adjustGridLayout() {
+        // switching off grid layout adjustment
     }
 
 }
