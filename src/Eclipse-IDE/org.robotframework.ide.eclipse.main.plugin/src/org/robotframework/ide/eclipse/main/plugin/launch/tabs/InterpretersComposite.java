@@ -16,8 +16,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -86,14 +84,8 @@ class InterpretersComposite extends Composite {
         });
         comboExecutorName = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
         comboExecutorName.setItems(SuiteExecutor.allExecutorNames().toArray(new String[0]));
-        comboExecutorName.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                listener.interpreterChanged(Optional
-                        .of(SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex()))));
-            }
-        });
+        comboExecutorName.addModifyListener(e -> listener.interpreterChanged(
+                Optional.of(SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex())))));
         GridDataFactory.fillDefaults().applyTo(comboExecutorName);
         final Label systemExecutorLbl = new Label(this, SWT.NONE);
         systemExecutorLbl.setText("interpreter taken from sytem PATH environment variable");
@@ -153,6 +145,7 @@ class InterpretersComposite extends Composite {
         return SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex()));
     }
 
+    @FunctionalInterface
     public interface InterpreterListener {
 
         void interpreterChanged(Optional<SuiteExecutor> newExecutor);
