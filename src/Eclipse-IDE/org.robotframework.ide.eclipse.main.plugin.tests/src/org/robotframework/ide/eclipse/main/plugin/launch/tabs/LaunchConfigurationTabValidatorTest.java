@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -97,9 +98,9 @@ public class LaunchConfigurationTabValidatorTest {
     public void whenSuitesSpecifiedToRunDoesNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
         thrown.expectMessage(CoreMatchers
-                .<String> either(CoreMatchers.<String> equalTo("Following suites does not exist: /" + PROJECT_NAME
-                        + "/file2.robot, /" + PROJECT_NAME + "/suite/dir"))
-                .or(CoreMatchers.<String> equalTo("Following suites does not exist: /" + PROJECT_NAME + "/suite/dir, /"
+                .either(CoreMatchers.equalTo("Following suites does not exist: /" + PROJECT_NAME + "/file2.robot, /"
+                        + PROJECT_NAME + "/suite/dir"))
+                .or(CoreMatchers.equalTo("Following suites does not exist: /" + PROJECT_NAME + "/suite/dir, /"
                         + PROJECT_NAME + "/file2.robot")));
 
         final IPath filePath = Path.fromPortableString("file.robot");
@@ -233,6 +234,17 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     @Test
+    public void whenExecutableFileDefinedWithVariableDoesNotExist_fatalExceptionIsThrown() throws CoreException {
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setExecutableFilePath("${workspace_loc:/not_existing.txt}");
+
+        assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
+                .isThrownBy(() -> validator.validateExecutorTab(launchConfig))
+                .withMessage("Executable file does not exist")
+                .withCauseExactlyInstanceOf(CoreException.class);
+    }
+
+    @Test
     public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_1() throws Exception {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
         thrown.expectMessage("Project '" + PROJECT_NAME + "' is using invalid Python environment");
@@ -283,6 +295,15 @@ public class LaunchConfigurationTabValidatorTest {
 
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setExecutableFilePath(executableFile.getLocation().toOSString());
+        validator.validateExecutorTab(launchConfig);
+    }
+
+    @Test
+    public void nothingIsThrown_whenVariableIsUsedInExecutableFilePath() throws Exception {
+        projectProvider.createFile("robot_executable_file.txt", "run robot command");
+
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setExecutableFilePath("${workspace_loc:/" + PROJECT_NAME + "/robot_executable_file.txt}");
         validator.validateExecutorTab(launchConfig);
     }
 

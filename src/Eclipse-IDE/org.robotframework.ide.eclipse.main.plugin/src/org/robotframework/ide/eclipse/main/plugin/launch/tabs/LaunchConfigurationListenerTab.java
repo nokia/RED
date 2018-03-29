@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+
 import java.util.Arrays;
 
 import org.eclipse.core.runtime.CoreException;
@@ -15,10 +17,6 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -59,7 +57,7 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
 
     private Text commandLineArgument;
 
-    public LaunchConfigurationListenerTab(final boolean isAgentTypeButtonSelection) {
+    LaunchConfigurationListenerTab(final boolean isAgentTypeButtonSelection) {
         this.isAgentTypeButtonSelection = isAgentTypeButtonSelection;
     }
 
@@ -85,13 +83,7 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
         GridDataFactory.fillDefaults().grab(true, false).applyTo(projectGroup);
         GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(projectGroup);
 
-        projectComposite = new ProjectComposite(projectGroup, new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
+        projectComposite = new ProjectComposite(projectGroup, e -> updateLaunchConfigurationDialog());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(projectComposite);
     }
 
@@ -116,14 +108,10 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
     private Button createAgentTypeSelectionButton(final Composite parent, final String text) {
         final Button button = createRadioButton(parent, text);
         GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(button);
-        button.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                updateLaunchConfigurationDialog();
-                updateRemoteGroupState();
-            }
-        });
+        button.addSelectionListener(widgetSelectedAdapter(e -> {
+            updateLaunchConfigurationDialog();
+            updateRemoteGroupState();
+        }));
         return button;
     }
 
@@ -159,13 +147,7 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
 
         final Text txt = new Text(parent, SWT.BORDER);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(txt);
-        txt.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
+        txt.addModifyListener(e -> updateLaunchConfigurationDialog());
 
         // spacer to occupy next grid cell
         new Label(parent, SWT.NONE);
@@ -187,13 +169,8 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
         final Button exportBtn = new Button(clientGroup, SWT.PUSH);
         GridDataFactory.swtDefaults().applyTo(exportBtn);
         exportBtn.setText("Export Client Script");
-        exportBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open();
-            }
-        });
+        exportBtn.addSelectionListener(
+                widgetSelectedAdapter(e -> new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open()));
 
         final Label commandLineDescription = new Label(clientGroup, SWT.WRAP);
         GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).applyTo(commandLineDescription);
