@@ -6,17 +6,20 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.variables.IStringVariableManager;
+import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -85,7 +88,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
                 final ArrayList<AgentServerStatusListener> additionalServerListeners = newArrayList(
                         new ProcessConnectingInRunServerListener(launch));
-                
+
                 final List<RobotAgentEventListener> additionalAgentListeners = new ArrayList<>();
                 additionalAgentListeners.add(new AgentServerVersionsChecker());
                 additionalAgentListeners.add(testsStarter);
@@ -196,11 +199,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         builder.useArgumentFile(preferences.shouldLaunchUsingArgumentsFile());
         if (!robotConfig.getExecutableFilePath().isEmpty()) {
-            final File executableFile = new File(robotConfig.getExecutableFilePath());
-            if (!executableFile.exists()) {
-                throw newCoreException("Executable file '" + executableFile.getAbsolutePath() + "' does not exist");
-            }
-            builder.withExecutableFile(executableFile);
+            builder.withExecutableFile(resolveExecutableFile(robotConfig.getExecutableFilePath()));
             builder.addUserArgumentsForExecutableFile(parseArguments(robotConfig.getExecutableFileArguments()));
             builder.useSingleRobotCommandLineArg(preferences.shouldUseSingleCommandLineArgument());
         }
@@ -236,8 +235,24 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 && robotConfig.getSuiteResources().get(0) instanceof IFile;
     }
 
+    private File resolveExecutableFile(final String path) throws CoreException {
+        final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+        final File executableFile = new File(variableManager.performStringSubstitution(path));
+        if (!executableFile.exists()) {
+            throw newCoreException("Executable file '" + executableFile.getAbsolutePath() + "' does not exist");
+        }
+        return executableFile;
+    }
+
     private List<String> parseArguments(final String arguments) {
-        return Arrays.asList(DebugPlugin.parseArguments(arguments));
+        final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+        return Stream.of(DebugPlugin.parseArguments(arguments)).map(argument -> {
+            try {
+                return variableManager.performStringSubstitution(argument);
+            } catch (final CoreException e) {
+                return argument;
+            }
+        }).collect(toList());
     }
 
     @VisibleForTesting

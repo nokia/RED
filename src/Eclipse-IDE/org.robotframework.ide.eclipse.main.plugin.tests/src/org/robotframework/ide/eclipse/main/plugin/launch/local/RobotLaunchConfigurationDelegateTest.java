@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -16,8 +17,12 @@ import java.io.File;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.variables.IStringVariableManager;
+import org.eclipse.core.variables.IValueVariable;
+import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -55,11 +60,27 @@ public class RobotLaunchConfigurationDelegateTest {
     public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
             RobotLaunchConfiguration.TYPE_ID);
 
+    private static final IStringVariableManager VARIABLE_MANAGER = VariablesPlugin.getDefault()
+            .getStringVariableManager();
+
+    private static final IValueVariable[] CUSTOM_VARIABLES = new IValueVariable[] {
+            VARIABLE_MANAGER.newValueVariable("a_var", "a_desc", true, "a_value"),
+            VARIABLE_MANAGER.newValueVariable("b_var", "b_desc", true, "b_value"),
+            VARIABLE_MANAGER.newValueVariable("c_var", "c_desc", true, "c_value") };
+
     @BeforeClass
     public static void before() throws Exception {
+        VARIABLE_MANAGER.addVariables(CUSTOM_VARIABLES);
+
         projectProvider.createDir(Path.fromPortableString("001__suites_a"));
         projectProvider.createFile(Path.fromPortableString("001__suites_a/s1.robot"), "*** Test Cases ***",
                 "001__case1", "  Log  10", "001__case2", "  Log  20");
+        projectProvider.createFile("executable_script.bat");
+    }
+
+    @AfterClass
+    public static void after() throws Exception {
+        VARIABLE_MANAGER.removeVariables(CUSTOM_VARIABLES);
     }
 
     @Test
@@ -244,7 +265,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        final String executablePath = projectProvider.createFile("executable_script.bat").getLocation().toOSString();
+        final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
@@ -255,13 +276,30 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     @Test
+    public void commandLineStartsWithExecutableFilePath_whenPathContainsVariables() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setExecutableFilePath("${workspace_loc:/" + PROJECT_NAME + "/executable_script.bat}");
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        assertThat(commandLine.getCommandLine())
+                .startsWith(projectProvider.getFile("executable_script.bat").getLocation().toOSString());
+    }
+
+    @Test
     public void commandLineContainsExecutableFilePathWithArguments() throws Exception {
         final RedPreferences preferences = mock(RedPreferences.class);
 
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        final String executablePath = projectProvider.createFile("executable_script.bat").getLocation().toOSString();
+        final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
         robotConfig.setExecutableFileArguments("-arg1 abc -arg2 xyz");
 
@@ -269,7 +307,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
                 preferences);
 
-        assertThat(commandLine.getCommandLine()).containsSubsequence(executablePath, "-arg1", "abc", "-arg2", "xyz");
+        assertThat(commandLine.getCommandLine()).startsWith(executablePath, "-arg1", "abc", "-arg2", "xyz");
     }
 
     @Test
@@ -291,6 +329,23 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     @Test
+    public void coreExceptionIsThrown_whenExecutableFileDefinedWithVariableDoesNotExist() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setExecutableFilePath("${workspace_loc:/" + PROJECT_NAME + "/not_existing.bat}");
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+
+        assertThatExceptionOfType(CoreException.class)
+                .isThrownBy(() -> launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, preferences))
+                .withMessage("Variable references non-existent resource : ${workspace_loc:/" + PROJECT_NAME
+                        + "/not_existing.bat}");
+    }
+
+    @Test
     public void pathToSuiteIsUsed_whenSingleSuiteIsRunAndPreferenceIsSet() throws Exception {
         final RedPreferences preferences = mock(RedPreferences.class);
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
@@ -306,7 +361,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
                 preferences);
 
-        final String suitePath = projectProvider.createFile("001__suites_a/s1.robot").getLocation().toOSString();
+        final String suitePath = projectProvider.getFile("001__suites_a/s1.robot").getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).endsWith(suitePath).doesNotContain("-s", "-t");
     }
 
@@ -326,7 +381,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
                 preferences);
 
-        final String suitePath = projectProvider.createFile("001__suites_a/s1.robot").getLocation().toOSString();
+        final String suitePath = projectProvider.getFile("001__suites_a/s1.robot").getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).endsWith("-t", "001__case1", suitePath).doesNotContain("-s");
     }
 
@@ -515,5 +570,28 @@ public class RobotLaunchConfigurationDelegateTest {
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
         launchDelegate.launch(launchCopy, "run", null, null);
+    }
+
+    @Test
+    public void knownVariablesAreResolvedInAdditionalArguments() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setRobotArguments("a ${a_var} ${a}");
+        robotConfig.setInterpreterArguments("${b} b ${b_var}");
+        final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toOSString();
+        robotConfig.setExecutableFilePath(executablePath);
+        robotConfig.setExecutableFileArguments("${c_var} ${c} c");
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getCommandLine()).startsWith(executablePath, "c_value", "${c}", "c")
+                .containsSequence("${b}", "b", "b_value", "-m", "robot.run")
+                .endsWith("a", "a_value", "${a}", projectPath);
     }
 }
