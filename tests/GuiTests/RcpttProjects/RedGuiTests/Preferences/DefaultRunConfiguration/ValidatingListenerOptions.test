@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XUivgOobEea0ALtmCcrmfA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/9/18 1:20 PM
+Save-Time: 3/30/18 12:12 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,7 +22,7 @@ with [get-window Preferences] {
         get-property "getChildren().Control[0].getText()" | equals "Configure default robot launch configurations" 
             | verify-true
             
-        //check how muchh is gropus    
+        //check how much is gropus    
         get-property "getChildren().Control[1].getChildren().length" | equals 3 | verify-true
         get-property "getChildren().Control[1].getChildren().Control[0].getText()" | equals "Robot tab" | verify-true
         get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals "Listener tab" | verify-true
@@ -31,11 +31,12 @@ with [get-window Preferences] {
     
     //main tab
        with [get-group "Robot tab"] {
-        get-property childCount | equals 2 | verify-true
-        get-property "getChildren().Control[0].getText()" | equals "Additional Robot Framework arguments:" | verify-true
-        get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[1].getText()" | equals "" | verify-true
-    }
+        	get-property "getChildren().length" | equals 3 | verify-true
+		    get-property "getChildren().Control[0].getText()" | equals "Additional Robot Framework arguments:" | verify-true
+		    get-property "getChildren().Control[1].getText()" | equals "" | verify-true
+		    get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
+		    get-property "getChildren().Control[2].getText()" | equals "Variables..." | verify-true
+	  }
     
     //Listener
     with [get-group "Listener tab"] {
@@ -53,17 +54,28 @@ with [get-window Preferences] {
     }
     //executor
     with [get-group "Executor tab"] {
-        get-property childCount | equals 7 | verify-true
-        get-property "getChildren().Control[0].getText()" | equals "Additional interpreter arguments:" | verify-true
-        get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[1].getText()" | equals "" | verify-true
-        get-property "getChildren().Control[2].getText()" | equals "Executable file to run Robot Framework tests:" | verify-true
-        get-property "getChildren().Control[3].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[3].getText()" | equals "" | verify-true
-        get-property "getChildren().Control[4].getText()" | equals "&Browse..." | verify-true
-        get-property "getChildren().Control[5].getText()" | equals "Additional executable file arguments:" | verify-true
-        get-property "getChildren().Control[6].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[6].getText()" | equals "" | verify-true
+        get-property "getChildren().length" | equals 9 | verify-true
+        
+        // Additional interpreter
+	    get-property "getChildren().Control[0].getText()" | equals "Additional interpreter arguments:" | verify-true
+	    get-property "getChildren().Control[1].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[2].getText()" | equals "Variables..." | verify-true
+	    
+	    // Executable file 
+	    get-property "getChildren().Control[3].getText()" | equals "Executable file to run Robot Framework tests:" 
+	        | verify-true
+	    get-property "getChildren().Control[4].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[4].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[5].getChildren().length" | equals 3 | verify-true
+	    get-property "getChildren().Control[5].getChildren().Control[0].getText()" | equals "Workspace..." | verify-true
+	    get-property "getChildren().Control[5].getChildren().Control[1].getText()" | equals "File system..." | verify-true
+	    get-property "getChildren().Control[5].getChildren().Control[2].getText()" | equals "Variables..." | verify-true
+	    
+	    // Additional executable
+	    get-property "getChildren().Control[6].getText()" | equals "Additional executable file arguments:" | verify-true
+	    get-property "getChildren().Control[7].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[7].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[8].getText()" | equals "Variables..." | verify-true
     }
     get-button "Restore Defaults" | get-property enablement | equals true | verify-true
     get-button Apply | get-property enablement | equals true | verify-true
