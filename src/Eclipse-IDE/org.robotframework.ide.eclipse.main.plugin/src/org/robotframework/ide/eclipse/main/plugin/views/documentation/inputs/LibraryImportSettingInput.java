@@ -5,17 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
-import static com.google.common.collect.Lists.newArrayList;
+import java.net.URISyntaxException;
 
-import java.net.URI;
-import java.util.Optional;
-
-import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.LibrarySpecification;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.ImportedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri;
 
 
 public class LibraryImportSettingInput extends InternalElementInput<RobotSetting> {
@@ -34,19 +30,21 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
 
     @Override
     protected String createHeader() {
-        final Optional<URI> imgUri = RedImages.getBookImageUri();
-        final ArgumentsDescriptor descriptor = specification.getConstructor() == null
-                ? ArgumentsDescriptor.createDescriptor()
-                : specification.getConstructor().createArgumentsDescriptor();
-
-        return Headers.formatSimpleHeader(imgUri, specification.getName(),
-                newArrayList("Version", specification.getVersion()), 
-                newArrayList("Scope", specification.getScope()),
-                newArrayList("Arguments", descriptor.getDescription()));
+        return LibrarySpecificationInput.createHeader(specification);
     }
 
     @Override
     protected Documentation createDocumentation() {
         return specification.createDocumentation();
+    }
+
+    @Override
+    protected String localKeywordsLinker(final String name) {
+        try {
+            final String projectName = element.getSuiteFile().getProject().getName();
+            return LibraryUri.createShowKeywordDocUri(projectName, specification.getName(), name).toString();
+        } catch (final URISyntaxException e) {
+            return "#";
+        }
     }
 }

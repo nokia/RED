@@ -25,23 +25,20 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 class ProjectComposite extends Composite {
 
-    private final ModifyListener listener;
-
     private Text projectText;
 
     ProjectComposite(final Composite parent, final ModifyListener listener) {
         super(parent, SWT.NONE);
-        this.listener = listener;
 
         GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 5).applyTo(this);
 
-        createProjectText();
+        createProjectText(listener);
         createBrowseButton();
     }
 
-    private void createProjectText() {
+    private void createProjectText(final ModifyListener listener) {
         projectText = new Text(this, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(projectText);
+        GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).applyTo(projectText);
         projectText.addModifyListener(listener);
     }
 

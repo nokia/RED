@@ -78,8 +78,8 @@ public class AssistProposals {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
         return new RedNotAccessibleLibraryKeywordProposal(spec.getName(), alias, scope, bddPrefix, keyword.getName(),
-                argsDescriptor, keyword.createDocumentation(), keyword.isDeprecated(), exposingFilepath,
-                shouldUseQualified, match);
+                argsDescriptor, keyword.createDocumentation(spec.getKeywordNames()), keyword.isDeprecated(),
+                exposingFilepath, shouldUseQualified, match);
     }
 
     static RedKeywordProposal createLibraryKeywordProposal(final LibrarySpecification spec,
@@ -89,7 +89,8 @@ public class AssistProposals {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
         return new RedLibraryKeywordProposal(spec.getName(), alias, scope, bddPrefix, keyword.getName(), argsDescriptor,
-                keyword.createDocumentation(), keyword.isDeprecated(), exposingFilepath, shouldUseQualified, match);
+                keyword.createDocumentation(spec.getKeywordNames()), keyword.isDeprecated(), exposingFilepath,
+                shouldUseQualified, match);
     }
 
     static RedKeywordProposal createUserKeywordProposal(final RobotKeywordDefinition userKeyword,

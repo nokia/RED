@@ -31,13 +31,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordDefinitionInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordDefinitionInput.KeywordDefinitionOnSettingInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordProposalInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.LibraryImportSettingInput;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SettingOfCaseWithDocumentationInput;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SettingOfKeywordWithDocumentationInput;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SettingWithDocumentationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput.SuiteFileOnSettingInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput.TestCaseOnSettingInput;
 
 public class Documentations {
 
@@ -107,16 +107,16 @@ public class Documentations {
         } else if (element instanceof RobotDefinitionSetting) {
             final RobotDefinitionSetting setting = (RobotDefinitionSetting) element;
             if (setting.isDocumentation() && setting.getParent() instanceof RobotCase) {
-                return Optional.of(new SettingOfCaseWithDocumentationInput(setting));
+                return Optional.of(new TestCaseOnSettingInput(setting));
 
             } else if (setting.isDocumentation() && setting.getParent() instanceof RobotKeywordDefinition) {
-                return Optional.of(new SettingOfKeywordWithDocumentationInput(setting));
+                return Optional.of(new KeywordDefinitionOnSettingInput(setting));
             }
 
         } else if (element instanceof RobotSetting) {
             final RobotSetting setting = (RobotSetting) element;
             if (setting.isDocumentation()) {
-                return Optional.of(new SettingWithDocumentationInput(setting));
+                return Optional.of(new SuiteFileOnSettingInput(setting));
 
             } else if (setting.isResourceImport()) {
                 final Optional<IResource> resource = setting.getImportedResource();
