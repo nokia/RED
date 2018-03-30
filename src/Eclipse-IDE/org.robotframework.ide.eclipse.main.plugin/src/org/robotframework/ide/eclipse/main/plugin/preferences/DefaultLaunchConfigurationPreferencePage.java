@@ -19,6 +19,7 @@ import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.BrowseButtons;
 import org.robotframework.red.jface.dialogs.ScriptExportDialog;
+import org.robotframework.red.jface.preferences.ParameterizedFilePathStringFieldEditor;
 
 public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPreferencePage {
 
@@ -97,11 +98,12 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
 
         BrowseButtons.selectVariableButton(group, additionalInterpreterArguments.getTextControl(group));
 
-        final StringFieldEditor scriptPathEditor = new StringFieldEditor(
+        final ParameterizedFilePathStringFieldEditor scriptPathEditor = new ParameterizedFilePathStringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS,
                 "Executable file to run Robot Framework tests:", group);
         GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getLabelControl(group));
         GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getTextControl(group));
+        scriptPathEditor.setErrorMessage("Value must be an existing file");
         scriptPathEditor.load();
         addField(scriptPathEditor);
 
