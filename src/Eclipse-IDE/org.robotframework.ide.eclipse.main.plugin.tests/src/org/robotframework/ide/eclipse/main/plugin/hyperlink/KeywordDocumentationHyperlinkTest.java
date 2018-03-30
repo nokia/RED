@@ -6,15 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.hyperlink.Conditions.shellWithText;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.text.Region;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -27,7 +23,6 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.KeywordDocumentationPopup;
 import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -73,22 +68,5 @@ public class KeywordDocumentationHyperlinkTest {
         assertThat(link.additionalLabelDecoration())
                 .isEqualTo("[" + projectProvider.getFile("testlib.py").getLocation().toString() + "]");
         assertThat(link.getImage()).isEqualTo(RedImages.getLibraryImage());
-    }
-
-    @Test
-    public void testIfPopupOpensCorrectly() {
-        final Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
-        assertThat(display.getShells()).doesNotHave(shellWithText(KeywordDocumentationPopup.POPUP_TEXT));
-
-        final KeywordDocumentationHyperlink link = new KeywordDocumentationHyperlink(model, new Region(20, 50),
-                projectProvider.getProject(), libSpec, kwSpec);
-        link.open();
-        assertThat(display.getShells()).has(shellWithText(KeywordDocumentationPopup.POPUP_TEXT));
-
-        for (final Shell shell : display.getShells()) {
-            if (shell.getText().equals(KeywordDocumentationPopup.POPUP_TEXT)) {
-                shell.close();
-            }
-        }
     }
 }
