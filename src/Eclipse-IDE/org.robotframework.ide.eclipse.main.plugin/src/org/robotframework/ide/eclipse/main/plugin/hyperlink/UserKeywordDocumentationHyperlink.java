@@ -7,9 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -55,6 +59,8 @@ public class UserKeywordDocumentationHyperlink extends KeywordDocumentationHyper
 
     @Override
     public void open() {
-        open(userKeyword.createSpecification());
+        final IWorkbenchWindow workbench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        final IWorkbenchPage page = workbench.getActivePage();
+        Documentations.showDocForRobotElement(page, userKeyword);
     }
 }

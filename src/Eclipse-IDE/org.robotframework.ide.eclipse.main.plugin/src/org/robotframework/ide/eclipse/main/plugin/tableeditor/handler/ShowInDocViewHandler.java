@@ -10,7 +10,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
@@ -30,8 +30,8 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
 
         @Execute
         public void showInDocView(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
-            final IWorkbenchPartSite site = editor.getSite();
-            Documentations.markViewSyncBroken(site);
+            final IWorkbenchPage page = editor.getSite().getPage();
+            Documentations.markViewSyncBroken(page);
 
             if (editor.getActiveEditor() instanceof SuiteSourceEditor) {
                 final SuiteSourceEditor sourceEditor = (SuiteSourceEditor) editor.getActiveEditor();
@@ -39,11 +39,11 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                 final IDocument document = sourceEditor.getDocument();
                 final int offset = sourceEditor.getViewer().getTextWidget().getCaretOffset();
 
-                Documentations.showDocForEditorSourceSelection(site, suiteModel, document, offset);
+                Documentations.showDocForEditorSourceSelection(page, suiteModel, document, offset);
             } else {
                 final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
 
-                Documentations.showDocForEditorTablesSelection(site, selectionLayerAccessor);
+                Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor);
             }
         }
     }

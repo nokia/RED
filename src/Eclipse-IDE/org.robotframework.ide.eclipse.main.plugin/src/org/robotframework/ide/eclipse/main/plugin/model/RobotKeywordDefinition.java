@@ -19,7 +19,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
-import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
@@ -164,15 +163,6 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         final MappingResult extractedVars = extractor.extract(getLinkedElement().getDeclaration(),
                 getSuiteFile().getName());
         return extractedVars.getCorrectVariables();
-    }
-
-    public KeywordSpecification createSpecification() {
-        final KeywordSpecification keywordSpecification = new KeywordSpecification();
-        keywordSpecification.setName(getName());
-        keywordSpecification.setArguments(getArguments());
-        keywordSpecification.setFormat("ROBOT");
-        keywordSpecification.setDocumentation(getDocumentation());
-        return keywordSpecification;
     }
 
     @SuppressWarnings("unchecked")
