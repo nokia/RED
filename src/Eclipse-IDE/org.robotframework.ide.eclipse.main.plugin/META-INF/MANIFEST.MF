@@ -31,7 +31,8 @@ Require-Bundle: org.apache.commons.logging,
  org.eclipse.nebula.widgets.nattable.core;bundle-version="1.5.0",
  org.eclipse.nebula.widgets.nattable.extension.glazedlists;bundle-version="1.5.0",
  ca.odell.glazedlists;bundle-version="1.9.0",
- com.codeaffine.eclipse.swt;bundle-version="0.5.0"
+ com.codeaffine.eclipse.swt;bundle-version="0.5.0",
+ org.eclipse.core.variables;bundle-version="3.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar,

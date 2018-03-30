@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
@@ -49,5 +51,13 @@ public class RobotCasesSection extends RobotSuiteFileSection {
         final RobotCase testCase = new RobotCase(this, userTestCase);
         elements.add(index, testCase);
         return testCase;
+    }
+
+    List<RobotCase> getTestCases() {
+        final List<RobotCase> testCases = newArrayList();
+        for (final RobotElement child : getChildren()) {
+            testCases.add((RobotCase) child);
+        }
+        return testCases;
     }
 }

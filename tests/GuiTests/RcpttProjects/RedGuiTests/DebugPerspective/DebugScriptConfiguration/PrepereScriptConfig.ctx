@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YLsq8BVSEeeZSZgUeG7ZOA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/13/18 5:19 PM
+Save-Time: 3/29/18 5:49 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -28,7 +28,7 @@ proc "prepere-run-config"{
 	//set path to agent (worspace) and to folder outsiece ws (user folder)
 	with [get-window "Run Configurations"] {
 	    with [get-group "External script"] {
-	        get-button "Browse..." | click
+	        get-button "File system..." | click
 	        get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] | set-text [format " %s %s" $RED_workspace_path $user_folder] 
 	    }
 	    get-button Apply | click

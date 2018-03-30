@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z-lo8BRiEeeZSZgUeG7ZOA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/9/18 1:36 PM
+Save-Time: 3/29/18 5:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -90,7 +90,7 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 }-else{
 	set-dialog-result File "platform:/resource/ExecutorTab/scripts/script_lin.sh"
 }	
-get-window Preferences | get-group "Executor tab" | get-button "Browse..." | click
+get-window Preferences | get-group "Executor tab" | get-button "File system..." | click
 
 check-if-no-error-is-shown
 check-buttons-enablement -apply_button true -ok_button true
@@ -133,7 +133,7 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	set-dialog-result File "platform:/resource/ExecutorTab/scripts/script_lin.sh"
 }	
 with [get-window Preferences | get-group "Executor tab"] {
-    get-button "Browse..." | click
+    get-button "File system..." | click
     get-editbox -after [get-label "Additional executable file arguments:"] | set-text "a b"
 }
 check-buttons-enablement -apply_button true -ok_button true
@@ -168,7 +168,7 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 }	
 with [get-window Preferences] {
     with [get-group "Executor tab"] {
-        get-button "Browse..." | click
+        get-button "File system..." | click
         get-editbox -after [get-label "Additional executable file arguments:"] | set-text "new 1 new2 new3"
   }
     get-button Apply | click

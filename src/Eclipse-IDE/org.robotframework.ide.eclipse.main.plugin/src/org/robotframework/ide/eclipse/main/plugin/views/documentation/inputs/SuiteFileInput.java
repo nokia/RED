@@ -10,9 +10,12 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.net.URI;
 import java.util.Optional;
 
+import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
 public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
 
@@ -25,11 +28,16 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
         return suiteHeader(element);
     }
 
-    static String suiteHeader(final RobotSuiteFile suiteFile) {
+    private static String suiteHeader(final RobotSuiteFile suiteFile) {
         final Optional<URI> imgUri = RedImages.getRobotFileImageUri();
 
-        return Headers.formatSimpleHeader(imgUri, suiteFile.getName(),
-                newArrayList("Source", suiteFile.getSuiteFile().getFile().getFullPath().toOSString()));
+        final IFile file = suiteFile.getSuiteFile().getFile();
+        final URI srcHref = WorkspaceFileUri.createFileUri(file);
+        final String srcLabel = file.getFullPath().toString();
+
+        final String source = Formatters.formatHyperlink(srcHref, srcLabel);
+        return Formatters.formatSimpleHeader(imgUri, suiteFile.getName(),
+                newArrayList("Source", source));
     }
 
     @Override
@@ -37,4 +45,20 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
         return element.createDocumentation();
     }
 
+    public static class SuiteFileOnSettingInput extends InternalElementInput<RobotSetting> {
+
+        public SuiteFileOnSettingInput(final RobotSetting docSetting) {
+            super(docSetting);
+        }
+
+        @Override
+        protected String createHeader() {
+            return SuiteFileInput.suiteHeader(element.getSuiteFile());
+        }
+
+        @Override
+        protected Documentation createDocumentation() {
+            return element.getSuiteFile().createDocumentation();
+        }
+    }
 }

@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +22,8 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+
+import com.google.common.io.Files;
 
 @SuppressWarnings("PMD.GodClass")
 public class RedImages {
@@ -168,7 +170,7 @@ public class RedImages {
     }
 
     public static Optional<URI> getRobotFileImageUri() {
-        return getImageUri("resources/file_robot.png");
+        return getImageUri("resources", "file_robot.png");
     }
 
     public static ImageDescriptor getTestCaseImage() {
@@ -176,7 +178,7 @@ public class RedImages {
     }
 
     public static Optional<URI> getTestCaseImageUri() {
-        return getImageUri("resources/case.png");
+        return getImageUri("resources", "case.png");
     }
 
     public static ImageDescriptor getTemplatedTestCaseImage() {
@@ -184,7 +186,7 @@ public class RedImages {
     }
 
     public static Optional<URI> getTemplatedTestCaseImageUri() {
-        return getImageUri("resources/case_templated.png");
+        return getImageUri("resources", "case_templated.png");
     }
 
     public static ImageDescriptor getTestCaseSettingImage() {
@@ -260,7 +262,7 @@ public class RedImages {
     }
 
     public static Optional<URI> getBookImageUri() {
-        return getImageUri("resources/book.png");
+        return getImageUri("resources", "book.png");
     }
 
     public static ImageDescriptor getBigKeywordImage() {
@@ -272,7 +274,7 @@ public class RedImages {
     }
 
     public static Optional<URI> getKeywordImageUri() {
-        return getImageUri("resources/keyword.png");
+        return getImageUri("resources", "keyword.png");
     }
 
     public static ImageDescriptor getUserKeywordImage() {
@@ -280,7 +282,7 @@ public class RedImages {
     }
 
     public static Optional<URI> getUserKeywordImageUri() {
-        return getImageUri("resources/keyword_user.png");
+        return getImageUri("resources", "keyword_user.png");
     }
 
     public static ImageDescriptor getRobotProjectConfigFile() {
@@ -475,11 +477,29 @@ public class RedImages {
         return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(symbolicName);
     }
 
-    private static Optional<URI> getImageUri(final String path) {
+    private static Optional<URI> getImageUri(final String parentPath, final String filename) {
+        // The file is copied from bundle to our plugin metadata folder, because
+        // those images has to be placed somewhere in file system, not in other zips/jars
+        // in order to be displayed by the browser
         try {
-            final URL url = FileLocator.find(RedPlugin.getDefault().getBundle(), new Path(path), null);
-            return Optional.of(FileLocator.resolve(url).toURI().normalize());
-        } catch (final IOException | URISyntaxException e) {
+            final String path = parentPath + "/" + filename;
+
+            final File stateLocation = RedPlugin.getDefault().getStateLocation().toFile();
+            final File docsDir = new File(stateLocation, "docs");
+            if (!docsDir.exists()) {
+                docsDir.mkdir();
+            }
+            final File targetFile = new File(docsDir, filename);
+            if (!targetFile.exists()) {
+                final InputStream stream = FileLocator.openStream(RedPlugin.getDefault().getBundle(), new Path(path),
+                        false);
+                final byte[] buffer = new byte[stream.available()];
+                stream.read(buffer);
+                Files.write(buffer, targetFile);
+            }
+
+            return Optional.of(targetFile.toURI());
+        } catch (final IOException e) {
             return Optional.empty();
         }
     }
