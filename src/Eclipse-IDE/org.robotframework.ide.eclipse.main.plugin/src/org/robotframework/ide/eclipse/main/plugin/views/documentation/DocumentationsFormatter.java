@@ -9,10 +9,12 @@ import static java.util.stream.Collectors.joining;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.swt.graphics.RGB;
+import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
@@ -27,13 +29,17 @@ public class DocumentationsFormatter {
         this.env = env;
     }
 
-    public String format(final String header, final Documentation documentation) {
+    public String format(final String header, final Documentation documentation,
+            final Function<String, String> localKeywordsLinker) {
+
         final String doc = documentation.provideFormattedDocumentation(env);
-        return writeHtml(header, doc);
+        final Collection<String> localSymbols = documentation.getLocalSymbols();
+        return writeHtml(header, doc, localSymbols, localKeywordsLinker);
     }
 
-    private String writeHtml(final String header, final String doc) {
-        return "<html>" + writeHead() + writeBody(header, doc) + "</html>";
+    private String writeHtml(final String header, final String doc, final Collection<String> localSymbols,
+            final Function<String, String> localKeywordsLinker) {
+        return "<html>" + writeHead() + writeBody(header, doc, localSymbols, localKeywordsLinker) + "</html>";
     }
 
     private String writeHead() {
@@ -61,8 +67,12 @@ public class DocumentationsFormatter {
                 .toString();
     }
 
-    private String writeBody(final String header, final String doc) {
-        return "<body>" + header + identifyHeaders(doc) + "</body>";
+    private String writeBody(final String header, final String doc, final Collection<String> localSymbols,
+            final Function<String, String> localKeywordsLinker) {
+        final String localLinksEnabledDoc = createHyperlinks(doc, localSymbols,
+                name -> "<a href=\"" + localKeywordsLinker.apply(name) + "\">" + name + "</a>");
+
+        return "<body>" + header + identifyHeaders(localLinksEnabledDoc) + "</body>";
     }
 
     private static String identifyHeaders(final String doc) {
@@ -86,14 +96,16 @@ public class DocumentationsFormatter {
             previousEnd = matcher.end();
         }
         docBuilder.append(doc.substring(previousEnd, doc.length()));
-        return createHyperlinks(docBuilder.toString(), headersIds);
+        return createHyperlinks(docBuilder.toString(), headersIds,
+                name -> "<a href=\"#" + RedURI.URI_SPECIAL_CHARS_ESCAPER.escape(name) + "\">" + name + "</a>");
     }
 
-    private static String createHyperlinks(final String doc, final Collection<String> headersIds) {
-        if (headersIds.isEmpty()) {
+    private static String createHyperlinks(final String doc, final Collection<String> symbols,
+            final Function<String, String> transformation) {
+        if (symbols.isEmpty()) {
             return doc;
         }
-        final String regex = headersIds.stream().map(name -> "`\\Q" + name + "\\E`").collect(joining("|"));
+        final String regex = symbols.stream().map(name -> "`\\Q" + name + "\\E`").collect(joining("|"));
         final Matcher matcher = Pattern.compile(regex).matcher(doc);
 
         int previousEnd = 0;
@@ -104,10 +116,7 @@ public class DocumentationsFormatter {
             String name = matcher.group(0);
             name = name.substring(1, name.length() - 1); // cut off enclosing ` characters
             
-            docBuilder.append("<a href=\"#" + name + "\">");
-            docBuilder.append(name);
-            docBuilder.append("</a>");
-            
+            docBuilder.append(transformation.apply(name));
             previousEnd = matcher.end();
         }
         docBuilder.append(doc.substring(previousEnd, doc.length()));
