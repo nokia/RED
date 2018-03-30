@@ -37,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Key
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordProposalInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordSpecificationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.LibraryImportSettingInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.LibrarySpecificationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput.SuiteFileOnSettingInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
@@ -47,6 +48,11 @@ public class Documentations {
     public static void showDocForKeywordSpecification(final IWorkbenchPage page, final RobotProject project,
             final LibrarySpecification librarySpecification, final KeywordSpecification keywordSpecification) {
         display(page, new KeywordSpecificationInput(project, librarySpecification, keywordSpecification));
+    }
+
+    public static void showDocForLibrarySpecification(final IWorkbenchPage page, final RobotProject project,
+            final LibrarySpecification librarySpecification) {
+        display(page, new LibrarySpecificationInput(project, librarySpecification));
     }
 
     public static void showDocForRobotElement(final IWorkbenchPage page, final RobotFileInternalElement element) {
