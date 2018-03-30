@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
+import org.eclipse.ui.PartInitException;
 
 public class DocumentationInputOpenException extends RuntimeException {
 
@@ -12,5 +13,9 @@ public class DocumentationInputOpenException extends RuntimeException {
 
     public DocumentationInputOpenException(final String message) {
         super(message);
+    }
+
+    public DocumentationInputOpenException(final String message, final PartInitException cause) {
+        super(message, cause);
     }
 }
