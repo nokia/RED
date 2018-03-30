@@ -5,10 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static java.util.stream.Collectors.toCollection;
+
 import java.io.ObjectStreamException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.libraries.Documentation;
@@ -93,7 +97,11 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
     public Documentation createDocumentation() {
         // TODO : provide format depending on source
-        return new Documentation(DocFormat.ROBOT, getDocumentation());
+        final Set<String> keywords = getSuiteFile().getUserDefinedKeywords()
+                .stream()
+                .map(RobotKeywordDefinition::getName)
+                .collect(toCollection(HashSet::new));
+        return new Documentation(DocFormat.ROBOT, getDocumentation(), keywords);
     }
     
     public Optional<String> getTemplateInUse() {
