@@ -11,18 +11,18 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
- *
  */
 public class RegexValidatedStringFieldEditor extends StringFieldEditor {
 
     private final Pattern pattern;
 
     public RegexValidatedStringFieldEditor(final String name, final String labelText, final String regex,
-            final Composite composite) {
-        super(name, labelText, composite);
+            final Composite parent) {
+        super(name, labelText, parent);
         this.pattern = Pattern.compile(regex);
     }
 
@@ -42,8 +42,9 @@ public class RegexValidatedStringFieldEditor extends StringFieldEditor {
         }
     }
 
+    @VisibleForTesting
     @Override
-    protected Text getTextControl() { // making it available for tests plugin
+    protected Text getTextControl() {
         return super.getTextControl();
     }
 }
