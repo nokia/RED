@@ -177,17 +177,21 @@ class DocumentationViewPartListener implements IPartListener {
                         try {
                             final RobotFile newestModel = ((RobotDocument) document).getNewestModel();
                             RobotFile currentModel = fileModel.getLinkedElement();
-                            final long watingStart = System.currentTimeMillis();
+                            if (!sourceEditor.isDirty()) {
+                                // if everythin is changed we do not have to wait for newer model
+                                return;
+                            }
 
-                            // once reconciler gets new model from document, those objects should be
-                            // the same
+                            // the editor is being modified so we need to wait once reconciler gets
+                            // new model from document
+                            final long waitingStart = System.currentTimeMillis();
                             while (currentModel != newestModel) {
                                 Thread.sleep(300);
                                 currentModel = fileModel.getLinkedElement();
 
                                 // to avoid infinite loops
                                 final long waitingEnd = System.currentTimeMillis();
-                                if (waitingEnd - watingStart > 5000) {
+                                if (waitingEnd - waitingStart > 5000) {
                                     throw new IllegalStateException();
                                 }
                             }
