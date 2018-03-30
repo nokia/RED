@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9aBo4JQ7EeWNpL9oeriwCw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 3:41 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/30/18 11:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -100,15 +100,28 @@ with [get-window "Run Configurations"] {
         }
     }
     
-    //arguments
-    with [get-group Arguments] {
-        get-property "getText()" | equals Arguments | verify-true
-        get-property "getChildren().length" | equals 2 | verify-true
-        get-property "getChildren().Control[0].getText()" | equals "Additional Robot Framework arguments:" | verify-true
-        get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[1].getText()" | equals "" | verify-true
-    }
+    
 }
+//arguments
+with [get-window "Run Configurations" | get-group Arguments] {
+    get-property "getChildren().length" | equals 2 | verify-true
+    get-property "getChildren().Control[0].getText()" | equals "Additional Robot Framework arguments:" | verify-true
+    
+    get-property "getChildren().Control[1].getChildren().length" | equals 2 | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getText()" | equals "" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getEditable()" | equals true | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals "Variables..." | verify-true
+}
+
+//open variables window
+with [get-window "Run Configurations"] {
+    get-group Arguments | get-button "Variables..." | click
+}
+
+get-window "Run Configurations" | get-window "Select Variable" 
+    | get-label "Choose a variable (? = any character, * = any string):" | get-property caption 
+    | equals "&Choose a variable (? = any character, * = any string):" | verify-true
+get-window "Run Configurations" | get-window "Select Variable" | get-button Cancel | click
 
 //change configuration name an run test
 get-menu "Run/Run Configurations..." | click
@@ -178,7 +191,7 @@ with [get-window "Run Configurations"] {
     get-group "Test Suite(s)" | get-button "Browse..." | click
 }
 
-//check that is only one porject in window
+//check that is only one project in window
 with [get-window "Run Configurations" | get-window "Select test suite" | get-tree] {
     get-property itemCount | equals 1 | verify-true
     get-property "getItems().length" | equals 1 | verify-true
