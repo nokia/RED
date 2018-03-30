@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _h4fPYBh-Eee93KAG-tW51Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/14/18 3:58 PM
+Save-Time: 3/30/18 12:06 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -170,24 +170,46 @@ with [get-window "Run Configurations"] {
             | verify-true
             
         // Additional interpreter arguments
-        get-property "getChildren().Control[1].getText()" | equals "Additional interpreter arguments:" | verify-true
-        get-property "getChildren().Control[2].getMessage()" | equals "" | verify-true
+	    get-property "getChildren().Control[1].getText()" | equals "Additional interpreter arguments:" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[0].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[0].getEditable()" | equals true | verify-true
+	    
+	    get-property "getChildren().Control[2].getChildren().Control[1].getText()" | equals "Variables..." | verify-true
     }
     with [get-group "External script"] {
-        get-property childCount | equals 4 | verify-true
-        //Executable file
-        get-property caption | equals "External script" | verify-true
-        get-property "getChildren().Control[0].getText()" 
-            | equals "Executable file to run Robot Framework tests:" 
-            | verify-true
-        get-property "getChildren().Control[1].getChildren().length" | equals 2 | verify-true
-        get-property "getChildren().Control[1].getChildren().Control[0].getMessage()" | equals "" | verify-true
-        get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals "Browse..." | verify-true
-        get-property "getChildren().Control[2].getText()" | equals "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards." | verify-true
-        get-property "getChildren().Control[3].getMessage()" | equals "" | verify-true
-    }
+        get-property "getChildren().length" | equals 4 | verify-true
+	    get-property "getChildren().Control[0].getText()" | equals "Executable file to run Robot Framework tests:" 
+	        | verify-true
+	    //text box    
+	    get-property "getChildren().Control[1].getChildren().length" | equals 2 | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getEditable()" | equals true | verify-true
+	    
+	    //buttons
+	    get-property "getChildren().Control[1].getChildren().Control[1].getChildren().length" | equals 3 | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[1].getChildren().Control[0].getText()" 
+	        | equals "Workspace..." | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[1].getChildren().Control[1].getText()" 
+	        | equals "File system..." | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[1].getChildren().Control[2].getText()" 
+	        | equals "Variables..." | verify-true
+	        
+	    // Additional...    
+	    get-property "getChildren().Control[2].getText()" 
+	        | equals "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards." 
+	        | verify-true
+	    get-property "getChildren().Control[3].getChildren().length" | equals 2 | verify-true
+	    get-property "getChildren().Control[3].getChildren().Control[0].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[3].getChildren().Control[1].getText()" | equals "Variables..." | verify-true
+	}
 }
-
+//check if variables window is shown
+get-window "Run Configurations" | get-group Interpreter | get-button "Variables..." | click
+get-window "Run Configurations" | get-window "Select Variable" 
+    | get-label "Choose a variable (? = any character, * = any string):" | get-property caption 
+    | equals "&Choose a variable (? = any character, * = any string):" | verify-true
+get-window "Run Configurations" | get-window "Select Variable" | get-button OK | click
+    
 
 //set additional interp args
 get-window "Run Configurations" |  get-group Interpreter | get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "aa rr"
@@ -219,7 +241,7 @@ set-path-to-exe-file ""
 //set real path by button and add args
 set-dialog-result File [format"platform:/resource/ScriptProject/scripts/%s"  [os-specific "script_win.bat" "script_lin.sh"]]
 with [get-window "Run Configurations" | get-group "External script"] {
-    get-button "Browse..." | click
+    get-button "File system..." | click
     get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] | set-text "ff  yyy"
 }
 

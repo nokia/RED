@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _bwoQULpQEee_RrklJFm4zA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/17/17 10:30 AM
+Save-Time: 3/30/18 12:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -140,15 +140,30 @@ with [get-window Preferences | get-table] {
     get-property "getItems().length" | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "...add new rule" | verify-true
 }
-with [get-window Preferences | get-control Any -after [get-label "RfLint validation"] -index 9] {
-    get-property "getChildren().length" | equals 5 | verify-true
-    get-property "getChildren().Control[0].getText()" | equals "Configure rules and their severity" | verify-true
-    get-property "getChildren().Control[1].getItems().length" | equals 1 | verify-true
-    get-property "getChildren().Control[1].getItems().TableItem[0].getText()" | equals "...add new rule" | verify-true
-    get-property "getChildren().Control[2].getText()" | equals "Additional rules files" | verify-true
-    get-property "getChildren().Control[3].getItems().length" | equals 1 | verify-true
-    get-property "getChildren().Control[3].getItems().TableItem[0].getText()" | equals "...add new rules file" 
-        | verify-true
+
+with [get-window Preferences] {
+    with [get-control Any -after [get-label "RfLint validation"] -index 9] {
+        get-property "getChildren().length" | equals 6 | verify-true
+        
+        //configure rules
+        get-property "getChildren().Control[0].getText()" | equals "Configure rules and their severity" | verify-true
+        get-property "getChildren().Control[1].getItems().length" | equals 1 | verify-true
+        get-property "getChildren().Control[1].getItems().TableItem[0].getText()" | equals "...add new rule" 
+            | verify-true
+            
+        // python rules    
+        get-property "getChildren().Control[2].getText()" | equals "Additional rules files" | verify-true
+        get-property "getChildren().Control[3].getItems().length" | equals 1 | verify-true
+        get-property "getChildren().Control[3].getItems().TableItem[0].getText()" | equals "...add new rules file" 
+            | verify-true
+
+        // args    
+        get-property "getChildren().Control[4].getChildren().length" | equals 3 | verify-true
+        get-property "getChildren().Control[4].getChildren().Control[0].getText()" | equals "Additional arguments" 
+            | verify-true
+        get-property "getChildren().Control[4].getChildren().Control[1].getText()" | equals "" | verify-true
+        get-property "getChildren().Control[4].getChildren().Control[2].getText()" | equals "Variables..." | verify-true
+    }
 }
 
 //add new rule
