@@ -100,7 +100,7 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
         final Set<String> keywords = getSuiteFile().getUserDefinedKeywords()
                 .stream()
                 .map(RobotKeywordDefinition::getName)
-                .collect(toCollection(() -> new HashSet<>()));
+                .collect(toCollection(HashSet::new));
         return new Documentation(DocFormat.ROBOT, getDocumentation(), keywords);
     }
     
