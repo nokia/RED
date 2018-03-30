@@ -1,0 +1,166 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _yAtPsDQsEeiLWMPOs-qbiA
+Element-Name: RFLintWithArguments
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _gr19ADQpEeiLWMPOs-qbiA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 3/30/18 6:08 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open preference and add arg file with full path
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings/RfLint validation"
+
+with [get-window Preferences] {
+    get-editbox -after [get-label "Additional arguments"] | set-text [format "-A %s/project_a/arg_file.arg" $RED_workspace_path_unix_style]
+    get-button "Apply and Close" | click
+}
+
+//run analize
+get-view "Project Explorer" | get-tree | select "project_a/test3.robot"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+} -allowStatusDialog
+
+//check that 4 warnings ar shown
+get-view Problems | click
+with [get-view Problems | get-tree] {
+    get-item -path "Warnings \\(4 items\\)/Line is too long \\(exceeds 30 characters\\) \\(LineTooLong\\)" 
+        | get-property selection | equals false | verify-true
+    get-item -path "Warnings \\(4 items\\)/No suite documentation \\(RequireSuiteDocumentation\\)" 
+        | get-property selected | equals false | verify-true
+    get-item -path "Warnings \\(4 items\\)/Too many trailing blank lines \\(TrailingBlankLines\\)" 
+        | get-property selected | equals false | verify-true
+    get-item -path "Warnings \\(4 items\\)/Unrecognized table header: '\\*\\*\\* abc \\*\\*\\*'" 
+        | get-property selected | equals false | verify-true
+}
+
+//add rule in table - now TrailingBlankLines is error
+get-preferences-menu | click
+with [get-window Preferences] {
+    with [get-table] {
+        get-item "...add new rule" | double-click
+        select Rule | double-click
+        select Rule | activate-cell-edit -type MouseDoubleClickSelection
+        with [get-editbox] {
+            set-text TrailingBlankLines
+            key-type Enter
+        }
+        apply-cell-edit -deactivate
+        select TrailingBlankLines | double-click
+        select TrailingBlankLines | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+        get-combo | select Error
+        apply-cell-edit -deactivate
+    }
+    get-button "Apply and Close" | click
+}
+
+//run analize and check if one warning was changed to error
+get-view "Project Explorer" | get-tree | select "project_a/test3.robot" | get-menu 
+    -path "Robot Framework/Run RfLint analysis" | click
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(1 item\\)/Too many trailing blank lines \\(TrailingBlankLines\\)" | get-property selected 
+    | equals false | verify-true
+    
+with [get-view Problems | get-tree] {
+    get-item -path "Warnings \\(3 items\\)/Line is too long \\(exceeds 30 characters\\) \\(LineTooLong\\)" 
+        | get-property selection | equals false | verify-true
+    get-item -path "Warnings \\(3 items\\)/No suite documentation \\(RequireSuiteDocumentation\\)" 
+        | get-property selected | equals false | verify-true
+    get-item -path "Warnings \\(3 items\\)/Unrecognized table header: '\\*\\*\\* abc \\*\\*\\*'" 
+        | get-property selected | equals false | verify-true
+}
+    
+    
+//add rule form pytohn file    
+get-preferences-menu | click
+set-dialog-result File "platform:/resource/project_a/customRules.py"
+with [get-window Preferences] {
+    get-table -after [get-label "Additional rules files"] |  get-item "...add new rules file" | double-click
+    get-button "Apply and Close" | click
+}
+get-view "Project Explorer" | get-tree | select "project_a/test3.robot" | get-menu 
+    -path "Robot Framework/Run RfLint analysis" | click
+    
+//set new file using workspace_path variable (other rules are removed)
+get-preferences-menu | click
+get-window Preferences | get-button "Restore Defaults" | click
+
+with [get-window Preferences] {
+    with [get-editbox -after [get-label "Additional arguments"]] {
+        set-text "-A ${workspace_loc}/project_a/arg_file2.arg"
+    }
+    get-button "Apply and Close" | click
+}
+
+//run rflint
+get-view "Project Explorer" | get-tree | select "project_a/test3.robot"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+} -allowStatusDialog    
+    
+//check new errors     
+with [get-view Problems | get-tree] {
+    get-item -path "Errors \\(2 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
+        | get-property enablement | equals false | verify-true
+    get-item -path "Errors \\(2 items\\)/Unknown table name 'abc' \\(InvalidTable\\)" | get-property enablement 
+        | equals false | verify-true
+}    
+ 
+wait-for-warnings -amount 5 -times 5 -delay 1000  
+with [get-view Problems | get-tree] {
+    get-item -path "Warnings \\(5 items\\)/Line 5 should be empty \\(CustomRule\\)" | get-property selected 
+        | equals false | verify-true
+    get-item -path "Warnings \\(5 items\\)/No suite documentation \\(RequireSuiteDocumentation\\)" 
+        | get-property selected | equals false | verify-true
+    get-item -path "Warnings \\(5 items\\)" | get-item -path "No suite documentation \\(RequireSuiteDocumentation\\)" 
+        -index 1 | get-property selected | equals false | verify-true
+    get-item -path "Warnings \\(5 items\\)/Too many trailing blank lines \\(TrailingBlankLines\\)" 
+        | get-property selected | equals false | verify-true
+    get-item -path "Warnings \\(5 items\\)/Unrecognized table header: '\\*\\*\\* abc \\*\\*\\*'" 
+        | get-property selected | equals false | verify-true
+}   
+
+//set wrong path
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-editbox -after [get-label "Additional arguments"] | set-text "-A ${workspace_loc}/project_a/arg_file23.arg"
+    get-button "Apply and Close" | click
+}
+get-view "Project Explorer" | get-tree | select "project_a/test3.robot"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+    get-window "Problem Occurred" | get-button "Details >>" | click
+     get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
+        | get-property text | contains [format "No such file or directory: u'%s/project_a/arg_file23.arg'" [os-specific $RED_workspace_path_double_slaches $RED_workspace_path]]
+        | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+
+//set param that not exist
+get-preferences-menu | click
+with [get-window Preferences] {
+    with [get-editbox -after [get-label "Additional arguments"]] {
+        set-text "-A ${new_var}/project_a/arg_file2.arg"
+    }
+    get-button "Apply and Close" | click
+}
+get-view "Project Explorer" | get-tree | select "project_a/test3.robot"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+    get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
+        | get-property text | contains "[Errno 2] No such file or directory: u'${new_var}/project_a/arg_file2.arg'" 
+        | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
