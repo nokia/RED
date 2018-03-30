@@ -23,8 +23,8 @@ import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -47,7 +47,7 @@ class DocumentationViewPartListener implements IPartListener {
             editorListener = new EditorListener();
             registerEditorListener();
 
-            Documentations.markViewSyncBroken(currentlyActiveEditor.getSite());
+            Documentations.markViewSyncBroken(currentlyActiveEditor.getSite().getPage());
 
             if (currentlyActiveEditor.getActiveEditor() instanceof SuiteSourceEditor) {
                 final int caretOffset = currentlyActiveEditor.getSourceEditor()
@@ -132,8 +132,8 @@ class DocumentationViewPartListener implements IPartListener {
 
         private void displayForTableSelection(final ISelection selection) {
             if (selection instanceof IStructuredSelection) {
-                final IWorkbenchPartSite site = currentlyActiveEditor.getSite();
-                Documentations.markViewSyncBroken(site);
+                final IWorkbenchPage page = currentlyActiveEditor.getSite().getPage();
+                Documentations.markViewSyncBroken(page);
 
                 final SelectionLayerAccessor selectionLayerAccessor = currentlyActiveEditor.getSelectionLayerAccessor();
 
@@ -146,7 +146,7 @@ class DocumentationViewPartListener implements IPartListener {
                 if (newInput.isPresent() && !Objects.equals(selectionInput, newInput.get())) {
                     selectionInput = newInput.get();
                     scheduleShowDocJob(() -> {},
-                            () -> Documentations.showDocForEditorTablesSelection(site, selectionLayerAccessor));
+                            () -> Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor));
                 }
             }
         }
@@ -158,8 +158,8 @@ class DocumentationViewPartListener implements IPartListener {
         }
 
         private void displayForSourceSelection(final int offset) {
-            final IWorkbenchPartSite site = currentlyActiveEditor.getSite();
-            Documentations.markViewSyncBroken(site);
+            final IWorkbenchPage page = currentlyActiveEditor.getSite().getPage();
+            Documentations.markViewSyncBroken(page);
 
             final SuiteSourceEditor sourceEditor = currentlyActiveEditor.getSourceEditor();
             final RobotSuiteFile fileModel = currentlyActiveEditor.provideSuiteModel();
@@ -198,7 +198,7 @@ class DocumentationViewPartListener implements IPartListener {
                         } catch (final InterruptedException e) {
                             // ok, out of sync in that case
                         }
-                    }, () -> Documentations.showDocForEditorSourceSelection(site, fileModel, document, offset));
+                    }, () -> Documentations.showDocForEditorSourceSelection(page, fileModel, document, offset));
 
                 }
             } catch (final BadLocationException e) {
