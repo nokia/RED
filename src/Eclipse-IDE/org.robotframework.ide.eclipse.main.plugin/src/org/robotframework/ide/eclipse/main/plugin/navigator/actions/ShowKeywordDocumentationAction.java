@@ -5,16 +5,19 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.rf.ide.core.libraries.KeywordSpecification;
-import org.robotframework.red.viewers.Selections;
+import org.rf.ide.core.libraries.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 
-@SuppressWarnings("restriction")
 public class ShowKeywordDocumentationAction extends Action implements IEnablementUpdatingAction {
 
     private final IWorkbenchPage page;
@@ -34,11 +37,33 @@ public class ShowKeywordDocumentationAction extends Action implements IEnablemen
 
     @Override
     public void run() {
-        final KeywordSpecification spec = Selections.getSingleElement(
-                (IStructuredSelection) selectionProvider.getSelection(), KeywordSpecification.class);
+        IProject project = null;
+        LibrarySpecification librarySpecification = null;
+        KeywordSpecification keywordSpecification = null;
+        
+        // action is only enabled when there is one element selected
+        final ITreeSelection selection = (ITreeSelection) selectionProvider.getSelection();
+        final TreePath theOnlyPath = selection.getPaths()[0];
+        for (int i = 0; i < theOnlyPath.getSegmentCount(); i++) {
+            if (theOnlyPath.getSegment(i) instanceof IProject) {
+                project = (IProject) theOnlyPath.getSegment(i);
 
-        final IWorkbenchPartSite site = page.getActivePart().getSite();
-        final IThemeEngine themeEngine = site.getService(IThemeEngine.class);
-        new KeywordDocumentationPopup(site.getShell(), themeEngine, spec).open();
+            } else if (RedPlugin.getAdapter(theOnlyPath.getSegment(i), IProject.class) != null) {
+                project = RedPlugin.getAdapter(theOnlyPath.getSegment(i), IProject.class);
+
+            } else if (theOnlyPath.getSegment(i) instanceof LibrarySpecification) {
+                librarySpecification = (LibrarySpecification) theOnlyPath.getSegment(i);
+
+            } else if (theOnlyPath.getSegment(i) instanceof KeywordSpecification) {
+                keywordSpecification = (KeywordSpecification) theOnlyPath.getSegment(i);
+
+            }
+        }
+        
+        if (project != null && librarySpecification != null && keywordSpecification != null) {
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+            Documentations.showDocForKeywordSpecification(page, robotProject, librarySpecification,
+                    keywordSpecification);
+        }
     }
 }
