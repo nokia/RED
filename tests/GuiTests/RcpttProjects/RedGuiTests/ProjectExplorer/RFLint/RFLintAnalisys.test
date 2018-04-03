@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _bwoQULpQEee_RrklJFm4zA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/30/18 12:18 PM
+Save-Time: 4/3/18 2:38 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -203,6 +203,8 @@ with [get-window Preferences] {
 //run this new rule on project
 get-view "Project Explorer" | get-tree | select "project_a" | get-menu -path "Robot Framework/Run RfLint analysis" 
     | click
+wait-for-errors -amount 6 -times 6 -delay 1000
+    
 with [get-view Problems | get-tree] {
     get-item -path "Errors \\(6 items\\)" | get-property childCount | equals 6 | verify-true
     
