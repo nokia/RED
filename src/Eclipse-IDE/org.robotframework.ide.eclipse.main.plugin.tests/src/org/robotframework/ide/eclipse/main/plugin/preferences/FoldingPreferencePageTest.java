@@ -5,12 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
@@ -41,18 +44,15 @@ public class FoldingPreferencePageTest {
         final FoldingPreferencePage page = new FoldingPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<String> booleanPrefNames = newArrayList(RedPreferences.FOLDABLE_SECTIONS,
-                RedPreferences.FOLDABLE_CASES, RedPreferences.FOLDABLE_KEYWORDS, RedPreferences.FOLDABLE_DOCUMENTATION);
-
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(5);
-        for (final FieldEditor editor : editors) {
-            if (editor instanceof BooleanFieldEditor) {
-                booleanPrefNames.remove(editor.getPreferenceName());
-            } else if (editor instanceof IntegerFieldEditor) {
-                assertThat(editor.getPreferenceName()).isEqualTo(RedPreferences.FOLDING_LINE_LIMIT);
-            }
-        }
-        assertThat(booleanPrefNames).isEmpty();
+
+        final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
+                .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
+        assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.FOLDABLE_SECTIONS, RedPreferences.FOLDABLE_CASES,
+                        RedPreferences.FOLDABLE_KEYWORDS, RedPreferences.FOLDABLE_DOCUMENTATION));
+        assertThat(namesGroupedByType).hasEntrySatisfying(IntegerFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.FOLDING_LINE_LIMIT));
     }
 }
