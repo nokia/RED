@@ -99,8 +99,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         BrowseButtons.selectVariableButton(group, additionalInterpreterArguments.getTextControl(group));
 
         final ParameterizedFilePathStringFieldEditor scriptPathEditor = new ParameterizedFilePathStringFieldEditor(
-                RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS,
-                "Executable file to run Robot Framework tests:", group);
+                RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH, "Executable file to run Robot Framework tests:", group);
         GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getLabelControl(group));
         GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getTextControl(group));
         scriptPathEditor.setErrorMessage("Value must be an existing file");
