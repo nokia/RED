@@ -143,17 +143,6 @@ public class LibrarySpecification {
         return "Reserved".equals(name);
     }
 
-    public boolean canBeConvertedToHtml() {
-        return "ROBOT".equals(format);
-    }
-
-    public String getDocumentationAsHtml() {
-        if ("ROBOT".equals(format)) {
-            return new RobotToHtmlConverter().convert(documentation);
-        }
-        throw new IllegalArgumentException("Only ROBOT format can be converted to HTML");
-    }
-
     @XmlTransient
     public void setDescriptor(final LibraryDescriptor descriptor) {
         this.descriptor = descriptor;

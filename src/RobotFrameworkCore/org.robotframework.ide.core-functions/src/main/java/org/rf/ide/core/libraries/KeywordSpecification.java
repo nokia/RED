@@ -67,17 +67,6 @@ public class KeywordSpecification {
         this.arguments = arguments;
     }
 
-    public boolean canBeConvertedToHtml() {
-        return "ROBOT".equals(format);
-    }
-
-    public String getDocumentationAsHtml() {
-        if ("ROBOT".equals(format)) {
-            return new RobotToHtmlConverter().convert(documentation);
-        }
-        throw new IllegalArgumentException("Only ROBOT format can be converted to HTML");
-    }
-
     public ArgumentsDescriptor createArgumentsDescriptor() {
         return ArgumentsDescriptor.createDescriptor(arguments);
     }

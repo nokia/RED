@@ -5,16 +5,18 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.rf.ide.core.libraries.LibrarySpecification;
-import org.robotframework.red.viewers.Selections;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 
-@SuppressWarnings("restriction")
 public class ShowLibraryDocumentationAction extends Action implements IEnablementUpdatingAction {
 
     private final IWorkbenchPage page;
@@ -34,11 +36,28 @@ public class ShowLibraryDocumentationAction extends Action implements IEnablemen
 
     @Override
     public void run() {
-        final LibrarySpecification spec = Selections.getSingleElement(
-                (IStructuredSelection) selectionProvider.getSelection(), LibrarySpecification.class);
+        IProject project = null;
+        LibrarySpecification librarySpecification = null;
 
-        final IWorkbenchPartSite site = page.getActivePart().getSite();
-        final IThemeEngine engine = site.getService(IThemeEngine.class);
-        new LibraryDocumentationPopup(site.getShell(), engine, spec).open();
+        // action is only enabled when there is one element selected
+        final ITreeSelection selection = (ITreeSelection) selectionProvider.getSelection();
+        final TreePath theOnlyPath = selection.getPaths()[0];
+        for (int i = 0; i < theOnlyPath.getSegmentCount(); i++) {
+            if (theOnlyPath.getSegment(i) instanceof IProject) {
+                project = (IProject) theOnlyPath.getSegment(i);
+
+            } else if (RedPlugin.getAdapter(theOnlyPath.getSegment(i), IProject.class) != null) {
+                project = RedPlugin.getAdapter(theOnlyPath.getSegment(i), IProject.class);
+
+            } else if (theOnlyPath.getSegment(i) instanceof LibrarySpecification) {
+                librarySpecification = (LibrarySpecification) theOnlyPath.getSegment(i);
+
+            }
+        }
+
+        if (project != null && librarySpecification != null) {
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+            Documentations.showDocForLibrarySpecification(page, robotProject, librarySpecification);
+        }
     }
 }

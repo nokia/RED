@@ -6,10 +6,9 @@
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.libraries.KeywordSpecification;
@@ -17,8 +16,8 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.KeywordDocumentationPopup;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -26,7 +25,6 @@ import com.google.common.annotations.VisibleForTesting;
  * @author Michal Anglart
  *
  */
-@SuppressWarnings("restriction")
 public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     private final RobotModel model;
@@ -102,13 +100,8 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public void open() {
-        open(kwSpec);
-    }
-
-    protected final void open(final KeywordSpecification keywordSpecification) {
         final IWorkbenchWindow workbench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        final IThemeEngine themeEngine = workbench.getService(IThemeEngine.class);
-        final Shell shell = workbench.getShell();
-        new KeywordDocumentationPopup(shell, themeEngine, keywordSpecification).open();
+        final IWorkbenchPage page = workbench.getActivePage();
+        Documentations.showDocForKeywordSpecification(page, model.createRobotProject(project), libSpec, kwSpec);
     }
 }
