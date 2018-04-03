@@ -5,12 +5,15 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
@@ -41,19 +44,14 @@ public class DebuggerPreferencePageTest {
         final DebuggerPreferencePage page = new DebuggerPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<String> booleanPrefNames = newArrayList(RedPreferences.DEBUGGER_OMIT_LIB_KEYWORDS);
-        final List<String> radioPrefNames = newArrayList(RedPreferences.DEBUGGER_SUSPEND_ON_ERROR);
-
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(2);
-        for (final FieldEditor editor : editors) {
-            if (editor instanceof BooleanFieldEditor) {
-                booleanPrefNames.remove(editor.getPreferenceName());
-            } else if (editor instanceof RadioGroupFieldEditor) {
-                radioPrefNames.remove(editor.getPreferenceName());
-            }
-        }
-        assertThat(booleanPrefNames).isEmpty();
-        assertThat(radioPrefNames).isEmpty();
+
+        final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
+                .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
+        assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.DEBUGGER_OMIT_LIB_KEYWORDS));
+        assertThat(namesGroupedByType).hasEntrySatisfying(RadioGroupFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.DEBUGGER_SUSPEND_ON_ERROR));
     }
 }
