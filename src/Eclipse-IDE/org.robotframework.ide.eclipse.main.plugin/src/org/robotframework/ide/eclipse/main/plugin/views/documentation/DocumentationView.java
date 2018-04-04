@@ -77,6 +77,7 @@ public class DocumentationView {
 
         browser = new Browser(parent, SWT.NONE);
         browser.addLocationListener(new DocumentationViewLinksListener(linksSupport));
+        browser.setText(DocumentationsFormatter.createEmpty());
 
         final IToolBarManager toolbarManager = part.getViewSite().getActionBars().getToolBarManager();
         createToolbarActions(partService, toolbarManager, page, browserSupport);
