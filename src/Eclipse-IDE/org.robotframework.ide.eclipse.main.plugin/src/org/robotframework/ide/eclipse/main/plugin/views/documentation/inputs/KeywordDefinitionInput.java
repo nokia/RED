@@ -27,6 +27,11 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
     }
 
     @Override
+    public URI getInputUri() throws URISyntaxException {
+        return WorkspaceFileUri.createShowKeywordDocUri(element.getSuiteFile().getFile(), element.getName());
+    }
+
+    @Override
     protected String createHeader() {
         return createHeader(element);
     }
@@ -77,13 +82,22 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
         }
 
         @Override
+        public URI getInputUri() throws URISyntaxException {
+            return WorkspaceFileUri.createShowKeywordDocUri(element.getSuiteFile().getFile(), getKeyword().getName());
+        }
+
+        @Override
         protected String createHeader() {
-            return KeywordDefinitionInput.createHeader((RobotKeywordDefinition) element.getParent());
+            return KeywordDefinitionInput.createHeader(getKeyword());
         }
 
         @Override
         protected Documentation createDocumentation() {
-            return ((RobotKeywordDefinition) element.getParent()).createDocumentation();
+            return getKeyword().createDocumentation();
+        }
+
+        private RobotKeywordDefinition getKeyword() {
+            return (RobotKeywordDefinition) element.getParent();
         }
     }
 }

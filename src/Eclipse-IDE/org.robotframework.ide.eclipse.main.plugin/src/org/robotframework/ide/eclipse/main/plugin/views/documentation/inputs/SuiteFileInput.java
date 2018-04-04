@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
@@ -21,6 +22,11 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
 
     public SuiteFileInput(final RobotSuiteFile suiteFile) {
         super(suiteFile);
+    }
+
+    @Override
+    public URI getInputUri() throws URISyntaxException {
+        return WorkspaceFileUri.createShowSuiteDocUri(element.getSuiteFile().getFile());
     }
 
     @Override
@@ -49,6 +55,11 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
 
         public SuiteFileOnSettingInput(final RobotSetting docSetting) {
             super(docSetting);
+        }
+
+        @Override
+        public URI getInputUri() throws URISyntaxException {
+            return WorkspaceFileUri.createShowSuiteDocUri(element.getSuiteFile().getFile());
         }
 
         @Override
