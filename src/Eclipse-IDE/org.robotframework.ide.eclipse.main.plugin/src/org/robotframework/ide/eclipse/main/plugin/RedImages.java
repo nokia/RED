@@ -89,6 +89,14 @@ public class RedImages {
         return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_SYNCED);
     }
 
+    public static ImageDescriptor getBackImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_TOOL_BACK);
+    }
+
+    public static ImageDescriptor getForwardImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_TOOL_FORWARD);
+    }
+
     public static ImageDescriptor getSyncBrokenImage() {
         return RedPlugin.getImageDescriptor("resources/sync_broken.png");
     }
