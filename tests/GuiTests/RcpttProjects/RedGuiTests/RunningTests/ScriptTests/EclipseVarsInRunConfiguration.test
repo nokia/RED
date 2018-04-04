@@ -1,0 +1,204 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_4UxogBh5Eee93KAG-tW51Q,_s-ctEA4_EeePcNCRX_abWA
+Element-Name: EclipseVarsInRunConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _xSBOoDQ1EeiLWMPOs-qbiA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 4/3/18 5:21 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+export-agent-to-folder -folder $RED_workspace_path
+
+//set in preference to not show in console arg file
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Launching"
+    get-group Robot | get-button "Pass Robot arguments using arguments file" | uncheck
+    get-button "Apply and Close" | click
+}
+
+global [val script_name  [os-specific "script_win.bat" "script_lin.sh"]]
+
+//set simple logging in script
+get-view "Project Explorer" | get-tree | select [format "ScriptProject/scripts/%s" $script_name] | double-click
+
+if [get-by-os -win Win -linux Lin | eq Win]{
+	get-editor $script_name | get-text-viewer | set-text  "@echo off\n"
+	    + "echo arg1: %1\n"
+	    + "echo arg2: %2"
+}-else{
+
+}	    
+get-editor $script_name | get-text-viewer | key-type "M1+s"
+
+//run test to create run config
+get-view "Project Explorer" | get-tree | select "ScriptProject/TestFile.robot" | select "ScriptProject/TestFile.robot" 
+    | get-menu -path "Run As/1 Robot Test" | click
+    
+
+//open variables box and select current_date
+get-menu -path "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/TestFile.robot"
+    get-group Arguments | get-button "Variables..." | click
+    get-window "Select Variable" | get-table | select "current_date" | click -default
+}
+
+//check if this variable was set in the args
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text | equals "${current_date}" 
+    | verify-true
+    
+//add string_prompt
+with [get-window "Run Configurations"] {
+    get-group Arguments | get-button "Variables..." | click
+    get-window "Select Variable" | get-table | select "string_prompt" | click -default
+}
+
+// check if was added at the end
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | equals "${current_date}${string_prompt}" | verify-true
+    
+//select text and check if new selected var was set in selected text
+with [get-window "Run Configurations"] {
+    with [get-group Arguments] {
+        get-editbox -after [get-label "Additional Robot Framework arguments:"] | click-text 1 16
+        get-button "Variables..." | click
+    }
+    get-window "Select Variable" | get-table | select "build_type" | click -default
+}
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | equals "${build_type}${string_prompt}" | verify-true
+  
+//revert all    
+get-window "Run Configurations" | get-button Revert | click
+    
+//check if revert removed arg    
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text | equals "" | verify-true
+    
+//set path to workspace as Metadata    
+with [get-window "Run Configurations"] {
+    with [get-group Arguments] {
+        get-editbox -after [get-label "Additional Robot Framework arguments:"] | type-text "-M "
+        get-button "Variables..." | click
+    }
+    get-window "Select Variable" | get-table | select "workspace_loc" | click -default
+    get-button Apply | click
+    get-button Run | click
+}
+
+
+get-view Console | get-text-viewer | get-property text 
+    | contains [format" -M %s" $RED_workspace_path]| verify-true
+     
+//go to executor     
+get-menu -path "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    with [get-tab-folder] {
+        get-tab-item Executor | click
+    }
+    
+    //add 2 vars
+    get-group Interpreter | get-button "Variables..." | click
+    get-window "Select Variable" | get-table | select "build_files" | click -default
+    get-group Interpreter | get-button "Variables..." | click
+    get-window "Select Variable" | get-table | select "env_var" | click -default
+}
+
+//check if were added
+get-window "Run Configurations" | get-group Interpreter | get-editbox 
+    -after [get-label "Additional interpreter arguments:"] | get-property text | equals "${build_files}${env_var}" 
+    | verify-true
+    
+// go to script config and add workspace_loc    
+with [get-window "Run Configurations"] {
+    get-group "External script" | get-button "Workspace..." | click
+    get-window "Select file:" | get-tree | select [format "ScriptProject/scripts/%s" $script_name] | double-click
+}
+
+//check if workspace_loc was used
+get-window "Run Configurations" | get-group "External script" | get-editbox 
+    -after [get-label "Executable file to run Robot Framework tests:"] | get-property text 
+    | equals [format "${workspace_loc:/ScriptProject/scripts/%s}" $script_name]| verify-true
+    
+//revert evrything
+get-window "Run Configurations" | get-button Revert | click
+with [get-window "Run Configurations"] {
+    get-group Interpreter | get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text 
+        | equals "" | verify-true
+    get-group "External script" | get-editbox -after [get-label "Executable file to run Robot Framework tests:"] 
+        | get-property text | equals "" | verify-true
+}
+
+//add my own var
+with [get-window "Run Configurations"] {
+    get-group "External script" | get-button "Variables..." | click
+    get-window "Select Variable" | get-button "Edit Variables..." | click
+}
+with [get-window Preferences] {
+    get-button "New..." | click
+    with [get-window "New String Substitution Variable"] {
+        get-editbox -after [get-label "Name:"] | set-text "my_var"
+        get-editbox -after [get-label "Value:"] | set-text $script_name
+        get-button OK | click
+    }
+    get-button "Apply and Close" | click
+}
+
+
+
+
+//use new varaible
+with [get-window "Run Configurations" | get-window "Select Variable"] {
+    get-table | select "my_var"
+    get-button OK | click
+}
+
+//check that error is shown
+get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+    | get-property text | equals "Executable file does not exist" | verify-true
+    
+//set 2 variables  
+with [get-window "Run Configurations"] {
+    get-group "External script" | get-editbox -after [get-label "Executable file to run Robot Framework tests:"] 
+        | set-text "${workspace_loc}/ScriptProject/scripts/${my_var}"
+}
+//now error is not present - path is corrected
+get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+    | get-property text | equals "Edit interpreter parameters for launch configuration" | verify-true
+    
+//select build_type    
+with [get-window "Run Configurations"] {
+    get-group "External script" | get-button "Variables..." 
+        -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] 
+        | click
+    get-window "Select Variable" | get-table | select "build_type" | click -default
+
+    //add space
+    get-group "External script" | get-editbox 
+        -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] 
+        | type-text " "
+    
+    //select time   
+    get-group "External script" | get-button "Variables..." 
+        -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] 
+        | click 
+    get-window "Select Variable" | get-table | select "current_date" | click -default
+    get-button Run | click
+}
+
+get-view Console | get-text-viewer | get-property text | equals "arg1: none\n"
+    + "arg2: \d{8}_\d{4}\n"
+    + "Command: .*\n"
+    + "Suite Executor: <unknown>" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
