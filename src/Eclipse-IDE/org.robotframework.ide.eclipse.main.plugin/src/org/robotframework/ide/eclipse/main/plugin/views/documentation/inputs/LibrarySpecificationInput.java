@@ -39,6 +39,11 @@ public class LibrarySpecificationInput extends DocumentationViewInput {
     }
 
     @Override
+    public URI getInputUri() throws URISyntaxException {
+        return LibraryUri.createShowLibraryDocUri(project.getName(), specification.getName());
+    }
+
+    @Override
     public boolean contains(final Object wrappedInput) {
         return specification == wrappedInput;
     }

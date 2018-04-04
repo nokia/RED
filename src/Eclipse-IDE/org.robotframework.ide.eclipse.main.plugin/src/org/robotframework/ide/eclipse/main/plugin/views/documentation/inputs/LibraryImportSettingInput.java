@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IFile;
@@ -29,6 +30,12 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
     public void prepare() {
         specification = element.getImportedLibrary().map(ImportedLibrary::getSpecification).orElseThrow(
                 () -> new DocumentationInputGenerationException("Library specification not found, nothing to display"));
+    }
+
+    @Override
+    public URI getInputUri() throws URISyntaxException {
+        final String projectName = element.getSuiteFile().getProject().getName();
+        return LibraryUri.createShowLibraryDocUri(projectName, specification.getName());
     }
 
     @Override
