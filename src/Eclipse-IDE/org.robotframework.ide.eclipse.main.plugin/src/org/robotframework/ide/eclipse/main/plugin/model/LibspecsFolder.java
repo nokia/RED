@@ -5,7 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static java.util.stream.Collectors.toSet;
+
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -60,6 +64,23 @@ public class LibspecsFolder {
         }
     }
 
+    public Set<IFile> getNewestHtmlSpecFiles() {
+        if (exists()) {
+            try {
+                return Stream.of(folder.members())
+                        .filter(r -> r.getType() == IResource.FILE)
+                        .map(IFile.class::cast)
+                        .filter(r -> r.getFileExtension().equals("html"))
+                        .sorted((r1, r2) -> Long.compare(r2.getLocalTimeStamp(), r1.getLocalTimeStamp()))
+                        .limit(20)
+                        .collect(toSet());
+            } catch (final CoreException e) {
+                return new HashSet<>();
+            }
+        }
+        return new HashSet<>();
+    }
+
     public void preserveOnly(final Set<IFile> filesToPreserve) throws CoreException {
         if (!folder.exists()) {
             return;
@@ -95,6 +116,10 @@ public class LibspecsFolder {
 
     public IFile getXmlSpecFile(final String libraryName) {
         return getFile(libraryName + LIBSPEC_FILE_EXTENSION);
+    }
+
+    public IFile getHtmlSpecFile(final String libraryName) {
+        return getFile(libraryName + ".html");
     }
 
     public IFile getFile(final String name) {

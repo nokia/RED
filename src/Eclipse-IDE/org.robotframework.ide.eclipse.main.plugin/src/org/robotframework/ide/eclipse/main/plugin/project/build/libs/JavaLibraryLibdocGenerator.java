@@ -16,11 +16,14 @@ class JavaLibraryLibdocGenerator implements ILibdocGenerator {
     private final String libName;
     private final String jarPath;
     private final IFile targetSpecFile;
+    private final LibdocFormat format;
 
-    JavaLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile) {
+    JavaLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile,
+            final LibdocFormat format) {
         this.libName = libName;
         this.jarPath = path;
         this.targetSpecFile = targetSpecFile;
+        this.format = format;
     }
 
     @Override
@@ -28,16 +31,15 @@ class JavaLibraryLibdocGenerator implements ILibdocGenerator {
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
         runtimeEnvironment.createLibdoc(libName, jarPath, additionalPaths, targetSpecFile.getLocation().toFile(),
-                LibdocFormat.XML);
+                format);
     }
 
     @Override
     public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment,
-            final EnvironmentSearchPaths additionalPaths)
-            throws RobotEnvironmentException {
+            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
         runtimeEnvironment.createLibdocForcibly(libName, jarPath, additionalPaths,
-                targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
+                targetSpecFile.getLocation().toFile(), format);
     }
 
     @Override
