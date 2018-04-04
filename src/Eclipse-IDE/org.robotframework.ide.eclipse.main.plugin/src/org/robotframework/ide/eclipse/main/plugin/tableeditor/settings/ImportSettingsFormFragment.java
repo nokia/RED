@@ -104,11 +104,12 @@ import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsStyleConfiguration;
-import org.robotframework.red.nattable.configs.SettingsVariablesLabelAccumulator;
 import org.robotframework.red.nattable.configs.SpecialItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
+import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
 import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.configs.WithNameLabelAccumulator;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
@@ -218,9 +219,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 new AddingElementLabelAccumulator(dataProvider),
                 new ImportTypesLabelAccumulator(dataProvider),
                 new SettingsCommentsLabelAccumulator(dataProvider),
-                new SettingsVariablesLabelAccumulator(dataProvider),
                 new SettingsItemsLabelAccumulator(),
-                new WithNameLabelAccumulator(dataProvider));
+                new WithNameLabelAccumulator(dataProvider),
+                new VariableInsideLabelAccumulator());
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -328,6 +329,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.addConfiguration(new VariablesStyleConfiguration(theme));
         table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
+        table.addConfiguration(new VariableInsideStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {
