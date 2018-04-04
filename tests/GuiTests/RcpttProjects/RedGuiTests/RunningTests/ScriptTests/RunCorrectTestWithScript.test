@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lJ-jYBiAEee93KAG-tW51Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/24/17 4:48 PM
+Save-Time: 4/4/18 10:22 AM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -63,9 +63,9 @@ with [get-window "Run Configurations"] {
 //set path to script
 set-dialog-result File [format"platform:/resource/ScriptProject/scripts/%s" $script_name]
 with [get-window "Run Configurations"] {
-    with [get-group "Executable file"] {
-        get-button "Browse..." | click
-        get-editbox -after [get-label "Additional executable file arguments:"] | set-text  [format "%s %s" $RED_workspace_path $RED_workspace_path]
+    with [get-group "External script"] {
+        get-button "File system..." | click
+        get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards." ] | set-text  [format "%s %s" $RED_workspace_path $RED_workspace_path]
     }
     get-button Apply | click
     get-button Run | click
@@ -257,7 +257,7 @@ with [get-window "Run Configurations"] {
     get-group Interpreter | get-button "Use interpreter as defined in project configuration" | click
     
     //add other arg that will be not used
-    get-group "Executable file" | get-editbox -after [get-label "Additional executable file arguments:"] | set-text arg1
+    get-group "External script" | get-editbox -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards." ] | set-text arg1
     get-button Apply | click
     get-button Run | click
 }

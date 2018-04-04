@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _hmnS8I7CEeWetPU-dn-gxQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/17 4:35 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 4/4/18 10:26 AM
 Tags: Unstable
 Testcase-Type: ecl
 Verifications: _vFf3wM6GEeawFJWg5rP2EA
@@ -46,12 +46,12 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "Create missing this/new/folder/file.ROBOT file" 
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing 'this/new/folder/file.ROBOT' file" 
         | verify-true
 }
 //select by clicking
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Create missing this\\/new\\/folder\\/file.ROBOT file" | click -default
+    | select "Create missing 'this\\/new\\/folder\\/file.ROBOT' file" | click -default
     
 //============================================================ line 7 ====================================    
 //create html file in root
@@ -63,7 +63,7 @@ get-view Problems | get-tree
     | get-menu "Quick Fix" | click
 with [get-window "Quick Fix" | get-table] {
     get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "Create missing single_file.html file" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing 'single_file.html' file" | verify-true
 }
 get-window "Quick Fix" | get-button Finish | click
 
@@ -78,12 +78,12 @@ with [get-editor "TestFile.robot"] {
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "Create missing a  b/file.robot file" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing 'a  b/file.robot' file" | verify-true
 }
 
 //select using Enter
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    select "Create missing a  b\\/file.robot file" | key-type Enter
+    select "Create missing 'a  b\\/file.robot' file" | key-type Enter
     click -default
 }
 
@@ -98,7 +98,7 @@ open-quick-fix "Errors (7 items)/Resource import '!@#$%20^&()_+\\/special_chars.
 
 with [get-window "Quick Fix" | get-table] {
     get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "Create missing !@#$%20^&()_+/special_chars.txt file" 
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing '!@#$%20^&()_+/special_chars.txt' file" 
         | verify-true
 }
 get-window "Quick Fix" | get-button Finish | click
@@ -116,11 +116,11 @@ try -times 3 -delay 500 -command{
 	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
 	    get-property itemCount | equals 1 | verify-true
 	    get-property "getItems().TableItem[0].getText()" 
-	        | equals "Create missing ../SecondProject/folder1/in_second_project.robot file" | verify-true
+	        | equals "Create missing '../SecondProject/folder1/in_second_project.robot' file" | verify-true
 	}
 }	
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Create missing ..\\/SecondProject\\/folder1\\/in_second_project.robot file" | click -default
+    | select "Create missing '..\\/SecondProject\\/folder1\\/in_second_project.robot' file" | click -default
 get-editor "TestFile.robot" | click
 
 //============================================================ line 18 ==================================== 
@@ -134,8 +134,8 @@ get-window Clean | get-button $OK_Clean_button | click
 open-quick-fix "Errors (5 items)/Resource import 'folder\\/from_var\\/MY_RES.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
 
 get-window "Quick Fix" | get-table | get-property itemCount | equals 1 | verify-true
-get-window "Quick Fix" | get-table | get-item "Create missing folder\\/from_var\\/MY_RES.robot file" 
-    | get-property caption | equals "Create missing folder/from_var/MY_RES.robot file" | verify-true
+get-window "Quick Fix" | get-table | get-item "Create missing 'folder\\/from_var\\/MY_RES.robot' file" 
+    | get-property caption | equals "Create missing 'folder/from_var/MY_RES.robot' file" | verify-true
 get-window "Quick Fix" | get-button Finish | click
 
 //============================================================ line 21 ==================================== 
@@ -156,7 +156,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 try -times 2 -command{
 	wait 300
 	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-	    | select  "Create missing .*full_path.txt file" | click -default
+	    | select  "Create missing '.*full_path.txt' file" | click -default
 }    
 //=============================================================================================================================================    
 //check wrong paths    
