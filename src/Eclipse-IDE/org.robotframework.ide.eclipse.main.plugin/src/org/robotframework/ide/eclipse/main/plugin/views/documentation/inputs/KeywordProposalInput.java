@@ -44,6 +44,19 @@ public class KeywordProposalInput extends InternalElementInput<RobotFileInternal
     }
 
     @Override
+    public URI getInputUri() throws URISyntaxException {
+        final String name = proposal.getKeywordName();
+        if (isLibraryKeyword()) {
+            final String projectName = proposal.getExposingFilepath().segment(0);
+            return LibraryUri.createShowKeywordDocUri(projectName, proposal.getSourceName(), name);
+
+        } else {
+            final IResource file = ResourcesPlugin.getWorkspace().getRoot().findMember(proposal.getExposingFilepath());
+            return WorkspaceFileUri.createShowKeywordDocUri((IFile) file, name);
+        }
+    }
+
+    @Override
     protected String createHeader() {
         final Optional<URI> imgUri = isLibraryKeyword() ? RedImages.getKeywordImageUri()
                 : RedImages.getUserKeywordImageUri();

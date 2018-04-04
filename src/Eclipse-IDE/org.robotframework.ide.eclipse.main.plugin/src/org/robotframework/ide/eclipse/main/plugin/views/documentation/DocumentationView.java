@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -19,8 +21,11 @@ import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartService;
@@ -36,6 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksSupport.UnableToOpenUriException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputGenerationException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputOpenException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
@@ -47,12 +53,17 @@ public class DocumentationView {
 
     private Browser browser;
 
+    private DocumentationsBrowsingHistory history;
+
     private DocumentationViewInput currentInput;
     private Job documentationJob;
 
+    private BackAction backAction;
+    private ForwardAction forwardAction;
     private LinkWithSelectionAction linkSelectionAction;
     private OpenInputAction openInputAction;
     private OpenInExternalBrowserAction openInBrowserAction;
+
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IWorkbenchPage page, final IViewPart part,
@@ -60,8 +71,12 @@ public class DocumentationView {
         parent.setLayout(new FillLayout());
 
         final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+        final DocumentationViewLinksSupport linksSupport = new DocumentationViewLinksSupport(page, browserSupport,
+                this);
+        history = new DocumentationsBrowsingHistory(linksSupport);
+
         browser = new Browser(parent, SWT.NONE);
-        browser.addLocationListener(new DocumentationViewLinksListener(page, browserSupport, this));
+        browser.addLocationListener(new DocumentationViewLinksListener(linksSupport));
 
         final IToolBarManager toolbarManager = part.getViewSite().getActionBars().getToolBarManager();
         createToolbarActions(partService, toolbarManager, page, browserSupport);
@@ -73,10 +88,15 @@ public class DocumentationView {
 
     private void createToolbarActions(final IPartService partService, final IToolBarManager manager,
             final IWorkbenchPage page, final IWorkbenchBrowserSupport browserSupport) {
+        backAction = new BackAction();
+        forwardAction = new ForwardAction();
         linkSelectionAction = new LinkWithSelectionAction(partService);
         openInputAction = new OpenInputAction(page);
         openInBrowserAction = new OpenInExternalBrowserAction(browserSupport);
 
+        manager.add(backAction);
+        manager.add(forwardAction);
+        manager.add(new Separator());
         manager.add(linkSelectionAction);
         manager.add(openInputAction);
         manager.add(openInBrowserAction);
@@ -124,7 +144,11 @@ public class DocumentationView {
                 input.prepare();
                 final String html = input.provideHtml();
 
+                history.newInput(input);
                 currentInput = input;
+
+                backAction.setEnabled(history.isBackEnabled());
+                forwardAction.setEnabled(history.isForwardEnabled());
                 openInputAction.setEnabled(true);
                 openInBrowserAction.setEnabled(true);
                 SwtThread.asyncExec(() -> {
@@ -157,6 +181,80 @@ public class DocumentationView {
         } else if (keywordCall instanceof RobotSetting && ((RobotSetting) keywordCall).isDocumentation()
                 && currentInput.contains(keywordCall)) {
             scheduleInputLoadingJob(currentInput);
+        }
+    }
+
+    private static class DocumentationViewLinksListener implements LocationListener {
+
+        private final DocumentationViewLinksSupport linksSupport;
+
+        public DocumentationViewLinksListener(final DocumentationViewLinksSupport linksSupport) {
+            this.linksSupport = linksSupport;
+        }
+
+        @Override
+        public void changing(final LocationEvent event) {
+            try {
+                event.doit = !linksSupport.changeLocationTo(toUri(event.location));
+
+            } catch (final UnableToOpenUriException e) {
+                StatusManager.getManager().handle(
+                        new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Cannot open '" + event.location + "'", e),
+                        StatusManager.BLOCK);
+            }
+        }
+
+        private URI toUri(final String location) {
+            try {
+                return new URI(location);
+            } catch (final URISyntaxException e) {
+                throw new UnableToOpenUriException("Syntax error in uri '" + location + "'", e);
+            }
+        }
+
+        @Override
+        public void changed(final LocationEvent event) {
+            // nothing to do
+        }
+    }
+
+    private class BackAction extends Action {
+
+        private static final String ID = "org.robotframework.action.views.documentation.Back";
+
+        public BackAction() {
+            setId(ID);
+            setText("Back");
+            setImageDescriptor(RedImages.getBackImage());
+            setEnabled(false);
+        }
+
+        @Override
+        public void run() {
+            history.back();
+
+            backAction.setEnabled(history.isBackEnabled());
+            forwardAction.setEnabled(history.isForwardEnabled());
+        }
+    }
+
+    private class ForwardAction extends Action {
+
+        private static final String ID = "org.robotframework.action.views.documentation.Forward";
+
+        public ForwardAction() {
+            setId(ID);
+            setText("Forward");
+            setImageDescriptor(RedImages.getForwardImage());
+            setEnabled(false);
+        }
+
+        @Override
+        public void run() {
+            history.forward();
+
+            backAction.setEnabled(history.isBackEnabled());
+            forwardAction.setEnabled(history.isForwardEnabled());
         }
     }
 

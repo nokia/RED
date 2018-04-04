@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
 
@@ -19,4 +22,6 @@ public abstract class DocumentationViewInput {
     public abstract void showInput(IWorkbenchPage page);
 
     public abstract IFile generateHtmlLibdoc();
+
+    public abstract URI getInputUri() throws URISyntaxException;
 }
