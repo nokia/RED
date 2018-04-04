@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 import java.net.URI;
 import java.util.function.Consumer;
 
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksListener.OpenableUri;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksSupport.OpenableUri;
 import org.robotframework.red.swt.SwtThread;
 
 class FragmentUri implements OpenableUri {

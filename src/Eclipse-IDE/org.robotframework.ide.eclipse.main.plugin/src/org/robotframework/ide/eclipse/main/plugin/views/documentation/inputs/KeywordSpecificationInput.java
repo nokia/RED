@@ -43,6 +43,11 @@ public class KeywordSpecificationInput extends DocumentationViewInput {
     }
 
     @Override
+    public URI getInputUri() throws URISyntaxException {
+        return LibraryUri.createShowKeywordDocUri(project.getName(), libSpec.getName(), kwSpec.getName());
+    }
+
+    @Override
     public boolean contains(final Object wrappedInput) {
         return kwSpec == wrappedInput;
     }
