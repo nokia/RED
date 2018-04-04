@@ -148,10 +148,11 @@ import org.robotframework.red.nattable.configs.SettingsActionNamesLabelAccumulat
 import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsStyleConfiguration;
-import org.robotframework.red.nattable.configs.SettingsVariablesLabelAccumulator;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
+import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
 import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
@@ -525,9 +526,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 new AlternatingRowConfigLabelAccumulator(),
                 new EmptyGeneralSettingLabelAccumulator(dataProvider),
                 new SettingsCommentsLabelAccumulator(dataProvider),
-                new SettingsVariablesLabelAccumulator(dataProvider),
                 new SettingsActionNamesLabelAccumulator(dataProvider),
-                new SettingsItemsLabelAccumulator());
+                new SettingsItemsLabelAccumulator(),
+                new VariableInsideLabelAccumulator());
         final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -635,6 +636,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(new VariablesStyleConfiguration(theme));
         table.addConfiguration(new ActionNamesStyleConfiguration(theme));
         table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
+        table.addConfiguration(new VariableInsideStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {
@@ -767,7 +769,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         clearDocumentationMatches();
         final TreeRangeSet<Integer> ranges = settingsMatches.getRanges(documentation.getText());
         for (final Range<Integer> range : ranges.asRanges()) {
-            final StyleRange styleRange = new StyleRange(range.lowerEndpoint(), range.upperEndpoint() - range.lowerEndpoint(), null, null);
+            final StyleRange styleRange = new StyleRange(range.lowerEndpoint(),
+                    range.upperEndpoint() - range.lowerEndpoint(), null, null);
             Stylers.Common.MATCH_STYLER.applyStyles(styleRange);
             documentation.setStyleRange(styleRange);
         }
