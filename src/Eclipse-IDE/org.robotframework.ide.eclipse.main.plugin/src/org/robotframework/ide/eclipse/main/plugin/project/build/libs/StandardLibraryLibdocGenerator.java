@@ -15,22 +15,24 @@ class StandardLibraryLibdocGenerator implements ILibdocGenerator {
 
     private final String libName;
     private final IFile targetSpecFile;
+    private final LibdocFormat format;
 
-    StandardLibraryLibdocGenerator(final String libName, final IFile targetSpecFile) {
+    StandardLibraryLibdocGenerator(final String libName, final IFile targetSpecFile, final LibdocFormat format) {
         this.libName = libName;
         this.targetSpecFile = targetSpecFile;
+        this.format = format;
     }
 
     @Override
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        runtimeEnvironment.createLibdoc(libName, targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
+        runtimeEnvironment.createLibdoc(libName, targetSpecFile.getLocation().toFile(), format);
     }
 
     @Override
     public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        runtimeEnvironment.createLibdocForcibly(libName, targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
+        runtimeEnvironment.createLibdocForcibly(libName, targetSpecFile.getLocation().toFile(), format);
     }
 
     @Override

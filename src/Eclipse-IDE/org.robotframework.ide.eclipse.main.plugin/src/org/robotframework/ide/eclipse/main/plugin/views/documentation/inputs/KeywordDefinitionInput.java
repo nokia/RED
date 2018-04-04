@@ -18,6 +18,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
+import com.google.common.html.HtmlEscapers;
+
 public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDefinition> {
 
     public KeywordDefinitionInput(final RobotKeywordDefinition keyword) {
@@ -40,9 +42,11 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
         final String source = String.format("%s [%s]", Formatters.formatHyperlink(srcHref, srcLabel),
                 Formatters.formatHyperlink(docHref, "Documentation"));
 
+        final String args = HtmlEscapers.htmlEscaper().escape(keyword.createArgumentsDescriptor().getDescription());
+
         return Formatters.formatSimpleHeader(imgUri, keyword.getName(),
                 newArrayList("Source", source),
-                newArrayList("Arguments", keyword.createArgumentsDescriptor().getDescription()));
+                newArrayList("Arguments", args));
     }
 
     private static String createShowKeywordSrcUri(final IFile file, final String label) {

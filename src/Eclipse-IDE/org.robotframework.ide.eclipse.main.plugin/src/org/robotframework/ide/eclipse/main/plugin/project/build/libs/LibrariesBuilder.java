@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -22,6 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -32,12 +34,15 @@ import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.io.Files;
 
 public class LibrariesBuilder {
 
@@ -45,6 +50,58 @@ public class LibrariesBuilder {
 
     public LibrariesBuilder(final BuildLogger logger) {
         this.logger = logger;
+    }
+
+    public IFile buildHtmlLibraryDoc(final IFile resourceFile) {
+        final RobotModel model = RedPlugin.getModelManager().getModel();
+
+        final IProject project = resourceFile.getProject();
+        final RobotProject robotProject = model.createRobotProject(project);
+        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+
+        final RobotSuiteFile suiteFile = model.createSuiteFile(resourceFile);
+
+        if (suiteFile.isResourceFile()) {
+            final String fileName = Files.getNameWithoutExtension(suiteFile.getName()) + "_"
+                    + System.currentTimeMillis();
+            final IFile htmlTargetFile = LibspecsFolder.get(project).getHtmlSpecFile(fileName);
+            runtimeEnvironment.createLibdoc(resourceFile.getLocation().toFile().toString(),
+                    htmlTargetFile.getLocation().toFile(), LibdocFormat.HTML);
+            return htmlTargetFile;
+        } else {
+            throw new IllegalStateException("Unable to generate HTML documentation file. The file '"
+                    + resourceFile.getFullPath().toOSString() + "' is not a resource file");
+        }
+    }
+
+    public IFile buildHtmlLibraryDoc(final String projectName, final String library) {
+        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+        final LibraryDescriptor descriptor = robotProject.getLibraryDescriptorsStream()
+                .filter(desc -> desc.getName().equals(library))
+                .findFirst()
+                .orElse(null);
+        return buildHtmlLibraryDoc(robotProject, descriptor);
+    }
+
+    public IFile buildHtmlLibraryDoc(final RobotProject robotProject, final LibrarySpecification specification) {
+        return buildHtmlLibraryDoc(robotProject, specification.getDescriptor());
+    }
+
+    private IFile buildHtmlLibraryDoc(final RobotProject robotProject, final LibraryDescriptor descriptor) {
+        if (descriptor != null) {
+            final IProject project = robotProject.getProject();
+            final String fileName = descriptor.generateLibspecFileName();
+            final IFile htmlTargetFile = LibspecsFolder.get(project).getHtmlSpecFile(fileName);
+
+            final ILibdocGenerator generator = provideGenerator(descriptor, htmlTargetFile, LibdocFormat.HTML);
+            generator.generateLibdoc(robotProject.getRuntimeEnvironment(),
+                    new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
+                            .createEnvironmentSearchPaths(project));
+            return htmlTargetFile;
+        } else {
+            throw new IllegalStateException("Unable to generate HTML documentation file. Missing library descriptor");
+        }
     }
 
     public void forceLibrariesRebuild(final Multimap<IProject, LibrarySpecification> groupedSpecifications,
@@ -56,7 +113,7 @@ public class LibrariesBuilder {
             final String fileName = spec.getDescriptor().generateLibspecFileName();
             final IFile xmlTargetFile = LibspecsFolder.get(project).getXmlSpecFile(fileName);
 
-            groupedGenerators.put(project, provideGenerator(spec.getDescriptor(), xmlTargetFile));
+            groupedGenerators.put(project, provideGenerator(spec.getDescriptor(), xmlTargetFile, LibdocFormat.XML));
         });
 
         monitor.setWorkRemaining(groupedGenerators.size());
@@ -99,24 +156,25 @@ public class LibrariesBuilder {
         monitor.done();
     }
 
-    private ILibdocGenerator provideGenerator(final LibraryDescriptor libraryDescriptor, final IFile targetFile) {
+    private ILibdocGenerator provideGenerator(final LibraryDescriptor libraryDescriptor, final IFile targetFile,
+            final LibdocFormat format) {
         final String nameForLibdoc = createLibraryName(libraryDescriptor);
 
         if (libraryDescriptor.isStandardLibrary()) {
-            return new StandardLibraryLibdocGenerator(nameForLibdoc, targetFile);
+            return new StandardLibraryLibdocGenerator(nameForLibdoc, targetFile, format);
 
         } else {
             final String path = libraryDescriptor.getPath();
 
             final LibraryType type = libraryDescriptor.getLibraryType();
             if (type == LibraryType.VIRTUAL) {
-                return new VirtualLibraryLibdocGenerator(Path.fromPortableString(path), targetFile);
+                return new VirtualLibraryLibdocGenerator(Path.fromPortableString(path), targetFile, format);
 
             } else if (type == LibraryType.PYTHON) {
-                return new PythonLibraryLibdocGenerator(nameForLibdoc, toAbsolute(path), targetFile);
+                return new PythonLibraryLibdocGenerator(nameForLibdoc, toAbsolute(path), targetFile, format);
 
             } else if (type == LibraryType.JAVA) {
-                return new JavaLibraryLibdocGenerator(nameForLibdoc, toAbsolute(path), targetFile);
+                return new JavaLibraryLibdocGenerator(nameForLibdoc, toAbsolute(path), targetFile, format);
             }
             throw new IllegalStateException("Unknown library type: " + type);
         }
@@ -178,7 +236,7 @@ public class LibrariesBuilder {
                     || !hasSameVersion(new File(xmlSpecFile.getLocationURI()), environment.getVersion())) {
                 // we always want to regenerate standard libraries when RF version have changed
                 // or libdoc does not exist
-                generators.add(new StandardLibraryLibdocGenerator(stdLib, xmlSpecFile));
+                generators.add(new StandardLibraryLibdocGenerator(stdLib, xmlSpecFile, LibdocFormat.XML));
             }
         }
         return generators;
@@ -198,7 +256,8 @@ public class LibrariesBuilder {
 
             // we always want to regenerate remote libraries, as something may have changed
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-            generators.add(new StandardLibraryLibdocGenerator("Remote::" + location.getUri(), xmlSpecFile));
+            generators.add(
+                    new StandardLibraryLibdocGenerator("Remote::" + location.getUri(), xmlSpecFile, LibdocFormat.XML));
         }
         return generators;
     }
@@ -217,7 +276,7 @@ public class LibrariesBuilder {
 
                 final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
                 if (!fileExist(xmlSpecFile)) {
-                    generators.add(new VirtualLibraryLibdocGenerator(libPath, xmlSpecFile));
+                    generators.add(new VirtualLibraryLibdocGenerator(libPath, xmlSpecFile, LibdocFormat.XML));
                 }
             }
         });
@@ -233,7 +292,8 @@ public class LibrariesBuilder {
 
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
             if (!fileExist(xmlSpecFile)) {
-                generators.add(new PythonLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile));
+                generators.add(new PythonLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile,
+                        LibdocFormat.XML));
             }
         });
         return generators;
@@ -248,7 +308,8 @@ public class LibrariesBuilder {
 
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
             if (!fileExist(xmlSpecFile)) {
-                generators.add(new JavaLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile));
+                generators.add(new JavaLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile,
+                        LibdocFormat.XML));
             }
         });
         return generators;

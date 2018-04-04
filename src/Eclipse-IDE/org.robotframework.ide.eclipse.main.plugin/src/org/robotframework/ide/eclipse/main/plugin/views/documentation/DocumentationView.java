@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -51,6 +52,7 @@ public class DocumentationView {
 
     private LinkWithSelectionAction linkSelectionAction;
     private OpenInputAction openInputAction;
+    private OpenInExternalBrowserAction openInBrowserAction;
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IWorkbenchPage page, final IViewPart part,
@@ -61,7 +63,8 @@ public class DocumentationView {
         browser = new Browser(parent, SWT.NONE);
         browser.addLocationListener(new DocumentationViewLinksListener(page, browserSupport, this));
 
-        createToolbarActions(partService, part.getViewSite().getActionBars().getToolBarManager(), page);
+        final IToolBarManager toolbarManager = part.getViewSite().getActionBars().getToolBarManager();
+        createToolbarActions(partService, toolbarManager, page, browserSupport);
     }
 
     Browser getBrowser() {
@@ -69,12 +72,14 @@ public class DocumentationView {
     }
 
     private void createToolbarActions(final IPartService partService, final IToolBarManager manager,
-            final IWorkbenchPage page) {
+            final IWorkbenchPage page, final IWorkbenchBrowserSupport browserSupport) {
         linkSelectionAction = new LinkWithSelectionAction(partService);
         openInputAction = new OpenInputAction(page);
+        openInBrowserAction = new OpenInExternalBrowserAction(browserSupport);
 
         manager.add(linkSelectionAction);
         manager.add(openInputAction);
+        manager.add(openInBrowserAction);
     }
 
     @Focus
@@ -121,6 +126,7 @@ public class DocumentationView {
 
                 currentInput = input;
                 openInputAction.setEnabled(true);
+                openInBrowserAction.setEnabled(true);
                 SwtThread.asyncExec(() -> {
                     browser.setText(html);
                     markSynced();
@@ -238,6 +244,35 @@ public class DocumentationView {
                             new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, IStatus.OK, "Error opening input", e),
                             StatusManager.SHOW);
                 }
+            }
+        }
+    }
+
+    private class OpenInExternalBrowserAction extends Action {
+
+        private static final String ID = "org.robotframework.action.views.documentation.OpenInBrowser";
+
+        private final IWorkbenchBrowserSupport browserSupport;
+
+        public OpenInExternalBrowserAction(final IWorkbenchBrowserSupport browserSupport) {
+            this.browserSupport = browserSupport;
+            setId(ID);
+            setText("Open attached documentation in a Browser");
+            setImageDescriptor(RedImages.getOpenInBrowserImage());
+
+            setEnabled(false);
+        }
+
+        @Override
+        public void run() {
+            if (currentInput != null) {
+                final DocumentationViewInput input = currentInput;
+                final Job docJob = Job.create("Opening attached documentation", monitor -> {
+                    final IFile htmlDoc = input.generateHtmlLibdoc();
+                    new ExternalBrowserUri(htmlDoc.getLocationURI(), browserSupport).open();
+                    return Status.OK_STATUS;
+                });
+                docJob.schedule();
             }
         }
     }
