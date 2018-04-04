@@ -19,11 +19,14 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
     private final String libName;
     private final String libPath;
     private final IFile targetSpecFile;
+    private final LibdocFormat format;
 
-    PythonLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile) {
+    PythonLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile,
+            final LibdocFormat format) {
         this.libName = libName;
         this.libPath = path;
         this.targetSpecFile = targetSpecFile;
+        this.format = format;
     }
 
     @Override
@@ -33,7 +36,7 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
         runtimeEnvironment.createLibdoc(libName, additionalLocation, additionalPaths,
-                targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
+                targetSpecFile.getLocation().toFile(), format);
     }
 
     @Override
@@ -44,7 +47,7 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
         runtimeEnvironment.createLibdocForcibly(libName, additionalLocation, additionalPaths,
-                targetSpecFile.getLocation().toFile(), LibdocFormat.XML);
+                targetSpecFile.getLocation().toFile(), format);
     }
 
     private String extractLibParent() { //e.g. libPath=Project1/Plib/ca libName=Plib.ca.ab => parent=Project1

@@ -19,6 +19,8 @@ import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
@@ -155,6 +157,11 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> extends 
             current2 = (RobotFileInternalElement) current2.getParent();
         }
         return true;
+    }
+
+    @Override
+    public IFile generateHtmlLibdoc() {
+        return new LibrariesBuilder(new BuildLogger()).buildHtmlLibraryDoc(element.getSuiteFile().getFile());
     }
 
     @Override
