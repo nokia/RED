@@ -107,10 +107,11 @@ import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConf
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
-import org.robotframework.red.nattable.configs.SettingsVariablesLabelAccumulator;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
+import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
 import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
@@ -215,7 +216,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                 new AlternatingRowConfigLabelAccumulator(),
                 new AddingElementLabelAccumulator(dataProvider),
                 new SettingsCommentsLabelAccumulator(dataProvider),
-                new SettingsVariablesLabelAccumulator(dataProvider));
+                new VariableInsideLabelAccumulator());
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -315,6 +316,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new VariablesStyleConfiguration(theme));
+        table.addConfiguration(new VariableInsideStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {

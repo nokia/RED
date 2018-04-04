@@ -107,6 +107,8 @@ import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
+import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.SpecialItemsLabelAccumulator;
@@ -206,9 +208,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 new AddingElementLabelAccumulator(dataProvider),
                 new CommentsLabelAccumulator(dataProvider),
                 new CasesElementsLabelAccumulator(dataProvider),
-                new ActionNamesLabelAccumulator(dataProvider),
                 new VariablesLabelAccumulator(dataProvider),
-                new SpecialItemsLabelAccumulator(dataProvider));
+                new ActionNamesLabelAccumulator(dataProvider),
+                new SpecialItemsLabelAccumulator(dataProvider),
+                new VariableInsideLabelAccumulator());
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
                 dataProvider.getTreeList());
         final GlazedListTreeData<Object> treeData = new GlazedListTreeData<>(dataProvider.getTreeList());
@@ -321,6 +324,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
+        table.addConfiguration(new VariableInsideStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {
