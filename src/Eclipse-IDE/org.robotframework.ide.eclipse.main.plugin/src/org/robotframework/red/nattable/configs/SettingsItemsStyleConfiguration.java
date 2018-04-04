@@ -35,10 +35,10 @@ public class SettingsItemsStyleConfiguration extends RobotElementsStyleConfigura
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
-        final Style variableStyle = createStyle(SyntaxHighlightingCategory.SETTING);
+        final Style settingStyle = createStyle(SyntaxHighlightingCategory.SETTING);
 
         Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
-            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, variableStyle, mode,
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, mode,
                     SettingsItemsLabelAccumulator.SETTING_CONFIG_LABEL);
         });
     }

@@ -36,6 +36,7 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
         final Style actionStyle = createStyle(SyntaxHighlightingCategory.KEYWORD_CALL);
+        VariableInsideStyleConfiguration.augmentGivenStyleWithVariables(actionStyle, preferences);
 
         Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
             configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, actionStyle, mode,
