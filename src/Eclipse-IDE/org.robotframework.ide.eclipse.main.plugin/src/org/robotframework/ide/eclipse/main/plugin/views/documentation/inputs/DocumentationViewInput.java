@@ -15,9 +15,7 @@ public interface DocumentationViewInput {
 
     public boolean contains(final Object wrappedInput);
 
-    public void prepare() throws DocumentationInputGenerationException;
-
-    public String provideHtml();
+    public String provideHtml() throws DocumentationInputGenerationException;
 
     public void showInput(IWorkbenchPage page) throws DocumentationInputOpenException;
 

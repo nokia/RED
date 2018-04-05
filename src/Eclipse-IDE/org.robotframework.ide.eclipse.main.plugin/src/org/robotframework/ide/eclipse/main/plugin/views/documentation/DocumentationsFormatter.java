@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.joining;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +30,12 @@ public class DocumentationsFormatter {
         this.env = env;
     }
 
-    static String createEmpty() {
-        return "<html>" + writeHead() + "<body/></html>";
+    public static String createEmpty() {
+        return create(() -> "");
+    }
+
+    public static String create(final Supplier<String> bodySupplier) {
+        return "<html>" + writeHead() + "<body>" + bodySupplier.get() + "</body></html>";
     }
 
     public String format(final String header, final Documentation documentation,
