@@ -142,7 +142,6 @@ public class DocumentationView {
     private Job createDocumentationJob(final DocumentationViewInput input) {
         return Job.create("Generating documentation", monitor -> {
             try {
-                input.prepare();
                 final String html = input.provideHtml();
 
                 history.newInput(input);
