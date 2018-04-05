@@ -22,7 +22,7 @@ class AdditionalArgumentsComposite extends Composite {
         GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 5).applyTo(this);
 
         createAdditionalArgumentsText(listener);
-        BrowseButtons.selectVariableButton(this, argumentsText);
+        BrowseButtons.selectVariableButton(this, argumentsText::insert);
     }
 
     private void createAdditionalArgumentsText(final ModifyListener listener) {
