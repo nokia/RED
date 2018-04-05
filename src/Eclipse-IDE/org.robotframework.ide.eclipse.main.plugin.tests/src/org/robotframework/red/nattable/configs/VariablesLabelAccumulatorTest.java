@@ -110,6 +110,15 @@ public class VariablesLabelAccumulatorTest {
         assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
     }
 
+    @Test
+    public void labelIsAdded_forScalarVariableAssignment_withEqualSignAndSpaces_InKeywords() {
+        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
+                .get(0).getChildren().get(3);
+        when(dataProvider.getRowObject(3)).thenReturn(call);
+        labelAccumulator.accumulateConfigLabels(labels, 0, 3);
+        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
+    }
+
     private static RobotSuiteFile createModel() {
         return new RobotSuiteFileCreator()
                 .appendLine("*** Test Cases ***")
@@ -122,6 +131,7 @@ public class VariablesLabelAccumulatorTest {
                 .appendLine("  &{dict}=  Create Dictionary  key=value")
                 .appendLine("  @{list}  Create List  qwop")
                 .appendLine("  log many  10  &{a}  @{b}  ${c}")
+                .appendLine("  ${ var with spaces } =")
                 .build();
     }
 }

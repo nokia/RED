@@ -22,7 +22,7 @@ public class VariablesLabelAccumulator implements IConfigLabelAccumulator {
 
     public static final String VARIABLE_CONFIG_LABEL = "VARIABLE";
 
-    private static final Pattern varPattern = Pattern.compile("^[$@&]\\{[^\\}]*\\}(\\[.*\\])?=?");
+    private static final Pattern varPattern = Pattern.compile("^[$@&]\\{[^\\}]*\\}(\\[.*\\])?(\\s)*=?");
 
     private final IRowDataProvider<Object> dataProvider;
 
