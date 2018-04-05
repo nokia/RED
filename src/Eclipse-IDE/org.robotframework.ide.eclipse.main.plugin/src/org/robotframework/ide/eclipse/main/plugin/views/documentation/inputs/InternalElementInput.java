@@ -25,7 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentat
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
 
-abstract class InternalElementInput<T extends RobotFileInternalElement> extends DocumentationViewInput {
+abstract class InternalElementInput<T extends RobotFileInternalElement> implements DocumentationViewInput {
 
     protected final T element;
 
