@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TkwYoPCWEeePD6aU90_GvA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/9/18 1:43 PM
+Save-Time: 4/5/18 10:27 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -104,7 +104,7 @@ get-window "Library import problem" | get-button OK | click
 // 6 --------------------------------------------------------------
 get-editor "Script.robot" | get-text-viewer | set-caret-pos 7 26
 with [get-editor "Script.robot" | get-text-viewer] {
-    set-caret-pos 7 26
+    set-caret-pos 7 19
     key-type "M1+1"
 }
 wait 500
