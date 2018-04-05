@@ -49,17 +49,18 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> implemen
     }
 
     @Override
-    public void prepare() {
-        // nothing to prepare
-    }
-
-    @Override
     public final String provideHtml() {
+        prepare();
+
         final RobotRuntimeEnvironment environment = element.getSuiteFile().getProject().getRuntimeEnvironment();
         final String header = createHeader();
         final Documentation doc = createDocumentation();
 
         return new DocumentationsFormatter(environment).format(header, doc, this::localKeywordsLinker);
+    }
+
+    protected void prepare() {
+        // nothing to prepare
     }
 
     protected abstract String createHeader();

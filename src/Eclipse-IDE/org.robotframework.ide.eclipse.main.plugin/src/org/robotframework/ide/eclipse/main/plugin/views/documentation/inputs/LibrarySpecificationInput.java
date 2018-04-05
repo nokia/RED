@@ -49,11 +49,6 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
     }
 
     @Override
-    public void prepare() {
-        // nothing to prepare
-    }
-
-    @Override
     public String provideHtml() {
         final RobotRuntimeEnvironment environment = project.getRuntimeEnvironment();
         final String header = createHeader(specification);
