@@ -49,6 +49,8 @@ public class ActionNamesStyleConfigurationTest {
                 .thenReturn(new ColoringPreference(new RGB(1, 2, 3), SWT.BOLD));
         when(preferences.getSyntaxColoring(SyntaxHighlightingCategory.VARIABLE))
                 .thenReturn(new ColoringPreference(new RGB(4, 5, 6), SWT.NORMAL));
+        when(preferences.getSyntaxColoring(SyntaxHighlightingCategory.GHERKIN))
+                .thenReturn(new ColoringPreference(new RGB(7, 8, 9), SWT.BOLD));
     }
 
     @Test
@@ -105,7 +107,7 @@ public class ActionNamesStyleConfigurationTest {
     }
 
     @Test
-    public void rangeStylesFunctionForVariablesIsDefinedButDoesNotFindAnyVariable_whenThereAreNoVariables() {
+    public void rangeStylesFunctionForVariablesAndGherkinsIsDefinedButDoesNotFindAnything_whenThereAreNoVariablesOrGherkins() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
         final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
@@ -150,6 +152,68 @@ public class ActionNamesStyleConfigurationTest {
         final TextStyle styleToCheck = new TextStyle();
         stylesAsMap.values().forEach(styler -> styler.applyStyles(styleToCheck));
 
+        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(4, 5, 6));
+    }
+
+    @Test
+    public void rangeStylesFunctionForGherkinsIsDefinedAndProperlyFindsGherkins_whenThereIsGherkin() {
+        final IConfigRegistry configRegistry = new ConfigRegistry();
+
+        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
+                preferences);
+        config.configureRegistry(configRegistry);
+
+        final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
+                ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+
+        final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
+                .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
+        assertThat(decoratingFunction).isNotNull();
+
+        final RangeMap<Integer, Styler> styles = decoratingFunction
+                .apply("GiVeN keywordCall And sth But foo Then bar When");
+        final Map<Range<Integer>, Styler> stylesAsMap = styles.asMapOfRanges();
+
+        assertThat(stylesAsMap).hasSize(1);
+        assertThat(stylesAsMap.keySet()).containsExactly(Range.closedOpen(0, 5));
+
+        final TextStyle styleToCheck = new TextStyle();
+        stylesAsMap.values().forEach(styler -> styler.applyStyles(styleToCheck));
+
+        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(7, 8, 9));
+    }
+
+    @Test
+    public void rangeStylesFunctionForGherkinsAndVariablesIsDefinedAndProperlyFindsThose_whenThereAreSuchElements() {
+        final IConfigRegistry configRegistry = new ConfigRegistry();
+
+        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
+                preferences);
+        config.configureRegistry(configRegistry);
+
+        final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
+                ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+
+        final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
+                .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
+        assertThat(decoratingFunction).isNotNull();
+
+        final RangeMap<Integer, Styler> styles = decoratingFunction
+                .apply("When key&{var@{${ia}ble}} sth} &{another}[index]]variable But {nonvariable} And ${");
+        final Map<Range<Integer>, Styler> stylesAsMap = styles.asMapOfRanges();
+
+        assertThat(stylesAsMap).hasSize(3);
+        assertThat(stylesAsMap.keySet()).containsExactly(Range.closedOpen(0, 4), Range.closedOpen(8, 25),
+                Range.closedOpen(31, 48));
+
+        final TextStyle styleToCheck = new TextStyle();
+        stylesAsMap.get(Range.closedOpen(0, 4)).applyStyles(styleToCheck);
+        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(7, 8, 9));
+
+        stylesAsMap.get(Range.closedOpen(8, 25)).applyStyles(styleToCheck);
+        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(4, 5, 6));
+
+        stylesAsMap.get(Range.closedOpen(31, 48)).applyStyles(styleToCheck);
         assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(4, 5, 6));
     }
 }
