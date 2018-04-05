@@ -78,7 +78,7 @@ public class VariableInsideStyleConfiguration extends RobotElementsStyleConfigur
         };
     }
 
-    private static List<Range<Integer>> markVariables(final String label) {
+    public static List<Range<Integer>> markVariables(final String label) {
         final List<Range<Integer>> variableRanges = new ArrayList<Range<Integer>>();
         final Matcher bracketsMatcher = Pattern.compile("([$@&]\\{|\\}(\\[[^\\]]+\\])?)").matcher(label);
         int deepLevel = 0;
@@ -99,5 +99,4 @@ public class VariableInsideStyleConfiguration extends RobotElementsStyleConfigur
         }
         return variableRanges;
     }
-
 }
