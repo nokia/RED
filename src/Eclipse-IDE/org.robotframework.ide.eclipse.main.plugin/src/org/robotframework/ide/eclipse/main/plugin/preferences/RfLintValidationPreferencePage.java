@@ -222,7 +222,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         argumentsEditor.setPreferenceStore(getPreferenceStore());
         argumentsEditor.setPage(this);
 
-        BrowseButtons.selectVariableButton(group, argumentsEditor.getTextControl(group));
+        BrowseButtons.selectVariableButton(group, argumentsEditor.getTextControl(group)::insert);
 
         return argumentsEditor;
     }
