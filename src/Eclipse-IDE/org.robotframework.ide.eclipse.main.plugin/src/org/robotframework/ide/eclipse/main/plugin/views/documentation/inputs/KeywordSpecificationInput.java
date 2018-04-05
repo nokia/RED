@@ -27,7 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri
 
 import com.google.common.html.HtmlEscapers;
 
-public class KeywordSpecificationInput extends DocumentationViewInput {
+public class KeywordSpecificationInput implements DocumentationViewInput {
 
     private final RobotProject project;
 
