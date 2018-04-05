@@ -7,12 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
+import java.util.function.Consumer;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.ui.StringVariableSelectionDialog;
@@ -22,7 +22,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -37,7 +36,7 @@ public class BrowseButtons {
                 : new String[] { "*.sh", "*.*" };
     }
 
-    public static Button selectVariableButton(final Composite parent, final Text textField) {
+    public static Button selectVariableButton(final Composite parent, final Consumer<String> selectedValueConsumer) {
         final Button button = new Button(parent, SWT.PUSH);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(button);
         button.setText("Variables...");
@@ -47,14 +46,15 @@ public class BrowseButtons {
             if (code == IDialogConstants.OK_ID) {
                 final String variable = dialog.getVariableExpression();
                 if (variable != null) {
-                    textField.insert(variable);
+                    selectedValueConsumer.accept(variable);
                 }
             }
         }));
         return button;
     }
 
-    public static Button selectWorkspaceFileButton(final Composite parent, final Text textField, final String message) {
+    public static Button selectWorkspaceFileButton(final Composite parent, final Consumer<String> selectedValueConsumer,
+            final String message) {
         final Button button = new Button(parent, SWT.PUSH);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(button);
         button.setText("Workspace...");
@@ -76,14 +76,14 @@ public class BrowseButtons {
                     final String fileLoc = VariablesPlugin.getDefault()
                             .getStringVariableManager()
                             .generateVariableExpression("workspace_loc", arg); //$NON-NLS-1$
-                    textField.setText(fileLoc);
+                    selectedValueConsumer.accept(fileLoc);
                 }
             }
         }));
         return button;
     }
 
-    public static Button selectSystemFileButton(final Composite parent, final Text textField,
+    public static Button selectSystemFileButton(final Composite parent, final Consumer<String> selectedValueConsumer,
             final String[] extensions) {
         final Button button = new Button(parent, SWT.PUSH);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(button);
@@ -91,25 +91,12 @@ public class BrowseButtons {
         button.addSelectionListener(widgetSelectedAdapter(e -> {
             final FileDialog dialog = new FileDialog(parent.getShell(), SWT.OPEN);
             dialog.setFilterExtensions(extensions);
-            dialog.setFilterPath(getStartingPath(textField).toOSString());
             final String filePath = dialog.open();
             if (filePath != null) {
-                textField.setText(filePath);
+                selectedValueConsumer.accept(filePath);
             }
         }));
         return button;
-    }
-
-    private static IPath getStartingPath(final Text textField) {
-        final String selectedPath = textField.getText().trim();
-        if (selectedPath.isEmpty()) {
-            return ResourcesPlugin.getWorkspace().getRoot().getLocation();
-        }
-        final Path path = new Path(selectedPath);
-        if (path.toFile().isFile()) {
-            return path.removeLastSegments(1);
-        }
-        return path;
     }
 
 }
