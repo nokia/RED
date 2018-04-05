@@ -11,17 +11,17 @@ import java.net.URISyntaxException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
 
-public abstract class DocumentationViewInput {
+public interface DocumentationViewInput {
 
-    public abstract boolean contains(final Object wrappedInput);
+    public boolean contains(final Object wrappedInput);
 
-    public abstract void prepare();
+    public void prepare() throws DocumentationInputGenerationException;
 
-    public abstract String provideHtml();
+    public String provideHtml();
 
-    public abstract void showInput(IWorkbenchPage page);
+    public void showInput(IWorkbenchPage page) throws DocumentationInputOpenException;
 
-    public abstract IFile generateHtmlLibdoc();
+    public IFile generateHtmlLibdoc();
 
-    public abstract URI getInputUri() throws URISyntaxException;
+    public URI getInputUri() throws URISyntaxException;
 }
