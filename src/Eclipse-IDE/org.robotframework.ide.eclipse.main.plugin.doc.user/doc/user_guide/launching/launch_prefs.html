@@ -19,29 +19,39 @@
 	<ul>
 		<li><b>Pass Robot arguments using arguments file</b> - when enabled RED will put all the Robot arguments
 		inside arguments file (temporary file) and call Robot using <code>--argumentfile</code> argument; when
-		disabled all the Robot arguments are passed directly in command line call,
+		disabled all the Robot arguments are passed directly in command line call.
+		</li>
+		<li><b>Run single suite using suite path</b> - when enabled RED will use path to suite during single suite test execution (Robot <code>__init__</code> files will not be used then); when
+		disabled path to project is used as data source, even for single suite run.
 		</li>
 		<li><b>Use single argument to pass robot execution command line</b> - when tests are 
 		<a href="local_launch_scripting.html">launched using script</a> the actual command line call is either
 		passed as a single argument (when preference is enabled) or simply as a sequence of arguments (when disabled).
+		</li>
+		<li><b>Limit Message Log output</b> - when enabled RED will apply provided characters limit in Message Log view.
 		</li>
 	</ul>
 	
 	<h3>Default launch configurations</h3>
 	
 	<p>All arguments which are set at 
-	<a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch)')">
+	<a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default)')">
 	Window-&gt;Preferences-&gt;Robot Framework-&gt;Launching-&gt;Default Launch Configurations
 	</a>
 	preference page will be used by RED when new launch configuration is automatically created. This may happen
 	for example when launching suites from <b>Project Explorer</b> and there is no launch configuration matching
-	selected suites (read <a href="ui_elements.html#launching">launching</a> paragraph to see when RED is automatically
-	creating launch configurations).
+	selected suites (read <a href="ui_elements.html#launching">launching</a> paragraph to see when RED automatically
+	creates launch configurations).    
+	</p>
+	<dl class="note">
+	   <dt>Note</dt>	   
+	   <dd>Additional arguments and executable file path preferences accept Eclipse <a href="string_substitution.html">string variables</a>.</dd>
+	</dl>
     
     <h3>Default behavior of Run/Debug actions</h3>
     <p>
     Run and Debug actions, depending on preferences, can use previously used or created launch configuration or create a new one.
-    Standard behaviour can be change in <a class="command-link" href="javascript:executeCommand(&quot;org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage)&quot;)">Window-&gt;Preferences-&gt;Run/Debug&gt;Launching</a> under Launch Operation.
+    Standard behavior can be changed at <a class="command" href="javascript:executeCommand(&quot;org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage)&quot;)">Window-&gt;Preferences-&gt;Run/Debug&gt;Launching</a> under Launch Operation.
     </p>
 </body>
 </html>
