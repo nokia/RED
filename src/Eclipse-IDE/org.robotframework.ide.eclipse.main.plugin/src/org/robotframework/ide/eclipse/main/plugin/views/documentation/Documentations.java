@@ -78,6 +78,19 @@ public class Documentations {
         }
     }
 
+    public static Optional<DocumentationViewInput> findDocumentationForEditorSourceSelection(
+            final RobotSuiteFile suiteModel, final int offset, final String cellContent) {
+
+        final Optional<? extends RobotElement> element = suiteModel.findElement(offset);
+        if (element.isPresent()) {
+            final RobotFileInternalElement internalElement = (RobotFileInternalElement) element.get();
+            return requiresPerLabelSearching(internalElement)
+                    ? Optional.of(new KeywordProposalInput(internalElement, cellContent))
+                    : findInput(internalElement);
+        }
+        return Optional.empty();
+    }
+
     public static void showDocForEditorTablesSelection(final IWorkbenchPage page,
             final SelectionLayerAccessor selectionLayerAccessor) {
         final PositionCoordinate[] coordinates = selectionLayerAccessor.getSelectedPositions();

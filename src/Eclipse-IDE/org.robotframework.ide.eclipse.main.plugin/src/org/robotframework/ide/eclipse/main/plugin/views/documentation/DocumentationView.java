@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -24,8 +22,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartService;
@@ -41,13 +37,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksSupport.UnableToOpenUriException;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.DocumentationDisplayer;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputGenerationException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputOpenException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 import org.robotframework.red.swt.SwtThread;
 
-public class DocumentationView {
+public class DocumentationView implements DocumentationDisplayer {
 
     public static final String ID = "org.robotframework.ide.DocumentationView";
 
@@ -71,12 +67,12 @@ public class DocumentationView {
         parent.setLayout(new FillLayout());
 
         final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
-        final DocumentationViewLinksSupport linksSupport = new DocumentationViewLinksSupport(page, browserSupport,
+        final DocumentationsLinksSupport linksSupport = new DocumentationsLinksSupport(page, browserSupport,
                 this);
         history = new DocumentationsBrowsingHistory(linksSupport);
 
         browser = new Browser(parent, SWT.NONE);
-        browser.addLocationListener(new DocumentationViewLinksListener(linksSupport));
+        browser.addLocationListener(new DocumentationsLinksListener(linksSupport));
         browser.setText(DocumentationsFormatter.createEmpty());
 
         final IToolBarManager toolbarManager = part.getViewSite().getActionBars().getToolBarManager();
@@ -122,7 +118,8 @@ public class DocumentationView {
     void markSyncBroken() {
         linkSelectionAction.switchToBrokenSync();
     }
-
+    
+    @Override
     public synchronized void displayDocumentation(final DocumentationViewInput input) {
         if (Objects.equals(currentInput, input)) {
             markSynced();
@@ -142,7 +139,6 @@ public class DocumentationView {
     private Job createDocumentationJob(final DocumentationViewInput input) {
         return Job.create("Generating documentation", monitor -> {
             try {
-                input.prepare();
                 final String html = input.provideHtml();
 
                 history.newInput(input);
@@ -182,40 +178,6 @@ public class DocumentationView {
         } else if (keywordCall instanceof RobotSetting && ((RobotSetting) keywordCall).isDocumentation()
                 && currentInput.contains(keywordCall)) {
             scheduleInputLoadingJob(currentInput);
-        }
-    }
-
-    private static class DocumentationViewLinksListener implements LocationListener {
-
-        private final DocumentationViewLinksSupport linksSupport;
-
-        public DocumentationViewLinksListener(final DocumentationViewLinksSupport linksSupport) {
-            this.linksSupport = linksSupport;
-        }
-
-        @Override
-        public void changing(final LocationEvent event) {
-            try {
-                event.doit = !linksSupport.changeLocationTo(toUri(event.location));
-
-            } catch (final UnableToOpenUriException e) {
-                StatusManager.getManager().handle(
-                        new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Cannot open '" + event.location + "'", e),
-                        StatusManager.BLOCK);
-            }
-        }
-
-        private URI toUri(final String location) {
-            try {
-                return new URI(location);
-            } catch (final URISyntaxException e) {
-                throw new UnableToOpenUriException("Syntax error in uri '" + location + "'", e);
-            }
-        }
-
-        @Override
-        public void changed(final LocationEvent event) {
-            // nothing to do
         }
     }
 
