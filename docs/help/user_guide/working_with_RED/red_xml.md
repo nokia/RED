@@ -41,7 +41,7 @@ regardless of interpreter setting in
 [Preferences](../launching/launch_prefs.md).
 
 **Variables mappings** \- values can be assigned to variables, this is used to
-resolved parametrized paths.
+resolved parameterized paths.
 
 More details can be found under topic [Variable
 mapping](variable_mapping.md)
