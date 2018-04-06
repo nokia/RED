@@ -52,4 +52,9 @@ public class ParameterizedFilePathStringFieldEditor extends StringFieldEditor {
     protected Text getTextControl() {
         return super.getTextControl();
     }
+
+    public void insertValue(final String value) {
+        getTextControl().insert(value);
+        valueChanged();
+    }
 }

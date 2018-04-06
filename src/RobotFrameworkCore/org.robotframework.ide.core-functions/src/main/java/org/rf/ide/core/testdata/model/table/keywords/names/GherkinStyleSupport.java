@@ -18,7 +18,7 @@ import java.util.function.Function;
  */
 public class GherkinStyleSupport {
 
-    private static final Set<String> PREFIXES = newHashSet("given", "when", "and", "but", "then");
+    public static final Set<String> PREFIXES = newHashSet("given", "when", "and", "but", "then");
 
     public static <T> Optional<T> firstNameTransformationResult(final String originalName,
             final Function<String, Optional<T>> transformation) {
@@ -51,14 +51,14 @@ public class GherkinStyleSupport {
     public static String getTextAfterGherkinPrefixesIfExists(final String originalName) {
         String current = originalName;
         String gherkinFree = GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName);
-        
+
         while (!gherkinFree.equals(current)) {
             current = gherkinFree;
             gherkinFree = GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(current);
         }
         return gherkinFree;
     }
-    
+
     public static String getTextAfterGherkinPrefixIfExists(final String originalName) {
         final String textAfterPrefix = GherkinStyleSupport.removeGherkinPrefix(originalName);
         if (textAfterPrefix.isEmpty()) {

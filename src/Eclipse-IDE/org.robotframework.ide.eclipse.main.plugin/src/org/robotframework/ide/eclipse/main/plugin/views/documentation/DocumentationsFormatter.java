@@ -29,6 +29,10 @@ public class DocumentationsFormatter {
         this.env = env;
     }
 
+    static String createEmpty() {
+        return "<html>" + writeHead() + "<body/></html>";
+    }
+
     public String format(final String header, final Documentation documentation,
             final Function<String, String> localKeywordsLinker) {
 
@@ -42,25 +46,43 @@ public class DocumentationsFormatter {
         return "<html>" + writeHead() + writeBody(header, doc, localSymbols, localKeywordsLinker) + "</html>";
     }
 
-    private String writeHead() {
+    private static String writeHead() {
         final RGB bgRgb = RedTheme.Colors.getEclipseInfoBackgroundColor();
+        final RGB fgRgb = RedTheme.Colors.getTableBodyForegroundColor().getRGB();
 
         return new StringBuilder().append("<head>")
                 .append("<meta charset=\"utf-8\">")
                 .append("<style>")
                 .append("body {")
+                .append("    color: rgb(" + fgRgb.red + "," + fgRgb.green + "," + fgRgb.blue + ");")
                 .append("    background-color: rgb(" + bgRgb.red + "," + bgRgb.green + "," + bgRgb.blue + ");")
                 .append("    font-size: small;")
                 .append("    font-family: sans-serif;")
                 .append("}")
                 .append("code {")
-                .append("    background-color: #eeeeee;")
+                .append("    background-color: rgba(220, 220, 220, 0.5);")
+                .append("    font-size: 1.1em;")
+                .append("}")
+                .append("a, a:link, a:visited {")
+                .append("    color: #c30;")
+                .append("}")
+                .append("a:hover, a:active {")
+                .append("    text-decoration: underline;")
+                .append("    color: black;")
+                .append("}")
+                .append("a:hover {")
+                .append("   text-decoration: underline !important;")
+                .append("}")
+                .append("pre {")
+                .append("    margin-left: 0.7em;")
+                .append("    background-color: rgba(220, 220, 220, 0.5);")
                 .append("}")
                 .append("table, th, td {")
                 .append("    border: 1px solid #a6a6a6;")
                 .append("    border-collapse: collapse;")
                 .append("    border-spacing: 2px;")
                 .append("    padding: 4px;")
+                .append("    font-size: 0.9em;")
                 .append("}")
                 .append("</style>")
                 .append("</head>")

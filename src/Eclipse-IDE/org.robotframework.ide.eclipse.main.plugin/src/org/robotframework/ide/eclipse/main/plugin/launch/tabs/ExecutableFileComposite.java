@@ -35,11 +35,11 @@ class ExecutableFileComposite extends Composite {
         final Composite buttonsParent = new Composite(this, SWT.NONE);
         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(buttonsParent);
         GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(buttonsParent);
-        BrowseButtons.selectWorkspaceFileButton(buttonsParent, executableFilePathText,
+        BrowseButtons.selectWorkspaceFileButton(buttonsParent, executableFilePathText::setText,
                 "Select executor file to run Robot Framework tests:");
-        BrowseButtons.selectSystemFileButton(buttonsParent, executableFilePathText,
+        BrowseButtons.selectSystemFileButton(buttonsParent, executableFilePathText::setText,
                 BrowseButtons.getSystemDependentExecutableFileExtensions());
-        BrowseButtons.selectVariableButton(buttonsParent, executableFilePathText);
+        BrowseButtons.selectVariableButton(buttonsParent, executableFilePathText::insert);
     }
 
     void setInput(final String executableFilePath) {

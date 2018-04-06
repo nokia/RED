@@ -21,8 +21,12 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
+
+import com.google.common.html.HtmlEscapers;
 
 public class KeywordProposalInput extends InternalElementInput<RobotFileInternalElement> {
 
@@ -40,6 +44,19 @@ public class KeywordProposalInput extends InternalElementInput<RobotFileInternal
     }
 
     @Override
+    public URI getInputUri() throws URISyntaxException {
+        final String name = proposal.getKeywordName();
+        if (isLibraryKeyword()) {
+            final String projectName = proposal.getExposingFilepath().segment(0);
+            return LibraryUri.createShowKeywordDocUri(projectName, proposal.getSourceName(), name);
+
+        } else {
+            final IResource file = ResourcesPlugin.getWorkspace().getRoot().findMember(proposal.getExposingFilepath());
+            return WorkspaceFileUri.createShowKeywordDocUri((IFile) file, name);
+        }
+    }
+
+    @Override
     protected String createHeader() {
         final Optional<URI> imgUri = isLibraryKeyword() ? RedImages.getKeywordImageUri()
                 : RedImages.getUserKeywordImageUri();
@@ -50,9 +67,11 @@ public class KeywordProposalInput extends InternalElementInput<RobotFileInternal
         final String source = String.format("%s [%s]", Formatters.formatHyperlink(srcHref, srcLabel),
                 Formatters.formatHyperlink(docHref, "Documentation"));
 
+        final String args = HtmlEscapers.htmlEscaper().escape(proposal.getArgumentsDescriptor().getDescription());
+
         return Formatters.formatSimpleHeader(imgUri, proposal.getKeywordName(),
                 newArrayList("Source", source),
-                newArrayList("Arguments", proposal.getArgumentsDescriptor().getDescription()));
+                newArrayList("Arguments", args));
     }
 
     private boolean isLibraryKeyword() {
@@ -112,6 +131,20 @@ public class KeywordProposalInput extends InternalElementInput<RobotFileInternal
             }
         } catch (final URISyntaxException e) {
             return "#";
+        }
+    }
+
+    @Override
+    public IFile generateHtmlLibdoc() {
+        final LibrariesBuilder builder = new LibrariesBuilder(new BuildLogger());
+        if (isLibraryKeyword()) {
+            final String project = proposal.getExposingFilepath().segment(0);
+            final String library = proposal.getSourceName();
+            return builder.buildHtmlLibraryDoc(project, library);
+        } else {
+            final IFile resourceFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(
+                    proposal.getExposingFilepath());
+            return builder.buildHtmlLibraryDoc(resourceFile);
         }
     }
 }
