@@ -43,6 +43,7 @@
         * [Debugger preferences](/user_guide/launching/debug/preferences.md)
         * [Debugging Robot & Python with RED & PyDev](/user_guide/launching/debug/robot_python_debug.md)
       * [Launching preferences](/user_guide/launching/launch_prefs.md)
+      * [String substitution variables](/user_guide/launching/string_substitution.md)
       * [RED Tests Runner Agent](/user_guide/launching/red_agent.md)
     * [Integration with other tools](/user_guide/tools_integration.md)
       * [Mounting folders via SSH](/user_guide/tools_integration/virtual_folders.md)

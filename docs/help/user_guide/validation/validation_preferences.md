@@ -44,7 +44,7 @@ Note
   * **Unsupported resource import used** \- occurs when imported file is in HTML format or is outside of workspace. Red will not parse such files, so keywords and variables defined inside will not be accessible. Use supported formats from workspace only.
   * **Import path relative via modules path** \- occurs when imported path is relative to python path.
   * **Import path outside of workspace** \- occurs when imported path points to location not from workspace.
-  * **Import Remote library without arguments** \- occurs when Remote library is imported without agruments.
+  * **Import Remote library without arguments** \- occurs when Remote library is imported without arguments.
 
 #### Robot version
 

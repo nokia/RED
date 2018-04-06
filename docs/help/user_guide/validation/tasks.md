@@ -38,7 +38,7 @@ Following preferences can be changed regarding tasks detection:
 
   * **detection enablement** \- whole mechanism can be enabled or disabled at _[Task Tags](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.tasks\)'\))_ page, 
   * **tags and their priorities** \- different tags can be specified at same _[Task Tags](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.tasks\)'\))_ page, 
-  * **tags syntax coloring** \- the color of syntax hihglighting for task tags can be specified at _[Syntax Coloring](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax\)'\))_ page, 
+  * **tags syntax coloring** \- the color of syntax highlighting for task tags can be specified at _[Syntax Coloring](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax\)'\))_ page, 
   * **marker annotations** color and appearance used by editor can be changed at _[Annotations](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.editors.preferencePages.Annotations\)'\))_ page. 
 
 [Return to Help index](http://nokia.github.io/RED/help/)
