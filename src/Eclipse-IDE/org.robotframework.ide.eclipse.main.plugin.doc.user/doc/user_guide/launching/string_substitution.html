@@ -1,0 +1,30 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<h2>String substitution variables</h2>
+		
+	<p>
+	Eclipse string substitution feature allows using of default or custom variables during command line creation, when such variables are resolved and replace with string values. 	
+	Default Eclipse variables and user defined ones can be chosen from variables selection dialog:
+	</p>
+	<img src="images/ui_eclipse_variables.png"/>
+	
+	<p>RED accepts Eclipse string substitution variables in following locations:
+	<ul>
+	<li>Launch configuration dialog Robot tab for setting additional Robot Framework arguments,</li>
+	<li>Launch configuration dialog Executor tab for setting additional interpreter or additional executable file arguments, as well as executable file path,</li>
+	<li>RfLint validation preference page for setting additional arguments,</li>
+	<li>Default launch configuration preference page.</li>
+	</ul>
+	When tests are run or RfLint validation is started RED replaces all known variables in command line with actual string values.
+	</p>
+	
+    <p>
+    Eclipse string substitution variables can be created and configured at <a class="command" href="javascript:executeCommand(&quot;org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.debug.ui.StringVariablePreferencePage)&quot;)">Window-&gt;Preferences-&gt;Run/Debug&gt;String Substitution</a> preference page.
+    </p>
+</body>
+</html>
