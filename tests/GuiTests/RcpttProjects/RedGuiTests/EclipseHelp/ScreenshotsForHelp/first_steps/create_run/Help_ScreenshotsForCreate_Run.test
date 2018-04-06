@@ -44,7 +44,7 @@ gui-view-screenshot "Execution View" "exec_1.png"
 get-menu -path "Run/Run Configurations..." | click
 
 with [get-window "Run Configurations" ] {
-    get-object | invoke setSize 950 600 
+    get-object | invoke setSize 950 650 
     get-object | save-screenshot [concat $screenshot_base_folder $screenshot_local_folder "run_configurations.png"]
 }
 
