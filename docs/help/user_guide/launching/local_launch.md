@@ -24,11 +24,15 @@ itself is using couple of tabs:
 
 At this tab following arguments can/have to be specified:
 
-  * **project** \- the path to project will be passed to robot as the suite to be executed, 
-  * **test suites/test** \- suites can be specified by adding files or directories, those entries will be translated to `--suite` arguments for Robot. Additionally when file suite is added the tests inside it can be chosen/excluded from execution, which translates to `--test` argument entries in command line call, 
+  * **project** \- the path to project will be passed to robot as the data source to be executed, 
+  * **test suite(s)** \- suites can be specified by adding files or directories, those entries will be translated to `--suite` arguments for Robot. Additionally when file suite is added the tests inside it can be chosen/excluded from execution, which translates to `--test` argument entries in command line call, 
   * **only run tests with these tags** \- test cases to be executed are filtered by tag, this setting translates to `--include` argument of command line call, 
   * **skip tests with these tags** \- test cases can be excluded from execution based on tags, this setting translates to `--exclude` argument of command line call, 
   * **additional Robot Framework arguments** \- additional arguments to be passed to Robot can be specified here. 
+
+Note
+
+    Additional arguments field accepts Eclipse [string variables](string_substitution.md).
 
 #### Listener tab
 
@@ -52,7 +56,7 @@ interpreter taken from `PATH` environment variable. Additionally freely
 defined arguments can be passed to interpreter.
 
 Moreover, the whole call can be passed to a script (or other executable) with
-additional arguments. The script/executable's command line paramters are the
+additional arguments. The script/executable's command line parameters are the
 same as RED command line during normal test execution (path to python
 interpreter with robot call, parameters for suites/testcases etc.). Such
 script/external executable mechanism can be used to wrap Robot execution into
@@ -60,6 +64,10 @@ other tools.
 
 For more information read [Local launches
 scripting](local_launch_scripting.md) topic in this guide.
+
+Note
+
+    Additional arguments and executable file path fields accept Eclipse [string variables](string_substitution.md).
 
 #### Environment tab
 

@@ -47,7 +47,7 @@ editor.
   
 ` Ctrl+Shift+G` |
 
-**Find referenes** of selected element.  
+**Find references** of selected element.  
   
 ` Alt+Up/Down` |
 

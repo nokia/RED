@@ -1,4 +1,4 @@
-## Runnning tests using Gradle
+## Running tests using Gradle
 
 It is possible to run Robot tests from RED by launching them through script.
 There are at least two different possibilities for running the tests from

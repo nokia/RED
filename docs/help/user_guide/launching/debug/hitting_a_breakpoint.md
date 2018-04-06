@@ -207,7 +207,7 @@ execution. Apart from that you may perform step. There are 3 kinds of steps:
 
   * **Step Over** ` F6` \- this kind of step is possible for every frame on stack and it will behave differently for each of them. In general this kind of step means 'suspend the execution on next keyword from instruction pointed by selected stack frame on the same level'. 
 
-  * **Step Return** ` F7` \- similarly to **Step Over** this action is possible for every frame on stack and will have different behaviour. This kind of step means 'suspend the execution on next keyword which will be executed after selected frame have ended'. For frame related to user keyword this mean that debugger will pause on next instruction after this user keyword ends. For test-related frame the dubugger will suspend at the very first instruction in next test (if any). For suite-related frame the debugger will suspend at very first keyword in next suite (if any). 
+  * **Step Return** ` F7` \- similarly to **Step Over** this action is possible for every frame on stack and will have different behavior. This kind of step means 'suspend the execution on next keyword which will be executed after selected frame have ended'. For frame related to user keyword this mean that debugger will pause on next instruction after this user keyword ends. For test-related frame the debugger will suspend at the very first instruction in next test (if any). For suite-related frame the debugger will suspend at very first keyword in next suite (if any). 
 
 Of course the debugger will suspend if it encounter e.g. breakpoint inside the
 code which should be stepped over.
