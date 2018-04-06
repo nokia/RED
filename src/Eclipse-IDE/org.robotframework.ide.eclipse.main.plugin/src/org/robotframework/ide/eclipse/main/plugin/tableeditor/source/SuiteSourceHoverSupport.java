@@ -5,12 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
@@ -19,6 +22,9 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.jface.internal.text.html.BrowserInformationControl;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
@@ -35,32 +41,39 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
-import org.rf.ide.core.libraries.LibrarySpecification;
-import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
-import org.rf.ide.core.testdata.text.read.IRobotLineElement;
-import org.rf.ide.core.testdata.text.read.RobotLine;
-import org.rf.ide.core.testdata.text.read.RobotLine.PositionCheck;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotModelPresentation;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksListener;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 
+// supressing seems it semms that BrowserInformationControl will become part of the API in future
+// eclipse anyway
+@SuppressWarnings("restriction")
 public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 
+    private static boolean isBrowserBased = true;
+
     private final RobotSuiteFile suiteFile;
+
+    private IInformationControlCreator hoverControlCreator;
+    private IInformationControlCreator focusedPopupControlCreator;
 
     public SuiteSourceHoverSupport(final RobotSuiteFile file) {
         this.suiteFile = file;
@@ -78,14 +91,12 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
             final IDocument document = textViewer.getDocument();
             final boolean isTsv = suiteFile.isTsvFile();
 
-            Optional<IRegion> region = DocumentUtilities.findVariable(document, isTsv, offset);
-            if (!region.isPresent()) {
-                region = DocumentUtilities.findCellRegion(document, isTsv, offset);
-                if (!region.isPresent()) {
-                    region = Optional.of(new Region(offset, 0));
-                }
+            final Optional<IRegion> region = DocumentUtilities.findVariable(document, isTsv, offset);
+            if (region.isPresent()) {
+                return region.get();
             }
-            return region.get();
+            return DocumentUtilities.findCellRegion(document, isTsv, offset).orElseGet(() -> new Region(offset, 0));
+
         } catch (final BadLocationException e) {
             RedPlugin.logError(e.getMessage(), e);
             return new Region(0, 0);
@@ -108,38 +119,11 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
             if (isVariable(hoveredText)) {
                 return getVariableHoverInfo(hoveredText);
             } else {
-                if (isLibrary(document, hoverRegion.getOffset())) {
-                    final String libInfo = getLibraryHoverInfo(hoveredText);
-                    if (libInfo != null) {
-                        return libInfo;
-                    }
-                }
-
-                if (isKeyword(suiteFile, hoverRegion)) {
-                    final Optional<String> info = GherkinStyleSupport.firstNameTransformationResult(hoveredText,
-                            this::getKeywordHoverInfo);
-                    return info.orElse(null);
-                }
+                return getElementDocumentation(hoverRegion.getOffset(), hoveredText);
             }
         } catch (final BadLocationException | CoreException e) {
         }
         return null;
-    }
-
-    private boolean isKeyword(final RobotSuiteFile suiteFile, final IRegion hoverRegion) {
-        final RobotFile model = suiteFile.getLinkedElement();
-        final Optional<Integer> lineIndex = model.getRobotLineIndexBy(hoverRegion.getOffset());
-        if (lineIndex.isPresent()) {
-            final RobotLine robotLine = model.getFileContent().get(lineIndex.get());
-            final Optional<Integer> elementPositionInLine = robotLine.getElementPositionInLine(hoverRegion.getOffset(),
-                    PositionCheck.INSIDE);
-            if (elementPositionInLine.isPresent()) {
-                final IRobotLineElement hoveredElement = robotLine.getLineElements().get(elementPositionInLine.get());
-                return (!hoveredElement.getTypes().contains(RobotTokenType.TEST_CASE_NAME));
-            }
-        }
-
-        return false;
     }
 
     private String getAnnotationInfo(final ITextViewer textViewer, final IRegion hoverRegion) throws CoreException {
@@ -147,61 +131,77 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         if (model == null) {
             return null;
         }
-        final String debuggerError = getInstructionPointerErrorMsgs(model, hoverRegion);
-        if (debuggerError != null) {
-            return debuggerError;
-        }
-        return getErrorMsgs(model, hoverRegion);
-
+        return getInstructionPointerErrorMsgs(model, hoverRegion).map(this::formatMessage)
+                .orElseGet(() -> getErrorMsgs(model, hoverRegion).map(this::formatMessage).orElse(null));
     }
 
-    private String getInstructionPointerErrorMsgs(final IAnnotationModel model, final IRegion hoverRegion)
-            throws CoreException {
-        final Iterator<?> iter = model.getAnnotationIterator();
-        while (iter.hasNext()) {
-            final Annotation annotation = (Annotation) iter.next();
-            if (RobotModelPresentation.RED_DEBUG_ERROR_CURRENT_IP.equals(annotation.getType())
-                    || RobotModelPresentation.RED_DEBUG_ERROR_SECONDARY_IP.equals(annotation.getType())) {
-                final Position position = model.getPosition(annotation);
-                if (position != null && position.overlapsWith(hoverRegion.getOffset(), hoverRegion.getLength())) {
-                    final String msg = annotation.getText();
-                    if (msg != null && msg.trim().length() > 0) {
-                        return msg.trim();
-                    }
-                }
-            }
-        }
-        return null;
+    private String formatMessage(final String msg) {
+        return isBrowserBased ? DocumentationsFormatter.create(() -> msg) : msg;
     }
 
-    private String getErrorMsgs(final IAnnotationModel model, final IRegion hoverRegion)
-            throws CoreException {
-        final List<String> msgs = newArrayList();
-        final Iterator<?> iter = model.getAnnotationIterator();
-        while (iter.hasNext()) {
-            final Annotation annotation = (Annotation) iter.next();
-            if (isAnnotationSupported(annotation)) {
-                final Position position = model.getPosition(annotation);
-                if (position != null && position.overlapsWith(hoverRegion.getOffset(), hoverRegion.getLength())) {
-                    final String msg = annotation.getText();
-                    if (msg != null && msg.trim().length() > 0) {
-                        msgs.add(msg);
-                    }
-                }
-            }
+    private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {
+        if (viewer instanceof ISourceViewerExtension2) {
+            final ISourceViewerExtension2 extension = (ISourceViewerExtension2) viewer;
+            return extension.getVisualAnnotationModel();
         }
+        return viewer.getAnnotationModel();
+    }
+
+    private Optional<String> getInstructionPointerErrorMsgs(final IAnnotationModel model, final IRegion hoverRegion) {
+        return annotationsWithMsgs(model, hoverRegion).filter(this::isRobotDebuggerAnnotation)
+                .map(Annotation::getText)
+                .findFirst();
+    }
+
+    private Optional<String> getErrorMsgs(final IAnnotationModel model, final IRegion hoverRegion) {
+        final List<String> msgs = annotationsWithMsgs(model, hoverRegion).filter(this::isRobotErrorAnnotation)
+                .map(Annotation::getText)
+                .collect(toList());
+
         if (msgs.isEmpty()) {
-            return null;
+            return Optional.empty();
         } else if (msgs.size() == 1) {
-            return msgs.get(0);
+            return Optional.of(msgs.get(0));
         } else {
-            return "Multiple markers at this line:\n- " + Joiner.on("\n- ").join(msgs);
+            if (isBrowserBased) {
+                return Optional
+                        .of("<p style=\"margin:0;\"><b>Multiple markers at this line:</b></p>"
+                            + "<ul style=\"margin-top:0;\">"
+                            + msgs.stream().map(msg -> "<li>" + msg + "</li>").collect(joining())
+                            + "</ul>");
+            } else {
+                return Optional.of("Multiple markers at this line:" + "\n- " + Joiner.on("\n- ").join(msgs));
+            }
         }
     }
+    private boolean isRobotDebuggerAnnotation(final Annotation annotation) {
+        return RobotModelPresentation.RED_DEBUG_ERROR_CURRENT_IP.equals(annotation.getType())
+                || RobotModelPresentation.RED_DEBUG_ERROR_SECONDARY_IP.equals(annotation.getType());
+    }
 
-    private boolean isAnnotationSupported(final Annotation annotation) throws CoreException {
-        return annotation instanceof MarkerAnnotation
-                && RobotProblem.TYPE_ID.equals(((MarkerAnnotation) annotation).getMarker().getType());
+    private boolean isRobotErrorAnnotation(final Annotation annotation) {
+        if (annotation instanceof MarkerAnnotation) {
+            final MarkerAnnotation markerAnnotation = (MarkerAnnotation) annotation;
+            try {
+                return RobotProblem.TYPE_ID.equals(markerAnnotation.getMarker().getType());
+            } catch (final CoreException e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private static Stream<Annotation> annotationsWithMsgs(final IAnnotationModel model, final IRegion hoverRegion) {
+        return annotations(model).filter(annotation -> {
+            final Position position = model.getPosition(annotation);
+            return position != null && position.overlapsWith(hoverRegion.getOffset(), hoverRegion.getLength());
+        }).filter(annotation -> annotation.getText() != null && annotation.getText().trim().length() > 0);
+    }
+
+    private static Stream<Annotation> annotations(final IAnnotationModel model) {
+        final Iterator<Annotation> iter = model.getAnnotationIterator();
+        final Iterable<Annotation> iterable = () -> iter;
+        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
     private static boolean isVariable(final String text) {
@@ -222,7 +222,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                         for (final IVariable variable : robotStackFrame.getAllVariables()) {
                             if (VariableNamesSupport.hasEqualNames(variable.getName(), variableName)) {
                                 final String value = ((RobotDebugVariable) variable).getValue().getDetailedValue();
-                                return "Current value:\n" + value;
+                                return formatVariableValue(value);
                             }
                         }
                     }
@@ -232,42 +232,102 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         return null;
     }
 
-    private boolean isLibrary(final IDocument document, final int offset) {
-        final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-        return lineContent.trim().startsWith("Library");
-    }
-
-    private String getLibraryHoverInfo(final String hoveredText) {
-        return suiteFile.getProject()
-                .getLibrarySpecificationsStream()
-                .filter(spec -> spec.getName().equalsIgnoreCase(hoveredText))
-                .map(LibrarySpecification::getDocumentation)
-                .findFirst()
-                .orElse(null);
-    }
-
-    private Optional<String> getKeywordHoverInfo(final String keywordName) {
-        final Optional<RedKeywordProposal> bestMatch = new RedKeywordProposals(suiteFile)
-                .getBestMatchingKeywordProposal(keywordName);
-        return bestMatch.map(RedKeywordProposal::getDescription);
-    }
-
-    private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {
-        if (viewer instanceof ISourceViewerExtension2) {
-            final ISourceViewerExtension2 extension = (ISourceViewerExtension2) viewer;
-            return extension.getVisualAnnotationModel();
+    private String formatVariableValue(final String value) {
+        if (isBrowserBased) {
+            return DocumentationsFormatter.create(() -> "<p style=\"margin:0;\"><b>Current value:</b></p>"
+                    + "<pre style=\"font-family: monospace; font-size: small; background-color: inherit; margin-top:0;\">"
+                    + value
+                    + "</pre>");
+        } else {
+            return "Current value:\n" + value;
         }
-        return viewer.getAnnotationModel();
+    }
+
+    private String getElementDocumentation(final int offset, final String hoveredText) {
+        final Optional<DocumentationViewInput> docInput = Documentations
+                .findDocumentationForEditorSourceSelection(suiteFile, offset, hoveredText);
+
+        try {
+            if (isBrowserBased) {
+                return docInput.map(DocumentationViewInput::provideHtml).orElse(null);
+            } else {
+                return docInput.map(DocumentationViewInput::provideRawText).orElse(null);
+            }
+        } catch (final RuntimeException e) {
+            RedPlugin.logError("Unable to generate documentation", e);
+            return null;
+        }
     }
 
     @Override
     public IInformationControlCreator getHoverControlCreator() {
-        return new IInformationControlCreator() {
+        if (hoverControlCreator == null) {
+            hoverControlCreator = new HoverControlCreator();
+        }
+        return hoverControlCreator;
+    }
 
-            @Override
-            public IInformationControl createInformationControl(final Shell parent) {
+    protected IInformationControlCreator getFocusedPopupControlCreator() {
+        if (focusedPopupControlCreator == null) {
+            focusedPopupControlCreator = new FocusedPopupControlCreator();
+        }
+        return focusedPopupControlCreator;
+    }
+
+    private class HoverControlCreator extends AbstractReusableInformationControlCreator {
+
+        @Override
+        protected IInformationControl doCreateInformationControl(final Shell parent) {
+            isBrowserBased = BrowserInformationControl.isAvailable(parent);
+            if (isBrowserBased) {
+                return new HoverBrowserInformationControl(parent);
+            } else {
                 return new DefaultInformationControl(parent);
             }
-        };
+        }
+    }
+
+    private class HoverBrowserInformationControl extends BrowserInformationControl {
+
+        private HoverBrowserInformationControl(final Shell parent) {
+            super(parent, JFaceResources.DEFAULT_FONT, "Press 'F2' for focus");
+        }
+
+        @Override
+        public IInformationControlCreator getInformationPresenterControlCreator() {
+            return getFocusedPopupControlCreator();
+        }
+
+        @Override
+        public Point computeSizeHint() {
+            final Point size = super.computeSizeHint();
+            size.x = Math.max(size.x, 400);
+            return size;
+        }
+    }
+
+    private static class FocusedPopupControlCreator extends AbstractReusableInformationControlCreator {
+
+        @Override
+        protected IInformationControl doCreateInformationControl(final Shell parent) {
+            if (isBrowserBased) {
+                return new FocusedPopupBrowserInformationControl(parent);
+            } else {
+                return new DefaultInformationControl(parent);
+            }
+        }
+    }
+
+    private static class FocusedPopupBrowserInformationControl extends BrowserInformationControl {
+
+        private FocusedPopupBrowserInformationControl(final Shell parent) {
+            super(parent, JFaceResources.DEFAULT_FONT, true);
+
+            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            final DocumentationsLinksSupport support = new DocumentationsLinksSupport(page, input -> {
+                setInput(input.provideHtml());
+            });
+            addLocationListener(new DocumentationsLinksListener(support));
+        }
     }
 }
