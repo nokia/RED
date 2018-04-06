@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -33,22 +34,26 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Lib
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
 
-class DocumentationViewLinksSupport {
+public class DocumentationsLinksSupport {
 
     private final IWorkbenchPage page;
     private final IWorkbenchBrowserSupport browserSupport;
-    private final DocumentationView view;
+    private final DocumentationDisplayer displayer;
 
-    public DocumentationViewLinksSupport(final IWorkbenchPage page, final IWorkbenchBrowserSupport browserSupport,
-            final DocumentationView view) {
+    public DocumentationsLinksSupport(final IWorkbenchPage page, final DocumentationDisplayer displayer) {
+        this(page, PlatformUI.getWorkbench().getBrowserSupport(), displayer);
+    }
+
+    public DocumentationsLinksSupport(final IWorkbenchPage page, final IWorkbenchBrowserSupport browserSupport,
+            final DocumentationDisplayer displayer) {
         this.page = page;
         this.browserSupport = browserSupport;
-        this.view = view;
+        this.displayer = displayer;
     }
 
     boolean changeLocationTo(final URI locationUri) {
         if (isAboutBlankUri(locationUri)) {
-            // moving to generated site set by Browser#setText method
+            // moving to generated site set by Browser#setText method or to #id location
             return false;
         } else {
             final OpenableUri uriWrapper = createOpenableUri(locationUri);
@@ -58,10 +63,7 @@ class DocumentationViewLinksSupport {
     }
 
     private OpenableUri createOpenableUri(final URI locationUri) {
-        if (FragmentUri.isAboutBlankFragmentUri(locationUri)) {
-            return new FragmentUri(locationUri, this::executeScript);
-
-        } else if (LibraryUri.isLibrarySourceUri(locationUri)) {
+        if (LibraryUri.isLibrarySourceUri(locationUri)) {
             return new LibraryUri(locationUri, this::openLibrarySource);
 
         } else if (LibraryUri.isLibraryDocUri(locationUri)) {
@@ -83,12 +85,7 @@ class DocumentationViewLinksSupport {
     }
 
     private static boolean isAboutBlankUri(final URI uri) {
-        return Objects.equals(uri.getScheme(), "about") && Objects.equals(uri.getSchemeSpecificPart(), "blank")
-                && uri.getFragment() == null;
-    }
-
-    private void executeScript(final String script) {
-        view.getBrowser().execute(script);
+        return Objects.equals(uri.getScheme(), "about") && Objects.equals(uri.getSchemeSpecificPart(), "blank");
     }
 
     private void openLibrarySource(final RobotProject robotProject, final Optional<LibrarySpecification> libSpec,
@@ -110,10 +107,10 @@ class DocumentationViewLinksSupport {
     private void openLibraryDoc(final RobotProject robotProject, final Optional<LibrarySpecification> libSpec,
             final Optional<KeywordSpecification> kwSpec) {
         if (libSpec.isPresent() && kwSpec.isPresent()) {
-            view.displayDocumentation(new KeywordSpecificationInput(robotProject, libSpec.get(), kwSpec.get()));
+            displayer.displayDocumentation(new KeywordSpecificationInput(robotProject, libSpec.get(), kwSpec.get()));
 
         } else if (libSpec.isPresent()) {
-            view.displayDocumentation(new LibrarySpecificationInput(robotProject, libSpec.get()));
+            displayer.displayDocumentation(new LibrarySpecificationInput(robotProject, libSpec.get()));
 
         } else {
             throw new UnableToOpenUriException(
@@ -156,7 +153,7 @@ class DocumentationViewLinksSupport {
         }
 
         if (input.isPresent()) {
-            view.displayDocumentation(input.get());
+            displayer.displayDocumentation(input.get());
         } else {
             throw new UnableToOpenUriException("Unable to find given element");
         }
@@ -190,6 +187,13 @@ class DocumentationViewLinksSupport {
     static interface OpenableUri {
 
         void open() throws UnableToOpenUriException;
+    }
+
+    @FunctionalInterface
+    public static interface DocumentationDisplayer {
+
+        public void displayDocumentation(DocumentationViewInput input);
+
     }
 
     static class UnableToOpenUriException extends RuntimeException {
