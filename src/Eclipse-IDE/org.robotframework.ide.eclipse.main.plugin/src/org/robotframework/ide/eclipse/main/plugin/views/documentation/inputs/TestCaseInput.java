@@ -47,14 +47,14 @@ public class TestCaseInput extends InternalElementInput<RobotCase> {
         final String srcLabel = file.getFullPath().toString();
         final String docHref = createShowSuiteDocUri(file);
 
-        final String source = String.format("%s [%s]", Formatters.formatHyperlink(srcHref, srcLabel),
-                Formatters.formatHyperlink(docHref, "Documentation"));
+        final String source = String.format("%s [%s]", Formatters.hyperlink(srcHref, srcLabel),
+                Formatters.hyperlink(docHref, "Documentation"));
 
         final List<List<String>> table = new ArrayList<>();
         table.add(newArrayList("Source", source));
         templateInUse.ifPresent(template -> table.add(newArrayList("Template", template)));
 
-        return Formatters.formatSimpleHeader(imgUri, test.getName(), table);
+        return Formatters.simpleHeader(imgUri, test.getName(), table);
     }
 
     private static String createShowTestSrcUri(final IFile file, final String label) {

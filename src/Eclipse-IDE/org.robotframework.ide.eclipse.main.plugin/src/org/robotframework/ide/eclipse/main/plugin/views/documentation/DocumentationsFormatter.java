@@ -8,7 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 import static java.util.stream.Collectors.joining;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -40,10 +41,15 @@ public class DocumentationsFormatter {
 
     public String format(final String header, final Documentation documentation,
             final Function<String, String> localKeywordsLinker) {
+        return format(header, documentation, "", localKeywordsLinker);
+    }
+
+    public String format(final String header, final Documentation documentation, final String footer,
+            final Function<String, String> localKeywordsLinker) {
 
         final String doc = documentation.provideFormattedDocumentation(env);
         final Collection<String> localSymbols = documentation.getLocalSymbols();
-        return writeHtml(header, doc, localSymbols, localKeywordsLinker);
+        return writeHtml(header, doc + footer, localSymbols, localKeywordsLinker);
     }
 
     private String writeHtml(final String header, final String doc, final Collection<String> localSymbols,
@@ -103,7 +109,10 @@ public class DocumentationsFormatter {
     }
 
     private static String identifyHeaders(final String doc) {
-        final Collection<String> headersIds = new HashSet<>();
+        final Map<String, String> headersIds = new HashMap<>();
+        // we do not have Keywords header, but Shortcuts header can be used instead
+        headersIds.put("Keywords", "Shortcuts");
+        headersIds.put("keywords", "Shortcuts");
 
         final Matcher matcher = HEADER_PATTERN.matcher(doc);
 
@@ -114,7 +123,8 @@ public class DocumentationsFormatter {
 
             final String hLevel = matcher.group(1);
             final String headerName = matcher.group(2);
-            headersIds.add(headerName);
+            headersIds.put(headerName, headerName);
+            headersIds.put(headerName.toLowerCase(), headerName.toLowerCase());
 
             docBuilder.append("<h" + hLevel + " id=\"" + headerName + "\">");
             docBuilder.append(headerName);
@@ -123,8 +133,8 @@ public class DocumentationsFormatter {
             previousEnd = matcher.end();
         }
         docBuilder.append(doc.substring(previousEnd, doc.length()));
-        return createHyperlinks(docBuilder.toString(), headersIds,
-                name -> "<a href=\"#" + RedURI.URI_SPECIAL_CHARS_ESCAPER.escape(name) + "\">" + name + "</a>");
+        return createHyperlinks(docBuilder.toString(), headersIds.keySet(), name -> "<a href=\"#"
+                + RedURI.URI_SPECIAL_CHARS_ESCAPER.escape(headersIds.get(name)) + "\">" + name + "</a>");
     }
 
     private static String createHyperlinks(final String doc, final Collection<String> symbols,
