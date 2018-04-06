@@ -147,4 +147,10 @@ public class KeywordProposalInput extends InternalElementInput<RobotFileInternal
             return builder.buildHtmlLibraryDoc(resourceFile);
         }
     }
+
+    @Override
+    public String provideRawText() throws DocumentationInputGenerationException {
+        prepare();
+        return proposal.getDescription();
+    }
 }

@@ -74,6 +74,21 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
     protected Documentation createDocumentation() {
         return element.createDocumentation();
     }
+
+    @Override
+    public String provideRawText() throws DocumentationInputGenerationException {
+        return provideRawText(element);
+    }
+
+    private static String provideRawText(final RobotKeywordDefinition keyword)
+            throws DocumentationInputGenerationException {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Name: ").append(keyword.getName()).append("\n");
+        builder.append("Source: ").append(keyword.getSuiteFile().getFile().getFullPath().toString()).append("\n");
+        builder.append("Arguments: ").append(keyword.createArgumentsDescriptor().getDescription()).append("\n\n");
+        builder.append(keyword.getDocumentation());
+        return builder.toString();
+    }
     
     public static class KeywordDefinitionOnSettingInput extends InternalElementInput<RobotDefinitionSetting> {
 
@@ -94,6 +109,11 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
         @Override
         protected Documentation createDocumentation() {
             return getKeyword().createDocumentation();
+        }
+
+        @Override
+        public String provideRawText() throws DocumentationInputGenerationException {
+            return KeywordDefinitionInput.provideRawText(getKeyword());
         }
 
         private RobotKeywordDefinition getKeyword() {
