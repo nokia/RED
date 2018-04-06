@@ -9,8 +9,10 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.Optional;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
@@ -18,10 +20,14 @@ import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri;
 
-public class KeywordSpecificationInput extends DocumentationViewInput {
+import com.google.common.html.HtmlEscapers;
+
+public class KeywordSpecificationInput implements DocumentationViewInput {
 
     private final RobotProject project;
 
@@ -34,6 +40,11 @@ public class KeywordSpecificationInput extends DocumentationViewInput {
         this.project = project;
         this.libSpec = libSpec;
         this.kwSpec = kwSpec;
+    }
+
+    @Override
+    public URI getInputUri() throws URISyntaxException {
+        return LibraryUri.createShowKeywordDocUri(project.getName(), libSpec.getName(), kwSpec.getName());
     }
 
     @Override
@@ -65,9 +76,11 @@ public class KeywordSpecificationInput extends DocumentationViewInput {
         final String source = String.format("%s [%s]", Formatters.formatHyperlink(srcHref, srcLabel),
                 Formatters.formatHyperlink(docHref, "Documentation"));
 
+        final String args = HtmlEscapers.htmlEscaper().escape(kwSpec.createArgumentsDescriptor().getDescription());
+
         return Formatters.formatSimpleHeader(imgUri, kwSpec.getName(),
                 newArrayList("Source", source),
-                newArrayList("Arguments", kwSpec.createArgumentsDescriptor().getDescription()));
+                newArrayList("Arguments", args));
     }
 
     private String createShowKeywordSrcUri() {
@@ -98,5 +111,28 @@ public class KeywordSpecificationInput extends DocumentationViewInput {
     @Override
     public void showInput(final IWorkbenchPage page) {
         // TODO : where should we open specification input? should we at all...?
+    }
+
+    @Override
+    public IFile generateHtmlLibdoc() {
+        return new LibrariesBuilder(new BuildLogger()).buildHtmlLibraryDoc(project, libSpec);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        } else {
+            final KeywordSpecificationInput that = (KeywordSpecificationInput) obj;
+            return this.project.equals(that.project) && Objects.equals(this.libSpec, that.libSpec)
+                    && Objects.equals(this.kwSpec, that.kwSpec);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(project, libSpec, kwSpec);
     }
 }

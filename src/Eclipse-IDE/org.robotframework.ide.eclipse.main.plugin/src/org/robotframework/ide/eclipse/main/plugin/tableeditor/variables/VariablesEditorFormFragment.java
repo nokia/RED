@@ -89,6 +89,8 @@ import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
+import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
@@ -163,7 +165,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                         rowObject -> rowObject instanceof RobotElement),
                 new AlternatingRowConfigLabelAccumulator(),
                 new AddingElementLabelAccumulator(dataProvider, true),
-                new VariableTypesAndColumnsLabelAccumulator(dataProvider));
+                new VariableTypesAndColumnsLabelAccumulator(dataProvider),
+                new VariableInsideLabelAccumulator());
         final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory.createGlazedListEventsLayer(bodyDataLayer,
                 dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -263,6 +266,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
         table.addConfiguration(new VariablesStyleConfiguration(theme));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
+        table.addConfiguration(new VariableInsideStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {

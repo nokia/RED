@@ -27,6 +27,11 @@ public class TestCaseInput extends InternalElementInput<RobotCase> {
     }
 
     @Override
+    public URI getInputUri() throws URISyntaxException {
+        return WorkspaceFileUri.createShowCaseDocUri(element.getSuiteFile().getFile(), element.getName());
+    }
+
+    @Override
     protected String createHeader() {
         return createHeader(element);
     }
@@ -80,13 +85,22 @@ public class TestCaseInput extends InternalElementInput<RobotCase> {
         }
 
         @Override
+        public URI getInputUri() throws URISyntaxException {
+            return WorkspaceFileUri.createShowCaseDocUri(element.getSuiteFile().getFile(), getCase().getName());
+        }
+
+        @Override
         protected String createHeader() {
-            return TestCaseInput.createHeader((RobotCase) element.getParent());
+            return TestCaseInput.createHeader(getCase());
         }
 
         @Override
         protected Documentation createDocumentation() {
-            return ((RobotCase) element.getParent()).createDocumentation();
+            return getCase().createDocumentation();
+        }
+
+        private RobotCase getCase() {
+            return (RobotCase) element.getParent();
         }
     }
 }

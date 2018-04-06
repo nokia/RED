@@ -5,16 +5,23 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
 
-public abstract class DocumentationViewInput {
+public interface DocumentationViewInput {
 
-    public abstract boolean contains(final Object wrappedInput);
+    public boolean contains(final Object wrappedInput);
 
-    public abstract void prepare();
+    public void prepare() throws DocumentationInputGenerationException;
 
-    public abstract String provideHtml();
+    public String provideHtml();
 
-    public abstract void showInput(IWorkbenchPage page);
+    public void showInput(IWorkbenchPage page) throws DocumentationInputOpenException;
 
+    public IFile generateHtmlLibdoc();
+
+    public URI getInputUri() throws URISyntaxException;
 }

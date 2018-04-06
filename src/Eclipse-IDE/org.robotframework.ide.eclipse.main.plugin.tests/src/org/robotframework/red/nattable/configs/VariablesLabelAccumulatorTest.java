@@ -48,6 +48,15 @@ public class VariablesLabelAccumulatorTest {
     }
 
     @Test
+    public void labelIsNotAdded_forNonZerothColumn() {
+        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
+                .get(0).getChildren().get(2);
+        when(dataProvider.getRowObject(2)).thenReturn(call);
+        labelAccumulator.accumulateConfigLabels(labels, 2, 2);
+        assertThat(labels.getLabels()).isEmpty();
+    }
+
+    @Test
     public void labelIsNotAdded_forSimpleKeywordCall_InTestCases() {
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
                 .get(0).getChildren().get(0);
@@ -57,66 +66,21 @@ public class VariablesLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forSimpleKeywordCallArgument_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 0);
-        assertThat(labels.getLabels()).isEmpty();
-    }
-
-    @Test
-    public void labelIsAdded_forScalarVariable_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 2, 0);
-        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
-    }
-
-    @Test
-    public void labelIsAdded_forListVariable_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 3, 0);
-        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
-    }
-
-    @Test
-    public void labelIsAdded_forDictionaryVariable_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 4, 0);
-        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
-    }
-
-    @Test
-    public void labelIsNotAdded_forSettingKeywordCall_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(1);
-        when(dataProvider.getRowObject(1)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 1);
-        assertThat(labels.getLabels()).isEmpty();
-    }
-
-    @Test
-    public void labelIsNotAdded_forSetting_InTestCases() {
+    public void labelIsAdded_forScalarVariableAssignment_withEqualSign_InTestCases() {
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
                 .get(0).getChildren().get(1);
         when(dataProvider.getRowObject(1)).thenReturn(call);
         labelAccumulator.accumulateConfigLabels(labels, 0, 1);
-        assertThat(labels.getLabels()).isEmpty();
+        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
     }
 
     @Test
-    public void labelIsNotAdded_forSettingArgument_InTestCases() {
+    public void labelIsAdded_forScalarVariableAssignment_withuotEqualSign_InTestCases() {
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
                 .get(0).getChildren().get(2);
         when(dataProvider.getRowObject(2)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 2);
-        assertThat(labels.getLabels()).isEmpty();
+        labelAccumulator.accumulateConfigLabels(labels, 0, 2);
+        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
     }
 
     @Test
@@ -129,74 +93,29 @@ public class VariablesLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forSimpleKeywordCallArgument_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(2);
-        when(dataProvider.getRowObject(2)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 2);
-        assertThat(labels.getLabels()).isEmpty();
-    }
-
-    @Test
-    public void labelIsAdded_forDictionaryVariable_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(2);
-        when(dataProvider.getRowObject(2)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 2, 2);
-        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
-    }
-
-    @Test
-    public void labelIsAdded_forListVariable_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(2);
-        when(dataProvider.getRowObject(2)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 3, 2);
-        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
-    }
-
-    @Test
-    public void labelIsAdded_forScalarVariable_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(2);
-        when(dataProvider.getRowObject(2)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 4, 2);
-        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
-    }
-
-    @Test
-    public void labelIsNotAdded_forSettingKeywordCall_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 0);
-        assertThat(labels.getLabels()).isEmpty();
-    }
-
-    @Test
-    public void labelIsNotAdded_forSetting_InKeywords() {
+    public void labelIsAdded_forDictionaryVariableAssignment_withEqualSign_InKeywords() {
         final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0).getChildren().get(0);
         when(dataProvider.getRowObject(0)).thenReturn(call);
         labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        assertThat(labels.getLabels()).isEmpty();
+        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
     }
 
     @Test
-    public void labelIsNotAdded_forSettingArgument_InKeywords() {
+    public void labelIsAdded_forListVariableAssignment_withuotEqualSign_InKeywords() {
         final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0).getChildren().get(1);
         when(dataProvider.getRowObject(1)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 1);
-        assertThat(labels.getLabels()).isEmpty();
+        labelAccumulator.accumulateConfigLabels(labels, 0, 1);
+        assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
     }
 
     @Test
-    public void labelIsAdded_forDirtyScalarVariable() {
-        final RobotKeywordCall call = new RobotKeywordCall(null, new RobotExecutableRow<>());
-        call.getLinkedElement().insertValueAt("${var}", 0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
+    public void labelIsAdded_forScalarVariableAssignment_withEqualSignAndSpaces_InKeywords() {
+        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
+                .get(0).getChildren().get(3);
+        when(dataProvider.getRowObject(3)).thenReturn(call);
+        labelAccumulator.accumulateConfigLabels(labels, 0, 3);
         assertThat(labels.getLabels()).containsExactly(VariablesLabelAccumulator.VARIABLE_CONFIG_LABEL);
     }
 
@@ -205,13 +124,14 @@ public class VariablesLabelAccumulatorTest {
                 .appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  log many  10  ${x}  @{y}  &{z}")
-                .appendLine("  [Teardown]  t enter")
-                .appendLine("  [Tags]  t1  t2")
+                .appendLine("  ${var1}=  Set Value  something important")
+                .appendLine("  ${var2}  Set Value  something else")
                 .appendLine("*** Keywords ***")
                 .appendLine("kw")
-                .appendLine("  [Teardown]   Log  kw exit")
-                .appendLine("  [Tags]   t1  t2")
+                .appendLine("  &{dict}=  Create Dictionary  key=value")
+                .appendLine("  @{list}  Create List  qwop")
                 .appendLine("  log many  10  &{a}  @{b}  ${c}")
+                .appendLine("  ${ var with spaces } =")
                 .build();
     }
 }
