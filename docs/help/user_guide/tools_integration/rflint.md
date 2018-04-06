@@ -47,4 +47,10 @@ validation](javascript:executeCommand\('org.eclipse.ui.window.preferences\(prefe
 
   * **additional rules files** \- add python files containing custom RfLint rules so that they will be also used for analysis. 
 
+  * **additional arguments** \- custom RfLint arguments that will be used for analysis 
+
+Note
+
+    Additional arguments field accepts Eclipse [string variables](../launching/string_substitution.md).
+
 [Return to Help index](http://nokia.github.io/RED/help/)

@@ -1,9 +1,9 @@
-## Variable mapping - dealing with parametrized paths to libraries and
+## Variable mapping - dealing with parameterized paths to libraries and
 resources
 
-Whenever parametrized file path is used in resources or libraries paths (paths
-are resolved during Robot runtime when parameter in path is known), RED will
-not be able to evaluate parameter value by itself.
+Whenever parameterized file path is used in resources or libraries paths
+(paths are resolved during Robot runtime when parameter in path is known), RED
+will not be able to evaluate parameter value by itself.
 ![](variable_mapping/variable_mapping_5.png) Variables mappings can be used to
 statically assign value to parameters in paths to resolve such paths to
 resources and libraries. This applies only while editing tests,during Robot
