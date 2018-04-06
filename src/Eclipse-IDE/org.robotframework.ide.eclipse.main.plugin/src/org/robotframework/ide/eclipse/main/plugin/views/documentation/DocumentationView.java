@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -12,9 +13,11 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.Action;
@@ -50,6 +53,7 @@ public class DocumentationView implements DocumentationDisplayer {
     private Browser browser;
 
     private DocumentationsBrowsingHistory history;
+    private DocumentationsLinksSupport linksSupport;
 
     private DocumentationViewInput currentInput;
     private Job documentationJob;
@@ -67,7 +71,7 @@ public class DocumentationView implements DocumentationDisplayer {
         parent.setLayout(new FillLayout());
 
         final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
-        final DocumentationsLinksSupport linksSupport = new DocumentationsLinksSupport(page, browserSupport,
+        linksSupport = new DocumentationsLinksSupport(page, browserSupport,
                 this);
         history = new DocumentationsBrowsingHistory(linksSupport);
 
@@ -174,10 +178,30 @@ public class DocumentationView implements DocumentationDisplayer {
         }
         if (keywordCall instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) keywordCall).isDocumentation()
                 && currentInput.contains(keywordCall)) {
-            scheduleInputLoadingJob(currentInput);
+            reloadCurrentInput();
+
         } else if (keywordCall instanceof RobotSetting && ((RobotSetting) keywordCall).isDocumentation()
                 && currentInput.contains(keywordCall)) {
-            scheduleInputLoadingJob(currentInput);
+            reloadCurrentInput();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenStructuralChangeWasMade(
+            @UIEventTopic(RobotModelEvents.ROBOT_LIBRARY_SPECIFICATION_CHANGE) final IProject project) {
+        if (currentInput != null && currentInput.contains(project)) {
+            reloadCurrentInput();
+        }
+    }
+
+    private void reloadCurrentInput() {
+        try {
+            linksSupport.changeLocationTo(currentInput.getInputUri());
+        } catch (final URISyntaxException e) {
+            StatusManager.getManager().handle(
+                    new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, IStatus.OK, "Error reloading view input", e),
+                    StatusManager.SHOW);
         }
     }
 

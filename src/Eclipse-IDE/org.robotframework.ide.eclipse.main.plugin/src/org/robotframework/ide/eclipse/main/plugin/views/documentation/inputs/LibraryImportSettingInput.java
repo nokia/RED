@@ -9,6 +9,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -27,6 +29,14 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
     }
 
     @Override
+    public boolean contains(final Object wrappedInput) {
+        if (wrappedInput instanceof IProject) {
+            return element.getSuiteFile().getProject().getProject().equals(wrappedInput);
+        }
+        return super.contains(wrappedInput);
+    }
+
+    @Override
     public void prepare() {
         specification = element.getImportedLibrary().map(ImportedLibrary::getSpecification).orElseThrow(
                 () -> new DocumentationInputGenerationException("Library specification not found, nothing to display"));
@@ -40,12 +50,19 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
 
     @Override
     protected String createHeader() {
-        return LibrarySpecificationInput.createHeader(specification);
+        final IProject project = element.getSuiteFile().getProject().getProject();
+        return LibrarySpecificationInput.createHeader(project, specification);
     }
 
     @Override
     protected Documentation createDocumentation() {
         return specification.createDocumentation();
+    }
+
+    @Override
+    protected String createFooter() {
+        final RobotRuntimeEnvironment env = element.getSuiteFile().getProject().getRuntimeEnvironment();
+        return LibrarySpecificationInput.createFooter(specification, env);
     }
 
     @Override
