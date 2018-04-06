@@ -38,9 +38,9 @@
 	<p>At this tab following arguments can/have to be specified:
 	</p>
 	<ul>
-		<li><b>project</b> - the path to project will be passed to robot as the suite to be executed,
+		<li><b>project</b> - the path to project will be passed to robot as the data source to be executed,
 		</li>
-		<li><b>test suites/test</b> - suites can be specified by adding files or directories, those entries will
+		<li><b>test suite(s)</b> - suites can be specified by adding files or directories, those entries will
 		be translated to <code>--suite</code> arguments for Robot. Additionally when file suite is added
 		the tests inside it can be chosen/excluded from execution, which translates to <code>--test</code> argument entries
 		in command line call,
@@ -54,7 +54,12 @@
 		<li><b>additional Robot Framework arguments</b> - additional arguments to be passed to Robot 
 		can be specified here.
 		</li>
-	</ul>
+	</ul>	
+	
+	<dl class="note">
+	   <dt>Note</dt>	   
+	   <dd>Additional arguments field accepts Eclipse <a href="string_substitution.html">string variables</a>.</dd>
+	</dl>
 	
 	<h4>Listener tab</h4>
 	<img src="images/local_config_listener.png"/>
@@ -74,12 +79,17 @@
 	</p>
 	
 	<p>Moreover, the whole call can be passed to a script (or other executable) with additional arguments.
-	The script/executable's command line paramters are the same as RED command line during normal test execution 
+	The script/executable's command line parameters are the same as RED command line during normal test execution 
     (path to python interpreter with robot call, parameters for suites/testcases etc.). Such script/external executable 
     mechanism can be used to wrap Robot execution into other tools. 
 	</p>
 	
 	<p>For more information read <a href="local_launch_scripting.html">Local launches scripting</a> topic in this guide.
+	
+	<dl class="note">
+	   <dt>Note</dt>	   
+	   <dd>Additional arguments and executable file path fields accept Eclipse <a href="string_substitution.html">string variables</a>.</dd>
+	</dl>
 	
 	<h4>Environment tab</h4>
 	<img src="images/local_config_env.png"/>

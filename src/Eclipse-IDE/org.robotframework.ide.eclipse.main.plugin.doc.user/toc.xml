@@ -77,6 +77,8 @@
        </topic>
        <topic href="doc/user_guide/launching/launch_prefs.html" label="Launching preferences">
        </topic>
+       <topic href="doc/user_guide/launching/string_substitution.html" label="String substitution variables">
+       </topic>
        <topic href="doc/user_guide/launching/red_agent.html" label="RED Tests Runner Agent">
        </topic>
     </topic>
