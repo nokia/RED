@@ -14,12 +14,12 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Doc
 
 class DocumentationsBrowsingHistory {
 
-    private final DocumentationViewLinksSupport linksSupport;
+    private final DocumentationsLinksSupport linksSupport;
 
     private final List<URI> urisHistory = new ArrayList<>();
     private int current = -1;
 
-    public DocumentationsBrowsingHistory(final DocumentationViewLinksSupport linksSupport) {
+    public DocumentationsBrowsingHistory(final DocumentationsLinksSupport linksSupport) {
         this.linksSupport = linksSupport;
     }
 

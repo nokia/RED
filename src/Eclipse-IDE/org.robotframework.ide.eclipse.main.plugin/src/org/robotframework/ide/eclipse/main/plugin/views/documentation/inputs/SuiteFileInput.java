@@ -18,6 +18,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
+import com.google.common.io.Files;
+
 public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
 
     public SuiteFileInput(final RobotSuiteFile suiteFile) {
@@ -37,7 +39,7 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
     private static String suiteHeader(final RobotSuiteFile suiteFile) {
         final Optional<URI> imgUri = RedImages.getRobotFileImageUri();
 
-        final IFile file = suiteFile.getSuiteFile().getFile();
+        final IFile file = suiteFile.getFile();
         final URI srcHref = WorkspaceFileUri.createFileUri(file);
         final String srcLabel = file.getFullPath().toString();
 
@@ -49,6 +51,19 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
     @Override
     protected Documentation createDocumentation() {
         return element.createDocumentation();
+    }
+
+    @Override
+    public String provideRawText() throws DocumentationInputGenerationException {
+        return provideRawText(element);
+    }
+
+    private static String provideRawText(final RobotSuiteFile suiteFile) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Name: ").append(Files.getNameWithoutExtension(suiteFile.getName())).append("\n");
+        builder.append("Source: ").append(suiteFile.getFile().getFullPath().toString()).append("\n");
+        builder.append(suiteFile.getDocumentation());
+        return builder.toString();
     }
 
     public static class SuiteFileOnSettingInput extends InternalElementInput<RobotSetting> {
@@ -70,6 +85,11 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
         @Override
         protected Documentation createDocumentation() {
             return element.getSuiteFile().createDocumentation();
+        }
+
+        @Override
+        public String provideRawText() throws DocumentationInputGenerationException {
+            return SuiteFileInput.provideRawText(element.getSuiteFile());
         }
     }
 }
