@@ -9,8 +9,10 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.Optional;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
@@ -18,10 +20,14 @@ import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri;
 
-public class LibrarySpecificationInput extends DocumentationViewInput {
+import com.google.common.html.HtmlEscapers;
+
+public class LibrarySpecificationInput implements DocumentationViewInput {
 
     private final RobotProject project;
 
@@ -30,6 +36,11 @@ public class LibrarySpecificationInput extends DocumentationViewInput {
     public LibrarySpecificationInput(final RobotProject project, final LibrarySpecification specification) {
         this.project = project;
         this.specification = specification;
+    }
+
+    @Override
+    public URI getInputUri() throws URISyntaxException {
+        return LibraryUri.createShowLibraryDocUri(project.getName(), specification.getName());
     }
 
     @Override
@@ -57,10 +68,12 @@ public class LibrarySpecificationInput extends DocumentationViewInput {
                 ? ArgumentsDescriptor.createDescriptor()
                 : specification.getConstructor().createArgumentsDescriptor();
 
+        final String args = HtmlEscapers.htmlEscaper().escape(descriptor.getDescription());
+
         return Formatters.formatSimpleHeader(imgUri, specification.getName(),
                 newArrayList("Version", specification.getVersion()),
                 newArrayList("Scope", specification.getScope()),
-                newArrayList("Arguments", descriptor.getDescription()));
+                newArrayList("Arguments", args));
     }
 
     private String localKeywordsLinker(final String name) {
@@ -76,4 +89,25 @@ public class LibrarySpecificationInput extends DocumentationViewInput {
         // TODO : where should we open specification input? should we at all...?
     }
 
+    @Override
+    public IFile generateHtmlLibdoc() {
+        return new LibrariesBuilder(new BuildLogger()).buildHtmlLibraryDoc(project, specification);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        } else {
+            final LibrarySpecificationInput that = (LibrarySpecificationInput) obj;
+            return this.project.equals(that.project) && Objects.equals(this.specification, that.specification);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(project, specification);
+    }
 }

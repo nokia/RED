@@ -62,4 +62,16 @@ public class ParameterizedFilePathStringFieldEditorTest {
         assertThat(editor.checkState()).isFalse();
     }
 
+    @Test
+    public void valueIsInsertedIntoEditor() {
+        final ParameterizedFilePathStringFieldEditor editor = new ParameterizedFilePathStringFieldEditor("foo", "label",
+                shellProvider.getShell());
+
+        editor.getTextControl().setText("some_file.txt");
+        editor.getTextControl().setSelection(5, 9);
+        editor.insertValue("${variable}");
+
+        assertThat(editor.getStringValue()).isEqualTo("some_${variable}.txt");
+    }
+
 }

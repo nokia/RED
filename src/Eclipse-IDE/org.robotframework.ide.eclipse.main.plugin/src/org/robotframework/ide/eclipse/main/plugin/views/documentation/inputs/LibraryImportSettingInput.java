@@ -5,12 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.ImportedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri;
 
 
@@ -26,6 +30,12 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
     public void prepare() {
         specification = element.getImportedLibrary().map(ImportedLibrary::getSpecification).orElseThrow(
                 () -> new DocumentationInputGenerationException("Library specification not found, nothing to display"));
+    }
+
+    @Override
+    public URI getInputUri() throws URISyntaxException {
+        final String projectName = element.getSuiteFile().getProject().getName();
+        return LibraryUri.createShowLibraryDocUri(projectName, specification.getName());
     }
 
     @Override
@@ -46,5 +56,11 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
         } catch (final URISyntaxException e) {
             return "#";
         }
+    }
+
+    @Override
+    public IFile generateHtmlLibdoc() {
+        return new LibrariesBuilder(new BuildLogger()).buildHtmlLibraryDoc(element.getSuiteFile().getProject(),
+                specification);
     }
 }

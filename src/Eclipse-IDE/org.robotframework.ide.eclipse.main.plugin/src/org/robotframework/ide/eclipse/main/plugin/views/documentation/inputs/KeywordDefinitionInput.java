@@ -18,10 +18,17 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
+import com.google.common.html.HtmlEscapers;
+
 public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDefinition> {
 
     public KeywordDefinitionInput(final RobotKeywordDefinition keyword) {
         super(keyword);
+    }
+
+    @Override
+    public URI getInputUri() throws URISyntaxException {
+        return WorkspaceFileUri.createShowKeywordDocUri(element.getSuiteFile().getFile(), element.getName());
     }
 
     @Override
@@ -40,9 +47,11 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
         final String source = String.format("%s [%s]", Formatters.formatHyperlink(srcHref, srcLabel),
                 Formatters.formatHyperlink(docHref, "Documentation"));
 
+        final String args = HtmlEscapers.htmlEscaper().escape(keyword.createArgumentsDescriptor().getDescription());
+
         return Formatters.formatSimpleHeader(imgUri, keyword.getName(),
                 newArrayList("Source", source),
-                newArrayList("Arguments", keyword.createArgumentsDescriptor().getDescription()));
+                newArrayList("Arguments", args));
     }
 
     private static String createShowKeywordSrcUri(final IFile file, final String label) {
@@ -73,13 +82,22 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
         }
 
         @Override
+        public URI getInputUri() throws URISyntaxException {
+            return WorkspaceFileUri.createShowKeywordDocUri(element.getSuiteFile().getFile(), getKeyword().getName());
+        }
+
+        @Override
         protected String createHeader() {
-            return KeywordDefinitionInput.createHeader((RobotKeywordDefinition) element.getParent());
+            return KeywordDefinitionInput.createHeader(getKeyword());
         }
 
         @Override
         protected Documentation createDocumentation() {
-            return ((RobotKeywordDefinition) element.getParent()).createDocumentation();
+            return getKeyword().createDocumentation();
+        }
+
+        private RobotKeywordDefinition getKeyword() {
+            return (RobotKeywordDefinition) element.getParent();
         }
     }
 }

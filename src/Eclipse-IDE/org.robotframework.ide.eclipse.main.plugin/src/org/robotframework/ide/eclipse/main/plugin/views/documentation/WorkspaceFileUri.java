@@ -15,7 +15,7 @@ import java.util.Optional;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksListener.OpenableUri;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksSupport.OpenableUri;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -70,6 +70,12 @@ public class WorkspaceFileUri implements OpenableUri {
 
     public static URI createShowCaseSourceUri(final IFile file, final String testName) throws URISyntaxException {
         final Map<String, String> values = ImmutableMap.of(SHOW_SRC_PARAM, Boolean.toString(true), TEST_PARAM,
+                testName);
+        return createUri(file.getLocationURI(), values);
+    }
+
+    public static URI createShowCaseDocUri(final IFile file, final String testName) throws URISyntaxException {
+        final Map<String, String> values = ImmutableMap.of(SHOW_DOC_PARAM, Boolean.toString(true), TEST_PARAM,
                 testName);
         return createUri(file.getLocationURI(), values);
     }

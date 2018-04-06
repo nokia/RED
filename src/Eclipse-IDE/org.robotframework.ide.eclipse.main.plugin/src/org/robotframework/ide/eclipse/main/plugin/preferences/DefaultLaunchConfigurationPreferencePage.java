@@ -48,7 +48,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         additionalRobotArguments.load();
         addField(additionalRobotArguments);
 
-        BrowseButtons.selectVariableButton(group, additionalRobotArguments.getTextControl(group));
+        BrowseButtons.selectVariableButton(group, additionalRobotArguments.getTextControl(group)::insert);
     }
 
     private void createListenerLaunchConfigurationPreferences(final Composite parent) {
@@ -96,7 +96,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         additionalInterpreterArguments.load();
         addField(additionalInterpreterArguments);
 
-        BrowseButtons.selectVariableButton(group, additionalInterpreterArguments.getTextControl(group));
+        BrowseButtons.selectVariableButton(group, additionalInterpreterArguments.getTextControl(group)::insert);
 
         final ParameterizedFilePathStringFieldEditor scriptPathEditor = new ParameterizedFilePathStringFieldEditor(
                 RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH, "Executable file to run Robot Framework tests:", group);
@@ -109,11 +109,11 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         final Composite buttonsParent = new Composite(group, SWT.NONE);
         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(buttonsParent);
         GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(buttonsParent);
-        BrowseButtons.selectWorkspaceFileButton(buttonsParent, scriptPathEditor.getTextControl(group),
+        BrowseButtons.selectWorkspaceFileButton(buttonsParent, scriptPathEditor::setStringValue,
                 "Select executor file to run Robot Framework tests:");
-        BrowseButtons.selectSystemFileButton(buttonsParent, scriptPathEditor.getTextControl(group),
+        BrowseButtons.selectSystemFileButton(buttonsParent, scriptPathEditor::setStringValue,
                 BrowseButtons.getSystemDependentExecutableFileExtensions());
-        BrowseButtons.selectVariableButton(buttonsParent, scriptPathEditor.getTextControl(group));
+        BrowseButtons.selectVariableButton(buttonsParent, scriptPathEditor::insertValue);
 
         final StringFieldEditor additionalScriptArguments = new StringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS, "Additional executable file arguments:",
@@ -122,7 +122,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         additionalScriptArguments.load();
         addField(additionalScriptArguments);
 
-        BrowseButtons.selectVariableButton(group, additionalScriptArguments.getTextControl(group));
+        BrowseButtons.selectVariableButton(group, additionalScriptArguments.getTextControl(group)::insert);
     }
 
     @Override
