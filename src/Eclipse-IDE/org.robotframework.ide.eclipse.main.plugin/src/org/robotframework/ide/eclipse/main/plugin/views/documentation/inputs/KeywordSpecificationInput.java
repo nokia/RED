@@ -53,11 +53,6 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
     }
 
     @Override
-    public void prepare() {
-        // nothing to prepare
-    }
-
-    @Override
     public String provideHtml() {
         final RobotRuntimeEnvironment environment = project.getRuntimeEnvironment();
         final String header = createHeader();
@@ -106,6 +101,16 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
         } catch (final URISyntaxException e) {
             return "#";
         }
+    }
+
+    @Override
+    public String provideRawText() throws DocumentationInputGenerationException {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Name: ").append(kwSpec.getName()).append("\n");
+        builder.append("Source: ").append(libSpec.getName()).append("\n");
+        builder.append("Arguments: ").append(kwSpec.createArgumentsDescriptor().getDescription()).append("\n\n");
+        builder.append(kwSpec.getDocumentation());
+        return builder.toString();
     }
 
     @Override
