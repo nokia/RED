@@ -55,8 +55,9 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> implemen
         final RobotRuntimeEnvironment environment = element.getSuiteFile().getProject().getRuntimeEnvironment();
         final String header = createHeader();
         final Documentation doc = createDocumentation();
+        final String footer = createFooter();
 
-        return new DocumentationsFormatter(environment).format(header, doc, this::localKeywordsLinker);
+        return new DocumentationsFormatter(environment).format(header, doc, footer, this::localKeywordsLinker);
     }
 
     protected void prepare() {
@@ -66,6 +67,10 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> implemen
     protected abstract String createHeader();
 
     protected abstract Documentation createDocumentation();
+
+    protected String createFooter() {
+        return "";
+    }
 
     protected String localKeywordsLinker(final String name) {
         try {

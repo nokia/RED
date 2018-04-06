@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
@@ -43,9 +45,28 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
         final URI srcHref = WorkspaceFileUri.createFileUri(file);
         final String srcLabel = file.getFullPath().toString();
 
-        final String source = Formatters.formatHyperlink(srcHref, srcLabel);
-        return Formatters.formatSimpleHeader(imgUri, suiteFile.getName(),
+        final String source = Formatters.hyperlink(srcHref, srcLabel);
+        final String header = Formatters.simpleHeader(imgUri, suiteFile.getName(),
                 newArrayList("Source", source));
+        return header + Formatters.title("Introduction", 2);
+    }
+
+    @Override
+    protected String createFooter() {
+        return suiteFooter(element);
+    }
+
+    private static String suiteFooter(final RobotSuiteFile suiteFile) {
+        final String shortcuts = suiteFile.getUserDefinedKeywords()
+                .stream()
+                .map(RobotKeywordDefinition::getName)
+                .map(name -> "`" + name + "`")
+                .collect(joining(" &middot; "));
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append(Formatters.title("Shortcuts", 2));
+        builder.append(Formatters.paragraph(shortcuts));
+        return builder.toString();
     }
 
     @Override
@@ -85,6 +106,11 @@ public class SuiteFileInput extends InternalElementInput<RobotSuiteFile> {
         @Override
         protected Documentation createDocumentation() {
             return element.getSuiteFile().createDocumentation();
+        }
+
+        @Override
+        protected String createFooter() {
+            return SuiteFileInput.suiteFooter(element.getSuiteFile());
         }
 
         @Override

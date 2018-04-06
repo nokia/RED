@@ -8,12 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
@@ -60,8 +58,8 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentat
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.collect.Streams;
 
 // supressing seems it semms that BrowserInformationControl will become part of the API in future
 // eclipse anyway
@@ -170,7 +168,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                             + msgs.stream().map(msg -> "<li>" + msg + "</li>").collect(joining())
                             + "</ul>");
             } else {
-                return Optional.of("Multiple markers at this line:" + "\n- " + Joiner.on("\n- ").join(msgs));
+                return Optional.of("Multiple markers at this line:" + "\n- " + String.join("\n- ", msgs));
             }
         }
     }
@@ -192,16 +190,10 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     }
 
     private static Stream<Annotation> annotationsWithMsgs(final IAnnotationModel model, final IRegion hoverRegion) {
-        return annotations(model).filter(annotation -> {
+        return Streams.stream(model.getAnnotationIterator()).filter(annotation -> {
             final Position position = model.getPosition(annotation);
             return position != null && position.overlapsWith(hoverRegion.getOffset(), hoverRegion.getLength());
         }).filter(annotation -> annotation.getText() != null && annotation.getText().trim().length() > 0);
-    }
-
-    private static Stream<Annotation> annotations(final IAnnotationModel model) {
-        final Iterator<Annotation> iter = model.getAnnotationIterator();
-        final Iterable<Annotation> iterable = () -> iter;
-        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
     private static boolean isVariable(final String text) {

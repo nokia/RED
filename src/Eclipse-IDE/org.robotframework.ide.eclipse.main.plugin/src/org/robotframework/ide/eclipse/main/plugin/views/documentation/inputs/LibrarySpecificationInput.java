@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,10 +14,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.Documentation;
+import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -45,28 +48,61 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
 
     @Override
     public boolean contains(final Object wrappedInput) {
+        if (wrappedInput instanceof IProject) {
+            return project.getProject().equals(wrappedInput);
+        }
         return specification == wrappedInput;
     }
 
     @Override
     public String provideHtml() {
         final RobotRuntimeEnvironment environment = project.getRuntimeEnvironment();
-        final String header = createHeader(specification);
+        final String header = createHeader(project.getProject(), specification);
         final Documentation doc = specification.createDocumentation();
+        final String footer = createFooter(specification, environment);
 
-        return new DocumentationsFormatter(environment).format(header, doc, this::localKeywordsLinker);
+        return new DocumentationsFormatter(environment).format(header, doc, footer, this::localKeywordsLinker);
     }
 
-    static String createHeader(final LibrarySpecification specification) {
+    static String createHeader(final IProject project, final LibrarySpecification specification) {
         final Optional<URI> imgUri = RedImages.getBookImageUri();
-        final ArgumentsDescriptor descriptor = getDescriptor(specification);
 
+        final String srcHref = createShowSrcUri(project, specification);
+        final String source = Formatters.hyperlink(srcHref, specification.getName());
+
+        final ArgumentsDescriptor descriptor = getDescriptor(specification);
         final String args = HtmlEscapers.htmlEscaper().escape(descriptor.getDescription());
 
-        return Formatters.formatSimpleHeader(imgUri, specification.getName(),
+        final String header = Formatters.simpleHeader(imgUri, specification.getName(),
+                newArrayList("Source", source),
                 newArrayList("Version", specification.getVersion()),
                 newArrayList("Scope", specification.getScope()),
                 newArrayList("Arguments", args));
+        return header + Formatters.title("Introduction", 2);
+    }
+
+    private static String createShowSrcUri(final IProject project, final LibrarySpecification specification) {
+        try {
+            return LibraryUri.createShowLibrarySourceUri(project.getName(), specification.getName()).toString();
+        } catch (final URISyntaxException e) {
+            return "#";
+        }
+    }
+
+    static String createFooter(final LibrarySpecification specification, final RobotRuntimeEnvironment env) {
+        final String shortcuts = specification.getKeywordsStream()
+                .map(KeywordSpecification::getName)
+                .map(name -> "`" + name + "`")
+                .collect(joining(" &middot; "));
+        
+        final StringBuilder builder = new StringBuilder();
+        if (specification.getConstructor() != null) {
+            builder.append(Formatters.title("Importing", 2));
+            builder.append(specification.createConstructorDocumentation().provideFormattedDocumentation(env));
+        }
+        builder.append(Formatters.title("Shortcuts", 2));
+        builder.append(Formatters.paragraph(shortcuts));
+        return builder.toString();
     }
 
     private static ArgumentsDescriptor getDescriptor(final LibrarySpecification specification) {
@@ -115,7 +151,8 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
             return false;
         } else {
             final LibrarySpecificationInput that = (LibrarySpecificationInput) obj;
-            return this.project.equals(that.project) && Objects.equals(this.specification, that.specification);
+            return this.project.equals(that.project) && Objects.equals(this.specification, that.specification)
+                    && Objects.equals(this.specification.getDocumentation(), that.specification.getDocumentation());
         }
     }
 
