@@ -78,6 +78,20 @@ public class TestCaseInput extends InternalElementInput<RobotCase> {
         return element.createDocumentation();
     }
 
+    @Override
+    public String provideRawText() throws DocumentationInputGenerationException {
+        return provideRawText(element);
+    }
+
+    private static String provideRawText(final RobotCase testCase) throws DocumentationInputGenerationException {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Name: ").append(testCase.getName()).append("\n");
+        builder.append("Source: ").append(testCase.getSuiteFile().getFile().getFullPath().toString()).append("\n");
+        testCase.getTemplateInUse().ifPresent(template -> builder.append("Template: " + template + "\n\n"));
+        builder.append(testCase.getDocumentation());
+        return builder.toString();
+    }
+
     public static class TestCaseOnSettingInput extends InternalElementInput<RobotDefinitionSetting> {
 
         public TestCaseOnSettingInput(final RobotDefinitionSetting element) {
@@ -97,6 +111,11 @@ public class TestCaseInput extends InternalElementInput<RobotCase> {
         @Override
         protected Documentation createDocumentation() {
             return getCase().createDocumentation();
+        }
+
+        @Override
+        public String provideRawText() throws DocumentationInputGenerationException {
+            return TestCaseInput.provideRawText(getCase());
         }
 
         private RobotCase getCase() {

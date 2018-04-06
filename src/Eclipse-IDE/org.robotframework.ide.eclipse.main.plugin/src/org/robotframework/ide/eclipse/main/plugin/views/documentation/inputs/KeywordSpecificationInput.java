@@ -104,6 +104,16 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
     }
 
     @Override
+    public String provideRawText() throws DocumentationInputGenerationException {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Name: ").append(kwSpec.getName()).append("\n");
+        builder.append("Source: ").append(libSpec.getName()).append("\n");
+        builder.append("Arguments: ").append(kwSpec.createArgumentsDescriptor().getDescription()).append("\n\n");
+        builder.append(kwSpec.getDocumentation());
+        return builder.toString();
+    }
+
+    @Override
     public void showInput(final IWorkbenchPage page) {
         // TODO : where should we open specification input? should we at all...?
     }

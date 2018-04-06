@@ -17,6 +17,8 @@ public interface DocumentationViewInput {
 
     public String provideHtml() throws DocumentationInputGenerationException;
 
+    public String provideRawText() throws DocumentationInputGenerationException;
+
     public void showInput(IWorkbenchPage page) throws DocumentationInputOpenException;
 
     public IFile generateHtmlLibdoc();

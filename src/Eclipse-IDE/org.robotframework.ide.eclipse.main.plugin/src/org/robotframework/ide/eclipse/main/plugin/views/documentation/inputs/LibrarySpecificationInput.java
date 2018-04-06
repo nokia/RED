@@ -59,9 +59,7 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
 
     static String createHeader(final LibrarySpecification specification) {
         final Optional<URI> imgUri = RedImages.getBookImageUri();
-        final ArgumentsDescriptor descriptor = specification.getConstructor() == null
-                ? ArgumentsDescriptor.createDescriptor()
-                : specification.getConstructor().createArgumentsDescriptor();
+        final ArgumentsDescriptor descriptor = getDescriptor(specification);
 
         final String args = HtmlEscapers.htmlEscaper().escape(descriptor.getDescription());
 
@@ -71,12 +69,32 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
                 newArrayList("Arguments", args));
     }
 
+    private static ArgumentsDescriptor getDescriptor(final LibrarySpecification specification) {
+        return specification.getConstructor() == null ? ArgumentsDescriptor.createDescriptor()
+                : specification.getConstructor().createArgumentsDescriptor();
+    }
+
     private String localKeywordsLinker(final String name) {
         try {
             return LibraryUri.createShowKeywordDocUri(project.getName(), specification.getName(), name).toString();
         } catch (final URISyntaxException e) {
             return "#";
         }
+    }
+
+    @Override
+    public String provideRawText() throws DocumentationInputGenerationException {
+        return provideRawText(specification);
+    }
+
+    static String provideRawText(final LibrarySpecification specification)
+            throws DocumentationInputGenerationException {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Version: ").append(specification.getVersion()).append("\n");
+        builder.append("Scope: ").append(specification.getScope()).append("\n");
+        builder.append("Arguments: ").append(getDescriptor(specification).getDescription()).append("\n\n");
+        builder.append(specification.getDocumentation());
+        return builder.toString();
     }
 
     @Override
