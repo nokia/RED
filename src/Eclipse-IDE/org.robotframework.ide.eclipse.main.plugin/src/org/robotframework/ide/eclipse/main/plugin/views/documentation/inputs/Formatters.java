@@ -14,21 +14,29 @@ import java.util.Optional;
 
 class Formatters {
 
-    static String formatHyperlink(final URI href, final String label) {
-        return formatHyperlink(href.toString(), label);
+    static String title(final String title, final int level) {
+        return "<h" + level + ">" + title + "</h" + level + ">";
     }
 
-    static String formatHyperlink(final String href, final String label) {
+    static String paragraph(final String content) {
+        return "<p>" + content + "</p>";
+    }
+
+    static String hyperlink(final URI href, final String label) {
+        return hyperlink(href.toString(), label);
+    }
+
+    static String hyperlink(final String href, final String label) {
         return "<a href=\"" + href + "\">" + label + "</a>";
     }
 
     @SafeVarargs
-    static String formatSimpleHeader(final Optional<URI> imgUri, final String title,
+    static String simpleHeader(final Optional<URI> imgUri, final String title,
             final List<String>... simpleTable) {
-        return formatSimpleHeader(imgUri, title, Arrays.asList(simpleTable));
+        return simpleHeader(imgUri, title, Arrays.asList(simpleTable));
     }
 
-    static String formatSimpleHeader(final Optional<URI> imgUri, final String title,
+    static String simpleHeader(final Optional<URI> imgUri, final String title,
             final List<List<String>> simpleTable) {
         
         final StringBuilder builder = new StringBuilder();
