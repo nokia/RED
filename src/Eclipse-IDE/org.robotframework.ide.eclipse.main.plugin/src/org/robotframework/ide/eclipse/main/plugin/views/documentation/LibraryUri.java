@@ -22,7 +22,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksSupport.OpenableUri;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.OpenableUri;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;

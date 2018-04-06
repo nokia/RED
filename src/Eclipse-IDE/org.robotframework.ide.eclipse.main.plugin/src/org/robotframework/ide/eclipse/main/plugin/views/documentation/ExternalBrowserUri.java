@@ -11,8 +11,8 @@ import java.net.URI;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksSupport.OpenableUri;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewLinksSupport.UnableToOpenUriException;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.OpenableUri;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.UnableToOpenUriException;
 import org.robotframework.red.swt.SwtThread;
 
 class ExternalBrowserUri implements OpenableUri {

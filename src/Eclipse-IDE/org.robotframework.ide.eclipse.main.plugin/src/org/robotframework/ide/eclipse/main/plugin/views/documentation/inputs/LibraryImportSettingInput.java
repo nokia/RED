@@ -63,4 +63,10 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
         return new LibrariesBuilder(new BuildLogger()).buildHtmlLibraryDoc(element.getSuiteFile().getProject(),
                 specification);
     }
+
+    @Override
+    public String provideRawText() throws DocumentationInputGenerationException {
+        prepare();
+        return LibrarySpecificationInput.provideRawText(specification);
+    }
 }
