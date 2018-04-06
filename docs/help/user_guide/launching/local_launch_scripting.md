@@ -56,7 +56,7 @@ Note
 
 Note
 
-    User scipts examples can be found at <https://github.com/nokia/RED/tree/master/src/RobotUserScripts>. 
+    User scripts examples can be found at <https://github.com/nokia/RED/tree/master/src/RobotUserScripts>. 
 
 Windows batch example:
 
