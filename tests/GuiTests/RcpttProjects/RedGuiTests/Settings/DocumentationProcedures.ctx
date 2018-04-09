@@ -1,0 +1,30 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: DocumentationProcedures
+Element-Type: context
+Element-Version: 2.0
+Id: _hb89IDvxEeiDC73Fvf4wHA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 4/9/18 4:25 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "check-documentation-view" [val inner_html]{
+	get-window -from "Information Window" | get-control Browser | get-property text 
+	    | equals [concat "<html><head><meta charset=\"utf-8\"><style>body {    color: rgb(0,0,0);    background-color: rgb(255,255,225);"
+	     + "    font-size: small;    font-family: sans-serif;}code {    background-color: rgba(220, 220, 220, 0.5);    font-size: 1.1em;}a, "
+	     + "a:link, a:visited {    color: #c30;}a:hover, a:active {    text-decoration: underline;    color: black;}a:hover {   text-decoration: underline !important;}"
+	     + "pre {    margin-left: 0.7em;    background-color: rgba(220, 220, 220, 0.5);}table, th, td {    border: 1px solid #a6a6a6;    border-collapse: collapse;    "
+	     + "border-spacing: 2px;    padding: 4px;    font-size: 0.9em;}</style></head>"  $inner_html ] | verify-true
+}
+
+
+proc "check-error-in-editor" [val text]{
+	check-documentation-view [format "<body style=\"overflow: hidden;\">%s"
+	    + "</body></html>"  $text]
+}
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
