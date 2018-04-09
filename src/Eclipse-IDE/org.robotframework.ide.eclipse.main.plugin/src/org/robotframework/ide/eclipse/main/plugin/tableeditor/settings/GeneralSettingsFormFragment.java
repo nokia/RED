@@ -9,9 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -93,6 +91,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
@@ -1027,26 +1027,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private static class GeneralSettingsTableContentTooltip extends RedNatTableContentTooltip {
 
-        private final Map<String, String> tooltips = new HashMap<>();
-
-        {
-            tooltips.put("Suite Setup",
-                    "The keyword %s is executed before executing any of the test cases or lower level suites");
-            tooltips.put("Suite Teardown",
-                    "The keyword %s is executed after all test cases and lower level suites have been executed");
-            tooltips.put("Test Setup",
-                    "The keyword %s is executed before every test cases in this suite unless test cases override it");
-            tooltips.put("Test Teardown",
-                    "The keyword %s is executed after every test cases in this suite unless test cases override it");
-            tooltips.put("Test Template", "The keyword %s is used as default template keyword in this suite");
-            tooltips.put("Test Timeout",
-                    "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
-                            + "Numerical values are interpreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
-            tooltips.put("Force Tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
-            tooltips.put("Default Tags",
-                    "Sets tags to all tests cases in this suite, unless test case specifies own tags");
-        }
-
         public GeneralSettingsTableContentTooltip(final NatTable natTable,
                 final SuiteFileMarkersContainer markersContainer, final IRowDataProvider<?> dataProvider) {
             super(natTable, markersContainer, dataProvider);
@@ -1054,15 +1034,16 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         @Override
         protected String getText(final Event event) {
-            String text = super.getText(event);
+            final String text = super.getText(event);
+
             final int col = natTable.getColumnPositionByX(event.x);
-            if (col == 1 && text != null && tooltips.containsKey(text)) {
+            if (col == 1 && text != null && RedSettingProposals.isSetting(SettingTarget.GENERAL, text)) {
                 final int row = natTable.getRowPositionByY(event.y);
                 final ILayerCell cell = natTable.getCellByPosition(col + 1, row);
                 final String keyword = cell != null && cell.getDataValue() != null
                         && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue()
                                 : "given in first argument";
-                text = String.format(tooltips.get(text), keyword);
+                return RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, text, keyword);
             }
             return text;
         }
