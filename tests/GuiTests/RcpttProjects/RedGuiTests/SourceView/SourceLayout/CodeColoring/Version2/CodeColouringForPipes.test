@@ -6,20 +6,24 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _B0rm4FscEearwpaEcDJbag
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/19/17 3:08 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 4/6/18 4:40 PM
 Testcase-Type: ecl
-Verifications: _sjazQFscEearwpaEcDJbag,_mmYNEFscEearwpaEcDJbag,_etDgYFscEearwpaEcDJbag,_bUK5AFscEearwpaEcDJbag,_wTKjEN5QEea53q6vmC55pw
+Verifications: _sjazQFscEearwpaEcDJbag,_mmYNEFscEearwpaEcDJbag,_etDgYFscEearwpaEcDJbag,_bUK5AFscEearwpaEcDJbag,_wTKjEN5QEea53q6vmC55pw,_J_jWkDmgEeijHN-bQYyonA
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
 with [get-view "Project Explorer" | get-tree] {
-    select "RobotProject/embeded_kw.robot" | select "RobotProject/embeded_kw.robot" | double-click
+    select "RobotProject/embeded_kw.robot" | double-click
     select "RobotProject/pipe_file.robot" | double-click
     select "RobotProject/special_cases_in_kw_names.robot" | double-click
     select "RobotProject/wrong_sections_names.robot" | double-click
     select "RobotProject/special_kw.robot" | double-click
+    select "RobotProject/variables.robot" | double-click
 }
+
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
