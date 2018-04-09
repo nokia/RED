@@ -25,7 +25,7 @@ public class RedWithNameProposalTest {
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getLabel()).isEmpty();
         assertThat(proposal.getStyledLabel().length()).isEqualTo(0);
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -39,7 +39,7 @@ public class RedWithNameProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("content");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("content");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -76,7 +76,7 @@ public class RedWithNameProposalTest {
         assertThat(ranges[1].start).isEqualTo(4);
         assertThat(ranges[1].length).isEqualTo(3);
 
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 

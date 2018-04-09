@@ -50,9 +50,13 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> implemen
 
     @Override
     public final String provideHtml() {
+        return provideHtml(element.getSuiteFile().getProject().getRuntimeEnvironment());
+    }
+
+    @Override
+    public final String provideHtml(final RobotRuntimeEnvironment environment) {
         prepare();
 
-        final RobotRuntimeEnvironment environment = element.getSuiteFile().getProject().getRuntimeEnvironment();
         final String header = createHeader();
         final Documentation doc = createDocumentation();
         final String footer = createFooter();
@@ -83,6 +87,9 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> implemen
 
     private static <T extends RobotFileInternalElement> List<Integer> createIndexesPath(final T element) {
         final List<Integer> address = new ArrayList<>();
+        if (element == null) {
+            return address;
+        }
 
         RobotElement current = element;
         while (!(current instanceof RobotSuiteFile)) {

@@ -54,7 +54,7 @@ public class ImportsInCodeAssistProcessor extends RedContentAssistProcessor {
             final DocumentModification modification = new DocumentModification("",
                     new Position(offset - userContent.length(), cellLength), true);
 
-            proposals.add(new RedCompletionProposalAdapter(proposal, modification));
+            proposals.add(new RedCompletionProposalAdapter(assist, proposal, modification));
         }
         return proposals;
     }

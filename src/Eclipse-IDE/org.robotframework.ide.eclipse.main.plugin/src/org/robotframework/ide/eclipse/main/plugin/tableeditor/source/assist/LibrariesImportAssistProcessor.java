@@ -73,7 +73,7 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
             final DocumentModification modification = new DocumentModification(contentSuffix,
                     new Position(offset - userContent.length(), cellLength));
 
-            proposals.add(new RedCompletionProposalAdapter(libProposal, modification));
+            proposals.add(new RedCompletionProposalAdapter(assist, libProposal, modification));
         }
         return proposals;
     }

@@ -10,12 +10,15 @@ import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 
 public interface DocumentationViewInput {
 
     public boolean contains(final Object wrappedInput);
 
     public String provideHtml() throws DocumentationInputGenerationException;
+
+    public String provideHtml(RobotRuntimeEnvironment environment) throws DocumentationInputGenerationException;
 
     public String provideRawText() throws DocumentationInputGenerationException;
 

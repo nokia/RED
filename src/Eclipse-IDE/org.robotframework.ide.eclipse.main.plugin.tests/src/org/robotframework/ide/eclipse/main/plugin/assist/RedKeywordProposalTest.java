@@ -282,7 +282,7 @@ public class RedKeywordProposalTest {
                 new Documentation(DocFormat.ROBOT, "the documentation"), false, new Path("file.robot"),
                 AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Name: keyword\n" + "Source: User defined (file.robot)\n"
                 + "Arguments: [a, *b]\n\n" + "the documentation");
     }
@@ -294,7 +294,7 @@ public class RedKeywordProposalTest {
                 new Documentation(DocFormat.ROBOT, "the documentation"), false, new Path("file.robot"),
                 AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo(
                 "Name: keyword\n" + "Source: Library (source)\n" + "Arguments: [a, *b]\n\n" + "the documentation");
     }
@@ -306,7 +306,7 @@ public class RedKeywordProposalTest {
                 new Documentation(DocFormat.ROBOT, "the documentation"), false, new Path("file.robot"),
                 AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Name: keyword\n"
                 + "Source: Library (alias - alias for source)\n" + "Arguments: [a, *b]\n\n" + "the documentation");
     }

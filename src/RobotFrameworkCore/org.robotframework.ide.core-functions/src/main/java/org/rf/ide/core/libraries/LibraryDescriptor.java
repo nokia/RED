@@ -43,7 +43,7 @@ public final class LibraryDescriptor {
 
     private final List<String> arguments;
 
-    private LibraryDescriptor(final String name, final LibraryType type, final String path,
+    public LibraryDescriptor(final String name, final LibraryType type, final String path,
             final List<String> arguments) {
         this.name = name;
         this.type = type;

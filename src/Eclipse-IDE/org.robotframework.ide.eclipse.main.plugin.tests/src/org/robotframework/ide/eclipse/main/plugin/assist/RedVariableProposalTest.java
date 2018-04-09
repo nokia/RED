@@ -54,27 +54,27 @@ public class RedVariableProposalTest {
     public void descriptionsTest() {
         final RedVariableProposal proposal0 = new RedVariableProposal("${var}", "", "", "", VariableOrigin.BUILTIN,
                 ProposalMatch.EMPTY);
-        assertThat(proposal0.hasDescription()).isTrue();
+        assertThat(proposal0.isDocumented()).isTrue();
         assertThat(proposal0.getDescription()).isEqualTo("Source: ");
 
         final RedVariableProposal proposal1 = new RedVariableProposal("${var}", "source", "", "",
                 VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
-        assertThat(proposal1.hasDescription()).isTrue();
+        assertThat(proposal1.isDocumented()).isTrue();
         assertThat(proposal1.getDescription()).isEqualTo("Source: source");
 
         final RedVariableProposal proposal2 = new RedVariableProposal("@{var}", "source", "val", "",
                 VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
-        assertThat(proposal2.hasDescription()).isTrue();
+        assertThat(proposal2.isDocumented()).isTrue();
         assertThat(proposal2.getDescription()).isEqualTo("Source: source\nValue: val");
 
         final RedVariableProposal proposal3 = new RedVariableProposal("&{var}", "source", "", "comment",
                 VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
-        assertThat(proposal3.hasDescription()).isTrue();
+        assertThat(proposal3.isDocumented()).isTrue();
         assertThat(proposal3.getDescription()).isEqualTo("Source: source\nComment: comment");
 
         final RedVariableProposal proposal4 = new RedVariableProposal("&{var}", "source", "val", "comment",
                 VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
-        assertThat(proposal4.hasDescription()).isTrue();
+        assertThat(proposal4.isDocumented()).isTrue();
         assertThat(proposal4.getDescription()).isEqualTo("Source: source\nValue: val\nComment: comment");
     }
 
