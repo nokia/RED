@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.libraries;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -13,8 +12,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.rf.ide.core.libraries.Documentation.DocFormat;
 
 import com.google.common.base.Objects;
 
@@ -28,7 +25,6 @@ public class KeywordSpecification {
     }
 
     private String name;
-    private String format;
     private String documentation;
 
     private List<String> arguments;
@@ -42,10 +38,6 @@ public class KeywordSpecification {
     @XmlAttribute
     public void setName(final String name) {
         this.name = name;
-    }
-
-    public void setFormat(final String format) {
-        this.format = format;
     }
 
     public String getDocumentation() {
@@ -77,10 +69,6 @@ public class KeywordSpecification {
                     && Pattern.compile("^\\*deprecated[^\\n\\r]*\\*.*").matcher(documentation.toLowerCase()).find());
         }
         return isDeprecated.booleanValue();
-    }
-
-    public Documentation createDocumentation(final Collection<String> localKeywords) {
-        return new Documentation(DocFormat.valueOf(format), documentation, localKeywords);
     }
 
     @Override

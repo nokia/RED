@@ -44,12 +44,12 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
         final String srcLabel = file.getFullPath().toString();
         final String docHref = createShowSuiteDocUri(file);
 
-        final String source = String.format("%s [%s]", Formatters.formatHyperlink(srcHref, srcLabel),
-                Formatters.formatHyperlink(docHref, "Documentation"));
+        final String source = String.format("%s [%s]", Formatters.hyperlink(srcHref, srcLabel),
+                Formatters.hyperlink(docHref, "Documentation"));
 
         final String args = HtmlEscapers.htmlEscaper().escape(keyword.createArgumentsDescriptor().getDescription());
 
-        return Formatters.formatSimpleHeader(imgUri, keyword.getName(),
+        return Formatters.simpleHeader(imgUri, keyword.getName(),
                 newArrayList("Source", source),
                 newArrayList("Arguments", args));
     }

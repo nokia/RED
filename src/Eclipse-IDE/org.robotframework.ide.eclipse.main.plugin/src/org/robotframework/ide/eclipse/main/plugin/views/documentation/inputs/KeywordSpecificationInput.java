@@ -56,7 +56,7 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
     public String provideHtml() {
         final RobotRuntimeEnvironment environment = project.getRuntimeEnvironment();
         final String header = createHeader();
-        final Documentation doc = kwSpec.createDocumentation(libSpec.getKeywordNames());
+        final Documentation doc = libSpec.createKeywordDocumentation(kwSpec.getName());
 
         return new DocumentationsFormatter(environment).format(header, doc, this::localKeywordsLinker);
     }
@@ -68,12 +68,12 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
         final String srcLabel = libSpec.getName();
         final String docHref = createShowLibDocUri();
 
-        final String source = String.format("%s [%s]", Formatters.formatHyperlink(srcHref, srcLabel),
-                Formatters.formatHyperlink(docHref, "Documentation"));
+        final String source = String.format("%s [%s]", Formatters.hyperlink(srcHref, srcLabel),
+                Formatters.hyperlink(docHref, "Documentation"));
 
         final String args = HtmlEscapers.htmlEscaper().escape(kwSpec.createArgumentsDescriptor().getDescription());
 
-        return Formatters.formatSimpleHeader(imgUri, kwSpec.getName(),
+        return Formatters.simpleHeader(imgUri, kwSpec.getName(),
                 newArrayList("Source", source),
                 newArrayList("Arguments", args));
     }
