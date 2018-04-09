@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_pjyZ0Af5Eee0EKWnoBYU9g,_ur0DkAf5Eee0EKWnoBYU9g,_s-ctEA4_EeePcNCRX_abWA
+Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_pjyZ0Af5Eee0EKWnoBYU9g,_ur0DkAf5Eee0EKWnoBYU9g,_hb89IDvxEeiDC73Fvf4wHA,_s-ctEA4_EeePcNCRX_abWA
 Element-Name: RemoteDebugForTheSameTestNameSuspend
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _TDBEsH2vEeeUiMBqkyjlBQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 4:07 PM
+Save-Time: 4/9/18 4:13 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -21,14 +21,6 @@ proc "check-if-red-marker-is-shown" [val text]{
 		    get-property "markers['1'][0].text" | equals $text| verify-true
 	}
 }		
-
-proc "check-error-in-editor" [val text]{
-	get-editor "TestFile.robot" | get-text-viewer | hover-text 1 10
-	get-window -from "Information Window" | get-editbox | get-property text 
-	    | equals $text | verify-true
-	check-if-red-marker-is-shown -text $text
-}
-
 
 proc "check-decorators-on-frames"  [val error_list] [val suite] [val project]{
 	
@@ -115,10 +107,9 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		get-window "Debugger error" | get-button Suspend | click
 		
 		//check if errors are shown in red highlightning and marker
-		check-error-in-editor "RED debugger: Unable to find test 'test 1'\n"
-			    + "There is no such test in current suite\n"
-			    + "Unable to find executable call of 'BuiltIn.Log' keyword"
-
+		check-error-in-editor "RED debugger: Unable to find test 'test 1'\\n"
+		    + "There is no such test in current suite\\n"
+		    + "Unable to find executable call of 'BuiltIn.Log' keyword\\n"
 		//check decorators in thread list
 		check-decorators-on-frames -error_list [list 0] -suite 1 -project 2
 				
@@ -145,7 +136,7 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		//go to Log kw defintion    
 		get-editor "BuiltIn.Log" | get-link "Click here" | click
 		
-		try -times 5 -delay 500 -command{
+		try -times 8 -delay 500 -command{
 			get-editor "BuiltIn.py"
 		}		
 		get-editor "BuiltIn.py" | get-text-viewer | get-property "getSelectionText()" | equals log | verify-true
@@ -158,9 +149,9 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		//-------------------------------------------------------------------------------------------------------------
 		//go out from log
 		get-button "Step Into (F5)" | click
-		check-error-in-editor -text "RED debugger: Unable to find test 'test 1'\n"
-		    + "There is no such test in current suite\n"
-		    + "Unable to find executable call of 'BuiltIn.Log' keyword" 
+		check-error-in-editor -text "RED debugger: Unable to find test 'test 1'\\n"
+		    + "There is no such test in current suite\\n"
+		    + "Unable to find executable call of 'BuiltIn.Log' keyword\\n" 
 		
 		check-decorators-on-frames -error_list [list 0] -suite 1 -project 2	
 		check-thread-list [list "[Test] test 1 [line: 1]"]
@@ -172,9 +163,9 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		try -times 4 -delay 1000 -command{
 			get-window "Debugger error" | get-button Suspend | click
 		}
-		check-error-in-editor  -text "RED debugger: Unable to find test 'test 2'\n"
-		    + "There is no such test in current suite\n"
-		    + "Unable to find executable call of 'res.kw from res' keyword"
+		check-error-in-editor  -text "RED debugger: Unable to find test 'test 2'\\n"
+		    + "There is no such test in current suite\\n"
+		    + "Unable to find executable call of 'res.kw from res' keyword\\n"
 		check-decorators-on-frames -error_list [list 0] -suite 1 -project 2
 		check-thread-list [list "[Test] test 2 [line: 1]"]
 		
@@ -224,9 +215,9 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		    click
 		}
 		
-		check-error-in-editor  -text "RED debugger: Unable to find test 'test 2'\n"
-		    + "There is no such test in current suite\n"
-		    + "Unable to find executable call of 'res.kw from res' keyword"
+		check-error-in-editor  -text "RED debugger: Unable to find test 'test 2'\\n"
+		    + "There is no such test in current suite\\n"
+		    + "Unable to find executable call of 'res.kw from res' keyword\\n"
 		check-decorators-on-frames -error_list [list 0] -suite 1 -project 2
 		check-thread-list [list "[Test] test 2 [line: 1]"]
 		
