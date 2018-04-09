@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 @XmlRootElement(name = "keywordspec")
 public class LibrarySpecification {
@@ -127,14 +128,6 @@ public class LibrarySpecification {
         this.constructor = constructor;
     }
 
-    public void propagateFormat() {
-        if (keywords != null) {
-            for (final KeywordSpecification kwSpec : keywords) {
-                kwSpec.setFormat(format);
-            }
-        }
-    }
-
     public boolean isAccessibleWithoutImport() {
         return Arrays.asList("BuiltIn", "Easter", "Reserved").contains(name);
     }
@@ -162,8 +155,20 @@ public class LibrarySpecification {
     }
 
     public Documentation createDocumentation() {
-        return new Documentation(DocFormat.valueOf(format), documentation,
-                getKeywordNames());
+        return new Documentation(DocFormat.valueOf(format), documentation, getKeywordNames());
+    }
+
+    public Documentation createConstructorDocumentation() {
+        Preconditions.checkState(constructor != null);
+        return new Documentation(DocFormat.valueOf(format), constructor.getDocumentation(), getKeywordNames());
+    }
+
+    public Documentation createKeywordDocumentation(final String keywordName) {
+        final KeywordSpecification spec = getKeywordsStream().filter(kw -> kw.getName().equals(keywordName))
+                .findFirst()
+                .orElse(null);
+        Preconditions.checkState(spec != null);
+        return new Documentation(DocFormat.valueOf(format), spec.getDocumentation(), getKeywordNames());
     }
 
     public Collection<String> getKeywordNames() {

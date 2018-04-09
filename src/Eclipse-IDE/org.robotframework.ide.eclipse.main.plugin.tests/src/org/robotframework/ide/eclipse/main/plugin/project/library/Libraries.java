@@ -36,7 +36,6 @@ public class Libraries {
         libSpec.setName(libName);
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();
-            kwSpec.setFormat("ROBOT");
             kwSpec.setName(kwName);
             libSpec.getKeywords().add(kwSpec);
         }
@@ -52,7 +51,6 @@ public class Libraries {
         libSpec.setName("Remote");
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();
-            kwSpec.setFormat("ROBOT");
             kwSpec.setName(kwName);
             libSpec.getKeywords().add(kwSpec);
         }
@@ -77,7 +75,6 @@ public class Libraries {
         libSpec.setDescriptor(descriptor);
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();
-            kwSpec.setFormat("ROBOT");
             kwSpec.setName(kwName);
             libSpec.getKeywords().add(kwSpec);
         }

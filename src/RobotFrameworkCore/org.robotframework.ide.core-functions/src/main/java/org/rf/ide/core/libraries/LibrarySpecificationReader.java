@@ -17,11 +17,7 @@ public class LibrarySpecificationReader {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(LibrarySpecification.class);
             final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            final LibrarySpecification specification = (LibrarySpecification) jaxbUnmarshaller
-                    .unmarshal(xmlLibspecFile);
-            specification.propagateFormat();
-
-            return specification;
+            return (LibrarySpecification) jaxbUnmarshaller.unmarshal(xmlLibspecFile);
 
         } catch (final JAXBException e) {
             throw new CannotReadLibrarySpecificationException("Unable to read library specification file", e);
