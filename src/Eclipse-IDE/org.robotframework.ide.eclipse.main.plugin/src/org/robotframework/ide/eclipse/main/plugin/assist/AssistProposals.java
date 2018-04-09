@@ -65,10 +65,8 @@ public class AssistProposals {
     static RedLibraryProposal createLibraryProposal(final RobotSuiteFile suiteFile, final LibrarySpecification libSpec,
             final ProposalMatch match) {
 
-        final String libraryName = libSpec.getName();
-        final List<String> arguments = new ArrayList<>(libSpec.getDescriptor().getArguments());
         final boolean isImported = suiteFile.getImportedLibraries().containsKey(libSpec);
-        return new RedLibraryProposal(libraryName, arguments, isImported, libSpec.getDocumentation(), match);
+        return new RedLibraryProposal(suiteFile.getProject(), libSpec, isImported, match);
     }
 
     static RedKeywordProposal createNotAccessibleLibraryKeywordProposal(final LibrarySpecification spec,

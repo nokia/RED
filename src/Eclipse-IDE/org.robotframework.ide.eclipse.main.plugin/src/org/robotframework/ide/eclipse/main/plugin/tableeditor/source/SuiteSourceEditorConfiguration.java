@@ -183,6 +183,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void setupAssistantProcessors(final ContentAssistant contentAssistant) {
+        final InformationControlSupport infoControlSupport = new InformationControlSupport(
+                "Press 'Tab' from proposal table or click for focus");
         final AssistantCallbacks assistantAccessor = new AssistantCallbacks() {
 
             @Override
@@ -195,34 +197,31 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 contentAssistant.showPossibleCompletions();
             }
         };
-        final Supplier<RobotSuiteFile> modelSupplier = new Supplier<RobotSuiteFile>() {
+        final Supplier<RobotSuiteFile> modelSupplier = () -> {
+            final RobotSuiteFile suiteModel = editor.getFileModel();
+            suiteModel.dispose();
 
-            @Override
-            public RobotSuiteFile get() {
-                final RobotSuiteFile suiteModel = editor.getFileModel();
-                suiteModel.dispose();
-
-                try {
-                    final RobotDocument document = (RobotDocument) editor.getDocument();
-                    final RobotFileOutput fileOutput = document.getNewestFileOutput();
-                    suiteModel.link(fileOutput);
-                } catch (final InterruptedException e) {
-                    // ok we'll return not-yet-parsed version
-                }
-                return suiteModel;
+            try {
+                final RobotDocument document = (RobotDocument) editor.getDocument();
+                final RobotFileOutput fileOutput = document.getNewestFileOutput();
+                suiteModel.link(fileOutput);
+            } catch (final InterruptedException e) {
+                // ok we'll return not-yet-parsed version
             }
+            return suiteModel;
         };
-        createSettingsAssist(contentAssistant, modelSupplier, assistantAccessor);
-        createVariablesAssist(contentAssistant, modelSupplier, assistantAccessor);
-        createKeywordsAssist(contentAssistant, modelSupplier, assistantAccessor);
-        createTestCasesAssist(contentAssistant, modelSupplier, assistantAccessor);
-        createDefaultAssist(contentAssistant, modelSupplier, assistantAccessor);
+        createSettingsAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
+        createVariablesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
+        createKeywordsAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
+        createTestCasesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
+        createDefaultAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
     }
 
-    private void createSettingsAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
-                contentAssistActivationTrigger);
+    private void createSettingsAssist(final InformationControlSupport infoControlSupport,
+            final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
+            final AssistantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+                modelSupplier, contentAssistActivationTrigger);
 
         final GeneralSettingsAssistProcessor settingNamesProcessor = new GeneralSettingsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
@@ -248,10 +247,11 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.addCompletionListener(cycledProcessor);
     }
 
-    private void createVariablesAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
-                contentAssistActivationTrigger);
+    private void createVariablesAssist(final InformationControlSupport infoControlSupport,
+            final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
+            final AssistantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+                modelSupplier, contentAssistActivationTrigger);
 
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
@@ -269,10 +269,11 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.addCompletionListener(cycledProcessor);
     }
 
-    private void createTestCasesAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
-                contentAssistActivationTrigger);
+    private void createTestCasesAssist(final InformationControlSupport infoControlSupport,
+            final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
+            final AssistantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+                modelSupplier, contentAssistActivationTrigger);
 
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
@@ -295,10 +296,11 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.addCompletionListener(cycledProcessor);
     }
 
-    private void createKeywordsAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
-                contentAssistActivationTrigger);
+    private void createKeywordsAssist(final InformationControlSupport infoControlSupport,
+            final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
+            final AssistantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+                modelSupplier, contentAssistActivationTrigger);
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
@@ -320,15 +322,16 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.addCompletionListener(cycledProcessor);
     }
 
-    private void createDefaultAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
+    private void createDefaultAssist(final InformationControlSupport infoControlSupport,
+            final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
+            final AssistantCallbacks assistantAccessor) {
         // we are adding all the assistants for default content type. Most of them (excluding
         // section headers assistant) are working in default content type only at the very last
         // position in file (this position always has default content type, but it can be actually
         // prepended with some valid meaningful content type
 
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
-                contentAssistActivationTrigger);
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+                modelSupplier, contentAssistActivationTrigger);
 
         final GeneralSettingsAssistProcessor generalSettingProcessor = new GeneralSettingsAssistProcessor(
                 assistContext);

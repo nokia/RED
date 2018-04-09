@@ -14,6 +14,9 @@ import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.TextStyle;
 import org.junit.Test;
+import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.libraries.LibrarySpecification;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.collect.Range;
@@ -22,8 +25,11 @@ public class RedLibraryProposalTest {
 
     @Test
     public void testProposalWithEmptyContentAndEmptyMatch() {
-        final RedLibraryProposal proposal = new RedLibraryProposal("", new ArrayList<String>(), false,
-                "desc", ProposalMatch.EMPTY);
+        final LibrarySpecification spec = LibrarySpecification.create("");
+        spec.setDescriptor(new LibraryDescriptor("", LibraryType.PYTHON, "path", new ArrayList<>()));
+        spec.setDocumentation("desc");
+        
+        final RedLibraryProposal proposal = new RedLibraryProposal(null, spec, false, ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEmpty();
         assertThat(proposal.getArguments()).isEmpty();
@@ -31,14 +37,17 @@ public class RedLibraryProposalTest {
         assertThat(proposal.getImage()).isEqualTo(RedImages.getLibraryImage());
         assertThat(proposal.getLabel()).isEmpty();
         assertThat(proposal.getStyledLabel().length()).isEqualTo(0);
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("desc");
     }
 
     @Test
     public void testProposalWithNonEmptyContentEmptyArgumentsAndEmptyMatch() {
-        final RedLibraryProposal proposal = new RedLibraryProposal("content", new ArrayList<String>(), false, "desc",
-                ProposalMatch.EMPTY);
+        final LibrarySpecification spec = LibrarySpecification.create("content");
+        spec.setDescriptor(new LibraryDescriptor("content", LibraryType.PYTHON, "path", new ArrayList<>()));
+        spec.setDocumentation("desc");
+
+        final RedLibraryProposal proposal = new RedLibraryProposal(null, spec, false, ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("content");
         assertThat(proposal.getArguments()).isEmpty();
@@ -47,14 +56,17 @@ public class RedLibraryProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("content");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("content");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("desc");
     }
 
     @Test
     public void testProposalWithNonEmptyContentNonEmptyArgumentsAndEmptyMatch() {
-        final RedLibraryProposal proposal = new RedLibraryProposal("content", newArrayList("arg1", "arg2"), false,
-                "desc", ProposalMatch.EMPTY);
+        final LibrarySpecification spec = LibrarySpecification.create("content");
+        spec.setDescriptor(new LibraryDescriptor("content", LibraryType.PYTHON, "path", newArrayList("arg1", "arg2")));
+        spec.setDocumentation("desc");
+
+        final RedLibraryProposal proposal = new RedLibraryProposal(null, spec, false, ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("content");
         assertThat(proposal.getArguments()).containsExactly("arg1", "arg2");
@@ -63,14 +75,17 @@ public class RedLibraryProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("content arg1 arg2");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("content arg1 arg2");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("desc");
     }
 
     @Test
     public void testAlreadyImportedProposalWithNonEmptyContentNonEmptyArgumentsAndEmptyMatch() {
-        final RedLibraryProposal proposal = new RedLibraryProposal("content", newArrayList("arg1", "arg2"), true,
-                "desc", ProposalMatch.EMPTY);
+        final LibrarySpecification spec = LibrarySpecification.create("content");
+        spec.setDescriptor(new LibraryDescriptor("content", LibraryType.PYTHON, "path", newArrayList("arg1", "arg2")));
+        spec.setDocumentation("desc");
+
+        final RedLibraryProposal proposal = new RedLibraryProposal(null, spec, true, ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("content");
         assertThat(proposal.getArguments()).containsExactly("arg1", "arg2");
@@ -92,14 +107,18 @@ public class RedLibraryProposalTest {
         assertThat(ranges[0].start).isEqualTo(17);
         assertThat(ranges[0].length).isEqualTo(19);
 
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("desc");
     }
 
     @Test
     public void testAlreadyImportedProposalWithNonEmptyContentNonEmptyArgumentsAndNonEmptyMatch() {
-        final RedLibraryProposal proposal = new RedLibraryProposal("content", newArrayList("arg1", "arg2"), true,
-                "desc", new ProposalMatch(Range.closedOpen(1, 5)));
+        final LibrarySpecification spec = LibrarySpecification.create("content");
+        spec.setDescriptor(new LibraryDescriptor("content", LibraryType.PYTHON, "path", newArrayList("arg1", "arg2")));
+        spec.setDocumentation("desc");
+
+        final RedLibraryProposal proposal = new RedLibraryProposal(null, spec, true,
+                new ProposalMatch(Range.closedOpen(1, 5)));
 
         assertThat(proposal.getContent()).isEqualTo("content");
         assertThat(proposal.getArguments()).containsExactly("arg1", "arg2");
@@ -131,7 +150,7 @@ public class RedLibraryProposalTest {
         assertThat(ranges[1].start).isEqualTo(17);
         assertThat(ranges[1].length).isEqualTo(19);
 
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("desc");
     }
 }

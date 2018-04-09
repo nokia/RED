@@ -141,16 +141,16 @@ public class SuiteSourceAssistantContextTest {
     @Test
     public void contextReturnsActivationTrigger() {
         final KeySequence trigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, '9'));
-        assertThat(new SuiteSourceAssistantContext(null, trigger).getActivationTrigger()).isSameAs(trigger);
+        assertThat(new SuiteSourceAssistantContext(null, null, trigger).getActivationTrigger()).isSameAs(trigger);
     }
 
     private SuiteSourceAssistantContext createContext(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(() -> model,
+        return new SuiteSourceAssistantContext(null, () -> model,
                 KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)));
     }
 
     private SuiteSourceAssistantContext createContext(final RobotSuiteFile model, final RedPreferences redPreferences) {
-        return new SuiteSourceAssistantContext(() -> model,
+        return new SuiteSourceAssistantContext(null, () -> model,
                 KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)),
                 new AssistPreferences(redPreferences));
     }

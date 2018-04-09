@@ -9,9 +9,11 @@ import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.InformationControlSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -20,23 +22,32 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class SuiteSourceAssistantContext {
 
+    private final InformationControlSupport infoControlSupport;
+
     private final Supplier<RobotSuiteFile> modelSupplier;
 
     private final KeySequence activationTrigger;
 
     private final AssistPreferences assistPreferences;
 
-    public SuiteSourceAssistantContext(final Supplier<RobotSuiteFile> modelSupplier,
-            final KeySequence activationTrigger) {
-        this(modelSupplier, activationTrigger, new AssistPreferences(RedPlugin.getDefault().getPreferences()));
+    public SuiteSourceAssistantContext(final InformationControlSupport infoControlSupport,
+            final Supplier<RobotSuiteFile> modelSupplier, final KeySequence activationTrigger) {
+        this(infoControlSupport, modelSupplier, activationTrigger,
+                new AssistPreferences(RedPlugin.getDefault().getPreferences()));
     }
 
     @VisibleForTesting
-    SuiteSourceAssistantContext(final Supplier<RobotSuiteFile> modelSupplier, final KeySequence activationTrigger,
+    SuiteSourceAssistantContext(final InformationControlSupport infoControlSupport,
+            final Supplier<RobotSuiteFile> modelSupplier, final KeySequence activationTrigger,
             final AssistPreferences assistPreferences) {
+        this.infoControlSupport = infoControlSupport;
         this.modelSupplier = modelSupplier;
         this.activationTrigger = activationTrigger;
         this.assistPreferences = assistPreferences;
+    }
+
+    public InformationControlSupport getInfoControlSupport() {
+        return infoControlSupport;
     }
 
     public void refreshPreferences() {
@@ -45,6 +56,10 @@ public class SuiteSourceAssistantContext {
 
     public RobotSuiteFile getModel() {
         return modelSupplier.get();
+    }
+
+    public RobotRuntimeEnvironment getEnvironment() {
+        return getModel().getProject().getRuntimeEnvironment();
     }
 
     public IFile getFile() {

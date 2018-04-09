@@ -72,7 +72,7 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
                     new Position(offset - userContent.length(), cellLength),
                     shouldActivate(settingProposal.getContent()));
 
-            proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));
+            proposals.add(new RedCompletionProposalAdapter(assist, settingProposal, modification));
         }
         return proposals;
     }

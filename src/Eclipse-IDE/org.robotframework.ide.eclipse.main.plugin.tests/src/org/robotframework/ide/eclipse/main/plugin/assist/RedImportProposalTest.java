@@ -45,7 +45,7 @@ public class RedImportProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("res");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("res");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -60,7 +60,7 @@ public class RedImportProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("lib");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("lib");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -89,7 +89,7 @@ public class RedImportProposalTest {
         assertThat(ranges[0].start).isEqualTo(0);
         assertThat(ranges[0].length).isEqualTo(3);
 
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 }
