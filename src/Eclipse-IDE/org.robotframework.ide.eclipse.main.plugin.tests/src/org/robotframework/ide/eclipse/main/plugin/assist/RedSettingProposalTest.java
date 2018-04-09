@@ -29,7 +29,7 @@ public class RedSettingProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("Documentation");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("Documentation");
         assertThat(proposal.getStyledLabel().getStyleRanges()).hasSize(0);
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -44,7 +44,7 @@ public class RedSettingProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("[Documentation]");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("[Documentation]");
         assertThat(proposal.getStyledLabel().getStyleRanges()).hasSize(0);
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Documentation of current test case");
     }
 
@@ -59,7 +59,7 @@ public class RedSettingProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("[Documentation]");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("[Documentation]");
         assertThat(proposal.getStyledLabel().getStyleRanges()).hasSize(0);
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Documentation of current keyword");
     }
 
@@ -96,7 +96,7 @@ public class RedSettingProposalTest {
         assertThat(ranges[1].start).isEqualTo(4);
         assertThat(ranges[1].length).isEqualTo(3);
 
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEmpty();
     }
 }

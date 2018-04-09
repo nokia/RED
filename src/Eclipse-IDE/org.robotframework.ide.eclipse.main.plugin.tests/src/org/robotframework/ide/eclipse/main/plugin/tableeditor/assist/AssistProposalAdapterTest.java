@@ -69,10 +69,10 @@ public class AssistProposalAdapterTest {
     @Test
     public void hasDescriptionIsTakenFromAdaptedProposal() {
         final AssistProposal proposal1 = mock(AssistProposal.class);
-        when(proposal1.hasDescription()).thenReturn(true);
+        when(proposal1.isDocumented()).thenReturn(true);
 
         final AssistProposal proposal2 = mock(AssistProposal.class);
-        when(proposal2.hasDescription()).thenReturn(false);
+        when(proposal2.isDocumented()).thenReturn(false);
 
         assertThat(new AssistProposalAdapter(proposal1).hasDescription()).isTrue();
         assertThat(new AssistProposalAdapter(proposal2).hasDescription()).isFalse();

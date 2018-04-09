@@ -44,7 +44,7 @@ public class CycledContentAssistProcessorTest {
                 r2 = mock(ICompletionProposal.class), r3 = mock(ICompletionProposal.class);
 
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, activationTrigger,
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -87,7 +87,7 @@ public class CycledContentAssistProcessorTest {
                 r2 = mock(ICompletionProposal.class), r3 = mock(ICompletionProposal.class);
 
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, activationTrigger,
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -122,7 +122,7 @@ public class CycledContentAssistProcessorTest {
     @Test
     public void nextProposalStatusesWithCorrectActivationTriggerAreSet_forNestedProcessors() throws Exception {
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, '9'));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, activationTrigger,
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -165,7 +165,7 @@ public class CycledContentAssistProcessorTest {
     @Test
     public void emptyNextProposalStatusIsSet_forSingleProcessor() throws Exception {
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, activationTrigger,
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -287,7 +287,7 @@ public class CycledContentAssistProcessorTest {
     public void activationCharsAreTakenFromPreferences() {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null,
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null,
                 assistPreferences);
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, null);
 

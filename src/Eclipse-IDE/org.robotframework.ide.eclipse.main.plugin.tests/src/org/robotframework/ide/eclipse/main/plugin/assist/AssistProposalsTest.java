@@ -27,6 +27,7 @@ import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
@@ -81,7 +82,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArgumentsDescriptor()).isEqualTo(ArgumentsDescriptor.createDescriptor("x", "*list"));
         assertThat(proposal.getImage()).isEqualTo(RedImages.getUserKeywordImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("kw1 - suite.robot");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).contains("myDocumentation");
         assertThat(proposal.isAccessible()).isTrue();
     }
@@ -107,7 +108,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArgumentsDescriptor()).isEqualTo(ArgumentsDescriptor.createDescriptor("x", "*list"));
         assertThat(proposal.getImage()).isEqualTo(RedImages.getKeywordImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("libKw - myLibrary");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).contains("myDocumentation");
         assertThat(proposal.isAccessible()).isTrue();
     }
@@ -133,7 +134,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArgumentsDescriptor()).isEqualTo(ArgumentsDescriptor.createDescriptor("x", "*list"));
         assertThat(proposal.getImage()).isEqualTo(RedImages.getKeywordImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("libKw - myNotImportedLibrary");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).contains("myDocumentation");
         assertThat(proposal.isAccessible()).isFalse();
     }
@@ -147,7 +148,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("${VAR}");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Source: Built-in\nValue: value");
     }
 
@@ -160,7 +161,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotListVariableImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("@{var}");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Source: varfile.py\nValue: value");
     }
 
@@ -173,7 +174,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("${var}");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Source: resfile.robot");
     }
 
@@ -186,7 +187,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotDictionaryVariableImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("&{var}");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Source: resfile.robot");
     }
 
@@ -199,7 +200,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("${scalar}");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Source: file.robot\nValue: 0\nComment: #something");
     }
 
@@ -211,7 +212,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotCasesFileSectionImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("*** name ***");
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -226,7 +227,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getImageForResource(toFile));
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("dir/file.txt");
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
 
         dir.delete(true, null);
@@ -246,7 +247,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getLibraryImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("library");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("docu");
     }
 
@@ -264,7 +265,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).containsExactly("http://location.org");
         assertThat(proposal.getImage()).isEqualTo(RedImages.getLibraryImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("library http://location.org");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("docu");
     }
 
@@ -276,7 +277,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("word");
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -288,7 +289,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotSettingImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("Documentation");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -300,7 +301,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotFileImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("resource");
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -312,7 +313,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotFileImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("resource");
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -324,7 +325,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getLibraryImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("library");
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -336,7 +337,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getLibraryImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("library");
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -347,7 +348,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("Fresh scalar");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Creates fresh scalar variable");
     }
 
@@ -358,7 +359,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).containsExactly("item");
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotListVariableImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("Fresh list");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Creates fresh list variable");
     }
 
@@ -369,7 +370,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).containsExactly("key=value");
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotDictionaryVariableImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("Fresh dictionary");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Creates fresh dictionary variable");
     }
 
@@ -499,7 +500,9 @@ public class AssistProposalsTest {
     }
 
     private RedLibraryProposal libProposal(final String name, final boolean isImported) {
-        return new RedLibraryProposal(name, new ArrayList<>(), isImported, "", ProposalMatch.EMPTY);
+        final LibrarySpecification spec = LibrarySpecification.create(name);
+        spec.setDescriptor(new LibraryDescriptor(name, LibraryType.PYTHON, "path", new ArrayList<>()));
+        return new RedLibraryProposal(null, spec, isImported, ProposalMatch.EMPTY);
     }
 
     private static RobotVariable createVariable() {

@@ -45,6 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
@@ -366,7 +367,7 @@ public class KeywordCallsAssistProcessorTest {
         }
 
         @Override
-        public boolean hasDescription() {
+        public boolean isDocumented() {
             return false;
         }
 
@@ -375,5 +376,9 @@ public class KeywordCallsAssistProcessorTest {
             return "";
         }
 
+        @Override
+        public DocumentationViewInput getDocumentationInput() {
+            return null;
+        }
     }
 }

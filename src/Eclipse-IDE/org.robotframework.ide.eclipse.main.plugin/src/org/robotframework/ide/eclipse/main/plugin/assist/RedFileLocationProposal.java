@@ -8,6 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
 
 class RedFileLocationProposal extends BaseAssistProposal {
 
@@ -30,5 +34,15 @@ class RedFileLocationProposal extends BaseAssistProposal {
     @Override
     public String getLabel() {
         return label;
+    }
+
+    @Override
+    public boolean isDocumented() {
+        return ASuiteFileDescriber.isResourceFile(targetFile);
+    }
+
+    @Override
+    public DocumentationViewInput getDocumentationInput() {
+        return new SuiteFileInput(RedPlugin.getModelManager().createSuiteFile(targetFile));
     }
 }

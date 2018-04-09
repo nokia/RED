@@ -20,7 +20,7 @@ class Assistant {
     }
 
     static SuiteSourceAssistantContext createAssistant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(() -> {
+        return new SuiteSourceAssistantContext(null, () -> {
             model.parse();
             return model;
         }, KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)),

@@ -71,7 +71,7 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
 
             final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, toSelect);
 
-            proposals.add(new RedCompletionProposalAdapter(proposal, modification));
+            proposals.add(new RedCompletionProposalAdapter(assist, proposal, modification));
         }
         return proposals;
     }
