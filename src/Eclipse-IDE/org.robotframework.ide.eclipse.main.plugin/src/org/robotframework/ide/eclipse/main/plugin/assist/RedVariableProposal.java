@@ -9,6 +9,8 @@ import java.util.Objects;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SingleParagraphInput;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -36,7 +38,7 @@ final class RedVariableProposal extends BaseAssistProposal {
     }
 
     @Override
-    public boolean hasDescription() {
+    public boolean isDocumented() {
         return true;
     }
 
@@ -49,6 +51,23 @@ final class RedVariableProposal extends BaseAssistProposal {
         }
         if (!comment.isEmpty()) {
             description.append("\nComment: " + comment);
+        }
+        return description.toString();
+    }
+
+    @Override
+    public DocumentationViewInput getDocumentationInput() {
+        return new SingleParagraphInput(this::getHtmlDesc);
+    }
+
+    private String getHtmlDesc() {
+        final StringBuilder description = new StringBuilder();
+        description.append("*Source:* " + source);
+        if (!value.isEmpty()) {
+            description.append("\n\n*Value:* " + value);
+        }
+        if (!comment.isEmpty()) {
+            description.append("\n\n*Comment:* " + comment);
         }
         return description.toString();
     }

@@ -39,6 +39,10 @@ public class DocumentationsFormatter {
         return "<html>" + writeHead() + "<body>" + bodySupplier.get() + "</body></html>";
     }
 
+    public String format(final Documentation documentation) {
+        return format("", documentation, "", name -> "#");
+    }
+
     public String format(final String header, final Documentation documentation,
             final Function<String, String> localKeywordsLinker) {
         return format(header, documentation, "", localKeywordsLinker);

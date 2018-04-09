@@ -9,24 +9,26 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
+import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-
-import com.google.common.base.Joiner;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.LibrarySpecificationInput;
 
 class RedLibraryProposal extends BaseAssistProposal {
 
-    private final List<String> arguments;
+    private final RobotProject robotProject;
+
+    private final LibrarySpecification librarySpecification;
 
     private final boolean isImported;
 
-    private final String description;
-
-    RedLibraryProposal(final String content, final List<String> arguments, final boolean isImported,
-            final String description, final ProposalMatch match) {
-        super(content, match);
-        this.arguments = arguments;
+    RedLibraryProposal(final RobotProject robotProject, final LibrarySpecification librarySpecification,
+            final boolean isImported, final ProposalMatch match) {
+        super(librarySpecification.getName(), match);
+        this.robotProject = robotProject;
+        this.librarySpecification = librarySpecification;
         this.isImported = isImported;
-        this.description = description;
     }
 
     boolean isImported() {
@@ -35,7 +37,7 @@ class RedLibraryProposal extends BaseAssistProposal {
 
     @Override
     public List<String> getArguments() {
-        return arguments;
+        return librarySpecification.getDescriptor().getArguments();
     }
 
     @Override
@@ -45,7 +47,12 @@ class RedLibraryProposal extends BaseAssistProposal {
 
     @Override
     public String getLabel() {
-        return super.getLabel() + (arguments.isEmpty() ? "" : " " + Joiner.on(' ').join(arguments));
+        final List<String> args = getArguments();
+        if (args.isEmpty()) {
+            return super.getLabel();
+        } else {
+            return super.getLabel() + " " + String.join(" ", args);
+        }
     }
 
     @Override
@@ -58,12 +65,17 @@ class RedLibraryProposal extends BaseAssistProposal {
     }
 
     @Override
-    public boolean hasDescription() {
+    public boolean isDocumented() {
         return true;
     }
 
     @Override
     public String getDescription() {
-        return description;
+        return librarySpecification.getDocumentation();
+    }
+
+    @Override
+    public DocumentationViewInput getDocumentationInput() {
+        return new LibrarySpecificationInput(robotProject, librarySpecification);
     }
 }

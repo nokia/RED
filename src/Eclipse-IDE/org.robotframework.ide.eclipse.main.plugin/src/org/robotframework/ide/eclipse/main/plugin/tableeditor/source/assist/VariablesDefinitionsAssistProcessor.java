@@ -92,7 +92,7 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
                                 : new ArrayList<>();
                         return createOperationsToPerformAfterAccepting(regionsToLinkedEdit);
                     });
-            proposals.add(new RedCompletionProposalAdapter(newVarProposal, modification));
+            proposals.add(new RedCompletionProposalAdapter(assist, newVarProposal, modification));
         }
         return proposals;
     }

@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SingleParagraphInput;
 
 class RedSettingProposal extends BaseAssistProposal {
 
@@ -24,12 +26,17 @@ class RedSettingProposal extends BaseAssistProposal {
     }
 
     @Override
-    public boolean hasDescription() {
+    public boolean isDocumented() {
         return true;
     }
 
     @Override
     public String getDescription() {
         return RedSettingProposals.getSettingDescription(target, content, "");
+    }
+
+    @Override
+    public DocumentationViewInput getDocumentationInput() {
+        return new SingleParagraphInput(this::getDescription);
     }
 }

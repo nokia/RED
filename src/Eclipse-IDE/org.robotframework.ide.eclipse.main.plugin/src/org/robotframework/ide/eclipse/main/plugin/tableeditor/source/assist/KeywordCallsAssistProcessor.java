@@ -88,7 +88,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
             });
             final IContextInformation contextInfo = new ContextInformation(null,
                     kwProposal.getArgumentsDescriptor().getDescription());
-            proposals.add(new RedCompletionProposalAdapter(kwProposal, modification, contextInfo));
+            proposals.add(new RedCompletionProposalAdapter(assist, kwProposal, modification, contextInfo));
         }
         return proposals;
     }

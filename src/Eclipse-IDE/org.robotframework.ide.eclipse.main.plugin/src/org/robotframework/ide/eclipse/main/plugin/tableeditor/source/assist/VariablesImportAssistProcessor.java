@@ -60,7 +60,7 @@ public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
             final DocumentModification modification = new DocumentModification("",
                     new Position(offset - userContent.length(), cellLength));
 
-            proposals.add(new RedCompletionProposalAdapter(proposal, modification));
+            proposals.add(new RedCompletionProposalAdapter(assist, proposal, modification));
         }
         return proposals;
     }
