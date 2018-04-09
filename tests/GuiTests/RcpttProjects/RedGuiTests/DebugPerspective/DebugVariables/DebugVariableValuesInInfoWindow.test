@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_znjMEBtDEeWSh6BKjAxDIw,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_znjMEBtDEeWSh6BKjAxDIw,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q,_hb89IDvxEeiDC73Fvf4wHA
 Element-Name: DebugVariableValuesInInfoWindow
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _oetugJnLEeWXV_VOYkM3Sw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/22/18 3:12 PM
+Save-Time: 4/9/18 2:59 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -17,7 +17,9 @@ Entry-Name: .content
 
 proc "check-variable-in-info-window" [val value]{
 	wait 100
-	get-window -from "Information Window" | get-editbox | get-property text | equals [concat "Current value:\n" $value] | verify-true
+	check-documentation-view [format "<body style=\"overflow: hidden;\"><p style=\"margin: 0px;\"><b>"
+	+ "Current value:</b></p><pre style=\"font-family: monospace; font-size: small; margin-top: 0px; background-color: inherit;\">"
+	+ "%s</pre></body></html>" $value]
 }
 
 
@@ -66,8 +68,8 @@ exec-with-options -disableJobWaiting -command {
 	
 	//new var
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 4 5
-	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \n"
-	    + ". New line here."
+	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \\n. New line here."
+	
 	//concat    
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 5 5
 	check-variable-in-info-window -value  "text7"
@@ -120,8 +122,7 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Step Into (F5)" | click
 	wait 500
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 19 28
-	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \n"
-	    + ". New line here."
+	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \\n. New line here."
 	    
 	//Should Be Equal As Strings    
 	try -times 5 -delay 500 -command{
