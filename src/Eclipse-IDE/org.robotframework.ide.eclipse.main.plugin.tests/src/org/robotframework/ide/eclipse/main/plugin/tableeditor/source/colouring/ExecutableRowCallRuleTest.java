@@ -173,18 +173,14 @@ public class ExecutableRowCallRuleTest {
     public void keywordCallTokenIsDetected_whenPositionedOutsideVariables() {
         final String text1 = "abc";
         final String text2 = "def";
-        final String index1 = "[0]";
         final String text3 = "ghi";
-        final String index2 = "[key]";
         final String text4 = "jkl";
-        final String content = text1 + "${var}" + text2 + "@{list}" + index1 + text3 + "&{dir}" + index2 + text4;
+        final String content = text1 + "${var}" + text2 + "@{list}[0]" + text3 + "&{dir}[key]" + text4;
 
         final List<Position> nonVarPositions = new ArrayList<>();
         nonVarPositions.add(new Position(content.indexOf(text1), text1.length()));
         nonVarPositions.add(new Position(content.indexOf(text2), text2.length()));
-        nonVarPositions.add(new Position(content.indexOf(index1), index1.length()));
         nonVarPositions.add(new Position(content.indexOf(text3), text3.length()));
-        nonVarPositions.add(new Position(content.indexOf(index2), index2.length()));
         nonVarPositions.add(new Position(content.indexOf(text4), text4.length()));
 
         for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
