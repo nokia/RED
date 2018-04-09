@@ -90,11 +90,12 @@ public class AssistProposalsTest {
     public void verifyKeywordProposalPropertiesMadeFromLibraryKeyword() throws Exception, CoreException {
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setName("myLibrary");
+        libSpec.setFormat("ROBOT");
         final KeywordSpecification kwSpec = new KeywordSpecification();
-        kwSpec.setFormat("ROBOT");
         kwSpec.setName("libKw");
         kwSpec.setArguments(newArrayList("x", "*list"));
         kwSpec.setDocumentation("myDocumentation");
+        libSpec.setKeywords(newArrayList(kwSpec));
 
         final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "Given ",
                 KeywordScope.STD_LIBRARY, Optional.empty(), new Path("test.robot"),
@@ -115,11 +116,12 @@ public class AssistProposalsTest {
     public void verifyKeywordProposalPropertiesMadeFromNotImportedLibraryKeyword() throws Exception, CoreException {
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setName("myNotImportedLibrary");
+        libSpec.setFormat("ROBOT");
         final KeywordSpecification kwSpec = new KeywordSpecification();
-        kwSpec.setFormat("ROBOT");
         kwSpec.setName("libKw");
         kwSpec.setArguments(newArrayList("x", "*list"));
         kwSpec.setDocumentation("myDocumentation");
+        libSpec.setKeywords(newArrayList(kwSpec));
 
         final RedKeywordProposal proposal = AssistProposals.createNotAccessibleLibraryKeywordProposal(libSpec, kwSpec,
                 "Given ", KeywordScope.STD_LIBRARY, Optional.empty(), new Path("test.robot"),
@@ -486,8 +488,8 @@ public class AssistProposalsTest {
         libSpec.setFormat("ROBOT");
         libSpec.setName(source);
         final KeywordSpecification kwSpec = new KeywordSpecification();
-        kwSpec.setFormat("ROBOT");
         kwSpec.setName(name);
+        libSpec.setKeywords(newArrayList(kwSpec));
         return AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "", KeywordScope.REF_LIBRARY,
                 Optional.empty(), new Path("test.robot"), AssistProposalPredicates.alwaysTrue(), ProposalMatch.EMPTY);
     }

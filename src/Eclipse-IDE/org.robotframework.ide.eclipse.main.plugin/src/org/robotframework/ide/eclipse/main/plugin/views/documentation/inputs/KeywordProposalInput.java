@@ -64,12 +64,12 @@ public class KeywordProposalInput extends InternalElementInput<RobotFileInternal
         final String srcLabel = isLibraryKeyword() ? proposal.getSourceName() : proposal.getExposingFilepath().toString();
         final String docHref = createShowSuiteOrLibDocUri();
 
-        final String source = String.format("%s [%s]", Formatters.formatHyperlink(srcHref, srcLabel),
-                Formatters.formatHyperlink(docHref, "Documentation"));
+        final String source = String.format("%s [%s]", Formatters.hyperlink(srcHref, srcLabel),
+                Formatters.hyperlink(docHref, "Documentation"));
 
         final String args = HtmlEscapers.htmlEscaper().escape(proposal.getArgumentsDescriptor().getDescription());
 
-        return Formatters.formatSimpleHeader(imgUri, proposal.getKeywordName(),
+        return Formatters.simpleHeader(imgUri, proposal.getKeywordName(),
                 newArrayList("Source", source),
                 newArrayList("Arguments", args));
     }
