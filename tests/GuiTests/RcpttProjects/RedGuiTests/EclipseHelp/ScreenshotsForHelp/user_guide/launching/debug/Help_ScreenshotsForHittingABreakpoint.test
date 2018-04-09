@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1YsIcA_rEei3ANeiXqtLag
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/16/18 2:47 PM
+Save-Time: 4/9/18 12:28 PM
 Tags: help
 Testcase-Type: ecl
 
@@ -35,7 +35,7 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click
 	with [get-view Variables | get-tree] {
 		wait-for-specified_line-in-first-thread -line 17 -nr_of_frames 3
-	    wait 3000
+	    wait 6000
 	    get-item "@{newList}" |  expand
 	    get-item "&{newDict}" |  expand
 	}
