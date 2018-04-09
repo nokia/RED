@@ -11,13 +11,13 @@ import java.util.Optional;
 import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IndexDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
 
 public class VariableUsageRule implements ISyntaxColouringRule {
 
@@ -48,8 +48,8 @@ public class VariableUsageRule implements ISyntaxColouringRule {
                 final int endOffset = declaration.getEndFromFile().getOffset();
                 final int currentOffset = token.getStartOffset() + offsetInToken;
                 if (currentOffset <= startOffset || currentOffset <= endOffset) {
-                    final IToken tokenToUse = declaration instanceof VariableDeclaration ? textToken
-                            : getTokenForNonVariablePart();
+                    final IToken tokenToUse = (declaration instanceof VariableDeclaration
+                            || declaration instanceof IndexDeclaration) ? textToken : getTokenForNonVariablePart();
                     final int offsetToUse = i == 0 ? startOffset + offsetInToken : startOffset;
                     return Optional.of(new PositionedTextToken(tokenToUse, offsetToUse, endOffset - offsetToUse + 1));
                 }
