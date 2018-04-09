@@ -82,18 +82,14 @@ public class VariableUsageRuleTest {
     public void defaultTokenIsDetected_whenPositionedOutsideVariables() {
         final String text1 = "abc";
         final String text2 = "def";
-        final String index1 = "[0]";
         final String text3 = "ghi";
-        final String index2 = "[key]";
         final String text4 = "jkl";
-        final String content = text1 + "${var}" + text2 + "@{list}" + index1 + text3 + "&{dir}" + index2 + text4;
+        final String content = text1 + "${var}" + text2 + "@{list}[0]" + text3 + "&{dir}[key]" + text4;
 
         final List<Position> nonVarPositions = new ArrayList<>();
         nonVarPositions.add(new Position(content.indexOf(text1), text1.length()));
         nonVarPositions.add(new Position(content.indexOf(text2), text2.length()));
-        nonVarPositions.add(new Position(content.indexOf(index1), index1.length()));
         nonVarPositions.add(new Position(content.indexOf(text3), text3.length()));
-        nonVarPositions.add(new Position(content.indexOf(index2), index2.length()));
         nonVarPositions.add(new Position(content.indexOf(text4), text4.length()));
 
         final RobotToken token = createToken(content);
@@ -109,6 +105,27 @@ public class VariableUsageRuleTest {
                 assertThat(evaluatedToken.get().getToken()).isSameAs(ISyntaxColouringRule.DEFAULT_TOKEN);
             }
         }
+    }
+
+    @Test
+    public void variableTokenIsDetected_forVariableWithIndex() {
+        final String var = "@{list}";
+        final String index = "[0]";
+        final RobotToken token = createToken(var + index);
+
+        final Optional<PositionedTextToken> evaluatedVar = evaluate(token);
+
+        assertThat(evaluatedVar).isPresent();
+        assertThat(evaluatedVar.get().getPosition())
+                .isEqualTo(new Position(token.getStartOffset(), var.length()));
+        assertThat(evaluatedVar.get().getToken().getData()).isEqualTo("token");
+
+        final Optional<PositionedTextToken> evaluatedIndex = evaluate(token, var.length());
+
+        assertThat(evaluatedIndex).isPresent();
+        assertThat(evaluatedIndex.get().getPosition())
+                .isEqualTo(new Position(var.length(), index.length()));
+        assertThat(evaluatedIndex.get().getToken().getData()).isEqualTo("token");
     }
 
     private RobotToken createToken(final String content) {
