@@ -57,20 +57,21 @@ public class RedSettingProposals {
         builder.put(SettingTarget.KEYWORD, "[return]",
                 "Specify the return value for this keyword. Multiple values can be used.");
 
-        builder.put(SettingTarget.GENERAL, "library", "");
-        builder.put(SettingTarget.GENERAL, "resource", "");
-        builder.put(SettingTarget.GENERAL, "variables", "");
-        builder.put(SettingTarget.GENERAL, "documentation", "");
-        builder.put(SettingTarget.GENERAL, "metadata", "");
-        builder.put(SettingTarget.GENERAL, "suite setup", "");
-        builder.put(SettingTarget.GENERAL, "suite teardown", "");
-        builder.put(SettingTarget.GENERAL, "force tags", "");
-        builder.put(SettingTarget.GENERAL, "default tags", "");
-        builder.put(SettingTarget.GENERAL, "test setup", "");
-        builder.put(SettingTarget.GENERAL, "test teardown", "");
-        builder.put(SettingTarget.GENERAL, "test template", "");
-        builder.put(SettingTarget.GENERAL, "test timeout", "");
-
+        builder.put(SettingTarget.GENERAL, "library", "Imports library given by its name or path");
+        builder.put(SettingTarget.GENERAL, "resource", "Imports resource file to be used in current suite");
+        builder.put(SettingTarget.GENERAL, "variables", "Imports variables file to be used in current suite");
+        builder.put(SettingTarget.GENERAL, "documentation", "Documentation of current suite");
+        builder.put(SettingTarget.GENERAL, "metadata", "Metadata current suite hold");
+        builder.put(SettingTarget.GENERAL, "suite setup", "The keyword %s is executed before executing any of the test cases or lower level suites");
+        builder.put(SettingTarget.GENERAL, "suite teardown", "The keyword %s is executed after all test cases and lower level suites have been executed");
+        builder.put(SettingTarget.GENERAL, "force tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
+        builder.put(SettingTarget.GENERAL, "default tags", "Sets tags to all tests cases in this suite, unless test case specifies own tags");
+        builder.put(SettingTarget.GENERAL, "test setup", "The keyword %s is executed before every test cases in this suite unless test cases override it");
+        builder.put(SettingTarget.GENERAL, "test teardown", "The keyword %s is executed after every test cases in this suite unless test cases override it");
+        builder.put(SettingTarget.GENERAL, "test template", "The keyword %s is used as default template keyword in this suite");
+        builder.put(SettingTarget.GENERAL, "test timeout",
+                "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
+                        + "Numerical values are interpreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
         DESCRIBED_SETTINGS = builder.build();
     }
 

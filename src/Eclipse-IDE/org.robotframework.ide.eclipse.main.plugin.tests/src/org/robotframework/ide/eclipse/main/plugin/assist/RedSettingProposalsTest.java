@@ -46,9 +46,12 @@ public class RedSettingProposalsTest {
 
     @Test
     public void settingDescriptionTest() {
-        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "documentation", "")).isEmpty();
-        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "metadata", "")).isEmpty();
-        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "library", "")).isEmpty();
+        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "documentation", ""))
+                .isEqualTo("Documentation of current suite");
+        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "metadata", ""))
+                .isEqualTo("Metadata current suite hold");
+        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "library", ""))
+                .isEqualTo("Imports library given by its name or path");
 
         assertThat(RedSettingProposals.getSettingDescription(SettingTarget.KEYWORD, "[documentation]", ""))
                 .isNotEmpty();

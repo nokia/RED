@@ -290,7 +290,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotSettingImage());
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("Documentation");
         assertThat(proposal.isDocumented()).isTrue();
-        assertThat(proposal.getDescription()).isEmpty();
+        assertThat(proposal.getDescription()).isEqualTo("Documentation of current suite");
     }
 
     @Test
