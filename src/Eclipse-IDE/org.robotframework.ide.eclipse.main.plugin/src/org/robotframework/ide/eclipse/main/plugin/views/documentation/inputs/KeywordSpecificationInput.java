@@ -54,7 +54,11 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
 
     @Override
     public String provideHtml() {
-        final RobotRuntimeEnvironment environment = project.getRuntimeEnvironment();
+        return provideHtml(project.getRuntimeEnvironment());
+    }
+
+    @Override
+    public String provideHtml(final RobotRuntimeEnvironment environment) throws DocumentationInputGenerationException {
         final String header = createHeader();
         final Documentation doc = libSpec.createKeywordDocumentation(kwSpec.getName());
 

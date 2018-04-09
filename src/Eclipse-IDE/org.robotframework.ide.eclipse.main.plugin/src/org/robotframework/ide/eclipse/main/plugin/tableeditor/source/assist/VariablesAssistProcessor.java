@@ -92,7 +92,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             final DocumentModification modification = new DocumentModification("",
                     new Position(offset - userContentToReplace.length(), lengthToReplace));
 
-            proposals.add(new RedCompletionProposalAdapter(varProposal, modification));
+            proposals.add(new RedCompletionProposalAdapter(assist, varProposal, modification));
         }
         return proposals;
     }

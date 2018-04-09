@@ -41,7 +41,7 @@ public class RedFileLocationProposalTest {
         assertThat(proposal.getImage()).isNotNull();
         assertThat(proposal.getLabel()).isEqualTo("label");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("label");
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -57,7 +57,7 @@ public class RedFileLocationProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("label");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("label");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -95,7 +95,7 @@ public class RedFileLocationProposalTest {
         assertThat(ranges[1].start).isEqualTo(4);
         assertThat(ranges[1].length).isEqualTo(1);
 
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 }

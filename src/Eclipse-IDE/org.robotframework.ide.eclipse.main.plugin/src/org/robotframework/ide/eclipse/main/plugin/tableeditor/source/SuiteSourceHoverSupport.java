@@ -45,6 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputGenerationException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 
 import com.google.common.base.Objects;
@@ -228,6 +229,10 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
             } else {
                 return docInput.map(DocumentationViewInput::provideRawText).orElse(null);
             }
+        } catch (final DocumentationInputGenerationException e) {
+            // ok then we will not show any hovers
+            return null;
+
         } catch (final RuntimeException e) {
             RedPlugin.logError("Unable to generate documentation", e);
             return null;

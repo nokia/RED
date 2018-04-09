@@ -68,7 +68,7 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
             final DocumentModification modification = new DocumentModification(contentSuffix,
                     new Position(offset - userContent.length(), cellLength));
 
-            proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));
+            proposals.add(new RedCompletionProposalAdapter(assist, settingProposal, modification));
         }
         return proposals;
     }

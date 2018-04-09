@@ -56,7 +56,11 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
 
     @Override
     public String provideHtml() {
-        final RobotRuntimeEnvironment environment = project.getRuntimeEnvironment();
+        return provideHtml(project.getRuntimeEnvironment());
+    }
+
+    @Override
+    public String provideHtml(final RobotRuntimeEnvironment environment) throws DocumentationInputGenerationException {
         final String header = createHeader(project.getProject(), specification);
         final Documentation doc = specification.createDocumentation();
         final String footer = createFooter(specification, environment);

@@ -94,7 +94,7 @@ public class AssistProposalAdapter implements RedContentProposal {
 
     @Override
     public boolean hasDescription() {
-        return wrappedProposal.hasDescription();
+        return wrappedProposal.isDocumented();
     }
 
     @Override

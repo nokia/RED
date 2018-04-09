@@ -13,20 +13,16 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
-import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.InformationControlSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -40,9 +36,9 @@ public class RedCompletionProposalAdapterTest {
         final DocumentModification modification1 = new DocumentModification("", new Position(0));
         final DocumentModification modification2 = new DocumentModification(" enhanced", new Position(0));
 
-        final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(proposal, modification1);
+        final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, proposal, modification1);
         assertThat(adapter1.getPrefixCompletionText(mock(IDocument.class), 0)).isEqualTo("content");
-        final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(proposal, modification2);
+        final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(null, proposal, modification2);
         assertThat(adapter2.getPrefixCompletionText(mock(IDocument.class), 0)).isEqualTo("content enhanced");
     }
 
@@ -51,25 +47,25 @@ public class RedCompletionProposalAdapterTest {
         final DocumentModification modification1 = new DocumentModification("", new Position(10));
         final DocumentModification modification2 = new DocumentModification("", new Position(20), true);
         final DocumentModification modification3 = new DocumentModification("", new Position(30),
-                () -> new ArrayList<Runnable>());
+                () -> new ArrayList<>());
         final DocumentModification modification4 = new DocumentModification("", new Position(40),
-                new Position(100, 200), () -> new ArrayList<Runnable>());
+                new Position(100, 200), () -> new ArrayList<>());
         final DocumentModification modification5 = new DocumentModification("", new Position(50),
-                new Position(100, 200), true, () -> new ArrayList<Runnable>());
+                new Position(100, 200), true, () -> new ArrayList<>());
 
-        final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, modification1);
+        final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, null, modification1);
         assertThat(adapter1.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(10);
 
-        final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(null, modification2);
+        final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(null, null, modification2);
         assertThat(adapter2.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(20);
 
-        final RedCompletionProposalAdapter adapter3 = new RedCompletionProposalAdapter(null, modification3);
+        final RedCompletionProposalAdapter adapter3 = new RedCompletionProposalAdapter(null, null, modification3);
         assertThat(adapter3.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(30);
 
-        final RedCompletionProposalAdapter adapter4 = new RedCompletionProposalAdapter(null, modification4);
+        final RedCompletionProposalAdapter adapter4 = new RedCompletionProposalAdapter(null, null, modification4);
         assertThat(adapter4.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(40);
 
-        final RedCompletionProposalAdapter adapter5 = new RedCompletionProposalAdapter(null, modification5);
+        final RedCompletionProposalAdapter adapter5 = new RedCompletionProposalAdapter(null, null, modification5);
         assertThat(adapter5.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(50);
     }
 
@@ -80,7 +76,7 @@ public class RedCompletionProposalAdapterTest {
         when(proposal.getImage()).thenReturn(imageDescriptor);
 
         final DocumentModification modification = new DocumentModification("", new Position(0));
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(proposal, modification);
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, proposal, modification);
         assertThat(adapter.getImage()).isSameAs(ImagesManager.getImage(imageDescriptor));
     }
 
@@ -91,7 +87,7 @@ public class RedCompletionProposalAdapterTest {
         when(proposal.getStyledLabel()).thenReturn(label);
 
         final DocumentModification modification = new DocumentModification("", new Position(0));
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(proposal, modification);
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, proposal, modification);
         assertThat(adapter.getStyledDisplayString()).isSameAs(label);
     }
 
@@ -102,7 +98,7 @@ public class RedCompletionProposalAdapterTest {
         when(proposal.getStyledLabel()).thenReturn(label);
 
         final DocumentModification modification = new DocumentModification("", new Position(0));
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(proposal, modification);
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, proposal, modification);
         assertThat(adapter.getDisplayString()).isEqualTo("label");
     }
 
@@ -116,7 +112,7 @@ public class RedCompletionProposalAdapterTest {
         };
         final DocumentModification modification = new DocumentModification("", new Position(0),
                 () -> newArrayList(r1, r2));
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, modification);
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, null, modification);
 
         assertThat(adapter.operationsToPerformAfterAccepting()).containsExactly(r1, r2);
     }
@@ -124,11 +120,11 @@ public class RedCompletionProposalAdapterTest {
     @Test
     public void assistantShouldBeActivateAfterAccept_whenItIsSpecifiedInModification() {
         final DocumentModification modification1 = new DocumentModification("", new Position(0), true);
-        final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, modification1);
+        final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, null, modification1);
         assertThat(adapter1.shouldActivateAssistantAfterAccepting()).isTrue();
 
         final DocumentModification modification2 = new DocumentModification("", new Position(0), false);
-        final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(null, modification2);
+        final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(null, null, modification2);
         assertThat(adapter2.shouldActivateAssistantAfterAccepting()).isFalse();
     }
 
@@ -137,7 +133,7 @@ public class RedCompletionProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
 
         final DocumentModification modification = new DocumentModification("", new Position(0));
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(proposal, modification);
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, proposal, modification);
         assertThat(adapter.getContextInformation()).isNull();
     }
 
@@ -147,7 +143,7 @@ public class RedCompletionProposalAdapterTest {
         final IContextInformation contextInfo = mock(IContextInformation.class);
 
         final DocumentModification modification = new DocumentModification("", new Position(0));
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(proposal, modification,
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, proposal, modification,
                 contextInfo);
         assertThat(adapter.getContextInformation()).isSameAs(contextInfo);
     }
@@ -166,9 +162,9 @@ public class RedCompletionProposalAdapterTest {
         final AssistProposal proposal3 = mock(AssistProposal.class);
         when(proposal3.getStyledLabel()).thenReturn(label3);
 
-        final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(proposal1, null);
-        final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(proposal2, null);
-        final RedCompletionProposalAdapter adapter3 = new RedCompletionProposalAdapter(proposal3, null);
+        final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, proposal1, null);
+        final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(null, proposal2, null);
+        final RedCompletionProposalAdapter adapter3 = new RedCompletionProposalAdapter(null, proposal3, null);
 
         assertThat(adapter1.compareTo(adapter2)).isNegative();
         assertThat(adapter1.compareTo(adapter3)).isNegative();
@@ -182,23 +178,29 @@ public class RedCompletionProposalAdapterTest {
 
     @Test
     public void descriptionIsTakenFromAdaptedProposal_ifThereIsADescription() {
+        final InformationControlSupport infoControlSupport = mock(InformationControlSupport.class);
+        when(infoControlSupport.isBrowserBased()).thenReturn(false);
+
+        final SuiteSourceAssistantContext context = mock(SuiteSourceAssistantContext.class);
+        when(context.getInfoControlSupport()).thenReturn(infoControlSupport);
+        
         final AssistProposal proposal = mock(AssistProposal.class);
-        when(proposal.hasDescription()).thenReturn(true);
+        when(proposal.isDocumented()).thenReturn(true);
         when(proposal.getDescription()).thenReturn("desc");
 
         final DocumentModification modification = new DocumentModification("", new Position(0));
-        assertThat(new RedCompletionProposalAdapter(proposal, modification).getAdditionalProposalInfo())
+        assertThat(new RedCompletionProposalAdapter(context, proposal, modification).getAdditionalProposalInfo())
                 .isEqualTo("desc");
     }
 
     @Test
     public void descriptionIsNull_IfThereIsNoDescription() {
         final AssistProposal proposal = mock(AssistProposal.class);
-        when(proposal.hasDescription()).thenReturn(false);
+        when(proposal.isDocumented()).thenReturn(false);
         when(proposal.getDescription()).thenReturn("desc");
 
         final DocumentModification modification = new DocumentModification("", new Position(0));
-        assertThat(new RedCompletionProposalAdapter(proposal, modification).getAdditionalProposalInfo()).isNull();
+        assertThat(new RedCompletionProposalAdapter(null, proposal, modification).getAdditionalProposalInfo()).isNull();
     }
 
     @Test
@@ -211,7 +213,7 @@ public class RedCompletionProposalAdapterTest {
         final DocumentModification modification = new DocumentModification(" with suffix",
                 new Position(9, 7));
 
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(proposal, modification);
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, proposal, modification);
         adapter.apply(document);
         assertThat(document).isEqualTo(new Document("document stuff with suffix is here"));
     }
@@ -219,9 +221,9 @@ public class RedCompletionProposalAdapterTest {
     @Test
     public void selectionIsTakenFromModification_whenProvided() {
         final DocumentModification modification = new DocumentModification("", new Position(0),
-                new Position(42, 84), () -> new ArrayList<Runnable>());
+                new Position(42, 84), () -> new ArrayList<>());
 
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, modification);
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, null, modification);
         assertThat(adapter.getSelection(mock(IDocument.class))).isEqualTo(new Point(42, 84));
     }
 
@@ -232,29 +234,7 @@ public class RedCompletionProposalAdapterTest {
 
         final DocumentModification modification = new DocumentModification("suffix", new Position(15));
 
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(proposal, modification);
+        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, proposal, modification);
         assertThat(adapter.getSelection(mock(IDocument.class))).isEqualTo(new Point(26, 0));
-    }
-
-    @Test
-    public void informationContentCreatorIsAlwaysNew() {
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, null);
-        final IInformationControlCreator creator1 = adapter.getInformationControlCreator();
-        final IInformationControlCreator creator2 = adapter.getInformationControlCreator();
-
-        assertThat(creator1).isNotSameAs(creator2);
-    }
-
-    @Test
-    public void informationControlCreatorAlwaysProvidesDefaultControl() {
-        final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, null);
-        final IInformationControlCreator creator = adapter.getInformationControlCreator();
-
-        final Shell shell = new Shell(Display.getCurrent());
-        final IInformationControl infoControl = creator.createInformationControl(shell);
-        assertThat(infoControl).isExactlyInstanceOf(DefaultInformationControl.class);
-
-        shell.close();
-        shell.dispose();
     }
 }

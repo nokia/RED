@@ -23,6 +23,8 @@ import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordProposalInput;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Range;
@@ -107,7 +109,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
     }
 
     @Override
-    public boolean hasDescription() {
+    public boolean isDocumented() {
         return true;
     }
 
@@ -120,6 +122,11 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
         builder.append(documentation.getRawDocumentation());
 
         return builder.toString();
+    }
+
+    @Override
+    public DocumentationViewInput getDocumentationInput() {
+        return new KeywordProposalInput(this);
     }
 
     public Documentation getDocumentation() {

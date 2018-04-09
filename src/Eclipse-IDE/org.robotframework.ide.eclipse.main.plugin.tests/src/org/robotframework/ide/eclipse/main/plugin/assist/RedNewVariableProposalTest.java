@@ -41,7 +41,7 @@ public class RedNewVariableProposalTest {
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getLabel()).isEqualTo("lbl");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("lbl");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("desc");
     }
 
@@ -56,7 +56,7 @@ public class RedNewVariableProposalTest {
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getLabel()).isEqualTo("lbl");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("lbl");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("desc");
     }
 
@@ -71,7 +71,7 @@ public class RedNewVariableProposalTest {
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getLabel()).isEqualTo("lbl");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("lbl");
-        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("desc");
     }
 }

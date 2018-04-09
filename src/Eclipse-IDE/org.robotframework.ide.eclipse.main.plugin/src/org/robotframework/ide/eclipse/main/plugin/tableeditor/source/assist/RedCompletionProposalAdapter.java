@@ -10,9 +10,7 @@ import java.util.Collection;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -22,12 +20,14 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.InformationControlSupport;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class RedCompletionProposalAdapter implements Comparable<RedCompletionProposalAdapter>, ICompletionProposal,
         ICompletionProposalExtension3, ICompletionProposalExtension6 {
+
+    private final SuiteSourceAssistantContext context;
 
     private final AssistProposal adaptedProposal;
 
@@ -35,12 +35,15 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
 
     private final IContextInformation contextInformation;
 
-    public RedCompletionProposalAdapter(final AssistProposal proposal, final DocumentModification modification) {
-        this(proposal, modification, null);
+
+    public RedCompletionProposalAdapter(final SuiteSourceAssistantContext context, final AssistProposal proposal,
+            final DocumentModification modification) {
+        this(context, proposal, modification, null);
     }
 
-    public RedCompletionProposalAdapter(final AssistProposal proposal, final DocumentModification modification,
-            final IContextInformation contextInformation) {
+    public RedCompletionProposalAdapter(final SuiteSourceAssistantContext context, final AssistProposal proposal,
+            final DocumentModification modification, final IContextInformation contextInformation) {
+        this.context = context;
         this.adaptedProposal = proposal;
         this.modification = modification;
         this.contextInformation = contextInformation;
@@ -82,14 +85,6 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
     }
 
     @Override
-    public String getAdditionalProposalInfo() {
-        if (adaptedProposal.hasDescription()) {
-            return adaptedProposal.getDescription();
-        }
-        return null;
-    }
-
-    @Override
     public String getDisplayString() {
         return getStyledDisplayString().getString();
     }
@@ -101,13 +96,21 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
 
     @Override
     public IInformationControlCreator getInformationControlCreator() {
-        return new IInformationControlCreator() {
+        final InformationControlSupport infoControlSupport = context.getInfoControlSupport();
+        return infoControlSupport.getHoverControlCreator();
+    }
 
-            @Override
-            public IInformationControl createInformationControl(final Shell parent) {
-                return new DefaultInformationControl(parent);
-            }
-        };
+    @Override
+    public String getAdditionalProposalInfo() {
+        if (!adaptedProposal.isDocumented()) {
+            return null;
+        }
+        
+        final InformationControlSupport infoControlSupport = context.getInfoControlSupport();
+        if (infoControlSupport.isBrowserBased()) {
+            return adaptedProposal.getDocumentationInput().provideHtml(context.getEnvironment());
+        }
+        return adaptedProposal.getDescription();
     }
 
     @Override
@@ -144,16 +147,16 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
         public Supplier<Collection<Runnable>> operationsAfterAccepting;
 
         public DocumentModification(final String contentSuffix, final Position toReplace) {
-            this(contentSuffix, toReplace, null, false, () -> new ArrayList<Runnable>());
+            this(contentSuffix, toReplace, null, false, () -> new ArrayList<>());
         }
 
         public DocumentModification(final String contentSuffix, final Position toReplace,
                 final boolean shouldActivate) {
-            this(contentSuffix, toReplace, null, shouldActivate, () -> new ArrayList<Runnable>());
+            this(contentSuffix, toReplace, null, shouldActivate, () -> new ArrayList<>());
         }
 
         public DocumentModification(final String contentSuffix, final Position toReplace, final Position toSelect) {
-            this(contentSuffix, toReplace, toSelect, false, () -> new ArrayList<Runnable>());
+            this(contentSuffix, toReplace, toSelect, false, () -> new ArrayList<>());
         }
 
         public DocumentModification(final String contentSuffix, final Position toReplace, final Position toSelect,

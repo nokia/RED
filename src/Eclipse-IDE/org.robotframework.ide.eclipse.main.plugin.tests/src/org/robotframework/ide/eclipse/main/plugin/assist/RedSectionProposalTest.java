@@ -26,7 +26,7 @@ public class RedSectionProposalTest {
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotCasesFileSectionImage());
         assertThat(proposal.getLabel()).isEmpty();
         assertThat(proposal.getStyledLabel().length()).isEqualTo(0);
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -40,7 +40,7 @@ public class RedSectionProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("section");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("section");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
@@ -69,7 +69,7 @@ public class RedSectionProposalTest {
         assertThat(ranges[0].start).isEqualTo(1);
         assertThat(ranges[0].length).isEqualTo(2);
 
-        assertThat(proposal.hasDescription()).isFalse();
+        assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 }

@@ -36,11 +36,18 @@ public class KeywordProposalInput extends InternalElementInput<RobotFileInternal
         super(element, selectedLabel);
     }
 
+    public KeywordProposalInput(final RedKeywordProposal proposal) {
+        super(null, null);
+        this.proposal = proposal;
+    }
+
     @Override
     public void prepare() {
-        proposal = new RedKeywordProposals(element.getSuiteFile()).getBestMatchingKeywordProposal(selectedLabel)
-                .orElseThrow(() -> new DocumentationInputGenerationException(
-                        "Keyword " + selectedLabel + "not found, nothing to display"));
+        if (proposal == null) {
+            proposal = new RedKeywordProposals(element.getSuiteFile()).getBestMatchingKeywordProposal(selectedLabel)
+                    .orElseThrow(() -> new DocumentationInputGenerationException(
+                            "Keyword " + selectedLabel + "not found, nothing to display"));
+        }
     }
 
     @Override
