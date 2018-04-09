@@ -151,8 +151,8 @@ class ExternalLibrariesImportCollector {
                     } else {
                         libraryImporters.put(libImport, currentSuite);
                     }
-                 } else  {
-                     libraryLocator.locateByName(currentSuite, name);
+                } else {
+                    libraryLocator.locateByName(currentSuite, name);
                 }
             } else if (!name.isEmpty() && !standardLibraryNames.contains(name)) {
                 if (unknownLibraryNames.containsKey(name)) {
