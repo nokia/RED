@@ -20,13 +20,8 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
-import org.eclipse.jface.internal.text.html.BrowserInformationControl;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
@@ -39,10 +34,6 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -54,24 +45,16 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksListener;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Streams;
 
-// supressing seems it semms that BrowserInformationControl will become part of the API in future
-// eclipse anyway
-@SuppressWarnings("restriction")
 public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 
-    private static boolean isBrowserBased = true;
+    private final InformationControlSupport infoSupport = new InformationControlSupport("Press 'F2' for focus");
 
     private final RobotSuiteFile suiteFile;
-
-    private IInformationControlCreator hoverControlCreator;
-    private IInformationControlCreator focusedPopupControlCreator;
 
     public SuiteSourceHoverSupport(final RobotSuiteFile file) {
         this.suiteFile = file;
@@ -134,7 +117,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     }
 
     private String formatMessage(final String msg) {
-        return isBrowserBased ? DocumentationsFormatter.create(() -> msg) : msg;
+        return infoSupport.isBrowserBased() ? DocumentationsFormatter.create(() -> msg) : msg;
     }
 
     private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {
@@ -161,7 +144,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         } else if (msgs.size() == 1) {
             return Optional.of(msgs.get(0));
         } else {
-            if (isBrowserBased) {
+            if (infoSupport.isBrowserBased()) {
                 return Optional
                         .of("<p style=\"margin:0;\"><b>Multiple markers at this line:</b></p>"
                             + "<ul style=\"margin-top:0;\">"
@@ -225,7 +208,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     }
 
     private String formatVariableValue(final String value) {
-        if (isBrowserBased) {
+        if (infoSupport.isBrowserBased()) {
             return DocumentationsFormatter.create(() -> "<p style=\"margin:0;\"><b>Current value:</b></p>"
                     + "<pre style=\"font-family: monospace; font-size: small; background-color: inherit; margin-top:0;\">"
                     + value
@@ -240,7 +223,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                 .findDocumentationForEditorSourceSelection(suiteFile, offset, hoveredText);
 
         try {
-            if (isBrowserBased) {
+            if (infoSupport.isBrowserBased()) {
                 return docInput.map(DocumentationViewInput::provideHtml).orElse(null);
             } else {
                 return docInput.map(DocumentationViewInput::provideRawText).orElse(null);
@@ -253,73 +236,6 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
     @Override
     public IInformationControlCreator getHoverControlCreator() {
-        if (hoverControlCreator == null) {
-            hoverControlCreator = new HoverControlCreator();
-        }
-        return hoverControlCreator;
-    }
-
-    protected IInformationControlCreator getFocusedPopupControlCreator() {
-        if (focusedPopupControlCreator == null) {
-            focusedPopupControlCreator = new FocusedPopupControlCreator();
-        }
-        return focusedPopupControlCreator;
-    }
-
-    private class HoverControlCreator extends AbstractReusableInformationControlCreator {
-
-        @Override
-        protected IInformationControl doCreateInformationControl(final Shell parent) {
-            isBrowserBased = BrowserInformationControl.isAvailable(parent);
-            if (isBrowserBased) {
-                return new HoverBrowserInformationControl(parent);
-            } else {
-                return new DefaultInformationControl(parent);
-            }
-        }
-    }
-
-    private class HoverBrowserInformationControl extends BrowserInformationControl {
-
-        private HoverBrowserInformationControl(final Shell parent) {
-            super(parent, JFaceResources.DEFAULT_FONT, "Press 'F2' for focus");
-        }
-
-        @Override
-        public IInformationControlCreator getInformationPresenterControlCreator() {
-            return getFocusedPopupControlCreator();
-        }
-
-        @Override
-        public Point computeSizeHint() {
-            final Point size = super.computeSizeHint();
-            size.x = Math.max(size.x, 400);
-            return size;
-        }
-    }
-
-    private static class FocusedPopupControlCreator extends AbstractReusableInformationControlCreator {
-
-        @Override
-        protected IInformationControl doCreateInformationControl(final Shell parent) {
-            if (isBrowserBased) {
-                return new FocusedPopupBrowserInformationControl(parent);
-            } else {
-                return new DefaultInformationControl(parent);
-            }
-        }
-    }
-
-    private static class FocusedPopupBrowserInformationControl extends BrowserInformationControl {
-
-        private FocusedPopupBrowserInformationControl(final Shell parent) {
-            super(parent, JFaceResources.DEFAULT_FONT, true);
-
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            final DocumentationsLinksSupport support = new DocumentationsLinksSupport(page, input -> {
-                setInput(input.provideHtml());
-            });
-            addLocationListener(new DocumentationsLinksListener(support));
-        }
+        return infoSupport.getHoverControlCreator();
     }
 }
