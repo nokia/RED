@@ -26,7 +26,7 @@ public class CodeTableContentTooltip extends RedNatTableContentTooltip {
 
     @Override
     protected String getText(final Event event) {
-        String text = super.getText(event);
+        final String text = super.getText(event);
 
         final int col = natTable.getColumnPositionByX(event.x);
         if (col == 1 && RedSettingProposals.isSetting(settingTarget, text)) {
@@ -34,7 +34,7 @@ public class CodeTableContentTooltip extends RedNatTableContentTooltip {
             final ILayerCell cell = natTable.getCellByPosition(col + 1, row);
             final String keyword = cell != null && cell.getDataValue() != null
                     && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue() : "";
-            text = RedSettingProposals.getSettingDescription(settingTarget, text, keyword);
+            return RedSettingProposals.getSettingDescription(settingTarget, text, keyword);
         }
         return text;
     }
