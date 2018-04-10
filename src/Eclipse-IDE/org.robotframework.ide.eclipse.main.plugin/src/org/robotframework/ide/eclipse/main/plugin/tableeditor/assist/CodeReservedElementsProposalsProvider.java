@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
@@ -22,9 +23,13 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 
 public class CodeReservedElementsProposalsProvider implements RedContentProposalProvider {
 
+    private final RobotRuntimeEnvironment environment;
+
     private final IRowDataProvider<?> dataProvider;
 
-    public CodeReservedElementsProposalsProvider(final IRowDataProvider<?> dataProvider) {
+    public CodeReservedElementsProposalsProvider(final RobotRuntimeEnvironment environment,
+            final IRowDataProvider<?> dataProvider) {
+        this.environment = environment;
         this.dataProvider = dataProvider;
     }
 
@@ -40,8 +45,8 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
 
         return reservedWordProposals.stream()
                 .map(proposal -> RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())
-                        ? new AssistProposalAdapter(proposal, " ")
-                        : new AssistProposalAdapter(proposal, p -> true))
+                        ? new AssistProposalAdapter(environment, proposal, " ")
+                        : new AssistProposalAdapter(environment, proposal, p -> true))
                 .toArray(RedContentProposal[]::new);
     }
 

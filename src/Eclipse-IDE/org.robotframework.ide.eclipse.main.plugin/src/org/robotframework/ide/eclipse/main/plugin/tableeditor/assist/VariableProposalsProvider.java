@@ -14,6 +14,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
@@ -63,8 +64,9 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> variableProposals = new RedVariableProposals(suiteFile, predicate)
                 .getVariableProposals(userContentToReplace, getModelElement(rowElement));
 
+        final RobotRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
         return variableProposals.stream()
-                .map(proposal -> new AssistProposalAdapter(proposal, modificationStrategy))
+                .map(proposal -> new AssistProposalAdapter(env, proposal, modificationStrategy))
                 .toArray(RedContentProposal[]::new);
     }
 
