@@ -26,6 +26,8 @@ import org.rf.ide.core.project.ResolvedImportPath;
 import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.model.IRegionCacheable;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
@@ -135,6 +137,29 @@ public class RobotSetting extends RobotKeywordCall {
     @Override
     public ImageDescriptor getImage() {
         return RedImages.getRobotSettingImage();
+    }
+
+    @Override
+    public Optional<? extends RobotElement> findElement(final int offset) {
+        final AModelElement<?> linkedElement = getLinkedElement();
+        if (linkedElement instanceof IRegionCacheable<?>) {
+            final List<FileRegion> regions = ((IRegionCacheable<?>) linkedElement).getContinuousRegions();
+            // the linked element may be made from couple of elements defined in different places
+            // inside the file
+            for (final FileRegion region : regions) {
+                if (!region.getStart().isNotSet() && region.getStart().getOffset() <= offset
+                        && offset <= region.getEnd().getOffset()) {
+                    return Optional.of(this);
+                }
+            }
+
+        } else {
+            if (!linkedElement.getBeginPosition().isNotSet() && linkedElement.getBeginPosition().getOffset() <= offset
+                    && offset <= linkedElement.getEndPosition().getOffset()) {
+                return Optional.of(this);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
