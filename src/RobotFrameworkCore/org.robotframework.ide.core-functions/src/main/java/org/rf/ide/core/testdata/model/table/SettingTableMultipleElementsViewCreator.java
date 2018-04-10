@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model.table;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
@@ -28,111 +29,44 @@ import org.rf.ide.core.testdata.model.table.setting.views.TestTimeoutView;
 public class SettingTableMultipleElementsViewCreator {
 
     public Optional<SuiteDocumentation> createViewAboutSuiteDoc(final List<SuiteDocumentation> docs) {
-        Optional<SuiteDocumentation> doc = Optional.empty();
-        if (!docs.isEmpty()) {
-            if (docs.size() == 1) {
-                doc = Optional.of(docs.get(0));
-            } else {
-                doc = Optional.of(((SuiteDocumentation) new SuiteDocumentationView(docs)));
-            }
-        }
-
-        return doc;
+        return createView(docs, SuiteDocumentationView::new);
     }
 
     public Optional<SuiteSetup> createViewAboutSuiteSetup(final List<SuiteSetup> setups) {
-        Optional<SuiteSetup> setup = Optional.empty();
-
-        if (!setups.isEmpty()) {
-            if (setups.size() == 1) {
-                setup = Optional.of(setups.get(0));
-            } else {
-                setup = Optional.of(((SuiteSetup) new SuiteSetupView(setups)));
-            }
-        }
-
-        return setup;
+        return createView(setups, SuiteSetupView::new);
     }
 
     public Optional<SuiteTeardown> createViewAboutSuiteTeardown(final List<SuiteTeardown> teardowns) {
-        Optional<SuiteTeardown> teardown = Optional.empty();
-
-        if (!teardowns.isEmpty()) {
-            if (teardowns.size() == 1) {
-                teardown = Optional.of(teardowns.get(0));
-            } else {
-                teardown = Optional.of(((SuiteTeardown) new SuiteTeardownView(teardowns)));
-            }
-        }
-
-        return teardown;
+        return createView(teardowns, SuiteTeardownView::new);
     }
 
     public Optional<TestSetup> createViewAboutTestSetup(final List<TestSetup> setups) {
-        Optional<TestSetup> setup = Optional.empty();
-
-        if (!setups.isEmpty()) {
-            if (setups.size() == 1) {
-                setup = Optional.of(setups.get(0));
-            } else {
-                setup = Optional.of(((TestSetup) new TestSetupView(setups)));
-            }
-        }
-
-        return setup;
+        return createView(setups, TestSetupView::new);
     }
 
     public Optional<TestTeardown> createViewAboutTestTeardown(final List<TestTeardown> teardowns) {
-        Optional<TestTeardown> teardown = Optional.empty();
-
-        if (!teardowns.isEmpty()) {
-            if (teardowns.size() == 1) {
-                teardown = Optional.of(teardowns.get(0));
-            } else {
-                teardown = Optional.of(((TestTeardown) new TestTeardownView(teardowns)));
-            }
-        }
-
-        return teardown;
+        return createView(teardowns, TestTeardownView::new);
     }
 
     public Optional<ForceTags> createViewAboutForceTags(final List<ForceTags> tags) {
-        Optional<ForceTags> tagged = Optional.empty();
-
-        if (!tags.isEmpty()) {
-            if (tags.size() == 1) {
-                tagged = Optional.of(tags.get(0));
-            } else {
-                tagged = Optional.of(((ForceTags) new ForceTagsView(tags)));
-            }
-        }
-
-        return tagged;
+        return createView(tags, ForceTagsView::new);
     }
 
     public Optional<DefaultTags> createViewAboutDefaultTags(final List<DefaultTags> tags) {
-        Optional<DefaultTags> tagged = Optional.empty();
-        if (!tags.isEmpty()) {
-            if (tags.size() == 1) {
-                tagged = Optional.of(tags.get(0));
-            } else {
-                tagged = Optional.of(((DefaultTags) new DefaultTagsView(tags)));
-            }
-        }
-
-        return tagged;
+        return createView(tags, DefaultTagsView::new);
     }
 
     public Optional<TestTimeout> createViewAboutTestTimeout(final List<TestTimeout> timeouts) {
-        Optional<TestTimeout> timeout = Optional.empty();
-        if (!timeouts.isEmpty()) {
-            if (timeouts.size() == 1) {
-                timeout = Optional.of(timeouts.get(0));
-            } else {
-                timeout = Optional.of(((TestTimeout) new TestTimeoutView(timeouts)));
-            }
-        }
+        return createView(timeouts, TestTimeoutView::new);
+    }
 
-        return timeout;
+    private static <T> Optional<T> createView(final List<T> settings, final Function<List<T>, T> viewCreator) {
+        if (settings.isEmpty()) {
+            return Optional.empty();
+        } else if (settings.size() == 1) {
+            return Optional.of(settings.get(0));
+        } else {
+            return Optional.of(viewCreator.apply(settings));
+        }
     }
 }
