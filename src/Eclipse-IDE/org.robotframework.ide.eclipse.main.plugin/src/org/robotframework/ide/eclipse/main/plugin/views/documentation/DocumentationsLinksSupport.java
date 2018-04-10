@@ -39,16 +39,28 @@ public class DocumentationsLinksSupport {
     private final IWorkbenchPage page;
     private final IWorkbenchBrowserSupport browserSupport;
     private final DocumentationDisplayer displayer;
+    private final Runnable whenLocationChangeOutsideOfDisplayer;
 
     public DocumentationsLinksSupport(final IWorkbenchPage page, final DocumentationDisplayer displayer) {
-        this(page, PlatformUI.getWorkbench().getBrowserSupport(), displayer);
+        this(page, PlatformUI.getWorkbench().getBrowserSupport(), displayer, null);
+    }
+
+    public DocumentationsLinksSupport(final IWorkbenchPage page, final DocumentationDisplayer displayer,
+            final Runnable whenLocationChangeOutsideOfDisplayer) {
+        this(page, PlatformUI.getWorkbench().getBrowserSupport(), displayer, whenLocationChangeOutsideOfDisplayer);
     }
 
     public DocumentationsLinksSupport(final IWorkbenchPage page, final IWorkbenchBrowserSupport browserSupport,
             final DocumentationDisplayer displayer) {
+        this(page, browserSupport, displayer, null);
+    }
+
+    private DocumentationsLinksSupport(final IWorkbenchPage page, final IWorkbenchBrowserSupport browserSupport,
+            final DocumentationDisplayer displayer, final Runnable whenLocationChangeOutsideOfDisplayer) {
         this.page = page;
         this.browserSupport = browserSupport;
         this.displayer = displayer;
+        this.whenLocationChangeOutsideOfDisplayer = whenLocationChangeOutsideOfDisplayer;
     }
 
     boolean changeLocationTo(final URI locationUri) {
@@ -80,7 +92,7 @@ public class DocumentationsLinksSupport {
 
         } else {
             // all other links will be handled by workbench browser
-            return new ExternalBrowserUri(locationUri, browserSupport);
+            return new ExternalBrowserUri(locationUri, browserSupport, whenLocationChangeOutsideOfDisplayer);
         }
     }
 
@@ -90,6 +102,8 @@ public class DocumentationsLinksSupport {
 
     private void openLibrarySource(final RobotProject robotProject, final Optional<LibrarySpecification> libSpec,
             final Optional<KeywordSpecification> kwSpec) {
+
+        notifyMovingOutOfDisplayer();
 
         final IProject project = robotProject.getProject();
         final RobotModel model = (RobotModel) robotProject.getParent();
@@ -119,6 +133,7 @@ public class DocumentationsLinksSupport {
     }
 
     private void openFile(final Optional<IFile> file, @SuppressWarnings("unused") final Map<String, String> params) {
+        notifyMovingOutOfDisplayer();
         if (file.isPresent()) {
             SourceOpeningSupport.tryToOpenInEditor(page, file.get());
         } else {
@@ -127,6 +142,7 @@ public class DocumentationsLinksSupport {
     }
 
     private void openFileSource(final Optional<IFile> file, final Map<String, String> params) {
+        notifyMovingOutOfDisplayer();
         final Optional<? extends RobotFileInternalElement> element = findElement(file, params);
         if (element.isPresent()) {
             element.get().getOpenRobotEditorStrategy().run(page);
@@ -180,6 +196,12 @@ public class DocumentationsLinksSupport {
                     .findFirst();
         } else {
             return Optional.empty();
+        }
+    }
+
+    private void notifyMovingOutOfDisplayer() {
+        if (whenLocationChangeOutsideOfDisplayer != null) {
+            whenLocationChangeOutsideOfDisplayer.run();
         }
     }
 

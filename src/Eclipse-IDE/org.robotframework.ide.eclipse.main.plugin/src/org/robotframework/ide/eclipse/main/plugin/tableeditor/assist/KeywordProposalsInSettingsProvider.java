@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
@@ -49,8 +50,9 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
         final Predicate<AssistProposal> shouldCommitAfterAccepting = proposal -> !EmbeddedKeywordNamesSupport
                 .hasEmbeddedArguments(proposal.getContent());
 
+        final RobotRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
         return keywordsProposals.stream()
-                .map(proposal -> new AssistProposalAdapter(proposal, shouldCommitAfterAccepting,
+                .map(proposal -> new AssistProposalAdapter(env, proposal, shouldCommitAfterAccepting,
                         () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal,
                                 (NatTableAssistantContext) context)))
                 .toArray(RedContentProposal[]::new);

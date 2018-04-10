@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
@@ -45,15 +46,17 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> keywordsProposals = new RedKeywordProposals(suiteFile.get())
                 .getKeywordProposals(prefix);
 
+        final RobotRuntimeEnvironment env = suiteFile.get().getProject().getRuntimeEnvironment();
         if (!dataProvider.isPresent()) {
-            return keywordsProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
+            return keywordsProposals.stream().map(proposal -> new AssistProposalAdapter(env, proposal)).toArray(
+                    RedContentProposal[]::new);
         }
 
         final Predicate<AssistProposal> shouldCommitAfterAccepting = proposal -> !EmbeddedKeywordNamesSupport
                 .hasEmbeddedArguments(proposal.getContent());
 
         return keywordsProposals.stream()
-                .map(proposal -> new AssistProposalAdapter(proposal, shouldCommitAfterAccepting,
+                .map(proposal -> new AssistProposalAdapter(env, proposal, shouldCommitAfterAccepting,
                         () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal,
                                 (NatTableAssistantContext) context)))
                 .toArray(RedContentProposal[]::new);
