@@ -5,59 +5,48 @@
  */
 package org.rf.ide.core.executor;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
+import java.io.File;
 import java.util.EnumSet;
 import java.util.List;
-
+import java.util.Optional;
 
 public enum SuiteExecutor {
 
-    Python {
-        @Override
-        public String executableName() {
-            return "python" + getExtension();
-        }
-    },
-    Jython {
-        @Override
-        public String executableName() {
-            return "jython" + getExtension();
-        }
-    },
-    IronPython {
-        @Override
-        public String executableName() {
-            return "ipy" + getExtension();
-        }
-    },
-    IronPython64 {
-        @Override
-        public String executableName() {
-            return "ipy64" + getExtension();
-        }
-    },
-    PyPy {
-        @Override
-        public String executableName() {
-            return "pypy" + getExtension();
-        }
-    };
+    Python("python"),
+    Python2("python2"),
+    Python3("python3"),
+    Jython("jython"),
+    IronPython("ipy"),
+    IronPython64("ipy64"),
+    PyPy("pypy");
+
+    private String fileName;
+
+    private SuiteExecutor(final String fileName) {
+        this.fileName = fileName;
+    }
 
     public static SuiteExecutor fromName(final String name) {
         return SuiteExecutor.valueOf(name);
     }
 
-    public static List<String> allExecutorNames() {
-        final List<String> names = new ArrayList<>();
-        for (final SuiteExecutor executor : EnumSet.allOf(SuiteExecutor.class)) {
-            names.add(executor.name());
+    public static Optional<SuiteExecutor> fromLocation(final File location) {
+        if (!location.isFile()) {
+            return Optional.empty();
         }
-        return names;
+        return EnumSet.allOf(SuiteExecutor.class)
+                .stream()
+                .filter(executor -> location.getName().equals(executor.executableName()))
+                .findFirst();
     }
 
-    public abstract String executableName();
+    public static List<String> allExecutorNames() {
+        return EnumSet.allOf(SuiteExecutor.class).stream().map(SuiteExecutor::name).collect(toList());
+    }
 
-    private static String getExtension() {
-        return RedSystemProperties.isWindowsPlatform() ? ".exe" : "";
+    public String executableName() {
+        return RedSystemProperties.isWindowsPlatform() ? fileName + ".exe" : fileName;
     }
 }
