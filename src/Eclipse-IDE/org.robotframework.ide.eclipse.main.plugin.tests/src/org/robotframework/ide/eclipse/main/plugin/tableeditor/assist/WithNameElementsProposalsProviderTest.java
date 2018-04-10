@@ -75,7 +75,7 @@ public class WithNameElementsProposalsProviderTest {
                 .filter(element -> !(element instanceof RobotSetting))
                 .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(dataProvider);
+        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
 
         for (int column = 0; column < 10; column++) {
             int row = 0;
@@ -96,7 +96,7 @@ public class WithNameElementsProposalsProviderTest {
 
         final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(dataProvider);
+        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
 
         for (int column = 0; column < 2; column++) {
 
@@ -118,7 +118,7 @@ public class WithNameElementsProposalsProviderTest {
 
         final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(dataProvider);
+        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
 
         int row = 0;
         for (@SuppressWarnings("unused")
@@ -137,7 +137,7 @@ public class WithNameElementsProposalsProviderTest {
 
         final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(dataProvider);
+        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
 
         int row = 0;
         for (@SuppressWarnings("unused")
@@ -160,7 +160,7 @@ public class WithNameElementsProposalsProviderTest {
 
         final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(dataProvider);
+        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
 
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("with");
@@ -181,7 +181,7 @@ public class WithNameElementsProposalsProviderTest {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(libraryImport);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(dataProvider);
+        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
 
         for (int column = 0; column < 10; column++) {
             if (column == 0 || column == 1) { // we only test for at least third column
