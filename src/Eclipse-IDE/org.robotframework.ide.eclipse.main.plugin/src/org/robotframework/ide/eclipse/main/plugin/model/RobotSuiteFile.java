@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -370,12 +371,20 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return this;
     }
 
+    /**
+     * Returns project to which this file belongs. May be null for RobotSuiteStreamFile objects
+     */
     public RobotProject getProject() {
         RobotElement current = parent;
-        while (!(current instanceof RobotProject)) {
+        while (current != null && !(current instanceof RobotProject)) {
             current = current.getParent();
         }
         return (RobotProject) current;
+    }
+
+    public RobotRuntimeEnvironment getRuntimeEnvironment() {
+        final RobotProject project = getProject();
+        return project == null ? null : project.getRuntimeEnvironment();
     }
 
     public <T extends RobotElement> Optional<T> findSection(final Class<T> sectionClass) {

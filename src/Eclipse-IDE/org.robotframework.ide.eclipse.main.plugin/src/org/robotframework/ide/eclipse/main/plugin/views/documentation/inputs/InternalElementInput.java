@@ -50,7 +50,7 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> implemen
 
     @Override
     public final String provideHtml() {
-        return provideHtml(element.getSuiteFile().getProject().getRuntimeEnvironment());
+        return provideHtml(element.getSuiteFile().getRuntimeEnvironment());
     }
 
     @Override

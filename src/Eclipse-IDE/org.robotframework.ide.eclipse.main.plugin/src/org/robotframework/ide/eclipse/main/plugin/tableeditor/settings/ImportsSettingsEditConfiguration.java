@@ -47,7 +47,7 @@ class ImportsSettingsEditConfiguration extends AbstractRegistryConfiguration {
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new VariableFileLocationsProposalsProvider(suiteFile, dataProvider),
                 new ResourceFileLocationsProposalsProvider(suiteFile, dataProvider),
-                new WithNameElementsProposalsProvider(suiteFile.getProject().getRuntimeEnvironment(), dataProvider),
+                new WithNameElementsProposalsProvider(suiteFile.getRuntimeEnvironment(), dataProvider),
                 new LibrariesProposalsProvider(suiteFile, dataProvider),
                 new VariableProposalsProvider(suiteFile, dataProvider));
 
