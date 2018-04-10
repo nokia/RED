@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
@@ -157,30 +158,15 @@ public class RobotRuntimeEnvironment {
     }
 
     public static List<PythonInstallationDirectory> possibleInstallationsFor(final File location) {
-        final List<PythonInstallationDirectory> installations = new ArrayList<>();
-
         if (!location.exists()) {
-            return installations;
+            return new ArrayList<>();
         }
-        for (final File file : location.listFiles()) {
-            final String fileName = file.getName();
-            if (file.isFile() && (fileName.equals("python") || fileName.equals("python.exe"))) {
-                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python));
-            }
-            if (file.isFile() && (fileName.equals("jython") || fileName.equals("jython.exe"))) {
-                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Jython));
-            }
-            if (file.isFile() && (fileName.equals("ipy") || fileName.equals("ipy.exe"))) {
-                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.IronPython));
-            }
-            if (file.isFile() && (fileName.equals("ipy64") || fileName.equals("ipy64.exe"))) {
-                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.IronPython64));
-            }
-            if (file.isFile() && (fileName.equals("pypy") || fileName.equals("pypy.exe"))) {
-                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.PyPy));
-            }
-        }
-        return installations;
+        return Stream.of(location.listFiles())
+                .map(SuiteExecutor::fromLocation)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(interpreter -> new PythonInstallationDirectory(location.toURI(), interpreter))
+                .collect(toList());
     }
 
     /**
