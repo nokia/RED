@@ -114,13 +114,13 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public String getRobotVersion() {
         try {
-            final List<String> cmdLine = createCommandLine(null, "-m", "robot.run", "--version");
+            final List<String> cmdLine = createCommandLine(null, "-m", "robot", "--version");
 
             // help or version information printing returns custom robot exit code
             final List<String> output = runExternalProcess(cmdLine, 251);
 
             final String version = Iterables.getOnlyElement(output);
-            return version.startsWith("Robot Framework") ? version.trim() : null;
+            return version.startsWith("Robot Framework") ? version : null;
         } catch (final IOException e) {
             return null;
         }
