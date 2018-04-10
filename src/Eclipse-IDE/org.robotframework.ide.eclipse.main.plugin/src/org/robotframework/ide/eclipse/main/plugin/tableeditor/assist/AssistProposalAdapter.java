@@ -13,11 +13,14 @@ import java.util.function.Supplier;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
 
 public class AssistProposalAdapter implements RedContentProposal {
+
+    private final RobotRuntimeEnvironment environment;
 
     private final AssistProposal wrappedProposal;
 
@@ -33,33 +36,36 @@ public class AssistProposalAdapter implements RedContentProposal {
     // it is calculated only when proposal is chosen
     private final Predicate<AssistProposal> shouldCommitAfterAccepting;
 
-    public AssistProposalAdapter(final AssistProposal wrappedProposal) {
-        this(wrappedProposal, null, "", ArrayList::new, p -> false);
+    public AssistProposalAdapter(final RobotRuntimeEnvironment environment, final AssistProposal wrappedProposal) {
+        this(environment, wrappedProposal, null, "", ArrayList::new, p -> false);
     }
 
-    public AssistProposalAdapter(final AssistProposal wrappedProposal,
+    public AssistProposalAdapter(final RobotRuntimeEnvironment environment, final AssistProposal wrappedProposal,
             final Predicate<AssistProposal> shouldCommitAfterAccepting) {
-        this(wrappedProposal, null, "", ArrayList::new, shouldCommitAfterAccepting);
+        this(environment, wrappedProposal, null, "", ArrayList::new, shouldCommitAfterAccepting);
     }
 
-    public AssistProposalAdapter(final AssistProposal wrappedProposal,
+    public AssistProposalAdapter(final RobotRuntimeEnvironment environment, final AssistProposal wrappedProposal,
             final ModificationStrategy modificationStrategy) {
-        this(wrappedProposal, modificationStrategy, "", ArrayList::new, p -> false);
+        this(environment, wrappedProposal, modificationStrategy, "", ArrayList::new, p -> false);
     }
 
-    public AssistProposalAdapter(final AssistProposal wrappedProposal, final String additionalSuffix) {
-        this(wrappedProposal, null, additionalSuffix, ArrayList::new, p -> false);
+    public AssistProposalAdapter(final RobotRuntimeEnvironment environment, final AssistProposal wrappedProposal,
+            final String additionalSuffix) {
+        this(environment, wrappedProposal, null, additionalSuffix, ArrayList::new, p -> false);
     }
 
-    public AssistProposalAdapter(final AssistProposal wrappedProposal,
+    public AssistProposalAdapter(final RobotRuntimeEnvironment environment, final AssistProposal wrappedProposal,
             final Predicate<AssistProposal> shouldCommitAfterAccepting,
             final Supplier<Collection<Runnable>> operationsAfterAccepting) {
-        this(wrappedProposal, null, "", operationsAfterAccepting, shouldCommitAfterAccepting);
+        this(environment, wrappedProposal, null, "", operationsAfterAccepting, shouldCommitAfterAccepting);
     }
 
-    private AssistProposalAdapter(final AssistProposal wrappedProposal, final ModificationStrategy modificationStrategy,
-            final String additionalSuffix, final Supplier<Collection<Runnable>> operationsAfterAccepting,
+    private AssistProposalAdapter(final RobotRuntimeEnvironment environment, final AssistProposal wrappedProposal,
+            final ModificationStrategy modificationStrategy, final String additionalSuffix,
+            final Supplier<Collection<Runnable>> operationsAfterAccepting,
             final Predicate<AssistProposal> shouldCommitAfterAccepting) {
+        this.environment = environment;
         this.wrappedProposal = wrappedProposal;
         this.modificationStrategy = Optional.ofNullable(modificationStrategy);
         this.additionalSuffix = additionalSuffix;
@@ -100,6 +106,11 @@ public class AssistProposalAdapter implements RedContentProposal {
     @Override
     public String getDescription() {
         return wrappedProposal.getDescription();
+    }
+
+    @Override
+    public String getHtmlDocumentation() {
+        return wrappedProposal.getDocumentationInput().provideHtml(environment);
     }
 
     @Override

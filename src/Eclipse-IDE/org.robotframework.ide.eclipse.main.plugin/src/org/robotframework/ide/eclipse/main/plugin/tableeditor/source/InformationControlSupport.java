@@ -102,9 +102,8 @@ public class InformationControlSupport {
             super(parent, JFaceResources.DEFAULT_FONT, true);
 
             final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            final DocumentationsLinksSupport support = new DocumentationsLinksSupport(page, input -> {
-                setInput(input.provideHtml());
-            });
+            final DocumentationsLinksSupport support = new DocumentationsLinksSupport(page,
+                    input -> setInput(input.provideHtml()));
             addLocationListener(new DocumentationsLinksListener(support));
         }
     }
