@@ -22,7 +22,7 @@ def get_classes_from_module(module_location):
         pythonpathsetter.add_path(os.path.dirname(module_directory))
         class_names.extend(_try_to_find_names_in_module(module_name))
         class_names.extend(_try_to_find_names_in_path([module_directory], _find_names_in_module))
-        class_names = [n if n.startswith(module_name) else module_name + "." + n for n in class_names]
+        class_names = [_adjust_class_name(module_name, class_name) for class_name in class_names]
 
     elif module_location.endswith('.py'):
         pythonpathsetter.add_path(module_directory)
@@ -38,6 +38,12 @@ def get_classes_from_module(module_location):
     class_names.extend(_find_missing_names(class_names, module_name))
     return sorted(set(class_names))
 
+def _adjust_class_name(module_name, class_name):
+    module_name_base = module_name.rsplit('.', 1)[-1]
+    if class_name.startswith(module_name) or class_name.startswith(module_name_base):
+        return class_name
+    else:
+        return module_name_base + '.' + class_name
 
 def _find_missing_names(names, module_name):
     result = list()

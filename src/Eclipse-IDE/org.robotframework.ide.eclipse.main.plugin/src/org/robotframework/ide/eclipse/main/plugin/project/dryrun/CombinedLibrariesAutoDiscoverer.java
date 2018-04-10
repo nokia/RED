@@ -20,23 +20,23 @@ public class CombinedLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
 
     private final Collection<RobotSuiteFile> suites;
 
-    private final ExternalLibrariesImportCollector referenceLibraryImportCollector;
+    private final ExternalLibrariesImportCollector libImportCollector;
 
     public CombinedLibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler) {
         super(robotProject, summaryHandler);
         this.suites = suites;
-        this.referenceLibraryImportCollector = new ExternalLibrariesImportCollector(robotProject);
+        this.libImportCollector = new ExternalLibrariesImportCollector(robotProject);
     }
 
     @Override
     void prepareDiscovering(final IProgressMonitor monitor) throws CoreException {
-        referenceLibraryImportCollector.collectFromSuites(suites, monitor);
+        libImportCollector.collectFromSuites(suites, monitor);
     }
 
     @Override
     void startDiscovering(final IProgressMonitor monitor) throws InterruptedException, CoreException {
-        final Set<String> libraryNames = referenceLibraryImportCollector.getUnknownLibraryNames().keySet();
+        final Set<String> libraryNames = libImportCollector.getUnknownLibraryNames().keySet();
         if (!libraryNames.isEmpty()) {
             startDryRunDiscovering(monitor, libraryNames);
         }
@@ -46,11 +46,11 @@ public class CombinedLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
     List<RobotDryRunLibraryImport> getImportedLibraries() {
         final List<RobotDryRunLibraryImport> importedLibraries = super.getImportedLibraries();
         importedLibraries.forEach(libImport -> setImportersPaths(libImport,
-                referenceLibraryImportCollector.getUnknownLibraryNames().get(libImport.getName())));
+                libImportCollector.getUnknownLibraryNames().get(libImport.getName())));
 
-        final Set<RobotDryRunLibraryImport> collectedLibraries = referenceLibraryImportCollector.getLibraryImports();
-        collectedLibraries.forEach(libImport -> setImportersPaths(libImport,
-                referenceLibraryImportCollector.getLibraryImporters().get(libImport)));
+        final Set<RobotDryRunLibraryImport> collectedLibraries = libImportCollector.getLibraryImports();
+        collectedLibraries.forEach(
+                libImport -> setImportersPaths(libImport, libImportCollector.getLibraryImporters().get(libImport)));
 
         importedLibraries.addAll(collectedLibraries);
         return importedLibraries;
