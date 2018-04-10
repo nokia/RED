@@ -121,6 +121,48 @@ class ClassesRetrievingTests(unittest.TestCase):
                                   'init_and_module.OtherModuleClass', 'init_and_module.OtherModuleClass.DifferentModuleClass',
                                   'init_and_module.OtherModuleClass.OtherModuleClass'])
 
+    def test_retrieving_classes_from_nested_python_module_1(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'mod_outer', '__init__.py')
+
+        result = get_classes_from_module(module_location)
+
+        self.assertEqual(result, ['mod_outer', 'mod_outer.mod_inner', 'mod_outer.mod_inner.mod_a',
+                                  'mod_outer.mod_inner.mod_a.ClassA', 'mod_outer.mod_inner.mod_a.ClassA.ClassA',
+                                  'mod_outer.mod_inner.mod_a.OtherClassA', 'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA',
+                                  'mod_outer.mod_inner.mod_a.mod_a', 'mod_outer.mod_inner.mod_b', 'mod_outer.mod_inner.mod_b.ClassB',
+                                  'mod_outer.mod_inner.mod_b.ClassB.ClassB', 'mod_outer.mod_inner.mod_b.mod_b'])
+
+    def test_retrieving_classes_from_nested_python_module_2(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'mod_outer', 'mod_inner', '__init__.py')
+
+        result = get_classes_from_module(module_location)
+
+        self.assertEqual(result, ['mod_inner.mod_a',
+                                  'mod_inner.mod_a.ClassA', 'mod_inner.mod_a.ClassA.ClassA',
+                                  'mod_inner.mod_a.OtherClassA', 'mod_inner.mod_a.OtherClassA.OtherClassA',
+                                  'mod_inner.mod_a.mod_a', 'mod_inner.mod_b', 'mod_inner.mod_b.ClassB',
+                                  'mod_inner.mod_b.ClassB.ClassB', 'mod_inner.mod_b.mod_b', 'mod_outer.mod_inner', 'mod_outer.mod_inner.mod_a',
+                                  'mod_outer.mod_inner.mod_a.ClassA', 'mod_outer.mod_inner.mod_a.ClassA.ClassA',
+                                  'mod_outer.mod_inner.mod_a.OtherClassA', 'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA',
+                                  'mod_outer.mod_inner.mod_a.mod_a', 'mod_outer.mod_inner.mod_b', 'mod_outer.mod_inner.mod_b.ClassB',
+                                  'mod_outer.mod_inner.mod_b.ClassB.ClassB', 'mod_outer.mod_inner.mod_b.mod_b'])
+
+    def test_retrieving_classes_from_nested_python_module_3(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'mod_outer', 'mod_inner', 'mod_a', '__init__.py')
+
+        result = get_classes_from_module(module_location)
+
+        self.assertEqual(result, ['mod_a.ClassA', 'mod_a.ClassA.ClassA', 'mod_a.OtherClassA', 'mod_a.OtherClassA.OtherClassA',
+                                  'mod_inner.mod_a.ClassA', 'mod_inner.mod_a.ClassA.ClassA', 'mod_inner.mod_a.OtherClassA',
+                                  'mod_inner.mod_a.OtherClassA.OtherClassA', 'mod_inner.mod_outer.mod_inner.mod_a',
+                                  'mod_inner.mod_outer.mod_inner.mod_a.ClassA.ClassA', 'mod_inner.mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA',
+                                  'mod_inner.mod_outer.mod_inner.mod_a.mod_a', 'mod_outer.mod_inner.mod_a', 'mod_outer.mod_inner.mod_a.ClassA',
+                                  'mod_outer.mod_inner.mod_a.ClassA.ClassA', 'mod_outer.mod_inner.mod_a.OtherClassA',
+                                  'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA', 'mod_outer.mod_inner.mod_a.mod_a'])
+
     def test_retrieving_classes_from_python_module_in_zip(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'JythonLibWithPython.zip')
