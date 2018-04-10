@@ -48,19 +48,6 @@ class DocumentationViewPartListener implements IPartListener {
             registerEditorListener();
 
             Documentations.markViewSyncBroken(currentlyActiveEditor.getSite().getPage());
-
-            if (currentlyActiveEditor.getActiveEditor() instanceof SuiteSourceEditor) {
-                final int caretOffset = currentlyActiveEditor.getSourceEditor()
-                        .getViewer()
-                        .getTextWidget()
-                        .getCaretOffset();
-                editorListener.displayForSourceSelection(caretOffset);
-            } else {
-                final ISelection selection = currentlyActiveEditor.getEditorSite()
-                        .getSelectionProvider()
-                        .getSelection();
-                editorListener.displayForTableSelection(selection);
-            }
         }
     }
 
