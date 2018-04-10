@@ -131,7 +131,7 @@ class DocumentationViewPartListener implements IPartListener {
         }
 
         private void displayForTableSelection(final ISelection selection) {
-            if (selection instanceof IStructuredSelection) {
+            if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
                 final IWorkbenchPage page = currentlyActiveEditor.getSite().getPage();
                 Documentations.markViewSyncBroken(page);
 
