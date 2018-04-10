@@ -77,7 +77,8 @@ public class CodeReservedElementsProposalsProviderTest {
                 .filter(element -> !(element instanceof RobotKeywordCall))
                 .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(dataProvider);
+        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(null,
+                dataProvider);
 
         for (int column = 0; column < 10; column++) {
             int row = 0;
@@ -98,7 +99,8 @@ public class CodeReservedElementsProposalsProviderTest {
 
         final Iterable<RobotKeywordCall> elements = filter(getAllElements(suiteFile), RobotKeywordCall.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(dataProvider);
+        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(null,
+                dataProvider);
 
         for (int column = 0; column < 10; column++) {
             if (column == 0) { // we're ommiting first column
@@ -123,7 +125,8 @@ public class CodeReservedElementsProposalsProviderTest {
 
         final Iterable<RobotKeywordCall> elements = filter(getAllElements(suiteFile), RobotKeywordCall.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(dataProvider);
+        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(null,
+                dataProvider);
 
         int row = 0;
         for (@SuppressWarnings("unused")
@@ -142,7 +145,8 @@ public class CodeReservedElementsProposalsProviderTest {
 
         final Iterable<RobotKeywordCall> elements = filter(getAllElements(suiteFile), RobotKeywordCall.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(dataProvider);
+        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(null,
+                dataProvider);
 
         int row = 0;
         for (@SuppressWarnings("unused")
@@ -167,7 +171,8 @@ public class CodeReservedElementsProposalsProviderTest {
 
         final Iterable<RobotKeywordCall> elements = filter(getAllElements(suiteFile), RobotKeywordCall.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(dataProvider);
+        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(null,
+                dataProvider);
 
         int row = 0;
         for (@SuppressWarnings("unused")
@@ -195,7 +200,8 @@ public class CodeReservedElementsProposalsProviderTest {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(forExecutable);
-        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(dataProvider);
+        final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(null,
+                dataProvider);
 
         for (int column = 0; column < 10; column++) {
             if (column == 0 || column == 1) { // we only test for at least third column

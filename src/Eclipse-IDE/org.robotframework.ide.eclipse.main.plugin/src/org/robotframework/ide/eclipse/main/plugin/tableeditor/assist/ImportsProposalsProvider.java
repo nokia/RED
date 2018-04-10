@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import java.util.stream.Stream;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedFileLocationProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedLibraryProposals;
@@ -49,8 +50,9 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
                 .create(importType, model)
                 .getFilesLocationsProposals(prefix)
                 .stream();
+        final RobotRuntimeEnvironment env = model.getProject().getRuntimeEnvironment();
         return Stream.concat(librariesProposals, fileLocationProposals)
-                .map(proposal -> new AssistProposalAdapter(proposal, p -> true))
+                .map(proposal -> new AssistProposalAdapter(env, proposal, p -> true))
                 .toArray(RedContentProposal[]::new);
     }
 

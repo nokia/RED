@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import java.util.List;
 
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
@@ -17,9 +18,12 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 
 public class SettingProposalsProvider implements RedContentProposalProvider {
 
+    private final RobotRuntimeEnvironment environment;
+
     private final SettingTarget settingTarget;
 
-    public SettingProposalsProvider(final SettingTarget settingTarget) {
+    public SettingProposalsProvider(final RobotRuntimeEnvironment environment, final SettingTarget settingTarget) {
+        this.environment = environment;
         this.settingTarget = settingTarget;
     }
 
@@ -34,8 +38,9 @@ public class SettingProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(settingTarget)
                 .getSettingsProposals(prefix);
 
-        return settingsProposals.stream().map(proposal -> new AssistProposalAdapter(proposal, p -> true)).toArray(
-                RedContentProposal[]::new);
+        return settingsProposals.stream()
+                .map(proposal -> new AssistProposalAdapter(environment, proposal, p -> true))
+                .toArray(RedContentProposal[]::new);
     }
 
     private boolean areApplicable(final NatTableAssistantContext tableContext) {
