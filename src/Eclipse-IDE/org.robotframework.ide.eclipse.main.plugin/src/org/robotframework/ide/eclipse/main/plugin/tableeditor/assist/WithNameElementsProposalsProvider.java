@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
@@ -20,9 +21,13 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 
 public class WithNameElementsProposalsProvider implements RedContentProposalProvider {
 
+    private final RobotRuntimeEnvironment environment;
+
     private final IRowDataProvider<?> dataProvider;
 
-    public WithNameElementsProposalsProvider(final IRowDataProvider<?> dataProvider) {
+    public WithNameElementsProposalsProvider(final RobotRuntimeEnvironment environment,
+            final IRowDataProvider<?> dataProvider) {
+        this.environment = environment;
         this.dataProvider = dataProvider;
     }
 
@@ -36,8 +41,9 @@ public class WithNameElementsProposalsProvider implements RedContentProposalProv
         final List<? extends AssistProposal> withNameProposals = new RedWithNameProposals(predicateWordHasToSatisfy)
                 .getWithNameProposals(prefix);
 
-        return withNameProposals.stream().map(proposal -> new AssistProposalAdapter(proposal, p -> true)).toArray(
-                RedContentProposal[]::new);
+        return withNameProposals.stream()
+                .map(proposal -> new AssistProposalAdapter(environment, proposal, p -> true))
+                .toArray(RedContentProposal[]::new);
     }
 
     private AssistProposalPredicate<String> createWordPredicate(final NatTableAssistantContext context) {

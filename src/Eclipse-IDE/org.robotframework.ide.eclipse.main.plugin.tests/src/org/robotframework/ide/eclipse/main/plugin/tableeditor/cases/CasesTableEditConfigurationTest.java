@@ -15,20 +15,39 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.style.ConfigAttribute;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
+import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 public class CasesTableEditConfigurationTest {
 
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(CasesTableEditConfigurationTest.class);
+
+    private static RobotModel robotModel;
+
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
+        robotModel = new RobotModel();
+
+        projectProvider.createFile("suite.robot",
+                "*** Test Cases ***");
+    }
+    
     @SuppressWarnings("unchecked")
     @Test
     public void configurationCheck() {
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
+        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+
         final CasesTableEditConfiguration configuration = new CasesTableEditConfiguration(
-                new RobotSuiteFileCreator().build(), mock(IRowDataProvider.class), true);
+                model, mock(IRowDataProvider.class), true);
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class),
