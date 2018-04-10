@@ -63,8 +63,6 @@ import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.base.Joiner;
-
 public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.installed";
@@ -173,7 +171,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     private void createDescription(final Composite parent) {
         final Label lbl = new Label(parent, SWT.WRAP);
         lbl.setText("Add or remove Robot frameworks environments (location of Python interpreter with Robot library "
-                + "installed, currently " + Joiner.on(", ").join(SuiteExecutor.allExecutorNames())
+                + "installed, currently " + String.join(", ", SuiteExecutor.allExecutorNames())
                 + " are supported). The selected environment will be used by project unless it is explicitly "
                 + "overridden in project configuration.");
         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).hint(600, SWT.DEFAULT).applyTo(lbl);
@@ -210,7 +208,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
                 .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Path")
-                .withWidth(200)
+                .shouldGrabAllTheSpaceLeft(true)
                 .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
                 .createFor(viewer);
     }
@@ -313,17 +311,14 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     }
 
     private SelectionListener createRemoveListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                final RobotRuntimeEnvironment env = getSelectedInstallation();
-                installations.remove(env);
+        return widgetSelectedAdapter(e -> {
+            final RobotRuntimeEnvironment env = getSelectedInstallation();
+            installations.remove(env);
 
-                dirty = true;
-                viewer.setSelection(StructuredSelection.EMPTY);
-                viewer.refresh();
-            }
-        };
+            dirty = true;
+            viewer.setSelection(StructuredSelection.EMPTY);
+            viewer.refresh();
+        });
     }
 
     @Override
@@ -343,8 +338,8 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
             final String activePath = checkedEnv == null ? "" : checkedEnv.getFile().getAbsolutePath();
             final String activeExec = checkedEnv == null ? "" : getExecOf(checkedEnv);
-            final String allPaths = Joiner.on(';').join(allPathsList);
-            final String allExecs = Joiner.on(";").join(allExecsList);
+            final String allPaths = String.join(";", allPathsList);
+            final String allExecs = String.join(";", allExecsList);
 
             // The execs has to be stored first, because we're listening on ACTIVE_RUNTIMES
             // and OTHER_RUNTIMES changes and inside we need actaul value of corresponding
@@ -403,25 +398,22 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
         @Override
         public void done(final IJobChangeEvent event) {
-            SwtThread.asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    final RobotRuntimeEnvironment active = (RobotRuntimeEnvironment) event.getJob().getProperty(key);
-                    final Control control = InstalledRobotsPreferencesPage.this.getControl();
-                    if (control == null || control.isDisposed()) {
-                        return;
-                    }
-                    enableControls();
-                    viewer.setInput(installations);
-                    if (active != null) {
-                        viewer.setChecked(active, true);
-                        viewer.refresh();
-                    }
-                    viewer.setSelection(StructuredSelection.EMPTY);
-
-                    destroyProgress(progressBar);
-                    progressBar = null;
+            SwtThread.asyncExec(() -> {
+                final RobotRuntimeEnvironment active = (RobotRuntimeEnvironment) event.getJob().getProperty(key);
+                final Control control = InstalledRobotsPreferencesPage.this.getControl();
+                if (control == null || control.isDisposed()) {
+                    return;
                 }
+                enableControls();
+                viewer.setInput(installations);
+                if (active != null) {
+                    viewer.setChecked(active, true);
+                    viewer.refresh();
+                }
+                viewer.setSelection(StructuredSelection.EMPTY);
+
+                destroyProgress(progressBar);
+                progressBar = null;
             });
         }
     }
