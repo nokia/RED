@@ -21,6 +21,8 @@ public interface RedContentProposal extends IContentProposal {
 
     boolean hasDescription();
 
+    String getHtmlDocumentation();
+
     ModificationStrategy getModificationStrategy();
 
     Collection<Runnable> getOperationsToPerformAfterAccepting();

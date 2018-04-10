@@ -14,6 +14,7 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -23,9 +24,8 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -42,11 +42,14 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksListener;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.StructuredContentProvider;
@@ -388,8 +391,9 @@ public class RedContentProposalAdapter {
                 // Check whether there are any proposals to be shown.
                 recordCursorPosition(); // must be done before getting proposals
                 final RedContentProposal[] proposals = getProposals();
-                if (proposals == null)
+                if (proposals == null) {
                     return;
+                }
                 if (proposals.length > 0) {
                     recordCursorPosition();
                     popup = new ContentProposalPopup(null, proposals);
@@ -899,16 +903,10 @@ public class RedContentProposalAdapter {
          * Internal class used to implement the secondary popup.
          */
         private class InfoPopupDialog extends PopupDialog {
+            
+            private boolean isBrowserAvailable;
 
-            /*
-             * The text control that displays the text.
-             */
-            private StyledText text;
-
-            /*
-             * The String shown in the popup.
-             */
-            private String contents = "";
+            private Control control; // Browser or StyledText
 
             /*
              * Construct an info-popup with the specified parent.
@@ -921,24 +919,28 @@ public class RedContentProposalAdapter {
             /*
              * Create a text control for showing the info about a proposal.
              */
+            @SuppressWarnings("restriction")
             @Override
             protected Control createDialogArea(final Composite parent) {
-                text = new StyledText(parent, SWT.NONE);
+                isBrowserAvailable = BrowserInformationControl.isAvailable(parent);
+                if (isBrowserAvailable) {
+                    final Browser browser = new Browser(parent, SWT.NONE);
+                    final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                    final DocumentationsLinksSupport support = new DocumentationsLinksSupport(page,
+                            input -> setContents(input.provideHtml()), () -> ContentProposalPopup.this.close());
+                    browser.addLocationListener(new DocumentationsLinksListener(support));
+                    control = browser;
+                } else {
+                    control = new StyledText(parent, SWT.NONE);
+                }
 
                 // Use the compact margins employed by PopupDialog.
                 final GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
                 gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
                 gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
-                text.setLayoutData(gd);
+                control.setLayoutData(gd);
 
-                // since SWT.NO_FOCUS is only a hint...
-                text.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(final FocusEvent event) {
-                        // ContentProposalPopup.this.close();
-                    }
-                });
-                return text;
+                return control;
             }
 
             /*
@@ -994,9 +996,13 @@ public class RedContentProposalAdapter {
              * Set the text contents of the popup.
              */
             void setContents(final String newContents) {
-                this.contents = Strings.nullToEmpty(newContents);
-                if (text != null && !text.isDisposed()) {
-                    text.setText(contents);
+                final String contents = Strings.nullToEmpty(newContents);
+                if (control != null && !control.isDisposed()) {
+                    if (control instanceof StyledText) {
+                        ((StyledText) control).setText(contents);
+                    } else {
+                        ((Browser) control).setText(contents);
+                    }
                 }
             }
 
@@ -1004,10 +1010,10 @@ public class RedContentProposalAdapter {
              * Return whether the popup has focus.
              */
             boolean hasFocus() {
-                if (text == null || text.isDisposed()) {
+                if (control == null || control.isDisposed()) {
                     return false;
                 }
-                return text.getShell().isFocusControl() || text.isFocusControl();
+                return control.getShell().isFocusControl() || control.isFocusControl();
             }
         }
 
@@ -1368,7 +1374,11 @@ public class RedContentProposalAdapter {
                                 infoPopup.open();
                                 infoPopup.getShell().addDisposeListener(event -> infoPopup = null);
                             }
-                            infoPopup.setContents(p.getDescription());
+                            if (infoPopup.isBrowserAvailable) {
+                                infoPopup.setContents(p.getHtmlDocumentation());
+                            } else {
+                                infoPopup.setContents(p.getDescription());
+                            }
                         } else if (infoPopup != null) {
                             infoPopup.close();
                         }

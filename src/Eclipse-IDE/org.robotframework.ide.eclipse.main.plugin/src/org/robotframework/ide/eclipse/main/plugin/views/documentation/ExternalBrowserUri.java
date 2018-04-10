@@ -21,13 +21,25 @@ class ExternalBrowserUri implements OpenableUri {
 
     private final IWorkbenchBrowserSupport browserSupport;
 
+    private Runnable whenLocationChangeOutsideOfDisplayer;
+
     ExternalBrowserUri(final URI uri, final IWorkbenchBrowserSupport browserSupport) {
         this.uri = uri;
         this.browserSupport = browserSupport;
     }
 
+    public ExternalBrowserUri(final URI uri, final IWorkbenchBrowserSupport browserSupport,
+            final Runnable whenLocationChangeOutsideOfDisplayer) {
+        this.uri = uri;
+        this.browserSupport = browserSupport;
+        this.whenLocationChangeOutsideOfDisplayer = whenLocationChangeOutsideOfDisplayer;
+    }
+
     @Override
     public void open() {
+        if (whenLocationChangeOutsideOfDisplayer != null) {
+            whenLocationChangeOutsideOfDisplayer.run();
+        }
         SwtThread.asyncExec(() -> {
             try {
                 final IWebBrowser wbBrowser = browserSupport.createBrowser(null);

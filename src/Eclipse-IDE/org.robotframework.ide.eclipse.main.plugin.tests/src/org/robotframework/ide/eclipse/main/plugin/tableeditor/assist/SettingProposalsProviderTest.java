@@ -24,7 +24,7 @@ public class SettingProposalsProviderTest {
 
     @Test
     public void thereAreNoTestCaseSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.TEST_CASE);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.TEST_CASE);
 
         for (int column = 0; column < 10; column++) {
             if (column == 0) { // first column is omitted
@@ -38,7 +38,7 @@ public class SettingProposalsProviderTest {
 
     @Test
     public void thereAreNoTestCaseSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.TEST_CASE);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.TEST_CASE);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals("xyz", 1, context);
@@ -50,7 +50,7 @@ public class SettingProposalsProviderTest {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("[dx");
 
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.TEST_CASE);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.TEST_CASE);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
@@ -62,7 +62,7 @@ public class SettingProposalsProviderTest {
 
     @Test
     public void thereAreNoKeywordSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.KEYWORD);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.KEYWORD);
 
         for (int column = 0; column < 10; column++) {
             if (column == 0) { // first column is omitted
@@ -76,7 +76,7 @@ public class SettingProposalsProviderTest {
 
     @Test
     public void thereAreNoKeywordSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.KEYWORD);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.KEYWORD);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals("xyz", 1, context);
@@ -89,7 +89,7 @@ public class SettingProposalsProviderTest {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("cut");
 
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.KEYWORD);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.KEYWORD);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
@@ -101,7 +101,7 @@ public class SettingProposalsProviderTest {
 
     @Test
     public void thereAreNoGeneralSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.GENERAL);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.GENERAL);
 
         for (int column = 0; column < 10; column++) {
             if (column == 0) { // first column is omitted
@@ -115,7 +115,7 @@ public class SettingProposalsProviderTest {
 
     @Test
     public void thereAreNoGeneralSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.GENERAL);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.GENERAL);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals("xyz", 1, context);
@@ -128,7 +128,7 @@ public class SettingProposalsProviderTest {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("cut");
 
-        final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.GENERAL);
+        final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.GENERAL);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
