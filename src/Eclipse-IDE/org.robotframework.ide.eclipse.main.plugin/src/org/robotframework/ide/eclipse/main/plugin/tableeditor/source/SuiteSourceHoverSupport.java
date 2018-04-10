@@ -42,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
@@ -69,6 +70,10 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
     @Override
     public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
+        if (suiteFile instanceof RobotSuiteStreamFile) {
+            return null;
+        }
+
         try {
             final IDocument document = textViewer.getDocument();
             final boolean isTsv = suiteFile.isTsvFile();
