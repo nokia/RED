@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedImportProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -38,7 +39,9 @@ public class ImportsInSettingsProposalsProvider implements RedContentProposalPro
         final List<? extends AssistProposal> importProposals = new RedImportProposals(suiteFile)
                 .getImportsProposals(prefix);
 
-        return importProposals.stream().map(AssistProposalAdapter::new).toArray(RedContentProposal[]::new);
+        final RobotRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
+        return importProposals.stream().map(proposal -> new AssistProposalAdapter(env, proposal)).toArray(
+                RedContentProposal[]::new);
     }
 
     private boolean areApplicable(final NatTableAssistantContext tableContext) {

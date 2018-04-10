@@ -27,8 +27,8 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
         when(proposal.getContent()).thenReturn("content");
 
-        assertThat(new AssistProposalAdapter(proposal).getContent()).isEqualTo("content");
-        assertThat(new AssistProposalAdapter(proposal, " enhanced").getContent()).isEqualTo("content enhanced");
+        assertThat(new AssistProposalAdapter(null, proposal).getContent()).isEqualTo("content");
+        assertThat(new AssistProposalAdapter(null, proposal, " enhanced").getContent()).isEqualTo("content enhanced");
     }
 
     @Test
@@ -36,8 +36,8 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
         when(proposal.getContent()).thenReturn("content");
 
-        assertThat(new AssistProposalAdapter(proposal).getCursorPosition()).isEqualTo(7);
-        assertThat(new AssistProposalAdapter(proposal, " enhanced").getCursorPosition()).isEqualTo(16);
+        assertThat(new AssistProposalAdapter(null, proposal).getCursorPosition()).isEqualTo(7);
+        assertThat(new AssistProposalAdapter(null, proposal, " enhanced").getCursorPosition()).isEqualTo(16);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
         when(proposal.getImage()).thenReturn(imageDescriptor);
 
-        assertThat(new AssistProposalAdapter(proposal).getImage()).isSameAs(imageDescriptor);
+        assertThat(new AssistProposalAdapter(null, proposal).getImage()).isSameAs(imageDescriptor);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
         when(proposal.getStyledLabel()).thenReturn(label);
 
-        assertThat(new AssistProposalAdapter(proposal).getStyledLabel()).isSameAs(label);
+        assertThat(new AssistProposalAdapter(null, proposal).getStyledLabel()).isSameAs(label);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
         when(proposal.getLabel()).thenReturn("label");
 
-        assertThat(new AssistProposalAdapter(proposal).getLabel()).isSameAs("label");
+        assertThat(new AssistProposalAdapter(null, proposal).getLabel()).isSameAs("label");
     }
 
     @Test
@@ -74,8 +74,8 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal2 = mock(AssistProposal.class);
         when(proposal2.isDocumented()).thenReturn(false);
 
-        assertThat(new AssistProposalAdapter(proposal1).hasDescription()).isTrue();
-        assertThat(new AssistProposalAdapter(proposal2).hasDescription()).isFalse();
+        assertThat(new AssistProposalAdapter(null, proposal1).hasDescription()).isTrue();
+        assertThat(new AssistProposalAdapter(null, proposal2).hasDescription()).isFalse();
     }
 
     @Test
@@ -83,18 +83,18 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal1 = mock(AssistProposal.class);
         when(proposal1.getDescription()).thenReturn("desc");
 
-        assertThat(new AssistProposalAdapter(proposal1).getDescription()).isEqualTo("desc");
+        assertThat(new AssistProposalAdapter(null, proposal1).getDescription()).isEqualTo("desc");
     }
 
     @Test
     public void substituteStrategyIsAlwaysProvided_whenNoOtherStrategyWasPassedToConstructor() {
         final AssistProposal proposal = mock(AssistProposal.class);
 
-        assertThat(new AssistProposalAdapter(proposal).getModificationStrategy())
+        assertThat(new AssistProposalAdapter(null, proposal).getModificationStrategy())
                 .isInstanceOf(SubstituteTextModificationStrategy.class);
-        assertThat(new AssistProposalAdapter(proposal, "").getModificationStrategy())
+        assertThat(new AssistProposalAdapter(null, proposal, "").getModificationStrategy())
                 .isInstanceOf(SubstituteTextModificationStrategy.class);
-        assertThat(new AssistProposalAdapter(proposal, (ModificationStrategy) null).getModificationStrategy())
+        assertThat(new AssistProposalAdapter(null, proposal, (ModificationStrategy) null).getModificationStrategy())
                 .isInstanceOf(SubstituteTextModificationStrategy.class);
     }
 
@@ -103,7 +103,7 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
         final ModificationStrategy strategy = mock(ModificationStrategy.class);
 
-        assertThat(new AssistProposalAdapter(proposal, strategy).getModificationStrategy()).isSameAs(strategy);
+        assertThat(new AssistProposalAdapter(null, proposal, strategy).getModificationStrategy()).isSameAs(strategy);
     }
 
     @Test
@@ -111,16 +111,18 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
         when(proposal.getContent()).thenReturn("kw name ${arg}");
 
-        assertThat(new AssistProposalAdapter(proposal, p -> !p.getContent().contains("$")).getModificationStrategy())
+        assertThat(
+                new AssistProposalAdapter(null, proposal, p -> !p.getContent().contains("$")).getModificationStrategy())
                 .isInstanceOfSatisfying(SubstituteTextModificationStrategy.class,
                         strategy -> assertThat(strategy.shouldCommitAfterInsert()).isFalse());
-        assertThat(new AssistProposalAdapter(proposal, p -> p.getContent().contains("$")).getModificationStrategy())
+        assertThat(
+                new AssistProposalAdapter(null, proposal, p -> p.getContent().contains("$")).getModificationStrategy())
                 .isInstanceOfSatisfying(SubstituteTextModificationStrategy.class,
                         strategy -> assertThat(strategy.shouldCommitAfterInsert()).isTrue());
-        assertThat(new AssistProposalAdapter(proposal, p -> !p.getContent().contains("$"), ArrayList::new)
+        assertThat(new AssistProposalAdapter(null, proposal, p -> !p.getContent().contains("$"), ArrayList::new)
                 .getModificationStrategy()).isInstanceOfSatisfying(SubstituteTextModificationStrategy.class,
                         strategy -> assertThat(strategy.shouldCommitAfterInsert()).isFalse());
-        assertThat(new AssistProposalAdapter(proposal, p -> p.getContent().contains("$"), ArrayList::new)
+        assertThat(new AssistProposalAdapter(null, proposal, p -> p.getContent().contains("$"), ArrayList::new)
                 .getModificationStrategy()).isInstanceOfSatisfying(SubstituteTextModificationStrategy.class,
                         strategy -> assertThat(strategy.shouldCommitAfterInsert()).isTrue());
     }
@@ -130,10 +132,12 @@ public class AssistProposalAdapterTest {
         final AssistProposal proposal = mock(AssistProposal.class);
         final ModificationStrategy strategy = mock(ModificationStrategy.class);
 
-        assertThat(new AssistProposalAdapter(proposal).getOperationsToPerformAfterAccepting()).isEmpty();
-        assertThat(new AssistProposalAdapter(proposal, p -> true).getOperationsToPerformAfterAccepting()).isEmpty();
-        assertThat(new AssistProposalAdapter(proposal, strategy).getOperationsToPerformAfterAccepting()).isEmpty();
-        assertThat(new AssistProposalAdapter(proposal, " ").getOperationsToPerformAfterAccepting()).isEmpty();
+        assertThat(new AssistProposalAdapter(null, proposal).getOperationsToPerformAfterAccepting()).isEmpty();
+        assertThat(new AssistProposalAdapter(null, proposal, p -> true).getOperationsToPerformAfterAccepting())
+                .isEmpty();
+        assertThat(new AssistProposalAdapter(null, proposal, strategy).getOperationsToPerformAfterAccepting())
+                .isEmpty();
+        assertThat(new AssistProposalAdapter(null, proposal, " ").getOperationsToPerformAfterAccepting()).isEmpty();
     }
 
     @Test
@@ -144,7 +148,7 @@ public class AssistProposalAdapterTest {
         final Runnable operation2 = () -> {
         };
 
-        assertThat(new AssistProposalAdapter(proposal, p -> true, () -> Arrays.asList(operation1, operation2))
+        assertThat(new AssistProposalAdapter(null, proposal, p -> true, () -> Arrays.asList(operation1, operation2))
                 .getOperationsToPerformAfterAccepting()).containsExactly(operation1, operation2);
     }
 }
