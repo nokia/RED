@@ -39,7 +39,7 @@ public class KeywordsTableEditConfiguration extends AbstractRegistryConfiguratio
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
-        final RobotRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
+        final RobotRuntimeEnvironment env = suiteFile.getRuntimeEnvironment();
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new SettingProposalsProvider(env, SettingTarget.KEYWORD),
                 new CodeReservedElementsProposalsProvider(env, dataProvider),

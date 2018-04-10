@@ -39,7 +39,7 @@ public class CasesTableEditConfiguration extends AbstractRegistryConfiguration {
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
-        RobotRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
+        final RobotRuntimeEnvironment env = suiteFile.getRuntimeEnvironment();
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new SettingProposalsProvider(env, SettingTarget.TEST_CASE),
                 new CodeReservedElementsProposalsProvider(env, dataProvider),

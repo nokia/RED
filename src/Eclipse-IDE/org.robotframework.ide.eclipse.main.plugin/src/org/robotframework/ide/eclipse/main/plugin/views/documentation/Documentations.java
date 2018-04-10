@@ -29,6 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
@@ -106,6 +107,10 @@ public class Documentations {
 
     private static void showDoc(final IWorkbenchPage page, final RobotFileInternalElement element,
             final String cellContent) {
+
+        if (element.getSuiteFile() instanceof RobotSuiteStreamFile) {
+            return;
+        }
 
         final Optional<DocumentationViewInput> input = requiresPerLabelSearching(element)
                 ? Optional.of(new KeywordProposalInput(element, cellContent))
