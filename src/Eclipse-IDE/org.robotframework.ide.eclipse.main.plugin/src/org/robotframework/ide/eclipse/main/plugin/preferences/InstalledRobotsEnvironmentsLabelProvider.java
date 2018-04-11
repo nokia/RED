@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -49,12 +50,15 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
     public String getToolTipText(final Object element) {
         final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
-            return "The location " + env.getFile().getAbsolutePath() + " does not seem to be a valid python directory.";
-        } else if (!env.hasRobotInstalled()) {
-            return "The python installation " + env.getFile().getAbsolutePath()
-                    + " does not seem to have robot framework installed.";
+            return "The location '" + env.getFile().getAbsolutePath()
+                    + "' does not seem to be a valid python directory.";
         }
-        return "Python installation in " + env.getFile().getAbsolutePath() + " has " + env.getVersion();
+        final String execPath = env.getFile().getAbsolutePath() + File.separator
+                + env.getInterpreter().executableName();
+        if (!env.hasRobotInstalled()) {
+            return "Python installation '" + execPath + "' does not seem to have robot framework installed.";
+        }
+        return "Python installation '" + execPath + "' has " + env.getVersion() + ".";
     }
 
     @Override
