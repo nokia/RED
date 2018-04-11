@@ -6,25 +6,34 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/9/18 4:25 PM
+Save-Time: 4/11/18 11:17 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
+global [val html_beginning "<html><head><meta charset=\"utf-8\"><style>body \{    color: rgb\(0,0,0\);    background-color: rgb\(255,255,225\);"
+	     + "    font-size: small;    font-family: sans-serif;}code \{    background-color: rgba\(220, 220, 220, 0.5\);    font-size: 1.1em;\}a, "
+	     + "a:link, a:visited \{    color: #c30;\}a:hover, a:active \{    text-decoration: underline;    color: black;\}a:hover \{   text-decoration: underline !important;\}"
+	     + "pre \{    margin-left: 0.7em;    background-color: rgba\(220, 220, 220, 0.5\);\}table, th, td \{    border: 1px solid #a6a6a6;    border-collapse: collapse;    "
+	     + "border-spacing: 2px;    padding: 4px;    font-size: 0.9em;\}</style></head>"]
+	     
+	     
 proc "check-documentation-view" [val inner_html]{
 	get-window -from "Information Window" | get-control Browser | get-property text 
-	    | equals [concat "<html><head><meta charset=\"utf-8\"><style>body {    color: rgb(0,0,0);    background-color: rgb(255,255,225);"
-	     + "    font-size: small;    font-family: sans-serif;}code {    background-color: rgba(220, 220, 220, 0.5);    font-size: 1.1em;}a, "
-	     + "a:link, a:visited {    color: #c30;}a:hover, a:active {    text-decoration: underline;    color: black;}a:hover {   text-decoration: underline !important;}"
-	     + "pre {    margin-left: 0.7em;    background-color: rgba(220, 220, 220, 0.5);}table, th, td {    border: 1px solid #a6a6a6;    border-collapse: collapse;    "
-	     + "border-spacing: 2px;    padding: 4px;    font-size: 0.9em;}</style></head>"  $inner_html ] | verify-true
+	    | matches [concat $html_beginning  $inner_html ] | verify-true
 }
 
 
 proc "check-error-in-editor" [val text]{
-	check-documentation-view [format "<body style=\"overflow: hidden;\">%s"
+	check-documentation-view [format "<body \s?style=\"overflow: hidden;\">%s"
 	    + "</body></html>"  $text]
 }
 
+proc "check-content-assist-documentation" [val value] {
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+	    | get-control Browser | get-property text 
+	    | equals [format  "<body \s?style=\"overflow: hidden;\"><p><b>Source:</b> Built-in</p>\\n"
+	    + "<p><b>Value:</b> %s</p></body></html>"  $html_beginning $value ]| verify-true
+}    
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
