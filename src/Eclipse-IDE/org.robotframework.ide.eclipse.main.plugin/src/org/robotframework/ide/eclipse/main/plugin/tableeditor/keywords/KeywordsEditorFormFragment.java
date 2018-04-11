@@ -108,8 +108,6 @@ import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
-import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
-import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.SpecialItemsLabelAccumulator;
@@ -117,6 +115,8 @@ import org.robotframework.red.nattable.configs.SpecialItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
+import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
 import org.robotframework.red.nattable.configs.VariablesLabelAccumulator;
 import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
@@ -280,7 +280,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                         theme.getHeadersUnderlineColor(), RedNattableLayersFactory.GRID_BORDER_WIDTH,
                         RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyOddRowBackground());
-        table.setForeground(parent.getForeground());
+        table.setForeground(theme.getBodyForeground());
 
         // calculate columns width
         table.addListener(SWT.Paint,
