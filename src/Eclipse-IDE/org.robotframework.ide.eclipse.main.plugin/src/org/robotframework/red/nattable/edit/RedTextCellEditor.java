@@ -37,7 +37,8 @@ import org.robotframework.red.swt.SwtThread;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- * Modified version of {@link org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor} which
+ * Modified version of
+ * {@link org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor} which
  * will move left/right after commits and validate entries asynchronously.
  *
  * @author Michal Anglart
@@ -114,8 +115,8 @@ public class RedTextCellEditor extends TextCellEditor {
         final Text textControl = new Text(parent, finalStyle);
 
         textControl.setBackground(this.cellStyle.getAttributeValue(CellStyleAttributes.BACKGROUND_COLOR));
-        textControl.setForeground(this.cellStyle.getAttributeValue(CellStyleAttributes.FOREGROUND_COLOR));
-        textControl.setFont(this.cellStyle.getAttributeValue(CellStyleAttributes.FONT));
+        textControl.setForeground(parent.getForeground());
+        textControl.setFont(parent.getFont());
         textControl.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
         textControl.addKeyListener(new TextKeyListener(parent));
@@ -126,8 +127,9 @@ public class RedTextCellEditor extends TextCellEditor {
 
     @Override
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
-        // workaround: switching off the focus listener during activation; this was causing
-        // some inconsistent state where newly created cell editor was not responsive
+        // workaround: switching off the focus listener during activation; this was
+        // causing some inconsistent state where newly created cell editor was not
+        // responsive
         ((InlineFocusListener) focusListener).handleFocusChanges = false;
 
         final Text text = (Text) super.activateCell(parent, originalCanonicalValue);
