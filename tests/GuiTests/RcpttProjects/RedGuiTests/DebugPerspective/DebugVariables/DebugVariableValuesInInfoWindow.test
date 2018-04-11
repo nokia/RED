@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oetugJnLEeWXV_VOYkM3Sw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/9/18 2:59 PM
+Save-Time: 4/11/18 11:20 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -17,7 +17,7 @@ Entry-Name: .content
 
 proc "check-variable-in-info-window" [val value]{
 	wait 100
-	check-documentation-view [format "<body style=\"overflow: hidden;\"><p style=\"margin: 0px;\"><b>"
+	check-documentation-view [format "<body \s?style=\"overflow: hidden;\"><p style=\"margin: 0px;\"><b>"
 	+ "Current value:</b></p><pre style=\"font-family: monospace; font-size: small; margin-top: 0px; background-color: inherit;\">"
 	+ "%s</pre></body></html>" $value]
 }
@@ -68,7 +68,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//new var
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 4 5
-	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \\n. New line here."
+	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \\\\n. New line here."
 	
 	//concat    
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 5 5
@@ -122,7 +122,7 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Step Into (F5)" | click
 	wait 500
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 19 28
-	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \\n. New line here."
+	check-variable-in-info-window -value  "vary long text with nothing special inside but must be long. Here is second sentence! \\\\n. New line here."
 	    
 	//Should Be Equal As Strings    
 	try -times 5 -delay 500 -command{
