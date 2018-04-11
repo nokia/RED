@@ -591,7 +591,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                         theme.getHeadersUnderlineColor(), RedNattableLayersFactory.GRID_BORDER_WIDTH,
                         RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyOddRowBackground());
-        table.setForeground(parent.getForeground());
+        table.setForeground(theme.getBodyForeground());
 
         // calculate columns width
         table.addListener(SWT.Paint,
