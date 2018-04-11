@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.File;
@@ -17,8 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
@@ -28,8 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 
 public class InstalledRobotEnvironments {
 
@@ -38,28 +35,22 @@ public class InstalledRobotEnvironments {
 
     private static Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> all = null;
     static {
-        InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID).addPreferenceChangeListener(
-                new IPreferenceChangeListener() {
-                    @Override
-                    public void preferenceChange(
-                            final org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent event) {
-                        if (event == null) {
-                            return;
-                        } else if (RedPreferences.ACTIVE_RUNTIME.equals(event.getKey())) {
-                            active = createRuntimeEnvironment((String) event.getNewValue(),
-                                    RedPlugin.getDefault().getPreferences().getActiveRuntimeExec());
-                        } else if (RedPreferences.ACTIVE_RUNTIME_EXEC.equals(event.getKey())
-                                && newHashSet(event.getOldValue(), event.getNewValue()).equals(newHashSet(
-                                        SuiteExecutor.IronPython.name(), SuiteExecutor.IronPython64.name()))) {
-                            active = createRuntimeEnvironment(
-                                    RedPlugin.getDefault().getPreferences().getActiveRuntime(),
-                                    (String) event.getNewValue());
-                        } else if (RedPreferences.OTHER_RUNTIMES.equals(event.getKey())) {
-                            all = createRuntimeEnvironments((String) event.getNewValue(),
-                                    RedPlugin.getDefault().getPreferences().getAllRuntimesExecs());
-                        }
-                    }
-                });
+        InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID).addPreferenceChangeListener(event -> {
+            if (event == null) {
+                return;
+            } else if (RedPreferences.ACTIVE_RUNTIME.equals(event.getKey())) {
+                active = createRuntimeEnvironment((String) event.getNewValue(),
+                        RedPlugin.getDefault().getPreferences().getActiveRuntimeExec());
+            } else if (RedPreferences.ACTIVE_RUNTIME_EXEC.equals(event.getKey())
+                    && newHashSet(event.getOldValue(), event.getNewValue())
+                            .equals(newHashSet(SuiteExecutor.IronPython.name(), SuiteExecutor.IronPython64.name()))) {
+                active = createRuntimeEnvironment(RedPlugin.getDefault().getPreferences().getActiveRuntime(),
+                        (String) event.getNewValue());
+            } else if (RedPreferences.OTHER_RUNTIMES.equals(event.getKey())) {
+                all = createRuntimeEnvironments((String) event.getNewValue(),
+                        RedPlugin.getDefault().getPreferences().getAllRuntimesExecs());
+            }
+        });
     }
 
     public static RobotRuntimeEnvironment getActiveRobotInstallation(final RedPreferences preferences) {
@@ -83,13 +74,13 @@ public class InstalledRobotEnvironments {
         if (all == null) {
             all = readAllFromPreferences(preferences);
         }
-        return newArrayList(transform(all.values(), Suppliers.<RobotRuntimeEnvironment> supplierFunction()));
+        return all.values().stream().map(Supplier::get).collect(Collectors.toList());
     }
 
     private static RobotRuntimeEnvironment readActiveFromPreferences(final RedPreferences preferences) {
         return createRuntimeEnvironment(preferences.getActiveRuntime(), preferences.getActiveRuntimeExec());
     }
-    
+
     private static Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> readAllFromPreferences(
             final RedPreferences preferences) {
         return createRuntimeEnvironments(preferences.getAllRuntimes(), preferences.getAllRuntimesExecs());
@@ -114,8 +105,7 @@ public class InstalledRobotEnvironments {
                 .synchronizedMap(new LinkedHashMap<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>>());
 
         final List<String> paths = Splitter.on(';').splitToList(allPaths);
-        final List<String> execs = allExecs.isEmpty() ? new ArrayList<String>()
-                : Splitter.on(';').splitToList(allExecs);
+        final List<String> execs = allExecs.isEmpty() ? new ArrayList<>() : Splitter.on(';').splitToList(allExecs);
 
         for (int i = 0; i < paths.size(); i++) {
             final String path = paths.get(i);
