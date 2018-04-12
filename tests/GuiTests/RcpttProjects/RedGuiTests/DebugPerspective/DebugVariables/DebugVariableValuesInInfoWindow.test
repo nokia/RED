@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oetugJnLEeWXV_VOYkM3Sw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/11/18 11:20 AM
+Save-Time: 4/12/18 12:15 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -17,8 +17,8 @@ Entry-Name: .content
 
 proc "check-variable-in-info-window" [val value]{
 	wait 100
-	check-documentation-view [format "<body \s?style=\"overflow: hidden;\"><p style=\"margin: 0px;\"><b>"
-	+ "Current value:</b></p><pre style=\"font-family: monospace; font-size: small; margin-top: 0px; background-color: inherit;\">"
+	check-documentation-view [format "<body.*"
+	+ "Current value:</b></p><pre style=.*\">"
 	+ "%s</pre></body></html>" $value]
 }
 
