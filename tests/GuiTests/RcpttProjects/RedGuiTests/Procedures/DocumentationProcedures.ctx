@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/12/18 12:05 PM
+Save-Time: 4/12/18 2:59 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -29,14 +29,19 @@ proc "check-documentation-view" [val inner_html]{
 
 
 proc "check-error-in-editor" [val text]{
-	check-documentation-view [format "<body.*\">%s"
-	    + "</body></html>"  $text]
+	check-documentation-view [format "<body.*\">%s</body></html>"  $text]
 }
 
-proc "check-content-assist-documentation" [val value] {
-	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
-	    | get-control Browser | get-property text 
-	    | equals [format  "<body \s?style=\"overflow: hidden;\"><p><b>Source:</b> Built-in</p>\\n"
-	    + "<p><b>Value:</b> %s</p></body></html>"  $html_beginning $value ]| verify-true
-}    
+proc "check-content-assist-documentation" [val source "Built-in"]  [val value] {
+	if [$value | eq ""]{
+		get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+	    	| get-control Browser | get-property text 
+	    	| equals [format  "%s<body.*\"><p><b>Source:</b> Built-in</p></body></html>" $html_beginning ]| verify-true
+	}-else{
+		get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+		    | get-control Browser | get-property text 
+		    | equals [format  "%s<body.*\"><p><b>Source:</b> %s</p>\\\\n<p><b>Value:</b> %s</p></body></html>" $html_beginning $source $value]| verify-true
+	}	    
+	    
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
