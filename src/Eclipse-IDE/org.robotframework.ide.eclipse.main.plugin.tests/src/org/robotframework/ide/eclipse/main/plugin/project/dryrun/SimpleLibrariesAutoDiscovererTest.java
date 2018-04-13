@@ -16,8 +16,10 @@ import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryI
 import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryImports.hasLibImports;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.assertj.core.api.Condition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -98,8 +100,9 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "CorrectLib", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(
-                ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLib", PROJECT_NAME));
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLib",
                 projectProvider.getFile("libs/CorrectLib.py"), newHashSet(suite.getFile())))));
@@ -117,8 +120,9 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "proj_module", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries())
-                .containsExactly(ReferencedLibrary.create(LibraryType.PYTHON, "proj_module", PROJECT_NAME));
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "proj_module", PROJECT_NAME)));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "proj_module",
                 projectProvider.getFile("proj_module/__init__.py"), newHashSet(suite.getFile())))));
@@ -136,8 +140,9 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "CorrectLibWithClasses.ClassB", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(ReferencedLibrary
-                .create(LibraryType.PYTHON, "CorrectLibWithClasses.ClassB", PROJECT_NAME));
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLibWithClasses.ClassB", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLibWithClasses.ClassB",
                 projectProvider.getFile("libs/CorrectLibWithClasses.py"), newHashSet(suite.getFile())))));
@@ -159,8 +164,9 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "module.ModuleLib", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(ReferencedLibrary
-                .create(LibraryType.PYTHON, "module.ModuleLib", PROJECT_NAME + "/python_path/module"));
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(ReferencedLibrary
+                .create(LibraryType.PYTHON, "module.ModuleLib", PROJECT_NAME + "/python_path/module")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "module.ModuleLib",
                 projectProvider.getFile("python_path/module/ModuleLib.py"), newHashSet(suite.getFile())))));
@@ -221,5 +227,17 @@ public class SimpleLibrariesAutoDiscovererTest {
         verify(summaryHandler)
                 .accept(argThat(hasLibImports(createImport(NOT_ADDED, "ExcludedLib", newHashSet(suite.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
+    }
+
+    private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {
+        return new Condition<ReferencedLibrary>() {
+
+            @Override
+            public boolean matches(final ReferencedLibrary toMatch) {
+                return Objects.equals(library.getType(), toMatch.getType())
+                        && Objects.equals(library.getName(), toMatch.getName())
+                        && Objects.equals(library.getPath(), toMatch.getPath());
+            }
+        };
     }
 }

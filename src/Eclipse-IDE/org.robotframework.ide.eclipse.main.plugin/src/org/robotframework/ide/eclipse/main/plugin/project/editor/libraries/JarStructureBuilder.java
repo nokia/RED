@@ -24,6 +24,7 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 
 public class JarStructureBuilder implements ILibraryStructureBuilder {
@@ -81,7 +82,7 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
 
         final List<JarClass> jarClasses = new ArrayList<>();
         for (final ILibraryClass pythonClass : pythonClasses) {
-            jarClasses.add(JarClass.createFromZipPythonEntry(pythonClass.getQualifiedName()));
+            jarClasses.add(new JarClass(pythonClass.getQualifiedName()));
         }
 
         return jarClasses;
@@ -95,18 +96,16 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
 
         private final String qualifiedName;
 
-        private JarClass(final String qualifiedName) {
+        @VisibleForTesting
+        JarClass(final String qualifiedName) {
             this.qualifiedName = qualifiedName;
         }
 
-        private static JarClass createFromZipJavaEntry(final String name) {
+        @VisibleForTesting
+        static JarClass createFromZipJavaEntry(final String name) {
             final String nameWithoutExtension = name.substring(0, name.length() - ".class".length());
             final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
             return new JarClass(qualifiedName);
-        }
-
-        private static JarClass createFromZipPythonEntry(final String name) {
-            return new JarClass(name);
         }
 
         @Override

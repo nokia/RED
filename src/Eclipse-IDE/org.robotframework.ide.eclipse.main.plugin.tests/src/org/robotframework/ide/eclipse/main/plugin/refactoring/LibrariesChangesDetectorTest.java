@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
@@ -20,8 +21,6 @@ import org.mockito.ArgumentMatcher;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-
-import com.google.common.base.Objects;
 
 public class LibrariesChangesDetectorTest {
 
@@ -183,9 +182,9 @@ public class LibrariesChangesDetectorTest {
 
     private static ArgumentMatcher<ReferencedLibrary> hasSameFields(final ReferencedLibrary library) {
         return toMatch -> {
-            return Objects.equal(library.getType(), toMatch.getType())
-                    && Objects.equal(library.getName(), toMatch.getName())
-                    && Objects.equal(library.getPath(), toMatch.getPath());
+            return Objects.equals(library.getType(), toMatch.getType())
+                    && Objects.equals(library.getName(), toMatch.getName())
+                    && Objects.equals(library.getPath(), toMatch.getPath());
         };
     }
 }
