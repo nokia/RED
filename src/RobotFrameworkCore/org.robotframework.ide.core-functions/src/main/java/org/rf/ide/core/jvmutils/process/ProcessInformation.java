@@ -13,10 +13,9 @@ public class ProcessInformation {
 
     public static final long PROCESS_NOT_FOUND = -1;
 
-    private Optional<ProcessInformation> parent = Optional.empty();
-
     private final long processPid;
 
+    private Optional<ProcessInformation> parent = Optional.empty();
     private final List<ProcessInformation> childProcesses = new ArrayList<>(0);
 
     private Optional<IProcessTreeHandler> handler = Optional.empty();
@@ -26,17 +25,12 @@ public class ProcessInformation {
     }
 
     public Optional<IProcessTreeHandler> findHandler() {
-        Optional<IProcessTreeHandler> foundHandler = Optional.empty();
-
         if (handler.isPresent()) {
-            foundHandler = handler;
-        } else {
-            if (parent().isPresent()) {
-                foundHandler = parent().get().findHandler();
-            }
+            return handler;
+        } else if (parent.isPresent()) {
+            return parent.get().findHandler();
         }
-
-        return foundHandler;
+        return Optional.empty();
     }
 
     public void setHandler(final IProcessTreeHandler handler) {
@@ -57,14 +51,14 @@ public class ProcessInformation {
 
     void addChildProcess(final ProcessInformation childProcess) {
         childProcess.setParent(this);
-        this.childProcesses.add(childProcess);
+        childProcesses.add(childProcess);
     }
 
     public List<ProcessInformation> childs() {
-        return this.childProcesses;
+        return childProcesses;
     }
 
-    public boolean wasFound() {
-        return (PROCESS_NOT_FOUND != pid());
+    public boolean isFound() {
+        return PROCESS_NOT_FOUND != processPid;
     }
 }

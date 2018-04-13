@@ -12,8 +12,11 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.RuntimeProcess;
 import org.rf.ide.core.execution.debug.UserProcessController;
+import org.rf.ide.core.jvmutils.process.OSProcessHelper;
+import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
+import org.robotframework.red.swt.SwtThread;
 
 public class LocalProcess extends RuntimeProcess implements IRobotProcess {
 
@@ -27,9 +30,16 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
 
     private boolean isSuspended;
 
+    private String pythonExecutablePath;
+
     public LocalProcess(final ILaunch launch, final Process process, final String name,
             final Map<String, String> attributes) {
         super(launch, process, name, attributes);
+    }
+
+    @Override
+    public void setPythonExecutablePath(final String pythonExecutablePath) {
+        this.pythonExecutablePath = pythonExecutablePath;
     }
 
     @Override
@@ -75,6 +85,23 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
             onDisconnectHook.run();
         }
         super.terminated();
+    }
+
+    @Override
+    public void interrupt() {
+        // we need to resume if suspended, so that the agent will be able to handle signal
+        final Runnable additionalOp = isSuspended() ? this::resume : () -> {};
+        new Thread(() -> {
+            final Process systemProcess = getSystemProcess();
+            if (systemProcess != null) {
+                try {
+                    new OSProcessHelper().interruptProcess(systemProcess, pythonExecutablePath);
+                } catch (final ProcessHelperException e) {
+                }
+            }
+            additionalOp.run();
+            SwtThread.asyncExec(() -> fireEvent(DebugEvent.CHANGE));
+        }).start();
     }
 
     @Override
