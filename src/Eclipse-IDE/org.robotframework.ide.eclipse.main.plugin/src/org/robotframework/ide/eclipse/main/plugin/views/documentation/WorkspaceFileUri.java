@@ -115,8 +115,8 @@ public class WorkspaceFileUri implements OpenableUri {
     }
 
     @FunctionalInterface
-    static interface FileConsumer {
+    public static interface FileConsumer {
 
-        void accept(Optional<IFile> file, Map<String, String> params);
+        public void accept(Optional<IFile> file, Map<String, String> params);
     }
 }

@@ -18,6 +18,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification")
 public class LibraryConstructor {
 
+    public static LibraryConstructor create(final String documentation, final List<String> arguments) {
+        final LibraryConstructor contructor = new LibraryConstructor();
+        contructor.setDocumentation(documentation);
+        contructor.setArguments(arguments);
+        return contructor;
+    }
+
     private String documentation;
 
     private List<String> arguments;
