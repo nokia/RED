@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.library;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,10 +68,15 @@ public class Libraries {
     public static Map<LibraryDescriptor, LibrarySpecification> createRefLib(final String libName,
             final String... kwNames) {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, libName, "");
+        return createRefLib(library, kwNames);
+    }
+
+    public static Map<LibraryDescriptor, LibrarySpecification> createRefLib(final ReferencedLibrary library,
+            final String... kwNames) {
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setFormat("ROBOT");
-        libSpec.setName(libName);
+        libSpec.setName(library.getName());
         libSpec.setDescriptor(descriptor);
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();

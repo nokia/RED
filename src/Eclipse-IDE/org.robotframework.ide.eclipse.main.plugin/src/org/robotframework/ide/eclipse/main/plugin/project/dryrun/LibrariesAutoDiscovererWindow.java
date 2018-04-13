@@ -54,7 +54,7 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.SourceOpeningSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.swt.SwtThread;

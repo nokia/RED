@@ -27,7 +27,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.SourceOpeningSupport;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
