@@ -15,7 +15,8 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.LibraryLocationFinder;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.SourceOpeningSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -82,7 +83,7 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
     @Override
     public String additionalLabelDecoration() {
-        return "[" + SourceOpeningSupport.extractLibraryLocation(model, project, libSpec) + "]";
+        return LibraryLocationFinder.findPath(model, project, libSpec).map(path -> "[" + path + "]").orElse("");
     }
 
     @Override
