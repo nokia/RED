@@ -13,7 +13,7 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.SourceOpeningSupport;
 import org.robotframework.red.viewers.Selections;
 
 public class ShowLibrarySourceAction extends Action implements IEnablementUpdatingAction {
