@@ -35,6 +35,10 @@ This only require that the path to one of those executables (Unix-like / Windows
 <ul>
     <li><span class="block">python</span> / <span class="block">python.exe</span>
     </li>
+    <li><span class="block">python2</span> / <span class="block">python2.exe</span>
+    </li>
+    <li><span class="block">python3</span> / <span class="block">python3.exe</span>
+    </li>
     <li><span class="block">jython</span> / <span class="block">jython.exe</span>
     </li>
     <li><span class="block">ipy</span> / <span class="block">ipy.exe</span>
@@ -47,18 +51,6 @@ This only require that the path to one of those executables (Unix-like / Windows
 <p>is appended to <a href="https://en.wikipedia.org/wiki/PATH_(variable)" class="external" target="_blank">
 <span class="code">PATH</span></a> environment variable in your system.
 </p>
-
-<dl class="warning">
-   <dt>Warning</dt>
-   <dd>On Unix-like systems (Linux / macOS) executables are often named <span class="block">python2</span> or 
-   <span class="block">python3</span> for respective versions of python. As of now RED does not recognize
-   such executables even if they are appended to <span class="block">PATH</span> variable. Probably the best
-   solution for this problem is to create a <a href="https://en.wikipedia.org/wiki/Symbolic_link" 
-   class="external" target="_blank">symlink</a> named <span class="block">python</span> targeted to either 
-   <span class="block">python2</span> or <span class="block">python3</span>.
-   </dd>
-</dl>
-
 
 <h3>Manual environment configuration</h3>
 
