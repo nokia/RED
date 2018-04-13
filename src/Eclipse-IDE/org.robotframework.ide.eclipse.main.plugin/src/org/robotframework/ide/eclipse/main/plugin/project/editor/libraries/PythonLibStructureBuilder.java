@@ -25,6 +25,7 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 
@@ -59,10 +60,12 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
         private final String qualifiedName;
 
-        private PythonClass(final String qualifiedName) {
+        @VisibleForTesting
+        PythonClass(final String qualifiedName) {
             this.qualifiedName = qualifiedName;
         }
 
+        @VisibleForTesting
         static PythonClass createWithoutDuplicationOfFileAndClassName(final String name) {
             final List<String> splitted = new ArrayList<>(Splitter.on('.').splitToList(name));
             if (splitted.size() > 1) {

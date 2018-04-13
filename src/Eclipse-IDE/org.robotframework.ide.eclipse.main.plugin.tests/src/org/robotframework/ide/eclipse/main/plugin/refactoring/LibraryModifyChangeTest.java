@@ -12,6 +12,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Objects;
+
+import org.assertj.core.api.Condition;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -64,17 +67,27 @@ public class LibraryModifyChangeTest {
         final Change undoOperation = change.perform(null);
 
         assertThat(undoOperation).isInstanceOf(LibraryModifyChange.class);
-        assertThat(config.getLibraries()).isNotEmpty();
-        assertThat(config.getLibraries().get(0).provideType()).isEqualTo(LibraryType.PYTHON);
-        assertThat(config.getLibraries().get(0).getName()).isEqualTo("d");
-        assertThat(config.getLibraries().get(0).getPath()).isEqualTo("x/y");
+        assertThat(config.getLibraries()).hasSize(1);
+        assertThat(config.getLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "d", "x/y")));
         verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);
-        assertThat(config.getLibraries()).isNotEmpty();
-        assertThat(config.getLibraries().get(0).provideType()).isEqualTo(LibraryType.PYTHON);
-        assertThat(config.getLibraries().get(0).getName()).isEqualTo("c");
-        assertThat(config.getLibraries().get(0).getPath()).isEqualTo("a/b");
+        assertThat(config.getLibraries()).hasSize(1);
+        assertThat(config.getLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b")));
+    }
+
+    private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {
+        return new Condition<ReferencedLibrary>() {
+
+            @Override
+            public boolean matches(final ReferencedLibrary toMatch) {
+                return Objects.equals(library.getType(), toMatch.getType())
+                        && Objects.equals(library.getName(), toMatch.getName())
+                        && Objects.equals(library.getPath(), toMatch.getPath());
+            }
+        };
     }
 }

@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.assertj.core.api.Condition;
@@ -29,8 +30,6 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.red.junit.Editors;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.base.Objects;
 
 public class RedXmlInProjectEditorChangesCollectorTest {
 
@@ -267,9 +266,9 @@ public class RedXmlInProjectEditorChangesCollectorTest {
 
             @Override
             public boolean matches(final ReferencedLibrary toMatch) {
-                return Objects.equal(library.getType(), toMatch.getType())
-                        && Objects.equal(library.getName(), toMatch.getName())
-                        && Objects.equal(library.getPath(), toMatch.getPath());
+                return Objects.equals(library.getType(), toMatch.getType())
+                        && Objects.equals(library.getName(), toMatch.getName())
+                        && Objects.equals(library.getPath(), toMatch.getPath());
             }
         };
     }
