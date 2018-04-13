@@ -100,6 +100,16 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return launch;
     }
 
+    public void interrupt() {
+        if (isSuspended()) {
+            getThread().resumed();
+            getThread().fireResumeEvent(DebugEvent.CLIENT_REQUEST);
+
+            fireChangeEvent(DebugEvent.CONTENT);
+        }
+        getProcess().interrupt();
+    }
+
     @Override
     public boolean canDisconnect() {
         return getProcess().canDisconnect();
