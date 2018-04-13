@@ -7,9 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLibs;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRemoteLib;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createStdLibs;
+import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRefLibs;
+import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRemoteLib;
+import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createStdLibs;
 
 import java.io.IOException;
 import java.util.List;

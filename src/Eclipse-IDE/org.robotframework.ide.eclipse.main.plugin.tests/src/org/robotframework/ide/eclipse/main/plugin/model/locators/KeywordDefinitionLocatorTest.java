@@ -6,8 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLib;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createStdLib;
+import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRefLib;
+import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createStdLib;
 
 import java.util.Collection;
 import java.util.HashMap;
