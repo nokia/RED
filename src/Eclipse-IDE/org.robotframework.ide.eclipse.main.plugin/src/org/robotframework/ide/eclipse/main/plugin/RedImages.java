@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.ISharedImages;
@@ -47,6 +48,18 @@ public class RedImages {
 
     public static ImageDescriptor getStopImage() {
         return RedPlugin.getImageDescriptor("resources/stop.png");
+    }
+
+    public static ImageDescriptor getInterruptImage() {
+        return RedPlugin.getImageDescriptor("resources/stop_soft.png");
+    }
+
+    public static ImageDescriptor getSuspendImage() {
+        return DebugUITools.getImageDescriptor("IMG_ELCL_SUSPEND");
+    }
+
+    public static ImageDescriptor getResumeImage() {
+        return DebugUITools.getImageDescriptor("IMG_ELCL_RESUME");
     }
 
     public static ImageDescriptor getDeleteImage() {
