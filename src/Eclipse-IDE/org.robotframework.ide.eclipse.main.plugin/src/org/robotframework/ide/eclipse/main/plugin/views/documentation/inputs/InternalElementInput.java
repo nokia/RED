@@ -92,7 +92,7 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> implemen
         }
 
         RobotElement current = element;
-        while (!(current instanceof RobotSuiteFile)) {
+        while (current.getParent() != null && !(current instanceof RobotSuiteFile)) {
             address.add(0, current.getParent().getChildren().indexOf(current));
             current = current.getParent();
         }
