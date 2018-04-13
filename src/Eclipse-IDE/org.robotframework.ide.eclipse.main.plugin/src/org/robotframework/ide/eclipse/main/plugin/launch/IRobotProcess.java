@@ -18,6 +18,8 @@ public interface IRobotProcess extends IProcess, IDisconnect, ISuspendResume {
 
     void onTerminate(Runnable operation);
 
+    void setPythonExecutablePath(String pythonExecutablePath);
+
     void setConnectedToTests(boolean isConnected);
 
     void setUserProcessController(UserProcessController controller);
@@ -36,6 +38,8 @@ public interface IRobotProcess extends IProcess, IDisconnect, ISuspendResume {
 
     @Override
     void disconnect();
+
+    void interrupt();
 
     void terminated();
 }
