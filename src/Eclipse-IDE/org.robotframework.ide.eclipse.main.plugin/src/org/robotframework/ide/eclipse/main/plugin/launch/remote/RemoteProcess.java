@@ -53,6 +53,11 @@ public class RemoteProcess implements IRobotProcess, IDisconnect {
     }
 
     @Override
+    public void setPythonExecutablePath(final String pythonExecutablePath) {
+        // not important for remote process
+    }
+
+    @Override
     public void setUserProcessController(final UserProcessController controller) {
         this.userProcessController = controller;
     }
@@ -113,6 +118,12 @@ public class RemoteProcess implements IRobotProcess, IDisconnect {
     @Override
     public void suspended() {
         isSuspended = true;
+        fireEvent(DebugEvent.CHANGE);
+    }
+
+    @Override
+    public void interrupt() {
+        userProcessController.interrupt(() -> {});
         fireEvent(DebugEvent.CHANGE);
     }
 
