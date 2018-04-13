@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -72,11 +71,18 @@ public class LibraryUri implements OpenableUri {
         return new URI(SCHEME, null, path, query, null);
     }
 
+    private final RobotModel model;
+
     private final URI uri;
 
     private final SpecificationsConsumer specsConsumer;
 
     LibraryUri(final URI uri, final SpecificationsConsumer specsConsumer) {
+        this(RedPlugin.getModelManager().getModel(), uri, specsConsumer);
+    }
+
+    LibraryUri(final RobotModel model, final URI uri, final SpecificationsConsumer specsConsumer) {
+        this.model = model;
         this.uri = uri;
         this.specsConsumer = specsConsumer;
     }
@@ -86,12 +92,10 @@ public class LibraryUri implements OpenableUri {
         final String[] path = uri.getPath().split("/");
 
         final String projectName = path[1];
-        final String libName = path[2];
+        final String libName = path.length >= 3 ? path[2] : null;
         final String kwName = path.length >= 4 ? path[3] : null;
 
-        final RobotModel model = RedPlugin.getModelManager().getModel();
-        final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-        final IProject project = wsRoot.getProject(projectName);
+        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
         final RobotProject robotProject = model.createRobotProject(project);
 
         final Optional<LibrarySpecification> libSpec = robotProject.getLibrarySpecificationsStream()
@@ -107,9 +111,9 @@ public class LibraryUri implements OpenableUri {
     }
 
     @FunctionalInterface
-    static interface SpecificationsConsumer {
+    public static interface SpecificationsConsumer {
 
-        void accept(RobotProject project, Optional<LibrarySpecification> libSpec,
+        public void accept(RobotProject project, Optional<LibrarySpecification> libSpec,
                 Optional<KeywordSpecification> kwSpec);
 
     }

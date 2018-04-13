@@ -46,7 +46,9 @@ class Formatters {
         builder.append(title);
         builder.append("</h3>");
 
-        builder.append("<p>");
+        if (!simpleTable.isEmpty()) {
+            builder.append("<p>");
+        }
         for (final List<String> row : simpleTable) {
             if (row.isEmpty()) {
                 continue;
@@ -57,6 +59,9 @@ class Formatters {
             builder.append("<b>" + rowTitle + ": </b>");
             builder.append("<span style=\"font-family: monospace;\">" + restOfRow + "</span>");
             builder.append("<br/>");
+        }
+        if (!simpleTable.isEmpty()) {
+            builder.append("</p>");
         }
         return builder.toString();
 
