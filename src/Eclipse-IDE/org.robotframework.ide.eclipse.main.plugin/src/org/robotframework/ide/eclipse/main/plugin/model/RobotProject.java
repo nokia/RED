@@ -417,19 +417,6 @@ public class RobotProject extends RobotContainer {
         return false;
     }
 
-    public synchronized String getPythonLibraryPath(final String libName) {
-        readProjectConfigurationIfNeeded();
-        if (configuration != null) {
-            for (final ReferencedLibrary lib : configuration.getLibraries()) {
-                if (lib.provideType() == LibraryType.PYTHON && lib.getName().equals(libName)) {
-                    return RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(
-                            new Path(lib.getPath()).append(lib.getName() + ".py")).toPortableString();
-                }
-            }
-        }
-        return "";
-    }
-
     public List<String> getVariableFilePaths() {
         readProjectConfigurationIfNeeded();
 
