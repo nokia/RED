@@ -24,6 +24,8 @@ automatically detect Python installation. This only require that the path to
 one of those executables (Unix-like / Windows):
 
   * python / python.exe
+  * python2 / python2.exe
+  * python3 / python3.exe
   * jython / jython.exe
   * ipy / ipy.exe
   * ipy64 / ipy64.exe
@@ -31,10 +33,6 @@ one of those executables (Unix-like / Windows):
 
 is appended to [ PATH](https://en.wikipedia.org/wiki/PATH_\(variable\))
 environment variable in your system.
-
-Warning
-
-    On Unix-like systems (Linux / macOS) executables are often named python2 or python3 for respective versions of python. As of now RED does not recognize such executables even if they are appended to PATH variable. Probably the best solution for this problem is to create a [symlink](https://en.wikipedia.org/wiki/Symbolic_link) named python targeted to either python2 or python3. 
 
 ### Manual environment configuration
 
