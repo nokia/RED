@@ -11,7 +11,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
-import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.SourceOpeningSupport;
 
 /**
  * @author Michal Anglart

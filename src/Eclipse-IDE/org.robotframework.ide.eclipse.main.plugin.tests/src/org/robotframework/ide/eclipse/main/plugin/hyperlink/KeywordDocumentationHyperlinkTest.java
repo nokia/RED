@@ -23,7 +23,7 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class KeywordDocumentationHyperlinkTest {
@@ -48,7 +48,9 @@ public class KeywordDocumentationHyperlinkTest {
         projectProvider.createFile("testlib.py");
         projectProvider.configure(config);
 
-        final Map<LibraryDescriptor, LibrarySpecification> refLibs = Libraries.createRefLib("testlib", "keyword");
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = Libraries.createRefLib(
+                ReferencedLibrary.create(LibraryType.PYTHON, "testlib", projectProvider.getProject().getName()),
+                "keyword");
         libSpec = refLibs.values().iterator().next();
         kwSpec = libSpec.getKeywords().get(0);
 
