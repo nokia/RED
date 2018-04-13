@@ -48,7 +48,7 @@ public class RobotSetting extends RobotKeywordCall {
 
     private SettingsGroup group;
 
-    RobotSetting(final RobotSettingsSection section, final AModelElement<?> linkedElement) {
+    public RobotSetting(final RobotSettingsSection section, final AModelElement<?> linkedElement) {
         this(section, SettingsGroup.NO_GROUP, linkedElement);
     }
 

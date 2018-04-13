@@ -34,6 +34,8 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Lib
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class DocumentationsLinksSupport {
 
     private final IWorkbenchPage page;
@@ -55,7 +57,8 @@ public class DocumentationsLinksSupport {
         this(page, browserSupport, displayer, null);
     }
 
-    private DocumentationsLinksSupport(final IWorkbenchPage page, final IWorkbenchBrowserSupport browserSupport,
+    @VisibleForTesting
+    DocumentationsLinksSupport(final IWorkbenchPage page, final IWorkbenchBrowserSupport browserSupport,
             final DocumentationDisplayer displayer, final Runnable whenLocationChangeOutsideOfDisplayer) {
         this.page = page;
         this.browserSupport = browserSupport;
@@ -63,13 +66,12 @@ public class DocumentationsLinksSupport {
         this.whenLocationChangeOutsideOfDisplayer = whenLocationChangeOutsideOfDisplayer;
     }
 
-    boolean changeLocationTo(final URI locationUri) {
+    public boolean changeLocationTo(final URI locationUri) {
         if (isAboutBlankUri(locationUri)) {
             // moving to generated site set by Browser#setText method or to #id location
             return false;
         } else {
-            final OpenableUri uriWrapper = createOpenableUri(locationUri);
-            uriWrapper.open();
+            createOpenableUri(locationUri).open();
             return true;
         }
     }
