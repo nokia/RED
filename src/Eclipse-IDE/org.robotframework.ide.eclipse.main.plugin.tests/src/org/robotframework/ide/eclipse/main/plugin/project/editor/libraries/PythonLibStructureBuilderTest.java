@@ -13,7 +13,10 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Objects;
 
+import org.assertj.core.api.Condition;
+import org.eclipse.core.runtime.IPath;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -23,8 +26,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.red.junit.ProjectProvider;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -82,7 +88,7 @@ public class PythonLibStructureBuilderTest {
     }
 
     @Test
-    public void fileNameAndClassNameDuplicationsAreSkipped() throws Exception {
+    public void entriesWithoutDuplicatedFileAndClassNameAreProvided() throws Exception {
         when(environment.getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths()))
                 .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName",
                         "module.OtherClassName", "module.OtherClassName.OtherClassName"));
@@ -97,7 +103,7 @@ public class PythonLibStructureBuilderTest {
     }
 
     @Test
-    public void fileNameAndClassNameDuplicationsAreNotSkipped() throws Exception {
+    public void allEntriesAreProvided() throws Exception {
         when(environment.getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths()))
                 .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName",
                         "module.OtherClassName", "module.OtherClassName.OtherClassName"));
@@ -109,6 +115,54 @@ public class PythonLibStructureBuilderTest {
 
         assertThat(classes.stream().map(ILibraryClass::getQualifiedName)).containsExactly("module", "module.ClassName",
                 "module.ClassName.ClassName", "module.OtherClassName", "module.OtherClassName.OtherClassName");
+    }
+
+    @Test
+    public void pythonClassesAreCreatedWithoutDuplicatedClassName() throws Exception {
+        assertThat(PythonClass.createWithoutDuplicationOfFileAndClassName("simpleName"))
+                .isEqualTo(new PythonClass("simpleName"));
+        assertThat(PythonClass.createWithoutDuplicationOfFileAndClassName("className.otherName"))
+                .isEqualTo(new PythonClass("className.otherName"));
+        assertThat(PythonClass.createWithoutDuplicationOfFileAndClassName("mod.className.otherName"))
+                .isEqualTo(new PythonClass("mod.className.otherName"));
+        assertThat(PythonClass.createWithoutDuplicationOfFileAndClassName("className.className"))
+                .isEqualTo(new PythonClass("className"));
+        assertThat(PythonClass.createWithoutDuplicationOfFileAndClassName("mod.className.className"))
+                .isEqualTo(new PythonClass("mod.className"));
+    }
+
+    @Test
+    public void referenceLibraryIsCreated() throws Exception {
+        final ILibraryClass libClass = new PythonClass("libName");
+        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final String fullLibraryPath = projectLocation.append("module/libName.py").toOSString();
+        final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
+
+        assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "libName",
+                projectProvider.getProject().getName() + "/module")));
+    }
+
+    @Test
+    public void referenceLibraryIsCreatedForModule() throws Exception {
+        final ILibraryClass libClass = new PythonClass("libName");
+        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final String fullLibraryPath = projectLocation.append("module/libName/__init__.py").toOSString();
+        final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
+
+        assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "libName",
+                projectProvider.getProject().getName() + "/module")));
+    }
+
+    private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {
+        return new Condition<ReferencedLibrary>() {
+
+            @Override
+            public boolean matches(final ReferencedLibrary toMatch) {
+                return Objects.equals(library.getType(), toMatch.getType())
+                        && Objects.equals(library.getName(), toMatch.getName())
+                        && Objects.equals(library.getPath(), toMatch.getPath());
+            }
+        };
     }
 
 }

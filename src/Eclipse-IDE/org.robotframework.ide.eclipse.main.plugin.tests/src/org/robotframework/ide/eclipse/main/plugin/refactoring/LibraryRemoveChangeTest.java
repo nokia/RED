@@ -12,6 +12,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Objects;
+
+import org.assertj.core.api.Condition;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -68,6 +71,20 @@ public class LibraryRemoveChangeTest {
                 any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);
-        assertThat(config.getLibraries()).contains(ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b"));
+        assertThat(config.getLibraries()).hasSize(1);
+        assertThat(config.getLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b")));
+    }
+
+    private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {
+        return new Condition<ReferencedLibrary>() {
+
+            @Override
+            public boolean matches(final ReferencedLibrary toMatch) {
+                return Objects.equals(library.getType(), toMatch.getType())
+                        && Objects.equals(library.getName(), toMatch.getName())
+                        && Objects.equals(library.getPath(), toMatch.getPath());
+            }
+        };
     }
 }
