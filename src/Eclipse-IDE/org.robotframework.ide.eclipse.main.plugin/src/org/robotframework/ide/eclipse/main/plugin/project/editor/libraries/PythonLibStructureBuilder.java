@@ -87,12 +87,35 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
         @Override
         public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
-            final IPath path = new Path(fullLibraryPath);
-            final IPath pathWithoutModuleName = fullLibraryPath.endsWith("__init__.py") ? path.removeLastSegments(2)
-                    : path.removeLastSegments(1);
-
+            IPath pathWithoutModuleName = new Path(fullLibraryPath).removeLastSegments(1);
+            final String[] nameParts = qualifiedName.split("\\.");
+            if (fullLibraryPath.endsWith("__init__.py") || nameParts.length > 1) {
+                final int segmentsToRemove = countModuleNameSegments(pathWithoutModuleName.segments(), nameParts);
+                pathWithoutModuleName = pathWithoutModuleName.removeLastSegments(segmentsToRemove);
+            }
             return ReferencedLibrary.create(LibraryType.PYTHON, qualifiedName,
                     RedWorkspace.Paths.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
+        }
+
+        private int countModuleNameSegments(final String[] pathSegments, final String[] nameParts) {
+            int moduleNameSegments = 0;
+            int currentMatch = 1;
+            while (currentMatch <= pathSegments.length && currentMatch <= nameParts.length) {
+                boolean currentPatsMatch = true;
+                for (int i = 0; i < currentMatch; i++) {
+                    final String currentNamePart = nameParts[i];
+                    final String currentPathSegment = pathSegments[pathSegments.length - currentMatch + i];
+                    if (!currentNamePart.equals(currentPathSegment)) {
+                        currentPatsMatch = false;
+                        break;
+                    }
+                }
+                if (currentPatsMatch) {
+                    moduleNameSegments = currentMatch;
+                }
+                currentMatch++;
+            }
+            return moduleNameSegments;
         }
 
         @Override
