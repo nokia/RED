@@ -208,7 +208,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
                 .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Path")
-                .shouldGrabAllTheSpaceLeft(true)
+                .withWidth(200)
                 .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
                 .createFor(viewer);
     }
