@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _h4fPYBh-Eee93KAG-tW51Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/30/18 12:06 PM
+Save-Time: 4/16/18 5:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -175,7 +175,24 @@ with [get-window "Run Configurations"] {
 	    get-property "getChildren().Control[2].getChildren().Control[0].getEditable()" | equals true | verify-true
 	    
 	    get-property "getChildren().Control[2].getChildren().Control[1].getText()" | equals "Variables..." | verify-true
+	    
+	    //optins in combo
+	    with [get-window "Run Configurations" | get-group Interpreter] {
+		    with [get-combo] {
+		        get-property "values[0]" | equals Python | verify-true
+		        get-property "values[1]" | equals Python2 | verify-true
+		        get-property "values[2]" | equals Python3 | verify-true
+		        get-property "values[3]" | equals Jython | verify-true
+		        get-property "values[4]" | equals IronPython | verify-true
+		        get-property "values[5]" | equals IronPython64 | verify-true
+		        get-property "values[6]" | equals PyPy | verify-true
+		    }
+		}
+    
     }
+    
+    
+    //External script
     with [get-group "External script"] {
         get-property "getChildren().length" | equals 4 | verify-true
 	    get-property "getChildren().Control[0].getText()" | equals "Executable file to run Robot Framework tests:" 
