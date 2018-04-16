@@ -1,21 +1,24 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _hb89IDvxEeiDC73Fvf4wHA
 Element-Name: OpeningDocumentationAndSource
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _lydfgNjhEeaPsa7IhEHBIQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/18/17 1:59 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 4/16/18 2:58 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-proc "check-doc-view-and-close"{
-	get-window "Keyword Documentation" | get-object | invoke isVisible |eq true| verify-true
-	get-window "Keyword Documentation" | get-object | invoke close	
+with [get-tab-folder -index 4] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property activePage | equals "Message Log" | verify-true
+    get-property tabCount | equals 2 | verify-true
 }
 
 //open doc for Catenate
@@ -26,7 +29,16 @@ with [get-view "Project Explorer" | get-tree] {
 }
 
 //verify and close
-check-doc-view-and-close
+with [get-tab-folder -index 4] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property "pages[2]" | equals "Documentation View" | verify-true
+    get-property activePage | equals "Documentation View" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+
+
+check-kw-documentation -kw_name "Catenate"  -library "BuiltIn" -arguments "\[\*items\]" -spec "Catenates the given items together and returns the resulted string.*"   
 
 //open source for Get count	
 get-view "Project Explorer" | get-tree 
@@ -38,12 +50,14 @@ get-editor "BuiltIn.py" | get-text-viewer | get-property "getSelectionText()"
 //collapse
 //get-view "Project Explorer" | get-button "Collapse All  (M1+M2+Numpad_Divide)" | click
 get-view "Project Explorer" | get-tree | get-item RobotProject | collapse-all
+
 //go to Collection
 get-view "Project Explorer" | get-tree 
     | select "RobotProject/Robot Standard libraries \\[Robot Framework .* \\(Python .*\\)\\]/Collections \\(\d\d\\)/Dictionary Should Contain Key" 
     | double-click
 
-check-doc-view-and-close
+
+check-kw-documentation -kw_name "Dictionary Should Contain Key"  -library "Collections" -arguments "\[dictionary, key, msg=None\]" -spec "Fails if <code>key</code> is not found from <code>dictionary</code>.*"   
 
 
 
