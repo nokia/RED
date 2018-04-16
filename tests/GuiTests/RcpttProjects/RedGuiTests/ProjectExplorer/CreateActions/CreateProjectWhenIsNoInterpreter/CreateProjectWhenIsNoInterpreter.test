@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _A9XVMAiaEea9m_qlhlPmsQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/5/17 9:32 AM
+Save-Time: 4/16/18 3:13 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,16 +19,17 @@ get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
 
 //Discover to remove all interpreters
+get-window Preferences | get-button Discover | click
+repeat  -times [get-window Preferences | get-table | get-property itemCount -raw] -command{
+	with [get-window Preferences] {
+	    get-table | get-item ".*" -index 0 | click
+	    get-button Remove | click
+	}
+}
 with [get-window Preferences] {
-    get-button Discover | click
-    get-table | select "Robot Framework .*\\(Python .*\\)"
-	get-button Remove | click
-	get-table | select "Robot Framework .*\\(Jython .*\\)"
-    get-button Remove | click
     get-button $Apply_and_OK_in_preference | click
     get-window "Rebuild required" | get-button OK | click
 }
-
 //set other view in Prefernce
 get-preferences-menu | click
 with [get-window Preferences] {
