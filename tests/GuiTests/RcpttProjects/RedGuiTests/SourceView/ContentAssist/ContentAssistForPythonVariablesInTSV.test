@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _Qxs1YJ2WEeWVv_UItyy1RQ,_cBeEIMN4Eeat3OoBX2X2jQ
+Contexts: _Qxs1YJ2WEeWVv_UItyy1RQ,_cBeEIMN4Eeat3OoBX2X2jQ,_hb89IDvxEeiDC73Fvf4wHA
 Element-Name: ContentAssistForPythonVariablesInTSV
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _88Mx8J2SEeWVv_UItyy1RQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/31/17 10:27 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 4/16/18 1:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -137,41 +137,33 @@ check-automatic-variables-for-test-case -start_index 8
 //check yellow window
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${a}"
 wait 500
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
-    | get-editbox | get-property text | equals "Source: var.py\n"
-    + "Value: 5" | verify-true
+check-content-assist-documentation -source "var.py" -value "5"
+
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select [get-item "${a}" -index 1]
 wait 500
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
-    | get-editbox | get-property text | equals "Source: var 3.py\n"
-    + "Value: from var 3" | verify-true
+check-content-assist-documentation -source "var 3.py" -value "from var 3"
+
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select [get-item "${a}" -index 2]
 wait 500
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
-    | get-editbox | get-property text | equals "Source: VariableProject/var 3.py\n"
-    + "Value: from var 3" | verify-true
+check-content-assist-documentation -source "VariableProject/var 3.py" -value "from var 3"
+
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${sumof2digit}"
 wait 500
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
-    | get-editbox | get-property text | equals "Source: var 3.py\n"
-    + "Value: 12" | verify-true   
+check-content-assist-documentation -source "var 3.py" -value "12"
+
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select [get-item "${sumof2digit}" 
     -index 1]
 wait 500
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
-    | get-editbox | get-property text | equals "Source: VariableProject/var 3.py\n"
-    + "Value: 12" | verify-true
+check-content-assist-documentation -source "VariableProject/var 3.py" -value "12"
+
+
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${aerosmith}"
 wait 500
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
-    | get-editbox | get-property text | equals "Source: space in name/ def.py\n"
-    + "Value: 9" | verify-true
+check-content-assist-documentation -source "space in name/ def.py" -value "9"
+
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${nirvava}"
 wait 500
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
-    | get-editbox | get-property text | equals "Source: space in name/var here .py\n"
-    + "Value: 99" | verify-true
-
+check-content-assist-documentation -source "space in name/var here .py" -value "99"
 
 with [get-editor "tsv_test.tsv"] {
     get-canvas | key-type "TRAVERSE_ESCAPE"

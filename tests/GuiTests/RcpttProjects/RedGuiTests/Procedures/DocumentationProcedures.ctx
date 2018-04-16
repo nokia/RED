@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/12/18 2:59 PM
+Save-Time: 4/16/18 2:56 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -36,7 +36,7 @@ proc "check-content-assist-documentation" [val source "Built-in"]  [val value] {
 	if [$value | eq ""]{
 		get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
 	    	| get-control Browser | get-property text 
-	    	| equals [format  "%s<body.*\"><p><b>Source:</b> Built-in</p></body></html>" $html_beginning ]| verify-true
+	    	| equals [format  "%s<body.*\"><p><b>Source:</b> %s</p></body></html>" $source $html_beginning ]| verify-true
 	}-else{
 		get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
 		    | get-control Browser | get-property text 
@@ -44,4 +44,20 @@ proc "check-content-assist-documentation" [val source "Built-in"]  [val value] {
 	}	    
 	    
 }
+
+proc "check-kw-documentation"[val kw_name] [val library] [val arguments] [val spec]{
+	if [$kw_name | contains " "]{
+		let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"] ]{
+			
+			get-view "Documentation View" | get-control Browser | get-property text 
+			| equals [format "%s<body>.*/org.robotframework.ide.eclipse.main.plugin/docs/keyword.png\"> %s.*"   
+			+ "</h3><p><b>Source: </b><span style=.*><a href=\"library:/RobotProject/%s/%s\?show_source=true\">%s.*" 
+			+ "</a> \[<a href=\"library:/RobotProject/%s\?show_doc=true\">.*Documentation</a>\]</span><br><b>"
+			+ "Arguments: </b><span.*>%s"
+			+"</span><br><p>%s</p></body></html>"  $html_beginning $kw_name $library $kw_name2 $library $library  $arguments $spec] | verify-true
+		}
+	}
+}
+
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
