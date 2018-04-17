@@ -598,20 +598,6 @@ public class RobotProjectConfig {
             return "Remote " + getUri();
         }
 
-        public static String createRemoteUri(final String address) {
-            final String newAddress = stripLastSlashIfNecessary(address) + "/";
-            return newAddress;
-        }
-
-        private static String stripLastSlashIfNecessary(final String string) {
-            return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
-        }
-
-        public static String createRemoteName(final String address) {
-            final String remoteLibName = "Remote " + createRemoteUri(address);
-            return remoteLibName;
-        }
-
         @Override
         public boolean equals(final Object obj) {
             if (obj instanceof RemoteLocation) {

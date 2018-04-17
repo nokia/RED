@@ -32,7 +32,6 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -44,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.GeneralSettingsLibrariesImportValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
@@ -137,14 +137,14 @@ class ExternalLibrariesImportCollector {
         protected void validateNameImport(final String name, final RobotToken nameToken,
                 final List<RobotToken> arguments) throws CoreException {
             if (name.equals("Remote")) {
-                if (!(arguments.size() > 1)) {
-                    final String address = RemoteLocation
-                            .createRemoteUri(arguments.stream().findFirst().map(RobotToken::getText).orElse(
-                                    RemoteLocation.DEFAULT_ADDRESS));
-                    final String remoteLibName = RemoteLocation.createRemoteName(address);
-                    final URI uriAddress = URI.create(address);
+                final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+                final String address = resolver.getUri();
+                if (address != null) {
+                    final String remoteLibName = "Remote " + RemoteArgumentsResolver.stripLastSlashIfNecessary(address)
+                            + "/";
+                    final URI uriAddress = URI.create(RemoteArgumentsResolver.stripLastSlashIfNecessary(address) + "/");
                     final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName, uriAddress);
-                    if (!libraryImports.contains(libImport)) {
+                    if (!isInLibraryImports(address, libraryImports)) {
                         libraryImports.add(libImport);
                         libraryImporters.put(libImport, currentSuite);
                         knownLibraryNames.put(remoteLibName, libImport);
@@ -275,6 +275,20 @@ class ExternalLibrariesImportCollector {
                     .map(lib -> new RobotDryRunLibraryImport(lib.getName(), libraryFile.toURI()))
                     .collect(Collectors.toList());
         }
+    }
+
+    private static boolean isInLibraryImports(final String address,
+            final Set<RobotDryRunLibraryImport> libraryImports) {
+        final String stripedAddress = RemoteArgumentsResolver.stripLastSlashIfNecessary(address);
+
+        for (final RobotDryRunLibraryImport libImport : libraryImports) {
+            if (stripedAddress
+                    .equals(RemoteArgumentsResolver.stripLastSlashIfNecessary(libImport.getSourcePath().toString()))) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
 }
