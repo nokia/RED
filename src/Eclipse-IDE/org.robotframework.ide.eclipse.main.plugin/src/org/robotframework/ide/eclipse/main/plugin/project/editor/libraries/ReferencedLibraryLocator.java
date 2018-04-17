@@ -121,7 +121,7 @@ public class ReferencedLibraryLocator {
         if (libraryFile.isDirectory() && new File(libraryFile, "__init__.py").exists()) {
             return importLibsFromFileWithCaching(new File(libraryFile, "__init__.py"),
                     () -> newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, libraryFile.getName(),
-                            new Path(libraryFile.getPath()).toPortableString())));
+                            new Path(libraryFile.getPath()).removeLastSegments(1).toPortableString())));
         } else {
             return importLibsFromFileWithCaching(libraryFile,
                     () -> importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
