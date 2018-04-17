@@ -38,6 +38,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
@@ -193,13 +194,15 @@ public class RobotSetting extends RobotKeywordCall {
                 && indexedLibraries.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
             // by-name import of remote library
             // empty were filtered out, so here size() > 0
-            final RemoteLocation remoteLocation = args.size() == 1 ? RemoteLocation.DEFAULT_LOCATION
-                    : RemoteLocation.create(RobotExpressions.unescapeSpaces(args.get(1)));
-            final String remote = stripLastSlashIfNecessary(remoteLocation.getUri());
+            final String uri = RemoteArgumentsResolver.getUriForSettingArgumentsList(args);
+            if (uri != null) {
+                final RemoteLocation remoteLocation = RemoteLocation.create(uri);
+                final String remote = stripLastSlashIfNecessary(remoteLocation.getUri());
 
-            for (final LibrarySpecification spec : indexedLibraries.get(libNameOrPath)) {
-                if (remote.equals(stripLastSlashIfNecessary(spec.getDescriptor().getArguments().get(0)))) {
-                    return Optional.of(new ImportedLibrary(spec, extractLibraryAlias()));
+                for (final LibrarySpecification spec : indexedLibraries.get(libNameOrPath)) {
+                    if (remote.equals(stripLastSlashIfNecessary(spec.getDescriptor().getArguments().get(0)))) {
+                        return Optional.of(new ImportedLibrary(spec, extractLibraryAlias()));
+                    }
                 }
             }
             return Optional.empty();
