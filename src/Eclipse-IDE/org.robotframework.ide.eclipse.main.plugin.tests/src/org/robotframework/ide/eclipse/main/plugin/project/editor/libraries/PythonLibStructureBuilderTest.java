@@ -132,25 +132,47 @@ public class PythonLibStructureBuilderTest {
     }
 
     @Test
-    public void referenceLibraryIsCreated() throws Exception {
+    public void referenceLibraryIsCreatedForPythonFile() throws Exception {
         final ILibraryClass libClass = new PythonClass("libName");
         final IPath projectLocation = projectProvider.getProject().getLocation();
-        final String fullLibraryPath = projectLocation.append("module/libName.py").toOSString();
+        final String fullLibraryPath = projectLocation.append("folder/libName.py").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "libName",
-                projectProvider.getProject().getName() + "/module")));
+                projectProvider.getProject().getName() + "/folder")));
     }
 
     @Test
-    public void referenceLibraryIsCreatedForModule() throws Exception {
-        final ILibraryClass libClass = new PythonClass("libName");
+    public void referenceLibraryIsCreatedForPythonFile_withQualifiedName() throws Exception {
+        final ILibraryClass libClass = new PythonClass("nameA.nameB.libName");
         final IPath projectLocation = projectProvider.getProject().getLocation();
-        final String fullLibraryPath = projectLocation.append("module/libName/__init__.py").toOSString();
+        final String fullLibraryPath = projectLocation.append("folder/nameA/nameB/libName.py").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
-        assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "libName",
-                projectProvider.getProject().getName() + "/module")));
+        assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "nameA.nameB.libName",
+                projectProvider.getProject().getName() + "/folder")));
+    }
+
+    @Test
+    public void referenceLibraryIsCreatedForPythonModule() throws Exception {
+        final ILibraryClass libClass = new PythonClass("moduleName");
+        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final String fullLibraryPath = projectLocation.append("folder/moduleName/__init__.py").toOSString();
+        final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
+
+        assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "moduleName",
+                projectProvider.getProject().getName() + "/folder")));
+    }
+
+    @Test
+    public void referenceLibraryIsCreatedForPythonModule_withQualifiedName() throws Exception {
+        final ILibraryClass libClass = new PythonClass("nameA.nameB.moduleName");
+        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final String fullLibraryPath = projectLocation.append("folder/nameA/nameB/moduleName__init__.py").toOSString();
+        final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
+
+        assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "nameA.nameB.moduleName",
+                projectProvider.getProject().getName() + "/folder")));
     }
 
     private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {
