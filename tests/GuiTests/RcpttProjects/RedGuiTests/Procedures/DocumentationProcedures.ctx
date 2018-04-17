@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/16/18 2:56 PM
+Save-Time: 4/17/18 3:04 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -20,23 +20,37 @@ global [val html_beginning "<html><head><meta charset=\"utf-8\"><style>body \{  
 	+"background-color: rgba\(220, 220, 220, 0.5\);\}table, th, td "
 	+ "\{    border: 1px solid #a6a6a6;    border-collapse: collapse;    border-spacing: 2px;    padding: 4px;"
 	+"    font-size: 0.9em;\}</style></head>"]
+	
+	   
+global [val html_standard_kw "%s<body.*>.*/org.robotframework.ide.eclipse.main.plugin/docs/keyword.png\"> %s"   // $html_beginning $kw_nam
+			+ "</h3><p><b>Source: </b><span style=.*><a href=\"library:/RobotProject/%s/%s\?show_source=true\">%s" //$library    $kw_name2  $library
+			+ "</a> \[<a href=\"library:/RobotProject/%s\?show_doc=true\">Documentation</a>\]</span><br><b>"  // $library
+			+ "Arguments: </b><span.*>%s"																		//$arguments
+			+"</span><br><p>%s</body></html>"] 	  
+			
+global [val html_user_kw "%s<body.*>.*/org.robotframework.ide.eclipse.main.plugin/docs/keyword_user.png\"> %s"   // $html_beginning $kw_nam
+			+ "</h3><p><b>Source: </b><span style=.*><a href=\"file:/.*%s\?show_source=true&amp;keyword=%s\">%s</a> "  //$path  $path   $kw_name2
+			+"\[<a href=\"file:.*%s\?show_doc=true&amp;suite=\">Documentation</a>\]"                        			//path
+			+ "</span><br><b>Arguments: </b><span style=.*\">%s" 														//$args
+			+ "</span><br><p>%s</p></body></html>" ] 																	// $spec	  			 
+	   
+	   
 	     
-	     
-proc "check-documentation-view" [val inner_html]{
+proc "check-information-window" [val inner_html]{
 	get-window -from "Information Window" | get-control Browser | get-property text 
 	    | matches [concat $html_beginning  $inner_html ] | verify-true
 }
 
 
-proc "check-error-in-editor" [val text]{
-	check-documentation-view [format "<body.*\">%s</body></html>"  $text]
+proc "check-error-in-information-window" [val text]{
+	check-information-window [format "<body.*\">%s</body></html>"  $text]
 }
 
-proc "check-content-assist-documentation" [val source "Built-in"]  [val value] {
+proc "check-content-assist-documentation-for-variables" [val source "Built-in"]  [val value] {
 	if [$value | eq ""]{
 		get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
 	    	| get-control Browser | get-property text 
-	    	| equals [format  "%s<body.*\"><p><b>Source:</b> %s</p></body></html>" $source $html_beginning ]| verify-true
+	    	| equals [format  "%s<body.*\"><p><b>Source:</b> %s</p></body></html>"  $html_beginning $source]| verify-true
 	}-else{
 		get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
 		    | get-control Browser | get-property text 
@@ -44,20 +58,44 @@ proc "check-content-assist-documentation" [val source "Built-in"]  [val value] {
 	}	    
 	    
 }
+//--------------------------------------------------------------------
 
-proc "check-kw-documentation"[val kw_name] [val library] [val arguments] [val spec]{
+proc "check-documentation-view" [val kw_name] [val library] [val arguments] [val spec]{
 	if [$kw_name | contains " "]{
 		let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"] ]{
-			
 			get-view "Documentation View" | get-control Browser | get-property text 
-			| equals [format "%s<body>.*/org.robotframework.ide.eclipse.main.plugin/docs/keyword.png\"> %s.*"   
-			+ "</h3><p><b>Source: </b><span style=.*><a href=\"library:/RobotProject/%s/%s\?show_source=true\">%s.*" 
-			+ "</a> \[<a href=\"library:/RobotProject/%s\?show_doc=true\">.*Documentation</a>\]</span><br><b>"
-			+ "Arguments: </b><span.*>%s"
-			+"</span><br><p>%s</p></body></html>"  $html_beginning $kw_name $library $kw_name2 $library $library  $arguments $spec] | verify-true
+				| equals [format $html_standard_kw  $html_beginning $kw_name $library $kw_name2 $library $library  $arguments $spec] | verify-true
+		}
+	}
+}
+
+proc "check-documentation-view-for-user-kw" [val kw_name] [val path ""][val arguments] [val spec]{
+	if [$kw_name | contains " "]{
+		let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"] ]{
+			get-view "Documentation View" | get-control Browser | get-property text 
+				| equals [format $html_user_kw  $html_beginning $kw_name $path  $kw_name2 $path $path $arguments $spec ] | verify-true
 		}
 	}
 }
 
 
+
+//------------------------------------------------
+proc "check-information-view-doc-for-kw" [val kw_name] [val library] [val arguments] [val spec]{
+	if [$kw_name | contains " "]{
+		let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"] ]{
+			get-window -from "Information Window" | get-control Browser | get-property text
+				| equals [format $html_standard_kw  $html_beginning $kw_name $library $kw_name2 $library $library  $arguments $spec] | verify-true
+		}
+	}
+}
+
+proc "check-information-view-doc-for-user-kw" [val kw_name] [val path ""][val arguments] [val spec]{
+	if [$kw_name | contains " "]{
+		let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"] ]{
+			get-window -from "Information Window" | get-control Browser | get-property text
+				| equals [format $html_user_kw  $html_beginning $kw_name $path  $kw_name2 $path $path $arguments $spec ] | verify-true
+		}
+	}
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

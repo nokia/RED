@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PmmBEH5zEeeUiMBqkyjlBQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/11/18 11:25 AM
+Save-Time: 4/17/18 2:57 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -55,7 +55,7 @@ proc "check-if-red-marker-is-shown" [val text] [val line] [val is_secondary fals
 
 proc "check-error-in-editor-and-marker" [val text] [val line]{
 	get-editor "TestFile.robot" | get-text-viewer | hover-text $line 10
-	check-error-in-editor $text
+	check-error-in-information-window $text
 	check-if-red-marker-is-shown -text $text -line $line
 }
 

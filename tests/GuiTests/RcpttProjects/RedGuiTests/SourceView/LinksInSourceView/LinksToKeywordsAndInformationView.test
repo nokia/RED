@@ -1,52 +1,31 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _8XizkJeGEeaa4JtzzKMFzw
+Contexts: _8XizkJeGEeaa4JtzzKMFzw,_hb89IDvxEeiDC73Fvf4wHA
 Element-Name: LinksToKeywordsAndInformationView
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _x5njgJeDEeaa4JtzzKMFzw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/29/18 5:57 PM
+Save-Time: 4/17/18 2:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-proc "open-definition"{
+// 0 - Defintion
+// 1 - Documentation
+proc "click-open-menu" [val option 0]{
 	try -times 5 -delay 200 -command{
 		with [get-window -from "Information Window" | get-table ]{
-		    get-object| invoke setSelection 0 
+		    get-object| invoke setSelection $option   
 			double-click
 		}
 	}	
 }
 
-proc "select-documentation-verify-and-close-window"{
-	try -times 5 -delay 200 -command{
-		with [get-window -from "Information Window" | get-table ]{
-		    get-object| invoke setSelection 1 
-			double-click
-		}
-	}	
-	try -times 5 -delay 200 -command{	
-		get-window "Keyword Documentation" | get-object | invoke isVisible |eq true| verify-true
-		get-window "Keyword Documentation" | get-object | invoke close
-	}
-}
-
-proc "check-information-window" [val expectedText]{
-	try -times 5 -delay 200 -command{
-		get-window -from "Information Window" | get-editbox | get-property text | equals $expectedText | verify-true
-	}	
-}
-
-proc "check-documentation-view" [val expectedText]{
-	try -times 5 -delay 200 -command{		
-		get-view "Documentation View" | get-editbox | get-property text | equals $expectedText | verify-true
-	}	
-}
+	
 //-----------------------------------------------------------------------------------------------------------
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
@@ -90,7 +69,7 @@ with [get-window -from "Information Window" | get-table] {
  
 //open defintion of CAPITAL LETTER
 get-editor "TestFile.robot" | get-text-viewer | hover-text 7 12 -with M1
-open-definition
+click-open-menu -option 0
 
 
 with [get-editor "TestFile.robot" | get-text-viewer] {
@@ -105,7 +84,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 36 3
     hover-text 36 3 -with M1
 }
-open-definition
+click-open-menu -option 0
 
 //check if first deuplicated kw was selected
 with [get-editor "TestFile.robot" | get-text-viewer] {
@@ -119,7 +98,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 11 8
     hover-text 11 12 -with M1
 }
-open-definition
+click-open-menu -option 0
 
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "TestFile.robot" | verify-true
@@ -130,7 +109,7 @@ with [get-tab-folder -index 1] {
 //open definition of kw in different file
 get-editor "TestFile.robot" | click
 get-editor "TestFile.robot" | get-text-viewer | hover-text 13 10 -with M1
-open-definition
+click-open-menu -option 0
 
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "TestFile.robot" | verify-true
@@ -145,19 +124,23 @@ with [get-tab-folder -index 1] {
 //check CATPITAL kw whisch has doc if doc view will be open
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 7 12
 get-editor "TestFile.robot" | get-text-viewer | hover-text 7 12 -with M1
-select-documentation-verify-and-close-window
+click-open-menu -option 1
+check-documentation-view-for-user-kw -kw_name "CAPITAL LETTER" -path "/RobotProject/TestFile.robot" -arguments "\[\]"  -spec "Doc for my kw with double doc" 
 
 // select kw with no doc and args
 get-editor "TestFile.robot" | get-text-viewer | hover-text 14 12 -with M1
-select-documentation-verify-and-close-window
+click-open-menu -option 1
+check-documentation-view-for-user-kw -kw_name "no args and doc" -path "/RobotProject/res/res.robot" -arguments "\[\]"  -spec "&lt;not documented&gt;" 
 
-//select kw declaration
-get-editor "TestFile.robot" | get-text-viewer | hover-text 28 6 -with M1
-select-documentation-verify-and-close-window
+//select kw declaration with args and doc
+get-editor "TestFile.robot" | get-text-viewer | hover-text 31 6 -with M1
+click-open-menu -option 1
+check-documentation-view-for-user-kw -kw_name "kw with arg and doc" -path  "/RobotProject/TestFile.robot" -arguments "\[y, \*\*new\]"  -spec "doc with special sigh and here was break"
 
-//select buil-in
+//select built-in
 get-editor "TestFile.robot" | get-text-viewer | hover-text 29 10 -with M1
-select-documentation-verify-and-close-window
+click-open-menu -option 1
+check-documentation-view -kw_name "Log Many" -library "BuiltIn" -arguments "\[\*messages\]"  -spec "Logs the given messages as separate entries using the INFO level.*"
 
 
 
@@ -170,22 +153,13 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     hover-text 7 12
 }
 
-check-information-window -expectedText "Name: CAPITAL LETTER\n"
-    + "Source: User defined (/RobotProject/TestFile.robot)\n"
-    + "Arguments: []\n\n"
-    + "Doc for my kw\n"
-    + "with double doc"
-
+check-information-view-doc-for-user-kw -kw_name "CAPITAL LETTER" -path "/RobotProject/TestFile.robot" -arguments "\[\]"  -spec "Doc for my kw with double doc" 
 //kw with special characters    
 get-editor "TestFile.robot" | get-text-viewer | hover-text 12 14
 
-check-information-window -expectedText "Name: kw with arg and doc\n"
-    + "Source: User defined (/RobotProject/TestFile.robot)\n"
-    + "Arguments: [y, **new]\n\n"
-    + "doc with special sigh \n"
-    + "\t and here was break"
+check-information-view-doc-for-user-kw -kw_name -kw_name "kw with arg and doc" -path  "/RobotProject/TestFile.robot" -arguments "\[y, \*\*new\]"  -spec "doc with special sigh and here was break" 
 
-//click to colse windows    
+//click to close window   
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 9 4
 }
@@ -193,21 +167,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 //hover on built-in Catenate
 get-editor "TestFile.robot" | get-text-viewer | hover-text 18 7
 
-check-information-window -expectedText "Name: Catenate\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [*items]\n\n"
-    + "Catenates the given items together and returns the resulted string.\n\n"
-    + "By default, items are catenated with spaces, but if the first item\n"
-    + "contains the string ``SEPARATOR=<sep>``, the separator ``<sep>`` is\n"
-    + "used instead. Items are converted into strings when necessary.\n\n"
-    + "Examples:\n"
-    + "| ${str1} = | Catenate | Hello         | world |       |\n"
-    + "| ${str2} = | Catenate | SEPARATOR=--- | Hello | world |\n"
-    + "| ${str3} = | Catenate | SEPARATOR=    | Hello | world |\n"
-    + "=>\n"
-    + "| ${str1} = 'Hello world'\n"
-    + "| ${str2} = 'Hello---world'\n"
-    + "| ${str3} = 'Helloworld'" 
+check-information-view-doc-for-kw -kw_name "Catenate"  -library "BuiltIn" -arguments "\[\*items\]" -spec "Catenates the given items together and returns the resulted string.*"
     
 //close window    
 with [get-editor "TestFile.robot" | get-text-viewer] {
@@ -215,10 +175,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 //hover on last char in kw
 get-editor "TestFile.robot" | get-text-viewer | hover-text 13 16
-check-information-window -expectedText "Name: kw from res\n"
-    + "Source: User defined (/RobotProject/res/res.robot)\n"
-    + "Arguments: [a, b, c, d, e]\n\n"
-    + "Doc for kw from resource file"  
+check-information-view-doc-for-user-kw -kw_name -kw_name "kw from res" -path  "/RobotProject/res/res.robot" -arguments "\[a, b, c, d, e\]"  -spec "Doc for kw from resource file"
     
 //go to resource file    
 with [get-editor "res.robot"] {
@@ -227,19 +184,8 @@ with [get-editor "res.robot"] {
     get-text-viewer | hover-text 13 11
 }
 
-check-information-window -expectedText "Name: Combine Lists\n"
-    + "Source: Library (Collections)\n"
-    + "Arguments: [*lists]\n\n"
-    + "Combines the given ``lists`` together and returns the result.\n\n"
-    + "The given lists are not altered by this keyword.\n\n"
-    + "Example:\n"
-    + "| ${x} = | Combine List | ${L1} | ${L2} |       |\n"
-    + "| ${y} = | Combine List | ${L1} | ${L2} | ${L1} |\n"
-    + "=>\n"
-    + "| ${x} = ['a', 'a', 'b']\n"
-    + "| ${y} = ['a', 'a', 'b', 'a']\n"
-    + "| ${L1} and ${L2} are not changed."
-    
+check-information-view-doc-for-kw -kw_name "Combine Lists"  -library "Collections" -arguments "\[\*lists\]" -spec "Combines the given <code>lists</code> together and returns the result.*"
+
 //click to close window    
 with [get-editor "res.robot" | get-text-viewer] {
     set-caret-pos 16 1
@@ -247,11 +193,9 @@ with [get-editor "res.robot" | get-text-viewer] {
 
 //hover on main kw name 
 get-editor "res.robot" | get-text-viewer | hover-text 2 6
-check-information-window -expectedText "Name: kw from res\n"
-    + "Source: User defined (/RobotProject/res/res.robot)\n"
-    + "Arguments: [a, b, c, d, e]\n\n"
-    + "Doc for kw from resource file"
- 
+
+check-information-view-doc-for-user-kw -kw_name "kw from res" -path "/RobotProject/res/res.robot"  -arguments "\[a, b, c, d, e\]" -spec "Doc for kw from resource file"
+
     
 //-----------------tsv in \t\n folder ----------------------------------------------------------------------------
 
@@ -259,23 +203,13 @@ check-information-window -expectedText "Name: kw from res\n"
 get-view "Project Explorer" | get-tree | select "RobotProject/n/t/folder/res2.tsv" | double-click
 
 get-editor "res2.tsv" | get-text-viewer | hover-text 3 3 -with Left
-check-information-window -expectedText "Name: kw 3\n"
-    + "Source: User defined (/RobotProject/n/t/folder/res2.tsv)\n"
-    + "Arguments: []\n\n"
-    + "doc with \\n"
-    + "\\t folder\n"
-    + "line 2"
+check-information-view-doc-for-user-kw -kw_name "kw3" -path "/RobotProject/n/t/folder/res2.tsv"  -arguments "\[\]" -spec "doc with \\n\\t folder line 2"
     
 //open doc view    
 with [get-editor "res2.tsv" | get-text-viewer] {
     set-caret-pos 4 26
     get-menu "Show documentation" | click
 }
-check-documentation-view -expectedText "kw 3\n"
-    + "res2.tsv\n\n"
-    + "doc with \\n"
-    + "\\t folder\n"
-    + "line 2"
-    
+check-documentation-view-for-user-kw -kw_name "kw3" -path "/RobotProject/n/t/folder/res2.tsv" --arguments "\[\]" -spec "doc with \\n\\t folder line 2"
         
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

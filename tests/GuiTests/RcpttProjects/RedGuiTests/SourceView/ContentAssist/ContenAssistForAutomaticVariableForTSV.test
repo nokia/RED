@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tCfYkMLdEeat3OoBX2X2jQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/12/18 2:59 PM
+Save-Time: 4/17/18 3:00 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -70,7 +70,7 @@ with [get-editor "checking_var.tsv" | get-text-viewer] {
 }
 
 //check ${/} value 
-check-content-assist-documentation  -value [os-specific "\\\\" "/"]
+check-content-assist-documentation-for-variables  -value [os-specific "\\\\" "/"]
 //get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
 //    | get-editbox | get-property text | equals [os-specific "Source: Built-in\nValue: \\" "Source: Built-in\nValue: /"] | verify-true
 
@@ -80,7 +80,7 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     select "${:}"
 }
 wait 500
-check-content-assist-documentation  -value [os-specific ";" ":"]
+check-content-assist-documentation-for-variables  -value [os-specific ";" ":"]
     
 //check empty var    
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
@@ -94,7 +94,7 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     select "${LOG_FILE}"
 }
 wait 1000
-check-content-assist-documentation  -value ""
+check-content-assist-documentation-for-variables  -value ""
 
 close-content-assist -file_name  "checking_var.tsv"
 
