@@ -49,7 +49,6 @@ public class AddRemoteLibraryToRedXmlFixerTest {
 
     @Test
     public void remoteFixerExistInFixers_whenRemoteLocationIsNotAddedToRedXml() throws Exception {
-
         final String path = "http://127.0.0.1:9000";
         final IMarkerResolution fixer = new AddRemoteLibraryToRedXmlFixer(path);
 
