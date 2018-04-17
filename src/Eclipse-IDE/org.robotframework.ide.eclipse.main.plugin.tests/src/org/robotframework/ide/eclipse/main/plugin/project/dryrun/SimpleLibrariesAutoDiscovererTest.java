@@ -165,8 +165,8 @@ public class SimpleLibrariesAutoDiscovererTest {
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(ReferencedLibrary
-                .create(LibraryType.PYTHON, "module.ModuleLib", PROJECT_NAME + "/python_path/module")));
+        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "module.ModuleLib", PROJECT_NAME + "/python_path")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "module.ModuleLib",
                 projectProvider.getFile("python_path/module/ModuleLib.py"), newHashSet(suite.getFile())))));
