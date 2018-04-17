@@ -168,7 +168,7 @@ public class PythonLibStructureBuilderTest {
     public void referenceLibraryIsCreatedForPythonModule_withQualifiedName() throws Exception {
         final ILibraryClass libClass = new PythonClass("nameA.nameB.moduleName");
         final IPath projectLocation = projectProvider.getProject().getLocation();
-        final String fullLibraryPath = projectLocation.append("folder/nameA/nameB/moduleName__init__.py").toOSString();
+        final String fullLibraryPath = projectLocation.append("folder/nameA/nameB/moduleName/__init__.py").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "nameA.nameB.moduleName",
