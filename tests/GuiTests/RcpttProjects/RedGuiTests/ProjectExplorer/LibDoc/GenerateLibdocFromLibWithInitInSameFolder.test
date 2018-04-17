@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: https://jira3.int.net.nokia.com/projects/RED/issues/RED-1060
 Id: _aCLYsB0wEeirJIfaEnmyJw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/16/18 11:46 AM
+Save-Time: 4/17/18 3:27 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -66,9 +66,15 @@ get-view "Project Explorer" | get-tree | get-item
     
 //one kw    
 with [get-view "Project Explorer" | get-tree] {
-    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries\\/moduleLib \\(1\\)" 
+    get-item -path "Lib/Robot Referenced libraries/moduleLib.api Lib\\/libraries \\(0\\)" 
+        | get-property "getItems().length" | equals 0 | verify-true
+        
+    //    
+    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries \\(1\\)" 
         | get-property "getItems().length" | equals 1 | verify-true
-    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries\\/moduleLib \\(1\\)" 
+    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries \\(1\\)" 
         | get-property "getItems().TreeItem[0].getText()" | equals Keyword | verify-true
-}    
+}
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
