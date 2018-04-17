@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/17/18 3:04 PM
+Save-Time: 4/17/18 4:57 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -33,7 +33,12 @@ global [val html_user_kw "%s<body.*>.*/org.robotframework.ide.eclipse.main.plugi
 			+"\[<a href=\"file:.*%s\?show_doc=true&amp;suite=\">Documentation</a>\]"                        			//path
 			+ "</span><br><b>Arguments: </b><span style=.*\">%s" 														//$args
 			+ "</span><br><p>%s</p></body></html>" ] 																	// $spec	  			 
-	   
+			
+global [val html_test "%s<body.*>.*/org.robotframework.ide.eclipse.main.plugin/docs/case.png\"> %s"   // $html_beginning $tc_name
+			+ "</h3><p><b>Source: </b><span.*>"
+			+ "<a href=\"file:.*%s\?show_source=true.*>%s</a> "                         				  //$path    $path
+			+ "\[<a href=\"file:/.*%s\?show_doc=true.*>Documentation</a>\]"								  // $path 
+			+ "</span><br><p>%s</p></body></html>" ]	   												  //$spec
 	   
 	     
 proc "check-information-window" [val inner_html]{
@@ -98,4 +103,15 @@ proc "check-information-view-doc-for-user-kw" [val kw_name] [val path ""][val ar
 		}
 	}
 }
+
+
+proc "check-documentation-view-for-tc" [val tc_name] [val path ""] [val spec]{
+	if [$tc_name | contains " "]{
+		let [val kw_name2 [replace -input $tc_name -old " " -new "\%20"] ]{
+			get-view "Documentation View" | get-control Browser | get-property text 
+				| equals [format $html_test  $html_beginning $tc_name  $path $path $path $spec] | verify-true
+		}
+	}
+}
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
