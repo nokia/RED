@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -94,13 +95,13 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
             throws CoreException {
         if (name.equals("Remote")) {
-            if (arguments.size() > 1) {
-                validateWithSpec(null, name, nameToken, arguments, false);
+            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+            final String address = resolver.getUri();
+
+            if (address == null) {
+                validateRemoteLibraryArguments(name, nameToken, arguments);
             } else {
-                final String address = RemoteLocation.createRemoteUri(
-                        arguments.stream().findFirst().map(RobotToken::getText).orElse(RemoteLocation.DEFAULT_ADDRESS));
-                final LibrarySpecification specification = validationContext.getLibrarySpecifications(name,
-                        address);
+                final LibrarySpecification specification = validationContext.getLibrarySpecifications(name, address);
                 validateWithSpec(specification, name, nameToken, arguments, false);
             }
         } else {
@@ -127,36 +128,33 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                         : ImmutableMap.of(AdditionalMarkerAttributes.NAME, pathOrName);
                 reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
             } else {
-                validateArgumentsForRemoteLibraryImport(pathOrName, pathOrNameToken, importArguments);
+                validateRemoteLibraryArguments(pathOrName, pathOrNameToken, importArguments);
             }
         }
     }
 
-    private void validateArgumentsForRemoteLibraryImport(final String name, final RobotToken nameToken,
+    private void validateRemoteLibraryArguments(final String name, final RobotToken nameToken,
             final List<RobotToken> arguments) {
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final String address = resolver.getUri();
 
-        if (!(arguments.size() > 1)) {
-            final String address = arguments.stream().findFirst().map(RobotToken::getText).orElse(
-                    RemoteLocation.DEFAULT_ADDRESS);
-            RobotToken markerToken = nameToken;
-            if (arguments.size() == 1) {
-                markerToken = arguments.get(0);
-            }
-            validateRemoteLocation(markerToken, RemoteLocation.createRemoteUri(address));
+        if (address == null) {
+            new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
+                    resolver.getDescriptor(), arguments).validate(new NullProgressMonitor());
+        } else {
+            final RobotToken markerToken = resolver.getUriToken() == null ? nameToken
+                    : resolver.getUriToken();
+            validateRemoteLocation(markerToken, address);
         }
-
-        // TODO: add timeout argument to descriptor - RED-1080
-        new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
-                ArgumentsDescriptor.createDescriptor("uri=" + RemoteLocation.DEFAULT_ADDRESS), arguments)
-                        .validate(new NullProgressMonitor());
     }
 
     private void validateRemoteLocation(final RobotToken markerToken, final String address) {
         final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
         final List<RemoteLocation> remoteLocations = robotProjectConfig.getRemoteLocations();
-        final RemoteLocation remoteLibrary = RemoteLocation.create(address);
+        final RemoteLocation remoteLibraryWithNoSlash = RemoteLocation.create(stripLastSlashIfNecessary(address));
+        final RemoteLocation remoteLibraryWithSlash = RemoteLocation.create(stripLastSlashIfNecessary(address) + "/");
 
-        if (remoteLocations.contains(remoteLibrary)) {
+        if (remoteLocations.contains(remoteLibraryWithNoSlash) || remoteLocations.contains(remoteLibraryWithSlash)) {
             final RobotProblem problem = RobotProblem
                     .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
                     .formatMessageWith(address);
@@ -168,5 +166,9 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
             reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
         }
+    }
+
+    private static String stripLastSlashIfNecessary(final String string) {
+        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
     }
 }

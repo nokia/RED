@@ -24,7 +24,6 @@ import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
@@ -125,8 +124,12 @@ public class ValidationContext {
 
     public LibrarySpecification getLibrarySpecification(final String libName, final String address) {
         final Collection<LibrarySpecification> candidates = accessibleLibraries.get(libName);
+        if (address == null) {
+            return null;
+        }
         for (final LibrarySpecification candidate : candidates) {
-            if (address.equals(RemoteLocation.createRemoteUri(candidate.getDescriptor().getArguments().get(0)))) {
+            if (stripLastSlashIfNecessary(address)
+                    .equals(stripLastSlashIfNecessary(candidate.getDescriptor().getArguments().get(0)))) {
                 return candidate;
             }
         }
