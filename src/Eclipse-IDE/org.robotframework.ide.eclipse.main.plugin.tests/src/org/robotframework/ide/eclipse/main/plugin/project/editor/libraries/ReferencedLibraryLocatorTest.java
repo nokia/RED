@@ -203,8 +203,7 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByPath(eq("python_path/py_module/"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "py_module",
-                        projectProvider.getDir("python_path/py_module"))));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "py_module", projectProvider.getDir("python_path"))));
         verifyNoMoreInteractions(detector);
     }
 
@@ -260,8 +259,7 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByName(eq("py_module"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "py_module",
-                        projectProvider.getDir("python_path/py_module"))));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "py_module", projectProvider.getDir("python_path"))));
         verifyNoMoreInteractions(detector);
     }
 
