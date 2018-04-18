@@ -69,6 +69,7 @@ robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
 robot.utils.encoding._output_encoding = robot.utils.encoding.OUTPUT_ENCODING
 
 from robot.libraries.BuiltIn import BuiltIn
+from robot.errors import HandlerExecutionFailed, UserKeywordExecutionFailed
 from robot import version
 try:
     # RF 2.7.5
@@ -357,13 +358,33 @@ class TestRunnerAgent:
                 return self._evaluate_condition(response)
                 
     def _evaluate_condition(self, condition):
-        try:
-            elements = condition[RedResponseMessage.EVALUATE_CONDITION]
-            keywordName, argList = elements[0], elements[1:]
+        robot_version_str = robot.version.get_version(True)
+        robot_version = tuple([int(num) for num in re.split('\\.', robot_version_str)])
+        evaluator = self._evaluate_condition_old_style if robot_version < (3, 0, 3) else self._evaluate_condition_new_style
+        
+        elements = condition[RedResponseMessage.EVALUATE_CONDITION]
+        keywordName, argList = elements[0], elements[1:]
+        return evaluator(keywordName, argList)
+        
 
+    def _evaluate_condition_old_style(self, keywordName, argList):
+        try:
             result = self._built_in.run_keyword_and_return_status(keywordName, *argList)
             self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'result': result})
             return result
+        except Exception as e:
+            msg = 'Error occurred when evaluating breakpoint condition. ' + str(e)
+            self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'error': msg})
+            return True
+
+    def _evaluate_condition_new_style(self,  keywordName, argList):
+        try:
+            self._built_in.run_keyword(keywordName, *argList)
+            self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'result': True})
+            return True
+        except (HandlerExecutionFailed, UserKeywordExecutionFailed) as e:
+            self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'result': False})
+            return False
         except Exception as e:
             msg = 'Error occurred when evaluating breakpoint condition. ' + str(e)
             self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'error': msg})
