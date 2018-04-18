@@ -44,6 +44,8 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Sui
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput.TestCaseOnSettingInput;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class Documentations {
 
     public static void showDocForKeywordSpecification(final IWorkbenchPage page, final RobotProject project,
@@ -130,7 +132,8 @@ public class Documentations {
         return element instanceof RobotKeywordCall;
     }
 
-    private static Optional<DocumentationViewInput> findInput(final RobotFileInternalElement element) {
+    @VisibleForTesting
+    static Optional<DocumentationViewInput> findInput(final RobotFileInternalElement element) {
         if (element instanceof RobotSuiteFile) {
             return Optional.of(new SuiteFileInput((RobotSuiteFile) element));
 

@@ -33,7 +33,7 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
     private static final long serialVersionUID = 1L;
 
-    RobotCase(final RobotCasesSection parent, final TestCase testCase) {
+    public RobotCase(final RobotCasesSection parent, final TestCase testCase) {
         super(parent, testCase);
     }
 

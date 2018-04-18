@@ -136,7 +136,9 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
         } else {
             final KeywordSpecificationInput that = (KeywordSpecificationInput) obj;
             return this.project.equals(that.project) && Objects.equals(this.libSpec, that.libSpec)
-                    && Objects.equals(this.kwSpec, that.kwSpec);
+                    && Objects.equals(this.libSpec.getDocumentation(), that.libSpec.getDocumentation())
+                    && Objects.equals(this.kwSpec, that.kwSpec)
+                    && Objects.equals(this.kwSpec.getDocumentation(), that.kwSpec.getDocumentation());
         }
     }
 

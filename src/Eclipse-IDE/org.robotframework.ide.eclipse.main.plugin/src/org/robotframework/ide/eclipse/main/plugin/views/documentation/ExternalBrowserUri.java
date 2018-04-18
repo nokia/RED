@@ -28,7 +28,7 @@ class ExternalBrowserUri implements OpenableUri {
         this.browserSupport = browserSupport;
     }
 
-    public ExternalBrowserUri(final URI uri, final IWorkbenchBrowserSupport browserSupport,
+    ExternalBrowserUri(final URI uri, final IWorkbenchBrowserSupport browserSupport,
             final Runnable whenLocationChangeOutsideOfDisplayer) {
         this.uri = uri;
         this.browserSupport = browserSupport;
