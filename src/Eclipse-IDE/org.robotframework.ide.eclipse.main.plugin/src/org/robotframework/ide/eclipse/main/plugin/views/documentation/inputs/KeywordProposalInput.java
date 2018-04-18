@@ -18,14 +18,17 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.html.HtmlEscapers;
 
 public class KeywordProposalInput extends InternalElementInput<RobotFileInternalElement> {
@@ -43,10 +46,16 @@ public class KeywordProposalInput extends InternalElementInput<RobotFileInternal
 
     @Override
     public void prepare() {
+        prepare(RedPlugin.getModelManager().getModel());
+    }
+
+    @VisibleForTesting
+    void prepare(final RobotModel model) {
         if (proposal == null) {
-            proposal = new RedKeywordProposals(element.getSuiteFile()).getBestMatchingKeywordProposal(selectedLabel)
+            proposal = new RedKeywordProposals(model, element.getSuiteFile())
+                    .getBestMatchingKeywordProposal(selectedLabel)
                     .orElseThrow(() -> new DocumentationInputGenerationException(
-                            "Keyword " + selectedLabel + "not found, nothing to display"));
+                            "Keyword '" + selectedLabel + "' not found, nothing to display"));
         }
     }
 
