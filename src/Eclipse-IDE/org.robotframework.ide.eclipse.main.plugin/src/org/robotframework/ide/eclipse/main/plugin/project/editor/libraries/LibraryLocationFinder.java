@@ -9,21 +9,17 @@ import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public class LibraryLocationFinder {
 
-    public static Optional<IPath> findPath(final RobotModel model, final IProject project,
-            final LibrarySpecification libSpec) {
-        final RobotProject robotProject = model.createRobotProject(project);
+    public static Optional<IPath> findPath(final RobotProject robotProject, final LibrarySpecification libSpec) {
         if (isLibraryFrom(libSpec, robotProject.getStandardLibraries())) {
             return findStandardLibPath(robotProject, libSpec);
         } else if (isLibraryFrom(libSpec, robotProject.getReferencedLibraries())) {
