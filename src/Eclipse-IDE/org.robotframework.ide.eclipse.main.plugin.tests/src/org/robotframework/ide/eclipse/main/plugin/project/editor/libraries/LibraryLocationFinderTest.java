@@ -7,10 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -44,12 +44,14 @@ public class LibraryLocationFinderTest {
         projectProvider.createFile("modOuter/modInner/ModLib.py");
     }
 
+    @AfterClass
+    public static void afterSuite() throws Exception {
+        robotProject.clearConfiguration();
+    }
+
     @Test
     public void testIfPathIsNotFound_forUnknownLibrary() throws Exception {
         final LibrarySpecification libSpec = LibrarySpecification.create("unknown");
-
-        robotProject.setStandardLibraries(new HashMap<>());
-        robotProject.setReferencedLibraries(new HashMap<>());
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
 
@@ -60,9 +62,9 @@ public class LibraryLocationFinderTest {
     public void testIfPathIsFound_forStandardLibrary() throws Exception {
         final LibraryDescriptor libDesc = LibraryDescriptor.ofStandardLibrary("BuiltIn");
         final LibrarySpecification libSpec = LibrarySpecification.create("BuiltIn");
+        libSpec.setDescriptor(libDesc);
 
         robotProject.setStandardLibraries(ImmutableMap.of(libDesc, libSpec));
-        robotProject.setReferencedLibraries(new HashMap<>());
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
 
@@ -77,7 +79,6 @@ public class LibraryLocationFinderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass");
         libSpec.setDescriptor(libDesc);
 
-        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
@@ -94,7 +95,6 @@ public class LibraryLocationFinderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass.LibClass");
         libSpec.setDescriptor(libDesc);
 
-        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
@@ -111,7 +111,6 @@ public class LibraryLocationFinderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass.OtherClass");
         libSpec.setDescriptor(libDesc);
 
-        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
@@ -128,7 +127,6 @@ public class LibraryLocationFinderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter");
         libSpec.setDescriptor(libDesc);
 
-        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
@@ -145,7 +143,6 @@ public class LibraryLocationFinderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner");
         libSpec.setDescriptor(libDesc);
 
-        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
@@ -162,7 +159,6 @@ public class LibraryLocationFinderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner.ModLib");
         libSpec.setDescriptor(libDesc);
 
-        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
@@ -179,7 +175,6 @@ public class LibraryLocationFinderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner.ModLib.ModLib");
         libSpec.setDescriptor(libDesc);
 
-        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
         final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);

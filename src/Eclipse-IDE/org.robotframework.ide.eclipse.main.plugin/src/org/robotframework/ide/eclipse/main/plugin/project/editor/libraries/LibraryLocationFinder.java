@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IProject;
@@ -23,13 +24,18 @@ public class LibraryLocationFinder {
     public static Optional<IPath> findPath(final RobotModel model, final IProject project,
             final LibrarySpecification libSpec) {
         final RobotProject robotProject = model.createRobotProject(project);
-        if (robotProject.isStandardLibrary(libSpec)) {
+        if (isLibraryFrom(libSpec, robotProject.getStandardLibraries())) {
             return findStandardLibPath(robotProject, libSpec);
-        } else if (robotProject.isReferencedLibrary(libSpec)) {
+        } else if (isLibraryFrom(libSpec, robotProject.getReferencedLibraries())) {
             final LibraryDescriptor descriptor = libSpec.getDescriptor();
             return findReferenceLibPath(descriptor, libSpec);
         }
         return Optional.empty();
+    }
+
+    private static boolean isLibraryFrom(final LibrarySpecification spec,
+            final Map<LibraryDescriptor, LibrarySpecification> libs) {
+        return libs.keySet().stream().anyMatch(descriptor -> descriptor.equals(spec.getDescriptor()));
     }
 
     private static Optional<IPath> findStandardLibPath(final RobotProject robotProject,
