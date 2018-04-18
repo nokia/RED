@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Objects;
 
-class RobotProjectDependencies {
+public class RobotProjectDependencies {
 
     protected final RobotProject project;
 
@@ -69,7 +69,7 @@ class RobotProjectDependencies {
         return Objects.hashCode(project, getName());
     }
 
-    static class ErroneousLibrarySpecification extends LibrarySpecification {
+    public static class ErroneousLibrarySpecification extends LibrarySpecification {
 
         public ErroneousLibrarySpecification(final LibraryDescriptor descriptor) {
             setDescriptor(descriptor);
