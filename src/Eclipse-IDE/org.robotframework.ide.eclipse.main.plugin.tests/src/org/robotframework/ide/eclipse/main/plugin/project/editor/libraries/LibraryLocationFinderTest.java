@@ -29,13 +29,11 @@ public class LibraryLocationFinderTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(LibraryLocationFinderTest.class);
 
-    private static final RobotModel model = new RobotModel();
-
     private static RobotProject robotProject;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         projectProvider.createFile("LibClass.py");
         projectProvider.createDir("modOuter");
         projectProvider.createDir("modOuter/modInner");
@@ -53,7 +51,7 @@ public class LibraryLocationFinderTest {
     public void testIfPathIsNotFound_forUnknownLibrary() throws Exception {
         final LibrarySpecification libSpec = LibrarySpecification.create("unknown");
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).isNotPresent();
     }
@@ -66,7 +64,7 @@ public class LibraryLocationFinderTest {
 
         robotProject.setStandardLibraries(ImmutableMap.of(libDesc, libSpec));
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(path -> assertThat(path.lastSegment()).isEqualTo("BuiltIn.py"));
     }
@@ -81,7 +79,7 @@ public class LibraryLocationFinderTest {
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(
                 path -> assertThat(path).isEqualTo(projectProvider.getFile("LibClass.py").getLocation()));
@@ -97,7 +95,7 @@ public class LibraryLocationFinderTest {
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(
                 path -> assertThat(path).isEqualTo(projectProvider.getFile("LibClass.py").getLocation()));
@@ -113,7 +111,7 @@ public class LibraryLocationFinderTest {
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(
                 path -> assertThat(path).isEqualTo(projectProvider.getFile("LibClass.py").getLocation()));
@@ -129,7 +127,7 @@ public class LibraryLocationFinderTest {
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(
                 path -> assertThat(path).isEqualTo(projectProvider.getFile("modOuter/__init__.py").getLocation()));
@@ -145,7 +143,7 @@ public class LibraryLocationFinderTest {
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(path -> assertThat(path)
                 .isEqualTo(projectProvider.getFile("modOuter/modInner/__init__.py").getLocation()));
@@ -161,7 +159,7 @@ public class LibraryLocationFinderTest {
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(path -> assertThat(path)
                 .isEqualTo(projectProvider.getFile("modOuter/modInner/ModLib.py").getLocation()));
@@ -177,7 +175,7 @@ public class LibraryLocationFinderTest {
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
-        final Optional<IPath> location = LibraryLocationFinder.findPath(model, projectProvider.getProject(), libSpec);
+        final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(path -> assertThat(path)
                 .isEqualTo(projectProvider.getFile("modOuter/modInner/ModLib.py").getLocation()));
