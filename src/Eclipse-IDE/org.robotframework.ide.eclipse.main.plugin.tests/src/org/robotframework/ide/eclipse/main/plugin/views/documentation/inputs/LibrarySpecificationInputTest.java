@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -52,7 +57,7 @@ public class LibrarySpecificationInputTest {
     }
 
     @Test
-    public void properHtmlIsReturned_forLibraryWithoutConstructor() {
+    public void properHtmlIsReturnedForLibrary_whenItHasNoConstructor() {
         final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
@@ -80,7 +85,7 @@ public class LibrarySpecificationInputTest {
     }
 
     @Test
-    public void properHtmlIsReturned_forLibraryWithConstructor() {
+    public void properHtmlIsReturnedForLibrary_whenItHasConstructor() {
         final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
