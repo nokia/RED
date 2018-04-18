@@ -75,9 +75,12 @@ public class Libraries {
             final String... kwNames) {
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
         final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setVersion("1.0");
+        libSpec.setScope("global");
         libSpec.setFormat("ROBOT");
         libSpec.setName(library.getName());
         libSpec.setDescriptor(descriptor);
+        libSpec.setDocumentation("library documentation");
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();
             kwSpec.setName(kwName);

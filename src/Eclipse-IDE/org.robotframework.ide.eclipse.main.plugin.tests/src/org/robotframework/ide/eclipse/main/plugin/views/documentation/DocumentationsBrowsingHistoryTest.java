@@ -78,7 +78,7 @@ public class DocumentationsBrowsingHistoryTest {
     }
 
     @Test
-    public void forwardIsDisabled_whenMutipleInputsWereOpened() throws URISyntaxException {
+    public void forwardIsDisabled_whenMultipleInputsWereOpened() throws URISyntaxException {
         final DocumentationViewInput input1 = mock(DocumentationViewInput.class);
         when(input1.getInputUri()).thenReturn(new URI("input:/destination"));
         final DocumentationViewInput input2 = mock(DocumentationViewInput.class);
@@ -100,7 +100,7 @@ public class DocumentationsBrowsingHistoryTest {
     }
 
     @Test
-    public void forwardIsEnabled_whenMutlipleInputsWereOpenedAndWeMovedBack() throws URISyntaxException {
+    public void forwardIsEnabled_whenMultipleInputsWereOpenedAndWeMovedBack() throws URISyntaxException {
         final DocumentationViewInput input1 = mock(DocumentationViewInput.class);
         when(input1.getInputUri()).thenReturn(new URI("input:/destination"));
         final DocumentationViewInput input2 = mock(DocumentationViewInput.class);
