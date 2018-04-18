@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 
+import com.google.common.annotations.VisibleForTesting;
+
 class DocumentationsBrowsingHistory {
 
     private final DocumentationsLinksSupport linksSupport;
@@ -21,6 +23,11 @@ class DocumentationsBrowsingHistory {
 
     public DocumentationsBrowsingHistory(final DocumentationsLinksSupport linksSupport) {
         this.linksSupport = linksSupport;
+    }
+
+    @VisibleForTesting
+    List<URI> getHistory() {
+        return urisHistory;
     }
 
     void newInput(final DocumentationViewInput input) {

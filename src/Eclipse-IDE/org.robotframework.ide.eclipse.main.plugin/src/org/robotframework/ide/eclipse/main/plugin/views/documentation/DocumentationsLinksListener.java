@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -16,12 +17,24 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.UnableToOpenUriException;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class DocumentationsLinksListener implements LocationListener {
 
     private final DocumentationsLinksSupport linksSupport;
 
+    private final Consumer<UnableToOpenUriException> locationExceptionHandler;
+
     public DocumentationsLinksListener(final DocumentationsLinksSupport linksSupport) {
+        this(linksSupport, e -> StatusManager.getManager()
+                .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Cannot open uri", e), StatusManager.BLOCK));
+    }
+
+    @VisibleForTesting
+    DocumentationsLinksListener(final DocumentationsLinksSupport linksSupport,
+            final Consumer<UnableToOpenUriException> locationExceptionHandler) {
         this.linksSupport = linksSupport;
+        this.locationExceptionHandler = locationExceptionHandler;
     }
 
     @Override
@@ -30,9 +43,7 @@ public class DocumentationsLinksListener implements LocationListener {
             event.doit = !linksSupport.changeLocationTo(toUri(event.location));
 
         } catch (final UnableToOpenUriException e) {
-            StatusManager.getManager().handle(
-                    new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Cannot open '" + event.location + "'", e),
-                    StatusManager.BLOCK);
+            locationExceptionHandler.accept(e);
         }
     }
 
