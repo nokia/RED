@@ -6,15 +6,19 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.navigator.RobotProjectDependencies.ErroneousLibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 
 public class ShowLibraryDocumentationAction extends Action implements IEnablementUpdatingAction {
@@ -56,8 +60,15 @@ public class ShowLibraryDocumentationAction extends Action implements IEnablemen
         }
 
         if (project != null && librarySpecification != null) {
-            final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-            Documentations.showDocForLibrarySpecification(page, robotProject, librarySpecification);
+            if (librarySpecification instanceof ErroneousLibrarySpecification) {
+                final String message = String.format("Unable to open documentation for library '%s' from '%s'.",
+                        librarySpecification.getName(), librarySpecification.getDescriptor().getPath());
+                final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, null);
+                StatusManager.getManager().handle(status, StatusManager.SHOW);
+            } else {
+                final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+                Documentations.showDocForLibrarySpecification(page, robotProject, librarySpecification);
+            }
         }
     }
 }
