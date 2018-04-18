@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,7 +105,7 @@ public class LibraryImportSettingInputTest {
     }
 
     @Test
-    public void properRawDocumentationIsReturnedForLibraryImport() throws Exception {
+    public void properRawDocumentationIsReturned_forLibraryImport() throws Exception {
         final RobotSetting libImport = createLibraryImportSetting("lib");
         final LibraryImportSettingInput input = new LibraryImportSettingInput(libImport);
         input.prepare();
