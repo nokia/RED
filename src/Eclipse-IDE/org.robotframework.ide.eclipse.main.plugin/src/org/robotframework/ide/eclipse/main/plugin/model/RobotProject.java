@@ -395,28 +395,6 @@ public class RobotProject extends RobotContainer {
         return paths;
     }
 
-    public synchronized boolean isStandardLibrary(final LibrarySpecification spec) {
-        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = getStandardLibraries();
-        return isLibraryFrom(spec, stdLibs == null ? null : stdLibs.values());
-    }
-
-    public synchronized boolean isReferencedLibrary(final LibrarySpecification spec) {
-        final Map<LibraryDescriptor, LibrarySpecification> refLibs = getReferencedLibraries();
-        return isLibraryFrom(spec, refLibs == null ? null : refLibs.values());
-    }
-
-    private boolean isLibraryFrom(final LibrarySpecification spec, final Collection<LibrarySpecification> libs) {
-        if (libs == null) {
-            return false;
-        }
-        for (final LibrarySpecification librarySpecification : libs) {
-            if (librarySpecification == spec) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public List<String> getVariableFilePaths() {
         readProjectConfigurationIfNeeded();
 
