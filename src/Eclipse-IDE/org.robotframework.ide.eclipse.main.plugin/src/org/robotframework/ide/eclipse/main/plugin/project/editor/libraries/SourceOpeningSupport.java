@@ -6,10 +6,12 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -33,10 +35,13 @@ import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.KeywordsAutoDiscoverer;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author bembenek
@@ -45,37 +50,49 @@ public class SourceOpeningSupport {
 
     public static void open(final IWorkbenchPage page, final RobotModel model, final IProject project,
             final LibrarySpecification libSpec) {
+        open(page, model.createRobotProject(project), libSpec, e -> handleOpeningError(libSpec, e));
+    }
+
+    @VisibleForTesting
+    static void open(final IWorkbenchPage page, final RobotProject robotProject, final LibrarySpecification libSpec,
+            final Consumer<Exception> errorHandler) {
         try {
-            final Optional<IPath> location = LibraryLocationFinder.findPath(model, project, libSpec);
+            final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
             if (location.isPresent()) {
-                final IFile file = resolveFile(location.get(), project, libSpec);
+                final IFile file = resolveFile(location.get(), robotProject.getProject(), libSpec);
                 openInEditor(page, file);
             } else {
-                handleOpeningError(libSpec, null);
+                errorHandler.accept(null);
             }
         } catch (final CoreException e) {
-            handleOpeningError(libSpec, e);
+            errorHandler.accept(e);
         }
     }
 
     public static void open(final IWorkbenchPage page, final RobotModel model, final IProject project,
             final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
-        final Optional<RobotDryRunKeywordSource> kwSource = tryToFindKeywordSource(model, project, libSpec, kwSpec);
+        open(page, model.createRobotProject(project), libSpec, kwSpec, e -> handleOpeningError(libSpec, e));
+    }
+
+    @VisibleForTesting
+    static void open(final IWorkbenchPage page, final RobotProject robotProject, final LibrarySpecification libSpec,
+            final KeywordSpecification kwSpec, final Consumer<Exception> errorHandler) {
+        final Optional<RobotDryRunKeywordSource> kwSource = tryToFindKeywordSource(robotProject, libSpec, kwSpec);
         if (kwSource.isPresent()) {
             try {
                 final RobotDryRunKeywordSource source = kwSource.get();
-                final IPath location = resolveLocation(project, source);
-                final IFile file = resolveFile(location, project, libSpec);
+                final IPath location = resolveLocation(robotProject.getProject(), source);
+                final IFile file = resolveFile(location, robotProject.getProject(), libSpec);
                 final IEditorPart editor = openInEditor(page, file);
                 final TextEditor textEditor = editor.getAdapter(TextEditor.class);
                 if (textEditor != null) {
                     selectTextInLine(textEditor, source.getLine(), source.getOffset(), source.getLength());
                 }
             } catch (final CoreException e) {
-                handleOpeningError(libSpec, e);
+                errorHandler.accept(e);
             }
         } else {
-            open(page, model, project, libSpec);
+            open(page, robotProject, libSpec, errorHandler);
         }
     }
 
@@ -84,9 +101,8 @@ public class SourceOpeningSupport {
         return path.isAbsolute() ? path : project.getLocation().append(path);
     }
 
-    private static Optional<RobotDryRunKeywordSource> tryToFindKeywordSource(final RobotModel model,
-            final IProject project, final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
-        final RobotProject robotProject = model.createRobotProject(project);
+    private static Optional<RobotDryRunKeywordSource> tryToFindKeywordSource(final RobotProject robotProject,
+            final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
         final String qualifiedKwName = libSpec.getName() + "." + kwSpec.getName();
         Optional<RobotDryRunKeywordSource> kwSource = robotProject.getKeywordSource(qualifiedKwName);
         if (!kwSource.isPresent()) {
@@ -98,13 +114,16 @@ public class SourceOpeningSupport {
 
     private static IFile resolveFile(final IPath location, final IProject project, final LibrarySpecification libSpec)
             throws CoreException {
-        IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
-        if (file == null || !file.isAccessible()) {
+        final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
+        final IResource wsResource = new RedWorkspace(wsRoot).forUri(location.toFile().toURI());
+        if (wsResource instanceof IFile && wsResource.isAccessible()) {
+            return (IFile) wsResource;
+        } else {
             final String libName = libSpec.getName() + ".py";
-            file = LibspecsFolder.createIfNeeded(project).getFile(libName);
+            final IFile file = LibspecsFolder.createIfNeeded(project).getFile(libName);
             file.createLink(location, IResource.REPLACE | IResource.HIDDEN, null);
+            return file;
         }
-        return file;
     }
 
     private static IEditorPart openInEditor(final IWorkbenchPage page, final IFile file) throws PartInitException {
@@ -130,7 +149,8 @@ public class SourceOpeningSupport {
     }
 
     private static void handleOpeningError(final LibrarySpecification libSpec, final Throwable cause) {
-        final String message = "Unable to open editor for library:\n" + libSpec.getName();
+        final String message = String.format("Unable to open editor for library '%s' from '%s'.", libSpec.getName(),
+                libSpec.getDescriptor().getPath());
         final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause);
         StatusManager.getManager().handle(status, StatusManager.SHOW);
     }
