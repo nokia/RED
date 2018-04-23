@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
@@ -53,7 +54,7 @@ public class RemoteProcess implements IRobotProcess, IDisconnect {
     }
 
     @Override
-    public void setPythonExecutablePath(final String pythonExecutablePath) {
+    public void setInterruptionData(final String pythonExecutablePath, final Supplier<Long> pidSupplier) {
         // not important for remote process
     }
 
