@@ -7,13 +7,17 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tMPTMN5NEeeM0Z7Do3ZSmA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/22/18 3:41 PM
+Save-Time: 4/23/18 10:57 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+//
+//                          before test install: pip install robotremoteserver   
+//
+//
 // run PythonRemoteServer
 run-python-remote-server-in-background -lib_name my_remote_lib.py -timeout 10
 
@@ -24,6 +28,15 @@ run-python-remote-server-in-background -lib_name my_second_remote_lib.py -timeou
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot" | double-click
 }
+// ------------- this is only intil RED-1072 will be solved - after that it should be removed
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 66
+    key-type Backspace -times 22
+    set-caret-pos 3 67
+    key-type Backspace -times 22
+    key-type "M1+s"
+}
+// ----------------------
 // verify if there is 3 errors
 get-view Problems | click
 wait-for-errors -amount 2 -times 2 -delay 1000
@@ -54,71 +67,102 @@ with [get-editor "TestFile.robot"] {
 }
 get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
 
+// --------------- commented part is not working until RED-1072 will be solved
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 7 19
+//    key-type Enter
+//    type-text tc
+//    key-type Enter
+//    type-text "${x}=  remote"
+//    key-type "M1+SPACE"
+//    key-type Down -times 2
+//    key-type Enter
+//}
+//with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+//    get-property "getItems().TableItem[0].getText()" | equals "Other Func - remote1" | verify-true
+//    get-property "getItems().TableItem[1].getText()" | equals "Return Some String - remote1" | verify-true
+//    get-property "getItems().TableItem[2].getText()" | equals "Stop Remote Server - remote1" | verify-true
+//}
+//get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Other Func - remote1" | click 
+//    -default
+//
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 9 30
+//    key-type Enter
+//    type-text "${y}=  remote1."
+//    key-type "M1+SPACE"
+//    key-type Down
+//    key-type Enter -times 3
+//    type-text "${x}=  remote2."
+//    key-type "M1+SPACE"
+//}
+//with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+//    get-property "getItems().TableItem[0].getText()" | equals "Other Func Second - remote2" | verify-true
+//    get-property "getItems().TableItem[1].getText()" | equals "Return Some String Second - remote2" | verify-true
+//    get-property "getItems().TableItem[2].getText()" | equals "Stop Remote Server - remote2" | verify-true
+//}
+//get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Other Func Second - remote2" 
+//    | click -default
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 12 37
+//    key-type Enter
+//    type-text "${y}=  remote2."
+//    key-type "M1+SPACE"
+//    key-type Down
+//    key-type Enter
+//    key-type "M1+s"
+//    key-type Enter -times 2
+//    type-text "${x}=  remo"
+//    key-type "M1+SPACE"
+//    key-type Down
+//    key-type Enter -times 2
+//    type-text "${y}=  rem"
+//    key-type "M1+SPACE"
+//    key-type Down -times 2
+//    key-type Enter -times 2
+//    type-text "${x}=  remo"
+//    key-type "M1+SPACE"
+//    key-type Down
+//    key-type Enter -times 2
+//    type-text "${y}=  rem"
+//    key-type "M1+SPACE"
+//    key-type Down -times 2
+//    key-type Enter
+//    key-type "M1+s"
+//}
+// --------------------------- remove part below when RED-1072 will be solved
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 19
     key-type Enter
     type-text tc
     key-type Enter
-    type-text "${x}=  remote"
-    key-type "M1+SPACE"
-    key-type Down -times 2
-    key-type Enter
-}
-with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "Other Func - remote1" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "Return Some String - remote1" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "Stop Remote Server - remote1" | verify-true
-}
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Other Func - remote1" | click 
-    -default
-
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 9 30
-    key-type Enter
-    type-text "${y}=  remote1."
-    key-type "M1+SPACE"
-    key-type Down
-    key-type Enter -times 3
-    type-text "${x}=  remote2."
+    type-text "Remote."
     key-type "M1+SPACE"
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "Other Func Second - remote2" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "Return Some String Second - remote2" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "Stop Remote Server - remote2" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Other Func - Remote" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Other Func Second - Remote" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "Return Some String - Remote" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "Return Some String Second - Remote" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "Stop Remote Server - Remote" | verify-true
 }
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Other Func Second - remote2" 
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Stop Remote Server - Remote" 
     | click -default
-
 with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 12 37
-    key-type Enter
-    type-text "${y}=  remote2."
-    key-type "M1+SPACE"
-    key-type Down
-    key-type Enter
-    key-type "M1+s"
-    key-type Enter -times 2
-    type-text "${x}=  remo"
-    key-type "M1+SPACE"
-    key-type Down
-    key-type Enter -times 2
-    type-text "${y}=  rem"
-    key-type "M1+SPACE"
-    key-type Down -times 2
-    key-type Enter -times 2
-    type-text "${x}=  remo"
-    key-type "M1+SPACE"
-    key-type Down
-    key-type Enter -times 2
-    type-text "${y}=  rem"
-    key-type "M1+SPACE"
-    key-type Down -times 2
-    key-type Enter
+    set-caret-pos 2 28
     key-type "M1+s"
 }
-
+// ---------------------------
 // run test to kill remote server
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
     | get-menu -path "Run As/1 Robot Test" | click
+// --------------------------- remove part below when RED-1072 will be solved
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 28
+    key-type "M1+/"
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | get-menu -path "Run As/1 Robot Test" | click
+// ---------------------------
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
