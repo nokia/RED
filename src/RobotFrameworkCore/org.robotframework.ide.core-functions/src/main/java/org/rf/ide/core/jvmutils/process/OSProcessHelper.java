@@ -25,17 +25,35 @@ public class OSProcessHelper {
         this.osPidCheckers = newArrayList(new WindowsProcessTreeHandler(), new UnixProcessTreeHandler());
     }
 
-    public Optional<IProcessTreeHandler> getInstanceByOS() {
+    public Optional<IProcessTreeHandler> getTreeHandler() {
         return osPidCheckers.stream().filter(IProcessTreeHandler::isSupportedOS).findFirst();
     }
 
+    @VisibleForTesting
+    Optional<IProcessTreeHandler> getTreeHandler(final Process process) {
+        return osPidCheckers.stream().filter(prov -> prov.isSupported(process)).findFirst();
+    }
+
     public ProcessInformation getProcessTreeInformations(final Process process) {
-        final Optional<IProcessTreeHandler> processTreeProv = findProcessTreeProviderFor(process);
+        final Optional<IProcessTreeHandler> processTreeProv = getTreeHandler(process);
         if (processTreeProv.isPresent()) {
             final IProcessTreeHandler provider = processTreeProv.get();
             return fillProcessTree(provider, provider.getProcessPid(process));
         }
-        return new ProcessInformation(ProcessInformation.PROCESS_NOT_FOUND);
+        return ProcessInformation.unknown();
+    }
+
+    public void interruptProcess(final long pid, final String pythonExecutablePath) throws ProcessHelperException {
+        final Optional<IProcessTreeHandler> processTreeProv = getTreeHandler();
+        if (processTreeProv.isPresent()) {
+            final ProcessInformation procInfo = ProcessInformation.of(pid, processTreeProv.get());
+            if (procInfo.isFound()) {
+                interruptProcess(procInfo, pythonExecutablePath);
+            } else {
+                throw new ProcessHelperException("Couldn't interrupt process. No PID found.");
+            }
+        }
+        throw new ProcessHelperException("Couldn't interrupt process. No suitable handler found.");
     }
 
     public void interruptProcess(final Process process, final String pythonExecutablePath)
@@ -44,7 +62,7 @@ public class OSProcessHelper {
         if (procInfo.isFound()) {
             interruptProcess(procInfo, pythonExecutablePath);
         } else {
-            throw new ProcessHelperException("Couldn't find PID!");
+            throw new ProcessHelperException("Couldn't interrupt process. No PID found.");
         }
     }
 
@@ -58,7 +76,7 @@ public class OSProcessHelper {
                 throw new ProcessHelperException(e);
             }
         } else {
-            throw new ProcessHelperException("Couldn't find suiteable handler!");
+            throw new ProcessHelperException("Couldn't interrupt process. No suitable handler found.");
         }
     }
 
@@ -67,7 +85,7 @@ public class OSProcessHelper {
         if (procInfo.isFound()) {
             destroyProcessTree(procInfo);
         } else {
-            throw new ProcessHelperException("Couldn't find PID!");
+            throw new ProcessHelperException("Couldn't destroy process. No PID found");
         }
     }
 
@@ -80,25 +98,19 @@ public class OSProcessHelper {
                 throw new ProcessHelperException(e);
             }
         } else {
-            throw new ProcessHelperException("Couldn't find suiteable handler!");
+            throw new ProcessHelperException("Couldn't destroy process. No suitable handler found.");
         }
     }
 
     @VisibleForTesting
     ProcessInformation fillProcessTree(final IProcessTreeHandler provider, final long pid) {
-        final ProcessInformation process = new ProcessInformation(pid);
-        process.setHandler(provider);
+        final ProcessInformation process = ProcessInformation.of(pid, provider);
 
         final List<Long> childPids = provider.getChildPids(pid);
         for (final Long childPid : childPids) {
             process.addChildProcess(fillProcessTree(provider, childPid));
         }
         return process;
-    }
-
-    @VisibleForTesting
-    Optional<IProcessTreeHandler> findProcessTreeProviderFor(final Process process) {
-        return osPidCheckers.stream().filter(prov -> prov.isSupported(process)).findFirst();
     }
 
     public static class ProcessHelperException extends Exception {

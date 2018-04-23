@@ -204,6 +204,7 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
         public InterruptTestsAction(final IRobotProcess process) {
             super("Terminate gracefully", IAction.AS_PUSH_BUTTON, process);
             setImageDescriptor(RedImages.getInterruptImage());
+            setDisabledImageDescriptor(RedImages.getDisabledInterruptImage());
         }
 
         @Override

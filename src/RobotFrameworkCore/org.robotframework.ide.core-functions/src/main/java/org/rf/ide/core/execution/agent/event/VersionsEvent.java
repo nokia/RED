@@ -7,6 +7,7 @@ package org.rf.ide.core.execution.agent.event;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.rf.ide.core.execution.server.AgentClient;
 import org.rf.ide.core.execution.server.response.ProtocolVersion;
@@ -23,13 +24,20 @@ public final class VersionsEvent {
         final String pythonVersion = (String) attributes.get("python");
         final String robotVersion = (String) attributes.get("robot");
         final Integer protocolVersion = (Integer) attributes.get("protocol");
+        final Optional<Long> pid;
+        if (attributes.get("pid") instanceof Integer) {
+            final Integer i = (Integer) attributes.get("pid");
+            pid = Optional.of(Long.valueOf(i.intValue()));
+        } else {
+            pid = Optional.ofNullable((Long) attributes.get("pid"));
+        }
 
         if (cmdLine == null || pythonVersion == null || robotVersion == null || protocolVersion == null) {
             throw new IllegalArgumentException(
                     "Versions event should have command line, versions of python, robot and protocol");
         }
         return new VersionsEvent(new VersionsEventResponder(client), cmdLine, pythonVersion, robotVersion,
-                protocolVersion);
+                protocolVersion, pid);
     }
 
 
@@ -43,13 +51,16 @@ public final class VersionsEvent {
 
     private final int protocolVersion;
 
+    private final Optional<Long> pid;
+
     public VersionsEvent(final VersionsEventResponder responder, final String cmdLine, final String pythonVersion,
-            final String robotVersion, final int protocolVersion) {
+            final String robotVersion, final int protocolVersion, final Optional<Long> pid) {
         this.responder = responder;
         this.cmdLine = cmdLine;
         this.pythonVersion = pythonVersion;
         this.robotVersion = robotVersion;
         this.protocolVersion = protocolVersion;
+        this.pid = pid;
     }
 
     public String getCommandLine() {
@@ -68,6 +79,10 @@ public final class VersionsEvent {
         return protocolVersion;
     }
 
+    public Optional<Long> getPid() {
+        return pid;
+    }
+
     public VersionsEventResponder responder() {
         return responder;
     }
@@ -77,14 +92,15 @@ public final class VersionsEvent {
         if (obj != null && obj.getClass() == VersionsEvent.class) {
             final VersionsEvent that = (VersionsEvent) obj;
             return this.cmdLine.equals(that.cmdLine) && this.pythonVersion.equals(that.pythonVersion)
-                    && this.robotVersion.equals(that.robotVersion) && this.protocolVersion == that.protocolVersion;
+                    && this.robotVersion.equals(that.robotVersion) && this.protocolVersion == that.protocolVersion
+                    && this.pid.equals(that.pid);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(cmdLine, pythonVersion, robotVersion, protocolVersion);
+        return Objects.hashCode(cmdLine, pythonVersion, robotVersion, protocolVersion, pid);
     }
 
     public static class VersionsEventResponder {
