@@ -246,7 +246,8 @@ class TestRunnerAgent:
         info = {'cmd_line': ' '.join(sys.argv), 
                 'python' : sys.version, 
                 'robot' : robot_version, 
-                'protocol' : self.RED_AGENT_PROTOCOL_VERSION}
+                'protocol' : self.RED_AGENT_PROTOCOL_VERSION,
+                'pid' : os.getpid()}
         self._send_to_server(AgentEventMessage.VERSION, info)
 
     def start_suite(self, name, attrs):

@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
@@ -90,40 +91,59 @@ public class VersionsEventTest {
 
     @Test
     public void equalsTests() {
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2))
-                .isEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L)))
+                .isEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2,
+                        Optional.of(42L)));
 
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2))
-                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.5", "3.0", 2));
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.5", "3.0", 2))
-                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.5", "3.0", 2,
+                        Optional.of(42L)));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.5", "3.0", 2, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2,
+                        Optional.of(42L)));
 
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2))
-                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd1", "3.6", "3.0", 2));
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd1", "3.6", "3.0", 2))
-                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd1", "3.6", "3.0", 2,
+                        Optional.of(42L)));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd1", "3.6", "3.0", 2, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2,
+                        Optional.of(42L)));
 
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2))
-                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.1", 2));
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.1", 2))
-                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.1", 2,
+                        Optional.of(42L)));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.1", 2, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2,
+                        Optional.of(42L)));
 
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2))
-                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 3));
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 3))
-                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 3,
+                        Optional.of(42L)));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 3, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2,
+                        Optional.of(42L)));
 
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2))
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(32L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2,
+                        Optional.of(42L)));
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L)))
+                .isNotEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2,
+                        Optional.of(43L)));
+
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L)))
                 .isNotEqualTo(new Object());
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2)).isNotEqualTo(null);
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L)))
+                .isNotEqualTo(null);
     }
 
     @Test
     public void hashCodeTests() {
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2).hashCode())
-                .isEqualTo(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2).hashCode());
-        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2).hashCode())
-                .isEqualTo(new VersionsEvent(null, "cmd", "3.6", "3.0", 2).hashCode());
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L))
+                .hashCode()).isEqualTo(
+                        new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L))
+                                .hashCode());
+        assertThat(new VersionsEvent(mock(VersionsEventResponder.class), "cmd", "3.6", "3.0", 2, Optional.of(42L))
+                .hashCode()).isEqualTo(new VersionsEvent(null, "cmd", "3.6", "3.0", 2, Optional.of(42L)).hashCode());
     }
 
     @Test

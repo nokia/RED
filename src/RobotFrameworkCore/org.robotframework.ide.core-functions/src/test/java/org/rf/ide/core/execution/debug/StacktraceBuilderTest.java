@@ -47,19 +47,19 @@ public class StacktraceBuilderTest {
         final ElementsLocator locator = mock(ElementsLocator.class);
         final StacktraceBuilder builder = new StacktraceBuilder(new Stacktrace(), locator, breakpointsSupplier());
 
-        builder.handleVersions(new VersionsEvent(null, "", "", "2.5", 1));
+        builder.handleVersions(new VersionsEvent(null, "", "", "2.5", 1, Optional.of(42L)));
         assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesForRf29Fixer.class);
 
-        builder.handleVersions(new VersionsEvent(null, "", "", "2.7", 1));
+        builder.handleVersions(new VersionsEvent(null, "", "", "2.7", 1, Optional.of(42L)));
         assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesForRf29Fixer.class);
 
-        builder.handleVersions(new VersionsEvent(null, "", "", "2.9", 1));
+        builder.handleVersions(new VersionsEvent(null, "", "", "2.9", 1, Optional.of(42L)));
         assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesForRf29Fixer.class);
 
-        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1));
+        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1, Optional.of(42L)));
         assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesFixer.class);
 
-        builder.handleVersions(new VersionsEvent(null, "", "", "3.2", 1));
+        builder.handleVersions(new VersionsEvent(null, "", "", "3.2", 1, Optional.of(42L)));
         assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesFixer.class);
     }
 
@@ -173,7 +173,7 @@ public class StacktraceBuilderTest {
 
         final StacktraceBuilder builder = new StacktraceBuilder(stack, mock(ElementsLocator.class),
                 breakpointsSupplier);
-        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1)); // has to be called to initialize types fixer
+        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1, Optional.of(42L))); // has to be called to initialize types fixer
         builder.handleKeywordAboutToStart(new KeywordStartedEvent("kw", "keyword", "lib"));
 
         assertThat(stack.size()).isEqualTo(1);
@@ -202,7 +202,7 @@ public class StacktraceBuilderTest {
         stack.push(new StackFrame("Test", FrameCategory.TEST, 3, mock(StackFrameContext.class)));
 
         final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, breakpointsSupplier());
-        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1)); // has to be called to
+        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1, Optional.of(42L))); // has to be called to
                                                                            // initialize types fixer
         builder.handleKeywordStarted(new KeywordStartedEvent("kw", "keyword", "lib"));
 
@@ -230,7 +230,7 @@ public class StacktraceBuilderTest {
         stack.push(new StackFrame("Test", FrameCategory.TEST, 3, mock(StackFrameContext.class)));
 
         final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, breakpointsSupplier());
-        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1)); // has to be called to initialize types fixer
+        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1, Optional.of(42L))); // has to be called to initialize types fixer
         builder.handleKeywordStarted(new KeywordStartedEvent("kw", "keyword", "lib"));
 
         assertThat(stack.size()).isEqualTo(3);
