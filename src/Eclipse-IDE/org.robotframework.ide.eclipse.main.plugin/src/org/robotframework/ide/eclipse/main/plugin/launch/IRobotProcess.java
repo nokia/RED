@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import java.util.function.Supplier;
+
 import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.ISuspendResume;
@@ -18,7 +20,7 @@ public interface IRobotProcess extends IProcess, IDisconnect, ISuspendResume {
 
     void onTerminate(Runnable operation);
 
-    void setPythonExecutablePath(String pythonExecutablePath);
+    void setInterruptionData(String pythonExecutablePath, Supplier<Long> pidSupplier);
 
     void setConnectedToTests(boolean isConnected);
 

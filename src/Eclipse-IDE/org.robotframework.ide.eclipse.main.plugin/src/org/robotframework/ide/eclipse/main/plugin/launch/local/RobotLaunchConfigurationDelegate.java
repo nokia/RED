@@ -36,6 +36,7 @@ import org.rf.ide.core.execution.server.AgentServerStatusListener;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.execution.server.AgentServerVersionsChecker;
 import org.rf.ide.core.execution.server.AgentServerVersionsDebugChecker;
+import org.rf.ide.core.execution.server.TestsPidReader;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
@@ -148,11 +149,13 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         final RobotProject robotProject = model.createRobotProject(robotConfig.getProject());
         final ConsoleData consoleData = ConsoleData.create(robotConfig, robotProject);
 
+        final TestsPidReader pidReader = new TestsPidReader();
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                 .serverStatusHandledBy(new ServerProblemsHandler())
                 .serverStatusHandledBy(additionalServerListeners)
                 .agentEventsListenedBy(additionalAgentListeners)
+                .agentEventsListenedBy(pidReader)
                 .agentEventsListenedBy(new ExecutionPauseContinueListener(userController))
                 .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
                 .agentEventsListenedBy(new ExecutionStatusTracker(testsLaunchContext))
@@ -170,7 +173,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, execProcess,
                 consoleData.getProcessLabel());
-        robotProcess.setPythonExecutablePath(robotProject.getRuntimeEnvironment().getPythonExecutablePath());
+        robotProcess.setInterruptionData(robotProject.getRuntimeEnvironment().getPythonExecutablePath(),
+                pidReader::getPid);
 
         robotProcess.onTerminate(serverJob::stopServer);
 
