@@ -27,7 +27,7 @@ In short:
 - GUI: Help -> Install New software -> Add -> Archive and continue with prompts (unselect "Contact all update sites) 
 - CLI: by issuing command: 
 
-```eclipse -application org.eclipse.equinox.p2.director -nosplash -consoleLog --launcher.suppressErrors -repository jar:file:<PATH_TO_ZIP>\!/,http://download.eclipse.org/releases/mars/   -installIU org.robotframework.ide.eclipse.main.feature.feature.group ```
+```eclipse -application org.eclipse.equinox.p2.director -nosplash -consoleLog --launcher.suppressErrors -repository http://master.dl.sourceforge.net/project/red-robot-editor/repository   -installIU org.robotframework.ide.eclipse.main.feature.feature.group ```
 
 #### Update existing RED feature
 Update can be done in the same way as installation on clean Eclipse.
