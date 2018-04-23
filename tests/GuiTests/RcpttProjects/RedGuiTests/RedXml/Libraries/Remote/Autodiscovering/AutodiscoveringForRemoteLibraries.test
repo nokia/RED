@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _O7bj0CuAEei6wOJtueYdHQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/26/18 5:49 PM
+Save-Time: 4/23/18 10:28 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -130,10 +130,11 @@ get-editor "TestFile.robot" | click
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 2 36
     select-range 2 44 2 22
-    hover-text 2 33
     key-type "M1+x"
     set-caret-pos 3 44
     key-type Tab
+    key-type "M1+v"
+    type-text "  "
     key-type "M1+v"
     key-type "M1+s"
 }
@@ -174,7 +175,7 @@ get-editor "RemoteProject/red.xml" | close
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
         set-caret-pos 3 61
-        select-range 3 70 3 48
+        select-range 3 94 3 48
         key-type "M1+x"
         set-caret-pos 2 22
         key-type "M1+v"
@@ -188,33 +189,23 @@ with [get-editor "TestFile.robot"] {
     click
     with [get-text-viewer] {
         set-caret-pos 3 46
-        type-text " W"
-        key-type "M1+SPACE"
-        key-type Enter
-        key-type Right
-        type-text 1
-        key-type Down
-        key-type Tab
-        type-text W
-        key-type "M1+SPACE"
-        key-type Enter
-        key-type Right
-        type-text 2
-        key-type "M1+s"
-        key-type Down -times 2
+        key-type Down -times 3
         key-type Enter
         type-text tc
         key-type Enter
-        type-text "alias1."
+        type-text "Remote"
         key-type "M1+SPACE"
-        key-type Down -times 2
         key-type Enter -times 2
-        type-text alias
-        key-type "M1+SPACE"
-        key-type Down
-        key-type Enter
-        key-type Down -times 2
-        key-type Enter
+        key-type "M1+s"
+    }
+}
+// run test to close
+get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
+    | click
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 3 38
+        key-type "M1+/"
         key-type "M1+s"
     }
 }
