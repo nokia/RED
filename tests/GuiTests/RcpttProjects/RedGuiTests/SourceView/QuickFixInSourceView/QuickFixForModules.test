@@ -1,0 +1,204 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _UfzXECubEeikWYhBbRs9Qw,_hb89IDvxEeiDC73Fvf4wHA
+Element-Name: QuickFixForModules
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _JVkfkEcAEei0qKwna87CYQ
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 4/23/18 5:45 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// turn off autodiscovery
+get-view "Project Explorer" | get-tree | select "ManyModules/red.xml" | double-click
+wait-for-loading-red-xml -editor_name "ManyModules/red.xml"
+
+with [get-editor "ManyModules/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action" | uncheck
+}
+get-button "Save (M1+S)" | click
+
+//close red.xml
+get-editor "ManyModules/red.xml" | close
+
+
+//run QF
+get-view "Project Explorer" | get-tree | select "ManyModules/test.robot" | double-click
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 28
+    hover-text 2 23
+    key-type "M1+1"
+}
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'Outer.Inner.MathModule' and add to configuration" | click -default
+ 
+//check if was found    
+get-window "Discovering libraries summary" | get-tree | get-item -path "Outer.Inner.MathModule" 
+    | get-property "image.path" | equals ".*/success_big.png" 
+    | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+
+//open second file
+get-view "Project Explorer" | get-tree | select "ManyModules/Script.robot" | double-click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 7 20
+    hover-text 7 22
+    key-type "M1+1"
+}
+wait 500
+//check if other module was found
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'nested_module.module3' and add to configuration" | click -default
+
+get-window "Discovering libraries summary" | get-tree | get-item -path "nested_module.module3" 
+    | get-property "image.path" | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" 
+    | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+
+//run QF on module in root
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 4 15
+    hover-text 4 15
+    key-type "M1+1"
+}
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'module2' and add to configuration" | click -default
+    
+ 
+//use QF for module in folder 
+with [get-editor "Script.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 9 23
+        hover-text 9 20
+        get-menu -path "Quick Fix" | click
+    }
+}
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'CalculatorLibrary' and add to configuration" | click -default
+get-window "Discovering libraries summary" | get-button OK | click
+
+//check if red.xml contains 4 libs - 2 last have full path?
+get-editor "ManyModules/red.xml" | click
+with [get-editor "ManyModules/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "Outer.Inner.MathModule - ManyModules" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "nested_module.module3 - ManyModules" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "module2 - D:/RCPTT_2_2/aut-red-produkt/ManyModules" 
+        | verify-true
+    get-property "getItems().TableItem[3].getText()" 
+        | equals "CalculatorLibrary - ManyModules/very_hidden_module/go_deeeper/and deeper" | verify-true
+}
+
+//run autodiscovery on project
+get-view "Project Explorer" | get-tree | select ManyModules | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+    
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item -path "import_with_functions" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path module1 | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path Multiply | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "Outer.Inner.PrintModule" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path "wrong_module" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    get-item -path CalculatorLibrary | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+    get-item -path module2 | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+    get-item -path "nested_module.module3" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+    get-item -path "Outer.Inner.MathModule" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning_big.png" | verify-true
+    get-item -path "external_lib.py" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error_fatal.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+get-button "Save All (M1+M2+S)" | click
+
+//check doc by double click
+get-view "Project Explorer" | get-tree 
+    | select "ManyModules/Robot Referenced libraries/CalculatorLibrary ManyModules\\/very_hidden_module\\/go_deeeper\\/and deeper \\(4\\)" 
+    | double-click
+get-view "Documentation View" | get-control Browser | get-property text 
+    | contains "CalculatorLibrary"
+    | verify-true
+    
+//open KW from module    
+get-view "Project Explorer" | get-tree 
+    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules \\(2\\)/Sum" | double-click
+    
+check-documentation-view   -library "Outer.Inner.MathModule" -project_name "ManyModules"  -kw_name "Sum" -arguments "\[a, b\]" -spec "sum 2 int" 
+
+//open source for module
+get-view "Project Explorer" | get-tree 
+    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules (2)/Multiply" | get-menu 
+    -path "Show keyword source" | click
+    
+//check that file was open and text selected    
+get-editor "MultiplyTwoDigits.py" | get-text-viewer | get-property "getSelectionText()" | equals multiply | verify-true
+
+//change file to wrong one
+with [get-editor "MultiplyTwoDigits.py" | get-text-viewer] {
+    set-caret-pos 4 30
+    key-type BackSpace -times 2
+    key-type "M1+s"
+}
+
+//select modile to reload
+get-view "Project Explorer" | get-tree 
+    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules (2)" 
+    
+//check tha lib was not generated    
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path Reload | click
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+
+    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
+        -after [get-label "See 'Details' for more information."] | get-property text 
+        | contains "            Exception: Unable to generate library specification file for library: 'Outer.Inner.MathModule'" 
+        | verify-true
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+
+//click double times - error for doc
+get-view "Project Explorer" | get-tree 
+    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules \\(non-accessible\\)"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | double-click
+    get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Problem Occurred" 
+        | get-label "Unable to open documentation for library 'Outer.Inner.MathModule' from 'ManyModules'." 
+        | get-property caption 
+        | equals "Unable to open documentation for library 'Outer.Inner.MathModule' from 'ManyModules'." | verify-true
+        
+    //details    
+    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
+        | get-property text 
+        | equals "Unable to open documentation for library 'Outer.Inner.MathModule' from 'ManyModules'." | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+//close python file
+get-editor "MultiplyTwoDigits.py" | close
+
+//open source file
+get-view "Project Explorer" | get-tree 
+    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules (non-accessible)" | get-menu 
+    -path "Show library source" | click
+    
+//init form modul is open    
+get-editor "__init__.py" | get-text-viewer | get-property "getSelectionCount()" | equals 0 | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
