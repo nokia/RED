@@ -195,13 +195,26 @@ public class ReferencedLibraryLocatorTest {
     }
 
     @Test
-    public void pythonModuleLibraryIsFoundByPath() throws Exception {
+    public void pythonModuleLibraryIsFoundByPath_1() throws Exception {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, "python_path/py_module/");
 
         verifyZeroInteractions(importer);
 
         verify(detector).libraryDetectedByPath(eq("python_path/py_module/"),
+                eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
+                argThat(isSingleLibrary(LibraryType.PYTHON, "py_module", projectProvider.getDir("python_path"))));
+        verifyNoMoreInteractions(detector);
+    }
+
+    @Test
+    public void pythonModuleLibraryIsFoundByPath_2() throws Exception {
+        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
+        locator.locateByPath(suite, "python_path/py_module");
+
+        verifyZeroInteractions(importer);
+
+        verify(detector).libraryDetectedByPath(eq("python_path/py_module"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
                 argThat(isSingleLibrary(LibraryType.PYTHON, "py_module", projectProvider.getDir("python_path"))));
         verifyNoMoreInteractions(detector);
