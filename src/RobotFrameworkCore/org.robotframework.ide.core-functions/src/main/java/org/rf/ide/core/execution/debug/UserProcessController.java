@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.rf.ide.core.execution.agent.PausingPoint;
 import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
 import org.rf.ide.core.execution.server.response.DisconnectExecution;
+import org.rf.ide.core.execution.server.response.InterruptExecution;
 import org.rf.ide.core.execution.server.response.PauseExecution;
 import org.rf.ide.core.execution.server.response.ResumeExecution;
 import org.rf.ide.core.execution.server.response.ServerResponse;
@@ -53,6 +54,10 @@ public class UserProcessController {
 
     public void disconnect(final Runnable whenResponseIsSent) {
         manualUserResponse.offer(new ResponseWithCallback(new DisconnectExecution(), whenResponseIsSent));
+    }
+
+    public void interrupt(final Runnable whenResponseIsSent) {
+        manualUserResponse.offer(new ResponseWithCallback(new InterruptExecution(), whenResponseIsSent));
     }
 
     public void terminate(final Runnable whenResponseIsSent) {

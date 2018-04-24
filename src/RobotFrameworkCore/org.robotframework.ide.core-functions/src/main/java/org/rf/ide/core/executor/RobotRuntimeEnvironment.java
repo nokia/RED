@@ -108,7 +108,7 @@ public class RobotRuntimeEnvironment {
                 : version;
     }
 
-    private static Collection<PythonInstallationDirectory> whereIsPythonInterpreter(final SuiteExecutor interpreter) {
+    public static Collection<PythonInstallationDirectory> whereIsPythonInterpreter(final SuiteExecutor interpreter) {
         final List<String> paths = new ArrayList<>();
         try {
             final String cmd = RedSystemProperties.isWindowsPlatform() ? "where" : "which";

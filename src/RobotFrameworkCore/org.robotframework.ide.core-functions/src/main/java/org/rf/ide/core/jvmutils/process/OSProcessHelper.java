@@ -5,17 +5,12 @@
  */
 package org.rf.ide.core.jvmutils.process;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Consumer;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.jvmutils.process.IProcessTreeHandler.ProcessInterruptException;
 import org.rf.ide.core.jvmutils.process.IProcessTreeHandler.ProcessKillException;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -26,70 +21,51 @@ public class OSProcessHelper {
 
     private final List<IProcessTreeHandler> osPidCheckers;
 
-    @VisibleForTesting
-    public OSProcessHelper(final List<IProcessTreeHandler> osPidCheckers) {
-        this.osPidCheckers = osPidCheckers;
-    }
-
     public OSProcessHelper() {
-        this.osPidCheckers = new ArrayList<IProcessTreeHandler>(
-                Arrays.asList(new WindowsProcessTreeHandler(this), new UnixProcessTreeHandler(this)));
+        this.osPidCheckers = newArrayList(new WindowsProcessTreeHandler(), new UnixProcessTreeHandler());
     }
 
-    public IProcessTreeHandler getInstanceByOS() {
-        IProcessTreeHandler proc = null;
-
-        for (final IProcessTreeHandler handler : osPidCheckers) {
-            if (handler.isSupportedOS()) {
-                proc = handler;
-                break;
-            }
-        }
-
-        return proc;
-    }
-
-    public int execCommandAndCollectOutput(final List<String> command, final Collection<String> output)
-            throws IOException {
-        final MyLineHandler handler = new MyLineHandler();
-        final int exitCode = RobotRuntimeEnvironment.runExternalProcess(command, handler);
-        output.addAll(handler.getCollectedOutput());
-
-        return exitCode;
-    }
-
-    private class MyLineHandler implements Consumer<String> {
-
-        private final Queue<String> lines = new ConcurrentLinkedQueue<>();
-
-        @Override
-        public void accept(final String line) {
-            lines.add(line);
-        }
-
-        public Queue<String> getCollectedOutput() {
-            return lines;
-        }
+    public Optional<IProcessTreeHandler> getInstanceByOS() {
+        return osPidCheckers.stream().filter(IProcessTreeHandler::isSupportedOS).findFirst();
     }
 
     public ProcessInformation getProcessTreeInformations(final Process process) {
-        ProcessInformation processInfo = new ProcessInformation(ProcessInformation.PROCESS_NOT_FOUND);
-
         final Optional<IProcessTreeHandler> processTreeProv = findProcessTreeProviderFor(process);
         if (processTreeProv.isPresent()) {
             final IProcessTreeHandler provider = processTreeProv.get();
-
-            processInfo = fillProcessTree(provider, provider.getProcessPid(process));
+            return fillProcessTree(provider, provider.getProcessPid(process));
         }
+        return new ProcessInformation(ProcessInformation.PROCESS_NOT_FOUND);
+    }
 
-        return processInfo;
+    public void interruptProcess(final Process process, final String pythonExecutablePath)
+            throws ProcessHelperException {
+        final ProcessInformation procInfo = getProcessTreeInformations(process);
+        if (procInfo.isFound()) {
+            interruptProcess(procInfo, pythonExecutablePath);
+        } else {
+            throw new ProcessHelperException("Couldn't find PID!");
+        }
+    }
+
+    public void interruptProcess(final ProcessInformation procInfo, final String pythonExecutablePath)
+            throws ProcessHelperException {
+        final Optional<IProcessTreeHandler> osHandler = procInfo.findHandler();
+        if (osHandler.isPresent()) {
+            try {
+                osHandler.get().interruptProcess(procInfo, pythonExecutablePath);
+            } catch (final ProcessInterruptException e) {
+                throw new ProcessHelperException(e);
+            }
+        } else {
+            throw new ProcessHelperException("Couldn't find suiteable handler!");
+        }
     }
 
     public void destroyProcessTree(final Process process) throws ProcessHelperException {
         final ProcessInformation procInfo = getProcessTreeInformations(process);
-
-        if (procInfo.wasFound()) {
-            this.destroyProcessTree(procInfo);
+        if (procInfo.isFound()) {
+            destroyProcessTree(procInfo);
         } else {
             throw new ProcessHelperException("Couldn't find PID!");
         }
@@ -109,7 +85,7 @@ public class OSProcessHelper {
     }
 
     @VisibleForTesting
-    protected ProcessInformation fillProcessTree(final IProcessTreeHandler provider, final long pid) {
+    ProcessInformation fillProcessTree(final IProcessTreeHandler provider, final long pid) {
         final ProcessInformation process = new ProcessInformation(pid);
         process.setHandler(provider);
 
@@ -117,22 +93,12 @@ public class OSProcessHelper {
         for (final Long childPid : childPids) {
             process.addChildProcess(fillProcessTree(provider, childPid));
         }
-
         return process;
     }
 
     @VisibleForTesting
-    protected Optional<IProcessTreeHandler> findProcessTreeProviderFor(final Process process) {
-        Optional<IProcessTreeHandler> provider = Optional.empty();
-
-        for (final IProcessTreeHandler prov : osPidCheckers) {
-            if (prov.isSupported(process)) {
-                provider = Optional.of(prov);
-                break;
-            }
-        }
-
-        return provider;
+    Optional<IProcessTreeHandler> findProcessTreeProviderFor(final Process process) {
+        return osPidCheckers.stream().filter(prov -> prov.isSupported(process)).findFirst();
     }
 
     public static class ProcessHelperException extends Exception {
