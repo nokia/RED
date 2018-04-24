@@ -139,6 +139,7 @@ class RedResponseMessage:
     OPERATING_MODE = 'operating_mode'
     PROTOCOL_VERSION = 'protocol_version'
     TERMINATE = 'terminate'
+    INTERRUPT = 'interrupt'
     DISCONNECT = 'disconnect'
     CONTINUE = 'continue'
     PAUSE = 'pause'
@@ -339,6 +340,7 @@ class TestRunnerAgent:
             RedResponseMessage.CONTINUE, 
             RedResponseMessage.PAUSE,
             RedResponseMessage.TERMINATE, 
+            RedResponseMessage.INTERRUPT,
             RedResponseMessage.DISCONNECT]
         if self._mode == AgentMode.DEBUG and pausing_point in [PausingPoint.PRE_START_KEYWORD, PausingPoint.PRE_END_KEYWORD]:
             possible_responses.append(RedResponseMessage.EVALUATE_CONDITION)
@@ -347,6 +349,9 @@ class TestRunnerAgent:
         while True:
             if response_name == RedResponseMessage.TERMINATE:
                 sys.exit()
+            elif response_name == RedResponseMessage.INTERRUPT:
+                self._interrupt()
+                return False
             elif response_name == RedResponseMessage.DISCONNECT:
                 self._close_connection()
                 return False
@@ -356,6 +361,11 @@ class TestRunnerAgent:
                 return True
             elif response_name == RedResponseMessage.EVALUATE_CONDITION:
                 return self._evaluate_condition(response)
+
+    def _interrupt(self):
+        import signal
+        from robot.running import signalhandler
+        signalhandler.STOP_SIGNAL_MONITOR(signal.SIGINT, None)
                 
     def _evaluate_condition(self, condition):
         robot_version_str = robot.version.get_version(True)
@@ -395,7 +405,8 @@ class TestRunnerAgent:
             return
         possible_responses = [
             RedResponseMessage.RESUME,
-            RedResponseMessage.TERMINATE, 
+            RedResponseMessage.TERMINATE,
+            RedResponseMessage.INTERRUPT,
             RedResponseMessage.DISCONNECT] 
         if self._mode == AgentMode.DEBUG:
             possible_responses.append(RedResponseMessage.CHANGE_VARIABLE)
@@ -410,6 +421,10 @@ class TestRunnerAgent:
                 return
             elif response_name == RedResponseMessage.TERMINATE:
                 sys.exit()
+            elif response_name == RedResponseMessage.INTERRUPT:
+                self._send_to_server(AgentEventMessage.RESUMED)
+                self._interrupt()
+                return
             elif response_name == RedResponseMessage.DISCONNECT:
                 self._close_connection()
                 return
