@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/23/18 5:38 PM
+Save-Time: 4/24/18 10:36 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -26,7 +26,7 @@ global [val html_standard_kw "%s<body.*>.*/org.robotframework.ide.eclipse.main.p
 			+ "</h3><p><b>Source: </b><span style=.*><a href=\"library:/%s/%s/%s\?show_source=true\">%s" 		//$project_name / $library  /  $kw_name2  > $library
 			+ "</a> \[<a href=\"library:/%s/%s\?show_doc=true\">Documentation</a>\]</span><br/?><b>"  			// $project_name/ $library
 			+ "Arguments: </b><span.*>%s"																		//$arguments
-			+"</span><br/?></p><p>%s</p></body></html>"] 														// $spec	
+			+"</span><br/?></p><p>%s(</p>)?</body></html>"] 														// $spec	
 																		  			 
 	   
 global [val html_user_kw "%s<body.*>.*org.robotframework.ide.eclipse.main.plugin/docs/keyword_user.png\"/?> %s"   // $html_beginning $kw_nam
@@ -81,14 +81,22 @@ proc "check-documentation-view-for-user-kw" [val kw_name] [val path ""][val argu
 }
 
 
+proc "check-documentation-view-for-tc" [val tc_name] [val path ""] [val spec]{
+	if [$tc_name | contains " "]{
+		let [val kw_name2 [replace -input $tc_name -old " " -new "\%20"] ]{
+			get-view "Documentation View" | get-control Browser | get-property text 
+				| equals [format $html_test  $html_beginning $tc_name  $path $path $path $spec] | verify-true
+		}
+	}
+}
 
 
 //------------------------------------------------
-proc "check-information-view-doc-for-kw" [val kw_name] [val library] [val arguments] [val spec]{
+proc "check-information-view-doc-for-kw" [val kw_name] [val project_name "RobotProject"] [val library] [val arguments] [val spec]{
 	if [$kw_name | contains " "]{
 		let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"] ]{
 			get-window -from "Information Window" | get-control Browser | get-property text
-				| equals [format $html_standard_kw  $html_beginning $kw_name $library $kw_name2 $library $library  $arguments $spec] | verify-true
+				| equals [format $html_standard_kw  $html_beginning $kw_name $project_name $library $kw_name2 $library $project_name $library  $arguments $spec] | verify-true
 		}
 	}
 }
@@ -103,13 +111,5 @@ proc "check-information-view-doc-for-user-kw" [val kw_name] [val path ""][val ar
 }
 
 
-proc "check-documentation-view-for-tc" [val tc_name] [val path ""] [val spec]{
-	if [$tc_name | contains " "]{
-		let [val kw_name2 [replace -input $tc_name -old " " -new "\%20"] ]{
-			get-view "Documentation View" | get-control Browser | get-property text 
-				| equals [format $html_test  $html_beginning $tc_name  $path $path $path $spec] | verify-true
-		}
-	}
-}
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
