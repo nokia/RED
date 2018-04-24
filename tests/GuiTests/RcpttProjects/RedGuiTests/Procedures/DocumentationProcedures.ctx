@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/24/18 5:21 PM
+Save-Time: 4/24/18 6:00 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -26,7 +26,7 @@ global [val html_standard_kw "%s<body.*>.*/org.robotframework.ide.eclipse.main.p
 			+ "<p><b>Source: </b><span style=.*><a href=\"library:/%s/%s/%s\?show_source=true\">%s" 		//$project_name / $library  /  $kw_name2  > $library
 			+ "</a> \[<a href=\"library:/%s/%s\?show_doc=true\">Documentation</a>\]</span><br/?>"  			// $project_name/ $library
 			+ "<b>Arguments: </b><span.*>%s"																		//$arguments
-			+"</span><br/?></p><p>%s"
+			+"</span><br/?></p><p>%s(</p>)?"
 			+ "</body></html>"] 														// $spec	
 																		  			 
 	   
