@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -20,9 +21,13 @@ import org.robotframework.red.swt.SwtThread;
 
 public class LocalProcess extends RuntimeProcess implements IRobotProcess {
 
-    private Runnable onDisconnectHook;
+    private String pythonExecutablePath;
+
+    private Supplier<Long> pidSupplier;
 
     private UserProcessController userProcessController;
+
+    private Runnable onDisconnectHook;
 
     private boolean isDisconnected;
 
@@ -30,7 +35,6 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
 
     private boolean isSuspended;
 
-    private String pythonExecutablePath;
 
     public LocalProcess(final ILaunch launch, final Process process, final String name,
             final Map<String, String> attributes) {
@@ -38,8 +42,9 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
     }
 
     @Override
-    public void setPythonExecutablePath(final String pythonExecutablePath) {
+    public void setInterruptionData(final String pythonExecutablePath, final Supplier<Long> pidSupplier) {
         this.pythonExecutablePath = pythonExecutablePath;
+        this.pidSupplier = pidSupplier;
     }
 
     @Override
@@ -92,12 +97,17 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
         // we need to resume if suspended, so that the agent will be able to handle signal
         final Runnable additionalOp = isSuspended() ? this::resume : () -> {};
         new Thread(() -> {
-            final Process systemProcess = getSystemProcess();
-            if (systemProcess != null) {
-                try {
-                    new OSProcessHelper().interruptProcess(systemProcess, pythonExecutablePath);
-                } catch (final ProcessHelperException e) {
+            final Long pid = pidSupplier.get();
+            try {
+                if (pid != null && pid.longValue() != -1) {
+                    new OSProcessHelper().interruptProcess(pid.longValue(), pythonExecutablePath);
+                } else {
+                    final Process systemProcess = getSystemProcess();
+                    if (systemProcess != null) {
+                        new OSProcessHelper().interruptProcess(systemProcess, pythonExecutablePath);
+                    }
                 }
+            } catch (final ProcessHelperException e) {
             }
             additionalOp.run();
             SwtThread.asyncExec(() -> fireEvent(DebugEvent.CHANGE));

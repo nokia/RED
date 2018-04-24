@@ -101,8 +101,8 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
                     .runExternalProcess(getKillProcessTreeCommand(procInformation), collectedOutput::add);
 
             if (returnCode == OSProcessHelper.SUCCESS) {
-                final List<ProcessInformation> childs = procInformation.childs();
-                for (final ProcessInformation pi : childs) {
+                final List<ProcessInformation> children = procInformation.getChildren();
+                for (final ProcessInformation pi : children) {
                     killProcessTree(pi);
                 }
             } else {

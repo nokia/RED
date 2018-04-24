@@ -21,6 +21,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
@@ -221,13 +222,13 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(mock(AgentClient.class), listener);
 
         final Map<String, Object> attributes = ImmutableMap.of("cmd_line", "cmdLine", "python", "py3", "robot", "1.2.3",
-                "protocol", 2);
+                "protocol", 2, "pid", 42);
         final String json = toJson(ImmutableMap.of("version", newArrayList(attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleVersions(new VersionsEvent(null, "cmdLine", "py3", "1.2.3", 2));
+        verify(listener).handleVersions(new VersionsEvent(null, "cmdLine", "py3", "1.2.3", 2, Optional.of(42L)));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
