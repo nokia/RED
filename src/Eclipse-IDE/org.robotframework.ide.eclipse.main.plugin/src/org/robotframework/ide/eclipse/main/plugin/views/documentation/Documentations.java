@@ -50,20 +50,20 @@ public class Documentations {
 
     public static void showDocForKeywordSpecification(final IWorkbenchPage page, final RobotProject project,
             final LibrarySpecification librarySpecification, final KeywordSpecification keywordSpecification) {
-        display(page, new KeywordSpecificationInput(project, librarySpecification, keywordSpecification));
+        display(page, new KeywordSpecificationInput(project, librarySpecification, keywordSpecification), true);
     }
 
     public static void showDocForLibrarySpecification(final IWorkbenchPage page, final RobotProject project,
             final LibrarySpecification librarySpecification) {
-        display(page, new LibrarySpecificationInput(project, librarySpecification));
+        display(page, new LibrarySpecificationInput(project, librarySpecification), true);
     }
 
     public static void showDocForRobotElement(final IWorkbenchPage page, final RobotFileInternalElement element) {
-        findInput(element).ifPresent(i -> display(page, i));
+        findInput(element).ifPresent(input -> display(page, input, true));
     }
 
     public static void showDocForEditorSourceSelection(final IWorkbenchPage page, final RobotSuiteFile suiteModel,
-            final IDocument document, final int offset) {
+            final IDocument document, final int offset, final boolean activate) {
 
         final Optional<? extends RobotElement> element = suiteModel.findElement(offset);
         if (element.isPresent()) {
@@ -73,7 +73,7 @@ public class Documentations {
                 if (activeCellRegion.isPresent()) {
                     final String cellContent = document.get(activeCellRegion.get().getOffset(),
                             activeCellRegion.get().getLength());
-                    showDoc(page, (RobotFileInternalElement) element.get(), cellContent);
+                    showDoc(page, (RobotFileInternalElement) element.get(), cellContent, activate);
                 }
             } catch (final BadLocationException e) {
                 RedPlugin.logError("Could not find selected position in document", e);
@@ -95,7 +95,7 @@ public class Documentations {
     }
 
     public static void showDocForEditorTablesSelection(final IWorkbenchPage page,
-            final SelectionLayerAccessor selectionLayerAccessor) {
+            final SelectionLayerAccessor selectionLayerAccessor, final boolean activate) {
         final PositionCoordinate[] coordinates = selectionLayerAccessor.getSelectedPositions();
         Stream.of(coordinates)
                 .findFirst()
@@ -104,11 +104,11 @@ public class Documentations {
                         .filter(RobotFileInternalElement.class::isInstance)
                         .map(RobotFileInternalElement.class::cast)
                         .findFirst()
-                        .ifPresent(elem -> showDoc(page, elem, label)));
+                        .ifPresent(elem -> showDoc(page, elem, label, activate)));
     }
 
     private static void showDoc(final IWorkbenchPage page, final RobotFileInternalElement element,
-            final String cellContent) {
+            final String cellContent, final boolean activate) {
 
         if (element.getSuiteFile() instanceof RobotSuiteStreamFile) {
             return;
@@ -118,7 +118,7 @@ public class Documentations {
                 ? Optional.of(new KeywordProposalInput(element, cellContent))
                 : findInput(element);
         if (input.isPresent()) {
-            display(page, input.get());
+            display(page, input.get(), activate);
         }
     }
 
@@ -183,8 +183,8 @@ public class Documentations {
         docView.markSyncBroken();
     }
 
-    private static void display(final IWorkbenchPage page, final DocumentationViewInput input) {
-        final DocumentationView docView = openDocumentationViewIfNeeded(page);
+    private static void display(final IWorkbenchPage page, final DocumentationViewInput input, final boolean activate) {
+        final DocumentationView docView = openDocumentationViewIfNeeded(page, activate);
         if (docView == null) {
             return;
         }
@@ -192,7 +192,7 @@ public class Documentations {
     }
 
     @SuppressWarnings("restriction")
-    private static DocumentationView openDocumentationViewIfNeeded(final IWorkbenchPage page) {
+    private static DocumentationView openDocumentationViewIfNeeded(final IWorkbenchPage page, final boolean activate) {
         final IViewPart docViewPart = page.findView(DocumentationView.ID);
         if (docViewPart == null) {
             try {
@@ -202,6 +202,9 @@ public class Documentations {
                 return null;
             }
         } else {
+            if (activate) {
+                page.bringToTop(docViewPart);
+            }
             return ((DocumentationViewWrapper) docViewPart).getComponent();
         }
     }

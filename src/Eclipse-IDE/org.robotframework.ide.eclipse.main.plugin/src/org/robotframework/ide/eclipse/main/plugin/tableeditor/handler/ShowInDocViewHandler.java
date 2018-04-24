@@ -39,11 +39,11 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                 final IDocument document = sourceEditor.getDocument();
                 final int offset = sourceEditor.getViewer().getTextWidget().getCaretOffset();
 
-                Documentations.showDocForEditorSourceSelection(page, suiteModel, document, offset);
+                Documentations.showDocForEditorSourceSelection(page, suiteModel, document, offset, true);
             } else {
                 final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
 
-                Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor);
+                Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor, true);
             }
         }
     }
