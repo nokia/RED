@@ -2053,7 +2053,7 @@
        </enabledWhen>
        <activeWhen>
           <reference
-                definitionId="org.robotframework.editorContextIsActive">
+                definitionId="org.robotframework.editorContextIsActiveAndEditable">
           </reference>
        </activeWhen>
     </handler>
@@ -3803,9 +3803,15 @@
              icon="resources/book.png"
              label="Show documentation"
              style="push">
-          <visibleWhen
-                checkEnabled="true">
-          </visibleWhen>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
        </command>
        <separator
              name="globals"
@@ -4885,7 +4891,39 @@
           </and>
        </with>
     </definition>
-    
+    <definition
+          id="org.robotframework.editorContextIsActiveAndEditable">
+          <and>
+          <with
+                variable="activeContexts">
+              <and>
+                 <iterate
+                       ifEmpty="false"
+                       operator="or">
+                    <equals
+                          value="org.robotframework.ide.eclipse.tableeditor.context">
+                    </equals>
+                 </iterate>
+                 <not>
+                    <iterate
+                          ifEmpty="false"
+                          operator="or">
+                       <equals
+                             value="org.robotframework.ide.eclipse.details.context">
+                       </equals>
+                    </iterate>
+                 </not>
+              </and>
+          </with>
+          <with
+              variable="activeEditor">
+              <test
+                   property="org.robotframework.editorModelIsEditable"
+                   value="true">
+              </test>
+          </with>
+       </and>
+    </definition>
     <definition
           id="org.robotframework.valueEditorContextIsActive">
        <with
