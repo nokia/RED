@@ -133,7 +133,7 @@ class DocumentationViewPartListener implements IPartListener {
                 if (newInput.isPresent() && !Objects.equals(selectionInput, newInput.get())) {
                     selectionInput = newInput.get();
                     scheduleShowDocJob(() -> {},
-                            () -> Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor));
+                            () -> Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor, false));
                 }
             }
         }
@@ -185,7 +185,7 @@ class DocumentationViewPartListener implements IPartListener {
                         } catch (final InterruptedException e) {
                             // ok, out of sync in that case
                         }
-                    }, () -> Documentations.showDocForEditorSourceSelection(page, fileModel, document, offset));
+                    }, () -> Documentations.showDocForEditorSourceSelection(page, fileModel, document, offset, false));
 
                 }
             } catch (final BadLocationException e) {

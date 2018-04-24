@@ -54,6 +54,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/stop_soft.png");
     }
 
+    public static ImageDescriptor getDisabledInterruptImage() {
+        return RedPlugin.getImageDescriptor("resources/stop_soft_disabled.png");
+    }
+
     public static ImageDescriptor getSuspendImage() {
         return DebugUITools.getImageDescriptor("IMG_ELCL_SUSPEND");
     }

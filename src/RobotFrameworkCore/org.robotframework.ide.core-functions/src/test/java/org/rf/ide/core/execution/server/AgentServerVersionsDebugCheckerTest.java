@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -114,7 +115,7 @@ public class AgentServerVersionsDebugCheckerTest {
         doThrow(ResponseException.class).when(responder).versionsCorrect();
 
         final VersionsEvent event = new VersionsEvent(responder, "cmd_line", "3.6", "3.0.2",
-                getCurrentProtocolVersion());
+                getCurrentProtocolVersion(), Optional.of(42L));
 
         checker.handleVersions(event);
     }
