@@ -8,8 +8,8 @@
 	<h2>Controlling execution</h2>
 	
 	<p>In both <b>RUN</b> and <b>DEBUG</b> modes no matter if locally or remotely launched tests it is possible to 
-	control basic aspects of execution: <code>suspend/resume</code>, <code>terminate</code> and 
-	<code>disconnect</code>	from running tests:
+	control basic aspects of execution: <code>suspend/resume</code>, <code>terminate</code>, <code>terminate 
+	gracefully</code> and <code>disconnect</code> from running tests:
 	</p>
 	
 	<ul>
@@ -48,19 +48,22 @@
 		the output of the process (both <code>stdout</code> and <code>stderr</code> of that process).
 		</li> 
 	</ul>
+	
+	<p>All the buttons described above are available in <b>Console</b> view with one additional button:
+	</p>
+	<ul>
+	   <li><b>terminate gracefully</b> - under Windows it simulates pressing <code>Ctrl+C</code> and under Unix-like 
+	   systems it sends <code>INT</code> signal to the process. As described in <a class="external" href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#stopping-test-execution-gracefully">
+	   User Guide</a> this allows Robot to stop tests execution execute all the teardowns and generate 
+	   output files.
+	   </li>
+	</ul>
 	<br/>
 	
 	<p>In <b>DEBUG</b> mode there are more aspects of execution which can be controlled (pausing on breakpoints,
 	stepping, changing variables values etc.). For more information proceed to <a href="debug.html">Debug</a> topic.
 	</p>
 	<br/>
-	
-	<dl class="note">
-	   <dt>Note</dt>
-	   <dd>It is possible to <b>terminate</b> also by using button inside <b>Console</b> view regardless of currently
-	   active perspective.
-	   </dd>
-	</dl>
-	<br/>
+
 </body>
 </html>
