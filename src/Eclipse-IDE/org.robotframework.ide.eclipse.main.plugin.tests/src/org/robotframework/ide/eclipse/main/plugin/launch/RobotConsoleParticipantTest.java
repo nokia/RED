@@ -26,7 +26,9 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.part.IPageBookViewPage;
 import org.eclipse.ui.part.IPageSite;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleParticipant.DebugEventsListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleParticipant.InterruptTestsAction;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleParticipant.PauseTestsAction;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleParticipant.ResumeTestsAction;
 
@@ -62,8 +64,9 @@ public class RobotConsoleParticipantTest {
         when(page.getSite()).thenReturn(site);
         participant.init(page, console);
 
-        verify(toolbarManager).appendToGroup(any(String.class), any(PauseTestsAction.class));
         verify(toolbarManager).appendToGroup(any(String.class), any(ResumeTestsAction.class));
+        verify(toolbarManager).appendToGroup(any(String.class), any(PauseTestsAction.class));
+        verify(toolbarManager).appendToGroup(any(String.class), any(InterruptTestsAction.class));
 
         verify(debugPlugin).addDebugEventListener(any(DebugEventsListener.class));
     }
@@ -77,8 +80,8 @@ public class RobotConsoleParticipantTest {
         final PauseTestsAction pauseAction = participant.new PauseTestsAction(process);
 
         final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final IDebugTarget debugTarget1 = mock(IDebugTarget.class);
-        final IDebugTarget debugTarget2 = mock(IDebugTarget.class);
+        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
         when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
         when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
         when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
@@ -99,8 +102,8 @@ public class RobotConsoleParticipantTest {
         final PauseTestsAction pauseAction = participant.new PauseTestsAction(process);
 
         final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final IDebugTarget debugTarget1 = mock(IDebugTarget.class);
-        final IDebugTarget debugTarget2 = mock(IDebugTarget.class);
+        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
         when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
         when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
         when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
@@ -121,8 +124,8 @@ public class RobotConsoleParticipantTest {
         final PauseTestsAction pauseAction = participant.new PauseTestsAction(process);
 
         final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final IDebugTarget debugTarget1 = mock(IDebugTarget.class);
-        final IDebugTarget debugTarget2 = mock(IDebugTarget.class);
+        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
         when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
         when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
         when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
@@ -142,8 +145,8 @@ public class RobotConsoleParticipantTest {
         final ResumeTestsAction resumeAction = participant.new ResumeTestsAction(process);
 
         final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final IDebugTarget debugTarget1 = mock(IDebugTarget.class);
-        final IDebugTarget debugTarget2 = mock(IDebugTarget.class);
+        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
         when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
         when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
         when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
@@ -164,8 +167,8 @@ public class RobotConsoleParticipantTest {
         final ResumeTestsAction resumeAction = participant.new ResumeTestsAction(process);
 
         final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final IDebugTarget debugTarget1 = mock(IDebugTarget.class);
-        final IDebugTarget debugTarget2 = mock(IDebugTarget.class);
+        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
         when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
         when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
         when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
@@ -186,8 +189,8 @@ public class RobotConsoleParticipantTest {
         final ResumeTestsAction resumeAction = participant.new ResumeTestsAction(process);
 
         final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final IDebugTarget debugTarget1 = mock(IDebugTarget.class);
-        final IDebugTarget debugTarget2 = mock(IDebugTarget.class);
+        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
         when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
         when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
         when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
@@ -199,22 +202,91 @@ public class RobotConsoleParticipantTest {
     }
 
     @Test
-    public void debugEventsListenerDisablesBothActionsAndDeregistersItself_whenProcessTerminates() {
+    public void interruptActionInterruptsDebugTarget_whenThereIsOneAvailableForGivenProcess() throws Exception {
+        final DebugPlugin debugPlugin = mock(DebugPlugin.class);
+        final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
+
+        final IRobotProcess process = mock(IRobotProcess.class);
+        final InterruptTestsAction interruptAction = participant.new InterruptTestsAction(process);
+
+        final ILaunchManager launchManager = mock(ILaunchManager.class);
+        final RobotDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final RobotDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
+        when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
+        when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
+        when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
+        when(debugTarget2.getProcess()).thenReturn(process);
+
+        interruptAction.run();
+
+        verify(debugTarget2).interrupt();
+        verifyZeroInteractions(process);
+    }
+
+    @Test
+    public void interruptActionInterruptProcess_whenInterruptingDebugTargetThrowsAnException() throws Exception {
+        final DebugPlugin debugPlugin = mock(DebugPlugin.class);
+        final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
+
+        final IRobotProcess process = mock(IRobotProcess.class);
+        final InterruptTestsAction interruptAction = participant.new InterruptTestsAction(process);
+
+        final ILaunchManager launchManager = mock(ILaunchManager.class);
+        final RobotDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final RobotDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
+        when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
+        when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
+        when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
+        when(debugTarget2.getProcess()).thenReturn(process);
+        doThrow(DebugException.class).when(debugTarget2).interrupt();
+
+        interruptAction.run();
+
+        verify(process).interrupt();
+    }
+
+    @Test
+    public void interruptActionInterruptsProcess_whenThereIsNoDebugTargetAvailableForGivenProcess() throws Exception {
+        final DebugPlugin debugPlugin = mock(DebugPlugin.class);
+        final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
+
+        final IRobotProcess process = mock(IRobotProcess.class);
+        final InterruptTestsAction interruptAction = participant.new InterruptTestsAction(process);
+
+        final ILaunchManager launchManager = mock(ILaunchManager.class);
+        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
+        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
+        when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
+        when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
+        when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
+        when(debugTarget2.getProcess()).thenReturn(mock(IRobotProcess.class));
+
+        interruptAction.run();
+
+        verify(process).interrupt();
+    }
+
+    @Test
+    public void debugEventsListenerDisablesAllActionsAndDeregistersItself_whenProcessTerminates() {
         final DebugPlugin debugPlugin = mock(DebugPlugin.class);
         final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
 
         final IRobotProcess process = mock(IRobotProcess.class);
         final PauseTestsAction pauseAction = participant.new PauseTestsAction(process);
         final ResumeTestsAction resumeAction = participant.new ResumeTestsAction(process);
-        final DebugEventsListener listener = participant.new DebugEventsListener(process, pauseAction, resumeAction);
+        final InterruptTestsAction interruptAction = participant.new InterruptTestsAction(process);
+        final DebugEventsListener listener = participant.new DebugEventsListener(process, interruptAction, pauseAction,
+                resumeAction);
 
         assertThat(pauseAction.isEnabled()).isTrue();
         assertThat(resumeAction.isEnabled()).isTrue();
+        assertThat(interruptAction.isEnabled()).isTrue();
 
         listener.handleDebugEvents(new DebugEvent[] { new DebugEvent(process, DebugEvent.TERMINATE) });
 
         assertThat(pauseAction.isEnabled()).isFalse();
         assertThat(resumeAction.isEnabled()).isFalse();
+        assertThat(interruptAction.isEnabled()).isFalse();
         verify(debugPlugin).removeDebugEventListener(listener);
     }
 
@@ -226,16 +298,20 @@ public class RobotConsoleParticipantTest {
         final IRobotProcess process = mock(IRobotProcess.class);
         final PauseTestsAction pauseAction = participant.new PauseTestsAction(process);
         final ResumeTestsAction resumeAction = participant.new ResumeTestsAction(process);
-        final DebugEventsListener listener = participant.new DebugEventsListener(process, pauseAction, resumeAction);
+        final InterruptTestsAction interruptAction = participant.new InterruptTestsAction(process);
+        final DebugEventsListener listener = participant.new DebugEventsListener(process, interruptAction, pauseAction,
+                resumeAction);
 
         assertThat(pauseAction.isEnabled()).isTrue();
         assertThat(resumeAction.isEnabled()).isTrue();
+        assertThat(interruptAction.isEnabled()).isTrue();
 
         listener.handleDebugEvents(
                 new DebugEvent[] { new DebugEvent(mock(IRobotProcess.class), DebugEvent.TERMINATE) });
 
         assertThat(pauseAction.isEnabled()).isTrue();
         assertThat(resumeAction.isEnabled()).isTrue();
+        assertThat(interruptAction.isEnabled()).isTrue();
         verifyZeroInteractions(debugPlugin);
     }
 
@@ -248,15 +324,19 @@ public class RobotConsoleParticipantTest {
         when(process.isSuspended()).thenReturn(true);
         final PauseTestsAction pauseAction = participant.new PauseTestsAction(process);
         final ResumeTestsAction resumeAction = participant.new ResumeTestsAction(process);
-        final DebugEventsListener listener = participant.new DebugEventsListener(process, pauseAction, resumeAction);
+        final InterruptTestsAction interruptAction = participant.new InterruptTestsAction(process);
+        final DebugEventsListener listener = participant.new DebugEventsListener(process, interruptAction, pauseAction,
+                resumeAction);
 
         assertThat(pauseAction.isEnabled()).isTrue();
         assertThat(resumeAction.isEnabled()).isTrue();
+        assertThat(interruptAction.isEnabled()).isTrue();
 
         listener.handleDebugEvents(new DebugEvent[] { new DebugEvent(process, DebugEvent.CHANGE) });
 
         assertThat(pauseAction.isEnabled()).isFalse();
         assertThat(resumeAction.isEnabled()).isTrue();
+        assertThat(interruptAction.isEnabled()).isTrue();
         verifyZeroInteractions(debugPlugin);
     }
 
@@ -269,15 +349,19 @@ public class RobotConsoleParticipantTest {
         when(process.isSuspended()).thenReturn(false);
         final PauseTestsAction pauseAction = participant.new PauseTestsAction(process);
         final ResumeTestsAction resumeAction = participant.new ResumeTestsAction(process);
-        final DebugEventsListener listener = participant.new DebugEventsListener(process, pauseAction, resumeAction);
+        final InterruptTestsAction interruptAction = participant.new InterruptTestsAction(process);
+        final DebugEventsListener listener = participant.new DebugEventsListener(process, interruptAction, pauseAction,
+                resumeAction);
 
         assertThat(pauseAction.isEnabled()).isTrue();
         assertThat(resumeAction.isEnabled()).isTrue();
+        assertThat(interruptAction.isEnabled()).isTrue();
 
         listener.handleDebugEvents(new DebugEvent[] { new DebugEvent(process, DebugEvent.CHANGE) });
 
         assertThat(pauseAction.isEnabled()).isTrue();
         assertThat(resumeAction.isEnabled()).isFalse();
+        assertThat(interruptAction.isEnabled()).isTrue();
         verifyZeroInteractions(debugPlugin);
     }
 

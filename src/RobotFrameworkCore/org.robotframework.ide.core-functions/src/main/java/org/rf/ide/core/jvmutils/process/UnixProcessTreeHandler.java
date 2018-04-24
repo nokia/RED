@@ -13,8 +13,9 @@ import org.rf.ide.core.executor.RedSystemProperties;
 
 public class UnixProcessTreeHandler extends AProcessTreeHandler {
 
-    public UnixProcessTreeHandler(final OSProcessHelper helper) {
-        super(helper);
+    @Override
+    public boolean isSupportedOS() {
+        return !RedSystemProperties.isWindowsPlatform();
     }
 
     @Override
@@ -25,35 +26,42 @@ public class UnixProcessTreeHandler extends AProcessTreeHandler {
 
     @Override
     public long getProcessPid(final Process process) {
-        long pid = ProcessInformation.PROCESS_NOT_FOUND;
         try {
             final Field f = process.getClass().getDeclaredField("pid");
             f.setAccessible(true);
-            pid = f.getLong(process);
-            f.setAccessible(false);
-        } catch (Exception e) {
+            try {
+                return f.getLong(process);
+            } finally {
+                f.setAccessible(false);
+            }
+        } catch (final Exception e) {
         }
-
-        return pid;
+        return ProcessInformation.PROCESS_NOT_FOUND;
     }
 
     @Override
-    public List<String> getChildPidsCommand(final long processPid) {
-        return Arrays.asList("ps", "--ppid", "" + processPid, "-o", "%U,%p,%P", "--no-header");
+    protected List<String> getChildPidsCommand(final long processPid) {
+        return Arrays.asList("ps", "--ppid", Long.toString(processPid), "-o", "%U,%p,%P", "--no-header");
     }
 
     @Override
-    public List<String> getKillProcessCommand(final ProcessInformation procInformation) {
-        return Arrays.asList("kill", "-9", "" + procInformation.pid());
+    protected List<String> getKillProcessCommand(final ProcessInformation procInformation) {
+        return Arrays.asList("kill", "-9", Long.toString(procInformation.pid()));
     }
 
     @Override
-    public List<String> getKillProcessTreeCommand(final ProcessInformation procInformation) {
-        return Arrays.asList("kill", "-9", "" + procInformation.pid());
+    protected List<String> getKillProcessTreeCommand(final ProcessInformation procInformation) {
+        return Arrays.asList("kill", "-9", Long.toString(procInformation.pid()));
     }
 
     @Override
-    public boolean isSupportedOS() {
-        return !RedSystemProperties.isWindowsPlatform();
+    protected List<String> getInterruptProcessCommand(final ProcessInformation procInformation,
+            final String pythonExecutablePath) {
+        return Arrays.asList("kill", "-2", Long.toString(procInformation.pid()));
+    }
+
+    @Override
+    protected boolean isInterruptionOutputValid(final int returnCode, final List<String> output) {
+        return OSProcessHelper.SUCCESS == returnCode;
     }
 }
