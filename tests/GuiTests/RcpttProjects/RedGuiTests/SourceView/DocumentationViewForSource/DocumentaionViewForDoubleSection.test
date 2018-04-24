@@ -7,8 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nGl_0JByEea_J4BglwdxcA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/24/18 1:50 PM
-Tags: notTestable
+Save-Time: 4/24/18 5:22 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -84,21 +83,17 @@ check-documentation-view-for-tc "test 2"  -path "/RobotProject/TestFile.robot"  
 //show doc for double Setting section
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 2 23
 
-wait-for-view_and-compare-text -text "Doc from Setting section\n"
-    + "with second line\n"
-    + "This is second part." 
+check-documentation-view-for-file "TestFile.robot"  -path "/RobotProject/TestFile.robot" -intro "Doc from Setting section with second line This is second part." 
+  	-shortcuts [list "kw1_with_imported_kw" "kw_with_doc_and_arg" "kw_with_no_doc" "kw_with_only_doc"]
     
 // set carte on [DOC] in test1
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 6 14
-wait-for-view_and-compare-text "test1\n"
-    + "TestFile.robot\n\n"
-    + "Doc for TC: test 1"
+check-documentation-view-for-tc "test1"  -path "/RobotProject/TestFile.robot"  -spec "Doc for TC: test 1"
     
 //go to second Documentation in Settings
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 35 27
-wait-for-view_and-compare-text "Doc from Setting section\n"
-    + "with second line\n"
-    + "This is second part." 
+check-documentation-view-for-file "TestFile.robot"  -path "/RobotProject/TestFile.robot" -intro "Doc from Setting section with second line This is second part." 
+  	-shortcuts [list "kw1_with_imported_kw" "kw_with_doc_and_arg" "kw_with_no_doc" "kw_with_only_doc"] 
 
 
 //----------------------------------------- checking if doc view is updateing after switcing from test doc to kw doc  -------------------
@@ -108,54 +103,30 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     hover-text 7 15
     set-caret-pos 7 16
 }
-wait-for-view_and-compare-text "Name: kw1_with_imported_kw\n"
-    + "Source: User defined (/RobotProject/TestFile.robot)\n"
-    + "Arguments: []\n\n"
-    + "<not documented>"
+check-documentation-view-for-user-kw -kw_name "kw1_with_imported_kw" -path "/RobotProject/TestFile.robot"  -arguments "\[\]" -spec "&lt;not documented&gt;"
     
 //set caret on [doc] section in TC    
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 6 26
-wait-for-view_and-compare-text "test1\n"
-    + "TestFile.robot\n\n"
-    + "Doc for TC: test 1"
+check-documentation-view-for-tc "test1"  -path "/RobotProject/TestFile.robot"  -spec "Doc for TC: test 1"
     
 //set caret again on kw    
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 18
 }
-wait-for-view_and-compare-text "Name: kw1_with_imported_kw\n"
-    + "Source: User defined (/RobotProject/TestFile.robot)\n"
-    + "Arguments: []\n\n"
-    + "<not documented>" 
-    
+check-documentation-view-for-user-kw -kw_name "kw1_with_imported_kw" -path "/RobotProject/TestFile.robot"  -arguments "\[\]" -spec "&lt;not documented&gt;"
+
 //set carte in built-in kw: catenate    
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 26 10
 }
-wait-for-view_and-compare-text -text "Name: Catenate\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [*items]\n\n"
-    + "Catenates the given items together and returns the resulted string.\n\n"
-    + "By default, items are catenated with spaces, but if the first item\n"
-    + "contains the string ``SEPARATOR=<sep>``, the separator ``<sep>`` is\n"
-    + "used instead. Items are converted into strings when necessary.\n\n"
-    + "Examples:\n"
-    + "| ${str1} = | Catenate | Hello         | world |       |\n"
-    + "| ${str2} = | Catenate | SEPARATOR=--- | Hello | world |\n"
-    + "| ${str3} = | Catenate | SEPARATOR=    | Hello | world |\n"
-    + "=>\n"
-    + "| ${str1} = 'Hello world'\n"
-    + "| ${str2} = 'Hello---world'\n"
-    + "| ${str3} = 'Helloworld'"
+check-documentation-view -kw_name "Catenate"  -library "BuiltIn" -arguments "\[\*items\]" -spec "Catenates the given items together and returns the resulted string.*"
+
+
 //-----------------------------  checking if in doc view documentation is shown do after selecting KW name -----------------------------
 
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 31 5
 }
-wait-for-view_and-compare-text "Name: kw_with_only_doc\n"
-    + "Source: User defined (/RobotProject/TestFile.robot)\n"
-    + "Arguments: []\n\n"
-    + "I have only doc, no args"   
-    
+check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/TestFile.robot" -arguments "\[\]" -spec "I have only doc, no args"
      
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
