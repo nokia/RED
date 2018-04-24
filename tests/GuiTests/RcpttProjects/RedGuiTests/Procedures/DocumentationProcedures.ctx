@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/24/18 10:36 AM
+Save-Time: 4/24/18 12:08 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -39,7 +39,7 @@ global [val html_test "%s<body.*>.*/org.robotframework.ide.eclipse.main.plugin/d
 			+ "</h3><p><b>Source: </b><span.*>"
 			+ "<a href=\"file:.*%s\?show_source=true.*>%s</a> "                         				  //$path    $path
 			+ "\[<a href=\"file:/.*%s\?show_doc=true.*>Documentation</a>\]"								  // $path 
-			+ "</span><br/?><p>%s</p></body></html>" ]	   												  //$spec
+			+ "</span><br/?></p><p>%s</p></body></html>" ]	   												  //$spec
 	   
 	     
 proc "check-information-window" [val inner_html]{
