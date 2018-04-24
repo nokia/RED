@@ -78,7 +78,7 @@ public class ReferencedLibraryLocator {
     public void locateByPath(final RobotSuiteFile suiteFile, final String path) {
         Optional<File> libraryFile = Optional.empty();
         try {
-            if (path.endsWith("/") || path.endsWith(".py")) {
+            if (path.contains("/") || path.endsWith(".py")) {
                 libraryFile = findLibraryFileByPath(suiteFile, path);
                 if (libraryFile.isPresent()) {
                     final SimpleImmutableEntry<File, Collection<ReferencedLibrary>> imported = importPythonLibrary(
