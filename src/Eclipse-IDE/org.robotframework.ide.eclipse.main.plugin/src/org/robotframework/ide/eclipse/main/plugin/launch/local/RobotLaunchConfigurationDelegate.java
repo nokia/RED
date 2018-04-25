@@ -173,8 +173,10 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, execProcess,
                 consoleData.getProcessLabel());
-        robotProcess.setInterruptionData(robotProject.getRuntimeEnvironment().getPythonExecutablePath(),
-                pidReader::getPid);
+        final String projectInterpreterPath = robotProject.getRuntimeEnvironment() != null
+                ? robotProject.getRuntimeEnvironment().getPythonExecutablePath()
+                : null;
+        robotProcess.setInterruptionData(projectInterpreterPath, pidReader::getPid);
 
         robotProcess.onTerminate(serverJob::stopServer);
 
