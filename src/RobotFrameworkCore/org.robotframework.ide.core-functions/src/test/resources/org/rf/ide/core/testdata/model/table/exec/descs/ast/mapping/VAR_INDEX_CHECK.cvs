@@ -1,21 +1,27 @@
+false index without variable,[index], false
+false index with variable without index inside,[${var}], false
 scalar variable with one index,${var}[index], true
 scalar variable with one index included in curly brackets,${var["index"]}, true
 scalar variable without index,${var}, false
 scalar variable with one index and variable inside variable,${var${var2}}[index], true
 scalar variable with one index and variable inside variable and index done wrongly,${var${var2}[index2]}[index], false
 scalar variable with one index and variable inside variable and index done ok,${var${var2["index2"]}}[index], true
+scalar variable with one index after space,${var} [index], false
 list variable with one index,@{var}[index], true
 list variable with one index included in curly brackets,@{var["index"]}, true
 list variable without index,@{var}, false
 list variable with one index and variable inside variable and index done wrongly,@{var${var2}[index2]}[index], false
 list variable with one index and variable inside variable and index done ok,@{var${var2["index2"]}}[index], true
+list variable with one index after space,@{var} [index], false
 dictionary variable with one index,&{var}[index], true
 dictionary variable with one index included in curly brackets,&{var["index"]}, true
 dictionary variable without index,&{var}, false
 dictionary variable with one index and variable inside variable and index done wrongly,&{var${var2}[index2]}[index], false
 dictionary variable with one index and variable inside variable and index done ok,&{var${var2["index2"]}}[index], true
+dictionary variable with one index after space,&{var} [index], false
 environment variable with one index,%{var}[index], false
 environment variable with one index included in curly brackets,%{var["index"]}, false
 environment variable without index,%{var}, false
 environment variable with one index and variable inside variable and index done wrongly,%{var${var2}[index2]}[index], false
 environment variable with one index and variable inside variable and index done ok,%{var${var2["index2"]}}[index], false
+environment variable with one index after space,%{var} [index], false

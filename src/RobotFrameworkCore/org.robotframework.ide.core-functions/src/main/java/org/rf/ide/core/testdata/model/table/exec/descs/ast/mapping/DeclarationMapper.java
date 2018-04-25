@@ -29,7 +29,6 @@ public class DeclarationMapper {
     public DeclarationMapper() {
         this.mapperFactory = new SimpleElementsMapper();
         this.fileMapped = "<NOT_SET>";
-
     }
 
     public MappingResult map(final FilePosition fp, final Container container, final String filename) {
@@ -112,14 +111,14 @@ public class DeclarationMapper {
                                 variableIdentifier.getEnd().getEnd()));
                     }
 
-                    if (seamsToBeCorrectRobotVariable(previousForContainer, mappingResult, variableDec)) {
+                    if (seemsToBeCorrectRobotVariable(previousForContainer, mappingResult, variableDec)) {
                         mappingResult.addCorrectVariable(variableDec);
                     } else {
                         convertIncorrectVariableBackToText(mappingResult, topContainer, variableDec);
                     }
                 } else {
                     final IndexDeclaration indexDec = (IndexDeclaration) lastComplex;
-                    if (subContainer.isOpenForModification()) {
+                    if (!seemsToBeCorrectRobotVariableIndex(mappedElements, indexDec)) {
                         convertIncorrectIndexElementBackToText(mappingResult, topContainer, indexDec);
                     }
                 }
@@ -250,7 +249,7 @@ public class DeclarationMapper {
         }
     }
 
-    private boolean seamsToBeCorrectRobotVariable(final FilePosition currentPosition, final MappingResult mappingResult,
+    private boolean seemsToBeCorrectRobotVariable(final FilePosition currentPosition, final MappingResult mappingResult,
             final VariableDeclaration variableDec) {
         boolean result = false;
         if (!variableDec.isEscaped()) {
@@ -279,6 +278,13 @@ public class DeclarationMapper {
         }
 
         return result;
+    }
+
+    private boolean seemsToBeCorrectRobotVariableIndex(List<IElementDeclaration> mappedElements,
+            IndexDeclaration indexDec) {
+        final int possibleIndexId = mappedElements.indexOf(indexDec);
+        return (possibleIndexId - 1 >= 0 && mappedElements.get(possibleIndexId - 1) instanceof VariableDeclaration)
+                || mappedElements.get(possibleIndexId).getLevelUpElement() instanceof VariableDeclaration;
     }
 
     private List<IElementDeclaration> getEscape(final List<IElementDeclaration> mappedElements) {
