@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4M2r0AB_EeWittqS49qH2Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 4:30 PM
+Save-Time: 4/25/18 2:51 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -25,9 +25,9 @@ get-window Preferences | get-tree | select "Robot Framework/Installed frameworks
 
 //Check Label
 get-window Preferences 
-    | get-label "Add or remove Robot frameworks environments (location of Python interpreter with Robot library installed, currently Python, Jython, IronPython, IronPython64, PyPy are supported). The selected environment will be used by project unless it is explicitly overridden in project configuration." 
+    | get-label "Add or remove Robot frameworks environments (location of Python interpreter with Robot library installed, currently Python, Python2, Python3, Jython, IronPython, IronPython64, PyPy are supported). The selected environment will be used by project unless it is explicitly overridden in project configuration." 
     | get-property caption 
-    | equals "Add or remove Robot frameworks environments (location of Python interpreter with Robot library installed, currently Python, Jython, IronPython, IronPython64, PyPy are supported). The selected environment will be used by project unless it is explicitly overridden in project configuration." 
+    | equals "Add or remove Robot frameworks environments (location of Python interpreter with Robot library installed, currently Python, Python2, Python3, Jython, IronPython, IronPython64, PyPy are supported). The selected environment will be used by project unless it is explicitly overridden in project configuration." 
     | verify-true
 
 
