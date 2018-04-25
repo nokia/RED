@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/24/18 6:00 PM
+Save-Time: 4/25/18 10:45 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -43,14 +43,15 @@ global [val html_test "%s<body.*>.*/org.robotframework.ide.eclipse.main.plugin/d
 			+ "</span><br/?></p><p>%s</p></body></html>" ]	   												  //$spec
 	   
 
-global [val html_test_file "%s<body.*><h3>.*org.robotframework.ide.eclipse.main.plugin/docs/file_robot.png\"> %s</h3>"   // $html_beginning $file_name
+global [val html_test_file "%s<body.*><h3>.*org.robotframework.ide.eclipse.main.plugin/docs/file_robot.png\"/?> %s</h3>"   // $html_beginning $file_name
 			+ "<p><b>Source: </b><span.*>"
-			+ "<a href=\"file:.*%s\">%s</a></span></?br></p>"        													//$path2    $path
+			+ "<a href=\"file:.*%s\">%s</a></span><br/?></p>"        													//$path2    $path
 			+ "<h2>Introduction</h2>"    
 			+ "<p>%s</p>"  																								// intro
 			+ "<h2 id=\"Shortcuts\">Shortcuts</h2><p>"   
 			+ "%s"        				  																				//shortcuts
-			+ "</p></body></html>"  ]	   												
+			+ "</p></body></html>"  
+			+ ".*"]	 
 
 			
 //------------------------------------------ scripts -------------------------------------------------	     
@@ -67,10 +68,9 @@ proc "check-error-in-information-window" [val text]{
 proc "create-shortcuts-list" [val sh_list] [val path]{
 	concat [$sh_list |each [val item ] 
 	{
-		format  "<a href=\"file:.*%s\?show_doc.*;keyword=%s\">%s</a> · " $path $item $item
-	}]  | str | invoke replaceAll "( · )$" "" 
+		format  "<a href=\"file:.*%s\?show_doc.*keyword=%s\">%s</a> (&middot;|·) " $path $item $item
+	}]  | str | invoke replaceAll "( \(&middot;\|·\) )$" "" 
 }
-
 
 //------------------------------------------ content assist --------------------------------------------
 proc "check-content-assist-documentation-for-variables" [val source "Built-in"]  [val value] {
