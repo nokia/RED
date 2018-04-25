@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _JVkfkEcAEei0qKwna87CYQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/24/18 11:13 AM
+Save-Time: 4/25/18 11:07 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -223,11 +223,13 @@ get-editor "test.robot" | get-text-viewer | set-text "*** Settings ***\n"
     + "tc\n"
     + "    Kw 1   00  11" 
 
-//check errors 
-wait-for-errors -amount 13 -times 5 -delay 1000
-get-view Problems | get-label "13 errors, 0 warnings, 0 others" | get-property caption 
-    | equals "13 errors, 0 warnings, 0 others" | verify-true
-        
+//exclude to have olny 2 errors
+get-view "Project Explorer" | get-tree | select "ManyModules/Script.robot" | select "ManyModules/Script.robot" 
+    | get-menu -path "Robot Framework/Exclude from validation" | click
+get-view Problems | get-label "2 errors, 0 warnings, 0 others" | get-property caption 
+    | equals "2 errors, 0 warnings, 0 others" | verify-true
+    
+      
 //run QF    
 with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 26
@@ -242,8 +244,8 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table
 //save red.xml    
 get-button "Save All (M1+M2+S)" | click
 
-wait-for-errors -amount 11   -times 4 -delay 1000
-get-view Problems | get-label "11 errors, 1 warning, 0 others" | get-property caption 
-    | equals "11 errors, 1 warning, 0 others" | verify-true
+wait-for-warnings -amount 1 -times 5 -delay 1000
+get-view Problems | get-label "0 errors, 1 warning, 0 others" | get-property caption 
+    | equals "0 errors, 1 warning, 0 others" | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
