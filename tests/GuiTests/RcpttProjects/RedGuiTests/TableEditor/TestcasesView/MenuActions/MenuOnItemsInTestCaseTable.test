@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aovVQG3GEeaFMpJxhF5ZTQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/27/18 11:25 AM
+Save-Time: 4/25/18 12:10 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -190,6 +190,7 @@ proc "check-menu-for-tc" [val is_move_enabled true]{
 	    get-property "getMenu().getItems().MenuItem[3].isEnabled()" | equals true | verify-true
 	    get-property "getMenu().getItems().MenuItem[3].getText()" | equals "Show in source\\9F4" | verify-true
 	    
+	    get-property "getMenu().getItems().MenuItem[4].isEnabled()" | equals true | verify-true
 	    get-property "getMenu().getItems().MenuItem[4].getText()" | equals "Show documentation" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[5].getStyle()" | equals "[SEPARATOR]" | verify-true
@@ -245,37 +246,43 @@ proc "check-menu-for-buton" {
 	get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu Paste 
 	
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-	    get-property "getMenu().getItemCount()" | equals 13 | verify-true
+	    get-property "getMenu().getItemCount()" | equals 15 | verify-true
 	    get-property "getMenu().getItems().MenuItem[0].isEnabled()" | equals true | verify-true
 	    get-property "getMenu().getItems().MenuItem[0].getText()" | equals "Add new test case\9M1+N"  | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[1].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[1].getAccelerator()" | equals 0 | verify-true
+	    get-property "getMenu().getItems().MenuItem[1].getText()" | equals "Add new line\\9M1+L" | verify-true
 	    
+
 	    get-property "getMenu().getItems().MenuItem[2].getStyle()" | equals "[SEPARATOR]" | verify-true
 	    
+	    get-property "getMenu().getItems().MenuItem[3].getText()" | equals "Show documentation" | verify-true
 	    get-property "getMenu().getItems().MenuItem[3].isEnabled()" | equals false | verify-true
-	    get-property "getMenu().getItems().MenuItem[3].getText()" | equals "Cut\\9M1+X" | verify-true
 	    
-	    get-property "getMenu().getItems().MenuItem[4].isEnabled()" | equals false | verify-true
-	    get-property "getMenu().getItems().MenuItem[4].getText()" | equals "Copy\\9M1+C" | verify-true
+	    get-property "getMenu().getItems().MenuItem[4].getStyle()" | equals "[SEPARATOR]" | verify-true
+	    
 	    
 	    get-property "getMenu().getItems().MenuItem[5].isEnabled()" | equals false | verify-true
-	    get-property "getMenu().getItems().MenuItem[5].getText()" | equals "Paste\\9M1+V" | verify-true
+	    get-property "getMenu().getItems().MenuItem[5].getText()" | equals "Cut\\9M1+X" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[6].isEnabled()" | equals false | verify-true
-	    get-property "getMenu().getItems().MenuItem[6].getMenu()" | equals null | verify-true
-	    get-property "getMenu().getItems().MenuItem[6].getText()" | equals "Delete\\9Delete" | verify-true
+	    get-property "getMenu().getItems().MenuItem[6].getText()" | equals "Copy\\9M1+C" | verify-true
 	    
-	    get-property "getMenu().getItems().MenuItem[7].getStyle()" | equals "[SEPARATOR]" | verify-true
+	    get-property "getMenu().getItems().MenuItem[7].isEnabled()" | equals false | verify-true
+	    get-property "getMenu().getItems().MenuItem[7].getText()" | equals "Paste\\9M1+V" | verify-true
 	    
-	    get-property "getMenu().getItems().MenuItem[8].getText()" | equals "Table" | verify-true
+	    get-property "getMenu().getItems().MenuItem[8].isEnabled()" | equals false | verify-true
+	    get-property "getMenu().getItems().MenuItem[8].getText()" | equals "Delete\\9Delete" | verify-true
 	    
-	    get-property "getMenu().getItems().MenuItem[9].getText()" | equals "Row" | verify-true
+	    get-property "getMenu().getItems().MenuItem[9].getStyle()" | equals "[SEPARATOR]" | verify-true
 	    
-	     get-property "getMenu().getItems().MenuItem[10].getStyle()" | equals "[SEPARATOR]"  | verify-true
-	     get-property "getMenu().getItems().MenuItem[11].getText()" | equals "Toggle Comment\9M1+/" | verify-true
-	     get-property "getMenu().getItems().MenuItem[12].getText()" | equals "References" | verify-true
+	    get-property "getMenu().getItems().MenuItem[10].getText()" | equals "Table" | verify-true
+	    
+	    get-property "getMenu().getItems().MenuItem[11].getText()" | equals "Row" | verify-true
+	    
+	     get-property "getMenu().getItems().MenuItem[12].getStyle()" | equals "[SEPARATOR]"  | verify-true
+	     get-property "getMenu().getItems().MenuItem[13].getText()" | equals "Toggle Comment\9M1+/" | verify-true
+	     get-property "getMenu().getItems().MenuItem[14].getText()" | equals "References" | verify-true
 	    
 	}  
 	
@@ -338,12 +345,12 @@ check-submenus
 //chec menu on "..."
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
 check-menu-for-buton
-check-submenus -row_enabled false -is_move_enabled false -start_index 8 -cell_operation false
+check-submenus -row_enabled false -is_move_enabled false -start_index 10 -cell_operation false
 
 
 //chec menu on "...add "
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 3
 check-menu-for-buton
-check-submenus -row_enabled false -is_move_enabled false -start_index 8 -cell_operation false
+check-submenus -row_enabled false -is_move_enabled false -start_index 10 -cell_operation false
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
