@@ -196,16 +196,20 @@ public class Documentations {
         final IViewPart docViewPart = page.findView(DocumentationView.ID);
         if (docViewPart == null) {
             try {
-                return ((DocumentationViewWrapper) page.showView(DocumentationView.ID)).getComponent();
+                final DocumentationView view = ((DocumentationViewWrapper) page.showView(DocumentationView.ID)).getComponent();
+                view.enableSync();
+                return view;
             } catch (final PartInitException e) {
                 RedPlugin.logError("Unable to show Documentation View.", e);
                 return null;
             }
         } else {
+            final DocumentationView view = ((DocumentationViewWrapper) docViewPart).getComponent();
             if (activate) {
                 page.bringToTop(docViewPart);
+                view.enableSync();
             }
-            return ((DocumentationViewWrapper) docViewPart).getComponent();
+            return view;
         }
     }
 }
