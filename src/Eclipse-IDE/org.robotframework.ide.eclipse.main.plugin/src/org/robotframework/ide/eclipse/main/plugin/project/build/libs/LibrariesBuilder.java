@@ -70,7 +70,7 @@ public class LibrariesBuilder {
             return htmlTargetFile;
         } else {
             throw new IllegalStateException("Unable to generate HTML documentation file. The file '"
-                    + resourceFile.getFullPath().toOSString() + "' is not a resource file");
+                    + resourceFile.getFullPath().toString() + "' is not a resource file");
         }
     }
 

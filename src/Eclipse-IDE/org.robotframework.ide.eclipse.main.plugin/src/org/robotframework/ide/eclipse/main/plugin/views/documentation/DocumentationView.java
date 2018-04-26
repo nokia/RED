@@ -115,6 +115,11 @@ public class DocumentationView implements DocumentationDisplayer {
         }
     }
 
+    void enableSync() {
+        linkSelectionAction.setChecked(true);
+        linkSelectionAction.run();
+    }
+
     void markSynced() {
         linkSelectionAction.switchToSynced();
     }
@@ -353,8 +358,14 @@ public class DocumentationView implements DocumentationDisplayer {
             if (currentInput != null) {
                 final DocumentationViewInput input = currentInput;
                 final Job docJob = Job.create("Opening attached documentation", monitor -> {
-                    final IFile htmlDoc = input.generateHtmlLibdoc();
-                    new ExternalBrowserUri(htmlDoc.getLocationURI(), browserSupport).open();
+                    try {
+                        final IFile htmlDoc = input.generateHtmlLibdoc();
+                        new ExternalBrowserUri(htmlDoc.getLocationURI(), browserSupport).open();
+                    } catch (final Exception e) {
+                        final IStatus status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                                e.getMessage(), null);
+                        StatusManager.getManager().handle(status, StatusManager.SHOW);
+                    }
                     return Status.OK_STATUS;
                 });
                 docJob.schedule();
