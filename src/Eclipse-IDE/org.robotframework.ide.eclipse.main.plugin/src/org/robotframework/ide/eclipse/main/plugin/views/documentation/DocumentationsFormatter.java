@@ -36,7 +36,7 @@ public class DocumentationsFormatter {
     }
 
     public static String create(final Supplier<String> bodySupplier) {
-        return "<html>" + writeHead() + "<body>" + bodySupplier.get() + "</body></html>";
+        return "<!DOCTYPE html>\n<html>" + writeHead() + "<body>" + bodySupplier.get() + "</body></html>";
     }
 
     public String format(final Documentation documentation) {
