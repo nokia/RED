@@ -143,10 +143,9 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 recursiveInVirtualenv, excludedPaths, additionalPaths);
     }
 
-    void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> collection) {
-        final Collection<URI> importersPaths = collection.stream()
-                .map(suite -> suite.getFile().getLocation().toFile().toURI())
-                .collect(toList());
+    void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> suites) {
+        final Collection<URI> importersPaths = suites.stream().map(suite -> suite.getFile().getLocationURI()).collect(
+                toList());
         libraryImport.setImportersPaths(importersPaths);
     }
 
