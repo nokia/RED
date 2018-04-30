@@ -248,7 +248,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void markerIsReported_whenRemoteLibraryWithNamedUriWithouProtocolInConfigWithoutLibSpec() {
+    public void markerIsReported_whenRemoteLibraryWithNamedUriWithoutProtocolInConfigWithoutLibSpec() {
         addRemoteUriToConfig("http://127.0.0.1:9000");
 
         validateLibraryImport("Remote  uri=127.0.0.1:9000/");
@@ -668,6 +668,27 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
+    public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByName_3() throws Exception {
+        final String libPath = projectProvider.getProject().getName() + "/directory";
+        final String libName = "lib";
+
+        final IFolder dir1 = projectProvider.createDir("directory");
+        final IFolder dir2 = projectProvider.createDir("directory/lib");
+        projectProvider.createFile("directory/lib/__init__.py");
+
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
+
+        validateLibraryImport(libName, new HashMap<>(), refLibs);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+
+        dir1.delete(true, null);
+        dir2.delete(true, null);
+    }
+
+    @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_2() throws Exception {
         final String libPath = projectProvider.getProject().getName() + "/directory";
         final String libName = "lib";
@@ -684,6 +705,27 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
 
         dir.delete(true, null);
+    }
+
+    @Test
+    public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_3() throws Exception {
+        final String libPath = projectProvider.getProject().getName() + "/directory";
+        final String libName = "lib";
+
+        final IFolder dir1 = projectProvider.createDir("directory");
+        final IFolder dir2 = projectProvider.createDir("directory/lib");
+        projectProvider.createFile("directory/lib/__init__.py");
+
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
+
+        validateLibraryImport("directory/lib", new HashMap<>(), refLibs);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+
+        dir1.delete(true, null);
+        dir2.delete(true, null);
     }
 
     @Test
