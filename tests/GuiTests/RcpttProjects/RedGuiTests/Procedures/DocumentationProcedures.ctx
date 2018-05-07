@@ -6,13 +6,13 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/27/18 11:19 AM
+Save-Time: 5/7/18 12:30 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
-global [val html_beginning "<html><head><meta charset=\"utf-8\"><style>body \{    color: rgb\(0,0,0\);    "
+global [val html_beginning "(<!DOCTYPE html>\\\\n)?<html><head><meta charset=\"utf-8\"><style>body \{    color: rgb\(0,0,0\);    "
 	+ "background-color: rgb\(255,255,2[25]5\);    font-size: small;    font-family: sans-serif;\}code "
 	+"\{    background-color: rgba\(220, 220, 220, 0.5\);    font-size: 1.1em;\}a, a:link, a:visited "
 	+"\{    color: #c30;\}a:hover, a:active \{    text-decoration: underline;    color: black;\}"
