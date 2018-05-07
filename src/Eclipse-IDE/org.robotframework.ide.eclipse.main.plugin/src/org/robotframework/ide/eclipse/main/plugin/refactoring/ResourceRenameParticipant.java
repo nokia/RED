@@ -39,7 +39,7 @@ public class ResourceRenameParticipant extends RenameParticipant {
             throws OperationCanceledException {
         return new RefactoringStatus();
     }
-    
+
     @Override
     public Change createPreChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
         if (!getArguments().getUpdateReferences()) {
@@ -54,6 +54,10 @@ public class ResourceRenameParticipant extends RenameParticipant {
 
     @Override
     public Change createChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
-        return null;
+        // This workaround solves problem with resource location cache
+        // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=534090
+        return renamedResource.isLinked()
+                ? new LinkedResourceLocationChange(renamedResource.getProject().getWorkspace())
+                : null;
     }
 }
