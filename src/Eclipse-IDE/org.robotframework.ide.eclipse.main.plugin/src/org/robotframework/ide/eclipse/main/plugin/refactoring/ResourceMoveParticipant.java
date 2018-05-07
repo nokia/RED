@@ -55,6 +55,9 @@ public class ResourceMoveParticipant extends MoveParticipant {
 
     @Override
     public Change createChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
-        return null;
+        // This workaround solves problem with resource location cache
+        // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=534090
+        return movedResource.isLinked() ? new LinkedResourceLocationChange(movedResource.getProject().getWorkspace())
+                : null;
     }
 }
