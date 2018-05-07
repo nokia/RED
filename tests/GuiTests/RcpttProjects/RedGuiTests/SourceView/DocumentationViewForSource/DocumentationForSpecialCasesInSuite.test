@@ -1,0 +1,106 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _WfFsgDJlEeielvsQm9uGYQ,_hb89IDvxEeiDC73Fvf4wHA
+Element-Name: DocumentationForSpecialCasesInSuite
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _ieJP8EiUEeiflbLxGZX6fg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 5/7/18 10:36 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "project_b/doc_sections.robot" | double-click
+with [get-editor "doc_sections.robot" | get-text-viewer] {
+    set-caret-pos 4 17
+    hover-text 4 19
+}
+
+get-editor "doc_sections.robot" | get-editbox | get-menu -path "Show documentation" | click
+
+get-view "Documentation View" | get-control Browser | get-property text 
+check-documentation-view-for-file -file_name "doc_sections.robot"  -project_name "project_b"  -path "/project_b/doc_sections.robot" 
+	-intro "Line 1 next line <b>My</b> '<i>pink</i>' <i><b>bold italic</b></i> <code>code</code>"
+	-shortcuts [list  "all in continuation" "mulitline" "special characters!" "section" "table" "list" "block" "ruler" "linki" "komentarze po srodku" "Italia sloneczna italia" ]
+
+get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 12 13
+check-documentation-view-for-user-kw -kw_name "all in continuation" -path "/project_b/doc_sections.robot" -arguments "\[\]"-spec "kkk lll mmm"
+
+get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 21 29
+check-documentation-view-for-user-kw -kw_name "special characters!" -path "/project_b/doc_sections.robot" -arguments "\[\]"-spec "abc def or tab\?"
+
+get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 25 9
+check-documentation-view-for-user-kw -kw_name "section" -path "/project_b/doc_sections.robot" -arguments "\[\]"-spec "<h2 id=\"First section\">First section</h2>\\\\n"
+    + "<h3 id=\"Subsection\">Subsection</h3>\\\\n"
+    + "<p>Some text.</p>\\\\n"
+    + "<h3 id=\"Second subsection\">Second subsection</h3>\\\\n"
+    + "<p>More text żółw."
+    
+get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 31 2
+check-documentation-view-for-user-kw -kw_name "table" -path "/project_b/doc_sections.robot" -arguments "\[\]" -spec "<table border=\"1\">\\\\n"
+    + "<tbody><tr>\\\\n"
+    + "<th>A</th>\\\\n"
+    + "<th>B</th>\\\\n"
+    + "<th>C</th>\\\\n"
+    + "</tr>\\\\n"
+    + "<tr>\\\\n"
+    + "<td><i>1</i></td>\\\\n"
+    + "<td>Hello</td>\\\\n"
+    + "<td>world!</td>\\\\n"
+    + "</tr>\\\\n"
+    + "<tr>\\\\n"
+    + "<td><i>2</i></td>\\\\n"
+    + "<td>Hi</td>\\\\n"
+    + "<td></td>\\\\n"
+    + "</tr>\\\\n"
+    + "</tbody></table>"
+ 
+get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 40 24
+check-documentation-view-for-user-kw -kw_name "list" -path "/project_b/doc_sections.robot" -arguments "\[\]" -spec "Example:</p>\\\\n"
+    + "<ul>\\\\n"
+    + "<li>a list item</li>\\\\n"
+    + "<li>second list item is</li>\\\\n"
+    + "</ul>\\\\n"
+    + "<p>continued after list"
+      
+      
+get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 45 15
+check-documentation-view-for-user-kw -kw_name "block" -path "/project_b/doc_sections.robot" -arguments "\[\]" -spec "Doc before block:</p>\\\\n"
+    + "<pre>inside block\\\\n"
+    + "some additional whitespace\\\\n"
+    + "</pre>\\\\n"
+    + "<p>After block."
+    
+get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 68 6
+check-documentation-view-for-user-kw -kw_name "Italia sloneczna italia" -path "/project_b/doc_sections.robot" -arguments "\[\]" -spec "<p><i>italia sloneczna italia</i></p>\\\\n"
+    + "<p><i>to_dziala</i>"
+
+//------------------------------------------------------------- suite ----------------------------------------------------     
+get-view "Project Explorer" | get-tree | select "project_b/test_with_libs.robot" | double-click      
+
+//lib with args
+get-editor "test_with_libs.robot" | get-text-viewer | set-caret-pos 21 12  
+check-documentation-view-for-user-kw -kw_name "kw with args" -path "/project_b/test_with_libs.robot" -arguments "\[b, \*\*a\]" -spec "This is <b>bold on multiple lines</b>."
+
+//lib form python file
+get-editor "test_with_libs.robot" | get-text-viewer | set-caret-pos 27 12 
+check-documentation-view  -kw_name "Simple Lib" -project_name "project_b" -library "simple_lib" -arguments "\[a, y, \*\*abc\]" -spec  "<i>here is italic</i> <b>and bold one</b>"
+
+
+//---------------------------------------------------------------- doc on imports -----------------------------
+//doc for simple lib in python
+get-editor "test_with_libs.robot" | get-text-viewer | set-caret-pos 2 15
+check-documentation-view-for-library -file_name "simple_lib" -project_name "project_b" -source "simple_lib" -args "\[\]"
+	 -intro "Documentation for test library <code>simple_lib</code>." -shortcuts  [list "Simple Lib"]
+
+//doc for imported resource
+get-editor "test_with_libs.robot" | get-text-viewer | set-caret-pos 7 4
+check-documentation-view-for-file -file_name "doc_sections.robot"  -project_name "project_b"  -path "/project_b/doc_sections.robot" 
+	-intro "Line 1 next line <b>My</b> '<i>pink</i>' <i><b>bold italic</b></i> <code>code</code>"
+	-shortcuts [list  "all in continuation" "mulitline" "special characters!" "section" "table" "list" "block" "ruler" "linki" "komentarze po srodku" "Italia sloneczna italia" ]
+	 
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

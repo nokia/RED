@@ -6,8 +6,8 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OaCcMFocEea7jMRO_K8Wdw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/17/17 4:40 PM
-Tags: Unstable
+Save-Time: 4/25/18 3:28 PM
+Tags: notTestable
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -86,6 +86,8 @@ get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 1 7
 
 //open doc view form Window
 get-menu "Window/Show View/Documentation View" | click
+get-view "Documentation View" | get-button "Link with Selection" | click
+
 
 with [get-tab-folder -index 5] {
     get-property "pages[0]" | equals "Message Log" | verify-true

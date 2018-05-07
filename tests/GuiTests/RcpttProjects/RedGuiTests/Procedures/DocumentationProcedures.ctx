@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/25/18 10:45 AM
+Save-Time: 4/27/18 11:19 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -34,7 +34,8 @@ global [val html_user_kw "%s<body.*>.*org.robotframework.ide.eclipse.main.plugin
 		+ "<p><b>Source: </b><span style=.*><a href=\"file:/.*%s\?show_source=true.*keyword=%s\">%s</a> "   //$path  $path   $kw_name2
 		+"\[<a href=\"file:.*%s\?show_doc=true.*suite=\">Documentation</a>\]"									//path
 		+ "</span><br/?><b>Arguments: </b><span style=.*>%s" 													//$args
-		+ "</span><br/?></p><p>%s</p></body></html>"	] 		   													// $spec
+		+ "</span><br/?></p>(<p>)?%s(</p>)?</body></html>"]
+			   													// $spec
 		
 global [val html_test "%s<body.*>.*/org.robotframework.ide.eclipse.main.plugin/docs/case.png\"/?> %s</h3>"   // $html_beginning $tc_name
 			+ "<p><b>Source: </b><span.*>"
@@ -53,7 +54,17 @@ global [val html_test_file "%s<body.*><h3>.*org.robotframework.ide.eclipse.main.
 			+ "</p></body></html>"  
 			+ ".*"]	 
 
-			
+global [val html_library "%s<body.*><h3>.*org.robotframework.ide.eclipse.main.plugin/docs/book.png\"/?> %s</h3>"   // $html_beginning $file_name
+			+ "<p><b>Source: </b><span.*>"
+			+ "<a href=\"library:/%s/%s\?show_source=true\">%s</a></span><br/?>"			//$project_name  source2 spource
+			+ "<b>Version: </b><span.*\">%s</span><br/?>"
+			+ "<b>Scope: </b><span.*\">%s</span><br/?>"
+			+ "<b>Arguments: </b><span.*\">%s</span><br/?></p>"
+			+ "<h2>Introduction</h2>"    
+			+ "<p>%s</p>"  																								// intro
+			+ "<h2 id=\"Shortcuts\">Shortcuts</h2><p>"   
+			+ "%s"        				  																				//shortcuts
+			+ "</p></body></html>"  ]	 			
 //------------------------------------------ scripts -------------------------------------------------	     
 proc "check-information-window" [val inner_html]{
 	get-window -from "Information Window" | get-control Browser | get-property text 
@@ -68,9 +79,17 @@ proc "check-error-in-information-window" [val text]{
 proc "create-shortcuts-list" [val sh_list] [val path]{
 	concat [$sh_list |each [val item ] 
 	{
-		format  "<a href=\"file:.*%s\?show_doc.*keyword=%s\">%s</a> (&middot;|·) " $path $item $item
+		format  "<a href=\"file:.*%s\?show_doc.*keyword=%s\">%s</a> (&middot;|·) " $path [replace -input $item -old " " -new "\%20"] $item
 	}]  | str | invoke replaceAll "( \(&middot;\|·\) )$" "" 
 }
+
+proc "create-shortcuts-list-for-library" [val sh_list] [val path]{
+	concat [$sh_list |each [val item ] 
+	{
+		format  "<a href=\"library:.*%s/%s\?show_doc=true\">%s</a> (&middot;|·) " $path [replace -input $item -old " " -new "\%20"] $item
+	}]  | str | invoke replaceAll "( \(&middot;\|·\) )$" "" 
+}
+
 
 //------------------------------------------ content assist --------------------------------------------
 proc "check-content-assist-documentation-for-variables" [val source "Built-in"]  [val value] {
@@ -88,7 +107,7 @@ proc "check-content-assist-documentation-for-variables" [val source "Built-in"] 
 //----------------------------------------doc view ----------------------------
 //all arguments must be escaped for regex!
 proc "check-documentation-view" [val kw_name] [val project_name "RobotProject"] [val library] [val arguments] [val spec]{
-	let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"] ]{
+	let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"]]{
 		get-view "Documentation View" | get-control Browser | get-property text 
 			| equals [format $html_standard_kw  $html_beginning $kw_name $project_name $library $kw_name2 $library $project_name $library  $arguments $spec] | verify-true
 	}
@@ -119,6 +138,14 @@ proc "check-documentation-view-for-file" [val file_name] [val project_name][val 
 	}
 }	
 
+proc "check-documentation-view-for-library" [val file_name] [val project_name][val source] [val version ""][val scope "global"] [val args] [val intro] [val shortcuts]{
+	create-shortcuts-list-for-library -sh_list $shortcuts -path $source | log
+	let [val source2 [replace -input $source -old " " -new "\%20"] ]{
+		get-view "Documentation View" | get-control Browser | get-property text 
+			| equals [format $html_library  $html_beginning $file_name $project_name $source2 $source $version $scope $args $intro [create-shortcuts-list-for-library -sh_list $shortcuts -path $source]] | verify-true
+	}
+}
+
 //--------------------------------------  information view -----------------------------------------------
 
 proc "check-information-view-doc-for-kw" [val kw_name] [val project_name "RobotProject"] [val library] [val arguments] [val spec]{
@@ -140,5 +167,12 @@ proc "check-information-view-doc-for-user-kw" [val kw_name] [val path ""][val ar
 }
 
 
+proc "check-information-view-for-file" [val file_name] [val project_name][val path] [val intro] [val shortcuts]{
+	create-shortcuts-list -sh_list $shortcuts -path $path | log
+	let [val path2 [replace -input $path -old " " -new "\%20"] ]{
+		get-window -from "Information Window" | get-control Browser | get-property text
+			| equals [format $html_test_file  $html_beginning $file_name $path2 $path $intro [create-shortcuts-list -sh_list $shortcuts -path $path2]] | verify-true
+	}
+}	
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
