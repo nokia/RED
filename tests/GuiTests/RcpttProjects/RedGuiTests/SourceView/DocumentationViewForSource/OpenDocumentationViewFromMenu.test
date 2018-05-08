@@ -1,193 +1,169 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _zKaAYG-LEeas5uogJbgGYA
+Contexts: _zKaAYG-LEeas5uogJbgGYA,_hb89IDvxEeiDC73Fvf4wHA
 Element-Name: OpenDocumentationViewFromMenu
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _cKvDgIbgEeaPRdjThepTww
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/16/18 3:53 PM
-Tags: notTestable
+Save-Time: 5/8/18 6:34 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-// ================================ check Show in Doc view ======================================
-
-// check test1 libdoc Show in Doc while Doc window is closed
-
-//set carte on test name
-get-view "Project Explorer" | get-tree | select "RobotProject/checking_doc.robot" | double-click
-with [get-editor "checking_doc.robot" | get-text-viewer] {
-    set-caret-pos 5 3
-    get-menu "Show documentation" | click
-}
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "checking_doc.robot\n\n"
-    + "Doc for TC: test 1" | verify-true
+//opem documentation for build in KW
+get-view "Project Explorer" | get-tree 
+    | select "RobotProject/Robot Standard libraries \\[.*\\]/BuiltIn \\(103\\)/Comment" 
+    | double-click
     
-//set cursor on kw in test
-with [get-editor "checking_doc.robot" | get-text-viewer] {
-    set-caret-pos 7 12
-    hover-text 7 15
-}
-get-view "Documentation View" | close
-
-
-// check kw with empty doc 
-get-editor "checking_doc.robot" | get-text-viewer | get-menu "Show in Doc View" | click
-
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw1_with_imported_kw\n"
-    + "Source: User defined (/RobotProject/checking_doc.robot)\n"
-    + "Arguments: []\n\n"
-    + "<not documented>" | verify-true
-
-// set caret on Log kw    
-with [get-editor "checking_doc.robot" | get-text-viewer] {
-    set-caret-pos 16 6
-    hover-text 16 6
-}
-
-get-view "Documentation View" | close
-
-
-// check Show in Doc for bultin kw
-get-editor "checking_doc.robot" | get-text-viewer | get-menu "Show in Doc View" | click
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: Log\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [message, level=INFO, html=False, console=False, repr=False]\n\n"
-    + "Logs the given message with the given level.\n\n"
-    + "Valid levels are TRACE, DEBUG, INFO (default), HTML, WARN, and ERROR.\n"
-    + "Messages below the current active log level are ignored. See\n"
-    + "`Set Log Level` keyword and ``--loglevel`` command line option\n"
-    + "for more details about setting the level.\n\n"
-    + "Messages logged with the WARN or ERROR levels will be automatically\n"
-    + "visible also in the console and in the Test Execution Errors section\n"
-    + "in the log file.\n\n"
-    + "Logging can be configured using optional ``html``, ``console`` and\n"
-    + "``repr`` arguments. They are off by default, but can be enabled\n"
-    + "by giving them a true value. See `Boolean arguments` section for more\n"
-    + "information about true and false values.\n\n"
-    + "If the ``html`` argument is given a true value, the message will be\n"
-    + "considered HTML and special characters such as ``<`` in it are not\n"
-    + "escaped. For example, logging ``<img src=\"image.png\">`` creates an\n"
-    + "image when ``html`` is true, but otherwise the message is that exact\n"
-    + "string. An alternative to using the ``html`` argument is using the HTML\n"
-    + "pseudo log level. It logs the message as HTML using the INFO level.\n\n"
-    + "If the ``console`` argument is true, the message will be written to\n"
-    + "the console where test execution was started from in addition to\n"
-    + "the log file. This keyword always uses the standard output stream\n"
-    + "and adds a newline after the written message. Use `Log To Console`\n"
-    + "instead if either of these is undesirable,\n\n"
-    + "If the ``repr`` argument is true, the given item will be passed through\n"
-    + "a custom version of Python's ``pprint.pformat()`` function before\n"
-    + "logging it. This is useful, for example, when working with strings or\n"
-    + "bytes containing invisible characters, or when working with nested data\n"
-    + "structures. The custom version differs from the standard one so that it\n"
-    + "omits the ``u`` prefix from Unicode strings and adds ``b`` prefix to\n"
-    + "byte strings.\n\n"
-    + "Examples:\n"
-    + "| Log | Hello, world!        |          |   | # Normal INFO message.   |\n"
-    + "| Log | Warning, world!      | WARN     |   | # Warning.               |\n"
-    + "| Log | <b>Hello</b>, world! | html=yes |   | # INFO message as HTML.  |\n"
-    + "| Log | <b>Hello</b>, world! | HTML     |   | # Same as above.         |\n"
-    + "| Log | <b>Hello</b>, world! | DEBUG    | html=true | # DEBUG as HTML. |\n"
-    + "| Log | Hello, console!   | console=yes | | # Log also to the console. |\n"
-    + "| Log | Hyvä \\x00     | repr=yes    | | # Log ``'Hyv\\xe4 \\x00'``. |\n\n"
-    + "See `Log Many` if you want to log multiple messages in one go, and\n"
-    + "`Log To Console` if you only want to write to the console.\n\n"
-    + "Arguments ``html``, ``console``, and ``repr`` are new in Robot Framework\n"
-    + "2.8.2.\n\n"
-    + "Pprint support when ``repr`` is used is new in Robot Framework 2.8.6,\n"
-    + "and it was changed to drop the ``u`` prefix and add the ``b`` prefix\n"
-    + "in Robot Framework 2.9." | verify-true
-
-get-view "Documentation View" | close
-    
-//open res file    
-get-view "Project Explorer" | get-tree | select "RobotProject/res.robot" | double-click
-
-//set caret on Get Time - kw not in first cell
-with [get-editor "res.robot" | get-text-viewer] {
-    hover-text 9 18
-    set-caret-pos 9 18
-    get-menu -path "Show in Doc View" | click
-}
-get-view "Documentation View" | get-editbox | get-property text | contains "Name: Get Time\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [format=timestamp, time_=NOW]\n\n"
-    + "Returns the given time in the requested format.\n\n"  | verify-true
-   
-//set caret on  Catenate which is arg
-get-view "Documentation View" | close
-    
-with [get-editor "res.robot" | get-text-viewer] {
-    hover-text 10 28
-    set-caret-pos 10 26
-}
-
-get-editor "res.robot" | get-text-viewer | get-menu -path "Show in Doc View" | click
-get-view "Documentation View" | get-editbox | get-property text | contains "Name: Catenate\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [*items]\n\n"
-    + "Catenates the given items together and returns the resulted string.\n\n"
-    + "By default, items are catenated with spaces, but if the first item\n"
-    + "contains the string ``SEPARATOR=<sep>``, the separator ``<sep>`` is\n"
-    + "used instead. Items are converted into strings when necessary.\n\n" | verify-true
-   
-
-//=========================================================================================================    
-//go to table view
+check-documentation-view -kw_name Comment -project_name "RobotProject"  -library BuiltIn  -arguments "\[\*messages\]" 
+	-spec "Displays the given messages in the log file as keyword arguments.*"
 get-view "Documentation View" | close    
 
-//go to kw Log which is in second cell
-get-editor "res.robot" | get-tab-folder | get-tab-item Keywords | click
-get-view Outline | get-tree | select "res.robot/Keywords/kw_from_res_with_no_doc/Log Many" | click
-
-//open view
-with [get-editor "res.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-    key-type Right
-    get-menu -path "Show in Doc View" | click
-}
-get-view "Documentation View" | get-editbox | get-property text | contains "Name: Log\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [message, level=INFO, html=False, console=False, repr=False]\n\n" | verify-true
+//open doc by menu
+get-view "Project Explorer" | get-tree 
+    | select "RobotProject/Robot Standard libraries \\[.*\\]/BuiltIn \\(103\\)/No Operation" 
+    | get-menu -path "Show keyword documentation" | click
     
+check-documentation-view -kw_name "No Operation" -project_name "RobotProject"  -library BuiltIn  -arguments "\[\]" 
+	-spec "Does absolutely nothing."
+get-view "Documentation View" | close  
 
-//clsoe view
+
+//change focus to execution view
+get-view "Execution View" | click
+get-view "Project Explorer" | get-tree 
+    | select "RobotProject/Robot Standard libraries \\[.*\\]/BuiltIn \\(103\\)/Get Time" 
+    | get-menu -path "Show keyword documentation" | click
+    
+check-documentation-view -kw_name "Get Time" -project_name "RobotProject"  -library BuiltIn  -arguments "\[format=timestamp, time_=NOW\]"  
+	-spec "Returns the given time in the requested format.*"
+get-view "Documentation View" | close  
+
+//collapse all and open suite
+with [get-view "Project Explorer"] {
+    get-button "Collapse All  (M1+M2+Numpad_Divide)" | click
+    get-tree | select "RobotProject/checking_doc.robot" | double-click
+}
+
+//---------------------------------------------------------------------------------------
+//open doc from menu
+get-editor "checking_doc.robot" | get-text-viewer | set-caret-pos 7 17
+get-editor "checking_doc.robot" | get-text-viewer | get-menu -path "Show documentation" | click
+
+check-documentation-view-for-user-kw -kw_name "kw1_with_imported_kw" -path "/RobotProject/checking_doc.robot"  -arguments "\[\]" -spec "&lt;not documented&gt;"
+
+
+//close view and open from Window/
+get-view "Documentation View" | close
+get-menu -path "Window/Show View/Documentation View" | click
+with [get-view "Documentation View"] {
+    get-button "Link with Selection" | get-property enablement | equals true | verify-true
+    get-button Back | get-property enablement | equals false | verify-true
+    get-button Forward | get-property enablement | equals false | verify-true
+    get-button "Open Input" | get-property enablement | equals false | verify-true
+    get-button "Open attached documentation in a Browser" | get-property enablement | equals false | verify-true
+}
+
+check-documentation-view   -is_empty true
+
+//close view and click on kw to check if view is not open
 get-view "Documentation View" | close
 
-//go to Get time
-with [get-editor "res.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-    key-type Up
-    get-menu -path "Show in Doc View" | click
+//set carte and open view
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 17 15
+    get-menu -path "Show documentation" | click
 }
-get-view "Documentation View" | get-editbox | get-property text | contains "Name: Get Time\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [format=timestamp, time_=NOW]\n\n"
-    + "Returns the given time in the requested format.\n\n"
-    + "*NOTE:* DateTime library added in Robot Framework 2.8.5 contains\n"
-    + "much more flexible keywords for getting the current date and time\n"
-    + "and for date and time handling in general.\n\n"
-    + "How time is returned is determined based on the given ``format``\n"
-    + "string as follows. Note that all checks are case-insensitive.\n\n" | verify-true
-    
-    
-// go to catenate    
-with [get-editor "res.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-    key-type Right
-    key-type Down
-}
-get-view "Documentation View" | get-editbox | get-property text | contains "Name: Catenate\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [*items]\n\n"
-    + "Catenates the given items together and returns the resulted string.\n\n"
-    + "By default, items are catenated with spaces, but if the first item\n"
-    + "contains the string ``SEPARATOR=<sep>``, the separator ``<sep>`` is\n"
-    + "used instead. Items are converted into strings when necessary.\n\n" | verify-true  
-  
 
+//unselct linking
+get-view "Documentation View" | get-button "Link with Selection" | click
+
+//set caret and check if doc is the same
+get-editor "checking_doc.robot" | get-text-viewer | set-caret-pos 13 10
+check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/checking_doc.robot"  -spec "I have only doc, no args"
+
+get-editor "checking_doc.robot" | get-text-viewer | set-caret-pos 2  17
+check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/checking_doc.robot"  -spec "I have only doc, no args"
+get-view "Documentation View" | close
+
+
+
+
+//---------------------bugs ----------------------------------
+
+//open doc from caret postion
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 13 11
+    get-menu -path "Show documentation" | click
+    //change caret position
+    set-caret-pos 7 12
+}
+//kw from line 13 is shown
+check-documentation-view-for-user-kw -kw_name "kw1_with_imported_kw" -path "/RobotProject/checking_doc.robot"  -arguments "\[\]" -spec "&lt;not documented&gt;"
+
+//set cart on new postion and open menu - menu does nothoin, caret open doc view
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 22 9
+    get-menu -path "Show documentation" | click
+}
+check-documentation-view-for-user-kw -kw_name "kw_with_doc_and_arg" -path "/RobotProject/checking_doc.robot"  -arguments "\[\*dict_1, \*\*list_2\]" 
+	-spec "Second main kw"
+
+//set carte on new place - doc is changed - ok
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 17 8
+
+}
+check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/checking_doc.robot"  
+	-spec "I have only doc, no args"
+	
+//remove linking - doc should not be changed
+get-view "Documentation View" | get-button "Link with Selection" | click
+get-editor "checking_doc.robot" | get-text-viewer | set-caret-pos 7 17
+
+check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/checking_doc.robot"  
+	-spec "I have only doc, no args"
+
+//---------------------------------bug 2 --------------------------------
+//close doc view
+get-view "Documentation View" | close
+
+get-editor "checking_doc.robot" | get-text-viewer | set-caret-pos 13 20
+
+//check if now doc view is not shown - bug 3
+with [get-tab-folder -index 4] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property activePage | equals "Message Log" | verify-true
+    get-property tabCount | equals 2 | verify-true
+} 
+
+//open doc
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 13 20
+    get-menu -path "Show documentation" | click
+    // change caret position
+    set-caret-pos 22 10
+}
+check-documentation-view-for-user-kw -kw_name "kw_with_doc_and_arg" -path "/RobotProject/checking_doc.robot"  -arguments "\[\*dict_1, \*\*list_2\]" 
+	-spec "Second main kw"
+	
+//turn of linking	
+get-view "Documentation View" | get-button "Link with Selection" | click
+
+//set carte in new place and open doc
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 13 16
+    get-menu -path "Show documentation" | click
+    set-caret-pos 35 8
+}
+
+check-documentation-view -kw_name "Log"  -arguments "\[message, level=INFO, html=False, console=False, repr=False\]" -library "BuiltIn" 
+	-spec "Logs the given message with the given level.*"
+	
+	
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

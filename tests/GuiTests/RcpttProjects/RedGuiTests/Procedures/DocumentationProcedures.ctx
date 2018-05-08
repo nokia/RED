@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/7/18 5:59 PM
+Save-Time: 5/8/18 5:09 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -106,14 +106,18 @@ proc "check-content-assist-documentation-for-variables" [val source "Built-in"] 
 }
 //----------------------------------------doc view ----------------------------
 //all arguments must be escaped for regex!
-proc "check-documentation-view" [val kw_name] [val project_name "RobotProject"] [val library] [val arguments] [val spec]{
-	let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"]]{
-		get-view "Documentation View" | get-control Browser | get-property text 
-			| equals [format $html_standard_kw  $html_beginning $kw_name $project_name $library $kw_name2 $library $project_name $library  $arguments $spec] | verify-true
+proc "check-documentation-view" [val kw_name ] [val project_name "RobotProject"] [val library ] [val arguments "\[\]"] [val spec ""] [val is_empty false]{
+	if [$is_empty | eq true]{
+		get-view "Documentation View" | get-control Browser | get-property text  | equals  [concat $html_standard_kw  "<body></body></html>"]
+	}-else{
+		let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"]]{
+			get-view "Documentation View" | get-control Browser | get-property text 
+				| equals [format $html_standard_kw  $html_beginning $kw_name $project_name $library $kw_name2 $library $project_name $library  $arguments $spec] | verify-true
+		}
 	}
 }	
 
-proc "check-documentation-view-for-user-kw" [val kw_name] [val path ""][val arguments] [val spec]{
+proc "check-documentation-view-for-user-kw" [val kw_name ""] [val path ""] [val arguments "\[\]" ] [val spec ""]{
 	let [val kw_name2 [replace -input $kw_name -old " " -new "\%20"] ]{
 		get-view "Documentation View" | get-control Browser | get-property text 
 			| equals [format $html_user_kw  $html_beginning $kw_name $path  $kw_name2 $path $path $arguments $spec ] | verify-true
