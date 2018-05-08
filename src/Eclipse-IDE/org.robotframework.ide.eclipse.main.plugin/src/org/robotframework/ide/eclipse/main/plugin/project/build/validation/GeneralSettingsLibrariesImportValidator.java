@@ -137,6 +137,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final List<RobotToken> arguments) {
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
         final String address = resolver.getUri();
+        final boolean uriStatus = resolver.getUriStatus();
 
         if (address == null) {
             new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
@@ -144,27 +145,36 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         } else {
             final RobotToken markerToken = resolver.getUriToken() == null ? nameToken
                     : resolver.getUriToken();
-            validateRemoteLocation(markerToken, address);
+            validateRemoteLocation(markerToken, address, uriStatus);
         }
     }
 
-    private void validateRemoteLocation(final RobotToken markerToken, final String address) {
+    private void validateRemoteLocation(final RobotToken markerToken, final String address, final boolean uriStatus) {
         final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
         final List<RemoteLocation> remoteLocations = robotProjectConfig.getRemoteLocations();
-        final RemoteLocation remoteLibraryWithNoSlash = RemoteLocation.create(stripLastSlashIfNecessary(address));
-        final RemoteLocation remoteLibraryWithSlash = RemoteLocation.create(stripLastSlashIfNecessary(address) + "/");
+        if (uriStatus) {
+            final RemoteLocation remoteLibraryWithNoSlash = RemoteLocation.create(stripLastSlashIfNecessary(address));
+            final RemoteLocation remoteLibraryWithSlash = RemoteLocation
+                    .create(stripLastSlashIfNecessary(address) + "/");
 
-        if (remoteLocations.contains(remoteLibraryWithNoSlash) || remoteLocations.contains(remoteLibraryWithSlash)) {
-            final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
-                    .formatMessageWith(address);
-            reporter.handleProblem(problem, validationContext.getFile(), markerToken);
+            if (remoteLocations.contains(remoteLibraryWithNoSlash)
+                    || remoteLocations.contains(remoteLibraryWithSlash)) {
+                final RobotProblem problem = RobotProblem
+                        .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
+                        .formatMessageWith(address);
+                reporter.handleProblem(problem, validationContext.getFile(), markerToken);
+            } else {
+                final RobotProblem problem = RobotProblem
+                        .causedBy(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML)
+                        .formatMessageWith(address);
+                final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
+                reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
+            }
         } else {
             final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML)
+                    .causedBy(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT)
                     .formatMessageWith(address);
-            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
-            reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
+            reporter.handleProblem(problem, validationContext.getFile(), markerToken);
         }
     }
 
