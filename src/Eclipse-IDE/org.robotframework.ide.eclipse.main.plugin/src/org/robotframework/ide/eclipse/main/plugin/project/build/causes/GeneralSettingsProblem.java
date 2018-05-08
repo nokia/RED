@@ -220,6 +220,13 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return fixers;
         }
     },
+    INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT {
+
+        @Override
+        public String getProblemDescription() {
+            return "Invalid URI during 'Remote' library import: illegal character in '%s'";
+        }
+    },
     NON_EXISTING_RESOURCE_IMPORT {
 
         @Override
