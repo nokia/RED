@@ -1,0 +1,103 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _hb89IDvxEeiDC73Fvf4wHA,_WfFsgDJlEeielvsQm9uGYQ
+Element-Name: FailCasesForDocumentationView
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _JMWB4FITEei8P-qAbw1qjQ
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 5/8/18 2:43 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file that is suite not resource
+get-view "Project Explorer" | get-tree | select "project_b/test_with_libs.robot" | double-click
+with [get-editor "test_with_libs.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 14 12
+        get-menu -path "Show documentation" | click
+    }
+}
+
+//press button to open documentation in Browser
+exec-with-options {
+    get-view "Documentation View" | get-button "Open attached documentation in a Browser" | click
+    get-window "Problem Occurred" 
+        | get-label "Unable to generate HTML documentation file. The file '/project_b/test_with_libs.robot' is not a resource file" 
+        | get-property caption 
+        | equals "Unable to generate HTML documentation file. The file '/project_b/test_with_libs.robot' is not a resource file" 
+        | verify-true
+        
+    //check details    
+    get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
+        | get-property text 
+        | equals "Unable to generate HTML documentation file. The file '/project_b/test_with_libs.robot' is not a resource file" 
+        | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+
+
+//----------------------------------------------------------------------------------
+
+//open red.xml and add xml file
+get-view "Project Explorer" | get-tree | select "project_b/red.xml" | double-click
+get-editor "project_b/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+set-dialog-result File "platform:/resource/project_b/AutoItLibrary.xml"
+get-editor "project_b/red.xml" | get-section "Referenced libraries" | get-button "Add libspec file" | click
+get-button "Save All (M1+M2+S)" | click
+
+//open any kw
+get-view "Project Explorer" | get-tree 
+    | select "project_b/Robot Referenced libraries/AutoItLibrary project_b\\/AutoItLibrary.xml \\(100\\)/Block Input" 
+    | double-click
+
+//remove added xml file    
+get-editor "project_b/red.xml" | get-section "Referenced libraries" | get-table 
+    | select "AutoItLibrary.xml - project_b\\/AutoItLibrary.xml" | key-type Del
+get-button "Save (M1+S)" | click
+
+//go back and forward
+with [get-view "Documentation View"] {
+    get-button Back | click
+    get-button Forward | click
+}
+
+
+
+
+//
+////open resource file
+//get-view "Project Explorer" | get-tree | select "project_b/doc_sections.robot" | double-click
+//get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 9 8
+//
+//// /remove link
+//get-view "Documentation View" | get-button "Link with Selection" | click
+//get-editor "project_b/red.xml" | click
+//get-editor "doc_sections.robot" | close
+//
+////delete file
+//get-view "Project Explorer" | get-tree | select "project_b/doc_sections.robot" | get-menu -path Delete | click
+//
+//
+//exec-with-options {
+//	get-window "Delete Resources" | get-button OK | click
+//    click-link-in-doc-view "/project_b/doc_sections.robot"
+//    get-window "Problem Occurred" | get-label "Cannot open uri" | get-property caption | equals "Cannot open uri" 
+//        | verify-true
+//    get-window "Problem Occurred" | get-label "Unable to find given file in workspace" | get-property caption 
+//        | equals "Unable to find given file in workspace" | verify-true
+//    get-window "Problem Occurred" | get-button "Details >>" | click
+//    get-window "Problem Occurred" | get-editbox -after [get-label "Unable to find given file in workspace"] 
+//        | get-property text | equals "Cannot open uri\n"
+//        + "Unable to find given file in workspace" | verify-true
+//    get-window "Problem Occurred" | get-button OK | click
+//} -allowStatusDialog 
+//get-view "Documentation View" | get-control Browser | get-property text | contains "This page can’t be displayed</div>\\n" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

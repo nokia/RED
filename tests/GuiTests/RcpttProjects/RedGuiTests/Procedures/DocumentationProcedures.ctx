@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/7/18 12:30 PM
+Save-Time: 5/7/18 5:59 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -175,4 +175,11 @@ proc "check-information-view-for-file" [val file_name] [val project_name][val pa
 	}
 }	
 
+//------------------------------------------------------------------------------------------------
+
+proc "click-link-in-doc-view"[val link]{
+//	get-view "Documentation View" | get-control Browser |  get-object | invoke evaluate [format "document.querySelector('a[href$=\"%s\"]').click()" $link]
+	get-view "Documentation View" | get-control Browser |  get-object | invoke evaluate [format "for (var i = 0, list = document.getElementsByTagName(\"a\"); i < list.length; i++) {if (list[i].text ==\"%s\"){list[i].click()}}" $link]
+	
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
