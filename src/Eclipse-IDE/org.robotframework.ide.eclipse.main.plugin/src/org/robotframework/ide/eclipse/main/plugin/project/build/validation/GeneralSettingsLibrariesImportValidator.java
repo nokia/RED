@@ -54,8 +54,8 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
 
     @Override
     protected boolean isPathImport(final String pathOrName) {
-        return pathOrName.contains("/") || pathOrName.endsWith(".py") || pathOrName.endsWith(".class")
-                || pathOrName.endsWith(".java");
+        return new Path(pathOrName).isAbsolute() || pathOrName.endsWith("/") || pathOrName.endsWith(".py")
+                || pathOrName.endsWith(".class") || pathOrName.endsWith(".java");
     }
 
     @Override

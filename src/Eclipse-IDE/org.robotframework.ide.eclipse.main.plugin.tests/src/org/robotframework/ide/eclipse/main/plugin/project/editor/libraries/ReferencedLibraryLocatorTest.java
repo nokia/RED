@@ -195,28 +195,57 @@ public class ReferencedLibraryLocatorTest {
     }
 
     @Test
-    public void pythonModuleLibraryIsFoundByPath_1() throws Exception {
+    public void pythonModuleLibraryIsFound_whenPathIsAbsolute() throws Exception {
+        final String absolutePath = projectProvider.getDir("python_path/py_module").getLocation().toPortableString();
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
-        locator.locateByPath(suite, "python_path/py_module/");
+        locator.locateByPath(suite, absolutePath);
 
         verifyZeroInteractions(importer);
 
-        verify(detector).libraryDetectedByPath(eq("python_path/py_module/"),
+        verify(detector).libraryDetectedByPath(eq(absolutePath),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
                 argThat(isSingleLibrary(LibraryType.PYTHON, "py_module", projectProvider.getDir("python_path"))));
         verifyNoMoreInteractions(detector);
     }
 
     @Test
-    public void pythonModuleLibraryIsFoundByPath_2() throws Exception {
+    public void pythonModuleLibraryIsFound_whenPathIsAbsoluteWithTrailingSeparator() throws Exception {
+        final String absolutePath = projectProvider.getDir("python_path/py_module").getLocation().toPortableString();
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
-        locator.locateByPath(suite, "python_path/py_module");
+        locator.locateByPath(suite, absolutePath + "/");
 
         verifyZeroInteractions(importer);
 
-        verify(detector).libraryDetectedByPath(eq("python_path/py_module"),
+        verify(detector).libraryDetectedByPath(eq(absolutePath + "/"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
                 argThat(isSingleLibrary(LibraryType.PYTHON, "py_module", projectProvider.getDir("python_path"))));
+        verifyNoMoreInteractions(detector);
+    }
+
+    @Test
+    public void pythonModuleLibraryIsFound_whenPathIsRelativeWithTrailingSeparator() throws Exception {
+        final String relativePath = "python_path/py_module";
+        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
+        locator.locateByPath(suite, relativePath + "/");
+
+        verifyZeroInteractions(importer);
+
+        verify(detector).libraryDetectedByPath(eq(relativePath + "/"),
+                eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
+                argThat(isSingleLibrary(LibraryType.PYTHON, "py_module", projectProvider.getDir("python_path"))));
+        verifyNoMoreInteractions(detector);
+    }
+
+    @Test
+    public void detectingFails_whenPathIsRelativeWithoutTrailingSeparator() throws Exception {
+        final String relativePath = "python_path/py_module";
+        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
+        locator.locateByPath(suite, relativePath);
+
+        verifyZeroInteractions(importer);
+
+        verify(detector).libraryDetectingByPathFailed(relativePath, Optional.empty(),
+                "The path 'python_path/py_module' should point to either .py file or python module directory.");
         verifyNoMoreInteractions(detector);
     }
 
