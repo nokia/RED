@@ -18,11 +18,14 @@ public class RemoteArgumentsResolver {
 
     private final String uri;
 
+    private final boolean uriValidationStatus;
+
     private final ArgumentsDescriptor descriptor;
 
     public RemoteArgumentsResolver(final List<RobotToken> arguments) {
         this.uriToken = selectUriToken(arguments);
         this.uri = selectUri(uriToken, arguments);
+        this.uriValidationStatus = isValid(uri);
         this.descriptor = ArgumentsDescriptor.createDescriptor("uri=" + RemoteLocation.DEFAULT_ADDRESS, "timeout=None");
     }
 
@@ -34,6 +37,10 @@ public class RemoteArgumentsResolver {
         return uri;
     }
 
+    public boolean getUriStatus() {
+        return uriValidationStatus;
+    }
+
     public ArgumentsDescriptor getDescriptor() {
         return descriptor;
     }
@@ -42,18 +49,18 @@ public class RemoteArgumentsResolver {
         final List<String> arguments = args.subList(1, args.size());
         if (arguments.size() == 0) {
             return RemoteLocation.DEFAULT_ADDRESS;
-        } else if (arguments.size() <= 2 && isPositional(arguments.get(0))) {
+        } else if (arguments.size() <= 2 && isPositional(arguments.get(0)) && isValid(arguments.get(0))) {
             return addProtocolIfNecessary((arguments.get(0)));
         } else if (arguments.size() == 1) {
             if (isTimeout(arguments.get(0))) {
                 return RemoteLocation.DEFAULT_ADDRESS;
-            } else if (isUri(arguments.get(0))) {
+            } else if (isUri(arguments.get(0)) && isValid(arguments.get(0))) {
                 return addProtocolIfNecessary(stripArgumentPrefixIfNecessary(arguments.get(0)));
             }
         } else if (arguments.size() == 2) {
             final List<String> allUris = arguments.stream().filter(RemoteArgumentsResolver::isUri).collect(
                     Collectors.toList());
-            if (allUris.size() == 1) {
+            if (allUris.size() == 1 && isValid(allUris.get(0))) {
                 return addProtocolIfNecessary(stripArgumentPrefixIfNecessary(allUris.get(0)));
             }
         }
@@ -98,6 +105,13 @@ public class RemoteArgumentsResolver {
         return argument.toLowerCase().startsWith("timeout=");
     }
 
+    private static boolean isValid(final String argument) {
+        if (argument != null) {
+            final String uriWithoutPrefix = stripArgumentPrefixIfNecessary(argument);
+            return argument.contains("://") ? !uriWithoutPrefix.matches(".*=.*://.*") : true;
+        }
+        return true;
+    }
 
     private static String addProtocolIfNecessary(final String argument) {
         return argument.contains("://") ? argument : "http://" + argument;
