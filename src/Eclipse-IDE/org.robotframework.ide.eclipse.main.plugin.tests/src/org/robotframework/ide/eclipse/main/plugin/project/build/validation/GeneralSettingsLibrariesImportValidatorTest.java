@@ -730,24 +730,6 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_1() throws Exception {
-        final String libPath = projectProvider.getProject().getName();
-        final String libName = "lib";
-
-        final IFile libFile = projectProvider.createFile("lib.py");
-
-        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
-        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
-        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
-
-        validateLibraryImport("lib.py", new HashMap<>(), refLibs);
-        assertThat(reporter.getReportedProblems()).isEmpty();
-
-        libFile.delete(true, null);
-    }
-
-    @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByName_2() throws Exception {
         final String libPath = projectProvider.getProject().getName() + "/directory";
         final String libName = "lib";
@@ -788,6 +770,24 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
+    public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_1() throws Exception {
+        final String libPath = projectProvider.getProject().getName();
+        final String libName = "lib";
+
+        final IFile libFile = projectProvider.createFile("lib.py");
+
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
+
+        validateLibraryImport("lib.py", new HashMap<>(), refLibs);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+
+        libFile.delete(true, null);
+    }
+
+    @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_2() throws Exception {
         final String libPath = projectProvider.getProject().getName() + "/directory";
         final String libName = "lib";
@@ -820,8 +820,31 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
-        validateLibraryImport("directory/lib", new HashMap<>(), refLibs);
+        validateLibraryImport("directory/lib/", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).isEmpty();
+
+        dir1.delete(true, null);
+        dir2.delete(true, null);
+    }
+
+    @Test
+    public void markerIsReported_whenLocallyExistingLibraryIsImportedByRelativePathWithoutTrailingSeparator()
+            throws Exception {
+        final String libPath = projectProvider.getProject().getName() + "/directory";
+        final String libName = "lib";
+
+        final IFolder dir1 = projectProvider.createDir("directory");
+        final IFolder dir2 = projectProvider.createDir("directory/lib");
+        projectProvider.createFile("directory/lib/__init__.py");
+
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
+
+        validateLibraryImport("directory/lib", new HashMap<>(), refLibs);
+        assertThat(reporter.getReportedProblems()).contains(new Problem(
+                GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT, new ProblemPosition(2, Range.closed(26, 39))));
 
         dir1.delete(true, null);
         dir2.delete(true, null);
