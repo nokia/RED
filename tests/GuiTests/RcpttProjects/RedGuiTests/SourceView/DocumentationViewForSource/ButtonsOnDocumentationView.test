@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5_J-oFIVEei8P-qAbw1qjQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/8/18 6:39 PM
+Save-Time: 5/8/18 6:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -138,11 +138,11 @@ get-view "Project Explorer" | get-tree
 exec-with-options {
     get-view "Documentation View" | get-button "Open attached documentation in a Browser" | click
     get-window "Problem Occurred" | get-label ".* libspec file" 
-        | get-property caption | equals "Unable to create link to 'project_b\\AutoItLibrary.html' libspec file" 
+        | get-property caption | equals "Unable to create link to 'project_b(\\\\|/)AutoItLibrary.html' libspec file" 
         | verify-true
     get-window "Problem Occurred" | get-button "Details >>" | click
     get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
-        | get-property text | equals "Unable to create link to 'project_b\\AutoItLibrary.html' libspec file" 
+        | get-property text | equals "Unable to create link to 'project_b(\\\\|/)AutoItLibrary.html' libspec file" 
         | verify-true
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
