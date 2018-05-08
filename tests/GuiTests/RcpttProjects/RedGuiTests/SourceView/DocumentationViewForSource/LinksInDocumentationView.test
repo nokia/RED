@@ -1,0 +1,129 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _hb89IDvxEeiDC73Fvf4wHA,_WfFsgDJlEeielvsQm9uGYQ
+Element-Name: LinksInDocumentationView
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Hjl3AFH1Eei8P-qAbw1qjQ
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 5/8/18 2:45 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "project_b/doc_sections.robot" | double-click
+get-editor "doc_sections.robot" | get-text-viewer | set-caret-pos 9 12
+get-editor "doc_sections.robot" | get-text-viewer | get-menu -path "Show documentation" | click
+
+check-documentation-view-for-user-kw -kw_name "all in continuation" -path "/project_b/doc_sections.robot"  -arguments "\[\]" -spec "kkk lll mmm"
+
+//-------------------------------------------------------------------
+//click on link [Documentation]
+click-link-in-doc-view -link "Documentation"
+check-documentation-view-for-file -file_name "doc_sections.robot"  -project_name "project_b"  -path "/project_b/doc_sections.robot" 
+	-intro "Line 1 next line <b>My</b> '<i>pink</i>' <i><b>bold italic</b></i> <code>code</code>"
+	-shortcuts [list  "all in continuation" "mulitline" "special characters!" "section" "table" "list" "block" "ruler" "linki" "komentarze po srodku" "Italia sloneczna italia" ]
+
+//click on "list" item	 
+click-link-in-doc-view "list"
+check-documentation-view-for-user-kw -kw_name "list" -path "/project_b/doc_sections.robot" -arguments "\[\]" -spec "Example:</p>\\\\n"
+    + "<ul>\\\\n"
+    + "<li>a list item</li>\\\\n"
+    + "<li>second list item is</li>\\\\n"
+    + "</ul>\\\\n"
+    + "<p>continued after list"
+ 
+//close editor
+get-editor "doc_sections.robot" | close
+
+//click on link to file:  /project_b/doc_sections.robot 
+click-link-in-doc-view "/project_b/doc_sections.robot"
+
+//suite should be open
+get-editor "doc_sections.robot" | get-text-viewer | get-property "getSelectionText()" | equals list | verify-true 
+ 
+ 
+//------------------------------------ PE ------------------------------ 
+//open doc from PE 
+get-view "Project Explorer" | get-tree 
+    | select "project_b/Robot Referenced libraries/simple_lib project_b\\/libs \\(1\\)/Simple Lib" | double-click 
+ 
+//go to pytoyhn source 
+click-link-in-doc-view "simple_lib" 
+get-editor "simple_lib.py" | get-text-viewer | get-property "getSelectionText()" | equals "simple_lib" | verify-true
+get-editor "simple_lib.py" | close   
+
+//click on [Documentation] link
+click-link-in-doc-view "Documentation"
+check-documentation-view-for-library -file_name simple_lib -project_name project_b -source simple_lib  -args "\[\]" -intro "Documentation for test library <code>simple_lib</code>." -shortcuts [list "Simple Lib"]
+
+//open lib from module
+get-view "Project Explorer" | get-tree 
+    | select "project_b/Robot Referenced libraries/big_example.LoggingLibrary project_b\\/libs \\(3\\)/Log Messages" 
+    | double-click
+    
+check-documentation-view -kw_name "Log Messages" -project_name "project_b"  -library "big_example.LoggingLibrary" -arguments "\[\*messages\]" -spec   "Logs given messages using the log level set during.*"
+
+//click on link to python file
+click-link-in-doc-view "big_example.LoggingLibrary"
+
+get-editor "big_example.py" | get-text-viewer | get-property "getSelectionText()" | equals "log_messages" | verify-true
+ 
+click-link-in-doc-view "Log Message" 
+check-documentation-view -kw_name "Log Message" -project_name "project_b" -library "big_example.LoggingLibrary" -arguments "\[message, level=None\]" -spec "Writes given message to the log file.*" 
+//-------------------------------------------- back/forward ---------------------------------- 
+
+get-view "Documentation View" | get-button Back | click
+
+//Log messages
+check-documentation-view -kw_name "Log Messages" -project_name "project_b"  -library "big_example.LoggingLibrary" -arguments "\[\*messages\]" -spec   "Logs given messages using the log level set during.*"
+
+//simple_lib
+get-view "Documentation View" | get-button Back | click
+check-documentation-view-for-library -file_name simple_lib -project_name project_b -source simple_lib  -args "\[\]" -intro "Documentation for test library <code>simple_lib</code>." -shortcuts [list "Simple Lib"]
+
+//list
+get-view "Documentation View" | get-button Back | click
+check-documentation-view  -kw_name "Simple Lib" -project_name "project_b" -library "simple_lib" -arguments "\[a, y, \*\*abc\]" -spec  "<i>here is italic</i> <b>and bold one</b>"
+
+get-view "Documentation View" | get-button Back | click
+check-documentation-view-for-user-kw -kw_name "list" -path "/project_b/doc_sections.robot" -arguments "\[\]" -spec "Example:</p>\\\\n"
+    + "<ul>\\\\n"
+    + "<li>a list item</li>\\\\n"
+    + "<li>second list item is</li>\\\\n"
+    + "</ul>\\\\n"
+    + "<p>continued after list"
+    
+//formard    
+get-view "Documentation View" | get-button Forward | click    
+check-documentation-view  -kw_name "Simple Lib" -project_name "project_b" -library "simple_lib" -arguments "\[a, y, \*\*abc\]" -spec  "<i>here is italic</i> <b>and bold one</b>"
+
+//add xml file
+get-view "Project Explorer" | get-tree | select "project_b/red.xml" | double-click
+get-editor "project_b/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+set-dialog-result File "platform:/resource/project_b/AutoItLibrary.xml"
+get-editor "project_b/red.xml" | get-section "Referenced libraries" | get-button "Add libspec file" | click
+get-button "Save (M1+S)" | click
+
+//open problematic kw (RED-1044)
+get-view "Project Explorer" | get-tree 
+    | select "project_b/Robot Referenced libraries/AutoItLibrary project_b\\/AutoItLibrary.xml \\(100\\)/Auto It Set Option" 
+    | double-click
+    
+check-documentation-view -kw_name "Auto It Set Option" -project_name "project_b"  -library "AutoItLibrary"  -arguments "\[strOption=&lt;PyOleEmpty object at 0x02D94690&gt;, nValue=&lt;PyOleEmpty object at 0x02D94690&gt;\]" 
+	-spec     "method AutoItSetOption"
+   
+//go back    
+get-view "Documentation View" | get-button Back | click    
+check-documentation-view  -kw_name "Simple Lib" -project_name "project_b" -library "simple_lib" -arguments "\[a, y, \*\*abc\]" -spec  "<i>here is italic</i> <b>and bold one</b>"
+
+//go to kw from xml
+get-view "Documentation View" | get-button Forward | click  
+check-documentation-view -kw_name "Auto It Set Option" -project_name "project_b"  -library "AutoItLibrary"  -arguments "\[strOption=&lt;PyOleEmpty object at 0x02D94690&gt;, nValue=&lt;PyOleEmpty object at 0x02D94690&gt;\]" 
+	-spec     "method AutoItSetOption"  
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
