@@ -40,6 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.DocumentationDisplayer;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputGenerationException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputOpenException;
@@ -115,9 +116,8 @@ public class DocumentationView implements DocumentationDisplayer {
         }
     }
 
-    void enableSync() {
-        linkSelectionAction.setChecked(true);
-        linkSelectionAction.run();
+    public void enableSync(final RobotFormEditor editor) {
+        linkSelectionAction.activate(editor);
     }
 
     void markSynced() {
@@ -278,6 +278,14 @@ public class DocumentationView implements DocumentationDisplayer {
             if (isChecked()) {
                 setText("Link with Selection (showing last valid input)");
                 setImageDescriptor(RedImages.getSyncBrokenImage());
+            }
+        }
+
+        private void activate(final RobotFormEditor editor) {
+            if (!isChecked()) {
+                setChecked(true);
+                run();
+                partsListener.partActivated(editor);
             }
         }
 

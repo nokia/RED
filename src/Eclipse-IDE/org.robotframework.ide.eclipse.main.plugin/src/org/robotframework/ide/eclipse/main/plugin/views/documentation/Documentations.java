@@ -50,20 +50,33 @@ public class Documentations {
 
     public static void showDocForKeywordSpecification(final IWorkbenchPage page, final RobotProject project,
             final LibrarySpecification librarySpecification, final KeywordSpecification keywordSpecification) {
-        display(page, new KeywordSpecificationInput(project, librarySpecification, keywordSpecification), true);
+        final DocumentationViewWrapper view = display(page,
+                new KeywordSpecificationInput(project, librarySpecification, keywordSpecification));
+        if (view != null) {
+            page.activate(view);
+        }
     }
 
     public static void showDocForLibrarySpecification(final IWorkbenchPage page, final RobotProject project,
             final LibrarySpecification librarySpecification) {
-        display(page, new LibrarySpecificationInput(project, librarySpecification), true);
+        final DocumentationViewWrapper view = display(page,
+                new LibrarySpecificationInput(project, librarySpecification));
+        if (view != null) {
+            page.activate(view);
+        }
     }
 
     public static void showDocForRobotElement(final IWorkbenchPage page, final RobotFileInternalElement element) {
-        findInput(element).ifPresent(input -> display(page, input, true));
+        findInput(element).ifPresent(input -> {
+            final DocumentationViewWrapper view = display(page, input);
+            if (view != null) {
+                page.activate(view);
+            }
+        });
     }
 
-    public static void showDocForEditorSourceSelection(final IWorkbenchPage page, final RobotSuiteFile suiteModel,
-            final IDocument document, final int offset, final boolean activate) {
+    public static DocumentationViewWrapper showDocForEditorSourceSelection(final IWorkbenchPage page,
+            final RobotSuiteFile suiteModel, final IDocument document, final int offset) {
 
         final Optional<? extends RobotElement> element = suiteModel.findElement(offset);
         if (element.isPresent()) {
@@ -73,12 +86,13 @@ public class Documentations {
                 if (activeCellRegion.isPresent()) {
                     final String cellContent = document.get(activeCellRegion.get().getOffset(),
                             activeCellRegion.get().getLength());
-                    showDoc(page, (RobotFileInternalElement) element.get(), cellContent, activate);
+                    return showDoc(page, (RobotFileInternalElement) element.get(), cellContent);
                 }
             } catch (final BadLocationException e) {
                 RedPlugin.logError("Could not find selected position in document", e);
             }
         }
+        return null;
     }
 
     public static Optional<DocumentationViewInput> findDocumentationForEditorSourceSelection(
@@ -94,32 +108,35 @@ public class Documentations {
         return Optional.empty();
     }
 
-    public static void showDocForEditorTablesSelection(final IWorkbenchPage page,
-            final SelectionLayerAccessor selectionLayerAccessor, final boolean activate) {
+    public static DocumentationViewWrapper showDocForEditorTablesSelection(final IWorkbenchPage page,
+            final SelectionLayerAccessor selectionLayerAccessor) {
         final PositionCoordinate[] coordinates = selectionLayerAccessor.getSelectedPositions();
-        Stream.of(coordinates)
+        return Stream.of(coordinates)
                 .findFirst()
                 .map(selectionLayerAccessor::getLabelFromCell)
-                .ifPresent(label -> selectionLayerAccessor.getSelectedElements()
+                .flatMap(label -> selectionLayerAccessor
+                        .getSelectedElements()
                         .filter(RobotFileInternalElement.class::isInstance)
                         .map(RobotFileInternalElement.class::cast)
                         .findFirst()
-                        .ifPresent(elem -> showDoc(page, elem, label, activate)));
+                        .map(elem -> showDoc(page, elem, label)))
+                .orElse(null);
     }
 
-    private static void showDoc(final IWorkbenchPage page, final RobotFileInternalElement element,
-            final String cellContent, final boolean activate) {
+    private static DocumentationViewWrapper showDoc(final IWorkbenchPage page, final RobotFileInternalElement element,
+            final String cellContent) {
 
         if (element.getSuiteFile() instanceof RobotSuiteStreamFile) {
-            return;
+            return null;
         }
 
         final Optional<DocumentationViewInput> input = requiresPerLabelSearching(element)
                 ? Optional.of(new KeywordProposalInput(element, cellContent))
                 : findInput(element);
         if (input.isPresent()) {
-            display(page, input.get(), activate);
+            return display(page, input.get());
         }
+        return null;
     }
 
     private static boolean requiresPerLabelSearching(final RobotFileInternalElement element) {
@@ -178,38 +195,29 @@ public class Documentations {
         if (docViewPart == null) {
             return;
         }
-        @SuppressWarnings("restriction")
         final DocumentationView docView = ((DocumentationViewWrapper) docViewPart).getComponent();
         docView.markSyncBroken();
     }
 
-    private static void display(final IWorkbenchPage page, final DocumentationViewInput input, final boolean activate) {
-        final DocumentationView docView = openDocumentationViewIfNeeded(page, activate);
-        if (docView == null) {
-            return;
+    private static DocumentationViewWrapper display(final IWorkbenchPage page, final DocumentationViewInput input) {
+        final DocumentationViewWrapper docView = openDocumentationViewIfNeeded(page);
+        if (docView != null) {
+            docView.getComponent().displayDocumentation(input);
         }
-        docView.displayDocumentation(input);
+        return docView;
     }
 
-    @SuppressWarnings("restriction")
-    private static DocumentationView openDocumentationViewIfNeeded(final IWorkbenchPage page, final boolean activate) {
+    private static DocumentationViewWrapper openDocumentationViewIfNeeded(final IWorkbenchPage page) {
         final IViewPart docViewPart = page.findView(DocumentationView.ID);
         if (docViewPart == null) {
             try {
-                final DocumentationView view = ((DocumentationViewWrapper) page.showView(DocumentationView.ID)).getComponent();
-                view.enableSync();
-                return view;
+                return ((DocumentationViewWrapper) page.showView(DocumentationView.ID));
             } catch (final PartInitException e) {
                 RedPlugin.logError("Unable to show Documentation View.", e);
                 return null;
             }
         } else {
-            final DocumentationView view = ((DocumentationViewWrapper) docViewPart).getComponent();
-            if (activate) {
-                page.bringToTop(docViewPart);
-                view.enableSync();
-            }
-            return view;
+            return (DocumentationViewWrapper) docViewPart;
         }
     }
 }
