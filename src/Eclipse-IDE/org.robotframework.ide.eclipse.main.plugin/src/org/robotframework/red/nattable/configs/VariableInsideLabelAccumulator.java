@@ -18,8 +18,6 @@ public class VariableInsideLabelAccumulator implements IConfigLabelAccumulator {
 
     @Override
     public void accumulateConfigLabels(LabelStack configLabels, int columnPosition, int rowPosition) {
-        if (columnPosition > 0) {
-            configLabels.addLabel(POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
-        }
+        configLabels.addLabel(POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
     }
 }

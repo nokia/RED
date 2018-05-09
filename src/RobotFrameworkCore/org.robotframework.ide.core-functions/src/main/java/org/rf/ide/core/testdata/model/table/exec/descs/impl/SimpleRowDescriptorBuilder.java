@@ -52,25 +52,13 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
         boolean isAfterFirstAction = false;
         final CommentedVariablesFilter filter = new CommentedVariablesFilter();
         for (final RobotToken elem : lineElements) {
-            MappingResult mappingResult = null;
-            // just to revert issues with assignment for variables in table view
-            if (!isAfterFirstAction) {
-                final String text = elem.getText().replaceAll("\\s+", "");
-                final String raw = elem.getRaw().replaceAll("\\s+", "") + "=";
-                if (text.equals(raw)) {
-                    final RobotToken varPretend = elem.copy();
-                    varPretend.setText(elem.getRaw());
-                    mappingResult = varExtractor.extract(varPretend, fileName);
-                }
-            }
-            if (mappingResult == null) {
-                mappingResult = varExtractor.extract(elem, fileName);
-            }
+            final MappingResult mappingResult = varExtractor.extract(elem, fileName);
             simple.addMessages(mappingResult.getMessages());
 
-            // value is keyword if is on the first place and have in it nested
-            // variables and when contains text on the beginning or end of field
-            FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
+            // value is a keyword if is on the first place and is not just a variable or
+            // variable with equal sign. Keyword can be defined as a ${var}=, however must
+            // be called with a plain text in the place of an embedded variable
+            final FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
             simple.addCommentedVariables(filteredVars.getCommented());
             final List<VariableDeclaration> correctVariables = filteredVars.getUsed();
             final List<IElementDeclaration> mappedElements = mappingResult.getMappedElements();
@@ -81,7 +69,8 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                     simple.addKeywordArgument(elem.copy());
                 }
             } else {
-                if (correctVariables.size() == 1 && mappedElements.size() == 1) {
+                if (correctVariables.size() == 1 && (mappedElements.size() == 1
+                        || (mappedElements.size() == 2 && "=".equals(mappedElements.get(1).getStart().getText())))) {
                     // definition variable
                     simple.addCreatedVariable(correctVariables.get(0));
                 } else {
