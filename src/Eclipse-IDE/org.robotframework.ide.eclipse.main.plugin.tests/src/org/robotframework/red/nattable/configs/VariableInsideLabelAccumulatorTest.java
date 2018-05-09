@@ -27,11 +27,10 @@ public class VariableInsideLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forZerothColumn() {
+    public void labelIsAdded_forZerothColumn() {
         labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 1);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 2);
-        assertThat(labels.getLabels()).isEmpty();
+        assertThat(labels.getLabels())
+                .containsExactly(VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
     }
 
     @Test
