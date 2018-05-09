@@ -45,9 +45,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputGenerationException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationsFormatter;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Streams;

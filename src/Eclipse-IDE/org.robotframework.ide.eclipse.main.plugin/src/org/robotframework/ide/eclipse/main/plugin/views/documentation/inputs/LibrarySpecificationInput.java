@@ -25,7 +25,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri;
 
 import com.google.common.html.HtmlEscapers;
