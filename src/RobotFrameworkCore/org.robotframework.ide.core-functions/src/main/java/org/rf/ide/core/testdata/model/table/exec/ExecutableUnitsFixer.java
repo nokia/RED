@@ -48,7 +48,7 @@ public class ExecutableUnitsFixer {
                 lastForExecutableIndex = -1;
             } else {
                 if (rowType == ERowType.FOR_CONTINUE) {
-                    final Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(row.getElementTokens());
+                    final Optional<RobotToken> previousLineContinue = getPreviousLineContinueToken(row.getElementTokens());
                     if (previousLineContinue.isPresent()) {
                         merge(execUnit, newRows, preBuildDescriptors, lineId, previousLineContinue.get());
                     } else {
@@ -87,7 +87,7 @@ public class ExecutableUnitsFixer {
                             }
                         }
                     } else {
-                        final Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(
+                        final Optional<RobotToken> previousLineContinue = getPreviousLineContinueToken(
                                 row.getElementTokens());
                         if (previousLineContinue.isPresent()) {
                             merge(execUnit, newRows, preBuildDescriptors, lineId,
@@ -294,7 +294,7 @@ public class ExecutableUnitsFixer {
         }
     }
 
-    private Optional<RobotToken> getPreviouseLineContinueToken(final List<RobotToken> tokens) {
+    private Optional<RobotToken> getPreviousLineContinueToken(final List<RobotToken> tokens) {
         Optional<RobotToken> token = Optional.empty();
         for (final RobotToken rt : tokens) {
             String text = rt.getRaw();

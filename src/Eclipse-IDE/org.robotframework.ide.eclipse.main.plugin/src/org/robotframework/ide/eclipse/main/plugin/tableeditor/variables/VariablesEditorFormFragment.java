@@ -95,7 +95,6 @@ import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfi
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
 import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
 import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
-import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -264,7 +263,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
-        table.addConfiguration(new VariablesStyleConfiguration(theme));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new VariableInsideStyleConfiguration(theme));
     }
