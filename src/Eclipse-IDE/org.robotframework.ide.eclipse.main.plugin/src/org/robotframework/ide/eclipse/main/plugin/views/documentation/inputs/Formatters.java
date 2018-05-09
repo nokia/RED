@@ -22,12 +22,32 @@ class Formatters {
         return "<p>" + content + "</p>";
     }
 
+    static String bold(final String content) {
+        return "<b>" + content + "</b>";
+    }
+
     static String hyperlink(final URI href, final String label) {
         return hyperlink(href.toString(), label);
     }
 
     static String hyperlink(final String href, final String label) {
         return "<a href=\"" + href + "\">" + label + "</a>";
+    }
+
+    static String errorMessage(final Optional<URI> imgUri, final String error) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("<table style=\"border:none\">");
+        builder.append("<tr style=\"border:none\">");
+        builder.append("<td style=\"border:none\">");
+        imgUri.ifPresent(
+                uri -> builder.append("<img style=\"vertical-align: top;\" src=\"" + uri.toString() + "\"/>"));
+        builder.append("</td>");
+        builder.append("<td style=\"border: none; font-size: 1.1em;\">");
+        builder.append(error);
+        builder.append("</td>");
+        builder.append("</tr>");
+        builder.append("</table>");
+        return builder.toString();
     }
 
     @SafeVarargs

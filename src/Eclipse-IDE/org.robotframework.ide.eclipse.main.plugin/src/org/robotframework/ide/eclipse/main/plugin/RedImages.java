@@ -98,6 +98,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/big_error.png");
     }
 
+    public static Optional<URI> getBigErrorImageUri() {
+        return getImageUri("resources", "big_error.png");
+    }
+
     public static ImageDescriptor getRefreshImage() {
         return RedPlugin.getImageDescriptor("resources/refresh.png");
     }
