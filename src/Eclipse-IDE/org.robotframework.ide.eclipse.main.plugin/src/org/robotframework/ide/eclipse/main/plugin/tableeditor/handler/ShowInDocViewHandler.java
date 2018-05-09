@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ShowInDocViewHandler.E4ShowInDocViewHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewWrapper;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.Documentations;
 import org.robotframework.red.commands.DIParameterizedHandler;
 
@@ -33,17 +34,25 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
             final IWorkbenchPage page = editor.getSite().getPage();
             Documentations.markViewSyncBroken(page);
 
+            final DocumentationViewWrapper view;
             if (editor.getActiveEditor() instanceof SuiteSourceEditor) {
                 final SuiteSourceEditor sourceEditor = (SuiteSourceEditor) editor.getActiveEditor();
                 final RobotSuiteFile suiteModel = editor.provideSuiteModel();
                 final IDocument document = sourceEditor.getDocument();
                 final int offset = sourceEditor.getViewer().getTextWidget().getCaretOffset();
 
-                Documentations.showDocForEditorSourceSelection(page, suiteModel, document, offset, true);
+                view = Documentations.showDocForEditorSourceSelection(page, suiteModel, document, offset);
             } else {
                 final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
 
-                Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor, true);
+                view = Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor);
+            }
+
+            if (view != null) {
+                if (!page.isPartVisible(view)) {
+                    page.bringToTop(view);
+                }
+                view.getComponent().enableSync(editor);
             }
         }
     }
