@@ -43,10 +43,10 @@ public class CommonVariableHelper {
                 if (element instanceof RobotToken) {
                     final RobotToken token = (RobotToken) element;
                     if (isVariable(token) && !wasNotVariableElement) {
-                        String variableText = token.getRaw().toString();
+                        String variableText = token.getRaw();
                         if (variableText != null
                                 && !variableText.contains(RobotTokenType.ASSIGNMENT.getRepresentation().get(0))) {
-                            variableText = token.getText().toString();
+                            variableText = token.getText();
                         }
                         final RobotToken assignment = extractAssignmentPart(token.getFilePosition(), variableText);
                         if (assignment.isNotEmpty()) {

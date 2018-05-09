@@ -112,7 +112,6 @@ import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
 import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
 import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
-import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -315,7 +314,6 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
-        table.addConfiguration(new VariablesStyleConfiguration(theme));
         table.addConfiguration(new VariableInsideStyleConfiguration(theme));
     }
 

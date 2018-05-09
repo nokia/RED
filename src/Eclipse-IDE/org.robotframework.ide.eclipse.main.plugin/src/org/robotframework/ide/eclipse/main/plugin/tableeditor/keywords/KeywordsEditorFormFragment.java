@@ -117,8 +117,6 @@ import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
 import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
 import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
-import org.robotframework.red.nattable.configs.VariablesLabelAccumulator;
-import org.robotframework.red.nattable.configs.VariablesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -209,7 +207,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new AddingElementLabelAccumulator(dataProvider),
                 new CommentsLabelAccumulator(dataProvider),
                 new KeywordsElementsLabelAccumulator(dataProvider),
-                new VariablesLabelAccumulator(dataProvider),
                 new ActionNamesLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(dataProvider),
                 new VariableInsideLabelAccumulator());
@@ -321,7 +318,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new KeywordsElementsStyleConfiguration(theme, fileModel.isEditable(), hasWrappedCells));
         table.addConfiguration(new ActionNamesStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
-        table.addConfiguration(new VariablesStyleConfiguration(theme));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
