@@ -30,10 +30,33 @@ public class FormattersTest {
     }
 
     @Test
+    public void givenTextIsProperlyInsertedIntoBold() {
+        assertThat(Formatters.bold("something important")).isEqualTo("<b>something important</b>");
+    }
+
+    @Test
     public void givenHrefIsProperlyInsertedIntoAnchor() {
         assertThat(Formatters.hyperlink("#", "lbl")).isEqualTo("<a href=\"#\">lbl</a>");
         assertThat(Formatters.hyperlink(URI.create("http://www.robotframework.org"), "robot"))
                 .isEqualTo("<a href=\"http://www.robotframework.org\">robot</a>");
+    }
+
+    @Test
+    public void errorMessageIsMadeOfTable() {
+        assertThat(Formatters.errorMessage(Optional.empty(), "msg")).isEqualTo(
+                "<table style=\"border:none\">"
+                + "<tr style=\"border:none\">"
+                + "<td style=\"border:none\"></td>"
+                + "<td style=\"border: none; font-size: 1.1em;\">msg</td>"
+                + "</tr>"
+                + "</table>");
+        assertThat(Formatters.errorMessage(Optional.of(URI.create("file:///image.png")), "msg")).isEqualTo(
+                "<table style=\"border:none\">"
+                + "<tr style=\"border:none\">"
+                + "<td style=\"border:none\"><img style=\"vertical-align: top;\" src=\"file:///image.png\"/></td>"
+                + "<td style=\"border: none; font-size: 1.1em;\">msg</td>"
+                + "</tr>"
+                + "</table>");
     }
 
     @Test
