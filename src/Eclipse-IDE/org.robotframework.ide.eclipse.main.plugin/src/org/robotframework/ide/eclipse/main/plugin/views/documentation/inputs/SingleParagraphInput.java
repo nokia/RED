@@ -14,7 +14,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsFormatter;
 
 
 public class SingleParagraphInput implements DocumentationViewInput {
