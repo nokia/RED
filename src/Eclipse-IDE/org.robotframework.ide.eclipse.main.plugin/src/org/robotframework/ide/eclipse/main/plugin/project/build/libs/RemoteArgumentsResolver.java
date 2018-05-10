@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
@@ -14,83 +15,54 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class RemoteArgumentsResolver {
 
-    private final RobotToken uriToken;
+    private final Optional<RobotToken> uriToken;
 
-    private final String uri;
-
-    private final boolean uriValidationStatus;
+    private final Optional<String> uri;
 
     private final ArgumentsDescriptor descriptor;
 
     public RemoteArgumentsResolver(final List<RobotToken> arguments) {
         this.uriToken = selectUriToken(arguments);
         this.uri = selectUri(uriToken, arguments);
-        this.uriValidationStatus = isValid(uri);
         this.descriptor = ArgumentsDescriptor.createDescriptor("uri=" + RemoteLocation.DEFAULT_ADDRESS, "timeout=None");
     }
 
-    public RobotToken getUriToken() {
+    public Optional<RobotToken> getUriToken() {
         return uriToken;
     }
 
-    public String getUri() {
+    public Optional<String> getUri() {
         return uri;
-    }
-
-    public boolean getUriStatus() {
-        return uriValidationStatus;
     }
 
     public ArgumentsDescriptor getDescriptor() {
         return descriptor;
     }
 
-    public static String getUriForSettingArgumentsList(final List<String> args) {
-        final List<String> arguments = args.subList(1, args.size());
-        if (arguments.size() == 0) {
-            return RemoteLocation.DEFAULT_ADDRESS;
-        } else if (arguments.size() <= 2 && isPositional(arguments.get(0)) && isValid(arguments.get(0))) {
-            return addProtocolIfNecessary((arguments.get(0)));
-        } else if (arguments.size() == 1) {
-            if (isTimeout(arguments.get(0))) {
-                return RemoteLocation.DEFAULT_ADDRESS;
-            } else if (isUri(arguments.get(0)) && isValid(arguments.get(0))) {
-                return addProtocolIfNecessary(stripArgumentPrefixIfNecessary(arguments.get(0)));
-            }
-        } else if (arguments.size() == 2) {
-            final List<String> allUris = arguments.stream().filter(RemoteArgumentsResolver::isUri).collect(
-                    Collectors.toList());
-            if (allUris.size() == 1 && isValid(allUris.get(0))) {
-                return addProtocolIfNecessary(stripArgumentPrefixIfNecessary(allUris.get(0)));
-            }
-        }
-        return null;
-    }
-
-    private RobotToken selectUriToken(final List<RobotToken> arguments) {
+    private Optional<RobotToken> selectUriToken(final List<RobotToken> arguments) {
         if (arguments.size() == 1 || arguments.size() == 2) {
             if (isPositional(arguments.get(0).getText())) {
-                return arguments.get(0);
+                return Optional.of(arguments.get(0));
             } else {
                 final List<RobotToken> allUris = arguments.stream().filter(uri -> isUri(uri.getText())).collect(
                         Collectors.toList());
                 if (allUris.size() == 1) {
-                    return allUris.get(0);
+                    return Optional.of(allUris.get(0));
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    private String selectUri(final RobotToken uriToken, final List<RobotToken> arguments) {
-        if (arguments.size() == 0) {
-            return RemoteLocation.DEFAULT_ADDRESS;
+    private Optional<String> selectUri(final Optional<RobotToken> uriToken, final List<RobotToken> arguments) {
+        if (arguments.isEmpty()) {
+            return Optional.of(RemoteLocation.DEFAULT_ADDRESS);
         } else if (arguments.size() == 1 && isTimeout(arguments.get(0).getText())) {
-            return RemoteLocation.DEFAULT_ADDRESS;
-        } else if (uriToken != null) {
-            return addProtocolIfNecessary(stripArgumentPrefixIfNecessary(uriToken.getText()));
+            return Optional.of(RemoteLocation.DEFAULT_ADDRESS);
+        } else if (uriToken.isPresent()) {
+            return Optional.of(addProtocolIfNecessary(stripArgumentPrefixIfNecessary(uriToken.get().getText())));
         }
-        return null;
+        return Optional.empty();
     }
 
     private static boolean isPositional(final String argument) {
@@ -103,14 +75,6 @@ public class RemoteArgumentsResolver {
 
     private static boolean isTimeout(final String argument) {
         return argument.toLowerCase().startsWith("timeout=");
-    }
-
-    private static boolean isValid(final String argument) {
-        if (argument != null) {
-            final String uriWithoutPrefix = stripArgumentPrefixIfNecessary(argument);
-            return argument.contains("://") ? !uriWithoutPrefix.matches(".*=.*://.*") : true;
-        }
-        return true;
     }
 
     private static String addProtocolIfNecessary(final String argument) {
