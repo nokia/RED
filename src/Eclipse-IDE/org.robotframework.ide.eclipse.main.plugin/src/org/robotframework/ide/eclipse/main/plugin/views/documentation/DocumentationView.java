@@ -23,6 +23,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.layout.FillLayout;
@@ -40,10 +41,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.DocumentationDisplayer;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputGenerationException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationInputOpenException;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationsFormatter;
 import org.robotframework.red.swt.SwtThread;
 
 public class DocumentationView implements DocumentationDisplayer {
@@ -60,6 +63,7 @@ public class DocumentationView implements DocumentationDisplayer {
 
     private BackAction backAction;
     private ForwardAction forwardAction;
+
     private LinkWithSelectionAction linkSelectionAction;
     private OpenInputAction openInputAction;
     private OpenInExternalBrowserAction openInBrowserAction;
@@ -115,9 +119,8 @@ public class DocumentationView implements DocumentationDisplayer {
         }
     }
 
-    void enableSync() {
-        linkSelectionAction.setChecked(true);
-        linkSelectionAction.run();
+    public void enableSync(final RobotFormEditor editor) {
+        linkSelectionAction.activate(editor);
     }
 
     void markSynced() {
@@ -210,43 +213,48 @@ public class DocumentationView implements DocumentationDisplayer {
         }
     }
 
-    private class BackAction extends Action {
+    private abstract class MoveAction extends Action {
 
-        private static final String ID = "org.robotframework.action.views.documentation.Back";
+        private final Runnable operation;
 
-        public BackAction() {
-            setId(ID);
-            setText("Back");
-            setImageDescriptor(RedImages.getBackImage());
+        public MoveAction(final String id, final String text, final ImageDescriptor descriptor,
+                final Runnable historyOperation) {
+            setId(id);
+            setText(text);
+            setImageDescriptor(descriptor);
             setEnabled(false);
+            this.operation = historyOperation;
         }
 
         @Override
         public void run() {
-            history.back();
-
-            backAction.setEnabled(history.isBackEnabled());
-            forwardAction.setEnabled(history.isForwardEnabled());
+            try {
+                operation.run();
+            } catch (final Exception e) {
+                browser.setText(DocumentationsFormatter.createError("Unable to retrieve document from browsing history",
+                        history.getCurrentUri().toString()));
+                currentInput = null;
+                markSynced();
+            } finally {
+                backAction.setEnabled(history.isBackEnabled());
+                forwardAction.setEnabled(history.isForwardEnabled());
+            }
         }
     }
 
-    private class ForwardAction extends Action {
+    private class BackAction extends MoveAction {
 
-        private static final String ID = "org.robotframework.action.views.documentation.Forward";
+        public BackAction() {
+            super("org.robotframework.action.views.documentation.Back", "Back", RedImages.getBackImage(),
+                    history::back);
+        }
+    }
+
+    private class ForwardAction extends MoveAction {
 
         public ForwardAction() {
-            setId(ID);
-            setText("Forward");
-            setImageDescriptor(RedImages.getForwardImage());
-            setEnabled(false);
-        }
-
-        @Override
-        public void run() {
-            history.forward();
-
-            backAction.setEnabled(history.isBackEnabled());
-            forwardAction.setEnabled(history.isForwardEnabled());
+            super("org.robotframework.action.views.documentation.Forward", "Forward", RedImages.getForwardImage(),
+                    history::forward);
         }
     }
 
@@ -278,6 +286,14 @@ public class DocumentationView implements DocumentationDisplayer {
             if (isChecked()) {
                 setText("Link with Selection (showing last valid input)");
                 setImageDescriptor(RedImages.getSyncBrokenImage());
+            }
+        }
+
+        private void activate(final RobotFormEditor editor) {
+            if (!isChecked()) {
+                setChecked(true);
+                run();
+                partsListener.partActivated(editor);
             }
         }
 

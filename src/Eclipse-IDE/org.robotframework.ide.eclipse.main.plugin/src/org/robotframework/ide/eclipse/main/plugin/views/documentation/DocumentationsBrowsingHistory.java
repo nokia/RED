@@ -52,6 +52,10 @@ class DocumentationsBrowsingHistory {
         }
     }
 
+    URI getCurrentUri() {
+        return urisHistory.get(current);
+    }
+
     boolean isBackEnabled() {
         return 0 < current && current <= urisHistory.size() - 1;
     }
