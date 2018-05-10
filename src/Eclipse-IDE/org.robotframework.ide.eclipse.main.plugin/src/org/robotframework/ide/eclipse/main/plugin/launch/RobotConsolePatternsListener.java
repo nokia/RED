@@ -38,6 +38,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author Michal Anglart
  */
@@ -65,65 +67,48 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
     public void matchFound(final PatternMatchEvent event) {
         try {
             final String matchedLine = console.getDocument().get(event.getOffset(), event.getLength());
-            final PathWithOffset pathWithOffset = getPath(matchedLine);
-            final URI uri = getURI(pathWithOffset.path);
-
-            final int offset = event.getOffset() + pathWithOffset.offsetInLine;
-            final int length = pathWithOffset.path.length();
-
-            if (isValidUri(uri)) {
-                console.addHyperlink(new ExecutionWebsiteHyperlink(uri), offset, length);
-            } else {
-                final File file = new File(pathWithOffset.path);
-                console.addHyperlink(new ExecutionArtifactsHyperlink(robotProject.getProject(), file), offset, length);
+            final PathWithOffset pathWithOffset = findPathWithOffset(matchedLine);
+            if (!pathWithOffset.path.isEmpty()) {
+                final IHyperlink hyperlink = createHyperlink(pathWithOffset.path);
+                final int offset = event.getOffset() + pathWithOffset.offsetInLine;
+                final int length = pathWithOffset.path.length();
+                console.addHyperlink(hyperlink, offset, length);
             }
-        } catch (final BadLocationException e) {
+        } catch (final BadLocationException | URISyntaxException e) {
             // fine, no hyperlinks then
         }
     }
 
-    private static URI getURI(final String path) {
-        try {
-            return new URI(path);
-        } catch (final URISyntaxException e) {
-            // fine, no link here
+    private IHyperlink createHyperlink(final String path) throws URISyntaxException {
+        if (path.startsWith("http://") || path.startsWith("https://")) {
+            return new ExecutionWebsiteHyperlink(new URI(path));
+        } else {
+            return new ExecutionArtifactsHyperlink(robotProject.getProject(), new File(path));
         }
-        return null;
     }
 
-    private static boolean isValidUri(final URI uri) {
-        final String scheme = uri == null ? null : uri.getScheme();
-        return scheme != null && (scheme.equals("http") || scheme.equals("https"));
-    }
-
-    private PathWithOffset getPath(final String matchedLine) {
+    private PathWithOffset findPathWithOffset(final String matchedLine) {
         if (matchedLine.startsWith("Debug:")) {
-            final String path = matchedLine.substring("Debug:".length()).trim();
-            final int offset = matchedLine.length() - path.length();
-            return new PathWithOffset(path, offset);
+            return PathWithOffset.createFromPrefixedLine(matchedLine, "Debug:");
         } else if (matchedLine.startsWith("Output:")) {
-            final String path = matchedLine.substring("Output:".length()).trim();
-            final int offset = matchedLine.length() - path.length();
-            return new PathWithOffset(path, offset);
+            return PathWithOffset.createFromPrefixedLine(matchedLine, "Output:");
         } else if (matchedLine.startsWith("XUnit:")) {
-            final String path = matchedLine.substring("XUnit:".length()).trim();
-            final int offset = matchedLine.length() - path.length();
-            return new PathWithOffset(path, offset);
+            return PathWithOffset.createFromPrefixedLine(matchedLine, "XUnit:");
         } else if (matchedLine.startsWith("Log:")) {
-            final String path = matchedLine.substring("Log:".length()).trim();
-            final int offset = matchedLine.length() - path.length();
-            return new PathWithOffset(path, offset);
+            return PathWithOffset.createFromPrefixedLine(matchedLine, "Log:");
         } else if (matchedLine.startsWith("Report:")) {
-            final String path = matchedLine.substring("Report:".length()).trim();
-            final int offset = matchedLine.length() - path.length();
-            return new PathWithOffset(path, offset);
+            return PathWithOffset.createFromPrefixedLine(matchedLine, "Report:");
         } else if (matchedLine.startsWith("Command:")) {
             final String listenerArg = "--argumentfile ";
-            final int start = matchedLine.indexOf(listenerArg) + listenerArg.length();
+            final int listenerArgIndex = matchedLine.indexOf(listenerArg);
+            if (listenerArgIndex == -1) {
+                return new PathWithOffset("", 0);
+            }
+            final int start = listenerArgIndex + listenerArg.length();
             final int end = matchedLine.indexOf(' ', start);
             return new PathWithOffset(matchedLine.substring(start, end), start);
         }
-        return null;
+        throw new IllegalStateException();
     }
 
     @Override
@@ -141,9 +126,11 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
         return "(Debug|Output|XUnit|Log|Report|Command): ";
     }
 
-    private static final class ExecutionArtifactsHyperlink implements IHyperlink {
+    @VisibleForTesting
+    static final class ExecutionArtifactsHyperlink implements IHyperlink {
 
         private final IProject project;
+
         private final File file;
 
         private ExecutionArtifactsHyperlink(final IProject project, final File file) {
@@ -224,7 +211,8 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
         }
     }
 
-    private static final class ExecutionWebsiteHyperlink implements IHyperlink {
+    @VisibleForTesting
+    static final class ExecutionWebsiteHyperlink implements IHyperlink {
 
         private final URI link;
 
@@ -264,7 +252,13 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
 
         private final int offsetInLine;
 
-        public PathWithOffset(final String path, final int offsetInLine) {
+        private static PathWithOffset createFromPrefixedLine(final String matchedLine, final String prefix) {
+            final String path = matchedLine.substring(prefix.length()).trim();
+            final int offset = matchedLine.length() - path.length();
+            return new PathWithOffset(path, offset);
+        }
+
+        private PathWithOffset(final String path, final int offsetInLine) {
             this.path = path;
             this.offsetInLine = offsetInLine;
         }
