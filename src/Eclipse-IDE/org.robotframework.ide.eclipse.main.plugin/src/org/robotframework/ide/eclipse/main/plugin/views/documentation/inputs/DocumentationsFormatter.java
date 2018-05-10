@@ -3,13 +3,15 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.views.documentation;
+package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
 import static java.util.stream.Collectors.joining;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -19,6 +21,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 
 public class DocumentationsFormatter {
@@ -37,6 +40,14 @@ public class DocumentationsFormatter {
 
     public static String create(final Supplier<String> bodySupplier) {
         return "<!DOCTYPE html>\n<html>" + writeHead() + "<body>" + bodySupplier.get() + "</body></html>";
+    }
+
+    public static String createError(final String error, final String uri) {
+        final Optional<URI> errorImgUri = RedImages.getBigErrorImageUri();
+        final String errorHtml = Formatters.bold(error + ": ")
+                + "<span style=\"border: none; font-family: monospace; font-size: 1.1em;\">" + uri + "</span>";
+        return "<!DOCTYPE html>\n<html>" + writeHead() + "<body>" + Formatters.errorMessage(errorImgUri, errorHtml)
+                + "</body></html>";
     }
 
     public String format(final Documentation documentation) {
