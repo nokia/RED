@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -96,13 +97,13 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             throws CoreException {
         if (name.equals("Remote")) {
             final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
-            final String address = resolver.getUri();
-
-            if (address == null) {
-                validateRemoteLibraryArguments(name, nameToken, arguments);
-            } else {
-                final LibrarySpecification specification = validationContext.getLibrarySpecifications(name, address);
+            final Optional<String> address = resolver.getUri();
+            if (address.isPresent()) {
+                final LibrarySpecification specification = validationContext.getLibrarySpecifications(name,
+                        address.get());
                 validateWithSpec(specification, name, nameToken, arguments, false);
+            } else {
+                validateRemoteLibraryArguments(name, nameToken, arguments);
             }
         } else {
             final List<String> args = arguments.stream().map(RobotToken::getText).collect(toList());
@@ -136,23 +137,21 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     private void validateRemoteLibraryArguments(final String name, final RobotToken nameToken,
             final List<RobotToken> arguments) {
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
-        final String address = resolver.getUri();
-        final boolean uriStatus = resolver.getUriStatus();
-
-        if (address == null) {
+        final Optional<String> address = resolver.getUri();
+        if (address.isPresent()) {
+            final RobotToken markerToken = resolver.getUriToken().isPresent() ? resolver.getUriToken().get()
+                    : nameToken;
+            validateRemoteLocation(markerToken, address.get());
+        } else {
             new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
                     resolver.getDescriptor(), arguments).validate(new NullProgressMonitor());
-        } else {
-            final RobotToken markerToken = resolver.getUriToken() == null ? nameToken
-                    : resolver.getUriToken();
-            validateRemoteLocation(markerToken, address, uriStatus);
         }
     }
 
-    private void validateRemoteLocation(final RobotToken markerToken, final String address, final boolean uriStatus) {
+    private void validateRemoteLocation(final RobotToken markerToken, final String address) {
         final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
         final List<RemoteLocation> remoteLocations = robotProjectConfig.getRemoteLocations();
-        if (uriStatus) {
+        try {
             final RemoteLocation remoteLibraryWithNoSlash = RemoteLocation.create(stripLastSlashIfNecessary(address));
             final RemoteLocation remoteLibraryWithSlash = RemoteLocation
                     .create(stripLastSlashIfNecessary(address) + "/");
@@ -170,10 +169,10 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                 final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
                 reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
             }
-        } else {
+        } catch (final IllegalArgumentException e) {
             final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT)
-                    .formatMessageWith(address);
+                    .causedBy(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(e.getCause().getMessage());
             reporter.handleProblem(problem, validationContext.getFile(), markerToken);
         }
     }

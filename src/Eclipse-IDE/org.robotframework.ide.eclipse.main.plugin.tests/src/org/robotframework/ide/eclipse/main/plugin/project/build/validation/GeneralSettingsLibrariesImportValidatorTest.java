@@ -313,16 +313,16 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidPositionalUri2() {
-        validateLibraryImport("Remote  =http://127.0.0.1:9000/");
+        validateLibraryImport("Remote  1://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(34, 57))));
+                        new ProblemPosition(2, Range.closed(34, 53))));
     }
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidPositionalUri3() {
-        validateLibraryImport("Remote  =urihttp://127.0.0.1:9000/");
+        validateLibraryImport("Remote  %urihttp://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
@@ -331,16 +331,34 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidPositionalUri4() {
-        validateLibraryImport("Remote  ==uri=http://127.0.0.1:9000/");
+        validateLibraryImport("Remote  http://127.0.0.1:9000/%");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(34, 62))));
+                        new ProblemPosition(2, Range.closed(34, 57))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidPositionalUriWithoutScheme() {
+        validateLibraryImport("Remote  ://127.0.0.1:9000/");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 52))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidPositionalUriWithoutAddress() {
+        validateLibraryImport("Remote  http://");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 41))));
     }
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidPositionalUriAndTimeout() {
-        validateLibraryImport("Remote  urrri=http://127.0.0.1:9000/  60");
+        validateLibraryImport("Remote  urrri[http://127.0.0.1:9000/  60");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
@@ -349,7 +367,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidNamedUri1() {
-        validateLibraryImport("Remote  uri=urrri=http://127.0.0.1:9000/");
+        validateLibraryImport("Remote  uri=urrri]http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
@@ -358,16 +376,16 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidNamedUri2() {
-        validateLibraryImport("Remote  uri==http://127.0.0.1:9000/");
+        validateLibraryImport("Remote  uri=:://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(34, 61))));
+                        new ProblemPosition(2, Range.closed(34, 57))));
     }
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidNamedUri3() {
-        validateLibraryImport("Remote  uri==urihttp://127.0.0.1:9000/");
+        validateLibraryImport("Remote  uri=}urihttp://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
@@ -376,16 +394,34 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidNamedUri4() {
-        validateLibraryImport("Remote  uri===uri=http://127.0.0.1:9000/");
+        validateLibraryImport("Remote  uri=uri=http://127.0.0.1:9000/%");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(34, 66))));
+                        new ProblemPosition(2, Range.closed(34, 65))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidNamedUriWithoutScheme() {
+        validateLibraryImport("Remote  uri=://127.0.0.1:9000/");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 56))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidNamedUriWithoutAddress() {
+        validateLibraryImport("Remote  uri=http://");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 45))));
     }
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidNamedUriAndTimeout() {
-        validateLibraryImport("Remote  uri=urrri=http://127.0.0.1:9000/  timeout=60");
+        validateLibraryImport("Remote  uri=urrri!http://127.0.0.1:9000/  timeout=60");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
@@ -394,7 +430,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvertedInvalidNamedUriAndTimeout() {
-        validateLibraryImport("Remote  timeout=60  uri=urrri=http://127.0.0.1:9000/");
+        validateLibraryImport("Remote  timeout=60  uri=urrri|http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
