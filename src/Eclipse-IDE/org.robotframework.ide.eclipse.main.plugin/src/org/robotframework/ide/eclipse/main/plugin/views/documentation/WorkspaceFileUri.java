@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.OpenableUri;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.UnableToOpenUriException;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -108,10 +109,18 @@ public class WorkspaceFileUri implements OpenableUri {
 
     @Override
     public void open() {
-        final RedWorkspace workspace = new RedWorkspace(ResourcesPlugin.getWorkspace().getRoot());
-        final Optional<IFile> file = workspace.fileForUri(uri);
+        try {
+            // this is a copy of original uri with stripped query part; the query part
+            // was causing the file not to be found under linux-based systems
+            final URI fileUri = new URI("file", null, uri.getPath(), null, null);
 
-        fileConsumer.accept(file, extractParams(uri.getQuery()));
+            final RedWorkspace workspace = new RedWorkspace(ResourcesPlugin.getWorkspace().getRoot());
+            final Optional<IFile> file = workspace.fileForUri(fileUri);
+
+            fileConsumer.accept(file, extractParams(uri.getQuery()));
+        } catch (final URISyntaxException e) {
+            throw new UnableToOpenUriException("Cannot open uri: " + uri, e);
+        }
     }
 
     @FunctionalInterface
