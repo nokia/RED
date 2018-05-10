@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
@@ -52,8 +51,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri().equals(RemoteLocation.DEFAULT_ADDRESS));
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).contains(RemoteLocation.DEFAULT_ADDRESS);
     }
 
     @Test
@@ -63,8 +62,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri().equals(RemoteLocation.DEFAULT_ADDRESS));
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).contains(RemoteLocation.DEFAULT_ADDRESS);
     }
 
     @Test
@@ -74,8 +73,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri()).isEqualTo(RemoteLocation.DEFAULT_ADDRESS);
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).contains(RemoteLocation.DEFAULT_ADDRESS);
     }
 
     @Test
@@ -85,8 +84,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri()).isEqualTo(RemoteLocation.DEFAULT_ADDRESS);
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).contains(RemoteLocation.DEFAULT_ADDRESS);
     }
 
     @Test
@@ -96,8 +95,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("http://127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -109,20 +108,19 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("http://127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
-    public void uriArgumentIsFound_whenRemoteArgumentsListContainsOnlyPositionalUriWithoutProtocol()
-            throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsOnlyPositionalUriWithoutProtocol() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -132,8 +130,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -143,8 +141,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -155,8 +153,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -168,8 +166,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -180,8 +178,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("http://127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -192,8 +190,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -203,8 +201,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -216,8 +214,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -229,8 +227,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -241,8 +239,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=127.0.0.1.9000/");
-        assertThat(resolver.getUri()).isEqualTo("http://127.0.0.1.9000/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=127.0.0.1.9000/");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
     }
 
     @Test
@@ -253,8 +251,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri()).isNull();
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).isEmpty();
     }
 
     @Test
@@ -265,8 +263,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri()).isNull();
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).isEmpty();
     }
 
     @Test
@@ -276,8 +274,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri()).isNull();
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).isEmpty();
     }
 
     @Test
@@ -289,8 +287,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri()).isNull();
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).isEmpty();
     }
 
     @Test
@@ -301,8 +299,8 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri()).isNull();
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).isEmpty();
     }
 
     @Test
@@ -312,52 +310,103 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isNull();
-        assertThat(resolver.getUri()).isNull();
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).isEmpty();
+    }
+
+    @Test
+    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUriWithoutScheme()
+            throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  ://127.0.0.1:8270/");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("://127.0.0.1:8270/");
+    }
+
+    @Test
+    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUriWithoutAddress()
+            throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://");
+        assertThat(resolver.getUri()).contains("http://");
+    }
+
+    @Test
+    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUriWithoutScheme() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=://127.0.0.1:8270/");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("://127.0.0.1:8270/");
+    }
+
+    @Test
+    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUriWithoutAddress() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=http://");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://");
+        assertThat(resolver.getUri()).contains("http://");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUri1() throws Exception {
-        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  urrri=http://127.0.0.1:8270/");
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport(
+                "Library  Remote  urrri=http://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("urrri=http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("urrri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText())
+                .isEqualTo("urrri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("urrri=http://127.0.0.1:8270/");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUri2() throws Exception {
-        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  =http://127.0.0.1:8270/");
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport(
+                "Library  Remote  ^://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("=http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("^://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("^://127.0.0.1:8270/");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUri3() throws Exception {
-        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  =urihttp://127.0.0.1:8270/");
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport(
+                "Library  Remote  [urihttp://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("=urihttp://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("=urihttp://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("[urihttp://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("[urihttp://127.0.0.1:8270/");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUri4() throws Exception {
-        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  ==uri=http://127.0.0.1:8270/");
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://127.0.0.1:8270/%");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("==uri=http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("==uri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText())
+                .isEqualTo("http://127.0.0.1:8270/%");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1:8270/%");
     }
 
     @Test
@@ -368,54 +417,59 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("urrri=http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("urrri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText())
+                .isEqualTo("urrri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("urrri=http://127.0.0.1:8270/");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUri1() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
-                "Library  Remote  uri=urrri=http://127.0.0.1:8270/");
+                "Library  Remote  uri=urrri(http://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=urrri=http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("urrri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText())
+                .isEqualTo("uri=urrri(http://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("urrri(http://127.0.0.1:8270/");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUri2() throws Exception {
-        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri==http://127.0.0.1:8270/");
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport(
+                "Library  Remote  uri=}://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri==http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=}://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("}://127.0.0.1:8270/");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUri3() throws Exception {
-        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri==urihttp://127.0.0.1:8270/");
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport(
+                "Library  Remote  uri=1urihttp://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri==urihttp://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("=urihttp://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText())
+                .isEqualTo("uri=1urihttp://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("1urihttp://127.0.0.1:8270/");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUri4() throws Exception {
-        final RobotSuiteFile suite = createSuiteFileForRemoteImport(
-                "Library  Remote  uri===uri=http://127.0.0.1:8270/");
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=http://127.0.0.1:8270/%");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri===uri=http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("==uri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo(
+                "uri=http://127.0.0.1:8270/%");
+        assertThat(resolver.getUri()).contains("http://127.0.0.1:8270/%");
     }
 
     @Test
@@ -426,201 +480,31 @@ public class RemoteArgumentsResolverTest {
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=urrri=http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("urrri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText())
+                .isEqualTo("uri=urrri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains("urrri=http://127.0.0.1:8270/");
     }
 
     @Test
     public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvertedInvalidNamedUriAndTimeout()
             throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
-                "Library  Remote  timeout=60  uri=urrri=http://127.0.0.1:8270/");
+                "Library  Remote  timeout=60  uri=;urrrihttp://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken().getText()).isEqualTo("uri=urrri=http://127.0.0.1:8270/");
-        assertThat(resolver.getUri()).isEqualTo("urrri=http://127.0.0.1:8270/");
+        assertThat(resolver.getUriToken().get().getText())
+                .isEqualTo("uri=;urrrihttp://127.0.0.1:8270/");
+        assertThat(resolver.getUri()).contains(";urrrihttp://127.0.0.1:8270/");
     }
 
-    @Test
-    public void defaultUriIsFound_whenLibrarySettingArgumentsListContainsNoRemoteArguments() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments))
-                .isEqualTo(RemoteLocation.DEFAULT_ADDRESS);
+    private RobotSuiteFile createSuiteFileForRemoteImport(final String librarySetting) throws Exception {
+        return model.createSuiteFile(
+                projectProvider.createFile("suite.robot", "*** Settings ***", librarySetting, "*** Test Cases ***"));
     }
 
-    @Test
-    public void defaultUriIsFound_whenLibrarySettingArgumentsListContainsOnlyTimeout() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "timeout=30");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments))
-                .isEqualTo(RemoteLocation.DEFAULT_ADDRESS);
-    }
-
-    @Test
-    public void uriArgumentIsFound_whenLibrarySettingArgumentsListContainsOnlyPositionalUriWithProtocol()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "http://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments))
-                .isEqualTo("http://127.0.0.1.9000/");
-    }
-
-    @Test
-    public void uriArgumentIsFound_whenLibrarySettingArgumentsListContainsOnlyPositionalUriWithoutProtocol()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "127.0.0.1.9000");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isEqualTo("http://127.0.0.1.9000");
-    }
-
-    @Test
-    public void uriArgumentIsFound_whenLibrarySettingArgumentsListContainsOnlyNamedUriWithProtocol() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri=http://127.0.0.1.9000");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isEqualTo("http://127.0.0.1.9000");
-    }
-
-    @Test
-    public void uriArgumentIsFound_whenLibrarySettingArgumentsListContainsOnlyNamedUriWithoutProtocol()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri=127.0.0.1.9000");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isEqualTo("http://127.0.0.1.9000");
-    }
-
-    @Test
-    public void uriArgumentIsFound_whenLibrarySettingArgumentsListContainsOnlyPositionalTimeoutAndUriWithProtocol()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "http://127.0.0.1.9000/", "30");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments))
-                .isEqualTo("http://127.0.0.1.9000/");
-    }
-
-    @Test
-    public void uriArgumentIsFound_whenLibrarySettingArgumentsListContainsOnlyNamedTimeoutAndUriWithoutProtocol()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri=127.0.0.1.9000/", "timeout=30");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments))
-                .isEqualTo("http://127.0.0.1.9000/");
-    }
-
-    @Test
-    public void uriArgumentIsFound_whenLibrarySettingArgumentsListContainsOnlyInvertedNamedTimeoutAndUri()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "timeout=30", "uri=http://127.0.0.1.9000");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isEqualTo("http://127.0.0.1.9000");
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsTooManyArguments() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri=http://127.0.0.1.9000", "timeout=30", "timeout=60");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsTwoNamedUriArguments() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri=http://127.0.0.1.9000",
-                "uri=http://127.0.0.1.9000");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsTwoNamedTimeoutArguments()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "timeout=30", "timeout=60");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidPositionalUri1() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "urrri=http://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidPositionalUri2() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "=http://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidPositionalUri3() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "=urihttp://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidPositionalUri4() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "==uri=http://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidPositionalUriAndTimeout()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "==uri=http://127.0.0.1.9000/", "60");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidNamedUri1() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri=urrri=http://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidNamedUri2() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri==http://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidNamedUri3() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri==urihttp://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidNamedUri4() throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri===uri=http://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvalidNamedUriAndTimeout()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "uri===uri=http://127.0.0.1.9000/", "timeout=60");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    @Test
-    public void uriArgumentIsNotFound_whenLibrarySettingArgumentsListContainsInvertedInvalidNamedUriAndTimeout()
-            throws Exception {
-        final List<String> arguments = Arrays.asList("Remote", "timeout=60", "uri===uri=http://127.0.0.1.9000/");
-
-        assertThat(RemoteArgumentsResolver.getUriForSettingArgumentsList(arguments)).isNull();
-    }
-
-    private LibraryImport getImport(final RobotSuiteFile suiteFile) {
+    private static LibraryImport getImport(final RobotSuiteFile suiteFile) {
         return (LibraryImport) suiteFile.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -628,8 +512,4 @@ public class RemoteArgumentsResolverTest {
                 .getLinkedElement();
     }
 
-    private RobotSuiteFile createSuiteFileForRemoteImport(final String librarySetting) throws Exception {
-        return model.createSuiteFile(
-                projectProvider.createFile("suite.robot", "*** Settings ***", librarySetting, "*** Test Cases ***"));
-    }
 }

@@ -12,6 +12,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -196,9 +197,14 @@ public class RobotSetting extends RobotKeywordCall {
                 && indexedLibraries.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
             // by-name import of remote library
             // empty were filtered out, so here size() > 0
-            final String uri = RemoteArgumentsResolver.getUriForSettingArgumentsList(args);
-            if (uri != null) {
-                final RemoteLocation remoteLocation = RemoteLocation.create(uri);
+            final List<RobotToken> arguments = args.subList(1, args.size())
+                    .stream()
+                    .map(arg -> RobotToken.create(arg))
+                    .collect(Collectors.toList());
+            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+            final Optional<String> uri = resolver.getUri();
+            try {
+                final RemoteLocation remoteLocation = RemoteLocation.create(uri.get());
                 final String remote = stripLastSlashIfNecessary(remoteLocation.getUri());
 
                 for (final LibrarySpecification spec : indexedLibraries.get(libNameOrPath)) {
@@ -206,9 +212,10 @@ public class RobotSetting extends RobotKeywordCall {
                         return Optional.of(new ImportedLibrary(spec, extractLibraryAlias()));
                     }
                 }
+            } catch (final Exception e) {
+                // nothing to do
             }
             return Optional.empty();
-
         } else {
             // maybe it's a by-path import
             try {
