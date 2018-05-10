@@ -30,11 +30,13 @@ public class DocumentationsLinksListenerTest {
         @SuppressWarnings("unchecked")
         final Consumer<UnableToOpenUriException> exceptionHandler = mock(Consumer.class);
         final DocumentationsLinksListener listener = new DocumentationsLinksListener(linksSupport, exceptionHandler);
-        listener.changing(newLocationEvent("file:/path with spaces"));
+        final LocationEvent event = newLocationEvent("file:/path with spaces");
+        listener.changing(event);
 
         verify(exceptionHandler)
                 .accept(argThat(isExceptionWithMessage("Syntax error in uri 'file:/path with spaces'")));
         verifyZeroInteractions(linksSupport);
+        assertThat(event.doit).isFalse();
     }
 
     @Test
