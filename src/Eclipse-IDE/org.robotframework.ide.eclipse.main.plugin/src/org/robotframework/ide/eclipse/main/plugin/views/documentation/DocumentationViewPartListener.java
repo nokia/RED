@@ -43,6 +43,9 @@ class DocumentationViewPartListener implements IPartListener {
     @Override
     public void partActivated(final IWorkbenchPart part) {
         if (part.getSite().getId().equals(RobotFormEditor.ID)) {
+            if (currentlyActiveEditor != null) {
+                removeEditorListener();
+            }
             currentlyActiveEditor = (RobotFormEditor) part;
             editorListener = new EditorListener();
             registerEditorListener();
@@ -133,7 +136,7 @@ class DocumentationViewPartListener implements IPartListener {
                 if (newInput.isPresent() && !Objects.equals(selectionInput, newInput.get())) {
                     selectionInput = newInput.get();
                     scheduleShowDocJob(() -> {},
-                            () -> Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor, false));
+                            () -> Documentations.showDocForEditorTablesSelection(page, selectionLayerAccessor));
                 }
             }
         }
@@ -185,7 +188,7 @@ class DocumentationViewPartListener implements IPartListener {
                         } catch (final InterruptedException e) {
                             // ok, out of sync in that case
                         }
-                    }, () -> Documentations.showDocForEditorSourceSelection(page, fileModel, document, offset, false));
+                    }, () -> Documentations.showDocForEditorSourceSelection(page, fileModel, document, offset));
 
                 }
             } catch (final BadLocationException e) {

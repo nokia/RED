@@ -15,4 +15,10 @@ public class DocumentationViewWrapper extends DIViewPart<DocumentationView> {
     public DocumentationViewWrapper() {
         super(DocumentationView.class);
     }
+
+    @Override
+    public DocumentationView getComponent() {
+        // overriding so that there will be no access-restricion warnings on call sites
+        return super.getComponent();
+    }
 }
