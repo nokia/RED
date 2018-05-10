@@ -43,6 +43,9 @@ public class DocumentationsLinksListener implements LocationListener {
             event.doit = !linksSupport.changeLocationTo(toUri(event.location));
 
         } catch (final UnableToOpenUriException e) {
+            // if we're having trouble opening the link we don't want the browser to try to open it
+            // anyway
+            event.doit = false;
             locationExceptionHandler.accept(e);
         }
     }
