@@ -70,8 +70,7 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
     private void rebuildLibraries(final IProgressMonitor monitor) {
         final Multimap<IProject, LibrarySpecification> groupedSpecifications = groupSpecificationsByProject();
         monitor.beginTask("Regenerating library specifications", 10);
-        new LibrariesBuilder(new BuildLogger()).forceLibrariesRebuild(groupedSpecifications,
-                SubMonitor.convert(monitor));
+        new LibrariesBuilder(new BuildLogger()).rebuildLibraries(groupedSpecifications, SubMonitor.convert(monitor));
         for (final IProject project : groupedSpecifications.keySet()) {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
             robotProject.clearDirtyLibSpecs(groupedSpecifications.values());

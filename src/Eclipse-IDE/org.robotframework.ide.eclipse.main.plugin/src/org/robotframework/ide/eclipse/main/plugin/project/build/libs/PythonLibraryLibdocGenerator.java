@@ -39,17 +39,6 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
                 targetSpecFile.getLocation().toFile(), format);
     }
 
-    @Override
-    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment,
-            final EnvironmentSearchPaths additionalPaths)
-            throws RobotEnvironmentException {
-        final File libFile = new File(libPath);
-        final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
-        additionalPaths.addPythonPath(additionalLocation);
-        runtimeEnvironment.createLibdocForcibly(libName, additionalLocation, additionalPaths,
-                targetSpecFile.getLocation().toFile(), format);
-    }
-
     private String extractLibParent() { //e.g. libPath=Project1/Plib/ca libName=Plib.ca.ab => parent=Project1
         String parent = libPath;
         final String[] libNameElements = libName.split("\\.");
