@@ -258,7 +258,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     protected void invokeLibrariesBuilder(final IProgressMonitor monitor,
             final Multimap<IProject, LibrarySpecification> groupedSpecifications) {
         try {
-            new LibrariesBuilder(new BuildLogger()).forceLibrariesRebuild(groupedSpecifications,
+            new LibrariesBuilder(new BuildLogger()).rebuildLibraries(groupedSpecifications,
                     SubMonitor.convert(monitor));
         } catch (final RobotEnvironmentException e) {
             rebuildTasksQueue.clear();
