@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/8/18 5:09 PM
+Save-Time: 5/11/18 3:06 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -64,7 +64,16 @@ global [val html_library "%s<body.*><h3>.*org.robotframework.ide.eclipse.main.pl
 			+ "<p>%s</p>"  																								// intro
 			+ "<h2 id=\"Shortcuts\">Shortcuts</h2><p>"   
 			+ "%s"        				  																				//shortcuts
-			+ "</p></body></html>"  ]	 			
+			+ "</p></body></html>"  ]	 	
+			
+global [val html_error "%s<body.*>"
+			+ "<tbody><tr .*\">"
+			+ "<td .*\"><img .*file:.*docs/big_error.png\"></td>"
+			+ "<td .*\"><b>Unable to retrieve document from browsing history: </b>"
+			+ "<span .*\">%s</span></td>"
+			+ "</tr></tbody></table></body></html>"
+			+ ".*" ]	 
+								
 //------------------------------------------ scripts -------------------------------------------------	     
 proc "check-information-window" [val inner_html]{
 	get-window -from "Information Window" | get-control Browser | get-property text 
@@ -150,6 +159,13 @@ proc "check-documentation-view-for-library" [val file_name] [val project_name][v
 	}
 }
 
+
+proc "check-documentation-view-for-error"  [val error]{
+	get-view "Documentation View" | get-control Browser | get-property text 
+		| equals [format $html_error  $html_beginning  $error] | verify-true
+	
+}	
+
 //--------------------------------------  information view -----------------------------------------------
 
 proc "check-information-view-doc-for-kw" [val kw_name] [val project_name "RobotProject"] [val library] [val arguments] [val spec]{
@@ -172,7 +188,6 @@ proc "check-information-view-doc-for-user-kw" [val kw_name] [val path ""][val ar
 
 
 proc "check-information-view-for-file" [val file_name] [val project_name][val path] [val intro] [val shortcuts]{
-	create-shortcuts-list -sh_list $shortcuts -path $path | log
 	let [val path2 [replace -input $path -old " " -new "\%20"] ]{
 		get-window -from "Information Window" | get-control Browser | get-property text
 			| equals [format $html_test_file  $html_beginning $file_name $path2 $path $intro [create-shortcuts-list -sh_list $shortcuts -path $path2]] | verify-true
@@ -186,4 +201,5 @@ proc "click-link-in-doc-view"[val link]{
 	get-view "Documentation View" | get-control Browser |  get-object | invoke evaluate [format "for (var i = 0, list = document.getElementsByTagName(\"a\"); i < list.length; i++) {if (list[i].text ==\"%s\"){list[i].click()}}" $link]
 	
 }
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
