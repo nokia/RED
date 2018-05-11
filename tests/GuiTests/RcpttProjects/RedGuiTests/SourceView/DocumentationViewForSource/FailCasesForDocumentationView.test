@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _JMWB4FITEei8P-qAbw1qjQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/8/18 2:43 PM
+Save-Time: 5/11/18 3:06 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -68,7 +68,7 @@ with [get-view "Documentation View"] {
     get-button Forward | click
 }
 
-
+check-documentation-view-for-error -error "library:/project_b/AutoItLibrary/Block%20Input\?show_doc=true" 
 
 
 //
