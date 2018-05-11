@@ -125,11 +125,12 @@ class DocumentationViewPartListener implements IPartListener {
                 final IWorkbenchPage page = currentlyActiveEditor.getSite().getPage();
                 Documentations.markViewSyncBroken(page);
 
+                // selection could change between different tables, so we add table id (hashcode)
                 final SelectionLayerAccessor selectionLayerAccessor = currentlyActiveEditor.getSelectionLayerAccessor();
-
-                // selection could change between different tables, so we add table id
-                final Optional<TableSelectedCellInput> newInput = Stream
-                        .of(selectionLayerAccessor.getSelectedPositions())
+                final Optional<TableSelectedCellInput> newInput = Optional.ofNullable(selectionLayerAccessor)
+                        .map(Stream::of)
+                        .orElseGet(() -> Stream.empty())
+                        .flatMap(accessor -> Stream.<PositionCoordinate> of(accessor.getSelectedPositions()))
                         .findFirst()
                         .map(pos -> new TableSelectedCellInput(selectionLayerAccessor.hashCode(), pos));
 
