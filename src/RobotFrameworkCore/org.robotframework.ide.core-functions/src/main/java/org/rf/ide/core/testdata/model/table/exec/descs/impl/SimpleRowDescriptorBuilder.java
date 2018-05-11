@@ -19,6 +19,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.JoinedTextDeclarations;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -70,7 +71,9 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                 }
             } else {
                 if (correctVariables.size() == 1 && (mappedElements.size() == 1
-                        || (mappedElements.size() == 2 && "=".equals(mappedElements.get(1).getStart().getText())))) {
+                        || (mappedElements.size() == 2
+                                && mappedElements.get(1) instanceof JoinedTextDeclarations
+                                && "=".equals(((JoinedTextDeclarations) (mappedElements.get(1))).getText().trim())))) {
                     // definition variable
                     simple.addCreatedVariable(correctVariables.get(0));
                 } else {
