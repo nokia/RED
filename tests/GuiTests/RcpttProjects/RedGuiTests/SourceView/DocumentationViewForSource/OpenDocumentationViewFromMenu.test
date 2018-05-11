@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cKvDgIbgEeaPRdjThepTww
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/11/18 2:35 PM
+Save-Time: 5/11/18 2:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,6 +16,7 @@ Entry-Name: .content
 
 //---------------------------------------------------------------------------------------
 //open doc from menu
+get-view "Project Explorer" | get-tree | select "RobotProject/checking_doc.robot" | double-click
 get-editor "checking_doc.robot" | get-text-viewer | set-caret-pos 7 17
 get-editor "checking_doc.robot" | get-text-viewer | get-menu -path "Show documentation" | click
 
@@ -54,7 +55,7 @@ check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotPr
 get-editor "checking_doc.robot" | get-text-viewer | set-caret-pos 2  17
 check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/checking_doc.robot"  -spec "I have only doc, no args"
 get-view "Documentation View" | close
-
+get-view "Execution View" | click
 
 
 
