@@ -30,12 +30,6 @@ class StandardLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        runtimeEnvironment.createLibdocForcibly(libName, targetSpecFile.getLocation().toFile(), format);
-    }
-
-    @Override
     public String getMessage() {
         return "generating libdoc for '" + libName + "' library";
     }

@@ -104,7 +104,7 @@ public class LibrariesBuilder {
         }
     }
 
-    public void forceLibrariesRebuild(final Multimap<IProject, LibrarySpecification> groupedSpecifications,
+    public void rebuildLibraries(final Multimap<IProject, LibrarySpecification> groupedSpecifications,
             final SubMonitor monitor) {
         monitor.subTask("generating libdocs");
 
@@ -126,7 +126,7 @@ public class LibrariesBuilder {
                 monitor.subTask(generator.getMessage());
                 try {
                     if (project.exists()) {
-                        generator.generateLibdocForcibly(runtimeEnvironment,
+                        generator.generateLibdoc(runtimeEnvironment,
                                 new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
                                         .createEnvironmentSearchPaths(project));
                     }
