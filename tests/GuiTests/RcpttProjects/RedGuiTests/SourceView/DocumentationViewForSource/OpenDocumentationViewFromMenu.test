@@ -7,47 +7,12 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cKvDgIbgEeaPRdjThepTww
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/11/18 12:01 PM
+Save-Time: 5/11/18 2:35 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
-
-//open documentation for build in KW
-get-view "Project Explorer" | get-tree 
-    | select "RobotProject/Robot Standard libraries \\[.*\\]/BuiltIn \\(103\\)/Comment" 
-    | double-click
-    
-check-documentation-view -kw_name Comment -project_name "RobotProject"  -library BuiltIn  -arguments "\[\*messages\]" 
-	-spec "Displays the given messages in the log file as keyword arguments.*"
-get-view "Documentation View" | close    
-
-//open doc by menu
-get-view "Project Explorer" | get-tree 
-    | select "RobotProject/Robot Standard libraries \\[.*\\]/BuiltIn \\(103\\)/No Operation" 
-    | get-menu -path "Show keyword documentation" | click
-    
-check-documentation-view -kw_name "No Operation" -project_name "RobotProject"  -library BuiltIn  -arguments "\[\]" 
-	-spec "Does absolutely nothing."
-get-view "Documentation View" | close  
-
-
-//change focus to execution view
-get-view "Execution View" | click
-get-view "Project Explorer" | get-tree 
-    | select "RobotProject/Robot Standard libraries \\[.*\\]/BuiltIn \\(103\\)/Get Time" 
-    | get-menu -path "Show keyword documentation" | click
-    
-check-documentation-view -kw_name "Get Time" -project_name "RobotProject"  -library BuiltIn  -arguments "\[format=timestamp, time_=NOW\]"  
-	-spec "Returns the given time in the requested format.*"
-get-view "Documentation View" | close  
-
-//collapse all and open suite
-with [get-view "Project Explorer"] {
-    get-button "Collapse All  (M1+M2+Numpad_Divide)" | click
-    get-tree | select "RobotProject/checking_doc.robot" | double-click
-}
 
 //---------------------------------------------------------------------------------------
 //open doc from menu
