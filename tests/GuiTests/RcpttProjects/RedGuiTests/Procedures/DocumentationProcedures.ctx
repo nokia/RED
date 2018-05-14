@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/11/18 3:06 PM
+Save-Time: 5/14/18 2:32 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -67,12 +67,13 @@ global [val html_library "%s<body.*><h3>.*org.robotframework.ide.eclipse.main.pl
 			+ "</p></body></html>"  ]	 	
 			
 global [val html_error "%s<body.*>"
-			+ "<tbody><tr .*\">"
-			+ "<td .*\"><img .*file:.*docs/big_error.png\"></td>"
+			+ "<table.*>"
+			+ "(<tbody>)?"
+			+ "<tr .*\">"
+			+ "<td .*\"><img .*file:.*docs/big_error.png\"(/)?></td>"
 			+ "<td .*\"><b>Unable to retrieve document from browsing history: </b>"
 			+ "<span .*\">%s</span></td>"
-			+ "</tr></tbody></table></body></html>"
-			+ ".*" ]	 
+			+ "</tr>(</tbody>)?</table></body></html>"]	
 								
 //------------------------------------------ scripts -------------------------------------------------	     
 proc "check-information-window" [val inner_html]{
