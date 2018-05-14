@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _hb89IDvxEeiDC73Fvf4wHA
 Element-Name: EditingDocumentationInKeywords
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _PIa6YFiWEeaKPZp2wD-8qw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/16/18 3:52 PM
+Save-Time: 5/11/18 3:33 PM
 Tags: notTestable
 Testcase-Type: ecl
 
@@ -27,11 +28,14 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
+//open doc view
 get-menu "Window/Show View/Other..." | click
 with [get-window "Show View"] {
     get-editbox | set-text doc
     get-tree | select "Robot/Documentation View" | double-click
 }
+
+get-view "Documentation View" | get-button "Link with Selection" | click
 
 //set focus on first KW    
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
@@ -52,9 +56,8 @@ with [get-editor "TestFile.robot"] {
 }
 wait 1000
 //check Doc view
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "TestFile.robot" | verify-true
-    
+check-documentation-view  -is_empty true
+
 with [get-editor "TestFile.robot"] {
 	get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
     get-canvas -after [get-label "User Keywords"] -index 1 | key-type Left -times 5
@@ -67,128 +70,106 @@ with [get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords
         + "lin2 with \\t tab and param ${a}"
     key-type Enter
 }
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "TestFile.robot\n\n"
-    + "line1\n"
-    + "lin2 with \t tab and param ${a}" | verify-true
 
-//add doc with triple dots    
+get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Up
+
+check-documentation-view-for-user-kw  -kw_name "test1" -path "/RobotProject/TestFile.robot"  -spec "line1 lin2 with \\\t tab and param \$\{a\}"
+
+//add new text and go to Source - here wa NPE   
 with [get-editor "TestFile.robot"] {
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Left -times 5
+        key-type Right
         key-type Enter
     }
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "triple dots ...."
+        type-text "new text"
         key-type Enter
     }
-    
-    //save file and go to Source
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
-    get-tab-folder | get-tab-item Source | click
 }
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
-    + "*** Setting ***\n"
-    + "*** Keyword ***\n"
-    + "test1\n"
-    + "    [Documentation]    triple dots ....\n"
-    + "    Log  6" | verify-true
-    
-    
+exec-with-options {
+    get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+} -allowStatusDialog
+
+
 
 //add new KW with doc
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-get-view Outline | get-tree | select "TestFile.robot/Keywords/test1/Log"
+
+
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Right
-        key-type Left
         key-type Down -times 2
         key-type Enter
-        key-type Down
-        key-type Enter -times 2
     }
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "[Documentation]"
-        key-type Enter
-    }
-}
-get-view "Documentation View" | get-editbox | get-property text | equals "Keyword\n"
-    + "TestFile.robot" | verify-true
-with [get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1] {
-    type-text "second doc"
-    key-type Enter
 }
 
-//check text in view
-get-view "Documentation View" | get-editbox | get-property text | equals "Keyword\n"
-    + "TestFile.robot\n\n"
-    + "second doc" | verify-true
- 
- 
- 
-//go to Source and add second line oof documentation
-with [get-editor "TestFile.robot"] {
-    get-tab-folder | get-tab-item Source | click
-    with [get-text-viewer] {
-        set-caret-pos 8 34
-        key-type "NUMPAD_ENTER" "\\u000D"
-        type-text "bb"
-        key-type "M1+s"
-    }
-    wait 1000
-    get-tab-folder | get-tab-item Keywords | click
-}
-wait 2000
-get-view Outline | get-tree | select "TestFile.robot/Keywords/Keyword" | click
-wait 500
-//set focus on doc argument
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Down
-        key-type Right
+        key-type Enter
+        type-text "["
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "Documentation]"
         key-type Enter
     }
-    //type "cc"
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
-    	set-text-selection -offset 14 -startLine 1 -endLine 1 -endOffset 14
-    	type-text cc
-		key-type Enter
-    }
-}
-//======================================================================================
-//temp solution - without addin somemting to cell nezt test have menu disabled
-with [get-editor "TestFile.robot"] {
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        set-text log
+        type-text "second doc"
+        key-type Enter
     }
 }
 
-//======================================================================================
-//ok
-//check Doc view
-get-view "Documentation View" | get-editbox | get-property text | equals "Keyword\n"
-    + "TestFile.robot\n\n"
-    + "second doc bbcc" | verify-true
-
-//======================================================================================
-//temp solution - without addin somemting to cell next test have menu disabled
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
-    + "*** Setting ***\n"
-    + "*** Keyword ***\n"
-    + "test1\n"
-    + "    [Documentation]    triple dots ....\n"
-    + "    Log  6\n"
-    + "Keyword\n"
-    + "    [Documentation]    second doc bbcc\n"
-    + "    log" | verify-true    
- 
-//====================================================================================== 
-//this will be when Log will be removed    
-    
-////check if new letters were added to second line    
+check-documentation-view-for-user-kw  -kw_name "Keyword" -path "/RobotProject/TestFile.robot"  -spec "second doc"
+//
+// 
+// 
+////go to Source and add second line oof documentation
+//with [get-editor "TestFile.robot"] {
+//    get-tab-folder | get-tab-item Source | click
+//    with [get-text-viewer] {
+//        set-caret-pos 8 34
+//        key-type "NUMPAD_ENTER" "\\u000D"
+//        type-text "bb"
+//        key-type "M1+s"
+//    }
+//    wait 1000
+//    get-tab-folder | get-tab-item Keywords | click
+//}
+//wait 2000
+//get-view Outline | get-tree | select "TestFile.robot/Keywords/Keyword" | click
+//wait 500
+////set focus on doc argument
+//with [get-editor "TestFile.robot"] {
+//    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+//        key-type Down
+//        key-type Right
+//        key-type Enter
+//    }
+//    //type "cc"
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//    	set-text-selection -offset 14 -startLine 1 -endLine 1 -endOffset 14
+//    	type-text cc
+//		key-type Enter
+//    }
+//}
+////======================================================================================
+////temp solution - without addin somemting to cell nezt test have menu disabled
+//with [get-editor "TestFile.robot"] {
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        set-text log
+//    }
+//}
+//
+////======================================================================================
+////ok
+////check Doc view
+//get-view "Documentation View" | get-editbox | get-property text | equals "Keyword\n"
+//    + "TestFile.robot\n\n"
+//    + "second doc bbcc" | verify-true
+//
+////======================================================================================
+////temp solution - without addin somemting to cell next test have menu disabled
 //get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 //get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
 //    + "*** Setting ***\n"
@@ -197,6 +178,21 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 //    + "    [Documentation]    triple dots ....\n"
 //    + "    Log  6\n"
 //    + "Keyword\n"
-//    + "    [Documentation]    second doc bbcc" | verify-true
-        
+//    + "    [Documentation]    second doc bbcc\n"
+//    + "    log" | verify-true    
+// 
+////====================================================================================== 
+////this will be when Log will be removed    
+//    
+//////check if new letters were added to second line    
+////get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+////get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+////    + "*** Setting ***\n"
+////    + "*** Keyword ***\n"
+////    + "test1\n"
+////    + "    [Documentation]    triple dots ....\n"
+////    + "    Log  6\n"
+////    + "Keyword\n"
+////    + "    [Documentation]    second doc bbcc" | verify-true
+//        
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
