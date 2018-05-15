@@ -307,7 +307,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  urrri=http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 62))));
     }
 
@@ -316,7 +316,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  1://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 53))));
     }
 
@@ -325,7 +325,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  %urihttp://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 60))));
     }
 
@@ -334,7 +334,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  http://127.0.0.1:9000/%");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 57))));
     }
 
@@ -343,7 +343,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  ://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 52))));
     }
 
@@ -352,7 +352,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  http://");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 41))));
     }
 
@@ -361,7 +361,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  urrri[http://127.0.0.1:9000/  60");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 62))));
     }
 
@@ -370,7 +370,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=urrri]http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 66))));
     }
 
@@ -379,7 +379,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=:://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 57))));
     }
 
@@ -388,7 +388,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=}urihttp://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 64))));
     }
 
@@ -397,7 +397,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=uri=http://127.0.0.1:9000/%");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 65))));
     }
 
@@ -406,7 +406,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 56))));
     }
 
@@ -415,7 +415,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=http://");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 45))));
     }
 
@@ -424,7 +424,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=urrri!http://127.0.0.1:9000/  timeout=60");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 66))));
     }
 
@@ -433,7 +433,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  timeout=60  uri=urrri|http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_DURING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(46, 78))));
     }
 
