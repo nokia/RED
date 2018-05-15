@@ -138,13 +138,15 @@ class ExternalLibrariesImportCollector {
                 final List<RobotToken> arguments) throws CoreException {
             if (name.equals("Remote")) {
                 final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
-                final String address = resolver.getUri();
-                if (address != null) {
-                    final String remoteLibName = "Remote " + RemoteArgumentsResolver.stripLastSlashIfNecessary(address)
+                final Optional<String> address = resolver.getUri();
+                if (address.isPresent()) {
+                    final String remoteLibName = "Remote "
+                            + RemoteArgumentsResolver.stripLastSlashIfNecessary(address.get())
                             + "/";
-                    final URI uriAddress = URI.create(RemoteArgumentsResolver.stripLastSlashIfNecessary(address) + "/");
+                    final URI uriAddress = URI
+                            .create(RemoteArgumentsResolver.stripLastSlashIfNecessary(address.get()) + "/");
                     final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName, uriAddress);
-                    if (!isInLibraryImports(address, libraryImports)) {
+                    if (!isInLibraryImports(address.get(), libraryImports)) {
                         libraryImports.add(libImport);
                         libraryImporters.put(libImport, currentSuite);
                         knownLibraryNames.put(remoteLibName, libImport);
