@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _JVkfkEcAEei0qKwna87CYQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/25/18 11:07 AM
+Save-Time: 5/15/18 4:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -203,7 +203,7 @@ get-editor "__init__.py" | get-text-viewer | get-property "getSelectionCount()" 
     
     
     
-//RED-995    
+// ------------------------------------------ RED-995     ---------------------------------
 //remove all libs
 with [get-editor "ManyModules/red.xml"] {
     click
@@ -218,22 +218,26 @@ with [get-editor "ManyModules/red.xml"] {
 //set new text
 get-editor "test.robot" | click
 get-editor "test.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "# full path with slash at the end - ok (without slash works too)\n"
     + "Library    ${EXECDIR}/module1/\n\n"
+    + "#relative path without slash at the end - error - ok\n"
+    + "Library    nested/modules3\n\n"
+    + "# relative path - slash at the end - ok\n"
+    + "Library    Outer/Inner/PrintModule/\n\n"
     + "*** Test Cases ***\n"
     + "tc\n"
     + "    Kw 1   00  11" 
 
-//exclude to have olny 2 errors
+//exclude to have only 2 errors
 get-view "Project Explorer" | get-tree | select "ManyModules/Script.robot" | select "ManyModules/Script.robot" 
     | get-menu -path "Robot Framework/Exclude from validation" | click
-get-view Problems | get-label "2 errors, 0 warnings, 0 others" | get-property caption 
-    | equals "2 errors, 0 warnings, 0 others" | verify-true
+get-view Problems | get-label "4 errors, 0 warnings, 0 others" | get-property caption 
+    | equals "4 errors, 0 warnings, 0 others" | verify-true
     
       
 //run QF    
 with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 2 26
-    hover-text 2 21
+    set-caret-pos 3 26
     get-menu -path "Quick Fix" | click
 }
 wait 500
@@ -241,11 +245,40 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table
     | select"Discover '.*ManyModules\\/module1\\/' and add to configuration" | click 
     -default
     
+// select second lib
+with [get-editor "test.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 6 20
+        hover-text 6 19
+        key-type "M1+1"
+    }
+}
+wait 200
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'nested\\/modules3' and add to configuration" | click -default    
+wait-for-discover-window
+
+//check fail
+get-window "Discovering libraries summary" | get-tree | get-item -path "nested\\/modules3" | get-property "image.path" 
+    | equals "org.robotframework.ide.eclipse.main.plugin/resources/error_fatal.png" | verify-true
+get-window "Discovering libraries summary" | get-button OK | click    
+   
+//lib in line 9    
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 9 18
+    hover-text 9 18
+    key-type "M1+1"
+} 
+wait 200
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'Outer\\/Inner\\/PrintModule\\/' and add to configuration" | click -default
+       
 //save red.xml    
 get-button "Save All (M1+M2+S)" | click
 
-wait-for-warnings -amount 1 -times 5 -delay 1000
-get-view Problems | get-label "0 errors, 1 warning, 0 others" | get-property caption 
-    | equals "0 errors, 1 warning, 0 others" | verify-true
+wait-for-warnings -amount 2 -times 5 -delay 1000
+get-view Problems | get-label "1 error, 2 warnings, 0 others" | get-property caption 
+    | equals "1 error, 2 warnings, 0 others" | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
