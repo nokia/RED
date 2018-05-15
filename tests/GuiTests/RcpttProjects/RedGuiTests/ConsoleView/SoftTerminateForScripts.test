@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _YLsq8BVSEeeZSZgUeG7ZOA,_znjMEBtDEeWSh6BKjAxDIw,__TTUMFd4EeilE_DD4P7SbQ
+Contexts: _znjMEBtDEeWSh6BKjAxDIw,__TTUMFd4EeilE_DD4P7SbQ,_s-ctEA4_EeePcNCRX_abWA
 Element-Name: SoftTerminateForScripts
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Low2MFeTEeilE_DD4P7SbQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/14/18 8:11 PM
+Save-Time: 5/15/18 12:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,6 +21,9 @@ proc "wait-for-test-start"{
 		    + "jj" | verify-true  
 	}
 }
+
+export-agent-to-folder -folder $RED_workspace_path_unix_style
+
 
 //run test to create run config
 get-view "Project Explorer" | get-tree | select "Soft/test.robot" | select "Soft/test.robot" | get-menu 
@@ -44,5 +47,77 @@ exec-with-options -disableJobWaiting -command{
 	get-view "Project Explorer" | get-tree | select "Soft/test.robot" | get-menu -path "Run As/1 Robot Test" | click
 	wait 1000
 	get-view Console | get-button "Terminate gracefully" | click
+	
+	if [get-by-os -win "Windows" -linux "Linux" | eq "Windows"]{
+		try -times 4 -delay 1000 -command{
+			get-view Console | get-text-viewer | get-property text | contains "Terminate batch job (Y/N)?" | verify-true
+			
+		}
+		//check if buttons are enabled
+		with [get-view Console] {
+		    get-button Terminate | get-property enablement | equals true | verify-true
+		    get-button "Suspend tests" | get-property enablement | equals true | verify-true
+		    get-button "Terminate gracefully" | get-property enablement | equals true | verify-true
+		}
+		//terminate again - no effect on windows
+		get-view Console | get-button "Terminate gracefully" | click
+		with [get-view Console] {
+		    get-button Terminate | get-property enablement | equals true | verify-true
+		    get-button "Suspend tests" | get-property enablement | equals true | verify-true
+		    get-button "Terminate gracefully" | get-property enablement | equals true | verify-true
+		}
+		//terminate normally
+		get-view Console | get-button "Terminate" | click
+		wait-for-console
+		
+	}
+	//add script that runs tests
+	get-menu -path "Run/Run Configurations..." | click
+	with [get-window "Run Configurations"] {
+	
+		//change port
+	    get-tab-folder | get-tab-item Listener | click
+	    get-group "Test Runner Agent" | get-button "Use remote agent connection (custom server parameters)" | click
+	    get-button Apply | click
+	    get-tab-folder | get-tab-item Executor | click
+	
+		//add script
+	    get-group "External script" | get-button "Workspace..." | click
+	    get-window "Select file:" | get-tree | select [os-specific "Soft/scripts/with_robot_test.bat" "Soft/scripts/with_robot_test.sh" ] | double-click
+	    get-group "External script" | get-editbox 
+	        -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] 
+	        | set-text [concat $RED_workspace_path " " $RED_workspace_path]
+	    get-button Run | click
+	   
+	}
+	wait-for-test-start
+	get-view Console | get-button "Terminate gracefully" | click
+	if [get-by-os -win "Windows" -linux "Linux" | eq "Windows"]{
+		try -times 4 -delay 1000 -command{
+			get-view Console | get-text-viewer | get-property text | contains "Terminate batch job (Y/N)?" | verify-true
+			
+		}
+		with [get-view Console | get-text-viewer] {
+		    set-caret-pos 25 28
+		    type-text y
+		    key-type "NUMPAD_ENTER" "\\u000D"
+		}
+		with [get-view Console] {
+		    get-button Terminate | get-property enablement | equals false | verify-true
+		    get-button "Suspend tests" | get-property enablement | equals false | verify-true
+		    get-button "Terminate gracefully" | get-property enablement | equals false | verify-true
+		}
+
+	}
+	get-view "Message Log" | get-editbox | get-property text | contains "Starting test: Soft.TestFile.jj\n"
+	    + ".* : INFO : 1500 qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n" 
+	    | verify-false
+	    
+	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Soft.TestFile.jj\n"
+	    + ".* : INFO : Starting!\n"   
+	    + "(.*\n)*"
+		+ ".* : INFO : Here was teardown\n"
+	    + "Ending test: Soft.TestFile.jj\n\n"
+	    + ".* : INFO : End of suite" | verify-true    	
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
