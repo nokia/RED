@@ -1,0 +1,170 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YDbWsNnJEeeKxYJgF2NTmg,_elFIQFgtEeiocp3js0hRPQ
+Element-Name: RemoteUriValidation
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _okTHQFgpEeiocp3js0hRPQ
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 5/16/18 11:24 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+get-view Problems | click
+wait-for-errors -amount 71 -times 2 -delay 500
+with [get-view Problems | get-tree] {
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().length" | equals 71 | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Remote URI is invalid: Expected authority at index 7: http://" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Remote URI is invalid: Expected authority at index 7: http://" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "Remote URI is invalid: Expected closing bracket for IPv6 address at index 20: http://[127.1.1.8270" 
+        | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "Remote URI is invalid: Expected closing bracket for IPv6 address at index 20: http://[127.1.1.8270" 
+        | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "Remote URI is invalid: Expected scheme name at index 0: ://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+        | equals "Remote URI is invalid: Expected scheme name at index 0: ://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http:// 127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http:// 127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[8].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://{127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[9].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://{127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[10].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://}127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[11].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://}127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[12].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://\\127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[13].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://\\127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[14].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://^127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[15].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://^127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[16].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://<127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[17].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://<127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[18].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://>127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[19].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://>127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[20].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://|127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[21].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://|127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[22].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://127.1. 1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[23].getText()" 
+        | equals "Remote URI is invalid: Illegal character in authority at index 7: http://127.1. 1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[24].getText()" 
+        | equals "Remote URI is invalid: Illegal character in hostname at index 7: http://]127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[25].getText()" 
+        | equals "Remote URI is invalid: Illegal character in hostname at index 7: http://]127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[26].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 0: =://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[27].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 0: =://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[28].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 0: 1://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[29].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 0: 1://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[30].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 1: u ri://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[31].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri ://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[32].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri ://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[33].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri;://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[34].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri;://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[35].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri;://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[36].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri;://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[37].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri!://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[38].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri!://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[39].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri(://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[40].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri(://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[41].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri)://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[42].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri)://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[43].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri[://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[44].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri[://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[45].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri]://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[46].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri]://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[47].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri{://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[48].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri{://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[49].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri}://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[50].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri}://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[51].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri@://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[52].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri@://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[53].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri*://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[54].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri*://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[55].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri&://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[56].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri&://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[57].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri%://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[58].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri%://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[59].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri^://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[60].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri^://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[61].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri<://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[62].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri<://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[63].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri>://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[64].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri>://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[65].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri|://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[66].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri|://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[67].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri$://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[68].getText()" 
+        | equals "Remote URI is invalid: Illegal character in scheme name at index 3: uri$://127.1.1.8270" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[69].getText()" 
+        | equals "Remote URI is invalid: Malformed escape pair at index 20: http://127.1.1.8270/%" | verify-true
+    get-item -path "Errors \\(71 items\\)" | get-property "getItems().TreeItem[70].getText()" 
+        | equals "Remote URI is invalid: Malformed escape pair at index 20: http://127.1.1.8270/%" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
