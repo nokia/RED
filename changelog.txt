@@ -1,6 +1,42 @@
 RED 0.8.4 - 2018/03/19
 Enhancement
 
+    [RED-1022] - allow html libdoc to be used in RED to support text formatting from robot
+    [RED-1035] - GitHub #194 - Coloring variables using square brackets
+    [RED-1040] - GitHub #125 - try to look for python2/python3 filenames when looking for python installations
+    [RED-1043] - Github #180 - Add command line filed to Rflint
+    [RED-1068] - Github #184 - Resolve Eclipse parameters in fields for launching stuff (rflint,run configs)
+    [RED-1085] - Provide part cell variable coloring in table view
+    [RED-1093] - Provide part cell gherkin coloring in table view
+    [RED-1110] - library source opening for python modules
+    [RED-1112] - [Github #170] interrupt tests processes instead of killing them
+
+Bug
+
+    [RED-557] - Documentation is not shown after clicking on test name in Source
+    [RED-559] - GitHub #187 - Keyword with parameterized name coloring
+    [RED-995] - Importing python module libraries by path is handled by Quick Fix, but validation reports marker
+    [RED-1042] - wrong Console url coloring when argumentFile preference is disabled
+    [RED-1044] - GitHub #185 Libdoc view from PE - does not show docs when doc contains &lt; and &gt; strings
+    [RED-1063] - Python Debug does not open python file
+    [RED-1065] - Coloring text to black when cell is edited
+    [RED-1072] - Exception when Remote library is imported without args and with alias
+    [RED-1076] - Exception when Remote library is imported with invalid URI
+    [RED-1080] - Remote import with two arguments: URI and timeout
+    [RED-1081] - moving linked folders/files in Project breaks "go to definition" of res and libs
+    [RED-1086] - Path to project is not added to pythonpath during autodiscovering
+    [RED-1088] - Variable coloring is changed to keyword color after modification
+    [RED-1090] - Variable is not colored when inside apostrophes
+    [RED-1118] - Invalid URI handling during Remote import
+
+Task
+
+    [RED-1114] - Debug in RF 3.0.2 and 3.0.3 is not consistent
+
+
+RED 0.8.4 - 2018/03/19
+Enhancement
+
     [RED-998] - Adding remote libraries during AutoDiscovery
     [RED-1024] - Provide coloring for table editors for keywords the same as in source editors
     [RED-1025] - table editor - add arguments after selecting/using kw
