@@ -1,3 +1,37 @@
+# RED - Robot Editor v0.8.5
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- RED now uses html format for documentation
+- many fixes in coloring in text and table editors
+- Rflint now has field for command line parameters - check Preferences
+- RED can use Eclipse parameters in fields for launching (rflint,run configurations) #184 - more info in help: RED - Robot Editor User Guide > User guide > Launching Tests >String substitution variables
+- Graceful Robot/process killing to allow Robot to generate reports #170
+- Autodiscovery and quick fix improvements
+
+## GitHub issues updates
+    #125 - try to look for python2/python3 filenames when looking for python installations
+    #170 - interrupt tests processes instead of killing them
+    #185 - Libdoc view from PE - does not show docs when doc contains &lt; and &gt; strings
+    #180 - Add command line filed to Rflint
+    #184 - Resolve Eclipse parameters in fields for launching stuff (rflint,run configs)
+    #187 - Keyword with parameterized name coloring
+    #194 - Coloring variables using square brackets
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.4
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
