@@ -72,16 +72,6 @@ class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment,
-            final EnvironmentSearchPaths additionalPaths) {
-        try {
-            generateLibdoc(runtimeEnvironment, additionalPaths);
-        } catch (final RobotEnvironmentException e) {
-            // nothing to do
-        }
-    }
-
-    @Override
     public String getMessage() {
         return "linking libdoc for workspace-external virtual library located at '" + path.toOSString() + "'";
     }

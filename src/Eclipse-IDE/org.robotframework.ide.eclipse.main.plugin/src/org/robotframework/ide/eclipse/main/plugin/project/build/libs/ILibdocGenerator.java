@@ -15,9 +15,6 @@ interface ILibdocGenerator {
     void generateLibdoc(RobotRuntimeEnvironment runtimeEnvironment, EnvironmentSearchPaths additionalPaths)
             throws RobotEnvironmentException;
 
-    void generateLibdocForcibly(RobotRuntimeEnvironment runtimeEnvironment, EnvironmentSearchPaths additionalPaths)
-            throws RobotEnvironmentException;
-
     String getMessage();
 
     IFile getTargetFile();

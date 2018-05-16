@@ -360,26 +360,11 @@ public class RobotRuntimeEnvironment {
         createLibdoc(libName, "", new EnvironmentSearchPaths(), outputFile, format);
     }
 
-    public void createLibdocForcibly(final String libName, final File outputFile, final LibdocFormat format)
-            throws RobotEnvironmentException {
-        createLibdocForcibly(libName, "", new EnvironmentSearchPaths(), outputFile, format);
-    }
-
     public void createLibdoc(final String libName, final String libPath, final EnvironmentSearchPaths additionalPaths,
             final File outputFile, final LibdocFormat format) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdoc(outputFile.getAbsolutePath(), format, libName, libPath, additionalPaths);
-        }
-    }
-
-    public void createLibdocForcibly(final String libName, final String libPath,
-            final EnvironmentSearchPaths additionalPaths, final File outputFile, final LibdocFormat format)
-            throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdoc(outputFile.getAbsolutePath(), format, libName, libPath, additionalPaths);
         }
     }
