@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PIa6YFiWEeaKPZp2wD-8qw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/11/18 3:33 PM
+Save-Time: 5/15/18 4:28 PM
 Tags: notTestable
 Testcase-Type: ecl
 
@@ -76,7 +76,7 @@ get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -ind
 
 check-documentation-view-for-user-kw  -kw_name "test1" -path "/RobotProject/TestFile.robot"  -spec "line1 lin2 with \\\t tab and param \$\{a\}"
 
-//add new text and go to Source - here wa NPE   
+//add new text and go to Source - here was NPE   
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Right
