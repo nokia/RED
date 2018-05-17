@@ -66,9 +66,10 @@ public class TwoModelReferencesLinker {
             final RobotFileOutput alreadyDumpedContent,
             final ListMultimap<RobotTokenType, RobotToken> newViewAboutTokens) {
 
-        // general idea: 1. 'old tokens contains content as expected, so we only updating in them
-        // position with clear dirty flag'
-        // 2. next we are searching new token in new output line position and replacing it by old
+        // general idea: 1. 'old tokens contains content as expected, so we only
+        // updating in them position with clear dirty flag'
+        // 2. next we are searching new token in new output line position and replacing
+        // it by old
         // 3. last we removing old lines and adding new lines in old output object
         final List<RobotLine> newContentLines = alreadyDumpedContent.getFileModel().getFileContent();
 
@@ -82,7 +83,6 @@ public class TwoModelReferencesLinker {
                 final RobotToken newToken = newToCopy.get(index);
 
                 oldToken.setText(newToken.getText());
-                oldToken.setRaw(newToken.getRaw());
                 oldToken.setLineNumber(newToken.getLineNumber());
                 oldToken.setStartColumn(newToken.getStartColumn());
                 oldToken.setStartOffset(newToken.getStartOffset());

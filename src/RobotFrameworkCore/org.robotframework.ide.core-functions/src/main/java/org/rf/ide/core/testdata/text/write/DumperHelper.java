@@ -132,7 +132,6 @@ public class DumperHelper {
         }
 
         final RobotToken tempEOL = new RobotToken();
-        tempEOL.setRaw(eol);
         tempEOL.setText(eol);
 
         return EndOfLineBuilder.newInstance().setEndOfLines(Constant.get(tempEOL)).buildEOL();

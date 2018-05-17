@@ -31,7 +31,6 @@ public class VariableExtractorTest {
         varToken.setStartColumn(1);
         varToken.setStartOffset(39);
         varToken.setText(text);
-        varToken.setRaw(text);
 
         final MappedResultStepHelper checkpoint = new MappedResultStepHelper(39).addNextTextStep("   ")
                 .addNextTextStep("\\\\")
@@ -78,7 +77,6 @@ public class VariableExtractorTest {
         varToken.setStartColumn(1);
         varToken.setStartOffset(39);
         varToken.setText(text);
-        varToken.setRaw(text);
 
         final MappedResultStepHelper checkpoint = new MappedResultStepHelper(39).addNextTextStep("   ")
                 .addNextTextStep("\\${")
@@ -126,7 +124,6 @@ public class VariableExtractorTest {
         varToken.setStartColumn(1);
         varToken.setStartOffset(39);
         varToken.setText(text);
-        varToken.setRaw(text);
 
         final MappedResultStepHelper checkpoint = new MappedResultStepHelper(39).addNextTextStep("   ")
                 .addNextVariableStep("${result}")
@@ -259,7 +256,6 @@ public class VariableExtractorTest {
         varToken.setLineNumber(0);
         varToken.setStartColumn(1);
         varToken.setStartOffset(2);
-        varToken.setRaw("%{user.home}");
         varToken.setText("%{user.home}");
 
         // execute

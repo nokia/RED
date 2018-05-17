@@ -22,7 +22,6 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class TestCaseFinder {
 
     public TestCase findOrCreateNearestTestCase(final RobotLine currentLine,
@@ -47,7 +46,6 @@ public class TestCaseFinder {
         return testCase;
     }
 
-
     private RobotLine findRobotLineInModel(final RobotFile fileModel,
             final TestCase testCase, final RobotLine currentLine) {
         RobotLine foundLine = currentLine;
@@ -66,7 +64,6 @@ public class TestCaseFinder {
         return foundLine;
     }
 
-
     private TestCase createArtificialTestCase(final RobotFileOutput robotFileOutput,
             final TestCaseTable testCaseTable) {
         TestCase testCase;
@@ -76,7 +73,6 @@ public class TestCaseFinder {
         final RobotToken artificialNameToken = new RobotToken();
         artificialNameToken.setLineNumber(tableHeader.getTableHeader()
                 .getLineNumber() + 1);
-        artificialNameToken.setRaw("");
         artificialNameToken.setText("");
         artificialNameToken.setStartColumn(0);
         final RobotLine robotLine = robotFileOutput.getFileModel().getFileContent()
@@ -89,7 +85,6 @@ public class TestCaseFinder {
         testCase = new TestCase(artificialNameToken);
         return testCase;
     }
-
 
     public List<TestCase> filterByTestCasesAfterLastHeader(
             final TestCaseTable testCaseTable) {

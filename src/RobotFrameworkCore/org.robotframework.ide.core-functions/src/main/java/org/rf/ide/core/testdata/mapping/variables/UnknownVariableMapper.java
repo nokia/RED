@@ -42,7 +42,6 @@ public class UnknownVariableMapper implements IParsingMapper {
         types.add(0, RobotTokenType.VARIABLES_UNKNOWN_DECLARATION);
         rt.setStartColumn(fp.getColumn());
         rt.setText(text);
-        rt.setRaw(text);
 
         final VariableTable varTable = robotFileOutput.getFileModel().getVariableTable();
         final UnknownVariable varUnknown = new UnknownVariable(rt.getRaw().toString(), rt, VariableScope.TEST_SUITE);

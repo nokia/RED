@@ -36,7 +36,6 @@ public class TestDocumentationTextMapper implements IParsingMapper {
         types.add(0, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT);
 
         rt.setText(text);
-        rt.setRaw(text);
         final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
         final TestCase testCase = testCases.get(testCases.size() - 1);
         final List<TestDocumentation> documentations = testCase.getDocumentation();

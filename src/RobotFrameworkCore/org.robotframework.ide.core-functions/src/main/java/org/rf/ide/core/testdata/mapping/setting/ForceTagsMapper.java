@@ -36,7 +36,6 @@ public class ForceTagsMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         rt.setType(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
 

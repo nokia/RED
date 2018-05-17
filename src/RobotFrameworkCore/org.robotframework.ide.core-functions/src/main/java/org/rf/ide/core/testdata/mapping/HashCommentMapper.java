@@ -93,7 +93,8 @@ public class HashCommentMapper implements IParsingMapper {
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         boolean addToStack = false;
-        rt.setRaw(text);
+        // FIXME: raw != text
+        // rt.setRaw(text);
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             addToStack = true;
         } else if (RobotExecutableRow.isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {

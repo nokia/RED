@@ -80,14 +80,12 @@ public class DumpLineUpdater {
                     if (artToken.getRaw().isEmpty()) {
                         if (artToken instanceof RobotToken) {
                             final RobotToken rt = (RobotToken) artToken;
-                            rt.setRaw(aDumperHelper.getEmpty());
                             rt.setText(aDumperHelper.getEmpty());
                         }
                     } else {
                         if (artToken instanceof RobotToken) {
                             final RobotToken rt = (RobotToken) artToken;
                             final String text = formatWhiteSpace(rt.getText());
-                            rt.setRaw(text);
                             rt.setText(text);
                         }
                     }
@@ -97,7 +95,6 @@ public class DumpLineUpdater {
                         if (artToken instanceof RobotToken) {
                             if (isTokenToEmptyEscape((RobotToken) artToken)) {
                                 final RobotToken rt = (RobotToken) artToken;
-                                rt.setRaw(aDumperHelper.getEmpty());
                                 rt.setText(aDumperHelper.getEmpty());
                             }
                         }
@@ -107,7 +104,8 @@ public class DumpLineUpdater {
                             if (rt.getText().isEmpty() && isTokenToEmptyEscape(rt)) {
                                 ((RobotToken) artToken).setText(aDumperHelper.getEmpty());
                             }
-                            rt.setRaw(artToken.getText());
+                            // FIXME: raw != text
+                            // rt.setRaw(artToken.getText());
                         }
                     }
                 }
@@ -208,11 +206,12 @@ public class DumpLineUpdater {
         if (elem instanceof RobotToken) {
             final RobotToken newToken = new RobotToken();
             newToken.setLineNumber(line.getLineNumber());
-            if (elem.getRaw().isEmpty()) {
-                newToken.setRaw(elem.getText());
-            } else {
-                newToken.setRaw(elem.getRaw());
-            }
+            // FIXME: raw != text
+            // if (elem.getRaw().isEmpty()) {
+            // newToken.setRaw(elem.getText());
+            // } else {
+            // newToken.setRaw(elem.getRaw());
+            // }
             newToken.setText(elem.getText());
             if (!elem.getTypes().isEmpty()) {
                 newToken.getTypes().clear();

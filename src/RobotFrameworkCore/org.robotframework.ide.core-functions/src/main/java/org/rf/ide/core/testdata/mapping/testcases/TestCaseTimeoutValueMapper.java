@@ -38,7 +38,6 @@ public class TestCaseTimeoutValueMapper implements IParsingMapper {
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE);
 
         rt.setText(text);
-        rt.setRaw(text);
 
         final TestCaseTable testCaseTable = robotFileOutput.getFileModel().getTestCaseTable();
         final List<TestCase> testCases = testCaseTable.getTestCases();

@@ -32,7 +32,6 @@ public class TestCaseTeardownMapper extends ATestCaseSettingDeclarationMapper {
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TEARDOWN);
 
         rt.setText(text);
-        rt.setRaw(text);
 
         final TestCase testCase = finder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput, rt,
                 fp);
