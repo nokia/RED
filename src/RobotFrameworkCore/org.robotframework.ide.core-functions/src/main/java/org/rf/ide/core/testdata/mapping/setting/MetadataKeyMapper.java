@@ -21,16 +21,13 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class MetadataKeyMapper implements IParsingMapper {
 
     private final ParsingStateHelper utility;
 
-
     public MetadataKeyMapper() {
         this.utility = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -39,7 +36,6 @@ public class MetadataKeyMapper implements IParsingMapper {
             final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_METADATA_KEY);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
@@ -54,7 +50,6 @@ public class MetadataKeyMapper implements IParsingMapper {
         return rt;
     }
 
-
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
             final RobotLine currentLine, final RobotToken rt, final String text,
@@ -67,7 +62,6 @@ public class MetadataKeyMapper implements IParsingMapper {
 
         return result;
     }
-
 
     @VisibleForTesting
     protected boolean isIncludedInSettingTable(final RobotLine line,

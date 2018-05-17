@@ -22,7 +22,7 @@ public class KeywordTeardownModelOperation implements IExecutablesStepsHolderEle
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.USER_KEYWORD_TEARDOWN;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.KEYWORD_SETTING_TEARDOWN;
@@ -33,7 +33,6 @@ public class KeywordTeardownModelOperation implements IExecutablesStepsHolderEle
             final List<String> args, final String comment) {
         final KeywordTeardown keywordTeardown = userKeyword.newTeardown(index);
         keywordTeardown.getDeclaration().setText(settingName);
-        keywordTeardown.getDeclaration().setRaw(settingName);
 
         if (!args.isEmpty()) {
             keywordTeardown.setKeywordName(args.get(0));

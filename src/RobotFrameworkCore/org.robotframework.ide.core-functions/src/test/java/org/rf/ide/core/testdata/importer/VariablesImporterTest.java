@@ -200,11 +200,9 @@ public class VariablesImporterTest {
         rtDec.setStartColumn(0);
         rtDec.setStartOffset(0);
         rtDec.setText("Variables");
-        rtDec.setRaw("Variables");
 
         final AImported importedOne = new VariablesImport(rtDec);
         final RobotToken varPathOne = new RobotToken();
-        varPathOne.setRaw(text);
         varPathOne.setText(text);
         varPathOne.setStartOffset(importedOne.getEndPosition().getOffset());
         varPathOne.setLineNumber(1);

@@ -105,7 +105,6 @@ public class VariableNamesSupportTest {
         rt.setLineNumber(0);
         rt.setStartOffset(0);
         rt.setStartColumn(0);
-        rt.setRaw(text);
         rt.setText(text);
         rt.setType(RobotTokenType.VARIABLE_USAGE);
         final VariableExtractor varExt = new VariableExtractor();

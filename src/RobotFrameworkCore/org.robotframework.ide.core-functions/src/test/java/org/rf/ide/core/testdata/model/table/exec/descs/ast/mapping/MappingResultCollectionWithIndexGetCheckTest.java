@@ -102,7 +102,6 @@ public class MappingResultCollectionWithIndexGetCheckTest {
         token.setStartOffset(0);
         token.setLineNumber(1);
         token.setStartColumn(0);
-        token.setRaw(text);
         token.setText(text);
         final VariableExtractor varExtractor = new VariableExtractor();
 

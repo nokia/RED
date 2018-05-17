@@ -214,7 +214,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 line.setSeparatorType(separator.getProducedType());
                 RobotToken rt = null;
 
-
                 final int textLength = currentLineText.length();
                 // check if is any data to process
                 if (isPrettyAlignLineOnly(currentLineText)) {
@@ -452,7 +451,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                     newRobotToken.setLineNumber(fp.getLine());
                     newRobotToken.setStartColumn(fp.getColumn());
                     newRobotToken.setText(text);
-                    newRobotToken.setRaw(text);
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
                     newRobotToken.getTypes().addAll(robotToken.getTypes());
                     robotToken = newRobotToken;
@@ -463,7 +461,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 robotToken.setLineNumber(fp.getLine());
                 robotToken.setStartColumn(fp.getColumn());
                 robotToken.setText(text);
-                robotToken.setRaw(text);
                 robotToken.setType(RobotTokenType.UNKNOWN);
 
                 newStatus = ParsingState.UNKNOWN;
@@ -539,7 +536,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         RobotToken robotToken = new RobotToken();
         robotToken.setFilePosition(fp);
         robotToken.setText(text);
-        robotToken.setRaw(text);
         robotToken.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
 
         robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState, robotFileOutput, fp,
@@ -620,7 +616,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             final RobotToken rt = new RobotToken();
             rt.setLineNumber(fp.getLine());
             rt.setText(text);
-            rt.setRaw(text);
             rt.setStartColumn(fp.getColumn());
 
             possibleRobotTokens.add(rt);

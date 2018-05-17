@@ -35,7 +35,6 @@ public class KeywordDocumentationTextMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT);
         rt.setText(text);
-        rt.setRaw(text);
         final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
         final UserKeyword keyword = keywords.get(keywords.size() - 1);
         final List<KeywordDocumentation> documentations = keyword.getDocumentation();

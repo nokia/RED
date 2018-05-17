@@ -36,8 +36,9 @@ public class VariableComputationHelperExtractionParameterizedTest {
 
     @Parameters(name = "${0}")
     public static Iterable<Object[]> data() throws Exception {
-        final List<String> lines = Files.readAllLines(Paths.get(VariableComputationHelperExtractionParameterizedTest.class
-                .getResource("VAR_WITH_MATH_OPERATIONS.cvs").toURI()), Charset.forName("UTF-8"));
+        final List<String> lines = Files
+                .readAllLines(Paths.get(VariableComputationHelperExtractionParameterizedTest.class
+                        .getResource("VAR_WITH_MATH_OPERATIONS.cvs").toURI()), Charset.forName("UTF-8"));
 
         final List<Object[]> o = new ArrayList<>(0);
         int lineNumber = 0;
@@ -135,7 +136,6 @@ public class VariableComputationHelperExtractionParameterizedTest {
         token.setStartOffset(0);
         token.setLineNumber(1);
         token.setStartColumn(0);
-        token.setRaw(text);
         token.setText(text);
         final VariableExtractor varExtractor = new VariableExtractor();
         final MappingResult extract = varExtractor.extract(token, "fileName_" + testName);

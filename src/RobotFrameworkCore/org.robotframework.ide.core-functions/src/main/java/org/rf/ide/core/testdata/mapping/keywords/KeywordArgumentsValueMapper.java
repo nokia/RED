@@ -21,16 +21,13 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class KeywordArgumentsValueMapper implements IParsingMapper {
 
     private final ParsingStateHelper utility;
 
-
     public KeywordArgumentsValueMapper() {
         this.utility = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -41,7 +38,6 @@ public class KeywordArgumentsValueMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_ARGUMENT);
         rt.setText(text);
-        rt.setRaw(text);
 
         final KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();
@@ -57,14 +53,14 @@ public class KeywordArgumentsValueMapper implements IParsingMapper {
         return rt;
     }
 
-
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
             final RobotLine currentLine, final RobotToken rt, final String text,
             final Stack<ParsingState> processingState) {
         boolean result = false;
         final ParsingState state = utility.getCurrentStatus(processingState);
-        result = (state == ParsingState.KEYWORD_SETTING_ARGUMENTS || state == ParsingState.KEYWORD_SETTING_ARGUMENTS_ARGUMENT_VALUE);
+        result = (state == ParsingState.KEYWORD_SETTING_ARGUMENTS
+                || state == ParsingState.KEYWORD_SETTING_ARGUMENTS_ARGUMENT_VALUE);
 
         return result;
     }

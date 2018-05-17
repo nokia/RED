@@ -21,7 +21,7 @@ public class TestCaseTagsModelOperation implements IExecutablesStepsHolderElemen
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.TEST_CASE_TAGS;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION;
@@ -32,7 +32,6 @@ public class TestCaseTagsModelOperation implements IExecutablesStepsHolderElemen
             final List<String> args, final String comment) {
         final TestCaseTags tags = testCase.newTags(index);
         tags.getDeclaration().setText(settingName);
-        tags.getDeclaration().setRaw(settingName);
 
         for (final String tag : args) {
             tags.addTag(tag);
@@ -48,7 +47,7 @@ public class TestCaseTagsModelOperation implements IExecutablesStepsHolderElemen
         testCase.addElement((TestCaseTags) modelElement, index);
         return modelElement;
     }
-    
+
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestCaseTags tags = (TestCaseTags) modelElement;
