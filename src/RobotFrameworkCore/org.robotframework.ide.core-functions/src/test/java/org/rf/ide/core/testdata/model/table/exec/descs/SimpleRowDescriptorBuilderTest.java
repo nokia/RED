@@ -35,14 +35,11 @@ public class SimpleRowDescriptorBuilderTest {
 
         final RobotExecutableRow<UserKeyword> oneRow = new RobotExecutableRow<>();
         final RobotToken createdScalar = RobotToken.create("${c}");
-        createdScalar.setRaw("");
         oneRow.setAction(createdScalar);
 
         final RobotToken action = RobotToken.create("Set Variable");
-        action.setRaw("");
         oneRow.addArgument(action);
         final RobotToken settedText = RobotToken.create("foobar");
-        settedText.setRaw("");
         oneRow.addArgument(settedText);
         userKeyword.addElement(oneRow);
 

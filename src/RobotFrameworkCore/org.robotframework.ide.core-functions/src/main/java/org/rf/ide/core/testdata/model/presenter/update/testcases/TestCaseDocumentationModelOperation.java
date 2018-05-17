@@ -22,18 +22,17 @@ public class TestCaseDocumentationModelOperation implements IExecutablesStepsHol
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.TEST_CASE_DOCUMENTATION;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION;
     }
-    
+
     @Override
     public AModelElement<TestCase> create(final TestCase testCase, final int index, final String settingName,
             final List<String> args, final String comment) {
         final TestDocumentation testDoc = testCase.newDocumentation(index);
         testDoc.getDeclaration().setText(settingName);
-        testDoc.getDeclaration().setRaw(settingName);
 
         for (int i = 0; i < args.size(); i++) {
             testDoc.addDocumentationText(i, args.get(i));

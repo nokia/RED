@@ -22,7 +22,7 @@ public class TestCaseSetupModelOperation implements IExecutablesStepsHolderEleme
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.TEST_CASE_SETUP;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.TEST_CASE_SETTING_SETUP;
@@ -33,7 +33,6 @@ public class TestCaseSetupModelOperation implements IExecutablesStepsHolderEleme
             final List<String> args, final String comment) {
         final TestCaseSetup setup = testCase.newSetup(index);
         setup.getDeclaration().setText(settingName);
-        setup.getDeclaration().setRaw(settingName);
 
         if (!args.isEmpty()) {
             setup.setKeywordName(args.get(0));

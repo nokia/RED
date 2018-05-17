@@ -38,7 +38,6 @@ public class TestCaseTemplateKeywordMapper implements IParsingMapper {
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME);
 
         rt.setText(text);
-        rt.setRaw(text);
         final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
         final TestCase testCase = testCases.get(testCases.size() - 1);
         final List<TestCaseTemplate> templates = testCase.getTemplates();
@@ -69,7 +68,7 @@ public class TestCaseTemplateKeywordMapper implements IParsingMapper {
     protected boolean checkIfHasAlreadyKeywordName(final List<TestCaseTemplate> testCaseTemplates) {
         boolean result = false;
         if (!testCaseTemplates.isEmpty()) {
-            TestCaseTemplate template = testCaseTemplates.get(testCaseTemplates.size() - 1);
+            final TestCaseTemplate template = testCaseTemplates.get(testCaseTemplates.size() - 1);
             result = (template.getKeywordName() != null);
         }
 

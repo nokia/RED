@@ -20,18 +20,15 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class TestTeardownKeywordArgumentMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
     private final ParsingStateHelper stateHelper;
 
-
     public TestTeardownKeywordArgumentMapper() {
         this.utility = new ElementsUtility();
         this.stateHelper = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -41,7 +38,6 @@ public class TestTeardownKeywordArgumentMapper implements IParsingMapper {
         rt.getTypes().add(0,
                 RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
@@ -56,7 +52,6 @@ public class TestTeardownKeywordArgumentMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

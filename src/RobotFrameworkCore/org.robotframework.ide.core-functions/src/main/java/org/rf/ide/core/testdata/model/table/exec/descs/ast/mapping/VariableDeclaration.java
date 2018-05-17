@@ -159,7 +159,6 @@ public class VariableDeclaration extends AContainerOperation {
     public RobotToken asToken() {
         final RobotToken token = new RobotToken();
         final String text = getVariableText().getText();
-        token.setRaw(text);
         token.setText(text);
         token.setType(getRobotType().getType());
         final FilePosition fp = getStartFromFile();
@@ -268,18 +267,10 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
     public enum GeneralVariableType implements IVariableType {
-        DYNAMIC,
-        NORMAL_TEXT,
-        PYTHON_SPECIFIC_INVOKE_VALUE_GET,
-        PYTHON_SPECIFIC_INVOKE_METHOD,
-        COMPUTATION;
+        DYNAMIC, NORMAL_TEXT, PYTHON_SPECIFIC_INVOKE_VALUE_GET, PYTHON_SPECIFIC_INVOKE_METHOD, COMPUTATION;
     }
 
     public enum Number implements IVariableType {
-        NORMAL_NUMBER,
-        BINARY_NUMBER,
-        OCTAL_NUMBER,
-        HEX_NUMBER,
-        EXPONENT_NUMBER;
+        NORMAL_NUMBER, BINARY_NUMBER, OCTAL_NUMBER, HEX_NUMBER, EXPONENT_NUMBER;
     }
 }

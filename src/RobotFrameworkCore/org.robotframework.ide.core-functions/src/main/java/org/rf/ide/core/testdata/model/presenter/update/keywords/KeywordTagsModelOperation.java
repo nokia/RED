@@ -21,7 +21,7 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.USER_KEYWORD_TAGS;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.KEYWORD_SETTING_TAGS;
@@ -32,7 +32,6 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
             final List<String> args, final String comment) {
         final KeywordTags keywordTags = userKeyword.newTags(index);
         keywordTags.getDeclaration().setText(settingName);
-        keywordTags.getDeclaration().setRaw(settingName);
 
         for (final String tag : args) {
             keywordTags.addTag(tag);
@@ -49,7 +48,7 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
         userKeyword.addElement((KeywordTags) modelElement, index);
         return modelElement;
     }
-    
+
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final KeywordTags keywordTags = (KeywordTags) modelElement;

@@ -24,8 +24,6 @@ public class RobotToken implements IRobotLineElement, Serializable {
 
     private FilePosition fp = new FilePosition(NOT_SET, NOT_SET, NOT_SET);
 
-    private String raw = "";
-
     private String text = "";
 
     private final List<IRobotTokenType> types = new ArrayList<>(0);
@@ -38,14 +36,13 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return (t1, t2) -> Integer.compare(t1.getStartOffset(), t2.getStartOffset());
     }
 
-    public static RobotToken create(final String rawAndText) {
-        return create(rawAndText, new ArrayList<>());
+    public static RobotToken create(final String text) {
+        return create(text, new ArrayList<>());
     }
 
-    public static RobotToken create(final String rawAndText, final Collection<? extends IRobotTokenType> types) {
+    public static RobotToken create(final String text, final Collection<? extends IRobotTokenType> types) {
         final RobotToken token = new RobotToken();
-        token.setRaw(rawAndText);
-        token.setText(rawAndText);
+        token.setText(text);
         if (!types.isEmpty()) {
             token.getTypes().clear();
         }
@@ -129,11 +126,7 @@ public class RobotToken implements IRobotLineElement, Serializable {
 
     @Override
     public String getRaw() {
-        return raw;
-    }
-
-    public void setRaw(final String raw) {
-        this.raw = raw.intern();
+        return text;
     }
 
     @Override
@@ -214,7 +207,6 @@ public class RobotToken implements IRobotLineElement, Serializable {
     private RobotToken copy(final boolean posInclude) {
         final RobotToken t = new RobotToken();
         t.setText(getText());
-        t.setRaw(getRaw());
         t.types.clear();
         t.types.addAll(getTypes());
         if (posInclude) {

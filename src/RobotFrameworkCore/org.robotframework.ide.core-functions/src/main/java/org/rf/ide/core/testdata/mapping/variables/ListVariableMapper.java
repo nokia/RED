@@ -38,7 +38,6 @@ public class ListVariableMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         final VariableTable varTable = robotFileOutput.getFileModel().getVariableTable();
         rt.setText(text);
-        rt.setRaw(text);
         rt.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
 
         final ListVariable var = new ListVariable(varHelper.extractVariableName(text), rt, VariableScope.TEST_SUITE);

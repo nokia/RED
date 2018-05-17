@@ -77,18 +77,18 @@ public class SetVariableNameCommand extends EditorCommand {
         final AVariable newHolder;
 
         switch (getProjectedType()) {
-            case SCALAR:
-                newHolder = createScalarHolder(modifiedToken, valueTokens);
-                break;
-            case LIST:
-                newHolder = createListHolder(modifiedToken, valueTokens);
-                break;
-            case DICTIONARY:
-                newHolder = createDictHolder(modifiedToken, valueTokens);
-                break;
-            default:
-                newHolder = createUnknownHolder(modifiedToken, valueTokens);
-                break;
+        case SCALAR:
+            newHolder = createScalarHolder(modifiedToken, valueTokens);
+            break;
+        case LIST:
+            newHolder = createListHolder(modifiedToken, valueTokens);
+            break;
+        case DICTIONARY:
+            newHolder = createDictHolder(modifiedToken, valueTokens);
+            break;
+        default:
+            newHolder = createUnknownHolder(modifiedToken, valueTokens);
+            break;
         }
 
         final Iterable<RobotToken> commentTokens = filter(elementTokens, containingOneOf(
@@ -160,7 +160,6 @@ public class SetVariableNameCommand extends EditorCommand {
         if (previousName.equals(newName)) {
             return Optional.empty();
         }
-        declaringToken.setRaw(newName);
         declaringToken.setText(newName);
         declaringToken.setType(getDeclaringTokenType());
 
@@ -195,7 +194,7 @@ public class SetVariableNameCommand extends EditorCommand {
     private String getNewHolderName() {
         return getProjectedType() == VariableType.INVALID ? newName : newName.substring(2, newName.length() - 1);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(new SetVariableNameCommand(variable, previousName));
