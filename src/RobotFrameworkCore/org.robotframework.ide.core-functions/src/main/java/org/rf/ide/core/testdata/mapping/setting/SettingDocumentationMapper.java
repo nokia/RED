@@ -36,7 +36,6 @@ public class SettingDocumentationMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         rt.setType(RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final SuiteDocumentation doc = new SuiteDocumentation(rt);

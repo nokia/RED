@@ -40,11 +40,10 @@ public class SetListVariableValueElementCommand extends EditorCommand {
             return;
         }
         oldElement.setText(newValue);
-        oldElement.setRaw(newValue);
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(new SetListVariableValueElementCommand(variable, oldElement, previousValue));

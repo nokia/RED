@@ -28,30 +28,27 @@ public class DictionaryVariableDumper extends ANotExecutableTableElementDumper {
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
             final AModelElement<? extends ARobotSectionTable> currentElement) {
-        DictionaryVariable var = (DictionaryVariable) currentElement;
+        final DictionaryVariable var = (DictionaryVariable) currentElement;
 
-        List<RobotToken> itemsAsValue = new ArrayList<>(0);
+        final List<RobotToken> itemsAsValue = new ArrayList<>(0);
         for (final DictionaryKeyValuePair dv : var.getItems()) {
-            RobotToken key = dv.getKey();
+            final RobotToken key = dv.getKey();
             if (!key.isDirty() && !dv.getValue().isDirty() && !dv.getRaw().getRaw().isEmpty()) {
                 itemsAsValue.add(dv.getRaw());
             } else {
-                RobotToken joinedKeyValue = new RobotToken();
+                final RobotToken joinedKeyValue = new RobotToken();
                 joinedKeyValue.setStartOffset(key.getStartOffset());
                 joinedKeyValue.setLineNumber(key.getLineNumber());
                 joinedKeyValue.setStartColumn(key.getStartColumn());
-                joinedKeyValue.setRaw(key.getText() + "=" + dv.getValue().getText());
-                if (joinedKeyValue.getRaw().equals("=")) {
-                    joinedKeyValue.setRaw("");
-                }
-                joinedKeyValue.setText(joinedKeyValue.getRaw());
+                final String text = key.getText() + "=" + dv.getValue().getText();
+                joinedKeyValue.setText(text.equals("=") ? "" : text);
                 joinedKeyValue.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
                 itemsAsValue.add(joinedKeyValue);
             }
         }
 
-        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.VARIABLES_VARIABLE_VALUE, 1, itemsAsValue);
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
                 getElementHelper().filter(var.getComment(), RobotTokenType.START_HASH_COMMENT));

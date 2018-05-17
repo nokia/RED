@@ -53,7 +53,6 @@ public class CommonVariableHelper {
                             final String variable = variableText.substring(0,
                                     assignment.getStartColumn() - token.getStartColumn());
                             token.setText(variable);
-                            token.setRaw(variable);
                             line.addLineElementAt(elementIndex + 1, assignment);
                             elementIndex++;
                         }
@@ -114,7 +113,6 @@ public class CommonVariableHelper {
                 assignToken.setStartColumn(startPosition.getColumn() + assignPart);
                 assignToken.setStartOffset(startPosition.getOffset() + assignPart);
                 assignToken.setText(assignmentText);
-                assignToken.setRaw(assignmentText);
                 assignToken.setType(RobotTokenType.ASSIGNMENT);
             }
         }

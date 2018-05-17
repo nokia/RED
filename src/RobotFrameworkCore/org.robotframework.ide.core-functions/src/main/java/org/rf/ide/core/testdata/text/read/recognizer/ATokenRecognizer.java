@@ -56,7 +56,6 @@ public abstract class ATokenRecognizer {
         final int end = m.end();
 
         t.setText(text.substring(start, end));
-        t.setRaw(t.getText());
         t.setType(getProducedType());
         return t;
     }

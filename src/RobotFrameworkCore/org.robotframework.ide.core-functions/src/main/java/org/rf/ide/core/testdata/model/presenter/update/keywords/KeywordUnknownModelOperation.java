@@ -32,7 +32,6 @@ public class KeywordUnknownModelOperation implements IExecutablesStepsHolderElem
             final List<String> args, final String comment) {
         final KeywordUnknownSettings unknown = userKeyword.newUnknownSettings(index);
         unknown.getDeclaration().setText(settingName);
-        unknown.getDeclaration().setRaw(settingName);
 
         for (final String arg : args) {
             unknown.addArgument(arg);

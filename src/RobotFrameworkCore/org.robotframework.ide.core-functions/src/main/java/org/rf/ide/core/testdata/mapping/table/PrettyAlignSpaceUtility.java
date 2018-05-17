@@ -87,7 +87,6 @@ public class PrettyAlignSpaceUtility {
 
                 final int lastBeginSpaceIndex = lastSpaceIndexLeft(correctedString);
                 final int numberOfSpacesLeft = lastBeginSpaceIndex + 1;
-                prettyLeftAlign.setRaw(String.format("%" + numberOfSpacesLeft + "s", " "));
                 prettyLeftAlign.setText(String.format("%" + numberOfSpacesLeft + "s", " "));
                 prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
                 line.addLineElementAt(line.getLineElements().size() - 1, prettyLeftAlign);
@@ -96,7 +95,6 @@ public class PrettyAlignSpaceUtility {
                 rt.setStartOffset(rt.getStartOffset() + numberOfSpacesLeft);
                 correctedString = rawText.substring(numberOfSpacesLeft);
                 rt.setText(correctedString);
-                rt.setRaw(correctedString);
             }
 
             if (correctedString.endsWith(" ")) {
@@ -108,14 +106,12 @@ public class PrettyAlignSpaceUtility {
                 prettyRightAlign.setStartOffset(rt.getStartOffset() + correctedString.length() - numberOfSpacesRight);
                 prettyRightAlign.setLineNumber(rt.getLineNumber());
                 prettyRightAlign.setStartColumn(rt.getStartColumn() + theLongestTextLength - numberOfSpacesRight);
-                prettyRightAlign.setRaw(String.format("%" + numberOfSpacesRight + "s", " "));
                 prettyRightAlign.setText(String.format("%" + numberOfSpacesRight + "s", " "));
                 prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
                 line.addLineElement(prettyRightAlign);
 
                 correctedString = correctedString.substring(0, correctedString.length() - numberOfSpacesRight);
                 rt.setText(correctedString);
-                rt.setRaw(correctedString);
             }
         }
     }

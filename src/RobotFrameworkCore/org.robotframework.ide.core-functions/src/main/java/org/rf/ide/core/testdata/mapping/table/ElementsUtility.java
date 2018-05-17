@@ -166,7 +166,6 @@ public class ElementsUtility {
                             newRobotToken.setLineNumber(fp.getLine());
                             newRobotToken.setStartColumn(fp.getColumn());
                             newRobotToken.setText(text);
-                            newRobotToken.setRaw(text);
                             newRobotToken.setType(RobotTokenType.UNKNOWN);
                             correct = newRobotToken;
                         } else {
@@ -176,7 +175,6 @@ public class ElementsUtility {
                             newRobotToken.setLineNumber(fp.getLine());
                             newRobotToken.setStartColumn(fp.getColumn());
                             newRobotToken.setText(text);
-                            newRobotToken.setRaw(text);
                             newRobotToken.setType(RobotTokenType.UNKNOWN);
                             final List<IRobotTokenType> types = newRobotToken.getTypes();
                             for (final RobotToken currentProposal : robotTokens) {
@@ -206,7 +204,6 @@ public class ElementsUtility {
                     newRobotToken.setLineNumber(fp.getLine());
                     newRobotToken.setStartColumn(fp.getColumn());
                     newRobotToken.setText(text);
-                    newRobotToken.setRaw(text);
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
                     final List<IRobotTokenType> types = newRobotToken.getTypes();
                     for (final RobotToken rt : robotTokens) {
@@ -222,7 +219,6 @@ public class ElementsUtility {
                 newRobotToken.setLineNumber(fp.getLine());
                 newRobotToken.setStartColumn(fp.getColumn());
                 newRobotToken.setText(text);
-                newRobotToken.setRaw(text);
                 if (text != null
                         && !(text.equals(token.getRaw()) || text.trim().equals(token.getRaw().trim()))) {
                     newRobotToken.setType(RobotTokenType.UNKNOWN);

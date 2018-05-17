@@ -97,11 +97,8 @@ public class HeaderDumperHelper {
             final VersionAvailabilityInfo vaiInCaseNoMatches = headerType
                     .getTheMostCorrectOneRepresentation(robotVersionInstalled);
             if (vaiInCaseNoMatches != null) {
-                decToken.setRaw(vaiInCaseNoMatches.getRepresentation());
                 decToken.setText(vaiInCaseNoMatches.getRepresentation());
             }
-        } else if (decToken.getRaw() == null || decToken.getRaw().isEmpty()) {
-            decToken.setRaw(decToken.getText());
         } else if (decToken.getText() == null || decToken.getText().isEmpty()) {
             decToken.setText(decToken.getRaw());
         }

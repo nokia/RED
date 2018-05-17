@@ -16,7 +16,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
-
 public abstract class ALineSeparator {
 
     private final AtomicBoolean wasInitialized = new AtomicBoolean(false);
@@ -26,12 +25,10 @@ public abstract class ALineSeparator {
     protected final String line;
     private final List<IRobotLineElement> lineElements = new ArrayList<>();
 
-
     protected ALineSeparator(final int lineNumber, final String line) {
         this.lineNumber = lineNumber;
         this.line = line;
     }
-
 
     private void init() {
         synchronized (this) {
@@ -41,7 +38,7 @@ public abstract class ALineSeparator {
                 final int textLength = line.length();
 
                 if (textLength > 0) {
-                    while(lastColumnProcessed < textLength) {
+                    while (lastColumnProcessed < textLength) {
                         if (hasNextSeparator()) {
                             final Separator currentSeparator = nextSeparator();
                             final int startColumn = currentSeparator.getStartColumn();
@@ -52,7 +49,6 @@ public abstract class ALineSeparator {
                             if (remainingData > 0 || !lineElements.isEmpty()) {
                                 final RobotToken token = new RobotToken();
                                 token.setLineNumber(lineNumber);
-                                token.setRaw(rawText);
                                 token.setText(rawText);
                                 token.setStartColumn(lastColumnProcessed);
                                 token.setType(RobotTokenType.UNKNOWN);
@@ -68,7 +64,6 @@ public abstract class ALineSeparator {
                                     .substring(lastColumnProcessed);
                             final RobotToken token = new RobotToken();
                             token.setLineNumber(lineNumber);
-                            token.setRaw(rawText);
                             token.setText(rawText);
                             token.setStartColumn(lastColumnProcessed);
                             token.setType(RobotTokenType.UNKNOWN);
@@ -83,9 +78,7 @@ public abstract class ALineSeparator {
         }
     }
 
-
     protected abstract Separator nextSeparator();
-
 
     public Separator next() {
         init();
@@ -100,9 +93,7 @@ public abstract class ALineSeparator {
         return found;
     }
 
-
     protected abstract boolean hasNextSeparator();
-
 
     public boolean hasNext() {
         init();
@@ -110,7 +101,6 @@ public abstract class ALineSeparator {
 
         return (elementIndex > prevElementIndex);
     }
-
 
     private void updateIndex() {
         final int elementsSize = lineElements.size();
@@ -123,7 +113,6 @@ public abstract class ALineSeparator {
             }
         }
     }
-
 
     private boolean isSeparator(final IRobotLineElement elem) {
         boolean result = false;
@@ -139,30 +128,24 @@ public abstract class ALineSeparator {
         return result;
     }
 
-
     public abstract SeparatorType getProducedType();
-
 
     public List<IRobotLineElement> getSplittedLine() {
         init();
         return Collections.unmodifiableList(lineElements);
     }
 
-
     public int getPreviousElementIndex() {
         return prevElementIndex;
     }
-
 
     public int getCurrentElementIndex() {
         return elementIndex;
     }
 
-
     public int getLineNumber() {
         return lineNumber;
     }
-
 
     public String getLine() {
         return line;

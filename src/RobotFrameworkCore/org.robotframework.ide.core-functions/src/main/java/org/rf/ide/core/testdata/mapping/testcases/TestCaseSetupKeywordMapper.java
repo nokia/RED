@@ -21,18 +21,15 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class TestCaseSetupKeywordMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
     private final ParsingStateHelper stateHelper;
 
-
     public TestCaseSetupKeywordMapper() {
         this.utility = new ElementsUtility();
         this.stateHelper = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -44,7 +41,6 @@ public class TestCaseSetupKeywordMapper implements IParsingMapper {
         types.add(0, RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME);
 
         rt.setText(text);
-        rt.setRaw(text);
         final List<TestCase> testCases = robotFileOutput.getFileModel()
                 .getTestCaseTable().getTestCases();
         final TestCase testCase = testCases.get(testCases.size() - 1);
@@ -57,7 +53,6 @@ public class TestCaseSetupKeywordMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

@@ -22,7 +22,7 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.TEST_CASE_TEARDOWN;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.TEST_CASE_SETTING_TEARDOWN;
@@ -33,7 +33,6 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
             final List<String> args, final String comment) {
         final TestCaseTeardown teardown = testCase.newTeardown(index);
         teardown.getDeclaration().setText(settingName);
-        teardown.getDeclaration().setRaw(settingName);
 
         if (!args.isEmpty()) {
             teardown.setKeywordName(args.get(0));

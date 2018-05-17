@@ -27,18 +27,15 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class DictionaryVariableValueMapper implements IParsingMapper {
 
     private final ParsingStateHelper stateHelper;
     private final SpecialEscapedCharactersExtractor escapedExtractor;
 
-
     public DictionaryVariableValueMapper() {
         this.stateHelper = new ParsingStateHelper();
         this.escapedExtractor = new SpecialEscapedCharactersExtractor();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -65,7 +62,6 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @VisibleForTesting
     protected KeyValuePair splitKeyNameFromValue(final RobotToken raw) {
@@ -115,8 +111,10 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
         final RobotToken key = new RobotToken();
         key.setLineNumber(raw.getLineNumber());
         key.setStartColumn(raw.getStartColumn());
-        key.setRaw(keyTextRaw.toString());
-        key.setText(keyText.toString());
+        // FIXME: raw != text
+        // key.setRaw(keyTextRaw.toString());
+        // key.setText(keyText.toString());
+        key.setText(keyTextRaw.toString());
         key.setType(RobotTokenType.VARIABLES_DICTIONARY_KEY);
 
         final RobotToken value = new RobotToken();
@@ -126,8 +124,10 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
         } else {
             value.setStartColumn(key.getEndColumn());
         }
-        value.setRaw(valueTextRaw.toString());
-        value.setText(valueText.toString());
+        // FIXME: raw != text
+        // value.setRaw(valueTextRaw.toString());
+        // value.setText(valueText.toString());
+        value.setText(valueTextRaw.toString());
         value.setType(RobotTokenType.VARIABLES_DICTIONARY_VALUE);
 
         return new KeyValuePair(key, value);
@@ -138,29 +138,26 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
         private final RobotToken key;
         private final RobotToken value;
 
-
         public KeyValuePair(final RobotToken key, final RobotToken value) {
             this.key = key;
             this.value = value;
         }
 
-
         public RobotToken getKey() {
             return key;
         }
-
 
         public RobotToken getValue() {
             return value;
         }
     }
 
-
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
             final RobotLine currentLine, final RobotToken rt, final String text,
             final Stack<ParsingState> processingState) {
         final ParsingState state = stateHelper.getCurrentStatus(processingState);
-        return (state == ParsingState.DICTIONARY_VARIABLE_DECLARATION || state == ParsingState.DICTIONARY_VARIABLE_VALUE);
+        return (state == ParsingState.DICTIONARY_VARIABLE_DECLARATION
+                || state == ParsingState.DICTIONARY_VARIABLE_VALUE);
     }
 }

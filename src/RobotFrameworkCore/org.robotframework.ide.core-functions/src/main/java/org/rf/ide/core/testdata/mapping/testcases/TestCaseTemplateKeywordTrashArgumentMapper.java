@@ -20,17 +20,14 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class TestCaseTemplateKeywordTrashArgumentMapper implements
         IParsingMapper {
 
     private final ParsingStateHelper stateHelper;
 
-
     public TestCaseTemplateKeywordTrashArgumentMapper() {
         this.stateHelper = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -44,7 +41,6 @@ public class TestCaseTemplateKeywordTrashArgumentMapper implements
                 RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
 
         rt.setText(text);
-        rt.setRaw(text);
         final List<TestCase> testCases = robotFileOutput.getFileModel()
                 .getTestCaseTable().getTestCases();
         final TestCase testCase = testCases.get(testCases.size() - 1);
@@ -57,7 +53,6 @@ public class TestCaseTemplateKeywordTrashArgumentMapper implements
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

@@ -31,7 +31,6 @@ public class QuickTokenListenerBaseTwoModelReferencesLinker {
             final RobotToken newToken = mappingBetweenOldAndNewTokens.get(oldToken);
 
             oldToken.setText(newToken.getText());
-            oldToken.setRaw(newToken.getRaw());
             oldToken.setLineNumber(newToken.getLineNumber());
             oldToken.setStartColumn(newToken.getStartColumn());
             oldToken.setStartOffset(newToken.getStartOffset());
@@ -57,7 +56,7 @@ public class QuickTokenListenerBaseTwoModelReferencesLinker {
         final RobotLine lineWithPositionCopied = line.deepCopy();
         final List<IRobotLineElement> newElements = lineWithPositionCopied.getLineElements();
         final List<IRobotLineElement> elements = line.getLineElements();
-        int size = elements.size();
+        final int size = elements.size();
         for (int i = 0; i < size; i++) {
             final IRobotLineElement element = elements.get(i);
             if (element.getClass() == RobotToken.class) {
@@ -70,7 +69,7 @@ public class QuickTokenListenerBaseTwoModelReferencesLinker {
 
     private <T, P> Map<P, T> reverseValuesWithKeys(final Map<T, P> toReverse) {
         final Map<P, T> reversed = new IdentityHashMap<>(toReverse.size());
-        for (T key : toReverse.keySet()) {
+        for (final T key : toReverse.keySet()) {
             reversed.put(toReverse.get(key), key);
         }
 

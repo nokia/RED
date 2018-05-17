@@ -21,16 +21,13 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class TestTimeoutValueMapper implements IParsingMapper {
 
     private final ParsingStateHelper utility;
 
-
     public TestTimeoutValueMapper() {
         this.utility = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -39,7 +36,6 @@ public class TestTimeoutValueMapper implements IParsingMapper {
             final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
@@ -53,7 +49,6 @@ public class TestTimeoutValueMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
@@ -70,7 +65,6 @@ public class TestTimeoutValueMapper implements IParsingMapper {
 
         return result;
     }
-
 
     @VisibleForTesting
     protected boolean checkIfHasAlreadyValue(final List<TestTimeout> testTimeouts) {
