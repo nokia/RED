@@ -113,8 +113,8 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
         key.setStartColumn(raw.getStartColumn());
         // FIXME: raw != text
         // key.setRaw(keyTextRaw.toString());
-        // key.setText(keyText.toString());
-        key.setText(keyTextRaw.toString());
+        key.setText(keyText.toString());
+        // key.setText(keyTextRaw.toString());
         key.setType(RobotTokenType.VARIABLES_DICTIONARY_KEY);
 
         final RobotToken value = new RobotToken();
@@ -126,8 +126,8 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
         }
         // FIXME: raw != text
         // value.setRaw(valueTextRaw.toString());
-        // value.setText(valueText.toString());
-        value.setText(valueTextRaw.toString());
+        value.setText(valueText.toString());
+        // value.setText(valueTextRaw.toString());
         value.setType(RobotTokenType.VARIABLES_DICTIONARY_VALUE);
 
         return new KeyValuePair(key, value);
