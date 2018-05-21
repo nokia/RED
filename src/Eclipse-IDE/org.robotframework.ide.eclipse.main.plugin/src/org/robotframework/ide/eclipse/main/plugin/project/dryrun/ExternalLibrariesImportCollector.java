@@ -140,13 +140,14 @@ class ExternalLibrariesImportCollector {
                 final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
                 final Optional<String> address = resolver.getUri();
                 if (address.isPresent()) {
+                    final String strippedAddress = RemoteArgumentsResolver
+                            .stripLastSlashAndProtocolIfNecessary(address.get());
                     final String remoteLibName = "Remote "
-                            + RemoteArgumentsResolver.stripLastSlashIfNecessary(address.get())
-                            + "/";
+                            + RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/";
                     final URI uriAddress = URI
-                            .create(RemoteArgumentsResolver.stripLastSlashIfNecessary(address.get()) + "/");
+                            .create(RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/");
                     final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName, uriAddress);
-                    if (!isInLibraryImports(address.get(), libraryImports)) {
+                    if (!isInLibraryImports(strippedAddress, libraryImports)) {
                         libraryImports.add(libImport);
                         libraryImporters.put(libImport, currentSuite);
                         knownLibraryNames.put(remoteLibName, libImport);
@@ -279,18 +280,15 @@ class ExternalLibrariesImportCollector {
         }
     }
 
-    private static boolean isInLibraryImports(final String address,
+    private static boolean isInLibraryImports(final String strippedAddress,
             final Set<RobotDryRunLibraryImport> libraryImports) {
-        final String stripedAddress = RemoteArgumentsResolver.stripLastSlashIfNecessary(address);
-
         for (final RobotDryRunLibraryImport libImport : libraryImports) {
-            if (stripedAddress
-                    .equals(RemoteArgumentsResolver.stripLastSlashIfNecessary(libImport.getSourcePath().toString()))) {
+            if (strippedAddress.equals(RemoteArgumentsResolver
+                    .stripLastSlashAndProtocolIfNecessary(libImport.getSourcePath().toString()))) {
                 return true;
             }
         }
         return false;
-
     }
 
 }

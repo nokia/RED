@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static java.util.stream.Collectors.toList;
 
 import java.io.File;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -103,7 +104,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                         address.get());
                 validateWithSpec(specification, name, nameToken, arguments, false);
             } else {
-                validateRemoteLibraryArguments(name, nameToken, arguments);
+                reportProblemOnRemoteLibraryArguments(name, nameToken, arguments);
             }
         } else {
             final List<String> args = arguments.stream().map(RobotToken::getText).collect(toList());
@@ -129,35 +130,35 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                         : ImmutableMap.of(AdditionalMarkerAttributes.NAME, pathOrName);
                 reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
             } else {
-                validateRemoteLibraryArguments(pathOrName, pathOrNameToken, importArguments);
+                reportProblemOnRemoteLibraryArguments(pathOrName, pathOrNameToken, importArguments);
             }
         }
     }
 
-    private void validateRemoteLibraryArguments(final String name, final RobotToken nameToken,
+    private void reportProblemOnRemoteLibraryArguments(final String name, final RobotToken nameToken,
             final List<RobotToken> arguments) {
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
         final Optional<String> address = resolver.getUri();
+        final RobotToken markerToken = resolver.getUriToken().isPresent() ? resolver.getUriToken().get() : nameToken;
         if (address.isPresent()) {
-            final RobotToken markerToken = resolver.getUriToken().isPresent() ? resolver.getUriToken().get()
-                    : nameToken;
-            validateRemoteLocation(markerToken, address.get());
+            try {
+                reportProblemOnRemoteLocation(markerToken, address.get());
+            } catch (final IllegalArgumentException e) {
+                final RobotProblem problem = RobotProblem
+                        .causedBy(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT)
+                        .formatMessageWith(e.getCause().getMessage());
+                reporter.handleProblem(problem, validationContext.getFile(), markerToken);
+            }
         } else {
             new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
                     resolver.getDescriptor(), arguments).validate(new NullProgressMonitor());
         }
     }
 
-    private void validateRemoteLocation(final RobotToken markerToken, final String address) {
-        final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
-        final List<RemoteLocation> remoteLocations = robotProjectConfig.getRemoteLocations();
-        try {
-            final RemoteLocation remoteLibraryWithNoSlash = RemoteLocation.create(stripLastSlashIfNecessary(address));
-            final RemoteLocation remoteLibraryWithSlash = RemoteLocation
-                    .create(stripLastSlashIfNecessary(address) + "/");
-
-            if (remoteLocations.contains(remoteLibraryWithNoSlash)
-                    || remoteLocations.contains(remoteLibraryWithSlash)) {
+    private void reportProblemOnRemoteLocation(final RobotToken markerToken, final String address) {
+        final String uriScheme = URI.create(address.toLowerCase()).getScheme();
+        if (uriScheme.equals("http") || uriScheme.equals("https")) {
+            if (isInRemoteLocations(address)) {
                 final RobotProblem problem = RobotProblem
                         .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
                         .formatMessageWith(address);
@@ -169,15 +170,23 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                 final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
                 reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
             }
-        } catch (final IllegalArgumentException e) {
+        } else {
             final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT)
-                    .formatMessageWith(e.getCause().getMessage());
+                    .causedBy(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(uriScheme);
             reporter.handleProblem(problem, validationContext.getFile(), markerToken);
         }
+
     }
 
-    private static String stripLastSlashIfNecessary(final String string) {
-        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
+    private boolean isInRemoteLocations(final String address) {
+        final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
+        final List<RemoteLocation> remoteLocations = robotProjectConfig.getRemoteLocations();
+
+        final String strippedAddress = RemoteArgumentsResolver.stripLastSlashAndProtocolIfNecessary(address);
+
+        return remoteLocations.stream()
+                .anyMatch(location -> strippedAddress
+                        .equals(RemoteArgumentsResolver.stripLastSlashAndProtocolIfNecessary(location.getUri())));
     }
 }

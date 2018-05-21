@@ -227,6 +227,13 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Remote URI is invalid: %s";
         }
     },
+    NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT {
+
+        @Override
+        public String getProblemDescription() {
+            return "Remote URI protocol '%s' is not supported";
+        }
+    },
     NON_EXISTING_RESOURCE_IMPORT {
 
         @Override
