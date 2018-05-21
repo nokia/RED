@@ -205,10 +205,13 @@ public class RobotSetting extends RobotKeywordCall {
             final Optional<String> uri = resolver.getUri();
             try {
                 final RemoteLocation remoteLocation = RemoteLocation.create(uri.get());
-                final String remote = stripLastSlashIfNecessary(remoteLocation.getUri());
+                final String remote = RemoteArgumentsResolver
+                        .stripLastSlashAndProtocolIfNecessary(remoteLocation.getUri());
 
                 for (final LibrarySpecification spec : indexedLibraries.get(libNameOrPath)) {
-                    if (remote.equals(stripLastSlashIfNecessary(spec.getDescriptor().getArguments().get(0)))) {
+                    if (remote
+                            .equals(RemoteArgumentsResolver.stripLastSlashAndProtocolIfNecessary(
+                                    spec.getDescriptor().getArguments().get(0)))) {
                         return Optional.of(new ImportedLibrary(spec, extractLibraryAlias()));
                     }
                 }
@@ -225,10 +228,6 @@ public class RobotSetting extends RobotKeywordCall {
                 return Optional.empty();
             }
         }
-    }
-
-    private static String stripLastSlashIfNecessary(final String string) {
-        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
     }
 
     private Optional<ImportedLibrary> findSpecForPath(final String path) {

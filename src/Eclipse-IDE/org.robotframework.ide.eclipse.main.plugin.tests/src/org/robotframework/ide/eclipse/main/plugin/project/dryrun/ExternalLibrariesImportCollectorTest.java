@@ -434,7 +434,7 @@ public class ExternalLibrariesImportCollectorTest {
         final RobotSuiteFile suite3 = createSuiteFileForSingleRemoteImport("A/B/suite.robot",
                 "Library  Remote  127.0.0.1:9000/");
         final RobotSuiteFile suite4 = createSuiteFileForSingleRemoteImport("A/B/C/suite.robot",
-                "Library  Remote  127.0.0.1:9000");
+                "Library  Remote  https://127.0.0.1:9000");
 
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
@@ -458,7 +458,7 @@ public class ExternalLibrariesImportCollectorTest {
         final RobotSuiteFile suite3 = createSuiteFileForSingleRemoteImport("A/B/suite.robot",
                 "Library  Remote  uri=127.0.0.1:9000/");
         final RobotSuiteFile suite4 = createSuiteFileForSingleRemoteImport("A/B/C/suite.robot",
-                "Library  Remote  uri=127.0.0.1:9000");
+                "Library  Remote  uri=https://127.0.0.1:9000");
 
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
@@ -482,7 +482,7 @@ public class ExternalLibrariesImportCollectorTest {
         final RobotSuiteFile suite3 = createSuiteFileForSingleRemoteImport("A/B/suite.robot",
                 "Library  Remote  127.0.0.1:9000/  30");
         final RobotSuiteFile suite4 = createSuiteFileForSingleRemoteImport("A/B/C/suite.robot",
-                "Library  Remote  127.0.0.1:9000  30");
+                "Library  Remote  https://127.0.0.1:9000  30");
 
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
@@ -506,7 +506,7 @@ public class ExternalLibrariesImportCollectorTest {
         final RobotSuiteFile suite3 = createSuiteFileForSingleRemoteImport("A/B/suite.robot",
                 "Library  Remote  uri=127.0.0.1:9000/  timeout=30");
         final RobotSuiteFile suite4 = createSuiteFileForSingleRemoteImport("A/B/C/suite.robot",
-                "Library  Remote  uri=127.0.0.1:9000  timeout=30");
+                "Library  Remote  uri=https://127.0.0.1:9000  timeout=30");
 
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
@@ -530,7 +530,7 @@ public class ExternalLibrariesImportCollectorTest {
         final RobotSuiteFile suite3 = createSuiteFileForSingleRemoteImport("A/B/suite.robot",
                 "Library  Remote  timeout=30  uri=127.0.0.1:9000/");
         final RobotSuiteFile suite4 = createSuiteFileForSingleRemoteImport("A/B/C/suite.robot",
-                "Library  Remote  timeout=30  uri=127.0.0.1:9000");
+                "Library  Remote  timeout=30  uri=https://127.0.0.1:9000");
 
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());

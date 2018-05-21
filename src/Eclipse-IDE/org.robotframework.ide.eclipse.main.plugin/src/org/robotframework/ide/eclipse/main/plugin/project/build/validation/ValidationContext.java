@@ -42,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
+import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -128,8 +129,8 @@ public class ValidationContext {
             return null;
         }
         for (final LibrarySpecification candidate : candidates) {
-            if (stripLastSlashIfNecessary(address)
-                    .equals(stripLastSlashIfNecessary(candidate.getDescriptor().getArguments().get(0)))) {
+            if (RemoteArgumentsResolver.stripLastSlashAndProtocolIfNecessary(address).equals(RemoteArgumentsResolver
+                    .stripLastSlashAndProtocolIfNecessary(candidate.getDescriptor().getArguments().get(0)))) {
                 return candidate;
             }
         }
