@@ -44,7 +44,7 @@ public class UnknownVariableMapper implements IParsingMapper {
         rt.setText(text);
 
         final VariableTable varTable = robotFileOutput.getFileModel().getVariableTable();
-        final UnknownVariable varUnknown = new UnknownVariable(rt.getRaw().toString(), rt, VariableScope.TEST_SUITE);
+        final UnknownVariable varUnknown = new UnknownVariable(rt.getText(), rt, VariableScope.TEST_SUITE);
         varTable.addVariable(varUnknown);
 
         processingState.push(ParsingState.VARIABLE_UNKNOWN);

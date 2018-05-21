@@ -133,7 +133,6 @@ public class Separator implements IRobotLineElement {
         this.text = text.intern();
     }
 
-    @Override
     public String getRaw() {
         return raw;
     }

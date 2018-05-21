@@ -57,7 +57,7 @@ public class PrettyAlignSpaceUtility {
                     }
                 }
 
-                final String text = rt.getRaw().toString();
+                final String text = rt.getText().toString();
                 if (text != null && text.trim().length() > 0) {
                     containsAnyValuableToken = true;
                 } else if (!containsAnyValuableToken && types.contains(RobotTokenType.UNKNOWN)) {

@@ -65,7 +65,7 @@ public class ResourceImporter {
             final PathsProvider pathsProvider, final Map<String, String> variableMappings) {
 
         if (imported.getType() == Type.RESOURCE) {
-            final String path = imported.getPathOrName().getRaw();
+            final String path = imported.getPathOrName().getText();
 
             URI importUri = null;
             try {
