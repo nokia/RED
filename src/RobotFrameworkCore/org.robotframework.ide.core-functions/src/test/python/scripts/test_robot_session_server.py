@@ -22,7 +22,7 @@ class RobotSessionServerTests(unittest.TestCase):
         response = create_libdoc("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [])
 
         self.assertEqual(response['result'], None)
-        self.assertTrue('Unable to generate library specification file for library: \'LibError\'' in response['exception'])
+        self.assertTrue('SyntaxError: ' in response['exception'])
 
 
 class LibdocGenerationTests(unittest.TestCase):
