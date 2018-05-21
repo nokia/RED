@@ -238,13 +238,13 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryWithNamedUriInConfigWithoutLibSpec() {
-        addRemoteUriToConfig("http://127.0.0.1:9000/");
+        addRemoteUriToConfig("https://127.0.0.1:9000/");
 
-        validateLibraryImport("Remote  uri=http://127.0.0.1:9000");
+        validateLibraryImport("Remote  uri=https://127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(34, 59))));
+                        new ProblemPosition(2, Range.closed(34, 60))));
     }
 
     @Test
@@ -435,6 +435,42 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(46, 78))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithNotSupportedPositionalUriProtocol() {
+        validateLibraryImport("Remote  ftp://127.0.0.1:9000/");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 55))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithNotSupportedNamedUriProtocol() {
+        validateLibraryImport("Remote  uri=ftp://127.0.0.1:9000/");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 59))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithNotSupportedPositionalUriProtocolAndTimeout() {
+        validateLibraryImport("Remote  ftp://127.0.0.1:9000/  60");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 55))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithNotSupportedNamedUriProtocolAndTimeout() {
+        validateLibraryImport("Remote  uri=ftp://127.0.0.1:9000/  timeout=60");
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 59))));
     }
 
     @Test
@@ -687,7 +723,33 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  uri=http://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+            validateLibraryImport("Remote  uri=127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+
+            assertThat(reporter.getReportedProblems()).isEmpty();
+        }
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithUriWithHttpProtocolInConfigWithLibSpec()
+            throws Exception {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
+
+            validateLibraryImport("Remote  https://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+
+            assertThat(reporter.getReportedProblems()).isEmpty();
+        }
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithUriWithHttpsProtocolInConfigWithLibSpec()
+            throws Exception {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            final String location = "https://127.0.0.1:" + socket.getLocalPort() + "/";
+            final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
+
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
