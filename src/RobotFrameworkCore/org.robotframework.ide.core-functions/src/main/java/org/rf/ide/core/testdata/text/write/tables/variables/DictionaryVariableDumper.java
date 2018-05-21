@@ -33,7 +33,7 @@ public class DictionaryVariableDumper extends ANotExecutableTableElementDumper {
         final List<RobotToken> itemsAsValue = new ArrayList<>(0);
         for (final DictionaryKeyValuePair dv : var.getItems()) {
             final RobotToken key = dv.getKey();
-            if (!key.isDirty() && !dv.getValue().isDirty() && !dv.getRaw().getRaw().isEmpty()) {
+            if (!key.isDirty() && !dv.getValue().isDirty() && !dv.getRaw().getText().isEmpty()) {
                 itemsAsValue.add(dv.getRaw());
             } else {
                 final RobotToken joinedKeyValue = new RobotToken();

@@ -292,7 +292,7 @@ public class ExecutableUnitsFixer {
     private Optional<RobotToken> getPreviousLineContinueToken(final List<RobotToken> tokens) {
         Optional<RobotToken> token = Optional.empty();
         for (final RobotToken rt : tokens) {
-            String text = rt.getRaw();
+            String text = rt.getText();
             if (text != null) {
                 text = text.trim();
             }

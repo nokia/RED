@@ -37,7 +37,8 @@ abstract class HyperlinksToVariablesDetector {
                     final RobotSuiteFile file = variable.getSuiteFile();
                     final IHyperlink definitionHyperlink = file == suiteFile
                             ? createLocalVariableHyperlink(variable, fullVariableName, fromRegion, file, destination)
-                            : createResourceVariableHyperlink(variable, fullVariableName, fromRegion, file, destination);
+                            : createResourceVariableHyperlink(variable, fullVariableName, fromRegion, file,
+                                    destination);
                     hyperlinks.add(definitionHyperlink);
                     return ContinueDecision.STOP;
                 } else {
@@ -51,7 +52,7 @@ abstract class HyperlinksToVariablesDetector {
                 if (VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(variableToken.getText().toString())
                         .equals(hoveredVariableName)) {
                     final IRegion destination = new Region(variableToken.getStartOffset(),
-                            variableToken.getRaw().length());
+                            variableToken.getText().length());
                     hyperlinks.add(createLocalVariableHyperlink(element, fullVariableName, fromRegion,
                             element.getSuiteFile(), destination));
                     return ContinueDecision.STOP;

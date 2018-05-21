@@ -25,7 +25,7 @@ public interface IRobotLineElement {
 
     String getText();
 
-    String getRaw();
+    String getRaw(); // FIXME: DELETE THIS and check what happened
 
     List<IRobotTokenType> getTypes();
 

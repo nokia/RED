@@ -12,9 +12,9 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
 public class MetaDeclarationSettingValidator implements ModelUnitValidator {
@@ -41,11 +41,11 @@ public class MetaDeclarationSettingValidator implements ModelUnitValidator {
         for (final Metadata meta : settingTable.getMetadatas()) {
             if (!oldMetaSyntaxHelper.isOldSyntax(meta, settingTable)) {
                 final RobotToken metaToken = meta.getDeclaration();
-                final String raw = metaToken.getRaw();
-                final String settingPrepared = raw.replaceAll("\\s", "").toLowerCase();
+                final String text = metaToken.getText();
+                final String settingPrepared = text.replaceAll("\\s", "").toLowerCase();
                 if (settingPrepared.equals("meta") || settingPrepared.equals("meta:")) {
                     reporter.handleProblem(
-                            RobotProblem.causedBy(GeneralSettingsProblem.META_SYNONYM).formatMessageWith(raw), file,
+                            RobotProblem.causedBy(GeneralSettingsProblem.META_SYNONYM).formatMessageWith(text), file,
                             metaToken);
                 }
             }
