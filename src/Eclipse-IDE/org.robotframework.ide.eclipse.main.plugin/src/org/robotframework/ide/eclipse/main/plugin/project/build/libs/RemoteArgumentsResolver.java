@@ -77,15 +77,28 @@ public class RemoteArgumentsResolver {
         return argument.toLowerCase().startsWith("timeout=");
     }
 
-    private static String addProtocolIfNecessary(final String argument) {
-        return argument.contains("://") ? argument : "http://" + argument;
-    }
-
     private static String stripArgumentPrefixIfNecessary(final String string) {
         return string.toLowerCase().startsWith("uri=") ? string.substring(4, string.length()) : string;
     }
 
+    public static String addProtocolIfNecessary(final String argument) {
+        return argument.contains("://") ? argument : "http://" + argument;
+    }
+
+    public static String stripLastSlashAndProtocolIfNecessary(final String string) {
+        return stripLastSlashIfNecessary(stripProtocolIfNecessary(string));
+    }
+
     public static String stripLastSlashIfNecessary(final String string) {
         return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
+    }
+
+    private static String stripProtocolIfNecessary(final String string) {
+        if (string.toLowerCase().startsWith("https://")) {
+            return string.substring(8, string.length());
+        } else if (string.toLowerCase().startsWith("http://")) {
+            return string.substring(7, string.length());
+        }
+        return string;
     }
 }
