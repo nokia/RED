@@ -22,21 +22,37 @@ def get_standard_library_path(libname):
 
 
 def create_libdoc(libname, format):
-    from robot.libdoc import libdoc
     from tempfile import mkstemp
     import os
 
     try:
         f, temp_lib_file_path = mkstemp()
         os.close(f)
-        libdoc(libname, temp_lib_file_path, format=format)
+        result = _create_libdoc_with_stdout_redirect(libname, format, temp_lib_file_path)
         encoded_libdoc = _encode_libdoc(temp_lib_file_path)
         if encoded_libdoc:
             return encoded_libdoc
         else :
-            raise Exception('Unable to generate library specification file for library: \'' + libname + '\'')
+            raise Exception(result)
     finally:
         os.remove(temp_lib_file_path)
+
+
+def _create_libdoc_with_stdout_redirect(libname, format, temp_lib_file_path):
+    from robot.libdoc import libdoc
+    import sys
+    try:
+        from StringIO import StringIO
+    except:
+        from io import StringIO
+
+    try:
+        old_stdout = sys.stdout
+        sys.stdout = StringIO()
+        libdoc(libname, temp_lib_file_path, format=format)
+        return sys.stdout.getvalue()
+    finally:
+        sys.stdout = old_stdout
 
 
 def _encode_libdoc(temp_lib_file_path):
