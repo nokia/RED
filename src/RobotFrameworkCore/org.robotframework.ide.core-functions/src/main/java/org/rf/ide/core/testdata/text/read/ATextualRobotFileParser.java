@@ -246,7 +246,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                                         robotFile.getName(), isNewLine);
 
                                 rt.setStartOffset(currentOffset);
-                                currentOffset += rt.getRaw().length();
+                                currentOffset += rt.getText().length();
                                 line.addLineElement(rt);
 
                                 metadataUtility.fixSettingMetadata(parsingOutput, line, rt, processingState);
@@ -272,7 +272,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                                     new FilePosition(lineNumber, lastColumnProcessed, currentOffset), rawText,
                                     robotFile.getName(), isNewLine);
                             rt.setStartOffset(currentOffset);
-                            currentOffset += rt.getRaw().length();
+                            currentOffset += rt.getText().length();
                             line.addLineElement(rt);
 
                             metadataUtility.fixSettingMetadata(parsingOutput, line, rt, processingState);
@@ -552,7 +552,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 RobotTokenType.VARIABLES_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
                 RobotTokenType.KEYWORDS_TABLE_HEADER);
 
-        final String raw = robotToken.getRaw().replaceAll("\\s+|[*]", "");
+        final String raw = robotToken.getText().replaceAll("\\s+|[*]", "");
         final List<IRobotTokenType> types = robotToken.getTypes();
         for (final IRobotTokenType type : types) {
             if (tableHeadersTypes.contains(type)) {

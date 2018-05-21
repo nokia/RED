@@ -91,16 +91,13 @@ public class HeaderDumperHelper {
             tokenTypes.add(headerType);
         }
 
-        if ((decToken.getRaw() == null || decToken.getRaw().isEmpty())
-                && (decToken.getText() == null || decToken.getText().isEmpty())) {
+        if (decToken.getText() == null || decToken.getText().isEmpty()) {
             final RobotVersion robotVersionInstalled = model.getParent().getRobotVersion();
             final VersionAvailabilityInfo vaiInCaseNoMatches = headerType
                     .getTheMostCorrectOneRepresentation(robotVersionInstalled);
             if (vaiInCaseNoMatches != null) {
                 decToken.setText(vaiInCaseNoMatches.getRepresentation());
             }
-        } else if (decToken.getText() == null || decToken.getText().isEmpty()) {
-            decToken.setText(decToken.getRaw());
         }
 
         if (currentLine != null) {

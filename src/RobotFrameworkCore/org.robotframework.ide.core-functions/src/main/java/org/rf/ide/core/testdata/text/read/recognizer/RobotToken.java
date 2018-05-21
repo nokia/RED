@@ -101,6 +101,11 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return text;
     }
 
+    @Override
+    public String getRaw() {
+        return text;
+    }
+
     public void setText(final String text) {
         if (wasFirstInit) {
             if (!Objects.equals(this.text, text)) {
@@ -120,13 +125,7 @@ public class RobotToken implements IRobotLineElement, Serializable {
     }
 
     public boolean isNotEmpty() {
-        return (this.getRaw() != null && !this.getRaw().isEmpty())
-                || (this.getText() != null && !this.getText().isEmpty());
-    }
-
-    @Override
-    public String getRaw() {
-        return text;
+        return this.getText() != null && !this.getText().isEmpty();
     }
 
     @Override
@@ -189,7 +188,7 @@ public class RobotToken implements IRobotLineElement, Serializable {
     public VersionAvailabilityInfo getVersionInformation() {
         VersionAvailabilityInfo vai = null;
         if (types != null && !types.isEmpty()) {
-            vai = types.get(0).findVersionAvailabilityInfo(getRaw());
+            vai = types.get(0).findVersionAvailabilityInfo(getText());
         }
         return vai;
     }
