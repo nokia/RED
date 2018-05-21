@@ -24,7 +24,7 @@ public class MetadataOldSyntaxUtility {
     public void fixSettingMetadata(final RobotFileOutput out, final RobotLine line, final RobotToken token,
             final Stack<ParsingState> processingState) {
         if (token.getTypes().contains(RobotTokenType.SETTING_METADATA_DECLARATION)) {
-            final String metadataSettingText = token.getRaw();
+            final String metadataSettingText = token.getText();
             final Matcher matcher = METADATA.matcher(metadataSettingText);
             if (matcher.find()) {
                 final int prettyAlignGroup = matcher.groupCount() - 1;
@@ -38,7 +38,7 @@ public class MetadataOldSyntaxUtility {
                 final RobotToken prettyToken = new RobotToken();
                 prettyToken.setLineNumber(token.getLineNumber());
                 prettyToken.setStartColumn(token.getEndColumn());
-                prettyToken.setStartOffset(token.getStartOffset() + token.getRaw().length());
+                prettyToken.setStartOffset(token.getStartOffset() + token.getText().length());
                 prettyToken.setText(prettyAlignText);
                 prettyToken.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
                 line.addLineElement(prettyToken);
@@ -47,7 +47,7 @@ public class MetadataOldSyntaxUtility {
                 final RobotToken metadataKeyToken = new RobotToken();
                 metadataKeyToken.setLineNumber(token.getLineNumber());
                 metadataKeyToken.setStartColumn(prettyToken.getEndColumn());
-                metadataKeyToken.setStartOffset(prettyToken.getStartOffset() + prettyToken.getRaw().length());
+                metadataKeyToken.setStartOffset(prettyToken.getStartOffset() + prettyToken.getText().length());
                 metadataKeyToken.setText(metadataKey);
                 metadataKeyToken.setType(RobotTokenType.SETTING_METADATA_KEY);
                 line.addLineElement(metadataKeyToken);

@@ -197,7 +197,7 @@ public class ElementsUtility {
                         }
                     }
                 }
-                if (exactlyOnPosition.getRaw().equals(text)) {
+                if (exactlyOnPosition.getText().equals(text)) {
                     correct = exactlyOnPosition;
                 } else {
                     final RobotToken newRobotToken = new RobotToken();
@@ -220,7 +220,7 @@ public class ElementsUtility {
                 newRobotToken.setStartColumn(fp.getColumn());
                 newRobotToken.setText(text);
                 if (text != null
-                        && !(text.equals(token.getRaw()) || text.trim().equals(token.getRaw().trim()))) {
+                        && !(text.equals(token.getText()) || text.trim().equals(token.getText().trim()))) {
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
                 } else {
                     newRobotToken.getTypes().clear();
@@ -326,7 +326,7 @@ public class ElementsUtility {
         for (final RobotToken rt : robotTokens) {
             final List<IRobotTokenType> types = rt.getTypes();
             if (types.contains(RobotTokenType.START_HASH_COMMENT) || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
-                if (text.equals(rt.getRaw())) {
+                if (text.equals(rt.getText())) {
                     comment = rt;
                     break;
                 }
@@ -429,7 +429,7 @@ public class ElementsUtility {
             }
         }
 
-        if (!t.getRaw().trim().startsWith("*")) {
+        if (!t.getText().trim().startsWith("*")) {
             result = false;
         }
 
@@ -447,9 +447,9 @@ public class ElementsUtility {
 
     public boolean isUserTableHeader(final RobotToken t) {
         boolean result = false;
-        final String raw = t.getRaw();
-        if (raw != null && raw.length() > 1) {
-            result = raw.trim().startsWith("*");
+        final String text = t.getText();
+        if (text != null && text.length() > 1) {
+            result = text.trim().startsWith("*");
         }
 
         return result;
@@ -642,7 +642,7 @@ public class ElementsUtility {
                 final IRobotLineElement elem = elements.get(elemIndex);
                 if (elem instanceof RobotToken) {
                     final RobotToken token = (RobotToken) elem;
-                    final String tokenText = token.getRaw();
+                    final String tokenText = token.getText();
                     if (RobotTokenType.PREVIOUS_LINE_CONTINUE.getRepresentation().get(0).equals(tokenText)) {
                         lti.positionsOfLineContinoue.add(elemIndex);
                         if (lti.positionsOfNotEmptyElements.isEmpty()) {
