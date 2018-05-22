@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,40 +126,23 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void createLibdoc(final String resultFilePath, final LibdocFormat format, final String libName,
-            final String libPath, final EnvironmentSearchPaths additionalPaths) {
+    public void createLibdoc(final String libName, final File outputFile, final LibdocFormat format,
+            final EnvironmentSearchPaths additionalPaths) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
             final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, "-libdoc", libName,
                     format.name().toLowerCase());
-            if (!libPath.isEmpty()) {
-                cmdLine.add(libPath);
-            }
-
             cmdLine.addAll(additionalPaths.getExtendedPythonPaths(interpreterType));
             cmdLine.addAll(additionalPaths.getClassPaths());
 
-            final byte[] decodedFileContent = runLibdoc(cmdLine);
-            writeLibdocToFile(resultFilePath, decodedFileContent);
+            final List<String> output = runExternalProcess(cmdLine);
+            // when properly finished there is encoded file content in last line
+            final String base64EncodedLibFileContent = Iterables.getLast(output);
+            RobotCommandRpcExecutor.writeBase64EncodedLibdoc(outputFile, base64EncodedLibFileContent);
         } catch (final IOException e) {
-            // simply libdoc will not be generated
+            throw new RobotEnvironmentException(
+                    "Unable to generate library specification file for library '" + libName + "'", e);
         }
-    }
-
-    private byte[] runLibdoc(final List<String> cmdLine) throws IOException {
-        final List<String> output = runExternalProcess(cmdLine);
-
-        // when properly finished there is encoded file content in last line
-        final String base64EncodedLibFileContent = Iterables.getLast(output);
-        return Base64.getDecoder().decode(base64EncodedLibFileContent);
-    }
-
-    private void writeLibdocToFile(final String resultFilePath, final byte[] decodedFileContent) throws IOException {
-        final File libdocFile = new File(resultFilePath);
-        if (!libdocFile.exists()) {
-            libdocFile.createNewFile();
-        }
-        Files.write(decodedFileContent, libdocFile);
     }
 
     @Override
@@ -200,7 +182,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final List<String> pathsFromJson = new ObjectMapper().readValue(json, STRING_LIST_TYPE);
             return pathsFromJson.stream()
                     .filter(input -> !"".equals(input) && !".".equals(input))
-                    .map(path -> new File(path))
+                    .map(File::new)
                     .collect(toList());
         } catch (final IOException e) {
             throw new RobotEnvironmentException("Unable to obtain modules search paths", e);
@@ -267,7 +249,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
             runExternalProcess(cmdLine);
         } catch (final IOException | NumberFormatException e) {
-            throw new RobotEnvironmentException("Unable to start library autodiscovering.");
+            throw new RobotEnvironmentException("Unable to start library autodiscovering");
         }
     }
 
@@ -287,7 +269,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
             runExternalProcess(cmdLine);
         } catch (final IOException | NumberFormatException e) {
-            throw new RobotEnvironmentException("Unable to start keyword autodiscovering.");
+            throw new RobotEnvironmentException("Unable to start keyword autodiscovering");
         }
     }
 

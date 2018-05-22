@@ -292,28 +292,31 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void createLibdoc(final String resultFilePath, final LibdocFormat format, final String libName,
-            final String libPath, final EnvironmentSearchPaths additionalPaths) {
+    public void createLibdoc(final String libName, final File outputFile, final LibdocFormat format,
+            final EnvironmentSearchPaths additionalPaths) {
         try {
-            final File libdocFile = new File(resultFilePath);
-
             final String base64EncodedLibFileContent = (String) callRpcFunction("createLibdoc", libName,
                     format.name().toLowerCase(), newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
-            final byte[] decodedFileContent = Base64.getDecoder().decode(base64EncodedLibFileContent);
-            if (!libdocFile.exists()) {
-                libdocFile.createNewFile();
-            }
-            Files.write(decodedFileContent, libdocFile);
-
+            writeBase64EncodedLibdoc(outputFile, base64EncodedLibFileContent);
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         } catch (final IOException e) {
-            final String additional = libPath.isEmpty() ? ""
-                    : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
             throw new RobotEnvironmentException(
-                    "Unable to generate library specification file for library '" + libName + "'" + additional, e);
+                    "Unable to generate library specification file for library '" + libName + "'", e);
         }
+    }
+
+    static void writeBase64EncodedLibdoc(final File outputFile, final String encodedFileContent) throws IOException {
+        final File libspecFolder = outputFile.getParentFile();
+        if (!libspecFolder.exists()) {
+            libspecFolder.mkdir();
+        }
+        if (!outputFile.exists()) {
+            outputFile.createNewFile();
+        }
+        final byte[] decodedFileContent = Base64.getDecoder().decode(encodedFileContent);
+        Files.write(decodedFileContent, outputFile);
     }
 
     @Override
