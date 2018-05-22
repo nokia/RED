@@ -30,12 +30,11 @@ interface RobotCommandExecutor {
 
     List<String> getStandardLibrariesNames();
 
-    String getStandardLibraryPath(final String libName);
+    String getStandardLibraryPath(String libName);
 
     String getRobotVersion();
 
-    void createLibdoc(String resultFilePath, LibdocFormat format, String libName, String libPath,
-            EnvironmentSearchPaths additionalPaths);
+    void createLibdoc(String libName, File outputFile, LibdocFormat format, EnvironmentSearchPaths additionalPaths);
 
     String createHtmlDoc(String doc, DocFormat format);
 

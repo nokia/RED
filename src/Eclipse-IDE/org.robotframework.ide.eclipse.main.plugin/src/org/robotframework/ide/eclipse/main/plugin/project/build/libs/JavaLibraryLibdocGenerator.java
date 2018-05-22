@@ -30,8 +30,7 @@ class JavaLibraryLibdocGenerator implements ILibdocGenerator {
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
-        runtimeEnvironment.createLibdoc(libName, jarPath, additionalPaths, targetSpecFile.getLocation().toFile(),
-                format);
+        runtimeEnvironment.createLibdoc(libName, targetSpecFile.getLocation().toFile(), format, additionalPaths);
     }
 
     @Override
