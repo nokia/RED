@@ -357,15 +357,15 @@ public class RobotRuntimeEnvironment {
 
     public void createLibdoc(final String libName, final File outputFile, final LibdocFormat format)
             throws RobotEnvironmentException {
-        createLibdoc(libName, "", new EnvironmentSearchPaths(), outputFile, format);
+        createLibdoc(libName, outputFile, format, new EnvironmentSearchPaths());
     }
 
-    public void createLibdoc(final String libName, final String libPath, final EnvironmentSearchPaths additionalPaths,
-            final File outputFile, final LibdocFormat format) throws RobotEnvironmentException {
+    public void createLibdoc(final String libName, final File outputFile, final LibdocFormat format,
+            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdoc(outputFile.getAbsolutePath(), format, libName, libPath, additionalPaths);
+            executor.createLibdoc(libName, outputFile, format, additionalPaths);
         }
     }
 
