@@ -22,7 +22,7 @@ public class DataDrivenKeywordName {
                 final IDataDrivenSetting template = templateArguments.get(templateId);
                 final RobotToken keywordName = template.getKeywordName();
                 if (keywordName != null) {
-                    templateText.append(keywordName.getText().toString());
+                    templateText.append(keywordName.getText());
                 }
 
                 final List<RobotToken> unexpectedTrashArguments = template

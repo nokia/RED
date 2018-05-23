@@ -64,21 +64,18 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
     }
 
     @VisibleForTesting
-    protected KeyValuePair splitKeyNameFromValue(final RobotToken raw) {
-        final List<Special> extract = escapedExtractor.extract(raw.getText());
+    protected KeyValuePair splitKeyNameFromValue(final RobotToken text) {
+        final List<Special> extract = escapedExtractor.extract(text.getText());
 
         boolean isValue = false;
         final StringBuilder keyText = new StringBuilder();
-        final StringBuilder keyTextRaw = new StringBuilder();
         final StringBuilder valueText = new StringBuilder();
-        final StringBuilder valueTextRaw = new StringBuilder();
 
         for (final Special special : extract) {
             final String specialRawText = special.getText();
             if (special.getType() == NamedSpecial.UNKNOWN_TEXT) {
                 if (isValue) {
                     valueText.append(specialRawText);
-                    valueTextRaw.append(specialRawText);
                 } else {
                     final int equalsIndex = specialRawText.indexOf('=');
                     if (equalsIndex > -1) {
@@ -87,47 +84,36 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
                         final String valuePart = specialRawText
                                 .substring(equalsIndex + 1);
                         keyText.append(keyPart);
-                        keyTextRaw.append(keyPart);
                         valueText.append(valuePart);
-                        valueTextRaw.append(valuePart);
 
                         isValue = true;
                     } else {
                         keyText.append(specialRawText);
-                        keyTextRaw.append(specialRawText);
                     }
                 }
             } else {
                 if (isValue) {
                     valueText.append(special.getType().getNormalized());
-                    valueTextRaw.append(specialRawText);
                 } else {
                     keyText.append(special.getType().getNormalized());
-                    keyTextRaw.append(specialRawText);
                 }
             }
         }
 
         final RobotToken key = new RobotToken();
-        key.setLineNumber(raw.getLineNumber());
-        key.setStartColumn(raw.getStartColumn());
-        // FIXME: raw != text
-        // key.setRaw(keyTextRaw.toString());
+        key.setLineNumber(text.getLineNumber());
+        key.setStartColumn(text.getStartColumn());
         key.setText(keyText.toString());
-        // key.setText(keyTextRaw.toString());
         key.setType(RobotTokenType.VARIABLES_DICTIONARY_KEY);
 
         final RobotToken value = new RobotToken();
-        value.setLineNumber(raw.getLineNumber());
+        value.setLineNumber(text.getLineNumber());
         if (valueText.length() > 0) {
             value.setStartColumn(key.getEndColumn() + 1);
         } else {
             value.setStartColumn(key.getEndColumn());
         }
-        // FIXME: raw != text
-        // value.setRaw(valueTextRaw.toString());
         value.setText(valueText.toString());
-        // value.setText(valueTextRaw.toString());
         value.setType(RobotTokenType.VARIABLES_DICTIONARY_VALUE);
 
         return new KeyValuePair(key, value);

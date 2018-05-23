@@ -104,8 +104,6 @@ public class DumpLineUpdater {
                             if (rt.getText().isEmpty() && isTokenToEmptyEscape(rt)) {
                                 ((RobotToken) artToken).setText(aDumperHelper.getEmpty());
                             }
-                            // FIXME: raw != text
-                            // rt.setRaw(artToken.getText());
                         }
                     }
                 }
@@ -206,12 +204,6 @@ public class DumpLineUpdater {
         if (elem instanceof RobotToken) {
             final RobotToken newToken = new RobotToken();
             newToken.setLineNumber(line.getLineNumber());
-            // FIXME: raw != text
-            // if (elem.getRaw().isEmpty()) {
-            // newToken.setRaw(elem.getText());
-            // } else {
-            // newToken.setRaw(elem.getRaw());
-            // }
             newToken.setText(elem.getText());
             if (!elem.getTypes().isEmpty()) {
                 newToken.getTypes().clear();

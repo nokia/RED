@@ -42,8 +42,7 @@ public class VariablesImportPathMapper implements IParsingMapper {
             vars = null;
 
             // FIXME: sth wrong - declaration of variables not inside setting
-            // and
-            // was not catch by previous variables declaration logic
+            // and was not catch by previous variables declaration logic
         }
         vars.setPathOrName(rt);
 

@@ -190,7 +190,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
         if (modelElement.getModelType() == ModelType.TEST_CASE) {
             return newArrayList(modelElement.getDeclaration());
         } else if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
-            // for keywords we'are displaying arguments in the same line as keyword name,
+            // for keywords we are displaying arguments in the same line as keyword name,
             // so we need to get markers for arguments setting
             final UserKeyword keyword = (UserKeyword) modelElement;
 
