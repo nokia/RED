@@ -7,39 +7,13 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/15/18 4:17 PM
+Save-Time: 5/23/18 10:53 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-//proc "check-error-for-libspec" [val lib_name]{
-//	exec-with-options {
-//	    get-editor "here_is_class.py" | get-text-viewer | key-type "M1+s"
-//	    get-window "Progress Information" | get-window "Problem Occurred" 
-//	        | get-label "Library specification generation problem" | get-property caption 
-//	        | equals "Library specification generation problem" | verify-true
-//	        
-//	    get-window "Progress Information" | get-window "Problem Occurred" | get-label "See 'Details' for more information." 
-//	        | get-property caption | equals "See 'Details' for more information." | verify-true
-//	        
-//	    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
-//	    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
-//	        -after [get-label "See 'Details' for more information."] | get-property text 
-//	        | equals [format "Library specification generation problem\n\n"
-//	        + "Problem occurred during generating libdoc for 'here_is_class.Dog' library located at '.*NewProject'.\n"
-//	        + "RED python session problem. Following exception has been thrown by python service:\n"
-//	        + "            Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'.\n"
-//	        + "            \n"
-//	        + "            Try --help for usage information.\n"
-//	        + "            Traceback \(most recent call last\):\n"
-//	        + "(.*\n)*"
-//	        + "            Exception: Unable to generate library specification file for library: '%s'"  $lib_name ]
-//	        | verify-true
-//	    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
-//	} -allowStatusDialog
-//}
 // open red.xml
 with [get-view "Project Explorer" | get-tree] {
     select NewProject | double-click
@@ -177,19 +151,15 @@ with [get-editor "here_is_class.py" | get-text-viewer] {
 
 }
 
-check-error-for-libspec -lib_name  "here_is_class.Dog" -path "NewProject" -file_name "here_is_class.py" -problem "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'."
+check-error-for-libspec -lib_name  "here_is_class.Dog" -path "NewProject" -file_name "here_is_class.py" 
+	-problem "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'."
 
 with [get-editor "here_is_class.py" | get-text-viewer] {
     set-caret-pos 12 22
-    key-type "NUMPAD_ENTER" "\\u000D"
-    key-type "M1+s"
-  
+    key-type Enter
 }
-with [get-editor "here_is_class.py" | get-text-viewer] {
-    set-caret-pos 13 9
-    type-text " "
-}
-check-error-for-libspec -lib_name  "here_is_class.Dog" -path "NewProject" -file_name "here_is_class.py" -problem "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'."
+check-error-for-libspec -lib_name  "here_is_class.Dog" -path "NewProject" -file_name "here_is_class.py" 
+	-problem "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'."
 
 
 //check that libery is not-accesible
@@ -278,10 +248,8 @@ with [get-view "Project Explorer" | get-tree] {
         | equals 3 | verify-true
 }
 
-with [get-tab-folder -index 1] {
+get-tab-folder -index 1 |  get-tab-item "class_to_import.py" | click
 
-    get-tab-item "class_to_import.py" | click
-}
 with [get-editor "class_to_import.py" | get-text-viewer] {
     set-caret-pos 1 18
     type-text 2
@@ -296,10 +264,9 @@ with [get-editor "MainClass.py" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 
-
 get-editor "MainClass.py" | get-text-viewer | set-caret-pos 12 7
-check-error-for-libspec -lib_name  "MainClass" -path "imports" -file_name "MainClass.py" -problem "Importing test library 'MainClass' failed: ImportError: cannot import name SimpleClass"
-
+check-error-for-libspec -lib_name  "MainClass" -path "imports" -file_name "MainClass.py"
+	 -problem "Importing test library 'MainClass' failed: ImportError: cannot import name SimpleClass"
 
 
 // remove entire project (for one file RCPPT cannot see window with error)

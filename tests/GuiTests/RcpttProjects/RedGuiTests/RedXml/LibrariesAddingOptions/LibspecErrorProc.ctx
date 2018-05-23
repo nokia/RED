@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VwgyEChbEeiftdZfQXkTXA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/15/18 4:25 PM
+Save-Time: 5/23/18 10:50 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -23,22 +23,21 @@ proc "check-error-for-libspec" [val file_name] [val lib_name] [val path] [val pr
 	        | get-property caption | equals "See 'Details' for more information." | verify-true
 	        
 	    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
-	    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
+
+		get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
 	        -after [get-label "See 'Details' for more information."] | get-property text 
 	        | equals [format "Library specification generation problem\n\n"
-	        + "Problem occurred during generating libdoc for '%s' library located at '.*%s'.\n"
-	        + "RED python session problem. Following exception has been thrown by python service:\n"
-	        + "            %s\n"
-	        + "(.*\n)*"
-	        + "            \n"
-	        + "            Try --help for usage information.\n"
-	        + "            Traceback \(most recent call last\):\n"
-	        + "(.*\n)*"
-	        + "            Exception: Unable to generate library specification file for library: '%s'" $lib_name $path $problem $lib_name ]
-	        | verify-true
+	         + "Problem occurred during generating libdoc for '%s' library located at '.*%s'.\n"   
+	         + "RED python session problem. Following exception has been thrown by python service:\n"
+	         + "            Traceback \(most recent call last\):\n"
+	         + "(.*\n)+"
+	         +  "            Exception: %s\n" 
+	         + "(.*\n)*"
+	         + "            \n"
+	         + "            Try --help for usage information."  $lib_name $path  $problem]  | verify-true
+
 	    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
 	} -allowStatusDialog
 }
-
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
