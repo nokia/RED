@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _G53vcAdVEeiksYLFL8zyCg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/16/18 12:44 PM
+Save-Time: 5/23/18 11:05 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -31,10 +31,16 @@ global [val StandardLibs [list
 
 proc "check-project-explorer"{
 	repeat [val index] -times 10 -command {
-		with [get-view "Project Explorer" | get-tree] {
-		    get-item -path "WithoutLibspecks/Robot Standard libraries \\[Robot Framework .* \\(Python .*\\)\\]" 
-		        | get-property [format "getItems().TreeItem[%s].getText()" $index] | equals [format "%s (non-accessible)" [$StandardLibs | get $index]] | verify-true
-		}        
+		if [ $index | eq 0]{
+			get-view "Project Explorer" | get-tree | get-item 
+			    -path "WithoutLibspecks/Robot Standard libraries \\[Robot Framework.*\\]/BuiltIn \\(\d\d\d\\)" 
+			    | get-property enablement | equals false | verify-true
+		}-else{
+			with [get-view "Project Explorer" | get-tree] {
+			    get-item -path "WithoutLibspecks/Robot Standard libraries \\[Robot Framework .* \\(Python .*\\)\\]" 
+			        | get-property [format "getItems().TreeItem[%s].getText()" $index] | equals [format "%s (non-accessible)" [$StandardLibs | get $index]] | verify-true
+			}   
+		}     
 	}
 }
 
