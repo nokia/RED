@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _GGNqcF4ZEeWeit3EM6sPPA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/16/18 12:11 PM
+Save-Time: 5/23/18 11:20 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,12 +33,16 @@ proc "execution-for-only-failed-cases"{
 	}
 }
 
-//open view and run test iwith mixed cases
+//open view and run test with mixed cases
 get-tab-folder -index 4 | get-tab-item "Execution View" | click
 get-view "Project Explorer" | get-tree | select "ExecutionViewProject/normal_cases.robot" 
     | get-menu "Run As/1 Robot Test" | click
 
 wait-for-console -times 5 -delay 1000
+
+//set focus on view to enable all buttons
+get-view "Execution View" | click
+
 try -times 3 -delay 500 -command{
 	get-view "Execution View" | get-button "Rerun Failed Tests" | get-property enablement | equals true | verify-true
 }
