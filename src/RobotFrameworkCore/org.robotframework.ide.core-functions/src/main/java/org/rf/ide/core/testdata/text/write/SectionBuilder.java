@@ -416,10 +416,20 @@ public class SectionBuilder {
     }
 
     public static enum SectionType {
-        TRASH, USER_TABLE, SETTING, SETTINGS(SETTING), VARIABLE, VARIABLES(
-                VARIABLE), TEST_CASE_SETTING, TEST_CASE_ROW, TEST_CASE(TEST_CASE_SETTING,
-                        TEST_CASE_ROW), TEST_CASES(TEST_CASE), KEYWORD_SETTING, KEYWORD_ROW, KEYWORD(KEYWORD_SETTING,
-                                KEYWORD_ROW), KEYWORDS(KEYWORD);
+        TRASH,
+        USER_TABLE,
+        SETTING,
+        SETTINGS(SETTING),
+        VARIABLE,
+        VARIABLES(VARIABLE),
+        TEST_CASE_SETTING,
+        TEST_CASE_ROW,
+        TEST_CASE(TEST_CASE_SETTING, TEST_CASE_ROW),
+        TEST_CASES(TEST_CASE),
+        KEYWORD_SETTING,
+        KEYWORD_ROW,
+        KEYWORD(KEYWORD_SETTING, KEYWORD_ROW),
+        KEYWORDS(KEYWORD);
 
         private final SectionType[] subSections;
 
