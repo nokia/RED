@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _p3kDgMhVEeaVRsIP7EWHyA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/11/17 9:38 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 5/21/18 4:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -77,37 +77,37 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[1].getText()" | equals "${c}" | verify-true
 }
 
-//close window
-get-editor "TestFile.robot"| get-canvas | key-type "TRAVERSE_ESCAPE"
-
-
-with [get-editor "TestFile.robot" | get-text-viewer] {
-	//add test
-    set-caret-pos 5 19
-    key-type Enter
-    type-text t1
-    key-type Enter
-    
-    //add log with variable $c
-    type-text "log  "
-    key-type "M1+SPACE" -times 3
-    key-type Enter -times 2
-    
-    //add "key from resource" kw
-    type-text "from res"
-    key-type "M1+SPACE"
-    key-type Enter
-}
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 4 12
-    key-type BackSpace -times 11
-    key-type "M1+s"
-}
-
-
-  get-editor "TestFile.robot" | get-text-viewer | get-property text | contains  "*** Test Cases ***\n"
-    + "t1\n"
-    + "    log  ${c}\n"
-    + "    key from resource" | verify-true
-    
+////close window
+//get-editor "TestFile.robot"| get-canvas | key-type "TRAVERSE_ESCAPE"
+//
+//
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//	//add test
+//    set-caret-pos 5 19
+//    key-type Enter
+//    type-text t1
+//    key-type Enter
+//    
+//    //add log with variable $c
+//    type-text "log  "
+//    key-type "M1+SPACE" -times 3
+//    key-type Enter -times 2
+//    
+//    //add "key from resource" kw
+//    type-text "from res"
+//    key-type "M1+SPACE"
+//    key-type Enter
+//}
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 4 12
+//    key-type BackSpace -times 11
+//    key-type "M1+s"
+//}
+//
+//
+//  get-editor "TestFile.robot" | get-text-viewer | get-property text | contains  "*** Test Cases ***\n"
+//    + "t1\n"
+//    + "    log  ${c}\n"
+//    + "    key from resource" | verify-true
+//    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
