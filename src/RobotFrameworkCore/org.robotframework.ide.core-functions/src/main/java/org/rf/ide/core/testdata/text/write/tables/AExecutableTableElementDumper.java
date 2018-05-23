@@ -221,10 +221,8 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
         return currentLine;
     }
 
-    private void handleLastEndOfTheLineBreak(final RobotFile model, final List<RobotLine> lines,
-            final RobotLine currentLine,
-            final IRobotLineElement lastToken, final List<RobotToken> tokens, final int nrOfTokens,
-            final List<Integer> lineEndPos,
+    private void handleLastEndOfTheLineBreak(final RobotFile model, final List<RobotLine> lines, final RobotLine currentLine,
+            final IRobotLineElement lastToken, final List<RobotToken> tokens, final int nrOfTokens, final List<Integer> lineEndPos,
             final int tokenId) {
         if (lineEndPos.contains(tokenId) && tokenId + 1 < nrOfTokens) {
             if (currentLine != null) {
