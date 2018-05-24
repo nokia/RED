@@ -319,6 +319,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         final List<String> importersPaths = libraryImport.getImportersPaths()
                 .stream()
+                .sorted((uri1, uri2) -> uri1.compareTo(uri2))
                 .map(File::new)
                 .map(File::getAbsolutePath)
                 .collect(toList());
