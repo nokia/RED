@@ -26,14 +26,14 @@ import com.google.common.base.Equivalence.Wrapper;
 class LibraryImports {
 
     static RobotDryRunLibraryImport createImport(final DryRunLibraryImportStatus status, final String name) {
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(name);
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(name);
         libImport.setStatus(status);
         return libImport;
     }
 
     static RobotDryRunLibraryImport createImport(final DryRunLibraryImportStatus status, final String name,
             final URI sourcePath, final Set<IFile> importers) {
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(name, sourcePath);
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(name, sourcePath);
         libImport.setStatus(status);
         libImport.setImportersPaths(importers.stream().map(IFile::getLocationURI).collect(toSet()));
         return libImport;
@@ -41,7 +41,7 @@ class LibraryImports {
 
     static RobotDryRunLibraryImport createImport(final DryRunLibraryImportStatus status, final String name,
             final IFile source) {
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(name, source.getLocationURI());
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(name, source.getLocationURI());
         libImport.setStatus(status);
         return libImport;
     }

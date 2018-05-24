@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.dryrun;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -14,11 +16,11 @@ import java.util.Set;
 
 import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.dryrun.JsonMessageMapper.JsonMessageMapperException;
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
 
 /**
  * @author mmarzec
@@ -43,24 +45,19 @@ public class RobotDryRunLibraryImportCollector {
     public void collectFromLibraryImportEvent(final LibraryImportEvent event) {
         if (event.getImporter().isPresent() && !erroneousLibraryNames.contains(event.getName())
                 && !standardLibraryNames.contains(event.getName())) {
-            if (event.getSource().isPresent()) {
-                importedLibraries.add(new RobotDryRunLibraryImport(event.getName(), event.getSource().get(),
-                        event.getImporter().get(), event.getArguments()));
-            } else {
-                importedLibraries.add(
-                        new RobotDryRunLibraryImport(event.getName(), event.getImporter().get(), event.getArguments()));
-            }
+            final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(event.getName(),
+                    event.getSource().orElse(null), event.getImporter().map(Sets::newHashSet).orElse(newHashSet()),
+                    event.getArguments());
+            importedLibraries.add(libImport);
         }
     }
 
     public void collectFromMessageEvent(final MessageEvent event) {
         try {
             JsonMessageMapper.readValue(event, MESSAGE_KEY, MESSAGE_TYPE).ifPresent(importError -> {
-                final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(
-                        importError.getName());
-                dryRunLibraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-                dryRunLibraryImport.setAdditionalInfo(formatAdditionalInfo(importError.getError()));
-                importedLibraries.add(dryRunLibraryImport);
+                final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(importError.getName(),
+                        importError.getError());
+                importedLibraries.add(libImport);
                 erroneousLibraryNames.add(importError.getName());
             });
         } catch (final IOException e) {

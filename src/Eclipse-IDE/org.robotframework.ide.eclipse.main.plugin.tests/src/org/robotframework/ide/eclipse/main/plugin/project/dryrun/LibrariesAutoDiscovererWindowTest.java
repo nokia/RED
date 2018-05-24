@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
@@ -36,9 +37,7 @@ public class LibrariesAutoDiscovererWindowTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(LibrariesAutoDiscovererWindowTest.class);
 
-    private static IFile suite1;
-
-    private static IFile suite2;
+    private static IFile suite;
 
     private static IFile lib;
 
@@ -48,23 +47,22 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        suite1 = projectProvider.createFile("suite1.robot");
-        suite2 = projectProvider.createFile("suite2.robot");
+        suite = projectProvider.createFile("suite.robot");
         lib = projectProvider.createFile("PyLib.py");
     }
 
     @Test
     public void testLibImportComparator() throws Exception {
-        final RobotDryRunLibraryImport added = new RobotDryRunLibraryImport("addedLib");
+        final RobotDryRunLibraryImport added = RobotDryRunLibraryImport.createUnknown("addedLib");
         added.setStatus(DryRunLibraryImportStatus.ADDED);
 
-        final RobotDryRunLibraryImport otherAdded = new RobotDryRunLibraryImport("otherAddedLib");
+        final RobotDryRunLibraryImport otherAdded = RobotDryRunLibraryImport.createUnknown("otherAddedLib");
         otherAdded.setStatus(DryRunLibraryImportStatus.ADDED);
 
-        final RobotDryRunLibraryImport notAdded = new RobotDryRunLibraryImport("notAddedLib");
+        final RobotDryRunLibraryImport notAdded = RobotDryRunLibraryImport.createUnknown("notAddedLib");
         notAdded.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
 
-        final RobotDryRunLibraryImport existing = new RobotDryRunLibraryImport("existingLib");
+        final RobotDryRunLibraryImport existing = RobotDryRunLibraryImport.createUnknown("existingLib");
         existing.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
 
         assertThat(LibrariesAutoDiscovererWindow.LIBRARY_IMPORT_COMPARATOR.compare(added, added)).isZero();
@@ -113,7 +111,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void testConvertingToText_forLibraryImportWithUnknownStatus() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         libImportElement.setStatus(null);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
@@ -122,7 +120,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void testConvertingToText_forLibraryImportWithKnownStatus() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
@@ -131,7 +129,8 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void testConvertingToText_forLibraryImportWithKnownStatusAndSource() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name", lib.getLocationURI());
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("name",
+                lib.getLocationURI());
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
@@ -142,7 +141,7 @@ public class LibrariesAutoDiscovererWindowTest {
     @Test
     public void testConvertingToText_forRemoteLibraryImportWithKnownStatusAndSource() throws Exception {
         final URI remote_uri = URI.create("http://127.0.0.1:9000");
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("Remote", remote_uri);
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote", remote_uri);
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
@@ -152,31 +151,39 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void testConvertingToText_forLibraryImportWithSingleImporter() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         libImportElement.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
-        libImportElement.addImporterPath(suite1.getLocationURI());
+        libImportElement.setImportersPaths(newHashSet(suite.getLocationURI()));
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
                 .isEqualTo("Status: Already existing in project configuration\n" + "Source: Unknown\n" + "Importers: "
-                        + suite1.getLocation().toFile().getAbsolutePath());
+                        + suite.getLocation().toFile().getAbsolutePath());
     }
 
     @Test
     public void testConvertingToText_forLibraryImportWithMultipleImporters() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         libImportElement.setStatus(DryRunLibraryImportStatus.ADDED);
-        libImportElement.addImporterPath(suite1.getLocationURI());
-        libImportElement.addImporterPath(suite2.getLocationURI());
+        final IFile suite1 = projectProvider.createFile("suite1.robot");
+        final IFile suite2 = projectProvider.createFile("suite2.robot");
+        final IFile suite3 = projectProvider.createFile("suite3.robot");
+        final IFile suite4 = projectProvider.createFile("suite4.robot");
+        final IFile suite5 = projectProvider.createFile("suite5.robot");
+        libImportElement.setImportersPaths(newHashSet(suite2.getLocationURI(), suite3.getLocationURI(),
+                suite1.getLocationURI(), suite5.getLocationURI(), suite4.getLocationURI()));
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
                 .isEqualTo("Status: Added to project configuration\n" + "Source: Unknown\n" + "Importers:\n"
                         + suite1.getLocation().toFile().getAbsolutePath() + "\n"
-                        + suite2.getLocation().toFile().getAbsolutePath());
+                        + suite2.getLocation().toFile().getAbsolutePath() + "\n"
+                        + suite3.getLocation().toFile().getAbsolutePath() + "\n"
+                        + suite4.getLocation().toFile().getAbsolutePath() + "\n"
+                        + suite5.getLocation().toFile().getAbsolutePath());
     }
 
     @Test
     public void testConvertingToText_forLibraryImportWithAdditionalInfo() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
         libImportElement.setAdditionalInfo("some additional info text");
 
@@ -187,7 +194,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void onlyForElementsWithChildren_providerSaysTheyHaveChildren() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         final DryRunLibraryImportChildElement childElement = new DryRunLibraryImportChildElement("name", "value");
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
                 Arrays.asList(childElement));
@@ -199,7 +206,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void nullIsReturned_whenProviderIsAskedForParent() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         final DryRunLibraryImportChildElement childElement = new DryRunLibraryImportChildElement("name", "value");
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
                 Arrays.asList(childElement));
@@ -211,8 +218,8 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void arrayOfElementsIsReturned_whenProviderIsAskedForInputWithArray() throws Exception {
-        final RobotDryRunLibraryImport libImportElement1 = new RobotDryRunLibraryImport("n1");
-        final RobotDryRunLibraryImport libImportElement2 = new RobotDryRunLibraryImport("n2");
+        final RobotDryRunLibraryImport libImportElement1 = RobotDryRunLibraryImport.createUnknown("n1");
+        final RobotDryRunLibraryImport libImportElement2 = RobotDryRunLibraryImport.createUnknown("n2");
 
         assertThat(contentProvider.getElements(new RobotDryRunLibraryImport[] {})).isEmpty();
         assertThat(contentProvider.getElements(new RobotDryRunLibraryImport[] { libImportElement1 }))
@@ -227,9 +234,10 @@ public class LibrariesAutoDiscovererWindowTest {
         final DryRunLibraryImportChildElement childElement2 = new DryRunLibraryImportChildElement("n2", "v2");
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
                 Arrays.asList(childElement1, childElement2));
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name", lib.getLocationURI());
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("name",
+                lib.getLocationURI());
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        libImportElement.addImporterPath(suite1.getLocationURI());
+        libImportElement.setImportersPaths(newHashSet(suite.getLocationURI()));
         libImportElement.setAdditionalInfo("additional info error");
 
         assertThat(contentProvider.getChildren(childElement1)).isNull();
@@ -245,7 +253,7 @@ public class LibrariesAutoDiscovererWindowTest {
                 .isEqualTo(lib.getLocation().toFile().getAbsolutePath());
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getValue())
-                .isEqualTo(suite1.getLocation().toFile().getAbsolutePath());
+                .isEqualTo(suite.getLocation().toFile().getAbsolutePath());
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getName()).isEqualTo("Additional info:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getValue())
                 .isEqualTo("additional info error");
@@ -254,9 +262,9 @@ public class LibrariesAutoDiscovererWindowTest {
     @Test
     public void elementChildrenAreProvided_whenProviderIsAskedForChildrenDuringForRemoteImport() throws Exception {
         final URI remote_uri = URI.create("http://127.0.0.1:9000");
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("Remote", remote_uri);
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote", remote_uri);
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        libImportElement.addImporterPath(suite1.getLocationURI());
+        libImportElement.setImportersPaths(newHashSet(suite.getLocationURI()));
         libImportElement.setAdditionalInfo("additional info error");
 
         final Object[] libImportChildren = contentProvider.getChildren(libImportElement);
@@ -269,7 +277,7 @@ public class LibrariesAutoDiscovererWindowTest {
                 .isEqualTo(libImportElement.getSourcePath().toString());
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getValue())
-                .isEqualTo(suite1.getLocation().toFile().getAbsolutePath());
+                .isEqualTo(suite.getLocation().toFile().getAbsolutePath());
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getName()).isEqualTo("Additional info:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getValue())
                 .isEqualTo("additional info error");
@@ -285,7 +293,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void libImportElement_hasOnlyNameInLabelWithoutStyles() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
 
         final StyledString label = labelProvider.getStyledText(libImportElement);
 
@@ -357,7 +365,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void libImportElementWithoutStatus_hasNoImage() throws Exception {
-        final RobotDryRunLibraryImport unknownLibImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport unknownLibImportElement = RobotDryRunLibraryImport.createUnknown("name");
         unknownLibImportElement.setStatus(null);
 
         assertThat(labelProvider.getImage(unknownLibImportElement)).isNull();
@@ -365,7 +373,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void libImportElementWithAddedStatus_hasBigSuccessImage() {
-        final RobotDryRunLibraryImport addedLibImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport addedLibImportElement = RobotDryRunLibraryImport.createUnknown("name");
         addedLibImportElement.setStatus(DryRunLibraryImportStatus.ADDED);
 
         assertThat(labelProvider.getImage(addedLibImportElement))
@@ -374,7 +382,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void libImportElementWithNotAddedStatus_hasFatalErrorImage() {
-        final RobotDryRunLibraryImport notAddedLibImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport notAddedLibImportElement = RobotDryRunLibraryImport.createUnknown("name");
         notAddedLibImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
 
         assertThat(labelProvider.getImage(notAddedLibImportElement))
@@ -383,7 +391,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void libImportElementWithAlreadyExistingStatus_hasBigWarningImage() {
-        final RobotDryRunLibraryImport existingLibImportElement = new RobotDryRunLibraryImport("name");
+        final RobotDryRunLibraryImport existingLibImportElement = RobotDryRunLibraryImport.createUnknown("name");
         existingLibImportElement.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
 
         assertThat(labelProvider.getImage(existingLibImportElement))
