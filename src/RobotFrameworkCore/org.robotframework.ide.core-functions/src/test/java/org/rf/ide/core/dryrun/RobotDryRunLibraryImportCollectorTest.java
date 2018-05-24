@@ -5,17 +5,19 @@
  */
 package org.rf.ide.core.dryrun;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.Objects;
 
+import org.assertj.core.api.Condition;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
@@ -31,7 +33,7 @@ public class RobotDryRunLibraryImportCollectorTest {
                 ImmutableSet.of("String"));
 
         libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("String",
-                new URI("file:///suite.robot"), new URI("file:///String.py"), Collections.emptyList()));
+                new URI("file:///suite.robot"), new URI("file:///String.py"), emptyList()));
 
         assertThat(libImportCollector.getImportedLibraries()).isEmpty();
     }
@@ -42,17 +44,16 @@ public class RobotDryRunLibraryImportCollectorTest {
                 ImmutableSet.of("String", "Xml"));
 
         libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("String",
-                new URI("file:///suite.robot"), new URI("file:///String.py"), Collections.emptyList()));
+                new URI("file:///suite.robot"), new URI("file:///String.py"), emptyList()));
         libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib", new URI("file:///suite.robot"),
-                new URI("file:///source.py"), Collections.emptyList()));
-        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("Xml", new URI("file:///suite.robot"),
-                new URI("file:///Xml.py"), Collections.emptyList()));
-
-        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", new URI("file:///source.py"),
-                new URI("file:///suite.robot"), Collections.emptyList());
+                new URI("file:///source.py"), emptyList()));
+        libImportCollector.collectFromLibraryImportEvent(
+                new LibraryImportEvent("Xml", new URI("file:///suite.robot"), new URI("file:///Xml.py"), emptyList()));
 
         assertThat(libImportCollector.getImportedLibraries()).hasSize(1);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(0), lib, DryRunLibraryType.PYTHON);
+        assertThat(libImportCollector.getImportedLibraries().get(0))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createKnown("lib", new URI("file:///source.py"),
+                        newHashSet(new URI("file:///suite.robot")), emptyList())));
     }
 
     @Test
@@ -64,20 +65,13 @@ public class RobotDryRunLibraryImportCollectorTest {
         libImportCollector.collectFromMessageEvent(createImportErrorMessageEvent("lib2"));
         libImportCollector.collectFromMessageEvent(createImportErrorMessageEvent("lib3"));
 
-        final RobotDryRunLibraryImport lib1 = new RobotDryRunLibraryImport("lib1", null, null, Collections.emptyList());
-        lib1.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib1.setAdditionalInfo("error in lib1");
-        final RobotDryRunLibraryImport lib2 = new RobotDryRunLibraryImport("lib2", null, null, Collections.emptyList());
-        lib2.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib2.setAdditionalInfo("error in lib2");
-        final RobotDryRunLibraryImport lib3 = new RobotDryRunLibraryImport("lib3", null, null, Collections.emptyList());
-        lib3.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib3.setAdditionalInfo("error in lib3");
-
         assertThat(libImportCollector.getImportedLibraries()).hasSize(3);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(0), lib1, DryRunLibraryType.UNKNOWN);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(1), lib2, DryRunLibraryType.UNKNOWN);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(2), lib3, DryRunLibraryType.UNKNOWN);
+        assertThat(libImportCollector.getImportedLibraries().get(0))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createUnknown("lib1", "error in lib1")));
+        assertThat(libImportCollector.getImportedLibraries().get(1))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createUnknown("lib2", "error in lib2")));
+        assertThat(libImportCollector.getImportedLibraries().get(2))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createUnknown("lib3", "error in lib3")));
     }
 
     @Test
@@ -99,45 +93,32 @@ public class RobotDryRunLibraryImportCollectorTest {
                 Collections.emptySet());
 
         libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib1", new URI("file:///suite1.robot"),
-                new URI("file:///lib1.py"), Collections.emptyList()));
+                new URI("file:///lib1.py"), emptyList()));
         libImportCollector.collectFromMessageEvent(createImportErrorMessageEvent("lib2"));
         libImportCollector.collectFromMessageEvent(createImportErrorMessageEvent("lib3"));
         libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib4", new URI("file:///suite2.robot"),
-                new URI("file:///lib4.py"), Collections.emptyList()));
+                new URI("file:///lib4.py"), emptyList()));
         libImportCollector.collectFromMessageEvent(createImportErrorMessageEvent("lib5"));
         libImportCollector.collectFromLibraryImportEvent(
-                new LibraryImportEvent("lib6", new URI("file:///suite3.robot"), null, Collections.emptyList()));
+                new LibraryImportEvent("lib6", new URI("file:///suite3.robot"), null, emptyList()));
         libImportCollector.collectFromLibraryImportEvent(
-                new LibraryImportEvent("lib7", null, new URI("file:///lib7.py"), Collections.emptyList()));
-
-        final RobotDryRunLibraryImport lib1 = new RobotDryRunLibraryImport("lib1", new URI("file:///lib1.py"),
-                new URI("file:///suite1.robot"), Collections.emptyList());
-
-        final RobotDryRunLibraryImport lib2 = new RobotDryRunLibraryImport("lib2");
-        lib2.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib2.setAdditionalInfo("error in lib2");
-
-        final RobotDryRunLibraryImport lib3 = new RobotDryRunLibraryImport("lib3");
-        lib3.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib3.setAdditionalInfo("error in lib3");
-
-        final RobotDryRunLibraryImport lib4 = new RobotDryRunLibraryImport("lib4", new URI("file:///lib4.py"),
-                new URI("file:///suite2.robot"), Collections.emptyList());
-
-        final RobotDryRunLibraryImport lib5 = new RobotDryRunLibraryImport("lib5");
-        lib5.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib5.setAdditionalInfo("error in lib5");
-
-        final RobotDryRunLibraryImport lib6 = new RobotDryRunLibraryImport("lib6", null,
-                new URI("file:///suite3.robot"), Collections.emptyList());
+                new LibraryImportEvent("lib7", null, new URI("file:///lib7.py"), emptyList()));
 
         assertThat(libImportCollector.getImportedLibraries()).hasSize(6);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(0), lib1, DryRunLibraryType.PYTHON);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(1), lib2, DryRunLibraryType.UNKNOWN);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(2), lib3, DryRunLibraryType.UNKNOWN);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(3), lib4, DryRunLibraryType.PYTHON);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(4), lib5, DryRunLibraryType.UNKNOWN);
-        assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(5), lib6, DryRunLibraryType.UNKNOWN);
+        assertThat(libImportCollector.getImportedLibraries().get(0))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createKnown("lib1", new URI("file:///lib1.py"),
+                        newHashSet(new URI("file:///suite1.robot")), emptyList())));
+        assertThat(libImportCollector.getImportedLibraries().get(1))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createUnknown("lib2", "error in lib2")));
+        assertThat(libImportCollector.getImportedLibraries().get(2))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createUnknown("lib3", "error in lib3")));
+        assertThat(libImportCollector.getImportedLibraries().get(3))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createKnown("lib4", new URI("file:///lib4.py"),
+                        newHashSet(new URI("file:///suite2.robot")), emptyList())));
+        assertThat(libImportCollector.getImportedLibraries().get(4))
+                .has(sameFieldsAs(RobotDryRunLibraryImport.createUnknown("lib5", "error in lib5")));
+        assertThat(libImportCollector.getImportedLibraries().get(5)).has(sameFieldsAs(RobotDryRunLibraryImport
+                .createKnown("lib6", null, newHashSet(new URI("file:///suite3.robot")), emptyList())));
     }
 
     @Test
@@ -162,14 +143,19 @@ public class RobotDryRunLibraryImportCollectorTest {
         return new MessageEvent(message, LogLevel.NONE, null);
     }
 
-    private static void assertCollectedLibraryImport(final RobotDryRunLibraryImport actual,
-            final RobotDryRunLibraryImport expected, final DryRunLibraryType expectedType) {
-        assertThat(actual.getType()).isEqualTo(expectedType);
-        assertThat(actual.getName()).isEqualTo(expected.getName());
-        assertThat(actual.getArgs()).isEqualTo(expected.getArgs());
-        assertThat(actual.getSourcePath()).isEqualTo(expected.getSourcePath());
-        assertThat(actual.getImportersPaths()).isEqualTo(expected.getImportersPaths());
-        assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
-        assertThat(actual.getAdditionalInfo()).isEqualTo(expected.getAdditionalInfo());
+    private static Condition<? super RobotDryRunLibraryImport> sameFieldsAs(final RobotDryRunLibraryImport library) {
+        return new Condition<RobotDryRunLibraryImport>() {
+
+            @Override
+            public boolean matches(final RobotDryRunLibraryImport toMatch) {
+                return Objects.equals(library.getName(), toMatch.getName())
+                        && Objects.equals(library.getSourcePath(), toMatch.getSourcePath())
+                        && Objects.equals(library.getType(), toMatch.getType())
+                        && Objects.equals(library.getImportersPaths(), toMatch.getImportersPaths())
+                        && Objects.equals(library.getArgs(), toMatch.getArgs())
+                        && Objects.equals(library.getStatus(), toMatch.getStatus())
+                        && Objects.equals(library.getAdditionalInfo(), toMatch.getAdditionalInfo());
+            }
+        };
     }
 }

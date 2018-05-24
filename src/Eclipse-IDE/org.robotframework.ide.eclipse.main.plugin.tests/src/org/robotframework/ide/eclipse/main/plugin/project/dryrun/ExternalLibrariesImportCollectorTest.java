@@ -369,8 +369,8 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8270/RPC2/",
-                URI.create("http://127.0.0.1:8270/RPC2/"));
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8270/RPC2/", URI.create("http://127.0.0.1:8270/RPC2/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite));
@@ -384,8 +384,8 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8270/RPC2/",
-                URI.create("http://127.0.0.1:8270/RPC2/"));
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8270/RPC2/", URI.create("http://127.0.0.1:8270/RPC2/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite));
@@ -400,7 +400,7 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown("Remote http://127.0.0.1:9000/",
                 URI.create("http://127.0.0.1:9000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
@@ -416,7 +416,7 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown("Remote http://127.0.0.1:9000/",
                 URI.create("http://127.0.0.1:9000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
@@ -439,7 +439,7 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown("Remote http://127.0.0.1:9000/",
                 URI.create("http://127.0.0.1:9000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
@@ -463,7 +463,7 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown("Remote http://127.0.0.1:9000/",
                 URI.create("http://127.0.0.1:9000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
@@ -487,7 +487,7 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown("Remote http://127.0.0.1:9000/",
                 URI.create("http://127.0.0.1:9000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
@@ -511,7 +511,7 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown("Remote http://127.0.0.1:9000/",
                 URI.create("http://127.0.0.1:9000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
@@ -535,7 +535,7 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown("Remote http://127.0.0.1:9000/",
                 URI.create("http://127.0.0.1:9000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
@@ -553,8 +553,8 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8270/RPC2/",
-                URI.create("http://127.0.0.1:8270/RPC2/"));
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8270/RPC2/", URI.create("http://127.0.0.1:8270/RPC2/"));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite1, suite2));
         assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
@@ -571,8 +571,8 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8270/RPC2/",
-                URI.create("http://127.0.0.1:8270/RPC2/"));
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8270/RPC2/", URI.create("http://127.0.0.1:8270/RPC2/"));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite1, suite2));
         assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
@@ -588,10 +588,10 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport1 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
-                URI.create("http://127.0.0.1:9000/"));
-        final RobotDryRunLibraryImport libImport2 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8000/",
-                URI.create("http://127.0.0.1:8000/"));
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"));
+        final RobotDryRunLibraryImport libImport2 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
@@ -607,10 +607,10 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport1 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
-                URI.create("http://127.0.0.1:9000/"));
-        final RobotDryRunLibraryImport libImport2 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8000/",
-                URI.create("http://127.0.0.1:8000/"));
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"));
+        final RobotDryRunLibraryImport libImport2 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
@@ -627,10 +627,10 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport1 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
-                URI.create("http://127.0.0.1:9000/"));
-        final RobotDryRunLibraryImport libImport2 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8000/",
-                URI.create("http://127.0.0.1:8000/"));
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"));
+        final RobotDryRunLibraryImport libImport2 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
@@ -648,10 +648,10 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport1 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
-                URI.create("http://127.0.0.1:9000/"));
-        final RobotDryRunLibraryImport libImport2 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8000/",
-                URI.create("http://127.0.0.1:8000/"));
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"));
+        final RobotDryRunLibraryImport libImport2 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
@@ -669,10 +669,10 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport1 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:9000/",
-                URI.create("http://127.0.0.1:9000/"));
-        final RobotDryRunLibraryImport libImport2 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8000/",
-                URI.create("http://127.0.0.1:8000/"));
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"));
+        final RobotDryRunLibraryImport libImport2 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
@@ -698,12 +698,12 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport1 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:10000/",
-                URI.create("http://127.0.0.1:10000/"));
-        final RobotDryRunLibraryImport libImport2 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8000/",
-                URI.create("http://127.0.0.1:8000/"));
-        final RobotDryRunLibraryImport libImport3 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:7000/",
-                URI.create("http://127.0.0.1:7000/"));
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:10000/", URI.create("http://127.0.0.1:10000/"));
+        final RobotDryRunLibraryImport libImport2 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"));
+        final RobotDryRunLibraryImport libImport3 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:7000/", URI.create("http://127.0.0.1:7000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport2, libImport1, libImport3));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(3);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite1, suite3));
@@ -731,12 +731,12 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport1 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:10000/",
-                URI.create("http://127.0.0.1:10000/"));
-        final RobotDryRunLibraryImport libImport2 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8000/",
-                URI.create("http://127.0.0.1:8000/"));
-        final RobotDryRunLibraryImport libImport3 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:7000/",
-                URI.create("http://127.0.0.1:7000/"));
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:10000/", URI.create("http://127.0.0.1:10000/"));
+        final RobotDryRunLibraryImport libImport2 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"));
+        final RobotDryRunLibraryImport libImport3 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:7000/", URI.create("http://127.0.0.1:7000/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport2, libImport1, libImport3));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(3);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite1, suite3));
@@ -761,14 +761,14 @@ public class ExternalLibrariesImportCollectorTest {
         final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
         collector.collectFromSuites(newArrayList(suite1, suite2, suite3, suite4), new NullProgressMonitor());
 
-        final RobotDryRunLibraryImport libImport1 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:10000/",
-                URI.create("http://127.0.0.1:10000/"));
-        final RobotDryRunLibraryImport libImport2 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8000/",
-                URI.create("http://127.0.0.1:8000/"));
-        final RobotDryRunLibraryImport libImport3 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:7000/",
-                URI.create("http://127.0.0.1:7000/"));
-        final RobotDryRunLibraryImport libImport4 = new RobotDryRunLibraryImport("Remote http://127.0.0.1:8270/RPC2/",
-                URI.create("http://127.0.0.1:8270/RPC2/"));
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:10000/", URI.create("http://127.0.0.1:10000/"));
+        final RobotDryRunLibraryImport libImport2 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"));
+        final RobotDryRunLibraryImport libImport3 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:7000/", URI.create("http://127.0.0.1:7000/"));
+        final RobotDryRunLibraryImport libImport4 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:8270/RPC2/", URI.create("http://127.0.0.1:8270/RPC2/"));
         assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport2, libImport1, libImport3, libImport4));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(4);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite1, suite3));
