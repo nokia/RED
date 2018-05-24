@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.File;
@@ -18,7 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -146,7 +146,8 @@ class ExternalLibrariesImportCollector {
                             + RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/";
                     final URI uriAddress = URI
                             .create(RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/");
-                    final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(remoteLibName, uriAddress);
+                    final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(remoteLibName,
+                            uriAddress);
                     if (!isInLibraryImports(strippedAddress, libraryImports)) {
                         libraryImports.add(libImport);
                         libraryImporters.put(libImport, currentSuite);
@@ -191,10 +192,8 @@ class ExternalLibrariesImportCollector {
         public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
                 final Map<String, Object> additionalAttributes) {
             if (problem.getCause() == GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED) {
-                final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(
-                        (String) additionalAttributes.get(AdditionalMarkerAttributes.NAME));
-                libImport.setStatus(RobotDryRunLibraryImport.DryRunLibraryImportStatus.NOT_ADDED);
-                libImport.setAdditionalInfo(problem.getMessage());
+                final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(
+                        (String) additionalAttributes.get(AdditionalMarkerAttributes.NAME), problem.getMessage());
                 libraryImports.add(libImport);
                 libraryImporters.put(libImport, currentSuite);
             }
@@ -264,8 +263,8 @@ class ExternalLibrariesImportCollector {
         public void libraryDetectingByPathFailed(final String path, final Optional<File> libraryFile,
                 final String failReason) {
             final RobotDryRunLibraryImport libImport = libraryFile.isPresent()
-                    ? new RobotDryRunLibraryImport(path, libraryFile.get().toURI())
-                    : new RobotDryRunLibraryImport(path);
+                    ? RobotDryRunLibraryImport.createKnown(path, libraryFile.get().toURI())
+                    : RobotDryRunLibraryImport.createUnknown(path);
             libImport.setStatus(RobotDryRunLibraryImport.DryRunLibraryImportStatus.NOT_ADDED);
             libImport.setAdditionalInfo(failReason);
             libraryImports.add(libImport);
@@ -275,8 +274,8 @@ class ExternalLibrariesImportCollector {
         private List<RobotDryRunLibraryImport> mapToImports(final File libraryFile,
                 final Collection<ReferencedLibrary> referenceLibraries) {
             return referenceLibraries.stream()
-                    .map(lib -> new RobotDryRunLibraryImport(lib.getName(), libraryFile.toURI()))
-                    .collect(Collectors.toList());
+                    .map(lib -> RobotDryRunLibraryImport.createKnown(lib.getName(), libraryFile.toURI()))
+                    .collect(toList());
         }
     }
 

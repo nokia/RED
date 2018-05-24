@@ -5,15 +5,15 @@
  */
 package org.rf.ide.core.dryrun;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.toSet;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author mmarzec
@@ -26,58 +26,59 @@ public class RobotDryRunLibraryImport {
 
     private final DryRunLibraryType type;
 
-    private final List<URI> importersPaths = newArrayList();
+    private final Set<URI> importersPaths;
 
-    private final List<String> args = newArrayList();
+    private final List<String> args;
 
     private DryRunLibraryImportStatus status;
 
     private String additionalInfo;
 
-    public RobotDryRunLibraryImport(final String name) {
-        this(name, null, new ArrayList<String>());
+    public static RobotDryRunLibraryImport createUnknown(final String name) {
+        return createUnknown(name, "");
     }
 
-    public RobotDryRunLibraryImport(final String name, final URI sourcePath) {
-        this(name, sourcePath, null, new ArrayList<>());
+    public static RobotDryRunLibraryImport createUnknown(final String name, final String additionalInfo) {
+        return new RobotDryRunLibraryImport(name, null, DryRunLibraryType.UNKNOWN, new HashSet<>(), new ArrayList<>(),
+                DryRunLibraryImportStatus.NOT_ADDED, additionalInfo);
     }
 
-    public RobotDryRunLibraryImport(final String name, final URI importerPath, final List<String> args) {
-        this(name, null, importerPath, args);
+    public static RobotDryRunLibraryImport createKnown(final String name, final URI originalPath) {
+        return createKnown(name, originalPath, new HashSet<>(), new ArrayList<>());
     }
 
-    public RobotDryRunLibraryImport(final String name, final URI sourcePath, final URI importerPath,
-            final List<String> args) {
-        this.name = name;
-        this.sourcePath = resolveSourcePath(sourcePath);
-        this.type = resolveType(this.name, this.sourcePath);
-        if (importerPath != null) {
-            this.importersPaths.add(importerPath);
-        }
-        this.args.addAll(args);
-        this.status = DryRunLibraryImportStatus.ADDED;
-        this.additionalInfo = "";
+    public static RobotDryRunLibraryImport createKnown(final String name, final URI originalPath,
+            final Set<URI> importersPaths, final List<String> args) {
+        final URI sourcePath = resolveSourcePath(originalPath);
+        final DryRunLibraryType type = resolveType(name, sourcePath);
+        return new RobotDryRunLibraryImport(name, sourcePath, type, importersPaths, args,
+                DryRunLibraryImportStatus.ADDED, "");
     }
 
-    private URI resolveSourcePath(final URI sourcePath) {
-        if (sourcePath == null) {
+    private static URI resolveSourcePath(final URI originalPath) {
+        if (originalPath == null) {
             return null;
         }
 
         try {
-            final String path = sourcePath.getPath();
+            final String path = originalPath.getPath();
             if (path.endsWith(".pyc")) {
-                return new URI("file", null, null, -1, path.substring(0, path.length() - 1), null, null);
+                final String normalizedPath = path.substring(0, path.length() - 1);
+                return new URI("file", null, null, -1, normalizedPath, null, null);
             } else if (path.endsWith("$py.class")) {
-                return new URI("file", null, null, -1, path.replace("$py.class", ".py"), null, null);
+                final String normalizedPath = path.replace("$py.class", ".py");
+                return new URI("file", null, null, -1, normalizedPath, null, null);
+            } else if (path.endsWith(".py") && path.contains(".jar/")) {
+                final String normalizedPath = path.substring(0, path.lastIndexOf(".jar/")) + ".jar";
+                return new URI("file", null, null, -1, normalizedPath, null, null);
             }
-            return sourcePath;
+            return originalPath;
         } catch (final URISyntaxException e) {
-            return sourcePath;
+            return originalPath;
         }
     }
 
-    private DryRunLibraryType resolveType(final String name, final URI sourcePath) {
+    private static DryRunLibraryType resolveType(final String name, final URI sourcePath) {
         if (name.equals("Remote") || name.startsWith("Remote ")) {
             return DryRunLibraryType.REMOTE;
         } else {
@@ -93,6 +94,19 @@ public class RobotDryRunLibraryImport {
         return DryRunLibraryType.UNKNOWN;
     }
 
+    @VisibleForTesting
+    RobotDryRunLibraryImport(final String name, final URI sourcePath, final DryRunLibraryType type,
+            final Set<URI> importersPaths, final List<String> args, final DryRunLibraryImportStatus status,
+            final String additionalInfo) {
+        this.name = name;
+        this.sourcePath = sourcePath;
+        this.type = type;
+        this.importersPaths = importersPaths;
+        this.args = args;
+        this.status = status;
+        this.additionalInfo = additionalInfo;
+    }
+
     public String getName() {
         return name;
     }
@@ -101,7 +115,7 @@ public class RobotDryRunLibraryImport {
         return sourcePath;
     }
 
-    public List<URI> getImportersPaths() {
+    public Set<URI> getImportersPaths() {
         return importersPaths;
     }
 
@@ -125,16 +139,9 @@ public class RobotDryRunLibraryImport {
         this.additionalInfo = additionalInfo;
     }
 
-    public void addImporterPath(final URI path) {
-        if (path != null && !importersPaths.contains(path)) {
-            importersPaths.add(path);
-        }
-    }
-
-    public void setImportersPaths(final Collection<URI> importersPaths) {
+    public void setImportersPaths(final Set<URI> importersPaths) {
         this.importersPaths.clear();
-        this.importersPaths.addAll(importersPaths.stream().filter(uri -> uri != null).collect(toSet()));
-        this.importersPaths.sort((uri1, uri2) -> uri1.compareTo(uri2));
+        this.importersPaths.addAll(importersPaths);
     }
 
     public List<String> getArgs() {

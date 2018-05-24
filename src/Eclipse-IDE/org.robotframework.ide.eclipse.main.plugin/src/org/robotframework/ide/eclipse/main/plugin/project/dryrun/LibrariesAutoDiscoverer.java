@@ -144,8 +144,10 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> suites) {
-        final Collection<URI> importersPaths = suites.stream().map(suite -> suite.getFile().getLocationURI()).collect(
-                toList());
+        final Set<URI> importersPaths = suites.stream()
+                .map(suite -> suite.getFile().getLocationURI())
+                .filter(uri -> uri != null)
+                .collect(toSet());
         libraryImport.setImportersPaths(importersPaths);
     }
 
