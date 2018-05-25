@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _AWwnMFd3EeilE_DD4P7SbQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/15/18 2:10 PM
+Save-Time: 5/25/18 12:14 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -79,7 +79,7 @@ exec-with-options -disableJobWaiting -command{
 	    + ".* : INFO : 1 qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n"
 	    + ".* : INFO : 2 qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n"
 	    + ".* : INFO : 3 qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n"
-	    + "(.* : INFO : .* qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n)*"
+	    + "(.*\n)*"
 	    + "(.* : INFO : .* Teardowm!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 444444444444444444444444444444444444444444444444444444444444444\n)*"
 	    + ".* : INFO : .* Teardowm!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 444444444444444444444444444444444444444444444444444444444444444" 
 	    | verify-true
@@ -131,7 +131,7 @@ exec-with-options -disableJobWaiting -command{
 	}
 	get-view Console | get-button Terminate | click
 	
-	get-view Console | get-text-viewer | get-property text 
+get-view Console | get-text-viewer | get-property text 
 	    | equals "Command: .*\n"
 	    + "Suite Executor: Robot Framework.*\n"
 	    + "==============================================================================\n"
@@ -140,7 +140,8 @@ exec-with-options -disableJobWaiting -command{
 	    + "Soft.TestFile                                                                 \n"
 	    + "==============================================================================\n"
 	    + "jj(                                                                    Second signal will force exit.)?" 
-	    + "(\n\[ ERROR \].*)?" | verify-true
+	    + "(\n.*)?"
+	    + "(\n.*)?" | verify-true
     
     
 	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Soft.TestFile.jj\n"
