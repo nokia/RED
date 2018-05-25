@@ -41,9 +41,9 @@ public class LibrariesAutoDiscovererWindowTest {
 
     private static IFile lib;
 
-    private final DiscoveredLibrariesViewerContentProvider contentProvider = new LibrariesAutoDiscovererWindow.DiscoveredLibrariesViewerContentProvider();
+    private final DiscoveredLibrariesViewerContentProvider contentProvider = new DiscoveredLibrariesViewerContentProvider();
 
-    private final DiscoveredLibrariesViewerLabelProvider labelProvider = new LibrariesAutoDiscovererWindow.DiscoveredLibrariesViewerLabelProvider();
+    private final DiscoveredLibrariesViewerLabelProvider labelProvider = new DiscoveredLibrariesViewerLabelProvider();
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
@@ -140,8 +140,8 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void testConvertingToText_forRemoteLibraryImportWithKnownStatusAndSource() throws Exception {
-        final URI remote_uri = URI.create("http://127.0.0.1:9000");
-        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote", remote_uri);
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote",
+                URI.create("http://127.0.0.1:9000"));
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
@@ -261,8 +261,8 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void elementChildrenAreProvided_whenProviderIsAskedForChildrenDuringForRemoteImport() throws Exception {
-        final URI remote_uri = URI.create("http://127.0.0.1:9000");
-        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote", remote_uri);
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote",
+                URI.create("http://127.0.0.1:9000"));
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
         libImportElement.setImportersPaths(newHashSet(suite.getLocationURI()));
         libImportElement.setAdditionalInfo("additional info error");

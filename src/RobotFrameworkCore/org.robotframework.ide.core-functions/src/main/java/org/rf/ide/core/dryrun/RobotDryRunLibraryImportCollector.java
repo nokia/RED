@@ -56,7 +56,7 @@ public class RobotDryRunLibraryImportCollector {
         try {
             JsonMessageMapper.readValue(event, MESSAGE_KEY, MESSAGE_TYPE).ifPresent(importError -> {
                 final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(importError.getName(),
-                        importError.getError());
+                        formatAdditionalInfo(importError.getError()));
                 importedLibraries.add(libImport);
                 erroneousLibraryNames.add(importError.getName());
             });

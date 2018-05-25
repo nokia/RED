@@ -319,6 +319,16 @@ public class RobotRuntimeEnvironment {
                 : null;
     }
 
+    public File getFile() {
+        return location;
+    }
+
+    public void resetCommandExecutors() {
+        if (hasRobotInstalled()) {
+            executors.resetExecutorFor((PythonInstallationDirectory) location);
+        }
+    }
+
     public List<File> getModuleSearchPaths() {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
@@ -342,16 +352,6 @@ public class RobotRuntimeEnvironment {
             return file.getCanonicalFile();
         } catch (final IOException e) {
             return file;
-        }
-    }
-
-    public File getFile() {
-        return location;
-    }
-
-    public void resetCommandExecutors() {
-        if (hasRobotInstalled()) {
-            executors.resetExecutorFor((PythonInstallationDirectory) location);
         }
     }
 
@@ -392,24 +392,28 @@ public class RobotRuntimeEnvironment {
         }
     }
 
-    public File getStandardLibraryPath(final String libraryName) {
+    public Optional<File> getStandardLibraryPath(final String libraryName) {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            final String pycPath = executor.getStandardLibraryPath(libraryName);
-            if (pycPath == null) {
-                return null;
-            } else if (pycPath.endsWith(".py")) {
-                return new File(pycPath);
-            } else if (pycPath.endsWith(".pyc")) {
-                return new File(pycPath.substring(0, pycPath.length() - 1));
-            } else if (pycPath.endsWith("$py.class")) {
-                return new File(pycPath.substring(0, pycPath.length() - 9) + ".py");
-            } else {
-                return null;
-            }
+            final String stdLibPath = executor.getStandardLibraryPath(libraryName);
+            return Optional.ofNullable(extractPythonSourcePath(stdLibPath)).map(File::new);
         }
-        return null;
+        return Optional.empty();
+    }
+
+    private String extractPythonSourcePath(final String path) {
+        if (path == null) {
+            return null;
+        } else if (path.endsWith(".py")) {
+            return path;
+        } else if (path.endsWith(".pyc")) {
+            return path.substring(0, path.length() - 1);
+        } else if (path.endsWith("$py.class")) {
+            return path.substring(0, path.length() - 9) + ".py";
+        } else {
+            return null;
+        }
     }
 
     /**

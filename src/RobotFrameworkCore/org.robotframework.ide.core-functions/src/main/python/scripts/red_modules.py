@@ -42,11 +42,6 @@ def get_module_path(module_name):
         raise e
 
 
-def get_run_module_path():
-    import robot
-    return robot.__file__
-
-
 if __name__ == '__main__':
     import sys
     import json
@@ -60,7 +55,5 @@ if __name__ == '__main__':
             sys.path.extend(sys.argv[3].split(';'))
 
         print(get_module_path(module_name))
-    elif sys.argv[1] == '-runmodulepath':
-        print(get_run_module_path())
     else:
         raise Exception('Unrecognized argument:' + sys.argv[1])
