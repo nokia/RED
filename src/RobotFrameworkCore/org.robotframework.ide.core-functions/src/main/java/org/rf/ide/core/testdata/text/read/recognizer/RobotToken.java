@@ -101,11 +101,6 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return text;
     }
 
-    @Override
-    public String getRaw() {
-        return text;
-    }
-
     public void setText(final String text) {
         if (wasFirstInit) {
             if (!Objects.equals(this.text, text)) {

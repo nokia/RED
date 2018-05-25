@@ -118,10 +118,9 @@ public class PrettyAlignSpaceUtilityTest {
         assertToken(token, rawAndText, RobotTokenType.PRETTY_ALIGN_SPACE, fp);
     }
 
-    private void assertToken(final IRobotLineElement token, final String rawAndText, final RobotTokenType type,
+    private void assertToken(final IRobotLineElement token, final String text, final RobotTokenType type,
             final FilePosition fp) {
-        assertThat(token.getText()).isEqualTo(rawAndText);
-        assertThat(token.getRaw()).isEqualTo(rawAndText);
+        assertThat(token.getText()).isEqualTo(text);
         assertThat(token.getTypes().get(0)).isEqualTo(type);
 
         assertThat(token.getFilePosition().isSamePlace(fp)).as("got position %s", token.getFilePosition()).isTrue();

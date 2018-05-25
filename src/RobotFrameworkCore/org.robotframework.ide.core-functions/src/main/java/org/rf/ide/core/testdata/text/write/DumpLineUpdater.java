@@ -76,34 +76,19 @@ public class DumpLineUpdater {
             boolean isRobotToken = false;
             if (elem instanceof RobotToken) {
                 isRobotToken = true;
-                if (artToken.isDirty()) {
-                    if (artToken.getRaw().isEmpty()) {
-                        if (artToken instanceof RobotToken) {
-                            final RobotToken rt = (RobotToken) artToken;
+                if (artToken instanceof RobotToken) {
+                    final RobotToken rt = (RobotToken) artToken;
+                    if (rt.isDirty()) {
+                        if (rt.getText().isEmpty()) {
                             rt.setText(aDumperHelper.getEmpty());
-                        }
-                    } else {
-                        if (artToken instanceof RobotToken) {
-                            final RobotToken rt = (RobotToken) artToken;
+                        } else {
                             final String text = formatWhiteSpace(rt.getText());
                             rt.setText(text);
                         }
-                    }
-                } else {
-                    if (artToken.getText().isEmpty() && artToken.getRaw().isEmpty()
-                            && (elem.isDirty() || elem.getFilePosition().isNotSet())) {
-                        if (artToken instanceof RobotToken) {
-                            if (isTokenToEmptyEscape((RobotToken) artToken)) {
-                                final RobotToken rt = (RobotToken) artToken;
-                                rt.setText(aDumperHelper.getEmpty());
-                            }
-                        }
-                    } else if (elem.isDirty()) {
-                        if (artToken instanceof RobotToken) {
-                            final RobotToken rt = (RobotToken) artToken;
-                            if (rt.getText().isEmpty() && isTokenToEmptyEscape(rt)) {
-                                ((RobotToken) artToken).setText(aDumperHelper.getEmpty());
-                            }
+                    } else {
+                        if (rt.getText().isEmpty() && isTokenToEmptyEscape(rt)
+                                && (elem.isDirty() || elem.getFilePosition().isNotSet())) {
+                            rt.setText(aDumperHelper.getEmpty());
                         }
                     }
                 }
@@ -180,7 +165,7 @@ public class DumpLineUpdater {
     private FilePosition calculateEndPosition(final IRobotLineElement elem, final boolean isEOL) {
         final FilePosition elemPos = elem.getFilePosition();
 
-        final String raw = elem.getRaw();
+        final String raw = elem instanceof Separator ? ((Separator) elem).getRaw() : elem.getText();
         int rawLength = 0;
         if (raw != null) {
             rawLength = raw.length();
@@ -218,10 +203,13 @@ public class DumpLineUpdater {
             final Separator newSeparator = new Separator();
             newSeparator.setType((SeparatorType) elem.getTypes().get(0));
             newSeparator.setLineNumber(line.getLineNumber());
-            if (elem.getRaw().isEmpty()) {
-                newSeparator.setRaw(elem.getText());
-            } else {
-                newSeparator.setRaw(elem.getRaw());
+            if (elem instanceof Separator) {
+                final Separator elemSeparator = (Separator) elem;
+                if (elemSeparator.getRaw().isEmpty()) {
+                    newSeparator.setRaw(elemSeparator.getText());
+                } else {
+                    newSeparator.setRaw(elemSeparator.getRaw());
+                }
             }
             newSeparator.setText(elem.getText());
             if (!elem.getTypes().isEmpty()) {

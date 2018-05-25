@@ -52,7 +52,6 @@ public class ATextualRobotFileParserSpecialCasesTest {
         assertThat(testCaseHeader.getFilePosition().isSamePlace(new FilePosition(1, 0, 1))).isTrue();
         assertThat(testCaseHeader.getStartColumn()).isEqualTo(0);
         assertThat(testCaseHeader.getText()).isEqualTo("*** Test Cases ***");
-        assertThat(testCaseHeader.getRaw()).isEqualTo("*** Test Cases ***");
         assertThat(testCaseHeader.getTypes()).containsExactly(RobotTokenType.TEST_CASES_TABLE_HEADER);
     }
 
