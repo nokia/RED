@@ -80,7 +80,7 @@ public class KeywordFinder {
                 .get(tableHeader.getTableHeader().getLineNumber() - 1);
         final IRobotLineElement endOfLine = robotLine.getEndOfLine();
         artificialNameToken.setStartOffset(endOfLine.getStartOffset()
-                + endOfLine.getRaw().length());
+                + endOfLine.getText().length());
         artificialNameToken.setType(RobotTokenType.KEYWORD_NAME);
 
         keyword = new UserKeyword(artificialNameToken);

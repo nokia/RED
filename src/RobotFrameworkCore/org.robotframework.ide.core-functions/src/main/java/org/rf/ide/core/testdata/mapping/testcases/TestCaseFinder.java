@@ -79,7 +79,7 @@ public class TestCaseFinder {
                 .get(tableHeader.getTableHeader().getLineNumber() - 1);
         final IRobotLineElement endOfLine = robotLine.getEndOfLine();
         artificialNameToken.setStartOffset(endOfLine.getStartOffset()
-                + endOfLine.getRaw().length());
+                + endOfLine.getText().length());
         artificialNameToken.setType(RobotTokenType.TEST_CASE_NAME);
 
         testCase = new TestCase(artificialNameToken);
