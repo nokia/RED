@@ -37,8 +37,8 @@ public class LibraryLocationFinder {
     private static Optional<IPath> findStandardLibPath(final RobotProject robotProject,
             final LibrarySpecification libSpec) {
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-        final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(libSpec.getName());
-        return Optional.ofNullable(standardLibraryPath).map(path -> new Path(path.getAbsolutePath()));
+        final Optional<File> standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(libSpec.getName());
+        return standardLibraryPath.map(file -> new Path(file.getAbsolutePath()));
     }
 
     private static Optional<IPath> findReferenceLibPath(final LibraryDescriptor descriptor,
