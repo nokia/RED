@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.File;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.TextSelection;
@@ -59,7 +59,7 @@ public class SourceOpeningSupportTest {
     public ResourceCreator resourceCreator = new ResourceCreator();
 
     @Mock
-    private Consumer<Exception> errorHandler;
+    private BiConsumer<String, Exception> errorHandler;
 
     private static final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
@@ -157,7 +157,63 @@ public class SourceOpeningSupportTest {
         SourceOpeningSupport.open(page, robotProject, unknownLibSpec, errorHandler);
 
         assertThat(page.getEditorReferences()).isEmpty();
-        verify(errorHandler).accept(null);
+        verify(errorHandler).accept("Unknown source location", null);
+    }
+
+    @Test
+    public void testIfJavaLibraryIsNotOpened() throws Exception {
+        final LibrarySpecification unsupportedLibSpec = LibrarySpecification.create("unsupported");
+        final LibraryDescriptor libDesc = LibraryDescriptor
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "unsupported", "path.jar"));
+        unsupportedLibSpec.setDescriptor(libDesc);
+
+        SourceOpeningSupport.open(page, robotProject, unsupportedLibSpec, errorHandler);
+
+        assertThat(page.getEditorReferences()).isEmpty();
+        verify(errorHandler).accept("Unsupported library type", null);
+    }
+
+    @Test
+    public void testIfVirtualLibraryIsNotOpened() throws Exception {
+        final LibrarySpecification unsupportedLibSpec = LibrarySpecification.create("unsupported");
+        final LibraryDescriptor libDesc = LibraryDescriptor
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.VIRTUAL, "unsupported", "path.xml"));
+        unsupportedLibSpec.setDescriptor(libDesc);
+
+        SourceOpeningSupport.open(page, robotProject, unsupportedLibSpec, errorHandler);
+
+        assertThat(page.getEditorReferences()).isEmpty();
+        verify(errorHandler).accept("Unsupported library type", null);
+    }
+
+    @Test
+    public void testIfJavaLibraryKeywordIsNotOpened() throws Exception {
+        final KeywordSpecification kwSpec = new KeywordSpecification();
+
+        final LibrarySpecification unsupportedLibSpec = LibrarySpecification.create("unsupported");
+        final LibraryDescriptor libDesc = LibraryDescriptor
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "unsupported", "path.jar"));
+        unsupportedLibSpec.setDescriptor(libDesc);
+
+        SourceOpeningSupport.open(page, robotProject, unsupportedLibSpec, kwSpec, errorHandler);
+
+        assertThat(page.getEditorReferences()).isEmpty();
+        verify(errorHandler).accept("Unsupported library type", null);
+    }
+
+    @Test
+    public void testIfVirtualLibraryKeywordIsNotOpened() throws Exception {
+        final KeywordSpecification kwSpec = new KeywordSpecification();
+
+        final LibrarySpecification unsupportedLibSpec = LibrarySpecification.create("unsupported");
+        final LibraryDescriptor libDesc = LibraryDescriptor
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.VIRTUAL, "unsupported", "path.xml"));
+        unsupportedLibSpec.setDescriptor(libDesc);
+
+        SourceOpeningSupport.open(page, robotProject, unsupportedLibSpec, kwSpec, errorHandler);
+
+        assertThat(page.getEditorReferences()).isEmpty();
+        verify(errorHandler).accept("Unsupported library type", null);
     }
 
     @Test

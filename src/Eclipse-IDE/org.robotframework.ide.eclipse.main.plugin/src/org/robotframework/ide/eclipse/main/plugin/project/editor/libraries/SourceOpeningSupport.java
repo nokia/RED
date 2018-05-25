@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -34,6 +34,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
@@ -50,33 +51,45 @@ public class SourceOpeningSupport {
 
     public static void open(final IWorkbenchPage page, final RobotModel model, final IProject project,
             final LibrarySpecification libSpec) {
-        open(page, model.createRobotProject(project), libSpec, e -> handleOpeningError(libSpec, e));
+        open(page, model.createRobotProject(project), libSpec,
+                (message, cause) -> handleOpeningError(libSpec, message, cause));
     }
 
     @VisibleForTesting
     static void open(final IWorkbenchPage page, final RobotProject robotProject, final LibrarySpecification libSpec,
-            final Consumer<Exception> errorHandler) {
+            final BiConsumer<String, Exception> errorHandler) {
+        if (libSpec.getDescriptor().getLibraryType() != LibraryType.PYTHON) {
+            errorHandler.accept("Unsupported library type", null);
+            return;
+        }
+
         try {
             final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
             if (location.isPresent()) {
                 final IFile file = resolveFile(location.get(), robotProject.getProject(), libSpec);
                 openInEditor(page, file);
             } else {
-                errorHandler.accept(null);
+                errorHandler.accept("Unknown source location", null);
             }
         } catch (final CoreException e) {
-            errorHandler.accept(e);
+            errorHandler.accept("Unknown problem", e);
         }
     }
 
     public static void open(final IWorkbenchPage page, final RobotModel model, final IProject project,
             final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
-        open(page, model.createRobotProject(project), libSpec, kwSpec, e -> handleOpeningError(libSpec, e));
+        open(page, model.createRobotProject(project), libSpec, kwSpec,
+                (message, cause) -> handleOpeningError(libSpec, message, cause));
     }
 
     @VisibleForTesting
     static void open(final IWorkbenchPage page, final RobotProject robotProject, final LibrarySpecification libSpec,
-            final KeywordSpecification kwSpec, final Consumer<Exception> errorHandler) {
+            final KeywordSpecification kwSpec, final BiConsumer<String, Exception> errorHandler) {
+        if (libSpec.getDescriptor().getLibraryType() != LibraryType.PYTHON) {
+            errorHandler.accept("Unsupported library type", null);
+            return;
+        }
+
         final Optional<RobotDryRunKeywordSource> kwSource = tryToFindKeywordSource(robotProject, libSpec, kwSpec);
         if (kwSource.isPresent()) {
             try {
@@ -89,7 +102,7 @@ public class SourceOpeningSupport {
                     selectTextInLine(textEditor, source.getLine(), source.getOffset(), source.getLength());
                 }
             } catch (final CoreException e) {
-                errorHandler.accept(e);
+                errorHandler.accept("Unknown problem", e);
             }
         } else {
             open(page, robotProject, libSpec, errorHandler);
@@ -148,9 +161,11 @@ public class SourceOpeningSupport {
         }
     }
 
-    private static void handleOpeningError(final LibrarySpecification libSpec, final Throwable cause) {
-        final String message = String.format("Unable to open editor for library '%s' from '%s'.", libSpec.getName(),
-                libSpec.getDescriptor().getPath());
+    private static void handleOpeningError(final LibrarySpecification libSpec, final String messageSuffix,
+            final Throwable cause) {
+        final String message = String.format("Unable to open editor for '%s' library '%s' from '%s'. %s.",
+                libSpec.getDescriptor().getLibraryType(), libSpec.getName(), libSpec.getDescriptor().getPath(),
+                messageSuffix);
         final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause);
         StatusManager.getManager().handle(status, StatusManager.SHOW);
     }
