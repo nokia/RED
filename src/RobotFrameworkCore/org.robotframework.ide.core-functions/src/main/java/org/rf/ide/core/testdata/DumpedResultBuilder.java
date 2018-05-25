@@ -14,6 +14,7 @@ import java.util.Map;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.write.ILineDumpTokenListener;
 
 /**
@@ -82,17 +83,21 @@ public class DumpedResultBuilder implements ILineDumpTokenListener {
         for (int i = 0; i < nrOfLines; i++) {
             final RobotLine line = lines.get(i);
             for (final IRobotLineElement elem : line.getLineElements()) {
-                strLine.append(elem.getRaw());
+                if (elem instanceof Separator) {
+                    strLine.append(((Separator) elem).getRaw());
+                } else {
+                    strLine.append(elem.getText());
+                }
             }
 
-            strLine.append(line.getEndOfLine().getRaw());
+            strLine.append(line.getEndOfLine().getText());
         }
 
         return strLine.toString();
     }
 
     public DumpedResult build() {
-        DumpedResult builded = new DumpedResult();
+        final DumpedResult builded = new DumpedResult();
         if (lines == null) {
             builded.setLines(new ArrayList<RobotLine>(0));
         } else {

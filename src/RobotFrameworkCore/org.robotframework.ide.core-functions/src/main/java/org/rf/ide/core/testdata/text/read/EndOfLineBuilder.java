@@ -193,11 +193,6 @@ public class EndOfLineBuilder {
         }
 
         @Override
-        public String getRaw() {
-            return getText();
-        }
-
-        @Override
         public List<IRobotTokenType> getTypes() {
             return types;
         }
