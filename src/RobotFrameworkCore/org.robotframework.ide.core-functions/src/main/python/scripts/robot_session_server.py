@@ -52,7 +52,7 @@ def logargs(func):
             if args == None or len(args) == 0:
                 STD_LOGGER.info('calling \'%s\' function, no arguments', func.__name__)
             else:
-                STD_LOGGER.info('calling\'%s\' function, supplied arguments:', func.__name__)
+                STD_LOGGER.info('calling \'%s\' function, supplied arguments:', func.__name__)
                 for arg in args:
                     STD_ARGS_LOGGER.info(arg)
         finally:
@@ -136,14 +136,6 @@ def get_module_path(module_name, python_paths, class_paths):
     import red_modules
     __extend_paths(python_paths, class_paths)
     return red_modules.get_module_path(module_name)
-
-
-@logresult
-@encode_result_or_exception
-@logargs
-def get_run_module_path():
-    import red_modules
-    return red_modules.get_run_module_path()
 
 
 @logresult
@@ -354,7 +346,6 @@ if __name__ == '__main__':
     server = SimpleXMLRPCServer((IP, PORT), allow_none=True)
     server.register_function(get_modules_search_paths, 'getModulesSearchPaths')
     server.register_function(get_module_path, 'getModulePath')
-    server.register_function(get_run_module_path, 'getRunModulePath')
     server.register_function(get_classes_from_module, 'getClassesFromModule')
     server.register_function(get_variables, 'getVariables')
     server.register_function(get_global_variables, 'getGlobalVariables')
