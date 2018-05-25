@@ -108,8 +108,8 @@ public final class LibraryDescriptor {
         // we use 7-digits abbreviation of SHA-1 hash; from approximation formulas of birthday
         // paradox the probability that two hashes will collide when there are 256 libraries with
         // the same name in project is < 2 ** (-13) which is around 0.012%
-        final String hashAbbrevieted = hasher.hash().toString().substring(0, 7);
-        return name + "_" + hashAbbrevieted;
+        final String hashAbbreviated = hasher.hash().toString().substring(0, 7);
+        return name + "_" + hashAbbreviated;
     }
 
     @Override
