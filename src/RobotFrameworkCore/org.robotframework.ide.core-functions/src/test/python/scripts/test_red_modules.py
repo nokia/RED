@@ -3,7 +3,6 @@ import os
 
 from red_modules import get_modules_search_paths
 from red_modules import get_module_path
-from red_modules import get_run_module_path
 
 
 class MudulePathsRetrievingTests(unittest.TestCase):
@@ -12,13 +11,13 @@ class MudulePathsRetrievingTests(unittest.TestCase):
 
         self.assertTrue(len(result) > 0)
 
-    @unittest.skip("enable it after unifying library imports")
-    def test_if_module_path_is_returned(self):        
-        result = get_module_path('robot.libraries.BuiltIn')
+    def test_if_module_path_is_returned(self):   
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_path = os.path.join(parent_path, 'res_test_red_modules')
 
-        self.assertTrue(len(result) > 0)
+        import importlib
+        importlib.import_module('res_test_red_modules')   
 
-    def test_if_run_module_path_is_returned(self):
-        result = get_run_module_path()
+        result = get_module_path('res_test_red_modules')
 
-        self.assertTrue(len(result) > 0)
+        self.assertEqual(os.path.abspath(result), os.path.abspath(module_path))
