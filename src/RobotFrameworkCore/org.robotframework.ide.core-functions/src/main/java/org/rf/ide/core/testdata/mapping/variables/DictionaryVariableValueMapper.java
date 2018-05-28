@@ -72,23 +72,23 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
         final StringBuilder valueText = new StringBuilder();
 
         for (final Special special : extract) {
-            final String specialRawText = special.getText();
+            final String specialText = special.getText();
             if (special.getType() == NamedSpecial.UNKNOWN_TEXT) {
                 if (isValue) {
-                    valueText.append(specialRawText);
+                    valueText.append(specialText);
                 } else {
-                    final int equalsIndex = specialRawText.indexOf('=');
+                    final int equalsIndex = specialText.indexOf('=');
                     if (equalsIndex > -1) {
-                        final String keyPart = specialRawText.substring(0,
+                        final String keyPart = specialText.substring(0,
                                 equalsIndex);
-                        final String valuePart = specialRawText
+                        final String valuePart = specialText
                                 .substring(equalsIndex + 1);
                         keyText.append(keyPart);
                         valueText.append(valuePart);
 
                         isValue = true;
                     } else {
-                        keyText.append(specialRawText);
+                        keyText.append(specialText);
                     }
                 }
             } else {
