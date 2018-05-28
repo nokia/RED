@@ -206,21 +206,39 @@ class ExternalLibrariesImportCollector {
         public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
                 final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
             final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
-            return importLib(builder, fullLibraryPath);
+            return importLib(builder, fullLibraryPath, Optional.empty());
+        }
+
+        @Override
+        public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
+                final IProject project, final RobotProjectConfig config, final String fullLibraryPath,
+                final String name) {
+            final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
+            return importLib(builder, fullLibraryPath, Optional.of(name));
         }
 
         @Override
         public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
                 final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
             final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
-            return importLib(builder, fullLibraryPath);
+            return importLib(builder, fullLibraryPath, Optional.empty());
         }
 
-        Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder, final String fullLibraryPath) {
+        @Override
+        public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
+                final IProject project, final RobotProjectConfig config, final String fullLibraryPath,
+                final String name) {
+            final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
+            return importLib(builder, fullLibraryPath, Optional.of(name));
+        }
+
+        Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder, final String fullLibraryPath,
+                final Optional<String> name) {
             try {
-                final Collection<ILibraryClass> libClasses = builder
+                final Collection<ILibraryClass> libClassesFromFile = builder
                         .provideEntriesFromFile(RedURI.fromString(fullLibraryPath));
-                return libClasses.stream()
+                return libClassesFromFile.stream()
+                        .filter(libClass -> !name.isPresent() || libClass.getQualifiedName().equals(name.get()))
                         .findFirst()
                         .map(libClass -> Collections.singletonList(libClass.toReferencedLibrary(fullLibraryPath)))
                         .orElse(Collections.emptyList());
