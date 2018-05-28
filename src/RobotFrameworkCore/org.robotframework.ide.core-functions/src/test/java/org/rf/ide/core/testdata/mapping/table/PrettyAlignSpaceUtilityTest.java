@@ -23,11 +23,11 @@ public class PrettyAlignSpaceUtilityTest {
     private PrettyAlignSpaceUtility prettyAlignExtractor;
 
     @Test
-    public void test_method_extractPrettyAlignWhitespaces_givenTokenWithPrettyAlign_SuffixAndPreffix_whenShouldDoExtraction_thenCheckIfTextWithoutSpaces() {
+    public void test_method_extractPrettyAlignWhitespaces_givenTokenWithPrettyAlign_SuffixAndPrefix_whenShouldDoExtraction_thenCheckIfTextWithoutSpaces() {
         // prepare
         final RobotLine line = new RobotLine(1, null);
-        final String rawAndText = "   data   ";
-        final RobotToken token = RobotToken.create(rawAndText);
+        final String text = "   data   ";
+        final RobotToken token = RobotToken.create(text);
         final FilePosition fp = new FilePosition(10, 10, 20);
         token.setStartOffset(fp.getOffset());
         token.setLineNumber(fp.getLine());
@@ -36,7 +36,7 @@ public class PrettyAlignSpaceUtilityTest {
         line.addLineElement(token);
 
         // execute
-        prettyAlignExtractor.extractPrettyAlignWhitespaces(line, token, rawAndText);
+        prettyAlignExtractor.extractPrettyAlignWhitespaces(line, token, text);
 
         // verify
         assertThat(line.getLineElements()).hasSize(3);
@@ -49,11 +49,11 @@ public class PrettyAlignSpaceUtilityTest {
     }
 
     @Test
-    public void test_method_extractPrettyAlignWhitespaces_givenTokenWithPrettyAlignPreffix_whenShouldDoExtraction_thenCheckIfTextWithoutSpaces() {
+    public void test_method_extractPrettyAlignWhitespaces_givenTokenWithPrettyAlignPrefix_whenShouldDoExtraction_thenCheckIfTextWithoutSpaces() {
         // prepare
         final RobotLine line = new RobotLine(1, null);
-        final String rawAndText = "data   ";
-        final RobotToken token = RobotToken.create(rawAndText);
+        final String text = "data   ";
+        final RobotToken token = RobotToken.create(text);
         final FilePosition fp = new FilePosition(10, 10, 20);
         token.setStartOffset(fp.getOffset());
         token.setLineNumber(fp.getLine());
@@ -62,7 +62,7 @@ public class PrettyAlignSpaceUtilityTest {
         line.addLineElement(token);
 
         // execute
-        prettyAlignExtractor.extractPrettyAlignWhitespaces(line, token, rawAndText);
+        prettyAlignExtractor.extractPrettyAlignWhitespaces(line, token, text);
 
         // verify
         assertThat(line.getLineElements()).hasSize(2);
@@ -76,8 +76,8 @@ public class PrettyAlignSpaceUtilityTest {
     public void test_method_extractPrettyAlignWhitespaces_givenTokenWithPrettyAlignSuffix_whenShouldDoExtraction_thenCheckIfTextWithoutSpaces() {
         // prepare
         final RobotLine line = new RobotLine(1, null);
-        final String rawAndText = "   data";
-        final RobotToken token = RobotToken.create(rawAndText);
+        final String text = "   data";
+        final RobotToken token = RobotToken.create(text);
         final FilePosition fp = new FilePosition(10, 10, 20);
         token.setStartOffset(fp.getOffset());
         token.setLineNumber(fp.getLine());
@@ -86,7 +86,7 @@ public class PrettyAlignSpaceUtilityTest {
         line.addLineElement(token);
 
         // execute
-        prettyAlignExtractor.extractPrettyAlignWhitespaces(line, token, rawAndText);
+        prettyAlignExtractor.extractPrettyAlignWhitespaces(line, token, text);
 
         // verify
         assertThat(line.getLineElements()).hasSize(2);
@@ -100,8 +100,8 @@ public class PrettyAlignSpaceUtilityTest {
     public void test_method_extractPrettyAlignWhitespaces_givenPrettyAlignToken_whenShouldNotDoAnything_thenCheckIfTextIsReturnAsItWas() {
         // prepare
         final RobotLine line = new RobotLine(1, null);
-        final String rawAndText = " ";
-        final RobotToken token = RobotToken.create(rawAndText);
+        final String text = " ";
+        final RobotToken token = RobotToken.create(text);
         final FilePosition fp = new FilePosition(10, 10, 10);
         token.setStartOffset(fp.getOffset());
         token.setLineNumber(fp.getLine());
@@ -110,12 +110,12 @@ public class PrettyAlignSpaceUtilityTest {
         line.addLineElement(token);
 
         // execute
-        prettyAlignExtractor.extractPrettyAlignWhitespaces(line, token, rawAndText);
+        prettyAlignExtractor.extractPrettyAlignWhitespaces(line, token, text);
 
         // verify
         assertThat(line.getLineElements()).hasSize(1);
         assertThat(line.getLineElements()).containsExactly(token);
-        assertToken(token, rawAndText, RobotTokenType.PRETTY_ALIGN_SPACE, fp);
+        assertToken(token, text, RobotTokenType.PRETTY_ALIGN_SPACE, fp);
     }
 
     private void assertToken(final IRobotLineElement token, final String text, final RobotTokenType type,

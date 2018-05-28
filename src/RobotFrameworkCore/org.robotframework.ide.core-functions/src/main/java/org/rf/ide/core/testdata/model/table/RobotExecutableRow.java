@@ -277,8 +277,8 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         return result;
     }
 
-    public static boolean isTsvComment(final String raw, final FileFormat format) {
-        return (format == FileFormat.TSV && TSV_COMMENT.matcher(raw).matches());
+    public static boolean isTsvComment(final String text, final FileFormat format) {
+        return (format == FileFormat.TSV && TSV_COMMENT.matcher(text).matches());
     }
 
     public IExecutableRowDescriptor<T> buildLineDescription() {
