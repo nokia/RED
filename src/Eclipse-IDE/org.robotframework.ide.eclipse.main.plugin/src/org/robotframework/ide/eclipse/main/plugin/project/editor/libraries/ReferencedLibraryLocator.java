@@ -12,6 +12,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -30,6 +31,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
+import com.google.common.base.Objects;
+
 public class ReferencedLibraryLocator {
 
     private final RobotProject robotProject;
@@ -40,7 +43,7 @@ public class ReferencedLibraryLocator {
 
     private final RobotProjectConfig projectConfig;
 
-    private final Map<File, Collection<ReferencedLibrary>> libImportCache = new HashMap<>();
+    private final Map<LibImportCacheKey, Collection<ReferencedLibrary>> libImportCache = new HashMap<>();
 
     public ReferencedLibraryLocator(final RobotProject robotProject, final IReferencedLibraryImporter importer,
             final IReferencedLibraryDetector detector) {
@@ -55,8 +58,7 @@ public class ReferencedLibraryLocator {
         try {
             libraryFile = findLibraryFileByName(suiteFile, name);
             if (libraryFile.isPresent()) {
-                final SimpleImmutableEntry<File, Collection<ReferencedLibrary>> imported = importJavaOrPythonLibrary(
-                        libraryFile.get());
+                final Entry<File, Collection<ReferencedLibrary>> imported = importByName(libraryFile.get(), name);
                 detector.libraryDetectedByName(name, imported.getKey(), imported.getValue());
             } else {
                 detector.libraryDetectingByNameFailed(name, libraryFile, "Unable to find '" + name + "' library.");
@@ -81,8 +83,7 @@ public class ReferencedLibraryLocator {
             if (new Path(path).isAbsolute() || path.endsWith("/") || path.endsWith(".py")) {
                 libraryFile = findLibraryFileByPath(suiteFile, path);
                 if (libraryFile.isPresent()) {
-                    final SimpleImmutableEntry<File, Collection<ReferencedLibrary>> imported = importPythonLibrary(
-                            libraryFile.get());
+                    final Entry<File, Collection<ReferencedLibrary>> imported = importByPath(libraryFile.get());
                     detector.libraryDetectedByPath(path, imported.getKey(), imported.getValue());
                 } else {
                     detector.libraryDetectingByPathFailed(path, libraryFile,
@@ -106,35 +107,58 @@ public class ReferencedLibraryLocator {
         }).map(File::new);
     }
 
-    private SimpleImmutableEntry<File, Collection<ReferencedLibrary>> importJavaOrPythonLibrary(
-            final File libraryFile) {
+    private Entry<File, Collection<ReferencedLibrary>> importByName(final File libraryFile, final String name) {
         if (libraryFile.getAbsolutePath().endsWith(".jar")) {
-            return importLibsFromFileWithCaching(libraryFile,
-                    () -> importer.importJavaLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
-                            projectConfig, libraryFile.getAbsolutePath()));
+            return importJavaLibrary(libraryFile, name);
+        } else if (isPythonModule(libraryFile)) {
+            return importPythonModuleLibrary(new File(libraryFile, "__init__.py"));
+        } else {
+            return importPythonLibrary(libraryFile, name);
+        }
+    }
+
+    private Entry<File, Collection<ReferencedLibrary>> importByPath(final File libraryFile) {
+        if (isPythonModule(libraryFile)) {
+            return importPythonModuleLibrary(new File(libraryFile, "__init__.py"));
         } else {
             return importPythonLibrary(libraryFile);
         }
     }
 
-    private SimpleImmutableEntry<File, Collection<ReferencedLibrary>> importPythonLibrary(final File libraryFile) {
-        if (libraryFile.isDirectory() && new File(libraryFile, "__init__.py").exists()) {
-            return importLibsFromFileWithCaching(new File(libraryFile, "__init__.py"),
-                    () -> newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, libraryFile.getName(),
-                            new Path(libraryFile.getPath()).removeLastSegments(1).toPortableString())));
-        } else {
-            return importLibsFromFileWithCaching(libraryFile,
-                    () -> importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
-                            projectConfig, libraryFile.getAbsolutePath()));
-        }
+    private boolean isPythonModule(final File libraryFile) {
+        return libraryFile.isDirectory() && new File(libraryFile, "__init__.py").exists();
     }
 
-    private SimpleImmutableEntry<File, Collection<ReferencedLibrary>> importLibsFromFileWithCaching(
-            final File libraryFile, final Supplier<Collection<ReferencedLibrary>> importLibrarySupplier) {
-        if (!libImportCache.containsKey(libraryFile)) {
-            libImportCache.put(libraryFile, importLibrarySupplier.get());
+    private Entry<File, Collection<ReferencedLibrary>> importJavaLibrary(final File libraryFile, final String name) {
+        return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, name),
+                () -> importer.importJavaLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
+                        projectConfig, libraryFile.getAbsolutePath(), name));
+    }
+
+    private Entry<File, Collection<ReferencedLibrary>> importPythonLibrary(final File libraryFile, final String name) {
+        return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, name),
+                () -> importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
+                        projectConfig, libraryFile.getAbsolutePath(), name));
+    }
+
+    private Entry<File, Collection<ReferencedLibrary>> importPythonLibrary(final File libraryFile) {
+        return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, null),
+                () -> importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
+                        projectConfig, libraryFile.getAbsolutePath()));
+    }
+
+    private Entry<File, Collection<ReferencedLibrary>> importPythonModuleLibrary(final File libraryFile) {
+        return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, null),
+                () -> newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, libraryFile.getParentFile().getName(),
+                        new Path(libraryFile.getPath()).removeLastSegments(2).toPortableString())));
+    }
+
+    private Entry<File, Collection<ReferencedLibrary>> importLibsFromFileWithCaching(final LibImportCacheKey key,
+            final Supplier<Collection<ReferencedLibrary>> importLibrarySupplier) {
+        if (!libImportCache.containsKey(key)) {
+            libImportCache.put(key, importLibrarySupplier.get());
         }
-        return new SimpleImmutableEntry<>(libraryFile, libImportCache.get(libraryFile));
+        return new SimpleImmutableEntry<>(key.libraryFile, libImportCache.get(key));
     }
 
     public interface IReferencedLibraryDetector {
@@ -146,5 +170,35 @@ public class ReferencedLibraryLocator {
         void libraryDetectingByNameFailed(String name, Optional<File> libraryFile, String failReason);
 
         void libraryDetectingByPathFailed(String path, Optional<File> libraryFile, String failReason);
+    }
+
+    private static class LibImportCacheKey {
+
+        private final File libraryFile;
+
+        private final String libraryName;
+
+        private LibImportCacheKey(final File libraryFile, final String libraryName) {
+            this.libraryFile = libraryFile;
+            this.libraryName = libraryName;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (LibImportCacheKey.class == obj.getClass()) {
+                final LibImportCacheKey that = (LibImportCacheKey) obj;
+                return Objects.equal(this.libraryFile, that.libraryFile)
+                        && Objects.equal(this.libraryName, that.libraryName);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(libraryFile, libraryName);
+        }
     }
 }

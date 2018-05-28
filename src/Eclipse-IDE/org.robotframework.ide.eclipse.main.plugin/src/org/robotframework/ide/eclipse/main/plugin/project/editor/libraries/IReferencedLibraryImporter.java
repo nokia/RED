@@ -17,6 +17,12 @@ public interface IReferencedLibraryImporter {
     Collection<ReferencedLibrary> importPythonLib(RobotRuntimeEnvironment environment, IProject project,
             RobotProjectConfig config, String fullLibraryPath);
 
+    Collection<ReferencedLibrary> importPythonLib(RobotRuntimeEnvironment environment, IProject project,
+            RobotProjectConfig config, String fullLibraryPath, String name);
+
     Collection<ReferencedLibrary> importJavaLib(RobotRuntimeEnvironment environment, IProject project,
             RobotProjectConfig config, String fullLibraryPath);
+
+    Collection<ReferencedLibrary> importJavaLib(RobotRuntimeEnvironment environment, IProject project,
+            RobotProjectConfig config, String fullLibraryPath, String name);
 }

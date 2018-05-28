@@ -49,7 +49,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibr
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Streams;
 
 /**
  * @author mmarzec
@@ -179,16 +179,10 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         List<RobotDryRunLibraryImport> getLibraryImportsToAdd(final List<RobotDryRunLibraryImport> libraryImports) {
-            final Set<String> existingReferencedLibraryNames = config.getLibraries()
-                    .stream()
-                    .map(ReferencedLibrary::getName)
+            final Set<String> existingLibraryNames = Streams
+                    .concat(config.getLibraries().stream().map(ReferencedLibrary::getName),
+                            config.getRemoteLocations().stream().map(RemoteLocation::getRemoteName))
                     .collect(toSet());
-            final Set<String> existingRemoteLibraryNames = config.getRemoteLocations()
-                    .stream()
-                    .map(RemoteLocation::getRemoteName)
-                    .collect(toSet());
-            final Set<String> existingLibraryNames = Sets.union(existingReferencedLibraryNames,
-                    existingRemoteLibraryNames);
 
             final List<RobotDryRunLibraryImport> result = new ArrayList<>();
             for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
@@ -261,7 +255,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         private void addRemoteLibrary(final RobotDryRunLibraryImport libraryImport) {
-            if (!(libraryImport.getSourcePath() == null)) {
+            if (libraryImport.getSourcePath() != null) {
                 final RemoteLocation remoteLibrary = RemoteLocation.create(libraryImport.getSourcePath());
                 addRemoteLocation(remoteLibrary);
             } else {
