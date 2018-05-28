@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,14 +56,28 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
     public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
             final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
         final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
-        return importLib(builder, fullLibraryPath, RedImages.getPythonLibraryImage());
+        return importLib(builder, fullLibraryPath, Optional.empty(), RedImages.getPythonLibraryImage());
+    }
+
+    @Override
+    public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
+            final IProject project, final RobotProjectConfig config, final String fullLibraryPath, final String name) {
+        final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
+        return importLib(builder, fullLibraryPath, Optional.of(name), RedImages.getPythonLibraryImage());
     }
 
     @Override
     public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
             final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
         final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
-        return importLib(builder, fullLibraryPath, RedImages.getJavaClassImage());
+        return importLib(builder, fullLibraryPath, Optional.empty(), RedImages.getJavaClassImage());
+    }
+
+    @Override
+    public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
+            final IProject project, final RobotProjectConfig config, final String fullLibraryPath, final String name) {
+        final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
+        return importLib(builder, fullLibraryPath, Optional.of(name), RedImages.getJavaClassImage());
     }
 
     public ReferencedLibrary importLibFromSpecFile(final String fullLibraryPath) {
@@ -71,13 +86,17 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
     }
 
     private Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder,
-            final String fullLibraryPath, final ImageDescriptor libImageDescriptor) {
+            final String fullLibraryPath, final Optional<String> name, final ImageDescriptor libImageDescriptor) {
         final List<ILibraryClass> libClasses = new ArrayList<>();
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(monitor -> {
                 monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
                 try {
-                    libClasses.addAll(builder.provideEntriesFromFile(RedURI.fromString(fullLibraryPath)));
+                    final Collection<ILibraryClass> libClassesFromFile = builder
+                            .provideEntriesFromFile(RedURI.fromString(fullLibraryPath));
+                    libClasses.addAll(libClassesFromFile.stream()
+                            .filter(libClass -> !name.isPresent() || libClass.getQualifiedName().equals(name.get()))
+                            .collect(Collectors.toList()));
                 } catch (final RobotEnvironmentException | URISyntaxException e) {
                     throw new InvocationTargetException(e);
                 }
