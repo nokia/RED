@@ -19,27 +19,35 @@ def get_module_path(module_name):
     except ImportError as e:
         # when trying to locate jar modules via jython
         import platform
-        if platform.python_implementation() != 'Jython':
-            raise e
+        if 'Jython' in platform.python_implementation():
+            source = _find_jar_source_path(module_name)
+            if source:
+                if 'file:' in source:
+                    source = source[source.index('file:') + 5:]
 
-        import sys
-        path_hook_finder = sys.path_importer_cache['__classpath__']
-        if path_hook_finder:
-            m = path_hook_finder.load_module(module_name)
-            map(__import__, [module_name])
-            if m is None:
-                m = path_hook_finder.load_module(module_name)
+                if '.jar!' in source:
+                    source = source[:source.rindex('.jar!')] + '.jar'
+                elif '.jar/' in source:
+                    source = source[:source.rindex('.jar/')] + '.jar'
+                elif '.jar\\' in source:
+                    source = source[:source.rindex('.jar\\')] + '.jar'
 
-            jar_path = m.getResource('/' + m.getName().replace('.', '/') + ".class").getPath()
-            if jar_path is None or len(jar_path) == 0:
-                raise e
-
-            if jar_path.startswith('file:/'):
-                jar_path = jar_path[6:]
-            if jar_path.index('.jar!') > 0:
-                jar_path = jar_path[:jar_path.index('.jar!')] + '.jar'
-            return jar_path
+                return source
         raise e
+
+
+def _find_jar_source_path(module_name):
+    import org.python.core.imp as jimp
+    from types import ModuleType
+    module = jimp.load(module_name)
+    if isinstance(module, ModuleType):
+        source = module.__file__
+        if '__pyclasspath__' in source:
+            res = source[source.index('__pyclasspath__') + 16:]
+            return jimp.getSyspathJavaLoader().getResource(res).getPath()
+        return source
+    else:
+        return module.getResource('/' + module_name.replace('.', '/') + ".class").getPath()
 
 
 if __name__ == '__main__':

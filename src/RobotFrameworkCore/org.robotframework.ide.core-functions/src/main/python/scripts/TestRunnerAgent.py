@@ -133,6 +133,24 @@ def _label_with_types(data):
         return (value_type, data)
 
 
+def _extract_source_path(source):
+    if 'file:' in source:
+        source = source[source.index('file:') + 5:]
+
+    if '.jar!' in source:
+        source = source[:source.rindex('.jar!')] + '.jar'
+    elif '.jar/' in source:
+        source = source[:source.rindex('.jar/')] + '.jar'
+    elif '.jar\\' in source:
+        source = source[:source.rindex('.jar\\')] + '.jar'
+    elif source.endswith('.pyc'):
+        source = source[:-1]
+    elif source.endswith('$py.class'):
+        source = source[:-9] + '.py'
+
+    return source
+
+
 class RedResponseMessage:
     
     DO_START = 'do_start'
@@ -570,31 +588,24 @@ class TestRunnerAgent:
         self._send_to_server(AgentEventMessage.RESOURCE_IMPORT, name, attributes)
 
     def library_import(self, name, attributes):
-        # equals org.python.core.ClasspathPyImporter.PYCLASSPATH_PREFIX
         if 'Jython' in platform.python_implementation():
-            import org.python.core.imp as jimp
-            if attributes['source']:
-                if '__pyclasspath__' in attributes['source']:
-                    res = attributes['source'].split('__pyclasspath__')[1].replace(os.sep, '')
-                    attributes['source'] = str(jimp.getSyspathJavaLoader().getResources(res).nextElement())
-            else:
-                try:
-                    source_uri = jimp.getSyspathJavaLoader().getResources(name + '.class').nextElement()
-                    attributes['source'] = str(source_uri)
-                except:
-                    pass
-
-            source_uri_txt = attributes['source']
-            if source_uri_txt and 'file:/' in source_uri_txt:
-                from java.io import File as File
-                from java.net import URL as URL
-                filePath = re.split('.*(?=file[:])', source_uri_txt)
-                if len(filePath) > 1:
-                    path = re.split('[!][/]', filePath[1])[0]
-                    f = File(URL(path).getFile())
-                    source_uri_txt = f.getAbsolutePath()
-                attributes['source'] = source_uri_txt
+            attributes['source'] = self._find_jar_source_path(attributes['source'], name)
+        if attributes['source']:
+            attributes['source'] = _extract_source_path(attributes['source'])
         self._send_to_server(AgentEventMessage.LIBRARY_IMPORT, name, attributes)
+
+    def _find_jar_source_path(self, source, name):
+        try:
+            import org.python.core.imp as jimp
+            if not source:
+                res = name + ".class"
+                return jimp.getSyspathJavaLoader().getResource(res).getPath()
+            elif '__pyclasspath__' in source:
+                res = source[source.index('__pyclasspath__') + 16:]
+                return jimp.getSyspathJavaLoader().getResource(res).getPath()
+        except:
+            pass
+        return source
 
     def message(self, message):
         if message['level'] in ('ERROR', 'FAIL', 'NONE'):

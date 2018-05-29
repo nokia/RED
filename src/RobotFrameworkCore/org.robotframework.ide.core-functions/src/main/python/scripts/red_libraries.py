@@ -18,7 +18,12 @@ def get_standard_library_names():
 def get_standard_library_path(libname):
     import importlib
     module = importlib.import_module('robot.libraries.' + libname)
-    return module.__file__
+    source = module.__file__
+    if source.endswith('.pyc'):
+        source = source[:-1]
+    elif source.endswith('$py.class'):
+        source = source[:-9] + '.py'
+    return source
 
 
 def create_libdoc(libname, format):
@@ -32,7 +37,7 @@ def create_libdoc(libname, format):
         encoded_libdoc = _encode_libdoc(temp_lib_file_path)
         if encoded_libdoc:
             return encoded_libdoc
-        else :
+        else:
             raise Exception(result)
     finally:
         os.remove(temp_lib_file_path)
@@ -68,7 +73,7 @@ def _encode_libdoc(temp_lib_file_path):
 
 def create_html_doc(doc, format):
     from robot.libdocpkg.htmlwriter import DocToHtml
-    
+
     formatter = DocToHtml(format)
     return formatter(doc)
 

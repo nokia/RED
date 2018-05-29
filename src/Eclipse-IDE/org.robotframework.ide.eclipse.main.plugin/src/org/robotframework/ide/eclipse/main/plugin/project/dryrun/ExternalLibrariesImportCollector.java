@@ -300,8 +300,8 @@ class ExternalLibrariesImportCollector {
     private static boolean isInLibraryImports(final String strippedAddress,
             final Set<RobotDryRunLibraryImport> libraryImports) {
         for (final RobotDryRunLibraryImport libImport : libraryImports) {
-            if (strippedAddress.equals(RemoteArgumentsResolver
-                    .stripLastSlashAndProtocolIfNecessary(libImport.getSourcePath().toString()))) {
+            if (strippedAddress.equals(
+                    RemoteArgumentsResolver.stripLastSlashAndProtocolIfNecessary(libImport.getSource().toString()))) {
                 return true;
             }
         }

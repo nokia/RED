@@ -305,19 +305,19 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                     new DryRunLibraryImportChildElement(STATUS_ELEMENT_NAME, libraryImport.getStatus().getMessage()));
         }
 
-        if (libraryImport.getSourcePath() != null) {
+        if (libraryImport.getSource() != null) {
             if (libraryImport.getType() != DryRunLibraryType.REMOTE) {
                 children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME,
-                        new File(libraryImport.getSourcePath()).getAbsolutePath()));
+                        new File(libraryImport.getSource()).getAbsolutePath()));
             } else {
-                children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME,
-                        libraryImport.getSourcePath().toString()));
+                children.add(
+                        new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, libraryImport.getSource().toString()));
             }
         } else {
             children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, UNKNOWN_ELEMENT_VALUE));
         }
 
-        final List<String> importersPaths = libraryImport.getImportersPaths()
+        final List<String> importersPaths = libraryImport.getImporters()
                 .stream()
                 .sorted((uri1, uri2) -> uri1.compareTo(uri2))
                 .map(File::new)

@@ -45,12 +45,12 @@ public class CombinedLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
     @Override
     List<RobotDryRunLibraryImport> getImportedLibraries() {
         final List<RobotDryRunLibraryImport> importedLibraries = super.getImportedLibraries();
-        importedLibraries.forEach(libImport -> setImportersPaths(libImport,
+        importedLibraries.forEach(libImport -> setImporters(libImport,
                 libImportCollector.getUnknownLibraryNames().get(libImport.getName())));
 
         final Set<RobotDryRunLibraryImport> collectedLibraries = libImportCollector.getLibraryImports();
-        collectedLibraries.forEach(
-                libImport -> setImportersPaths(libImport, libImportCollector.getLibraryImporters().get(libImport)));
+        collectedLibraries
+                .forEach(libImport -> setImporters(libImport, libImportCollector.getLibraryImporters().get(libImport)));
 
         importedLibraries.addAll(collectedLibraries);
         return importedLibraries;
