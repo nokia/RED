@@ -46,7 +46,7 @@ public class SimpleLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
     @Override
     List<RobotDryRunLibraryImport> getImportedLibraries() {
         final List<RobotDryRunLibraryImport> importedLibraries = super.getImportedLibraries();
-        importedLibraries.forEach(libImport -> setImportersPaths(libImport, newArrayList(suite)));
+        importedLibraries.forEach(libImport -> setImporters(libImport, newArrayList(suite)));
         return importedLibraries;
     }
 

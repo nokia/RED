@@ -274,9 +274,10 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public String getStandardLibraryPath(final String libName) {
+    public File getStandardLibraryPath(final String libName) {
         try {
-            return (String) callRpcFunction("getStandardLibraryPath", libName);
+            final String path = (String) callRpcFunction("getStandardLibraryPath", libName);
+            return new File(path);
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }

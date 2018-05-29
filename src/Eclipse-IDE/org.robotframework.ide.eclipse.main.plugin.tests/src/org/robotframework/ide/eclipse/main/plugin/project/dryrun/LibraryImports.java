@@ -35,7 +35,7 @@ class LibraryImports {
             final URI sourcePath, final Set<IFile> importers) {
         final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(name, sourcePath);
         libImport.setStatus(status);
-        libImport.setImportersPaths(importers.stream().map(IFile::getLocationURI).collect(toSet()));
+        libImport.setImporters(importers.stream().map(IFile::getLocationURI).collect(toSet()));
         return libImport;
     }
 
@@ -49,14 +49,14 @@ class LibraryImports {
     static RobotDryRunLibraryImport createImport(final DryRunLibraryImportStatus status, final String name,
             final Set<IFile> importers) {
         final RobotDryRunLibraryImport libImport = createImport(status, name);
-        libImport.setImportersPaths(importers.stream().map(IFile::getLocationURI).collect(toSet()));
+        libImport.setImporters(importers.stream().map(IFile::getLocationURI).collect(toSet()));
         return libImport;
     }
 
     static RobotDryRunLibraryImport createImport(final DryRunLibraryImportStatus status, final String name,
             final IFile source, final Set<IFile> importers) {
         final RobotDryRunLibraryImport libImport = createImport(status, name, source);
-        libImport.setImportersPaths(importers.stream().map(IFile::getLocationURI).collect(toSet()));
+        libImport.setImporters(importers.stream().map(IFile::getLocationURI).collect(toSet()));
         return libImport;
     }
 
@@ -102,15 +102,15 @@ class LibraryImports {
                 final RobotDryRunLibraryImport libImport2) {
             return Objects.equals(libImport1.getStatus(), libImport2.getStatus())
                     && Objects.equals(libImport1.getName(), libImport2.getName())
-                    && Objects.equals(libImport1.getSourcePath(), libImport2.getSourcePath())
+                    && Objects.equals(libImport1.getSource(), libImport2.getSource())
                     && Objects.equals(libImport1.getType(), libImport2.getType())
-                    && Objects.equals(libImport1.getImportersPaths(), libImport2.getImportersPaths());
+                    && Objects.equals(libImport1.getImporters(), libImport2.getImporters());
         }
 
         @Override
         protected int doHash(final RobotDryRunLibraryImport libImport) {
-            return Objects.hash(libImport.getStatus(), libImport.getName(), libImport.getSourcePath(),
-                    libImport.getType(), libImport.getImportersPaths());
+            return Objects.hash(libImport.getStatus(), libImport.getName(), libImport.getSource(), libImport.getType(),
+                    libImport.getImporters());
         }
     }
 }
