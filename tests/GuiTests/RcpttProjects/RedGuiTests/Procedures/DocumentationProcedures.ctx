@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/14/18 2:32 PM
+Save-Time: 5/29/18 11:01 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -145,7 +145,6 @@ proc "check-documentation-view-for-tc" [val tc_name] [val path ""] [val spec]{
 }
 
 proc "check-documentation-view-for-file" [val file_name] [val project_name][val path] [val intro] [val shortcuts]{
-	create-shortcuts-list -sh_list $shortcuts -path $path | log
 	let [val path2 [replace -input $path -old " " -new "\%20"] ]{
 		get-view "Documentation View" | get-control Browser | get-property text 
 			| equals [format $html_test_file  $html_beginning $file_name $path2 $path $intro [create-shortcuts-list -sh_list $shortcuts -path $path2]] | verify-true
