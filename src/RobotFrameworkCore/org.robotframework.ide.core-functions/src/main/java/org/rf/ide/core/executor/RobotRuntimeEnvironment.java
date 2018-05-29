@@ -396,24 +396,9 @@ public class RobotRuntimeEnvironment {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            final String stdLibPath = executor.getStandardLibraryPath(libraryName);
-            return Optional.ofNullable(extractPythonSourcePath(stdLibPath)).map(File::new);
+            return Optional.of(executor.getStandardLibraryPath(libraryName));
         }
         return Optional.empty();
-    }
-
-    private String extractPythonSourcePath(final String path) {
-        if (path == null) {
-            return null;
-        } else if (path.endsWith(".py")) {
-            return path;
-        } else if (path.endsWith(".pyc")) {
-            return path.substring(0, path.length() - 1);
-        } else if (path.endsWith("$py.class")) {
-            return path.substring(0, path.length() - 9) + ".py";
-        } else {
-            return null;
-        }
     }
 
     /**

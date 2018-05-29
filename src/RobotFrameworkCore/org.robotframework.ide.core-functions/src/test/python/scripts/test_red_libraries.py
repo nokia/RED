@@ -8,20 +8,21 @@ from red_libraries import create_html_doc
 
 
 class LibrariesRetrievingTests(unittest.TestCase):
-    def test_if_standard_library_names_are_returned(self):        
+    def test_if_standard_library_names_are_returned(self):
         result = get_standard_library_names()
 
         self.assertTrue(len(result) > 0)
 
-    def test_if_standard_library_path_is_returned(self):        
+    def test_if_standard_library_path_is_returned(self):
         result = get_standard_library_path('BuiltIn')
 
-        self.assertTrue(len(result) > 0)
+        self.assertTrue(result.endswith('BuiltIn.py'))
 
-    def test_if_libdoc_is_returned(self):        
+    def test_if_libdoc_is_returned(self):
         result = create_libdoc('BuiltIn', 'XML')
 
         self.assertTrue(len(result) > 0)
+
 
 class HtmlDocTests(unittest.TestCase):
     def test_simple_docs_in_robot_format_are_htmlified(self):
@@ -89,4 +90,3 @@ class HtmlDocTests(unittest.TestCase):
         self.assertEqual(create_html_doc('<h2>Section</h2>', 'HTML'), '<div style="margin: 0"><h2>Section</h2></div>')
         self.assertEqual(create_html_doc('== Section ==', 'HTML'), '<div style="margin: 0">== Section ==</div>')
         self.assertEqual(create_html_doc('<h3>Section</h3>', 'HTML'), '<div style="margin: 0"><h3>Section</h3></div>')
-        

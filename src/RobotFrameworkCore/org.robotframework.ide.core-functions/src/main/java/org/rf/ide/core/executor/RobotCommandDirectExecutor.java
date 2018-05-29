@@ -97,16 +97,16 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public String getStandardLibraryPath(final String libraryName) {
+    public File getStandardLibraryPath(final String libraryName) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
             final List<String> cmdLine = createCommandLine(scriptFile, "-path", libraryName);
 
             final List<String> output = runExternalProcess(cmdLine);
 
-            return Iterables.getOnlyElement(output);
+            return new File(Iterables.getOnlyElement(output));
         } catch (final IOException e) {
-            return null;
+            throw new RobotEnvironmentException("Unable to find path of '" + libraryName + "' standard library", e);
         }
     }
 

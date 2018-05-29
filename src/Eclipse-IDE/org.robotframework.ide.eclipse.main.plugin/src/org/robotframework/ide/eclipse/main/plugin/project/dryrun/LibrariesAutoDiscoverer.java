@@ -143,12 +143,12 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 recursiveInVirtualenv, excludedPaths, additionalPaths);
     }
 
-    void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> suites) {
-        final Set<URI> importersPaths = suites.stream()
+    void setImporters(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> suites) {
+        final Set<URI> importers = suites.stream()
                 .map(suite -> suite.getFile().getLocationURI())
                 .filter(uri -> uri != null)
                 .collect(toSet());
-        libraryImport.setImportersPaths(importersPaths);
+        libraryImport.setImporters(importers);
     }
 
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor,
@@ -214,7 +214,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     robotProject.getProject());
             try {
                 final Collection<ILibraryClass> libraryClasses = pythonLibStructureBuilder
-                        .provideAllEntriesFromFile(libraryImport.getSourcePath());
+                        .provideAllEntriesFromFile(libraryImport.getSource());
                 addReferencedLibrariesFromClasses(libraryImport, libraryClasses);
             } catch (final RobotEnvironmentException e) {
                 final Optional<File> modulePath = findPythonLibraryModulePath(libraryImport);
@@ -246,7 +246,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     robotProject.getProject());
             try {
                 final Collection<ILibraryClass> libraryClasses = jarStructureBuilder
-                        .provideEntriesFromFile(libraryImport.getSourcePath());
+                        .provideEntriesFromFile(libraryImport.getSource());
                 addReferencedLibrariesFromClasses(libraryImport, libraryClasses);
             } catch (final RobotEnvironmentException e) {
                 libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
@@ -255,9 +255,8 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         private void addRemoteLibrary(final RobotDryRunLibraryImport libraryImport) {
-            if (libraryImport.getSourcePath() != null) {
-                final RemoteLocation remoteLibrary = RemoteLocation.create(libraryImport.getSourcePath());
-                addRemoteLocation(remoteLibrary);
+            if (libraryImport.getSource() != null) {
+                addRemoteLocation(RemoteLocation.create(libraryImport.getSource()));
             } else {
                 libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                 libraryImport.setAdditionalInfo("Invalid number of arguments during Remote library import");
@@ -269,7 +268,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             final Collection<ReferencedLibrary> librariesToAdd = new ArrayList<>();
             for (final ILibraryClass libraryClass : libraryClasses) {
                 if (libraryClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
-                    librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSourcePath().getPath()));
+                    librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSource().getPath()));
                 }
             }
             if (!librariesToAdd.isEmpty()) {
@@ -277,7 +276,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             } else {
                 libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                 libraryImport.setAdditionalInfo("RED was unable to find class '" + libraryImport.getName()
-                        + "' inside '" + libraryImport.getSourcePath() + "' module.");
+                        + "' inside '" + libraryImport.getSource().toString() + "' module.");
             }
         }
 

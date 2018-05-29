@@ -146,14 +146,14 @@ public class LibrariesAutoDiscovererWindowTest {
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
                 .isEqualTo("Status: Not added to project configuration\n" + "Source: "
-                        + libImportElement.getSourcePath().toString() + "\n" + "Importers: Unknown");
+                        + libImportElement.getSource().toString() + "\n" + "Importers: Unknown");
     }
 
     @Test
     public void testConvertingToText_forLibraryImportWithSingleImporter() throws Exception {
         final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         libImportElement.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
-        libImportElement.setImportersPaths(newHashSet(suite.getLocationURI()));
+        libImportElement.setImporters(newHashSet(suite.getLocationURI()));
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
                 .isEqualTo("Status: Already existing in project configuration\n" + "Source: Unknown\n" + "Importers: "
@@ -169,7 +169,7 @@ public class LibrariesAutoDiscovererWindowTest {
         final IFile suite3 = projectProvider.createFile("suite3.robot");
         final IFile suite4 = projectProvider.createFile("suite4.robot");
         final IFile suite5 = projectProvider.createFile("suite5.robot");
-        libImportElement.setImportersPaths(newHashSet(suite2.getLocationURI(), suite3.getLocationURI(),
+        libImportElement.setImporters(newHashSet(suite2.getLocationURI(), suite3.getLocationURI(),
                 suite1.getLocationURI(), suite5.getLocationURI(), suite4.getLocationURI()));
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
@@ -237,7 +237,7 @@ public class LibrariesAutoDiscovererWindowTest {
         final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("name",
                 lib.getLocationURI());
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        libImportElement.setImportersPaths(newHashSet(suite.getLocationURI()));
+        libImportElement.setImporters(newHashSet(suite.getLocationURI()));
         libImportElement.setAdditionalInfo("additional info error");
 
         assertThat(contentProvider.getChildren(childElement1)).isNull();
@@ -264,7 +264,7 @@ public class LibrariesAutoDiscovererWindowTest {
         final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote",
                 URI.create("http://127.0.0.1:9000"));
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        libImportElement.setImportersPaths(newHashSet(suite.getLocationURI()));
+        libImportElement.setImporters(newHashSet(suite.getLocationURI()));
         libImportElement.setAdditionalInfo("additional info error");
 
         final Object[] libImportChildren = contentProvider.getChildren(libImportElement);
@@ -274,7 +274,7 @@ public class LibrariesAutoDiscovererWindowTest {
                 .isEqualTo("Not added to project configuration");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getName()).isEqualTo("Source:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getValue())
-                .isEqualTo(libImportElement.getSourcePath().toString());
+                .isEqualTo(libImportElement.getSource().toString());
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getValue())
                 .isEqualTo(suite.getLocation().toFile().getAbsolutePath());
