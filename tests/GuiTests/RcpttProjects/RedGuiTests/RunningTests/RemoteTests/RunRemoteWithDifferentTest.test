@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _nv-loA5WEeePcNCRX_abWA
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 8/25/17 7:54 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 5/29/18 11:02 AM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -46,7 +46,7 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		get-view "Project Explorer" | get-tree | select "OnlyRobotSuiteFile/SimpleLoggingTestCase.robot" 
 		    | get-menu "Run As/2 Robot Remote Test" | click
 	
-		run-remote-test -path $remote_project_path -project_name "RemoteProject" -test "TestFile" | log
+		run-remote-test -path $remote_project_path -project_name "RemoteProject" -test "TestFile"  // | log
 	} -allowStatusDialog	
 }
 check-console-and-execution-view-for-remote
@@ -89,7 +89,7 @@ get-view "Execution View" | get-tree | get-item "OnlyRobotSuiteFile \\(.* s\\)" 
 	
 
 let [val remote_project_path  [format "%s/Remote" $user_folder] ]{  
-	run-remote-test -path $remote_project_path -project_name "RemoteProject" -test "TestFile" | log
+	run-remote-test -path $remote_project_path -project_name "RemoteProject" -test "TestFile"  //| log
 }
 	
 wait-for-console
