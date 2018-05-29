@@ -30,7 +30,7 @@ interface RobotCommandExecutor {
 
     List<String> getStandardLibrariesNames();
 
-    String getStandardLibraryPath(String libName);
+    File getStandardLibraryPath(String libName);
 
     String getRobotVersion();
 

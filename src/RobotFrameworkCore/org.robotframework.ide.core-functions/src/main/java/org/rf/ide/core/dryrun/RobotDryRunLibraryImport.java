@@ -6,7 +6,6 @@
 package org.rf.ide.core.dryrun;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,11 +21,11 @@ public class RobotDryRunLibraryImport {
 
     private final String name;
 
-    private final URI sourcePath;
+    private final URI source;
 
     private final DryRunLibraryType type;
 
-    private final Set<URI> importersPaths;
+    private final Set<URI> importers;
 
     private final List<String> args;
 
@@ -47,61 +46,34 @@ public class RobotDryRunLibraryImport {
         return createKnown(name, originalPath, new HashSet<>(), new ArrayList<>());
     }
 
-    public static RobotDryRunLibraryImport createKnown(final String name, final URI originalPath,
-            final Set<URI> importersPaths, final List<String> args) {
-        final URI sourcePath = resolveSourcePath(originalPath);
-        final DryRunLibraryType type = resolveType(name, sourcePath);
-        return new RobotDryRunLibraryImport(name, sourcePath, type, importersPaths, args,
-                DryRunLibraryImportStatus.ADDED, "");
+    public static RobotDryRunLibraryImport createKnown(final String name, final URI source, final Set<URI> importers,
+            final List<String> args) {
+        final DryRunLibraryType type = resolveType(name, source);
+        return new RobotDryRunLibraryImport(name, source, type, importers, args, DryRunLibraryImportStatus.ADDED, "");
     }
 
-    private static URI resolveSourcePath(final URI originalPath) {
-        if (originalPath == null) {
-            return null;
-        }
-
-        try {
-            final String path = originalPath.getPath();
-            if (path.endsWith(".pyc")) {
-                final String normalizedPath = path.substring(0, path.length() - 1);
-                return new URI("file", null, null, -1, normalizedPath, null, null);
-            } else if (path.endsWith("$py.class")) {
-                final String normalizedPath = path.replace("$py.class", ".py");
-                return new URI("file", null, null, -1, normalizedPath, null, null);
-            } else if (path.endsWith(".py") && path.contains(".jar/")) {
-                final String normalizedPath = path.substring(0, path.lastIndexOf(".jar/")) + ".jar";
-                return new URI("file", null, null, -1, normalizedPath, null, null);
-            }
-            return originalPath;
-        } catch (final URISyntaxException e) {
-            return originalPath;
-        }
-    }
-
-    private static DryRunLibraryType resolveType(final String name, final URI sourcePath) {
+    private static DryRunLibraryType resolveType(final String name, final URI source) {
         if (name.equals("Remote") || name.startsWith("Remote ")) {
             return DryRunLibraryType.REMOTE;
-        } else {
-            if (sourcePath != null) {
-                final String path = sourcePath.getPath();
-                if (path.endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
-                    return DryRunLibraryType.JAVA;
-                } else {
-                    return DryRunLibraryType.PYTHON;
-                }
+        } else if (source != null) {
+            final String path = source.getPath();
+            if (path.endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
+                return DryRunLibraryType.JAVA;
+            } else if (path.endsWith(".py")) {
+                return DryRunLibraryType.PYTHON;
             }
         }
         return DryRunLibraryType.UNKNOWN;
     }
 
     @VisibleForTesting
-    RobotDryRunLibraryImport(final String name, final URI sourcePath, final DryRunLibraryType type,
-            final Set<URI> importersPaths, final List<String> args, final DryRunLibraryImportStatus status,
+    RobotDryRunLibraryImport(final String name, final URI source, final DryRunLibraryType type,
+            final Set<URI> importers, final List<String> args, final DryRunLibraryImportStatus status,
             final String additionalInfo) {
         this.name = name;
-        this.sourcePath = sourcePath;
+        this.source = source;
         this.type = type;
-        this.importersPaths = importersPaths;
+        this.importers = importers;
         this.args = args;
         this.status = status;
         this.additionalInfo = additionalInfo;
@@ -111,12 +83,12 @@ public class RobotDryRunLibraryImport {
         return name;
     }
 
-    public URI getSourcePath() {
-        return sourcePath;
+    public URI getSource() {
+        return source;
     }
 
-    public Set<URI> getImportersPaths() {
-        return importersPaths;
+    public Set<URI> getImporters() {
+        return importers;
     }
 
     public DryRunLibraryImportStatus getStatus() {
@@ -139,9 +111,9 @@ public class RobotDryRunLibraryImport {
         this.additionalInfo = additionalInfo;
     }
 
-    public void setImportersPaths(final Set<URI> importersPaths) {
-        this.importersPaths.clear();
-        this.importersPaths.addAll(importersPaths);
+    public void setImporters(final Set<URI> importers) {
+        this.importers.clear();
+        this.importers.addAll(importers);
     }
 
     public List<String> getArgs() {
@@ -154,7 +126,7 @@ public class RobotDryRunLibraryImport {
             return false;
         } else if (obj.getClass() == getClass()) {
             final RobotDryRunLibraryImport other = (RobotDryRunLibraryImport) obj;
-            return Objects.equals(name, other.name) && Objects.equals(sourcePath, other.sourcePath)
+            return Objects.equals(name, other.name) && Objects.equals(source, other.source)
                     && Objects.equals(type, other.type);
         }
         return false;
@@ -162,14 +134,13 @@ public class RobotDryRunLibraryImport {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, sourcePath, type);
+        return Objects.hash(name, source, type);
     }
 
     @Override
     public String toString() {
-        return "RobotDryRunLibraryImport [name=" + name + ", sourcePath=" + sourcePath + ", type=" + type
-                + ", importersPaths=" + importersPaths + ", args=" + args + ", status=" + status + ", additionalInfo="
-                + additionalInfo + "]";
+        return "RobotDryRunLibraryImport [name=" + name + ", source=" + source + ", type=" + type + ", importers="
+                + importers + ", args=" + args + ", status=" + status + ", additionalInfo=" + additionalInfo + "]";
     }
 
     public static enum DryRunLibraryImportStatus {

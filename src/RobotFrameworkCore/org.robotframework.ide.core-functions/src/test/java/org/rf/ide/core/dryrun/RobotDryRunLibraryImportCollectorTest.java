@@ -149,9 +149,9 @@ public class RobotDryRunLibraryImportCollectorTest {
             @Override
             public boolean matches(final RobotDryRunLibraryImport toMatch) {
                 return Objects.equals(library.getName(), toMatch.getName())
-                        && Objects.equals(library.getSourcePath(), toMatch.getSourcePath())
+                        && Objects.equals(library.getSource(), toMatch.getSource())
                         && Objects.equals(library.getType(), toMatch.getType())
-                        && Objects.equals(library.getImportersPaths(), toMatch.getImportersPaths())
+                        && Objects.equals(library.getImporters(), toMatch.getImporters())
                         && Objects.equals(library.getArgs(), toMatch.getArgs())
                         && Objects.equals(library.getStatus(), toMatch.getStatus())
                         && Objects.equals(library.getAdditionalInfo(), toMatch.getAdditionalInfo());
