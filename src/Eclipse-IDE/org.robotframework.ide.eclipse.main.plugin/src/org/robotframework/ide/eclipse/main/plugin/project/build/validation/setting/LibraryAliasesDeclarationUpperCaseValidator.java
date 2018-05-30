@@ -15,9 +15,9 @@ import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
 public class LibraryAliasesDeclarationUpperCaseValidator implements ModelUnitValidator {
@@ -45,11 +45,11 @@ public class LibraryAliasesDeclarationUpperCaseValidator implements ModelUnitVal
                     final LibraryAlias alias = libImport.getAlias();
                     if (alias.isPresent()) {
                         final RobotToken declaration = alias.getDeclaration();
-                        final String raw = declaration.getRaw();
-                        if (!isUpperCaseAliasesWITH_NAME(raw)) {
+                        final String text = declaration.getText();
+                        if (!isUpperCaseAliasesWITH_NAME(text)) {
                             reporter.handleProblem(RobotProblem
                                     .causedBy(GeneralSettingsProblem.LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION)
-                                    .formatMessageWith(raw), file, declaration);
+                                    .formatMessageWith(text), file, declaration);
                         }
                     }
                 }

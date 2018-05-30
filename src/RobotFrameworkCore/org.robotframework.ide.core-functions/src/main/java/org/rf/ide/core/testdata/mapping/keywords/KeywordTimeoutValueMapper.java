@@ -38,7 +38,6 @@ public class KeywordTimeoutValueMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE);
         rt.setText(text);
-        rt.setRaw(text);
 
         final KeywordTable keywordTable = robotFileOutput.getFileModel().getKeywordTable();
         final List<UserKeyword> keywords = keywordTable.getKeywords();

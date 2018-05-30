@@ -274,14 +274,12 @@ public class RobotParserTest {
         final AVariable varCorrect = variables.get(0);
         assertThat(varCorrect).isInstanceOf(ScalarVariable.class);
         assertThat(varCorrect.getDeclaration().getText()).isEqualTo("${var_ok}");
-        assertThat(varCorrect.getDeclaration().getRaw()).isEqualTo("${var_ok}");
         assertThat(varCorrect.getType()).isEqualTo(VariableType.SCALAR);
         assertThat(varCorrect.getName()).isEqualTo("var_ok");
 
         final AVariable varIncorrect = variables.get(1);
         assertThat(varIncorrect).isInstanceOf(UnknownVariable.class);
         assertThat(varIncorrect.getDeclaration().getText()).isEqualTo("${var} data");
-        assertThat(varIncorrect.getDeclaration().getRaw()).isEqualTo("${var} data");
         assertThat(varIncorrect.getType()).isEqualTo(VariableType.INVALID);
         assertThat(varIncorrect.getName()).isEqualTo("${var} data");
     }
@@ -311,7 +309,7 @@ public class RobotParserTest {
 
         final RobotParser parser = spy(RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy()));
 
-        //// prepare paths
+        // prepare paths
         final File startFile = new File(this.getClass().getResource("parser/bugs/tsv_positionCheck.tsv").toURI());
 
         // execute
@@ -330,7 +328,6 @@ public class RobotParserTest {
         //// verify test case T3
         final RobotToken testCaseT3Name = testCaseT3.getName();
         assertThat(testCaseT3Name.getText()).isEqualTo("T3");
-        assertThat(testCaseT3Name.getRaw()).isEqualTo("T3");
         final FilePosition tcT3Pos = testCaseT3Name.getFilePosition();
         assertThat(tcT3Pos.isSamePlace(new FilePosition(2, 0, 20))).as("got %s", tcT3Pos).isTrue();
         assertThat(testCaseT3.getExecutionContext()).isEmpty();
@@ -338,7 +335,6 @@ public class RobotParserTest {
         //// verify test case ${x}
         final TestCase testCaseSpacesX = testCases.get(1);
         assertThat(testCaseSpacesX.getName().getText()).isEqualTo("${x}");
-        assertThat(testCaseSpacesX.getName().getRaw()).isEqualTo("${x}");
         final FilePosition tcXPos = testCaseSpacesX.getName().getFilePosition();
         assertThat(tcXPos.isSamePlace(new FilePosition(3, 4, 28))).as("got %s", tcXPos).isTrue();
         final List<RobotExecutableRow<TestCase>> xTestExecutionList = testCaseSpacesX.getExecutionContext();
@@ -349,7 +345,6 @@ public class RobotParserTest {
         final RobotAction action = xTestFirstLineDescription.getAction();
         final RobotToken emptyAction = action.getToken();
         assertThat(emptyAction.getText()).isEmpty();
-        assertThat(emptyAction.getRaw()).isEmpty();
         final FilePosition emptyActionPosition = emptyAction.getFilePosition();
         assertThat(emptyActionPosition.isSamePlace(new FilePosition(4, 5, 43))).as("got %s", emptyActionPosition)
                 .isTrue();

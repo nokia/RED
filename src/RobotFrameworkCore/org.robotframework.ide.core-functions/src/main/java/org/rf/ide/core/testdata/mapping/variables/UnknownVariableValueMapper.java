@@ -19,16 +19,13 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class UnknownVariableValueMapper implements IParsingMapper {
 
     private final ParsingStateHelper utility;
 
-
     public UnknownVariableValueMapper() {
         this.utility = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -36,7 +33,6 @@ public class UnknownVariableValueMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
             final String text) {
         rt.setText(text);
-        rt.setRaw(text);
         rt.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
         final List<AVariable> variables = robotFileOutput.getFileModel()
@@ -52,7 +48,6 @@ public class UnknownVariableValueMapper implements IParsingMapper {
         processingState.push(ParsingState.VARIABLE_UNKNOWN_VALUE);
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

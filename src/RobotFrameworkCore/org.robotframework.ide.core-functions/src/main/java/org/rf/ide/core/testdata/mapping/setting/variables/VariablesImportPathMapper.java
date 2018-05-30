@@ -18,16 +18,13 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class VariablesImportPathMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
-
     public VariablesImportPathMapper() {
         this.utility = new ElementsUtility();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -36,7 +33,6 @@ public class VariablesImportPathMapper implements IParsingMapper {
             final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_VARIABLES_FILE_NAME);
         rt.setText(text);
-        rt.setRaw(text);
 
         final AImported imported = utility.getNearestImport(robotFileOutput);
         VariablesImport vars;
@@ -46,15 +42,13 @@ public class VariablesImportPathMapper implements IParsingMapper {
             vars = null;
 
             // FIXME: sth wrong - declaration of variables not inside setting
-            // and
-            // was not catch by previous variables declaration logic
+            // and was not catch by previous variables declaration logic
         }
         vars.setPathOrName(rt);
 
         processingState.push(ParsingState.SETTING_VARIABLE_IMPORT_PATH);
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

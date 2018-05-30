@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
-import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
+import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
@@ -23,16 +23,13 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class TestCaseNameMapper implements IParsingMapper {
 
     private final ElementPositionResolver positionResolver;
 
-
     public TestCaseNameMapper() {
         this.positionResolver = new ElementPositionResolver();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -43,7 +40,6 @@ public class TestCaseNameMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_NAME);
         rt.setText(text);
-        rt.setRaw(text);
 
         final TestCaseTable testCaseTable = robotFileOutput.getFileModel()
                 .getTestCaseTable();
@@ -54,7 +50,6 @@ public class TestCaseNameMapper implements IParsingMapper {
         return rt;
     }
 
-
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
             final RobotLine currentLine, final RobotToken rt, final String text,
@@ -64,7 +59,7 @@ public class TestCaseNameMapper implements IParsingMapper {
                 robotFileOutput.getFileModel(), currentLine, rt)) {
             if (isIncludedInTestCaseTable(currentLine, processingState)) {
                 boolean wasUpdated = false;
-                final String testCaseName = rt.getRaw().toString();
+                final String testCaseName = rt.getText().toString();
                 if (testCaseName != null) {
                     result = !testCaseName.trim().startsWith(
                             RobotTokenType.START_HASH_COMMENT
@@ -87,7 +82,6 @@ public class TestCaseNameMapper implements IParsingMapper {
 
         return result;
     }
-
 
     @VisibleForTesting
     protected boolean isIncludedInTestCaseTable(final RobotLine line,

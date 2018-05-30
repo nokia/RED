@@ -15,7 +15,6 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 /**
  * @author Michal Anglart
  *
@@ -37,7 +36,6 @@ public class TestCaseUnkownModelOperation implements IExecutablesStepsHolderElem
             final List<String> args, final String comment) {
         final TestCaseUnknownSettings unknown = testCase.newUnknownSettings(index);
         unknown.getDeclaration().setText(settingName);
-        unknown.getDeclaration().setRaw(settingName);
 
         for (final String arg : args) {
             unknown.addArgument(arg);

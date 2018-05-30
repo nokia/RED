@@ -10,7 +10,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.IDataDrivenSetting;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
 public class DataDrivenKeywordName {
 
     public static <T extends IDataDrivenSetting> String createRepresentation(final List<T> templateArguments) {
@@ -23,7 +22,7 @@ public class DataDrivenKeywordName {
                 final IDataDrivenSetting template = templateArguments.get(templateId);
                 final RobotToken keywordName = template.getKeywordName();
                 if (keywordName != null) {
-                    templateText.append(keywordName.getRaw().toString());
+                    templateText.append(keywordName.getText());
                 }
 
                 final List<RobotToken> unexpectedTrashArguments = template
@@ -36,7 +35,7 @@ public class DataDrivenKeywordName {
                         templateText.append(' ');
                     }
                     templateText.append(unexpectedTrashArguments.get(
-                            trashArgumentId).getRaw());
+                            trashArgumentId).getText());
                 }
 
                 if (templateName.length() > 0) {

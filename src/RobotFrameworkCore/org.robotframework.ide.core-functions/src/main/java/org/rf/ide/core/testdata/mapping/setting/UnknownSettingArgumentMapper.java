@@ -18,16 +18,13 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class UnknownSettingArgumentMapper implements IParsingMapper {
 
     private final ParsingStateHelper utility;
 
-
     public UnknownSettingArgumentMapper() {
         this.utility = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -36,7 +33,6 @@ public class UnknownSettingArgumentMapper implements IParsingMapper {
             final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_UNKNOWN_ARGUMENT);
         rt.setText(text);
-        rt.setRaw(text);
 
         final List<UnknownSetting> unknownSettings = robotFileOutput.getFileModel()
                 .getSettingTable().getUnknownSettings();
@@ -45,13 +41,12 @@ public class UnknownSettingArgumentMapper implements IParsingMapper {
                     .size() - 1);
             unknownSetting.addTrash(rt);
         } else {
-            // FIXME: internall error
+            // FIXME: internal error
         }
 
         processingState.push(ParsingState.SETTING_UNKNOWN_TRASH_ELEMENT);
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
@@ -59,7 +54,8 @@ public class UnknownSettingArgumentMapper implements IParsingMapper {
             final Stack<ParsingState> processingState) {
         final ParsingState currentState = utility.getCurrentStatus(processingState);
 
-        return (currentState == ParsingState.SETTING_UNKNOWN || currentState == ParsingState.SETTING_UNKNOWN_TRASH_ELEMENT);
+        return (currentState == ParsingState.SETTING_UNKNOWN
+                || currentState == ParsingState.SETTING_UNKNOWN_TRASH_ELEMENT);
     }
 
 }

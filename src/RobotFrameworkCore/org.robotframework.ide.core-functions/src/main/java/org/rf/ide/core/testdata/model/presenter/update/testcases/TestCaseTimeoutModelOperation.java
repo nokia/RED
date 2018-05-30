@@ -22,7 +22,7 @@ public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderEle
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.TEST_CASE_TIMEOUT;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.TEST_CASE_SETTING_TIMEOUT;
@@ -33,7 +33,6 @@ public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderEle
             final List<String> args, final String comment) {
         final TestCaseTimeout timeout = testCase.newTimeout(index);
         timeout.getDeclaration().setText(settingName);
-        timeout.getDeclaration().setRaw(settingName);
 
         if (!args.isEmpty()) {
             timeout.setTimeout(args.get(0));

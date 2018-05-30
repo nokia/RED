@@ -30,7 +30,6 @@ public class TestCaseTagsMapper extends ATestCaseSettingDeclarationMapper {
         final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION);
         rt.setText(text);
-        rt.setRaw(text);
 
         final TestCase testCase = finder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput, rt,
                 fp);

@@ -21,16 +21,13 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class KeywordReturnValueMapper implements IParsingMapper {
 
     private final ParsingStateHelper utility;
 
-
     public KeywordReturnValueMapper() {
         this.utility = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -41,7 +38,6 @@ public class KeywordReturnValueMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE);
         rt.setText(text);
-        rt.setRaw(text);
 
         final KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();
@@ -55,7 +51,6 @@ public class KeywordReturnValueMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

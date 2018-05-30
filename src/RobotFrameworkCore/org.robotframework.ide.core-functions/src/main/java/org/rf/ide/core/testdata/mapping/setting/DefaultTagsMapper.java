@@ -37,7 +37,6 @@ public class DefaultTagsMapper implements IParsingMapper {
         final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         final DefaultTags defaultTags = new DefaultTags(rt);

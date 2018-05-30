@@ -39,7 +39,6 @@ public abstract class ASuiteFileDescriber implements ITextContentDescriber {
     public static final String RESOURCE_FILE_CONTENT_ID = "org.robotframework.red.robotfile";
     public static final String INIT_FILE_CONTENT_ID = "org.robotframework.red.robotsuiteinitfile";
 
-
     private final ElementPositionResolver positionResolver = new ElementPositionResolver();
 
     private final Pattern newFullComplex = Pattern
@@ -115,7 +114,7 @@ public abstract class ASuiteFileDescriber implements ITextContentDescriber {
     }
 
     private boolean containsTestCaseTableHeader(final RobotToken currentToken) {
-        return newFullComplex.matcher(currentToken.getRaw()).find();
+        return newFullComplex.matcher(currentToken.getText()).find();
     }
 
     private RobotToken packSeparatorsUntilRobotTokenFound(final RobotLine currentLine,

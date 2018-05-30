@@ -159,7 +159,6 @@ public class VariableDeclaration extends AContainerOperation {
     public RobotToken asToken() {
         final RobotToken token = new RobotToken();
         final String text = getVariableText().getText();
-        token.setRaw(text);
         token.setText(text);
         token.setType(getRobotType().getType());
         final FilePosition fp = getStartFromFile();

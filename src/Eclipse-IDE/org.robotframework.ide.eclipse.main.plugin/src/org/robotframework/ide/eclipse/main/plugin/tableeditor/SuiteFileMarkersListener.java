@@ -190,7 +190,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
         if (modelElement.getModelType() == ModelType.TEST_CASE) {
             return newArrayList(modelElement.getDeclaration());
         } else if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
-            // for keywords we'are displaying arguments in the same line as keyword name,
+            // for keywords we are displaying arguments in the same line as keyword name,
             // so we need to get markers for arguments setting
             final UserKeyword keyword = (UserKeyword) modelElement;
 
@@ -206,7 +206,8 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
     }
 
     private synchronized void browseMatchingMarkers(final MarkerVisitor visitor, final List<RobotToken> tokens) {
-        // TODO : consider using e.g. segment tree for searching using segments (ranges), when
+        // TODO : consider using e.g. segment tree for searching using segments
+        // (ranges), when
         // performance becomes the issue
         final Set<IMarker> alreadyVisitedMarkers = new HashSet<>();
         for (final RobotToken token : tokens) {
@@ -217,7 +218,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
                 final Range<Integer> markerRange = getMarkerRange(marker);
                 // -2 because when token is newly created it may have -1 as line number
                 final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -2);
-                
+
                 if ((markerRange != null && getTokenRange(token).isConnected(markerRange))
                         || (markerRange == null && token.getFilePosition().getLine() == markerLine)) {
                     alreadyVisitedMarkers.add(marker);
@@ -232,7 +233,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
 
     private Range<Integer> getTokenRange(final RobotToken token) {
         final FilePosition tokenPosition = token.getFilePosition();
-        return Range.closed(tokenPosition.getOffset(), tokenPosition.getOffset() + token.getRaw().length());
+        return Range.closed(tokenPosition.getOffset(), tokenPosition.getOffset() + token.getText().length());
     }
 
     private Range<Integer> getMarkerRange(final IMarker marker) {

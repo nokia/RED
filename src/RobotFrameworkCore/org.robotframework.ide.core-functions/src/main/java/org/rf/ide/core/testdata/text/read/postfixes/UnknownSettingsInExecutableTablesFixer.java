@@ -46,8 +46,8 @@ public class UnknownSettingsInExecutableTablesFixer implements IPostProcessFixAc
             final List<RobotExecutableRow<UserKeyword>> execRows = userKeyword.getExecutionContext();
             for (int i = 0; i < execRows.size(); i++) {
                 final RobotExecutableRow<UserKeyword> robotExecutableRow = execRows.get(i);
-                final String raw = robotExecutableRow.getAction().getRaw().trim();
-                if (raw.startsWith("[") && raw.endsWith("]")) {
+                final String text = robotExecutableRow.getAction().getText().trim();
+                if (text.startsWith("[") && text.endsWith("]")) {
                     final KeywordUnknownSettings keywordUnknownSettings = new KeywordUnknownSettings(
                             robotExecutableRow.getDeclaration());
                     final List<IRobotTokenType> types = robotExecutableRow.getDeclaration().getTypes();
@@ -74,8 +74,8 @@ public class UnknownSettingsInExecutableTablesFixer implements IPostProcessFixAc
             final List<RobotExecutableRow<TestCase>> execRows = testCase.getExecutionContext();
             for (int i = 0; i < execRows.size(); i++) {
                 final RobotExecutableRow<TestCase> robotExecutableRow = execRows.get(i);
-                final String raw = robotExecutableRow.getAction().getRaw().trim();
-                if (raw.startsWith("[") && raw.endsWith("]")) {
+                final String text = robotExecutableRow.getAction().getText().trim();
+                if (text.startsWith("[") && text.endsWith("]")) {
                     final TestCaseUnknownSettings testCaseUnknownSettings = new TestCaseUnknownSettings(
                             robotExecutableRow.getDeclaration());
                     final List<IRobotTokenType> types = robotExecutableRow.getDeclaration().getTypes();

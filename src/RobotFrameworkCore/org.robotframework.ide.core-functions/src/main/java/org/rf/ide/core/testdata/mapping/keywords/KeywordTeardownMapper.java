@@ -32,7 +32,6 @@ public class KeywordTeardownMapper extends AKeywordSettingDeclarationMapper {
         types.add(0, RobotTokenType.KEYWORD_SETTING_TEARDOWN);
 
         rt.setText(text);
-        rt.setRaw(text);
 
         final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine, processingState, robotFileOutput, rt,
                 fp);

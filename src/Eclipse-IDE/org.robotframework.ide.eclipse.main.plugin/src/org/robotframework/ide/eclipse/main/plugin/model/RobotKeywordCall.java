@@ -155,7 +155,6 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
             if (wasAlreadyUpdatedWithAssignment(token)) {
                 final String text = view.getTokenRepresentation(token);
                 token.setText(text);
-                token.setRaw(text);
             }
             return token;
         };
