@@ -32,7 +32,6 @@ public class KeywordTimeoutMapper extends AKeywordSettingDeclarationMapper {
         types.add(0, RobotTokenType.KEYWORD_SETTING_TIMEOUT);
 
         rt.setText(text);
-        rt.setRaw(text);
 
         final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine, processingState, robotFileOutput, rt,
                 fp);

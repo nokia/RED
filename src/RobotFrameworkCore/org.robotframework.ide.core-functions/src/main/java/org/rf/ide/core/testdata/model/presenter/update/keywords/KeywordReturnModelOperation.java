@@ -21,7 +21,7 @@ public class KeywordReturnModelOperation implements IExecutablesStepsHolderEleme
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.USER_KEYWORD_RETURN;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.KEYWORD_SETTING_RETURN;
@@ -32,7 +32,6 @@ public class KeywordReturnModelOperation implements IExecutablesStepsHolderEleme
             final List<String> args, final String comment) {
         final KeywordReturn keywordReturn = userKeyword.newReturn(index);
         keywordReturn.getDeclaration().setText(settingName);
-        keywordReturn.getDeclaration().setRaw(settingName);
 
         for (int i = 0; i < args.size(); i++) {
             keywordReturn.addReturnValue(i, args.get(i));

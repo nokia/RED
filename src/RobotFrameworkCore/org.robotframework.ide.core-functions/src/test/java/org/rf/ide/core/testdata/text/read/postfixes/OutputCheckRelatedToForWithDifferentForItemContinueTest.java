@@ -339,7 +339,6 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         for (int i = 0; i < commentsSize; i++) {
             final RobotToken token = comments.get(i);
             assertThat(token.getText()).isEqualTo(comment.get(i));
-            assertThat(token.getRaw()).isEqualTo(comment.get(i));
             assertThat(token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                     || token.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)).isTrue();
         }
@@ -347,7 +346,6 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
 
     private void assertToken(final RobotToken token, final String text, final RobotTokenType... types) {
         assertThat(token.getText()).isEqualTo(text);
-        assertThat(token.getRaw()).isEqualTo(text);
         assertThat(token.getTypes()).containsAll(new ArrayList<>(Arrays.asList(types)));
     }
 

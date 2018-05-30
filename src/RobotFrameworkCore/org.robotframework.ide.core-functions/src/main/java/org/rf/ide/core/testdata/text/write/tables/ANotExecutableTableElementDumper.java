@@ -195,7 +195,6 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         }
 
         final RobotToken lineContinueToken = new RobotToken();
-        lineContinueToken.setRaw("...");
         lineContinueToken.setText("...");
         lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
 
@@ -264,7 +263,6 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
             }
 
             final RobotToken lineContinueToken = new RobotToken();
-            lineContinueToken.setRaw("...");
             lineContinueToken.setText("...");
             lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
 
@@ -278,8 +276,8 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
     }
 
     private boolean canBePossiblyDumpedDirectly(final IRobotLineElement lastToken) {
-        return !lastToken.isDirty() && (lastToken.getRaw().equals(lastToken.getText()))
-                && !lastToken.getFilePosition().isNotSet();
+        return !lastToken.isDirty() && !lastToken.getFilePosition().isNotSet()
+                && (!(lastToken instanceof Separator) || ((Separator) lastToken).getRaw().equals(lastToken.getText()));
     }
 
     private List<RobotToken> prepareTokens(final AModelElement<ARobotSectionTable> currentElement) {

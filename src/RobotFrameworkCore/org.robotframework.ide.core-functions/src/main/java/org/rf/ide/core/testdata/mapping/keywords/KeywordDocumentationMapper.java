@@ -31,7 +31,6 @@ public class KeywordDocumentationMapper extends AKeywordSettingDeclarationMapper
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
 
-        rt.setRaw(text);
         rt.setText(text);
 
         final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine, processingState, robotFileOutput, rt,

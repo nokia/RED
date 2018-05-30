@@ -18,13 +18,11 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class KeywordArgumentsMapper extends AKeywordSettingDeclarationMapper {
 
     public KeywordArgumentsMapper() {
         super(RobotTokenType.KEYWORD_SETTING_ARGUMENTS);
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -35,7 +33,6 @@ public class KeywordArgumentsMapper extends AKeywordSettingDeclarationMapper {
         types.add(0, RobotTokenType.KEYWORD_SETTING_ARGUMENTS);
 
         rt.setText(text);
-        rt.setRaw(text);
 
         final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);

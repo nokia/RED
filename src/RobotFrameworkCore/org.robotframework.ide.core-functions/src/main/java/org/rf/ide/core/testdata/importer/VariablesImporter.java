@@ -51,7 +51,7 @@ public class VariablesImporter {
                     if (varImport.getPathOrName() == null) {
                         continue;
                     }
-                    final String path = varImport.getPathOrName().getRaw().toString();
+                    final String path = varImport.getPathOrName().getText();
                     if (!isCorrectPath(path)) {
                         continue;
                     }
@@ -203,7 +203,7 @@ public class VariablesImporter {
             final Map<String, String> variableMappings) {
         final List<String> arguments = new ArrayList<>();
         for (final RobotToken rtArgument : varImport.getArguments()) {
-            String arg = rtArgument.getRaw().toString();
+            String arg = rtArgument.getText();
             if (RobotExpressions.isParameterized(arg)) {
                 arg = RobotExpressions.resolve(variableMappings, arg);
             }

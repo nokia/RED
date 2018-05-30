@@ -85,7 +85,6 @@ public class TrashCommentsParsingTest {
             final IRobotLineElement elem = lineElements.get(i);
             final IRobotLineElement expToken = toks[i];
             assertThat(expToken).hasSameClassAs(elem);
-            assertThat(expToken.getRaw()).isEqualTo(elem.getRaw());
             assertThat(expToken.getText()).isEqualTo(elem.getText());
             assertThat(expToken.getTypes()).containsExactlyElementsOf(elem.getTypes());
         }

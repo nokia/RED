@@ -22,7 +22,7 @@ public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElem
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.USER_KEYWORD_TIMEOUT;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.KEYWORD_SETTING_TIMEOUT;
@@ -33,7 +33,6 @@ public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElem
             final List<String> args, final String comment) {
         final KeywordTimeout keywordTimeout = userKeyword.newTimeout(index);
         keywordTimeout.getDeclaration().setText(settingName);
-        keywordTimeout.getDeclaration().setRaw(settingName);
 
         if (!args.isEmpty()) {
             keywordTimeout.setTimeout(args.get(0));

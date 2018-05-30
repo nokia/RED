@@ -23,7 +23,6 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class KeywordFinder {
 
     public UserKeyword findOrCreateNearestKeyword(final RobotLine currentLine,
@@ -48,7 +47,6 @@ public class KeywordFinder {
         return keyword;
     }
 
-
     private RobotLine findRobotLineInModel(final RobotFile fileModel,
             final UserKeyword userKeyword, final RobotLine currentLine) {
         RobotLine foundLine = currentLine;
@@ -67,7 +65,6 @@ public class KeywordFinder {
         return foundLine;
     }
 
-
     private UserKeyword createArtificialKeyword(
             final RobotFileOutput robotFileOutput, final KeywordTable keywordTable) {
         UserKeyword keyword;
@@ -77,21 +74,19 @@ public class KeywordFinder {
         final RobotToken artificialNameToken = new RobotToken();
         artificialNameToken.setLineNumber(tableHeader.getTableHeader()
                 .getLineNumber() + 1);
-        artificialNameToken.setRaw("");
         artificialNameToken.setText("");
         artificialNameToken.setStartColumn(0);
         final RobotLine robotLine = robotFileOutput.getFileModel().getFileContent()
                 .get(tableHeader.getTableHeader().getLineNumber() - 1);
         final IRobotLineElement endOfLine = robotLine.getEndOfLine();
         artificialNameToken.setStartOffset(endOfLine.getStartOffset()
-                + endOfLine.getRaw().length());
+                + endOfLine.getText().length());
         artificialNameToken.setType(RobotTokenType.KEYWORD_NAME);
 
         keyword = new UserKeyword(artificialNameToken);
 
         return keyword;
     }
-
 
     public List<UserKeyword> filterByKeywordAfterLastHeader(
             final KeywordTable keywordTable) {

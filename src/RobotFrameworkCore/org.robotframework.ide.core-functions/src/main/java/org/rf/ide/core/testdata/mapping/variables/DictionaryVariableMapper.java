@@ -38,7 +38,6 @@ public class DictionaryVariableMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         final VariableTable varTable = robotFileOutput.getFileModel().getVariableTable();
         rt.setText(text);
-        rt.setRaw(text);
         rt.setType(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
 
         final DictionaryVariable var = new DictionaryVariable(varHelper.extractVariableName(text), rt,

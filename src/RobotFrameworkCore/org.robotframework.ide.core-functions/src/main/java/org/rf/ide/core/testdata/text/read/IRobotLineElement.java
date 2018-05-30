@@ -25,8 +25,6 @@ public interface IRobotLineElement {
 
     String getText();
 
-    String getRaw();
-
     List<IRobotTokenType> getTypes();
 
     boolean isDirty();

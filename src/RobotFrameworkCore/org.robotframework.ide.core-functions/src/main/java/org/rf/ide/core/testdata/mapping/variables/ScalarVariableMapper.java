@@ -38,7 +38,6 @@ public class ScalarVariableMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         final VariableTable varTable = robotFileOutput.getFileModel().getVariableTable();
         rt.setText(text);
-        rt.setRaw(text);
         rt.setType(RobotTokenType.VARIABLES_SCALAR_DECLARATION);
 
         final ScalarVariable var = new ScalarVariable(varHelper.extractVariableName(text), rt,

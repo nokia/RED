@@ -47,7 +47,6 @@ public class VariableTable extends ARobotSectionTable {
 
     public ScalarVariable createScalarVariable(final int index, final String name, final List<String> values) {
         final RobotToken dec = new RobotToken();
-        dec.setRaw(VariableType.SCALAR.getIdentificator() + "{" + name + "}");
         dec.setText(VariableType.SCALAR.getIdentificator() + "{" + name + "}");
         dec.setType(RobotTokenType.VARIABLES_SCALAR_DECLARATION);
 
@@ -66,7 +65,6 @@ public class VariableTable extends ARobotSectionTable {
 
     public ListVariable createListVariable(final int index, final String name, final List<String> values) {
         final RobotToken dec = new RobotToken();
-        dec.setRaw(VariableType.LIST.getIdentificator() + "{" + name + "}");
         dec.setText(VariableType.LIST.getIdentificator() + "{" + name + "}");
         dec.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
         final ListVariable list = new ListVariable(name, dec, VariableScope.TEST_SUITE);
@@ -86,7 +84,6 @@ public class VariableTable extends ARobotSectionTable {
     public DictionaryVariable createDictionaryVariable(final int index, final String name,
             final List<Entry<String, String>> items) {
         final RobotToken dec = new RobotToken();
-        dec.setRaw(VariableType.DICTIONARY.getIdentificator() + "{" + name + "}");
         dec.setText(VariableType.DICTIONARY.getIdentificator() + "{" + name + "}");
         dec.setType(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
         final DictionaryVariable dict = new DictionaryVariable(name, dec, VariableScope.TEST_SUITE);

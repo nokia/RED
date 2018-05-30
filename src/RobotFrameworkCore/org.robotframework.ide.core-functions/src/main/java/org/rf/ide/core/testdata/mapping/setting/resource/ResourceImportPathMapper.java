@@ -18,16 +18,13 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class ResourceImportPathMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
 
-
     public ResourceImportPathMapper() {
         this.utility = new ElementsUtility();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -36,7 +33,6 @@ public class ResourceImportPathMapper implements IParsingMapper {
             final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_RESOURCE_FILE_NAME);
         rt.setText(text);
-        rt.setRaw(text);
         final AImported imported = utility.getNearestImport(robotFileOutput);
         ResourceImport resource;
         if (imported instanceof ResourceImport) {
@@ -53,7 +49,6 @@ public class ResourceImportPathMapper implements IParsingMapper {
         processingState.push(ParsingState.SETTING_RESOURCE_IMPORT_PATH);
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

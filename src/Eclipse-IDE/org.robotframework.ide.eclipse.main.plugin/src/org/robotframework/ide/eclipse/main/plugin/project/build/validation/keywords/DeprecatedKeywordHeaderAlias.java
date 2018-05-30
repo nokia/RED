@@ -13,9 +13,9 @@ import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
 public class DeprecatedKeywordHeaderAlias implements ModelUnitValidator {
@@ -39,11 +39,11 @@ public class DeprecatedKeywordHeaderAlias implements ModelUnitValidator {
         if (keywords.isPresent()) {
             for (final TableHeader<? extends ARobotSectionTable> th : keywords.getHeaders()) {
                 final RobotToken declaration = th.getDeclaration();
-                final String raw = declaration.getRaw();
-                final String rawWithoutWhiteSpaces = raw.toLowerCase().replaceAll("\\s", "");
-                if (rawWithoutWhiteSpaces.toLowerCase().contains("userkeyword")) {
+                final String text = declaration.getText();
+                final String textWithoutWhiteSpaces = text.toLowerCase().replaceAll("\\s", "");
+                if (textWithoutWhiteSpaces.toLowerCase().contains("userkeyword")) {
                     reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONYM)
-                            .formatMessageWith(raw), file, declaration);
+                            .formatMessageWith(text), file, declaration);
                 }
             }
         }

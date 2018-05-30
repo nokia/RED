@@ -188,13 +188,8 @@ public class EndOfLineBuilder {
         @Override
         public String getText() {
             return !getTypes().isEmpty() && !getTypes().get(0).getRepresentation().isEmpty()
-                    ? getTypes().get(0).getRepresentation().get(0) : "";
-        }
-
-        @Override
-        public String getRaw() {
-            return !getTypes().isEmpty() && !getTypes().get(0).getRepresentation().isEmpty()
-                    ? getTypes().get(0).getRepresentation().get(0) : "";
+                    ? getTypes().get(0).getRepresentation().get(0)
+                    : "";
         }
 
         @Override
@@ -217,7 +212,7 @@ public class EndOfLineBuilder {
         public VersionAvailabilityInfo getVersionInformation() {
             VersionAvailabilityInfo var = null;
             if (!types.isEmpty()) {
-                var = types.get(0).findVersionAvailabilityInfo(getRaw());
+                var = types.get(0).findVersionAvailabilityInfo(getText());
             }
 
             return var;
@@ -234,7 +229,8 @@ public class EndOfLineBuilder {
         }
 
         private AEndOfLine copy(final boolean posInclude) {
-            final EndOfLineBuilder builder = EndOfLineBuilder.newInstance().setEndOfLines(LineReader.Constant.get(this));
+            final EndOfLineBuilder builder = EndOfLineBuilder.newInstance()
+                    .setEndOfLines(LineReader.Constant.get(this));
             if (posInclude) {
                 builder.setLineNumber(this.getLineNumber());
                 builder.setStartColumn(this.getStartColumn());
