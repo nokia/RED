@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
-import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
+import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.SettingTable;
@@ -23,16 +23,13 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class TestTemplateMapper implements IParsingMapper {
 
     private final ElementPositionResolver positionResolver;
 
-
     public TestTemplateMapper() {
         this.positionResolver = new ElementPositionResolver();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -41,7 +38,6 @@ public class TestTemplateMapper implements IParsingMapper {
             final String text) {
         rt.setType(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         final TestTemplate template = new TestTemplate(rt);
@@ -50,7 +46,6 @@ public class TestTemplateMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
@@ -76,7 +71,6 @@ public class TestTemplateMapper implements IParsingMapper {
         }
         return result;
     }
-
 
     @VisibleForTesting
     protected boolean isIncludedInSettingTable(final RobotLine line,

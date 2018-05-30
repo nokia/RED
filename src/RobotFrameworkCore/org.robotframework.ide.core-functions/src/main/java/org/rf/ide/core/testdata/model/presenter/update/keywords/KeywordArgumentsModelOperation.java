@@ -21,18 +21,17 @@ public class KeywordArgumentsModelOperation implements IExecutablesStepsHolderEl
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.USER_KEYWORD_ARGUMENTS;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.KEYWORD_SETTING_ARGUMENTS;
     }
-    
+
     @Override
     public AModelElement<UserKeyword> create(final UserKeyword userKeyword, final int index, final String settingName,
             final List<String> args, final String comment) {
         final KeywordArguments keywordArgs = userKeyword.newArguments(index);
         keywordArgs.getDeclaration().setText(settingName);
-        keywordArgs.getDeclaration().setRaw(settingName);
 
         for (int i = 0; i < args.size(); i++) {
             keywordArgs.addArgument(i, args.get(i));

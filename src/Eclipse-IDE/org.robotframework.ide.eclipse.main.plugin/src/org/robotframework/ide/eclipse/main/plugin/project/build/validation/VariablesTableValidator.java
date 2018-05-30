@@ -28,9 +28,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
@@ -51,7 +51,8 @@ class VariablesTableValidator implements ModelUnitValidator {
     private static final Pattern VARIABLE_WITHOUT_NAME_PATTERN = Pattern.compile("^[$&@]\\{\\}=?$");
 
     VariablesTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reportingStrategy) {
+            final Optional<RobotVariablesSection> variablesSection,
+            final ValidationReportingStrategy reportingStrategy) {
         this(validationContext, variablesSection, reportingStrategy, new VersionDependentValidators());
     }
 
@@ -98,7 +99,7 @@ class VariablesTableValidator implements ModelUnitValidator {
         for (final IVariableHolder variable : variableTable.getVariables()) {
             final VariableType varType = variable.getType();
             if (varType != VariableType.INVALID) {
-                final String variableName = variable.getDeclaration().getRaw();
+                final String variableName = variable.getDeclaration().getText();
                 if (variableName != null && variableName.length() >= 2) {
                     if (variableName.charAt(1) != '{') {
                         final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_NAME)

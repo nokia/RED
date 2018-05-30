@@ -43,17 +43,12 @@ public class CommonVariableHelper {
                 if (element instanceof RobotToken) {
                     final RobotToken token = (RobotToken) element;
                     if (isVariable(token) && !wasNotVariableElement) {
-                        String variableText = token.getRaw();
-                        if (variableText != null
-                                && !variableText.contains(RobotTokenType.ASSIGNMENT.getRepresentation().get(0))) {
-                            variableText = token.getText();
-                        }
+                        final String variableText = token.getText();
                         final RobotToken assignment = extractAssignmentPart(token.getFilePosition(), variableText);
                         if (assignment.isNotEmpty()) {
                             final String variable = variableText.substring(0,
                                     assignment.getStartColumn() - token.getStartColumn());
                             token.setText(variable);
-                            token.setRaw(variable);
                             line.addLineElementAt(elementIndex + 1, assignment);
                             elementIndex++;
                         }
@@ -114,7 +109,6 @@ public class CommonVariableHelper {
                 assignToken.setStartColumn(startPosition.getColumn() + assignPart);
                 assignToken.setStartOffset(startPosition.getOffset() + assignPart);
                 assignToken.setText(assignmentText);
-                assignToken.setRaw(assignmentText);
                 assignToken.setType(RobotTokenType.ASSIGNMENT);
             }
         }

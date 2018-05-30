@@ -22,18 +22,17 @@ public class TestCaseTemplateModelOperation implements IExecutablesStepsHolderEl
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.TEST_CASE_TEMPLATE;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.TEST_CASE_SETTING_TEMPLATE;
     }
-    
+
     @Override
     public AModelElement<TestCase> create(final TestCase testCase, final int index, final String settingName,
             final List<String> args, final String comment) {
         final TestCaseTemplate template = testCase.newTemplate(index);
         template.getDeclaration().setText(settingName);
-        template.getDeclaration().setRaw(settingName);
 
         if (!args.isEmpty()) {
             template.setKeywordName(args.get(0));

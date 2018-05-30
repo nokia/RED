@@ -13,9 +13,9 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
 public class DeprecatedSettingHeaderAlias implements ModelUnitValidator {
@@ -39,11 +39,11 @@ public class DeprecatedSettingHeaderAlias implements ModelUnitValidator {
         if (settings.isPresent()) {
             for (final TableHeader<? extends ARobotSectionTable> th : settings.getHeaders()) {
                 final RobotToken declaration = th.getDeclaration();
-                final String raw = declaration.getRaw();
-                final String rawWithoutWhiteSpaces = raw.toLowerCase().replaceAll("\\s", "");
-                if (rawWithoutWhiteSpaces.toLowerCase().contains("metadata")) {
+                final String text = declaration.getText();
+                final String textWithoutWhiteSpaces = text.toLowerCase().replaceAll("\\s", "");
+                if (textWithoutWhiteSpaces.toLowerCase().contains("metadata")) {
                     reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.METADATA_TABLE_HEADER_SYNONYM)
-                            .formatMessageWith(raw), file, declaration);
+                            .formatMessageWith(text), file, declaration);
                 }
             }
         }

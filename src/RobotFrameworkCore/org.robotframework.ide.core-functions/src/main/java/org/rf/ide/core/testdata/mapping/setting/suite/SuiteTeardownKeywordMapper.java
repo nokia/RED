@@ -20,18 +20,15 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class SuiteTeardownKeywordMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
     private final ParsingStateHelper stateHelper;
 
-
     public SuiteTeardownKeywordMapper() {
         this.utility = new ElementsUtility();
         this.stateHelper = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -41,7 +38,6 @@ public class SuiteTeardownKeywordMapper implements IParsingMapper {
         rt.getTypes()
                 .add(0, RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable settings = robotFileOutput.getFileModel()
                 .getSettingTable();
@@ -55,7 +51,6 @@ public class SuiteTeardownKeywordMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

@@ -87,7 +87,6 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
         token.setLineNumber(rt.getLineNumber());
         token.setStartColumn(rt.getStartColumn());
         token.setText("");
-        token.setRaw("");
         token.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
 
         return token;

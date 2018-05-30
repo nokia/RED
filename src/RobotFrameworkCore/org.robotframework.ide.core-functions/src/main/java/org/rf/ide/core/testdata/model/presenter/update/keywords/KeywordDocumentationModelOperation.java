@@ -33,7 +33,6 @@ public class KeywordDocumentationModelOperation implements IExecutablesStepsHold
             final List<String> args, final String comment) {
         final KeywordDocumentation keywordDoc = userKeyword.newDocumentation(index);
         keywordDoc.getDeclaration().setText(settingName);
-        keywordDoc.getDeclaration().setRaw(settingName);
 
         for (int i = 0; i < args.size(); i++) {
             keywordDoc.addDocumentationText(i, args.get(i));

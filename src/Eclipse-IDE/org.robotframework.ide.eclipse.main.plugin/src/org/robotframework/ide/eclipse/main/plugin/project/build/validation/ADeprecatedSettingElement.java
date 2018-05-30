@@ -11,9 +11,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
 public abstract class ADeprecatedSettingElement implements ModelUnitValidator {
@@ -34,10 +34,10 @@ public abstract class ADeprecatedSettingElement implements ModelUnitValidator {
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         for (final RobotToken docToken : getDeclaration()) {
-            final String raw = docToken.getRaw();
-            final String rawWithoutWhiteSpaces = raw.replaceAll("\\s", "");
-            if (rawWithoutWhiteSpaces.toLowerCase().contains(representation)) {
-                reporter.handleProblem(RobotProblem.causedBy(getProblemId()).formatMessageWith(raw), file, docToken);
+            final String text = docToken.getText();
+            final String textWithoutWhiteSpaces = text.replaceAll("\\s", "");
+            if (textWithoutWhiteSpaces.toLowerCase().contains(representation)) {
+                reporter.handleProblem(RobotProblem.causedBy(getProblemId()).formatMessageWith(text), file, docToken);
             }
         }
     }

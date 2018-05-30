@@ -32,7 +32,6 @@ public class TestTemplateTrashDataMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TestTemplate> templates = settings.getTestTemplates();

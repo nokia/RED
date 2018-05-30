@@ -20,16 +20,13 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class KeywordTagsTagNameMapper implements IParsingMapper {
 
     private final ParsingStateHelper utility;
 
-
     public KeywordTagsTagNameMapper() {
         this.utility = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -38,7 +35,6 @@ public class KeywordTagsTagNameMapper implements IParsingMapper {
             final String text) {
         rt.getTypes().add(0, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME);
         rt.setText(text);
-        rt.setRaw(text);
 
         final KeywordTable keywordTable = robotFileOutput.getFileModel()
                 .getKeywordTable();
@@ -52,7 +48,6 @@ public class KeywordTagsTagNameMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

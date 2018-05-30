@@ -69,7 +69,7 @@ public class RemoveWhitespacesFromVariableNameFixer extends RedSuiteMarkerResolu
 
         final RobotToken varDeclaration = var.getDeclaration();
         final int offset = varDeclaration.getStartOffset();
-        final String varText = varDeclaration.getRaw();
+        final String varText = varDeclaration.getText();
         final String correctedVariable = varText.charAt(0) + varText.substring(varText.indexOf('{'));
 
         final IRegion toChange = new Region(offset, varDeclaration.getEndOffset() - offset);

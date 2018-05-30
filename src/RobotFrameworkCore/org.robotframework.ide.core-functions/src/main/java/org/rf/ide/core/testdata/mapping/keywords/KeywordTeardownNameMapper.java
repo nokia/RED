@@ -39,7 +39,6 @@ public class KeywordTeardownNameMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME);
         rt.setText(text);
-        rt.setRaw(text);
         final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
         final UserKeyword keyword = keywords.get(keywords.size() - 1);
         final List<KeywordTeardown> teardowns = keyword.getTeardowns();

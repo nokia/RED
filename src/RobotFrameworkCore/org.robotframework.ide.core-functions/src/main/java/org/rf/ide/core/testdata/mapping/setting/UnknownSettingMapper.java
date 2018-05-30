@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Stack;
 
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
+import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
-import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.SettingTable;
@@ -22,18 +22,15 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class UnknownSettingMapper implements IParsingMapper {
 
     private final ElementPositionResolver positionResolver;
     private final ParsingStateHelper utility;
 
-
     public UnknownSettingMapper() {
         this.positionResolver = new ElementPositionResolver();
         this.utility = new ParsingStateHelper();
     }
-
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -45,7 +42,6 @@ public class UnknownSettingMapper implements IParsingMapper {
         types.add(0, RobotTokenType.SETTING_UNKNOWN);
         rt.setStartColumn(fp.getColumn());
         rt.setText(text);
-        rt.setRaw(text);
 
         final SettingTable setting = robotFileOutput.getFileModel().getSettingTable();
         final UnknownSetting unknownSetting = new UnknownSetting(rt);
@@ -55,7 +51,6 @@ public class UnknownSettingMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,

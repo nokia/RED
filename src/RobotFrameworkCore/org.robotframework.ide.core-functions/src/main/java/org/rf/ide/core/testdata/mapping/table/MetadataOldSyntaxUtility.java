@@ -24,39 +24,36 @@ public class MetadataOldSyntaxUtility {
     public void fixSettingMetadata(final RobotFileOutput out, final RobotLine line, final RobotToken token,
             final Stack<ParsingState> processingState) {
         if (token.getTypes().contains(RobotTokenType.SETTING_METADATA_DECLARATION)) {
-            String metadataSettingText = token.getRaw();
-            Matcher matcher = METADATA.matcher(metadataSettingText);
+            final String metadataSettingText = token.getText();
+            final Matcher matcher = METADATA.matcher(metadataSettingText);
             if (matcher.find()) {
-                int prettyAlignGroup = matcher.groupCount() - 1;
-                int prettyStart = matcher.start(prettyAlignGroup);
-                int prettyEnd = matcher.end(prettyAlignGroup);
+                final int prettyAlignGroup = matcher.groupCount() - 1;
+                final int prettyStart = matcher.start(prettyAlignGroup);
+                final int prettyEnd = matcher.end(prettyAlignGroup);
 
-                String metadataSetting = metadataSettingText.substring(0, prettyStart);
-                token.setRaw(metadataSetting);
+                final String metadataSetting = metadataSettingText.substring(0, prettyStart);
                 token.setText(metadataSetting);
 
-                String prettyAlignText = metadataSettingText.substring(prettyStart, prettyEnd);
-                RobotToken prettyToken = new RobotToken();
+                final String prettyAlignText = metadataSettingText.substring(prettyStart, prettyEnd);
+                final RobotToken prettyToken = new RobotToken();
                 prettyToken.setLineNumber(token.getLineNumber());
                 prettyToken.setStartColumn(token.getEndColumn());
-                prettyToken.setStartOffset(token.getStartOffset() + token.getRaw().length());
+                prettyToken.setStartOffset(token.getStartOffset() + token.getText().length());
                 prettyToken.setText(prettyAlignText);
-                prettyToken.setRaw(prettyAlignText);
                 prettyToken.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
                 line.addLineElement(prettyToken);
 
-                String metadataKey = metadataSettingText.substring(prettyEnd);
-                RobotToken metadataKeyToken = new RobotToken();
+                final String metadataKey = metadataSettingText.substring(prettyEnd);
+                final RobotToken metadataKeyToken = new RobotToken();
                 metadataKeyToken.setLineNumber(token.getLineNumber());
                 metadataKeyToken.setStartColumn(prettyToken.getEndColumn());
-                metadataKeyToken.setStartOffset(prettyToken.getStartOffset() + prettyToken.getRaw().length());
+                metadataKeyToken.setStartOffset(prettyToken.getStartOffset() + prettyToken.getText().length());
                 metadataKeyToken.setText(metadataKey);
-                metadataKeyToken.setRaw(metadataKey);
                 metadataKeyToken.setType(RobotTokenType.SETTING_METADATA_KEY);
                 line.addLineElement(metadataKeyToken);
 
-                List<Metadata> metadatas = out.getFileModel().getSettingTable().getMetadatas();
-                Metadata lastMetadata = metadatas.get(metadatas.size() - 1);
+                final List<Metadata> metadatas = out.getFileModel().getSettingTable().getMetadatas();
+                final Metadata lastMetadata = metadatas.get(metadatas.size() - 1);
                 lastMetadata.setKey(metadataKeyToken);
 
                 processingState.push(ParsingState.SETTING_METADATA_KEY);

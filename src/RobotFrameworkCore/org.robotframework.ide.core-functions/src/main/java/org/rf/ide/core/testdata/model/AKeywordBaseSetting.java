@@ -125,7 +125,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         if (isPresent()) {
             tokens.add(getDeclaration());
             if (getKeywordName() != null) {
-                if (!getKeywordName().isNotEmpty()) {
+                if (!getKeywordName().isDirty() && !getKeywordName().isNotEmpty()) {
                     keywordName.setText("\\");
                     setKeywordName(keywordName);
                 }
@@ -176,7 +176,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
 
     @Override
     public void insertValueAt(String value, int position) {
-        RobotToken tokenToInsert = new RobotToken();
+        final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position == 1) { // new keyword name
             fixForTheType(keywordName, getArgumentType());

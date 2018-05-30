@@ -71,10 +71,10 @@ public class LineReader extends Reader {
                 }
             }
 
-            int textLength = (currentOffset - offset) + eolSize;
-            FilePosition fpStart = new FilePosition(line, column, offset);
+            final int textLength = (currentOffset - offset) + eolSize;
+            final FilePosition fpStart = new FilePosition(line, column, offset);
             offset = currentOffset + eolSize;
-            FilePosition fpEnd = new FilePosition(line, column + textLength, offset);
+            final FilePosition fpEnd = new FilePosition(line, column + textLength, offset);
 
             eols.add(new FileRegion(fpStart, fpEnd));
         }
@@ -113,9 +113,7 @@ public class LineReader extends Reader {
     }
 
     public enum Constant {
-        CR('\r'),
-        LF('\n'),
-        EOF((char) -1);
+        CR('\r'), LF('\n'), EOF((char) -1);
 
         private final char c;
 
@@ -142,7 +140,7 @@ public class LineReader extends Reader {
 
         public static List<Constant> get(final IRobotLineElement rle) {
             final List<Constant> converted = new ArrayList<>(0);
-            final char[] cArray = rle.getRaw().toCharArray();
+            final char[] cArray = rle.getText().toCharArray();
             if (cArray.length > 0) {
                 for (final char c : cArray) {
                     converted.add(Constant.get(c));

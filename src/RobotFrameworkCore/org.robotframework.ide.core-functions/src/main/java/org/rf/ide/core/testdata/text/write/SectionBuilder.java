@@ -143,7 +143,7 @@ public class SectionBuilder {
             }
 
             final FilePosition end = new FilePosition(line.getLineNumber(), line.getEndOfLine().getEndColumn(),
-                    line.getEndOfLine().getStartOffset() + line.getEndOfLine().getRaw().length());
+                    line.getEndOfLine().getStartOffset() + line.getEndOfLine().getText().length());
             if (sections.get(sections.size() - 1) != section) {
                 applyEndForLastSubSections(sections.get(sections.size() - 1), end);
             }
@@ -295,7 +295,7 @@ public class SectionBuilder {
             final Optional<AVariable> var = model.getVariableTable().findVariable(elem);
             if (var.isPresent()) {
                 final AVariable v = var.get();
-                if (v.getDeclaration().getRaw().isEmpty()) {
+                if (v.getDeclaration().getText().isEmpty()) {
                     result = (v.getElementTokens().indexOf(elem) == 1);
                 }
             }
