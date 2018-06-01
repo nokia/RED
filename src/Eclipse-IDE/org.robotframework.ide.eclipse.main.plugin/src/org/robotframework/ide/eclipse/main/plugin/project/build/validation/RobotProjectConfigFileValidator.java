@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ConfigVersion;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -42,9 +43,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
@@ -83,36 +84,46 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     void validate(final IProgressMonitor monitor, final RobotProjectConfigWithLines config) throws CoreException {
         final RobotProjectConfig model = config.getConfigurationModel();
 
-        if (model.hasCurrentVersion()) {
+        final boolean shallContinue = validateConfigVersion(model.getVersion(), config);
+        if (!shallContinue) {
+            return;
+        }
 
-            validateLibspecsAreGenerated(monitor, config);
+        validateLibspecsAreGenerated(monitor, config);
 
-            for (final RemoteLocation location : model.getRemoteLocations()) {
-                validateRemoteLocation(monitor, location, config);
-            }
-            int index = 0;
-            for (final ReferencedLibrary library : model.getLibraries()) {
-                validateReferencedLibrary(monitor, library, index, config);
-                index++;
-            }
-            for (final SearchPath path : model.getPythonPath()) {
-                validateSearchPath(monitor, path, config);
-            }
-            for (final SearchPath path : model.getClassPath()) {
-                validateSearchPath(monitor, path, config);
-            }
-            for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
-                validateReferencedVariableFile(monitor, variableFile, config);
-            }
-            for (final ExcludedFolderPath excludedPath : model.getExcludedPath()) {
-                validateExcludedPath(monitor, excludedPath, model.getExcludedPath(), config);
-            }
-        } else {
+        for (final RemoteLocation location : model.getRemoteLocations()) {
+            validateRemoteLocation(monitor, location, config);
+        }
+        int index = 0;
+        for (final ReferencedLibrary library : model.getLibraries()) {
+            validateReferencedLibrary(monitor, library, index, config);
+            index++;
+        }
+        for (final SearchPath path : model.getPythonPath()) {
+            validateSearchPath(monitor, path, config);
+        }
+        for (final SearchPath path : model.getClassPath()) {
+            validateSearchPath(monitor, path, config);
+        }
+        for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
+            validateReferencedVariableFile(monitor, variableFile, config);
+        }
+        for (final ExcludedFolderPath excludedPath : model.getExcludedPath()) {
+            validateExcludedPath(monitor, excludedPath, model.getExcludedPath(), config);
+        }
+    }
+
+    private boolean validateConfigVersion(final ConfigVersion version, final RobotProjectConfigWithLines config) {
+        // this should be updated when current version does not support older versions
+        final boolean isValidVersion = RobotProjectConfig.CURRENT_VERSION.equals(version.getVersion())
+                || "1".equals(version.getVersion()) || "1.0".equals(version.getVersion());
+        if (!isValidVersion) {
             final RobotProblem invalidVersionProblem = RobotProblem.causedBy(ConfigFileProblem.INVALID_VERSION)
-                    .formatMessageWith(model.getVersion().getVersion(), RobotProjectConfig.CURRENT_VERSION);
-            final ProblemPosition position = new ProblemPosition(config.getLineFor(model.getVersion()));
+                    .formatMessageWith(version.getVersion(), RobotProjectConfig.CURRENT_VERSION);
+            final ProblemPosition position = new ProblemPosition(config.getLineFor(version));
             reporter.handleProblem(invalidVersionProblem, configFile, position);
         }
+        return isValidVersion;
     }
 
     private void validateLibspecsAreGenerated(final IProgressMonitor monitor,

@@ -82,8 +82,33 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
+    public void whenConfigHasCurrentSupportedVersion_itHasNoValidationIssues() throws Exception {
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.setVersion("2");
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void whenConfigHasOldSupportedVersion_itHasNoValidationIssues() throws Exception {
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.setVersion("1");
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
     public void whenConfigHasOldVersionFormat_itHasNoValidationIssues() throws Exception {
-        // remove this test after red.xml version change
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.setVersion("1.0");
         final Map<Object, FilePosition> locations = new HashMap<>();
@@ -118,7 +143,7 @@ public class RobotProjectConfigFileValidatorTest {
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(stdLibs);
-        
+
         final RobotProjectConfig config = RobotProjectConfig.create();
 
         final Map<Object, FilePosition> locations = new HashMap<>();
@@ -128,9 +153,8 @@ public class RobotProjectConfigFileValidatorTest {
 
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
-        assertThat(reporter.getReportedProblems())
-                .containsExactly(
-                        new Problem(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED, new ProblemPosition(2)));
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED, new ProblemPosition(2)));
     }
 
     @Test

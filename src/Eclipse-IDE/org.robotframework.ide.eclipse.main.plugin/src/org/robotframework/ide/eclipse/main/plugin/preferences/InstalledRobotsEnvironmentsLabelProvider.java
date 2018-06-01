@@ -19,11 +19,14 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvider {
 
     private final CheckboxTableViewer viewer;
 
-    private InstalledRobotsEnvironmentsLabelProvider(final CheckboxTableViewer viewer) {
+    @VisibleForTesting
+    InstalledRobotsEnvironmentsLabelProvider(final CheckboxTableViewer viewer) {
         this.viewer = viewer;
     }
 

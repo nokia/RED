@@ -12,13 +12,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -44,6 +44,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirect
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage;
@@ -115,12 +116,15 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     private IHyperlinkListener createHyperlinkListener() {
         return new HyperlinkAdapter() {
+
             @Override
             public void linkActivated(final HyperlinkEvent event) {
                 final Shell shell = viewer.getTable().getShell();
                 if (PATH_LINK.equals(event.getHref())) {
                     if (Desktop.isDesktopSupported()) {
-                        final File file = new File(event.getLabel());
+                        final File file = RedWorkspace.Paths
+                                .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(event.getLabel()))
+                                .toFile();
                         try {
                             Desktop.getDesktop().open(file);
                         } catch (final IOException e) {
@@ -147,23 +151,18 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         sourceButton.setEnabled(false);
 
         sourceButton.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent event) {
                 viewer.getTable().setEnabled(sourceButton.getSelection());
 
                 final Object[] elements = viewer.getCheckedElements();
-                File file;
-                SuiteExecutor executor;
                 if (elements.length == 1 && sourceButton.getSelection()) {
                     final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) elements[0];
-                    file = env.getFile();
-                    executor = file instanceof PythonInstallationDirectory
-                            ? ((PythonInstallationDirectory) file).getInterpreter() : null;
+                    assignPythonLocation(env.getFile());
                 } else {
-                    file = null;
-                    executor = null;
+                    assignPythonLocation(null);
                 }
-                editorInput.getProjectConfiguration().assignPythonLocation(file, executor);
                 setDirty(true);
             }
         });
@@ -185,37 +184,42 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         ColumnViewerToolTipSupport.enableFor(viewer);
 
         viewer.setContentProvider(new ListInputStructuredContentProvider());
-        ViewerColumnsFactory.newColumn("Name").withWidth(200)
-                .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer)).createFor(viewer);
-        ViewerColumnsFactory.newColumn("Path").withWidth(200)
-                .shouldGrabAllTheSpaceLeft(true).withMinWidth(30)
-                .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer)).createFor(viewer);
+        ViewerColumnsFactory.newColumn("Name")
+                .withWidth(200)
+                .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
+                .createFor(viewer);
+        ViewerColumnsFactory.newColumn("Path")
+                .withWidth(200)
+                .shouldGrabAllTheSpaceLeft(true)
+                .withMinWidth(30)
+                .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
+                .createFor(viewer);
     }
 
     private ICheckStateListener createCheckListener() {
-        return new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(final CheckStateChangedEvent event) {
-                final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
-                File file;
-                SuiteExecutor executor;
-                if (event.getChecked()) {
-                    final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) event.getElement();
-                    viewer.setCheckedElements(new Object[] { env });
-                    file = env.getFile();
-                    executor = file instanceof PythonInstallationDirectory
-                            ? ((PythonInstallationDirectory) file).getInterpreter() : null;
-                } else {
-                    sourceButton.setSelection(false);
-                    viewer.getTable().setEnabled(false);
-                    file = null;
-                    executor = null;
-                }
-                configuration.assignPythonLocation(file, executor);
-                setDirty(true);
-                viewer.refresh();
+        return event -> {
+            if (event.getChecked()) {
+                final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) event.getElement();
+                viewer.setCheckedElements(new Object[] { env });
+                assignPythonLocation(env.getFile());
+            } else {
+                sourceButton.setSelection(false);
+                viewer.getTable().setEnabled(false);
+                assignPythonLocation(null);
             }
+            setDirty(true);
+            viewer.refresh();
         };
+    }
+
+    private void assignPythonLocation(final File file) {
+        final String path = file != null
+                ? RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(file.getAbsolutePath())).toPortableString()
+                : null;
+        final SuiteExecutor executor = file instanceof PythonInstallationDirectory
+                ? ((PythonInstallationDirectory) file).getInterpreter()
+                : null;
+        editorInput.getProjectConfiguration().assignPythonLocation(path, executor);
     }
 
     @Override
@@ -287,9 +291,10 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     private String createActiveFrameworkText(final RobotRuntimeEnvironment env, final boolean isUsingPrefs) {
         final StringBuilder activeText = new StringBuilder();
         activeText.append("<a href=\"" + PATH_LINK + "\">");
-        activeText.append(env.getFile().getAbsolutePath());
+        activeText.append(RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(env.getFile().getAbsolutePath()))
+                .toPortableString());
         activeText.append("</a>");
-        activeText.append(" " + env.getVersion());
+        activeText.append(" " + (env.getVersion() == null ? "&lt;unknown&gt;" : env.getVersion()));
         if (isUsingPrefs) {
             activeText.append(" (<a href=\"" + PREFERENCES_LINK + "\">from Preferences</a>)");
         }
