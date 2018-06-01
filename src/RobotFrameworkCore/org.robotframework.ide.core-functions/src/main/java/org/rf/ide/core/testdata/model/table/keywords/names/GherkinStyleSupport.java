@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model.table.keywords.names;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -14,11 +15,11 @@ import java.util.function.Function;
 
 /**
  * @author Michal Anglart
- *
  */
 public class GherkinStyleSupport {
 
-    public static final Set<String> PREFIXES = newHashSet("given", "when", "and", "but", "then");
+    public static final Set<String> PREFIXES = Collections
+            .unmodifiableSet(newHashSet("given", "when", "and", "but", "then"));
 
     public static <T> Optional<T> firstNameTransformationResult(final String originalName,
             final Function<String, Optional<T>> transformation) {
@@ -71,11 +72,11 @@ public class GherkinStyleSupport {
         for (final String prefix : PREFIXES) {
             if (name.toLowerCase().startsWith(prefix)) {
                 final String suffix = name.substring(prefix.length());
-                final String trimmedsuffix = suffix.trim();
-                if (suffix.equals(trimmedsuffix)) {
+                final String trimmedSuffix = suffix.trim();
+                if (suffix.equals(trimmedSuffix)) {
                     continue;
                 }
-                return trimmedsuffix;
+                return trimmedSuffix;
             }
         }
         return name;

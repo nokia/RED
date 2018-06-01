@@ -51,7 +51,7 @@ import com.google.common.base.Objects;
 @RunWith(MockitoJUnitRunner.class)
 public class ReferencedLibraryLocatorTest {
 
-    private static String PROJECT_NAME = ReferencedLibraryLocatorTest.class.getSimpleName();
+    private static final String PROJECT_NAME = ReferencedLibraryLocatorTest.class.getSimpleName();
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
