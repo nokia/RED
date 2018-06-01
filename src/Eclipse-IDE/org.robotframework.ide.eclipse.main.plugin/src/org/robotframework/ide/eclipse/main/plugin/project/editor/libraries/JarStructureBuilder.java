@@ -92,7 +92,7 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
         return entryName.endsWith(".class");
     }
 
-    public static class JarClass implements ILibraryClass {
+    public static final class JarClass implements ILibraryClass {
 
         private final String qualifiedName;
 
