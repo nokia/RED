@@ -7,7 +7,6 @@ package org.rf.ide.core.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ public class RobotProjectConfig {
 
     public static final String FILENAME = "red.xml";
 
-    public static final String CURRENT_VERSION = "1";
+    public static final String CURRENT_VERSION = "2";
 
     private static final String VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB = "1024";
 
@@ -96,24 +95,12 @@ public class RobotProjectConfig {
         return configuration;
     }
 
-    public static RobotProjectConfig create(final File pythonDirectory) {
-        final RobotProjectConfig configuration = new RobotProjectConfig();
-        configuration.setVersion(CURRENT_VERSION);
-        configuration.executionEnvironment.setPath(pythonDirectory.getAbsolutePath());
-        return configuration;
-    }
-
     public void setVersion(final String version) {
         this.version = ConfigVersion.create(version);
     }
 
     public ConfigVersion getVersion() {
         return version;
-    }
-
-    public boolean hasCurrentVersion() {
-        // workaround, or should be removed when moving to newer version
-        return CURRENT_VERSION.equals(version.getVersion()) || "1.0".equals(version.getVersion());
     }
 
     public void setExecutionEnvironment(final ExecutionEnvironment executionEnvironment) {
@@ -345,24 +332,24 @@ public class RobotProjectConfig {
         return executionEnvironment == null;
     }
 
-    public File providePythonLocation() {
-        return executionEnvironment == null ? null : new File(executionEnvironment.path);
+    public String providePythonLocation() {
+        return executionEnvironment == null ? null : executionEnvironment.getPath();
     }
 
     public SuiteExecutor providePythonInterpreter() {
         return executionEnvironment == null ? null : executionEnvironment.getInterpreter();
     }
 
-    public void assignPythonLocation(final File location, final SuiteExecutor executor) {
-        if (location == null) {
+    public void assignPythonLocation(final String path, final SuiteExecutor executor) {
+        if (path == null) {
             executionEnvironment = null;
             return;
         }
         if (executionEnvironment == null) {
-            executionEnvironment = ExecutionEnvironment.create(location.getAbsolutePath(), executor);
+            executionEnvironment = ExecutionEnvironment.create(path, executor);
         }
-        if (!executionEnvironment.getPath().equals(location.getAbsolutePath())) {
-            executionEnvironment.setPath(location.getAbsolutePath());
+        if (!executionEnvironment.getPath().equals(path)) {
+            executionEnvironment.setPath(path);
         }
         if (executionEnvironment.getInterpreter() != executor) {
             executionEnvironment.setInterpreter(executor);
