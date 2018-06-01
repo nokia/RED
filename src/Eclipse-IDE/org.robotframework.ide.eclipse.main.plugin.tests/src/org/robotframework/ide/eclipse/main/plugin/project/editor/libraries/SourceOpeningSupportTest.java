@@ -61,15 +61,14 @@ public class SourceOpeningSupportTest {
     @Mock
     private BiConsumer<String, Exception> errorHandler;
 
-    private static final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+    private LibrarySpecification libSpec;
 
-    private static LibrarySpecification libSpec;
+    private RobotProject robotProject;
 
-    private static RobotProject robotProject;
+    private IWorkbenchPage page;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         projectProvider.createFile("testlib.py",
                 "#comment",
                 "def defined_kw():",
@@ -91,7 +90,10 @@ public class SourceOpeningSupportTest {
         libSpec = LibrarySpecification.create("testlib");
         libSpec.setDescriptor(libDesc);
 
+        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
+
+        page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
     }
 
     @After

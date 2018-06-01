@@ -44,7 +44,7 @@ import org.robotframework.red.junit.ProjectProvider;
 public class DocumentationsTest {
 
     @ClassRule
-    public static final ProjectProvider projectProvider = new ProjectProvider(DocumentationsTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(DocumentationsTest.class);
 
     @Test
     public void suiteFileInputIsFoundForRobotSuiteFile() throws Exception {
@@ -148,7 +148,7 @@ public class DocumentationsTest {
         final RobotCase testCase = new RobotCase(null, new TestCase(RobotToken.create("test")));
         final RobotDefinitionSetting setting = new RobotDefinitionSetting(testCase,
                 new TestDocumentation(RobotToken.create("[Documentation]")));
-        
+
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
         assertThat(input).isPresent().containsInstanceOf(TestCaseOnSettingInput.class);
     }
