@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -127,9 +125,9 @@ public class RobotArtifactsBuilder {
 
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         if (runtimeEnvironment == null) {
-            final File location = configuration.providePythonLocation();
+            final String location = configuration.providePythonLocation();
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_MISSING)
-                    .formatMessageWith(location == null ? "" : location.getAbsolutePath());
+                    .formatMessageWith(location == null ? "" : location);
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
         } else if (!runtimeEnvironment.isValidPythonInstallation()) {
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_NOT_A_PYTHON)
