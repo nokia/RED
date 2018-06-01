@@ -185,15 +185,15 @@ public class ReferencedLibraryLocator {
 
         @Override
         public boolean equals(final Object obj) {
-            if (obj == null) {
+            if (obj == this) {
+                return true;
+            } else if (obj == null || obj.getClass() != this.getClass()) {
                 return false;
-            }
-            if (LibImportCacheKey.class == obj.getClass()) {
+            } else {
                 final LibImportCacheKey that = (LibImportCacheKey) obj;
                 return Objects.equal(this.libraryFile, that.libraryFile)
                         && Objects.equal(this.libraryName, that.libraryName);
             }
-            return false;
         }
 
         @Override
