@@ -1,0 +1,101 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _6-akYGfbEeiEwYlEOPk68w,_3GPE0GfOEeiEwYlEOPk68w
+Element-Name: AutoDiscoveryForJarsOutsideAndInsideWS
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Ph_egGfOEeiEwYlEOPk68w
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/4/18 4:15 PM
+Testcase-Type: ecl
+Verifications: _pCysgGgAEeiVpru4htsSeg
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// set jython as interpreter  
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+
+
+//set path to jython
+set-dialog-result Folder [os-specific "C:\\jython2.7.0\\bin" "/usr/local/lib/jython/bin"]
+with [get-window Preferences] {
+//	wait 5000
+    get-button "Add..." | click
+    get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
+    get-button $Apply_and_OK_in_preference | click
+    get-window "Rebuild required" | get-button OK | click
+}
+
+//open red.xml and add 2 jars from user folder
+get-view "Project Explorer" | get-tree | select "JythonProject/red.xml" | double-click
+wait-for-loading-red-xml -editor_name "JythonProject/red.xml"
+
+with [get-editor "JythonProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section Paths | get-table -after [get-label "Relative paths defined below are relative to:"] -index 1 
+        | get-item "...add new search path" | double-click
+}
+with [get-window "Add new search path"] {
+    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
+        | type-text [concat $user_folder "/Jars/JavaAndPython.jar" ]
+    get-button OK | click
+}
+get-editor "JythonProject/red.xml" | get-section Paths | get-table 
+    -after [get-label "Relative paths defined below are relative to:"] -index 1 | get-item "...add new search path" 
+    | double-click
+with [get-window "Add new search path"] {
+    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
+        | type-text [concat $user_folder "/Jars/OnlyPython.jar" ]
+    get-button OK | click
+}
+get-button "Save (M1+S)" | click
+
+//change script to run autodiscovery
+get-view "Project Explorer" | get-tree | select "JythonProject/Test.robot" | double-click
+with [get-editor "Test.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 18 10
+        type-text " "
+        key-type "M1+s"
+    }
+}
+wait-for-discover-window -times 20
+
+//check if all are added
+with [get-window "Discovering libraries summary"] {
+    with [get-tree] {
+        get-item -path CalculatorLibrary | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path module1 | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "nested_module.module3" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "only_python" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "Outer.Inner.PrintModule" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path outside | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path PythonOnly | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "PythonOnly.Other" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path PythonWithJava | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path RemoteSwingLibrary | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "simple_function" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    }
+    get-label "Discovered libraries (11):" | get-property caption | equals "Discovered libraries (11):" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+get-button "Save All (M1+M2+S)" | click
+
+release-files-handle
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
