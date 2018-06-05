@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _sSLVQEdzEeaRB_Xz0tiYpg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/2/17 8:59 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/5/18 5:17 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -101,7 +101,7 @@ get-view "Project Explorer" | get-tree | select "new/red.xml" | select "new/red.
 get-editor "red.xml" | get-text-viewer | get-property text 
     | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
     + "<projectConfiguration>\n"
-    + "    <configVersion>1</configVersion>\n"
+    + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
@@ -196,7 +196,7 @@ get-editor "red.xml" | click
 get-editor "red.xml" | get-text-viewer | get-property text 
     | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
     + "<projectConfiguration>\n"
-    + "    <configVersion>1</configVersion>\n"
+    + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
@@ -274,7 +274,7 @@ get-editor "red.xml" | click
 get-editor "red.xml" | get-text-viewer | get-property text 
     | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
     + "<projectConfiguration>\n"
-    + "    <configVersion>1</configVersion>\n"
+    + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 8/25/17 7:54 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/5/18 5:12 PM
 Tags: Quick
 Testcase-Type: ecl
 Verifications: _Xbz7EJUqEeaXOtocAkFx_w
@@ -324,7 +324,7 @@ get-tab-folder -index 1 | get-tab-item "red.xml" | click
 get-editor "red.xml" | get-text-viewer | get-property text 
     | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
     + "<projectConfiguration>\n"
-    + "    <configVersion>1</configVersion>\n"
+    + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
