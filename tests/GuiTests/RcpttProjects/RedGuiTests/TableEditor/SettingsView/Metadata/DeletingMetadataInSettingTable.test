@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _IDMU4DesEeaJIKJT0Mv9ow
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 11:08 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/5/18 4:58 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -131,7 +131,7 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     key-type "M1+s"
 }
 
-check-metadata-row -file "TestFile.robot" -row 1 -metadata "\\" -val "" -comment ""
+check-metadata-row -file "TestFile.robot" -row 1 -metadata "" -val "" -comment ""
 check-metadata-row -file "TestFile.robot" -row 2 -metadata "\\" -val "2" -comment "#comment2"
 check-metadata-row -file "TestFile.robot" -row 3 -metadata "a3" -val "" -comment "#comment3"
 check-metadata-row -file "TestFile.robot" -row 4 -metadata "a4" -val "4" -comment ""
@@ -143,7 +143,7 @@ check-metadata-row -file "TestFile.robot" -row 7 -metadata "a9" -val "9" -commen
 //check Source
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Metadata    \\    \n"
+    + "Metadata\n"
     + "Metadata    \\    2    #comment2\n"
     + "Metadata    a3    #comment3\n"
     + "Metadata    a4    4    \n"
