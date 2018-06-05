@@ -63,7 +63,6 @@ import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 
 public class RobotProject extends RobotContainer {
 
@@ -326,8 +325,10 @@ public class RobotProject extends RobotContainer {
         if (configuration == null || configuration.usesPreferences()) {
             return RedPlugin.getDefault().getActiveRobotInstallation();
         }
-        return RedPlugin.getDefault().getRobotInstallation(configuration.providePythonLocation(),
-                configuration.providePythonInterpreter());
+        final File file = RedWorkspace.Paths
+                .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(configuration.providePythonLocation()))
+                .toFile();
+        return RedPlugin.getDefault().getRobotInstallation(file, configuration.providePythonInterpreter());
     }
 
     public IFile getConfigurationFile() {
@@ -404,7 +405,7 @@ public class RobotProject extends RobotContainer {
                 final String path = RedWorkspace.Paths
                         .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(variableFile.getPath())).toOSString();
                 final List<String> args = variableFile.getArguments();
-                final String arguments = args == null || args.isEmpty() ? "" : ":" + Joiner.on(":").join(args);
+                final String arguments = args == null || args.isEmpty() ? "" : ":" + String.join(":", args);
                 list.add(path + arguments);
             }
         }
