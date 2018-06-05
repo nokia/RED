@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _emIDYDe5EeaJIKJT0Mv9ow
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/5/18 4:56 PM
+Save-Time: 6/5/18 5:29 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -155,7 +155,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Metadata    a3    3    \n"
     + "Metadata    \\    4    #comment4\n"
     + "Metadata    new    new    #new\n"
-    + "Metadata    \\    \n"
+    + "Metadata\n"
     + "Metadata    a8    8    #comment8\n"
     + "Metadata    a7    7    #comment7\n"
     + "Metadata    a9    9    #comment9\n\n"
