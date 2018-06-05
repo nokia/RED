@@ -1,0 +1,167 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Vm6_EGjDEeiVpru4htsSeg,_n_EF8GjBEeiVpru4htsSeg
+Element-Name: MovinglinkedFolders
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _BrguoGjFEeiVpru4htsSeg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/5/18 4:14 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add new link to folder
+get-view "Project Explorer" | get-tree | select "LINKS/dir" | get-menu -path "New/Folder" | click
+with [get-window "New Folder"] {
+    get-button "Advanced >>" | click
+    get-button "Link to alternate location (Linked Folder)" | click
+}
+
+
+set-dialog-result Folder [format "%s/linkes_folders/links_folders/dirA" $user_folder]
+with [get-window "New Folder"] {
+    get-button "Browse..." | click
+    get-button Finish | click
+}
+
+//open editor and type name of libray
+get-view "Project Explorer" | get-tree | select "LINKS/test.robot" | double-click
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 16
+    type-text simp
+    key-type "M1+SPACE"
+}
+//check if one file with full path is shown
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().getClassName()" | equals "org.eclipse.swt.widgets.TableItem[]" | verify-true
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals [format "%s/linkes_folders/links_folders/dirA/simple_function.py" [replace $user_folder "\\" "/"]] | verify-true
+}
+
+//select library
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select ".*\\/links_folders\\/dirA\\/simple_function.py" | click -default
+    
+//add resource    
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 3 11
+    type-text res
+    key-type "M1+SPACE"
+}
+
+//check if has full path
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals [format "%s/linkes_folders/links_folders/dirA/resA.robot"  [replace $user_folder "\\" "/"]] | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select ".*\\/linkes_folders\\/links_folders\\/dirA\\/resA.robot" | click -default
+    
+get-button "Save All (M1+M2+S)" | click
+
+
+//set focus on lib
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 60
+    hover-text 2 51
+    key-type "M1+1"
+}
+
+//run QF
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals [format "Discover '%s/linkes_folders/links_folders/dirA/simple_function.py' and add to configuration" [replace $user_folder "\\" "/"]]
+        | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Change to 'dir/dirA/simple_function.py'" | verify-true
+}
+
+//select to run AD
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover '.*\\/linkes_folders\\/links_folders\\/dirA\\/simple_function.py' and add to configuration" 
+    | click -default
+    
+//check if full path was added to red.xml    
+with [get-editor "LINKS/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals [format "simple_function - %s/linkes_folders/links_folders/dirA" [replace $user_folder "\\" "/"]] | verify-true
+}
+get-button "Save All (M1+M2+S)" | click
+
+
+//move linked folder to folder "b"
+with [get-view "Project Explorer" | get-tree] {
+    select "LINKS/dir/dirA"
+    get-item -path "LINKS/dir/dirA" | drag-start 2 3
+    get-item -path "LINKS/dir" | drag-enter 12 4 -detail move
+    get-item -path "LINKS/dir" | drag-over 12 1
+    get-item -path "LINKS/a/b" | drag-over "-9" 3 -detail move
+    get-item -path "LINKS/dir" | drag-exit
+    get-item -path "LINKS/a/b" | drag-accept "-9" 3 -detail move
+    drag-set-data
+    get-item -path "LINKS/a/b" | drop "-9" 3 -detail move
+    drag-end -detail move
+}
+
+//check if kw from res is in CA
+with [get-editor "test.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 7 28
+        key-type "NUMPAD_ENTER" "\\u000D"
+        type-text kw
+        key-type "M1+SPACE"
+    }
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "kw from res - resA.robot" 
+    | click -default
+    
+//go to source of kw    
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 8 10
+    hover-text 8 10
+    key-type F3
+}
+get-editor "resA.robot" | get-text-viewer | get-property "getSelectionText()" | equals "kw from res" | verify-true
+
+//go to source of lib
+with [get-editor "test.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 7 15
+        hover-text 7 16
+        key-type F3
+    }
+}
+get-editor "simple_function.py" | get-text-viewer | get-property "getSelectionText()" 
+    | equals "simple_kw_from_function" | verify-true
+    
+//check if there is no errors    
+get-view Problems | click
+get-view Problems | get-label "0 errors, 4 warnings, 0 others" | get-property caption 
+    | equals "0 errors, 4 warnings, 0 others" | verify-true
+
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "LINKS/a" | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().getClassName()" 
+        | equals "org.eclipse.swt.widgets.TreeItem[]" | verify-true
+    get-item -path "LINKS/a" | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().length" 
+        | equals 3 | verify-true
+    get-item -path "LINKS/a" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "resA.robot" | verify-true
+    get-item -path "LINKS/a" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "simple_function.py" | verify-true
+    get-item -path "LINKS/a" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "simple_function.pyc" | verify-true
+}
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
