@@ -292,7 +292,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         final StringBuilder activeText = new StringBuilder();
         activeText.append("<a href=\"" + PATH_LINK + "\">");
         activeText.append(RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(env.getFile().getAbsolutePath()))
-                .toPortableString());
+                .toOSString());
         activeText.append("</a>");
         activeText.append(" " + (env.getVersion() == null ? "&lt;unknown&gt;" : env.getVersion()));
         if (isUsingPrefs) {
