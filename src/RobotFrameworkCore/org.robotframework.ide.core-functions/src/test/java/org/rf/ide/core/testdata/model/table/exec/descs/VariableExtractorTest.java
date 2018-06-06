@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IndexDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.JoinedTextDeclarations;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
@@ -302,5 +303,103 @@ public class VariableExtractorTest {
         final RobotToken asToken = variableDeclaration.asToken();
         assertThat(asToken.getStartColumn()).isEqualTo(-1);
         assertThat(asToken.getEndColumn()).isEqualTo(-1);
+    }
+
+    @Test
+    public void test_extractionOf_listVariable_withIndex() {
+        // prepare
+        final VariableExtractor extractor = new VariableExtractor();
+
+        final RobotToken varToken = RobotToken.create("${items}[id]");
+
+        // execute
+        final MappingResult mapResult = extractor.extract(varToken, "myFile.robot");
+
+        // verify
+        assertThat(mapResult.getMessages()).isEmpty();
+        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+
+        assertThat(mapResult.getMappedElements()).hasSize(2);
+        assertThat(mapResult.getTextElements()).isEmpty();
+        assertThat(mapResult.getCorrectVariables()).hasSize(1);
+        final VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
+        assertThat(variableDeclaration.getRobotType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variableDeclaration.getVariableText().getText()).isEqualTo("${items}");
+        assertThat(variableDeclaration.getVariableName().getText()).isEqualTo("items");
+        final RobotToken asToken = variableDeclaration.asToken();
+        assertThat(asToken.getStartColumn()).isEqualTo(-1);
+        assertThat(asToken.getEndColumn()).isEqualTo(-1);
+        final IElementDeclaration indexDeclaration = mapResult.getMappedElements().get(1);
+        assertThat(indexDeclaration).isInstanceOf(IndexDeclaration.class);
+        assertThat(indexDeclaration.getStart().getText()).isEqualTo("[");
+        assertThat(indexDeclaration.getElementsDeclarationInside()).hasSize(1);
+        assertThat(indexDeclaration.getElementsDeclarationInside().get(0).getStart().getText()).isEqualTo("id");
+        assertThat(indexDeclaration.getEnd().getText()).isEqualTo("]");
+    }
+
+    @Test
+    public void test_extractionOf_listVariable_withFalseDistantIndex() {
+        // prepare
+        final VariableExtractor extractor = new VariableExtractor();
+
+        final RobotToken varToken = RobotToken.create("${items}sth[id]");
+
+        // execute
+        final MappingResult mapResult = extractor.extract(varToken, "myFile.robot");
+
+        // verify
+        assertThat(mapResult.getMessages()).isEmpty();
+        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+
+        assertThat(mapResult.getMappedElements()).hasSize(5);
+        assertThat(mapResult.getTextElements()).hasSize(4);
+        assertThat(mapResult.getCorrectVariables()).hasSize(1);
+        final VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
+        assertThat(variableDeclaration.getRobotType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variableDeclaration.getVariableText().getText()).isEqualTo("${items}");
+        assertThat(variableDeclaration.getVariableName().getText()).isEqualTo("items");
+        final RobotToken asToken = variableDeclaration.asToken();
+        assertThat(asToken.getStartColumn()).isEqualTo(-1);
+        assertThat(asToken.getEndColumn()).isEqualTo(-1);
+        assertThat(mapResult.getMappedElements().get(1)).isNotInstanceOf(IndexDeclaration.class);
+        assertThat(mapResult.getMappedElements().get(1).getStart().getText()).isEqualTo("sth");
+        assertThat(mapResult.getMappedElements().get(2)).isNotInstanceOf(IndexDeclaration.class);
+        assertThat(mapResult.getMappedElements().get(2).getStart().getText()).isEqualTo("[");
+        assertThat(mapResult.getMappedElements().get(3)).isNotInstanceOf(IndexDeclaration.class);
+        assertThat(mapResult.getMappedElements().get(3).getStart().getText()).isEqualTo("id");
+        assertThat(mapResult.getMappedElements().get(4)).isNotInstanceOf(IndexDeclaration.class);
+        assertThat(mapResult.getMappedElements().get(4).getStart().getText()).isEqualTo("]");
+    }
+
+    @Test
+    public void test_extractionOf_listVariable_withFalseOpenIndex() {
+        // prepare
+        final VariableExtractor extractor = new VariableExtractor();
+
+        final RobotToken varToken = RobotToken.create("${items}[id");
+
+        // execute
+        final MappingResult mapResult = extractor.extract(varToken, "myFile.robot");
+
+        // verify
+        assertThat(mapResult.getMessages()).hasSize(1);
+        assertThat(mapResult.getMessages().get(0).getMessage())
+                .isEqualTo("Missing closing bracket ']' for type INDEX.");
+        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+
+        assertThat(mapResult.getMappedElements()).hasSize(3);
+        assertThat(mapResult.getTextElements()).hasSize(2);
+        assertThat(mapResult.getCorrectVariables()).hasSize(1);
+        final VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
+        assertThat(variableDeclaration.getRobotType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variableDeclaration.getVariableText().getText()).isEqualTo("${items}");
+        assertThat(variableDeclaration.getVariableName().getText()).isEqualTo("items");
+        final RobotToken asToken = variableDeclaration.asToken();
+        assertThat(asToken.getStartColumn()).isEqualTo(-1);
+        assertThat(asToken.getEndColumn()).isEqualTo(-1);
+        assertThat(mapResult.getMappedElements().get(1)).isNotInstanceOf(IndexDeclaration.class);
+        assertThat(mapResult.getMappedElements().get(1).getStart().getText()).isEqualTo("[");
+        assertThat(mapResult.getMappedElements().get(2)).isNotInstanceOf(IndexDeclaration.class);
+        assertThat(mapResult.getMappedElements().get(2).getStart().getText()).isEqualTo("id");
     }
 }
