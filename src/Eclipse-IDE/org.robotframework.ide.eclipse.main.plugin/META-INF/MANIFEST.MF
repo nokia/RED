@@ -39,3 +39,4 @@ Bundle-ClassPath: lib/org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar,
  lib/guava-22.0.jar,
  .
 Bundle-Activator: org.robotframework.ide.eclipse.main.plugin.RedPlugin
+Export-Package: org.robotframework.ide.eclipse.main.plugin.project
