@@ -45,20 +45,16 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
 
     @Override
     public Collection<ILibraryClass> provideEntriesFromFile(final URI uri) throws RobotEnvironmentException {
-        return provideEntriesFromFile(new File(uri));
-    }
-
-    public Collection<ILibraryClass> provideEntriesFromFile(final File file) throws RobotEnvironmentException {
-        if (file.getName().endsWith(".jar")) {
-            return provideEntriesFromJarFile(file);
+        if (uri.getPath().endsWith(".jar")) {
+            return provideEntriesFromJarFile(uri);
         } else {
             return new ArrayList<>();
         }
     }
 
-    private Collection<ILibraryClass> provideEntriesFromJarFile(final File file) throws RobotEnvironmentException {
+    private Collection<ILibraryClass> provideEntriesFromJarFile(final URI uri) throws RobotEnvironmentException {
         final List<ILibraryClass> jarClasses = new ArrayList<>();
-        try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(file))) {
+        try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(new File(uri)))) {
             ZipEntry entry = zipStream.getNextEntry();
             while (entry != null) {
                 if (isJavaClass(entry.getName())) {
@@ -70,15 +66,15 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
             // nothing to do
         }
 
-        jarClasses.addAll(providePythonEntriesFromJarFile(file));
+        jarClasses.addAll(providePythonEntriesFromJarFile(uri));
 
         return jarClasses;
     }
 
-    private Collection<JarClass> providePythonEntriesFromJarFile(final File file) throws RobotEnvironmentException {
+    private Collection<JarClass> providePythonEntriesFromJarFile(final URI uri) throws RobotEnvironmentException {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
-        final Collection<ILibraryClass> pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(file.toURI());
+        final Collection<ILibraryClass> pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(uri);
 
         final List<JarClass> jarClasses = new ArrayList<>();
         for (final ILibraryClass pythonClass : pythonClasses) {

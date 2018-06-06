@@ -17,13 +17,13 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -61,12 +61,17 @@ public class RobotProjectConfigFileValidatorTest {
     @Before
     public void beforeTest() throws Exception {
         reporter = new MockReporter();
-        final ValidationContext context = mock(ValidationContext.class);
         model = new RobotModel();
+        validator = createValidator(SuiteExecutor.Python);
+    }
+
+    private RobotProjectConfigFileValidator createValidator(final SuiteExecutor executor) {
+        final ValidationContext context = mock(ValidationContext.class);
         when(context.getModel()).thenReturn(model);
+        when(context.getExecutorInUse()).thenReturn(executor);
         final IFile file = mock(IFile.class);
         when(file.getProject()).thenReturn(projectProvider.getProject());
-        validator = new RobotProjectConfigFileValidator(context, file, reporter);
+        return new RobotProjectConfigFileValidator(context, file, reporter);
     }
 
     @Test
@@ -189,7 +194,7 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenLibspecForReferencedLibraryIsMissing_notGeneratedProblemIsReported() throws CoreException {
+    public void whenLibspecForReferencedLibraryIsMissing_notGeneratedProblemIsReported() throws Exception {
         final ReferencedLibrary refLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "ref", "");
         final ReferencedLibrary refLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "missing", "");
 
@@ -214,6 +219,142 @@ public class RobotProjectConfigFileValidatorTest {
 
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED, new ProblemPosition(1729)));
+    }
+
+    @Test
+    public void whenLibraryFileDoesNotExist_missingFileIsReported() throws Exception {
+        projectProvider.createDir(Path.fromPortableString("libs"));
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
+                PROJECT_NAME + "/libs/notExisting.py");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("pyLib"));
+        robotProject.setStandardLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addReferencedLibrary(refLib);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(refLib, new FilePosition(123, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.MISSING_LIBRARY_FILE, new ProblemPosition(123)));
+    }
+
+    @Test
+    public void whenLibraryFileExistAndHasAbsolutePath_absolutePathWarningIsReported() throws Exception {
+        projectProvider.createDir(Path.fromPortableString("libs"));
+        projectProvider.createFile(Path.fromPortableString("libs/pyLib.py"));
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
+                projectProvider.getProject().getLocation() + "/libs/pyLib.py");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("pyLib"));
+        robotProject.setStandardLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addReferencedLibrary(refLib);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(refLib, new FilePosition(123, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.ABSOLUTE_PATH, new ProblemPosition(123)));
+    }
+
+    @Test
+    public void whenLibraryDoesNotExistAndHasAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
+            throws Exception {
+        projectProvider.createDir(Path.fromPortableString("libs"));
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
+                projectProvider.getProject().getLocation() + "/libs/notExisting.xml");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("pyLib"));
+        robotProject.setStandardLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addReferencedLibrary(refLib);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(refLib, new FilePosition(123, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems()).containsOnly(
+                new Problem(ConfigFileProblem.MISSING_LIBRARY_FILE, new ProblemPosition(123)),
+                new Problem(ConfigFileProblem.ABSOLUTE_PATH, new ProblemPosition(123)));
+    }
+
+    @Test
+    public void whenJavaLibraryFileDoesNotHaveJarExtension_notJarFileWarningIsReported() throws Exception {
+        projectProvider.createDir(Path.fromPortableString("libs"));
+        projectProvider.createFile(Path.fromPortableString("libs/JavaLib.zip"));
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
+                PROJECT_NAME + "/libs/JavaLib.zip");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("JavaLib"));
+        robotProject.setStandardLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addReferencedLibrary(refLib);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(refLib, new FilePosition(123, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        final RobotProjectConfigFileValidator validator = createValidator(SuiteExecutor.Jython);
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_FILE, new ProblemPosition(123)));
+    }
+
+    @Test
+    public void whenJavaLibraryFileIsUsedWithoutPythonExecutor_nonJavaEnvironmentWarningIsReported() throws Exception {
+        projectProvider.createDir(Path.fromPortableString("libs"));
+        projectProvider.createFile(Path.fromPortableString("libs/JavaLib.jar"));
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
+                PROJECT_NAME + "/libs/JavaLib.jar");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("JavaLib"));
+        robotProject.setStandardLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addReferencedLibrary(refLib);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(refLib, new FilePosition(123, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.JAVA_LIB_IN_NON_JAVA_ENV, new ProblemPosition(123)));
     }
 
     @Test
@@ -337,6 +478,24 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
+    public void whenPathIsIncorrect_invalidLocationProblemIsReported() throws Exception {
+        final SearchPath searchPath = SearchPath.create("invalid/${PARAM}/path");
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addPythonPath(searchPath);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
+
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.INVALID_SEARCH_PATH, new ProblemPosition(42)));
+    }
+
+    @Test
     public void whenVariableFileExist_nothingIsReported() throws Exception {
         projectProvider.createDir(Path.fromPortableString("a"));
         projectProvider.createFile(Path.fromPortableString("a/vars.py"), "VAR = 100");
@@ -378,7 +537,7 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenVariableFileExistAndIRelatedWithAbsolutePath_absolutePathWarningIsReported() throws Exception {
+    public void whenVariableFileExistAndHasAbsolutePath_absolutePathWarningIsReported() throws Exception {
         projectProvider.createDir(Path.fromPortableString("a"));
         projectProvider.createFile(Path.fromPortableString("a/vars.py"), "VAR = 100");
 
@@ -400,7 +559,7 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenVariableFileDoesNotExistAndIsRelatedWithAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
+    public void whenVariableFileDoesNotExistAndHasAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
             throws Exception {
         projectProvider.createDir(Path.fromPortableString("a"));
         projectProvider.createFile(Path.fromPortableString("a/vars2.py"), "VAR = 100");

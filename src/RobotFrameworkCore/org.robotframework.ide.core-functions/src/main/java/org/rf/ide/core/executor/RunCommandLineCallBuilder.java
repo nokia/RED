@@ -6,7 +6,7 @@
 package org.rf.ide.core.executor;
 
 import static com.google.common.base.Predicates.not;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +21,7 @@ import java.util.Optional;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
 
 /**
  * @author Michal Anglart
@@ -335,15 +336,13 @@ public class RunCommandLineCallBuilder {
         }
 
         private String classPath() {
-            final List<String> fullClasspath = new ArrayList<>();
-            fullClasspath.addAll(RedSystemProperties.getClassPaths());
-            fullClasspath.addAll(classPath);
-            return String.join(RedSystemProperties.getPathsSeparator(),
-                    fullClasspath.stream().filter(not(Strings::isNullOrEmpty)).collect(toList()));
+            return Streams.concat(RedSystemProperties.getClassPaths().stream(), classPath.stream())
+                    .filter(not(Strings::isNullOrEmpty))
+                    .collect(joining(File.pathSeparator));
         }
 
         private String pythonPath() {
-            return String.join(":", pythonPath.stream().filter(not(Strings::isNullOrEmpty)).collect(toList()));
+            return pythonPath.stream().filter(not(Strings::isNullOrEmpty)).collect(joining(":"));
         }
 
         private String extractAdditionalPythonPathLocationForJython() {

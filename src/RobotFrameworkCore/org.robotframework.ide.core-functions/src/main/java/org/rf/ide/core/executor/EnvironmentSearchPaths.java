@@ -65,8 +65,7 @@ public final class EnvironmentSearchPaths {
     public Collection<String> getExtendedPythonPaths(final SuiteExecutor interpreter) {
         final Set<String> extendedPythonPaths = new LinkedHashSet<>(pythonPaths);
         if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
-            // Both Jython and IronPython does not include paths from PYTHONPATH into
-            // sys.path list
+            // Both Jython and IronPython does not include paths from PYTHONPATH into sys.path list
             extendedPythonPaths.addAll(RedSystemProperties.getPythonPaths());
         }
         return ImmutableSet.copyOf(extendedPythonPaths);

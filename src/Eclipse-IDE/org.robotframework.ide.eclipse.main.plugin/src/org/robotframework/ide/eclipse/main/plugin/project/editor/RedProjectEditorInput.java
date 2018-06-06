@@ -21,14 +21,13 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
-import com.google.common.base.Function;
-
 public class RedProjectEditorInput {
 
     private Optional<IFile> file;
-    private final boolean isEditable;
-    private RobotProjectConfigWithLines projectConfiguration;
 
+    private final boolean isEditable;
+
+    private RobotProjectConfigWithLines projectConfiguration;
 
     public RedProjectEditorInput(final Optional<IFile> file, final boolean isEditable,
             final RobotProjectConfigWithLines robotProjectConfig) {
@@ -56,7 +55,7 @@ public class RedProjectEditorInput {
     public boolean isEditable() {
         return isEditable;
     }
-    
+
     public void refreshProjectConfiguration() {
         // FIXME : callee wanted to achieve something...
     }
@@ -75,11 +74,11 @@ public class RedProjectEditorInput {
             final IFile redXmlFile = file.get();
             try {
                 final IMarker[] markers = redXmlFile.findMarkers(RobotProblem.TYPE_ID, true, 1);
-
                 final List<RedXmlProblem> problems = new ArrayList<>();
                 for (final IMarker marker : markers) {
                     if (marker.getAttribute(IMarker.LINE_NUMBER, -1) == xmlLine) {
-                        final Severity severity = Severity.fromMarkerSeverity(marker.getAttribute(IMarker.SEVERITY, -1));
+                        final Severity severity = Severity
+                                .fromMarkerSeverity(marker.getAttribute(IMarker.SEVERITY, -1));
                         problems.add(new RedXmlProblem(severity, marker.getAttribute(IMarker.MESSAGE, "")));
                     }
                 }
@@ -105,26 +104,9 @@ public class RedProjectEditorInput {
             return hasProblemsOfSeverity(problems, Severity.ERROR);
         }
 
-        public static Function<RedXmlProblem, String> toDescriptions() {
-            return new Function<RedProjectEditorInput.RedXmlProblem, String>() {
-                @Override
-                public String apply(final RedXmlProblem problem) {
-                    return problem.description;
-                }
-            };
-        }
-
         private static boolean hasProblemsOfSeverity(final Collection<RedXmlProblem> problems,
                 final Severity severity) {
-            if (problems.isEmpty()) {
-                return false;
-            }
-            for (final RedXmlProblem problem : problems) {
-                if (problem.getSeverity() == severity) {
-                    return true;
-                }
-            }
-            return false;
+            return problems.stream().anyMatch(problem -> problem.getSeverity() == severity);
         }
 
         private final Severity severity;

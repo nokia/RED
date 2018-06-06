@@ -5,8 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
-import static com.google.common.collect.Iterables.transform;
+import static java.util.stream.Collectors.joining;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,14 +18,11 @@ import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
-
-import com.google.common.base.Joiner;
 
 /**
  * @author Michal Anglart
@@ -84,18 +82,14 @@ class PathsLabelProvider extends RedCommonLabelProvider {
             if (problems.isEmpty()) {
                 final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(
                         editorInput.getProjectConfiguration());
-
-                try {
-                    final String tooltipPath = redConfig
-                            .toAbsolutePath(path, editorInput.getRobotProject().getProject()).getPath();
-                    return path.isSystem() ? tooltipPath + " [already defined in " + pathVariableName + " variable]"
-                            : tooltipPath;
-                } catch (final PathResolvingException e) {
-                    return "";
-                }
+                return redConfig.toAbsolutePath(path, editorInput.getRobotProject().getProject())
+                        .map(File::getPath)
+                        .map(tooltipPath -> path.isSystem()
+                                ? tooltipPath + " [already defined in " + pathVariableName + " variable]"
+                                : tooltipPath)
+                        .orElse(null);
             } else {
-                final String descriptions = Joiner.on('\n').join(transform(problems, RedXmlProblem.toDescriptions()));
-                return descriptions;
+                return problems.stream().map(RedXmlProblem::getDescription).collect(joining("\n"));
             }
         }
         return null;
