@@ -314,9 +314,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         cmdLine.add(interpreterPath);
         if (interpreterType == SuiteExecutor.Jython && additionalPaths.hasClassPaths()) {
             cmdLine.add("-J-cp");
-            final String classpath = String.join(RedSystemProperties.getPathsSeparator(),
-                    additionalPaths.getClassPaths());
-            cmdLine.add(classpath);
+            cmdLine.add(String.join(File.pathSeparator, additionalPaths.getClassPaths()));
         }
         if (scriptFile != null) {
             cmdLine.add(scriptFile.getAbsolutePath());
