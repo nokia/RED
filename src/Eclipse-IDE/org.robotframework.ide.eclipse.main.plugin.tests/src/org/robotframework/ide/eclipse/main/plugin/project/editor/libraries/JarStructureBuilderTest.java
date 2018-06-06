@@ -78,7 +78,7 @@ public class JarStructureBuilderTest {
     public void notJarFilesAreNotProcessed() throws Exception {
         final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
 
-        builder.provideEntriesFromFile(projectProvider.createFile("module.other").getFullPath().toFile());
+        builder.provideEntriesFromFile(projectProvider.createFile("module.other").getLocationURI());
 
         verifyZeroInteractions(environment);
 
@@ -110,7 +110,7 @@ public class JarStructureBuilderTest {
 
         final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
 
-        final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(jarFile);
+        final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(jarFile.toURI());
 
         assertThat(classes.stream().map(ILibraryClass::getQualifiedName)).containsExactly("JavaClass", "A.JavaClass",
                 "A.B.JavaClass");
