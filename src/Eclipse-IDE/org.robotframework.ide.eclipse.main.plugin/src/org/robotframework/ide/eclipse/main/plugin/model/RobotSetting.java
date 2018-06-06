@@ -38,7 +38,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 
 import com.google.common.collect.ListMultimap;
@@ -221,12 +220,7 @@ public class RobotSetting extends RobotKeywordCall {
             return Optional.empty();
         } else {
             // maybe it's a by-path import
-            try {
-                return findSpecForPath(libNameOrPath);
-            } catch (final PathResolvingException e) {
-                // ok we won't provide any spec, since we can't resolve uri
-                return Optional.empty();
-            }
+            return findSpecForPath(libNameOrPath);
         }
     }
 
