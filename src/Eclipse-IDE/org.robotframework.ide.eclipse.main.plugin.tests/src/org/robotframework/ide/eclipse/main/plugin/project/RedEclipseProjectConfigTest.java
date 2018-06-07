@@ -7,50 +7,51 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 
 public class RedEclipseProjectConfigTest {
 
-    @Test(expected = PathResolvingException.class)
+    @Test
     public void cannotResolveAbsolutePath_whenBasePathIsNull() {
-        RedEclipseProjectConfig.resolveToAbsolutePath(null, path("path/pointing/somewhere"));
+        assertThat(RedEclipseProjectConfig.resolveToAbsolutePath(null, path("path/pointing/somewhere"))).isNotPresent();
     }
 
-    @Test(expected = PathResolvingException.class)
+    @Test
     public void cannotResolveAbsolutePath_whenRelativeIsParameterized() {
-        absoluteOf("/base", "dir/${PARAM}/file");
+        assertThat(absoluteOf("/base", "dir/${PARAM}/file")).isNotPresent();
     }
 
     @Test
     public void childPathIsReturned_whenItIsAlreadyAbsolutePath() {
-        assertThat(absoluteOf("/base", "/absolute")).isEqualTo(path("/absolute"));
-        assertThat(absoluteOf("/base", "c:/dir")).isEqualTo(path("c:/dir"));
+        assertThat(absoluteOf("/base", "/absolute")).hasValue(path("/absolute"));
+        assertThat(absoluteOf("/base", "c:/dir")).hasValue(path("c:/dir"));
     }
 
     @Test
     public void resolvedPathIsReturned_whenBaseIsGivenWithRelativeChild() {
-        assertThat(absoluteOf("/base", "relative")).isEqualTo(path("/relative"));
-        assertThat(absoluteOf("/base.file", "relative")).isEqualTo(path("/relative"));
+        assertThat(absoluteOf("/base", "relative")).hasValue(path("/relative"));
+        assertThat(absoluteOf("/base.file", "relative")).hasValue(path("/relative"));
 
-        assertThat(absoluteOf("/base/", "relative")).isEqualTo(path("/base/relative"));
-        assertThat(absoluteOf("/base/c.file", "relative")).isEqualTo(path("/base/relative"));
+        assertThat(absoluteOf("/base/", "relative")).hasValue(path("/base/relative"));
+        assertThat(absoluteOf("/base/c.file", "relative")).hasValue(path("/base/relative"));
 
-        assertThat(absoluteOf("/base/", "relative/something")).isEqualTo(path("/base/relative/something"));
-        assertThat(absoluteOf("/base/c.file", "relative/something")).isEqualTo(path("/base/relative/something"));
+        assertThat(absoluteOf("/base/", "relative/something")).hasValue(path("/base/relative/something"));
+        assertThat(absoluteOf("/base/c.file", "relative/something")).hasValue(path("/base/relative/something"));
 
         assertThat(absoluteOf("/base/1/2/3/", ".././../relative/something"))
-                .isEqualTo(path("/base/1/relative/something"));
+                .hasValue(path("/base/1/relative/something"));
         assertThat(absoluteOf("/base/1/2/3/c.file", ".././../relative/something"))
-                .isEqualTo(path("/base/1/relative/something"));
+                .hasValue(path("/base/1/relative/something"));
 
         assertThat(absoluteOf("/base/", "relative path/containing!@#$%^&*();,.\"/differentchars"))
-                .isEqualTo(path("/base/relative path/containing!@#$%^&*();,.\"/differentchars"));
+                .hasValue(path("/base/relative path/containing!@#$%^&*();,.\"/differentchars"));
     }
 
-    private static IPath absoluteOf(final String path1, final String path2) {
+    private static Optional<IPath> absoluteOf(final String path1, final String path2) {
         return RedEclipseProjectConfig.resolveToAbsolutePath(new Path(path1), new Path(path2));
     }
 

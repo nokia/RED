@@ -398,12 +398,7 @@ class PathsFormFragment implements ISectionFormFragment {
 
         @Override
         public PathAdder getPathAddingStrategy() {
-            return new PathAdder() {
-                @Override
-                public boolean addPath(final SearchPath path) {
-                    return editorInput.getProjectConfiguration().addPythonPath(path);
-                }
-            };
+            return path -> editorInput.getProjectConfiguration().addPythonPath(path);
         }
 
         @Override
@@ -436,12 +431,7 @@ class PathsFormFragment implements ISectionFormFragment {
 
         @Override
         public PathAdder getPathAddingStrategy() {
-            return new PathAdder() {
-                @Override
-                public boolean addPath(final SearchPath path) {
-                    return editorInput.getProjectConfiguration().addClassPath(path);
-                }
-            };
+            return path -> editorInput.getProjectConfiguration().addClassPath(path);
         }
 
         @Override
