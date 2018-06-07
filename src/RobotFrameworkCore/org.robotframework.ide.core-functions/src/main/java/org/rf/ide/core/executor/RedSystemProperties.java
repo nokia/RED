@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.executor;
 
+import java.io.File;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 
@@ -51,10 +53,6 @@ public class RedSystemProperties {
         return System.getProperty("os.name").toLowerCase().contains("win");
     }
 
-    public static String getPathsSeparator() {
-        return isWindowsPlatform() ? ";" : ":";
-    }
-
     public static ImmutableList<String> getPythonPaths() {
         return getPaths("PYTHONPATH");
     }
@@ -68,6 +66,6 @@ public class RedSystemProperties {
         if (paths == null || paths.isEmpty()) {
             return ImmutableList.of();
         }
-        return ImmutableList.copyOf(Splitter.on(getPathsSeparator()).splitToList(paths));
+        return ImmutableList.copyOf(Splitter.on(File.pathSeparatorChar).splitToList(paths));
     }
 }

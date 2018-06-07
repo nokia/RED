@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 
-import static com.google.common.collect.Iterables.transform;
+import static java.util.stream.Collectors.joining;
 import static org.eclipse.jface.viewers.Stylers.withForeground;
 
 import java.util.List;
@@ -21,10 +21,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
-import com.google.common.base.Joiner;
-
 class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
-    
+
     private final RedProjectEditorInput editorInput;
 
     public ProjectValidationPathsLabelProvider(final RedProjectEditorInput editorInput) {
@@ -34,7 +32,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
     @Override
     public StyledString getStyledText(final Object element) {
         final ProjectTreeElement projectTreeElement = (ProjectTreeElement) element;
-        
+
         if (projectTreeElement.isExcluded()) {
             final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
                     .getExcludedPath(projectTreeElement.getPath().toPortableString());
@@ -78,7 +76,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
                 .getExcludedPath(projectTreeElement.getPath().toPortableString());
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
 
-        final String descriptions = Joiner.on('\n').join(transform(problems, RedXmlProblem.toDescriptions()));
+        final String descriptions = problems.stream().map(RedXmlProblem::getDescription).collect(joining("\n"));
         return descriptions.isEmpty() ? null : descriptions;
     }
 

@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
-import static com.google.common.collect.Iterables.transform;
+import static java.util.stream.Collectors.joining;
 
 import java.util.List;
 
@@ -24,10 +24,8 @@ import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
-import com.google.common.base.Joiner;
-
 class VariableFilesLabelProvider extends RedCommonLabelProvider {
-    
+
     private final RedProjectEditorInput editorInput;
 
     public VariableFilesLabelProvider(final RedProjectEditorInput editorInput) {
@@ -91,7 +89,7 @@ class VariableFilesLabelProvider extends RedCommonLabelProvider {
             final ReferencedVariableFile varFile = (ReferencedVariableFile) element;
 
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(varFile);
-            final String descriptions = Joiner.on('\n').join(transform(problems, RedXmlProblem.toDescriptions()));
+            final String descriptions = problems.stream().map(RedXmlProblem::getDescription).collect(joining("\n"));
             return descriptions.isEmpty() ? null : descriptions;
         }
         return null;

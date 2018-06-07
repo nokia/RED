@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Streams.concat;
 import static java.util.stream.Collectors.toList;
 
@@ -55,7 +54,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -358,7 +356,7 @@ public class RobotProject extends RobotContainer {
             pp.addAll(getReferenceLibPaths(LibraryType.PYTHON));
             pp.addAll(getAdditionalPaths(configuration.getPythonPath()));
         }
-        return newArrayList(pp);
+        return new ArrayList<>(pp);
     }
 
     public synchronized List<String> getClasspath() {
@@ -369,7 +367,7 @@ public class RobotProject extends RobotContainer {
             cp.addAll(getReferenceLibPaths(LibraryType.JAVA));
             cp.addAll(getAdditionalPaths(configuration.getClassPath()));
         }
-        return newArrayList(cp);
+        return new ArrayList<>(cp);
     }
 
     private synchronized List<String> getReferenceLibPaths(final LibraryType libType) {
@@ -385,15 +383,13 @@ public class RobotProject extends RobotContainer {
 
     private synchronized List<String> getAdditionalPaths(final List<SearchPath> searchPaths) {
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
-        final List<String> paths = new ArrayList<>();
-        for (final SearchPath searchPath : searchPaths) {
-            try {
-                paths.add(redConfig.toAbsolutePath(searchPath, getProject()).getPath());
-            } catch (final PathResolvingException e) {
-                // we don't want to add syntax-problematic paths
-            }
-        }
-        return paths;
+        return configuration.getPythonPath()
+                .stream()
+                .map(path -> redConfig.toAbsolutePath(path, getProject()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(File::getPath)
+                .collect(toList());
     }
 
     public List<String> getVariableFilePaths() {
@@ -473,17 +469,13 @@ public class RobotProject extends RobotContainer {
             if (configuration == null) {
                 return new ArrayList<>();
             }
-            final List<File> paths = new ArrayList<>();
             final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
-            for (final SearchPath searchPath : configuration.getPythonPath()) {
-                try {
-                    final File searchPathParent = redConfig.toAbsolutePath(searchPath, getProject());
-                    paths.add(searchPathParent);
-                } catch (final PathResolvingException e) {
-                    continue;
-                }
-            }
-            return paths;
+            return configuration.getPythonPath()
+                    .stream()
+                    .map(path -> redConfig.toAbsolutePath(path, getProject()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(toList());
         }
     }
 }
