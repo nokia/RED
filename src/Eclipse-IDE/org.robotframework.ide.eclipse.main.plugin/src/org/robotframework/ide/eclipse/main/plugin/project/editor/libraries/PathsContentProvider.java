@@ -8,16 +8,14 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 
-import java.io.File;
 import java.util.List;
 
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.StructuredContentProvider;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 
 /**
  * @author Michal Anglart
@@ -56,13 +54,5 @@ class PathsContentProvider extends StructuredContentProvider {
         }
 
         return elements.toArray();
-    }
-
-    static class SystemVariableAccessor {
-        List<String> getPaths(final String variableName) {
-            return Splitter.on(File.pathSeparatorChar)
-                    .omitEmptyStrings()
-                    .splitToList(Strings.nullToEmpty(System.getenv(variableName)));
-        }
     }
 }
