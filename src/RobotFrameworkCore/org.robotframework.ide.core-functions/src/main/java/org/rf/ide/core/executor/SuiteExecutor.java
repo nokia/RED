@@ -12,6 +12,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import org.rf.ide.core.RedSystemProperties;
+
 public enum SuiteExecutor {
 
     Python("python"),

@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.rf.ide.core.executor.RedSystemProperties;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.rf.ide.core.executor.SuiteExecutor;

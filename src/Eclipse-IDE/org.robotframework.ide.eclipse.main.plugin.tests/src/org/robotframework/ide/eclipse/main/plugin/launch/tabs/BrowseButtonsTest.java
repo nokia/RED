@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.rf.ide.core.executor.RedSystemProperties;
+import org.rf.ide.core.RedSystemProperties;
 
 public class BrowseButtonsTest {
 

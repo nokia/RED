@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.executor.RobotCommandRpcExecutor.RobotCommandExecutorException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 
