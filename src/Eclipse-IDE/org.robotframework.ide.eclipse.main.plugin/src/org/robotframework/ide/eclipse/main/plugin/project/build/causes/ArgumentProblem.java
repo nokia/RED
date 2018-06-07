@@ -15,11 +15,25 @@ import org.eclipse.ui.IMarkerResolution;
  * @author Michal Anglart
  */
 public enum ArgumentProblem implements IProblemCause {
+    INVALID_ARGUMENTS_DESCRIPTOR {
+
+        @Override
+        public String getProblemDescription() {
+            return "Keyword '%s' has invalid arguments descriptor";
+        }
+    },
     INVALID_NUMBER_OF_PARAMETERS {
 
         @Override
         public String getProblemDescription() {
             return "Invalid number of arguments. %s";
+        }
+    },
+    INVALID_NUMBER_OF_NON_KEYWORD_PARAMETERS {
+
+        @Override
+        public String getProblemDescription() {
+            return "Invalid number of non-keyword arguments. %s";
         }
     },
     POSITIONAL_ARGUMENT_AFTER_NAMED {
@@ -36,21 +50,26 @@ public enum ArgumentProblem implements IProblemCause {
             return "Argument '%s' has value already passed (%s)";
         }
     },
+    OVERRIDDEN_NAMED_ARGUMENT {
+        
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.OVERRIDDEN_ARGUMENTS;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Argument '%s' is passed multiple times using named syntax. This value will never be used";
+        }
+    },
     NO_VALUE_PROVIDED_FOR_REQUIRED_ARG {
 
         @Override
         public String getProblemDescription() {
-            return "Keyword '%s' requires '%s' argument to be specified";
+            return "Keyword '%s' requires %s to be specified";
         }
     },
-    MISMATCHING_ARGUMENT {
-
-        @Override
-        public String getProblemDescription() {
-            return "Argument '%s' cannot be matched to positional arguments of '%s' keyword nor to '%s' kwargs argument";
-        }
-    },
-    DICT_ARGUMENT_SHOULD_PROVIDE_ARGS {
+    COLLECTION_ARGUMENT_SHOULD_PROVIDE_ARGS {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -59,19 +78,7 @@ public enum ArgumentProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Dictionary argument '%s' has to provide %s in order to ensure %s arguments of keyword definition";
-        }
-    },
-    LIST_ARGUMENT_SHOULD_PROVIDE_ARGS {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.COLLECTION_ARGUMENT_SIZE;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "List argument '%s' has to provide %s in order to ensure %s arguments of keyword definition";
+            return "%s argument '%s' %s";
         }
     },
     INVALID_TIME_FORMAT {

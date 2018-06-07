@@ -6,19 +6,21 @@
 package org.rf.ide.core.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Range;
 
 /**
@@ -63,6 +65,10 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         return arguments.iterator();
     }
 
+    public Stream<Argument> stream() {
+        return arguments.stream();
+    }
+
     public int size() {
         return arguments.size();
     }
@@ -71,45 +77,51 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         return arguments.get(index);
     }
 
-    public Optional<Argument> getKwargArgument() {
-        for (int i = arguments.size() - 1; i >= 0; i--) {
-            if (arguments.get(i).isKwArg()) {
-                return Optional.of(arguments.get(i));
-            }
-        }
-        return Optional.empty();
+    public boolean isValid() {
+        // there can be at most one vararg and at most one kwarg; the order should be:
+        // required, default, vararg, kwarg
+        final List<Integer> order = arguments.stream().map(arg -> arg.type.order).collect(toList());
+        return Ordering.natural().isOrdered(order) && arguments.stream().filter(Argument::isVarArg).count() <= 1
+                && arguments.stream().filter(Argument::isKwArg).count() <= 1
+                && arguments.stream().map(Argument::getName).distinct().count() == arguments.size();
+    }
+
+    public Range<Integer> getPossibleNumberOfNonKwargsArguments() {
+        final int min = getRequiredArguments().size();
+        return supportsVarargs() ? Range.atLeast(min) : Range.closed(min, min + getDefaultArguments().size());
+    }
+
+    public Range<Integer> getPossibleNumberOfArguments() {
+        final int min = getRequiredArguments().size();
+        return supportsVarargs() || supportsKwargs() ? Range.atLeast(min) : Range.closed(min, arguments.size());
+    }
+
+    public List<Argument> getRequiredArguments() {
+        return arguments.stream().filter(Argument::isRequired).collect(toList());
+    }
+
+    public List<Argument> getDefaultArguments() {
+        return arguments.stream().filter(Argument::isDefault).collect(toList());
+    }
+
+    public boolean supportsVarargs() {
+        return getVarargArgument().isPresent();
+    }
+
+    public Optional<Argument> getVarargArgument() {
+        return arguments.stream().filter(Argument::isVarArg).findFirst();
     }
 
     public boolean supportsKwargs() {
         return getKwargArgument().isPresent();
     }
 
-    public List<Argument> getRequiredArguments() {
-        final List<Argument> required = new ArrayList<>();
-        for (final Argument argument : arguments) {
-            if (argument.isRequired()) {
-                required.add(argument);
-            }
-        }
-        return required;
-    }
-
-
-    public Range<Integer> getPossibleNumberOfArguments() {
-        int min = 0;
-        boolean isUnbounded = false;
-        for (final Argument argument : arguments) {
-            if (argument.isRequired()) {
-                min++;
-            }
-            isUnbounded |= argument.isVarArg() || argument.isKwArg();
-        }
-        return isUnbounded ? Range.atLeast(min) : Range.closed(min, arguments.size());
+    public Optional<Argument> getKwargArgument() {
+        return arguments.stream().filter(Argument::isKwArg).findFirst();
     }
 
     public String getDescription() {
-        final Iterable<String> args = Iterables.transform(arguments, Argument::getDescription);
-        return "[" + Joiner.on(", ").join(args) + "]";
+        return arguments.stream().map(Argument::getDescription).collect(joining(", ", "[", "]"));
     }
 
     @Override
@@ -204,9 +216,15 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
     }
 
     public enum ArgumentType {
-        REQUIRED,
-        DEFAULT,
-        VARARG,
-        KWARG
+        REQUIRED(1),
+        DEFAULT(2),
+        VARARG(3),
+        KWARG(4);
+
+        private int order;
+
+        private ArgumentType(final int order) {
+            this.order = order;
+        }
     }
 }
