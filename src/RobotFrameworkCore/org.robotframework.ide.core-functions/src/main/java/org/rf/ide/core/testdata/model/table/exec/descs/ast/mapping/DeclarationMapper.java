@@ -118,8 +118,10 @@ public class DeclarationMapper {
                     }
                 } else {
                     final IndexDeclaration indexDec = (IndexDeclaration) lastComplex;
-                    if (!seemsToBeCorrectRobotVariableIndex(mappedElements, indexDec)) {
-                        convertIncorrectIndexElementBackToText(mappingResult, topContainer, indexDec);
+                    if (!seemsToBeCorrectRobotVariableIndex(mappedElements, indexDec,
+                            !subContainer.isOpenForModification())) {
+                        convertIncorrectIndexElementBackToText(mappingResult, topContainer, indexDec,
+                                !subContainer.isOpenForModification());
                     }
                 }
             } else {
@@ -149,7 +151,7 @@ public class DeclarationMapper {
     }
 
     private void convertIncorrectIndexElementBackToText(final MappingResult mappingResult,
-            final IElementDeclaration topContainer, final IndexDeclaration indexDec) {
+            final IElementDeclaration topContainer, final IndexDeclaration indexDec, final boolean isClosed) {
         final TextDeclaration textDec = new TextDeclaration(indexDec.getStart(),
                 ContainerElementType.SQUARE_BRACKET_OPEN);
         final JoinedTextDeclarations joinedStart = new JoinedTextDeclarations();
@@ -184,6 +186,19 @@ public class DeclarationMapper {
 
                 dec.setLevelUpElement(topContainer);
             }
+        }
+        if (isClosed) {
+            final TextDeclaration textDecClose = new TextDeclaration(indexDec.getEnd(),
+                    ContainerElementType.SQUARE_BRACKET_CLOSE);
+            final JoinedTextDeclarations joinedEnd = new JoinedTextDeclarations();
+            joinedEnd.addElementDeclarationInside(textDecClose);
+
+            if (topContainer != null) {
+                topContainer.addElementDeclarationInside(joinedEnd);
+            } else {
+                mappingResult.addMappedElement(joinedEnd);
+            }
+            joinedEnd.setLevelUpElement(topContainer);
         }
     }
 
@@ -281,7 +296,10 @@ public class DeclarationMapper {
     }
 
     private boolean seemsToBeCorrectRobotVariableIndex(List<IElementDeclaration> mappedElements,
-            IndexDeclaration indexDec) {
+            IndexDeclaration indexDec, final boolean isClosed) {
+        if (!isClosed) {
+            return false;
+        }
         final int possibleIndexId = mappedElements.indexOf(indexDec);
         return (possibleIndexId - 1 >= 0 && mappedElements.get(possibleIndexId - 1) instanceof VariableDeclaration)
                 || mappedElements.get(possibleIndexId).getLevelUpElement() instanceof VariableDeclaration;
