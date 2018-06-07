@@ -65,7 +65,7 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Missing library file '%s'. Keywords from this libary will not be accessible";
+            return "Missing library file '%s'. Keywords from this library will not be accessible";
         }
     },
     MISSING_VARIABLE_FILE {
@@ -111,24 +111,7 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "The path '%s' for Java library should point to .jar file. Keywords from this libary will not be visible";
-        }
-    },
-    JAVA_LIB_MISSING_CLASS {
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Java library '%s' does not contain class '%s'. Keywords from this libary will not be visible";
+            return "The path '%s' for Java library should point to .jar file. Keywords from this library will not be accessible";
         }
     },
     JAVA_LIB_IN_NON_JAVA_ENV {
