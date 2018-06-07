@@ -86,7 +86,7 @@ public class MockReporter extends ValidationReportingStrategy {
     @Override
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
             final Map<String, Object> additionalAttributes) {
-        problems.add(new Problem(problem.getCause(), filePosition));
+        problems.add(new Problem(problem.getCause(), filePosition, problem.getMessage()));
     }
 
     public static final class Problem {
@@ -95,9 +95,24 @@ public class MockReporter extends ValidationReportingStrategy {
 
         private final ProblemPosition position;
 
+        private final String message;
+
+        public Problem(final IProblemCause cause, final int line) {
+            this(cause, new ProblemPosition(line));
+        }
+
+        public Problem(final IProblemCause cause, final int line, final int offsetStart, final int offsetEnd) {
+            this(cause, new ProblemPosition(line, Range.closed(offsetStart, offsetEnd)));
+        }
+
         public Problem(final IProblemCause cause, final ProblemPosition filePosition) {
+            this(cause, filePosition, null);
+        }
+
+        public Problem(final IProblemCause cause, final ProblemPosition filePosition, final String message) {
             this.cause = cause;
             this.position = filePosition;
+            this.message = message;
         }
 
         public IProblemCause getCause() {
@@ -106,6 +121,22 @@ public class MockReporter extends ValidationReportingStrategy {
 
         public ProblemPosition getPosition() {
             return position;
+        }
+
+        public int getLine() {
+            return position.getLine();
+        }
+
+        public int getStart() {
+            return position.getRange().get().lowerEndpoint();
+        }
+
+        public int getEnd() {
+            return position.getRange().get().upperEndpoint();
+        }
+
+        public String getMessage() {
+            return message;
         }
 
         @Override
