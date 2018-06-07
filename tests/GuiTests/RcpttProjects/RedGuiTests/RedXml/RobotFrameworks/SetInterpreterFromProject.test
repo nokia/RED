@@ -1,0 +1,114 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: SetInterpreterFromProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _dAXLkGmkEeiVpru4htsSeg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/7/18 6:12 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//create virtual env in project
+exec-process -command [concat $RCPTT_project_path "/RedXml/RobotFrameworks/" [os-specific "set_virtualenv.bat" "set_virtualenv.sh"]] 
+	-args  [concat $RED_workspace_path "/RobotProject/ve"]
+
+//add interpreetr from project  
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+set-dialog-result Folder "platform:/resource/RobotProject/ve/ve/Scripts"
+with [get-window Preferences] {
+    get-button "Add..." | click
+    get-button "Apply and Close" | click
+    get-window "Rebuild required" | get-button OK | click
+}
+//open red.xml and select new interpreter
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-section "Robot framework" | get-button "Use local settings for this project" 
+    | check
+    
+get-editor "RobotProject/red.xml" | get-section "Robot framework" | get-table | get-property itemCount -raw | let [val rows_nr -input ]{       
+	get-editor "RobotProject/red.xml" | get-section "Robot framework" | get-table | get-item "Robot .*" -index  [minus $rows_nr 1]| check
+  
+	get-button "Save (M1+S)" | click
+	
+	//check if relative path is shown in label
+	get-editor "RobotProject/red.xml" | get-section "Robot framework" | get-canvas | get-property text 
+	    | equals " RobotProject/ve/ve/Scripts Robot Framework .* \(Python .* on .*\)\r\n" | verify-true
+	
+	//check text verion of red.xml
+	get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" | get-menu 
+	    -path "Open With/Text Editor" | click
+	get-editor "red.xml" | get-text-viewer | get-property text 
+	    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+	    + "<projectConfiguration>\n"
+	    + "    <configVersion>1.0</configVersion>\n"
+	    + "    <robotExecEnvironment path=\"RobotProject/ve/ve/Scripts\" interpreter=\"Python\"/>\n"
+	    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+	    + "    <pythonpath/>\n"
+	    + "    <classpath/>\n"
+	    + "    <excludedForValidation/>\n"
+	    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+	    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+	    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+	    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+	    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+	    + "</projectConfiguration>" | verify-true    
+	
+	//add folder with no interpreter
+	get-preferences-menu | click
+	set-dialog-result Folder "platform:/resource/RobotProject/TestSuiteFolder"
+	with [get-window Preferences] {
+	    get-button "Add..." | click
+	    get-button "Apply and Close" | click
+	    get-window "Rebuild required" | get-button OK | click
+	}
+	
+	//close red.xml and open again
+	get-view "Project Explorer" | click
+	get-editor "RobotProject/red.xml" | close
+	with [get-view "Project Explorer" | get-tree] {
+	    select "RobotProject/red.xml" | select "RobotProject/red.xml" | get-menu -path "Open With/RED Project Editor" 
+	        | click
+	}
+	
+	//check if new "unknown" intrpreter was added
+	with [get-editor "RobotProject/red.xml" | get-section "Robot framework" | get-table] {
+	    get-item -path "<unknown>" | get-property "values['Name']" | equals "<unknown>" | verify-true
+	    get-item -path "<unknown>" | get-property "values['Path']" 
+	        | equals [concat $RED_workspace_path $sys_sep  "RobotProject" $sys_sep "TestSuiteFolder"] | verify-true
+	}
+	//select unknown interpreter
+	get-editor "RobotProject/red.xml" | get-section "Robot framework" | get-table | get-item -path "<unknown>" | check
+	get-button "Save (M1+S)" | click
+	
+	//check label
+	get-editor "RobotProject/red.xml" | get-section "Robot framework" | get-canvas | get-property text 
+	    | equals " RobotProject/TestSuiteFolder <unknown>\r\n" | verify-true
+	
+	//check PE    
+	get-view "Project Explorer" | get-tree | get-item -path "RobotProject/Robot Standard libraries \\[???\\]" 
+	    | get-property caption | equals "Robot Standard libraries [???]" | verify-true
+	    
+	       
+	//reset environment to remove python interpreter    
+	get-editor "RobotProject/red.xml" | get-section "Robot framework" | get-table
+	    | get-item "Robot .*" -index  [minus $rows_nr 1] | check    
+
+
+	get-button "Save All (M1+M2+S)" | click
+	with [get-view "Project Explorer" | get-tree] {
+	    select RobotProject | get-menu -path "Robot Framework/Reset Robot Environment" | click
+	    select RobotProject | get-menu -path Delete | click
+	}
+	with [get-window "Delete Resources"] {
+	    get-button "Delete project contents on disk (cannot be undone)" | check
+	    get-button OK | click
+	}  
+}	
+	
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
