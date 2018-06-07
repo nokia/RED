@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.rf.ide.core.executor.RedURI;
+import org.rf.ide.core.RedURI;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ResolvedImportPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;

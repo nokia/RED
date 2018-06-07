@@ -10,7 +10,7 @@ import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import org.junit.Test;
-import org.rf.ide.core.executor.RedSystemProperties;
+import org.rf.ide.core.RedSystemProperties;
 
 public class ImportPathTest {
 

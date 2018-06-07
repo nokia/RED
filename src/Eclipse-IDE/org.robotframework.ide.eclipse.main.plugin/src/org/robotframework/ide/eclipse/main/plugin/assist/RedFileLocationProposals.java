@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IFile;
-import org.rf.ide.core.executor.RedSystemProperties;
+import org.rf.ide.core.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 

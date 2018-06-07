@@ -22,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 
 public class RobotRuntimeEnvironmentTest {

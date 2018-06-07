@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.rf.ide.core.SystemVariableAccessor;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 
@@ -66,7 +68,7 @@ public final class EnvironmentSearchPaths {
         final Set<String> extendedPythonPaths = new LinkedHashSet<>(pythonPaths);
         if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
             // Both Jython and IronPython does not include paths from PYTHONPATH into sys.path list
-            extendedPythonPaths.addAll(RedSystemProperties.getPythonPaths());
+            extendedPythonPaths.addAll(new SystemVariableAccessor().getPaths("PYTHONPATH"));
         }
         return ImmutableSet.copyOf(extendedPythonPaths);
     }

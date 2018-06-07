@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.rf.ide.core.executor.RedURI;
+import org.rf.ide.core.RedURI;
 
 class Events {
 
