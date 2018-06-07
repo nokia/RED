@@ -99,7 +99,8 @@ public class RobotProblem {
     }
 
     public String getMessage() {
-        return String.format(cause.getProblemDescription(), objects == null ? new Object[0] : objects);
+        return cause.getProblemDescription() == null ? ""
+                : String.format(cause.getProblemDescription(), objects == null ? new Object[0] : objects);
     }
 
     public Severity getSeverity() {
