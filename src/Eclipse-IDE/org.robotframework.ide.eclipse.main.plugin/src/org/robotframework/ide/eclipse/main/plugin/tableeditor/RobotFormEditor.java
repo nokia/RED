@@ -45,7 +45,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.rf.ide.core.executor.RedSystemProperties;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;

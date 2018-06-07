@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import org.rf.ide.core.executor.RedURI;
+import org.rf.ide.core.RedURI;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 
 public final class ResolvedImportPath {

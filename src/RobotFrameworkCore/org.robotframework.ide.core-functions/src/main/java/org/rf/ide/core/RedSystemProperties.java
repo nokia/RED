@@ -3,12 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
-
-import java.io.File;
-
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
+package org.rf.ide.core;
 
 /**
  * @author Michal Anglart
@@ -51,21 +46,5 @@ public class RedSystemProperties {
 
     public static boolean isWindowsPlatform() {
         return System.getProperty("os.name").toLowerCase().contains("win");
-    }
-
-    public static ImmutableList<String> getPythonPaths() {
-        return getPaths("PYTHONPATH");
-    }
-
-    public static ImmutableList<String> getClassPaths() {
-        return getPaths("CLASSPATH");
-    }
-
-    private static ImmutableList<String> getPaths(final String name) {
-        final String paths = System.getenv(name);
-        if (paths == null || paths.isEmpty()) {
-            return ImmutableList.of();
-        }
-        return ImmutableList.copyOf(Splitter.on(File.pathSeparatorChar).splitToList(paths));
     }
 }

@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import org.assertj.core.api.Condition;
 import org.junit.Test;
-import org.rf.ide.core.executor.RedSystemProperties;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 
 import com.google.common.collect.ImmutableMap;

@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-import org.rf.ide.core.executor.RedSystemProperties;
+import org.rf.ide.core.RedSystemProperties;
 
 public class UnixProcessTreeHandler extends AProcessTreeHandler {
 

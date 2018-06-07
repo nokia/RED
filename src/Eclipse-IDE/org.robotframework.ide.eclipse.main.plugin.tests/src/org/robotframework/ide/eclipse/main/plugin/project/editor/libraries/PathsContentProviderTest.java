@@ -7,20 +7,24 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PathsContentProvider.SystemVariableAccessor;
 import org.robotframework.red.viewers.ElementAddingToken;
 
 public class PathsContentProviderTest {
 
     @Test
     public void whenAskedForElementsAndContentIsEditable_systemPathsWithInputFollowedByAddingTokenAreReturned() {
-        final PathsContentProvider provider = new PathsContentProvider("var1", true, new MockVariablesAccessor());
+        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
+        when(variableAccessor.getPaths("var1")).thenReturn(newArrayList("p1", "q1", "r1"));
+        final PathsContentProvider provider = new PathsContentProvider("var1", true, variableAccessor);
 
         final List<SearchPath> inputPaths = newArrayList(SearchPath.create("custom1"), SearchPath.create("custom2"));
         final Object[] elements = provider.getElements(inputPaths);
@@ -33,7 +37,9 @@ public class PathsContentProviderTest {
 
     @Test
     public void whenContentProviderIsAskedForElementsAndContentIsNotEditable_systemPathsWithInputWithoutAddingToken() {
-        final PathsContentProvider provider = new PathsContentProvider("var2", false, new MockVariablesAccessor());
+        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
+        when(variableAccessor.getPaths("var2")).thenReturn(newArrayList("p2", "q2"));
+        final PathsContentProvider provider = new PathsContentProvider("var2", false, variableAccessor);
 
         final List<SearchPath> inputPaths = newArrayList(SearchPath.create("custom1"), SearchPath.create("custom2"));
         final Object[] elements = provider.getElements(inputPaths);
@@ -41,18 +47,5 @@ public class PathsContentProviderTest {
 
         assertThat(elements).containsExactly(SearchPath.create("p2"), SearchPath.create("q2"),
                 SearchPath.create("custom1"), SearchPath.create("custom2"));
-    }
-
-    private static class MockVariablesAccessor extends SystemVariableAccessor {
-
-        @Override
-        List<String> getPaths(final String variableName) {
-            if (variableName.equals("var1")) {
-                return newArrayList("p1", "q1", "r1");
-            } else if (variableName.equals("var2")) {
-                return newArrayList("p2", "q2");
-            }
-            throw new IllegalStateException();
-        }
     }
 }

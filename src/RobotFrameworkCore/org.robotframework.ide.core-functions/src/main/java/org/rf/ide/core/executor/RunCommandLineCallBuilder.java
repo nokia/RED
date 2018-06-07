@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 
 import com.google.common.base.Strings;
@@ -336,7 +337,7 @@ public class RunCommandLineCallBuilder {
         }
 
         private String classPath() {
-            return Streams.concat(RedSystemProperties.getClassPaths().stream(), classPath.stream())
+            return Streams.concat(new SystemVariableAccessor().getPaths("CLASSPATH").stream(), classPath.stream())
                     .filter(not(Strings::isNullOrEmpty))
                     .collect(joining(File.pathSeparator));
         }

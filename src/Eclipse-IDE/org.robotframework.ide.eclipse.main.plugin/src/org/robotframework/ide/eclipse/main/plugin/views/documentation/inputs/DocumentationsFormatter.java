@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.swt.graphics.RGB;
-import org.rf.ide.core.executor.RedURI;
+import org.rf.ide.core.RedURI;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -167,7 +167,7 @@ public class DocumentationsFormatter {
 
             String name = matcher.group(0);
             name = name.substring(1, name.length() - 1); // cut off enclosing ` characters
-            
+
             docBuilder.append(transformation.apply(name));
             previousEnd = matcher.end();
         }
