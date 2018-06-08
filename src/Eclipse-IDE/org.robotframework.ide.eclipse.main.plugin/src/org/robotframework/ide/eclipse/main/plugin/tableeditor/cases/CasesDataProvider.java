@@ -70,7 +70,8 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
                 if (element instanceof RobotKeywordCall) {
                     final RobotKeywordCall keyword = (RobotKeywordCall) element;
                     if (keyword.getLinkedElement().getModelType() != ModelType.TEST_CASE_DOCUMENTATION) {
-                        max = Math.max(max, ExecutablesRowHolderCommentService.execRowView(keyword).size());
+                        // add 1 for empty cell
+                        max = Math.max(max, ExecutablesRowHolderCommentService.execRowView(keyword).size() + 1);
                     }
                 }
             }
@@ -80,7 +81,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
 
     private void createLists(final RobotCasesSection section) {
         if (cases == null) {
-            casesSortedList = new SortedList<>(GlazedLists.<Object> eventListOf(), null);
+            casesSortedList = new SortedList<>(GlazedLists.<Object>eventListOf(), null);
             filterList = new FilterList<>(casesSortedList);
             cases = new TreeList<>(filterList, casesTreeFormat, TreeList.nodesStartExpanded());
         }
