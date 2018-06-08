@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IFile;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
@@ -32,8 +32,8 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class LibraryImportSettingInputTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibraryImportSettingInputTest.class);
+    @Rule
+    public ProjectProvider projectProvider = new ProjectProvider(LibraryImportSettingInputTest.class);
 
     private static RobotModel model = new RobotModel();
 
@@ -118,8 +118,7 @@ public class LibraryImportSettingInputTest {
         assertThat(raw).contains("library documentation");
     }
 
-    private static RobotSetting createLibraryImportSetting(final String libraryNameOrPath)
-            throws Exception {
+    private RobotSetting createLibraryImportSetting(final String libraryNameOrPath) throws Exception {
         final IFile file = projectProvider.createFile("suite.robot",
                 "*** Settings ***",
                 "Library  " + libraryNameOrPath);
