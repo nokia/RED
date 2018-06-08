@@ -236,6 +236,64 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     @Test
+    public void commandLineContainsClassPathsDefinedInRedXml_1() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldLaunchUsingArgumentsFile()).thenReturn(true);
+
+        final SearchPath searchPath1 = SearchPath.create("JavaLib1.jar");
+        final SearchPath searchPath2 = SearchPath.create("JavaLib2.jar");
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addClassPath(searchPath1);
+        config.addClassPath(searchPath2);
+        config.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
+        projectProvider.configure(config);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidJythonRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getCommandLine()).containsSequence("-J-cp",
+                "." + File.pathSeparator + projectAbsPath + File.separator + "JavaLib1.jar" + File.pathSeparator
+                        + projectAbsPath + File.separator + "JavaLib2.jar");
+    }
+
+    @Test
+    public void commandLineContainsClassPathsDefinedInRedXml_2() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldLaunchUsingArgumentsFile()).thenReturn(true);
+
+        final SearchPath searchPath1 = SearchPath.create(PROJECT_NAME + "/JavaLib1.jar");
+        final SearchPath searchPath2 = SearchPath.create(PROJECT_NAME + "/JavaLib2.jar");
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addClassPath(searchPath1);
+        config.addClassPath(searchPath2);
+        config.setRelativityPoint(RelativityPoint.create(RelativeTo.WORKSPACE));
+        projectProvider.configure(config);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidJythonRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getCommandLine()).containsSequence("-J-cp",
+                "." + File.pathSeparator + projectAbsPath + File.separator + "JavaLib1.jar" + File.pathSeparator
+                        + projectAbsPath + File.separator + "JavaLib2.jar");
+    }
+
+    @Test
     public void commandLineContainsTags() throws Exception {
         final RedPreferences preferences = mock(RedPreferences.class);
         when(preferences.shouldLaunchUsingArgumentsFile()).thenReturn(true);

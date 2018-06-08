@@ -383,8 +383,7 @@ public class RobotProject extends RobotContainer {
 
     private synchronized List<String> getAdditionalPaths(final List<SearchPath> searchPaths) {
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
-        return configuration.getPythonPath()
-                .stream()
+        return searchPaths.stream()
                 .map(path -> redConfig.toAbsolutePath(path, getProject()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
