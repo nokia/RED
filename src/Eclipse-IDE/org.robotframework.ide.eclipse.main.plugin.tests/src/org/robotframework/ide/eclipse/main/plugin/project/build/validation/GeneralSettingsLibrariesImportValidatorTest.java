@@ -140,7 +140,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=http://127.0.0.1:9000/  timeout=60  timeout=30");
 
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, new ProblemPosition(2, Range.closed(26, 32))));
+                ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT, new ProblemPosition(2, Range.closed(62, 72))));
     }
 
     @Test
