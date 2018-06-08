@@ -569,9 +569,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private void whenKeywordCallDetailIsChanged(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotKeywordCall keywordCall) {
         if (keywordCall.getParent() instanceof RobotCase && keywordCall.getSuiteFile() == fileModel) {
-            table.update();
-            table.refresh();
-            setDirty();
+            tableInputIsReplaced().run();
         }
     }
 

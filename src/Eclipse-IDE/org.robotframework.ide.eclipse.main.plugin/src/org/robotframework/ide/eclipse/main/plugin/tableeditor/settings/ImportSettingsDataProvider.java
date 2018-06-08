@@ -32,10 +32,10 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
 
     private final ImportSettingsColumnsPropertyAccessor propertyAccessor;
 
-
     public ImportSettingsDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotSettingsSection section) {
-        this.propertyAccessor = new ImportSettingsColumnsPropertyAccessor(commandsStack, countImportSettingsTableColumnsNumber());
+        this.propertyAccessor = new ImportSettingsColumnsPropertyAccessor(commandsStack,
+                countImportSettingsTableColumnsNumber());
         setInput(section);
     }
 
@@ -46,7 +46,7 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
     }
 
     private int countImportSettingsTableColumnsNumber() {
-        return calculateLongestArgumentsLength() + 2; // setting name + args + comment
+        return calculateLongestArgumentsLength() + 3; // setting name + args + empty cell + comment
     }
 
     private int calculateLongestArgumentsLength() {
@@ -64,7 +64,7 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
 
     private void createLists(final RobotSettingsSection section) {
         if (imports == null) {
-            imports = new SortedList<>(GlazedLists.<RobotKeywordCall> eventListOf(), null);
+            imports = new SortedList<>(GlazedLists.<RobotKeywordCall>eventListOf(), null);
             filteredImports = new FilterList<>(imports);
         }
         if (section != null) {

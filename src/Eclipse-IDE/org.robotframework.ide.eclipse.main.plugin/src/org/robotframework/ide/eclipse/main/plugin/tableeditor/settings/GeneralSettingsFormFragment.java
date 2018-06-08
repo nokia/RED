@@ -867,11 +867,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         if (setting.getSuiteFile() == fileModel && setting.getGroup() == SettingsGroup.NO_GROUP) {
-            if (table.isPresent()) {
-                table.get().update();
-            }
-            refreshTable();
-            setDirty();
+            refreshEverything();
         }
     }
 
