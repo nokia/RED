@@ -49,4 +49,15 @@ public class RuntimeEnvironmentsMocks {
         return mock;
     }
 
+    public static RobotRuntimeEnvironment createValidJythonRobotEnvironment(final String version) {
+        final RobotRuntimeEnvironment mock = mock(RobotRuntimeEnvironment.class);
+        when(mock.isValidPythonInstallation()).thenReturn(true);
+        when(mock.hasRobotInstalled()).thenReturn(true);
+        when(mock.getVersion()).thenReturn(version);
+        when(mock.getInterpreter()).thenReturn(SuiteExecutor.Jython);
+        when(mock.getFile()).thenReturn(new File("some/path/to/jython"));
+        when(mock.getPythonExecutablePath()).thenReturn("some/path/to/jython");
+        return mock;
+    }
+
 }
