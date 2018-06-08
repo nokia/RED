@@ -126,6 +126,10 @@ public enum ProblemCategory {
             ProblemCategoryType.UNNECESSARY_CODE,
             "Missing configuration path",
             "Occurs when missing path is defined in configuration. Such path is skipped."),
+    OVERRIDDEN_ARGUMENTS(
+            ProblemCategoryType.UNNECESSARY_CODE,
+            "Overridden named argument",
+            "Occurs when named argument is passed to keyword multiple times."),
     KEYWORD_FROM_NESTED_LIBRARY(
             ProblemCategoryType.CODE_STYLE,
             "Keyword from nested library",
