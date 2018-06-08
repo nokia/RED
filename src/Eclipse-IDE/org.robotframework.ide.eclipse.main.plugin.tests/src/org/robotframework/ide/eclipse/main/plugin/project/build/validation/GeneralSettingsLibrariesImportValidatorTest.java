@@ -474,6 +474,50 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithNamedInvalidTimeoutAndUri() {
+        validateLibraryImport("Remote  uri=http://127.0.0.1:9000/  timeout=wrong");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                        new ProblemPosition(2, Range.closed(34, 60))),
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
+                        new ProblemPosition(2, Range.closed(62, 75))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithInvertedNamedInvalidTimeoutAndUri() {
+        validateLibraryImport("Remote  timeout=wrong  uri=http://127.0.0.1:9000/");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                        new ProblemPosition(2, Range.closed(49, 75))),
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
+                        new ProblemPosition(2, Range.closed(34, 47))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidNamedTimeoutWithoutUri() {
+        validateLibraryImport("Remote  timeout=wrong");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                        new ProblemPosition(2, Range.closed(26, 32))),
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
+                        new ProblemPosition(2, Range.closed(34, 47))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidPositionalTimeoutAndUri() {
+        validateLibraryImport("Remote  http://127.0.0.1:9000/  wrong");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                        new ProblemPosition(2, Range.closed(34, 56))),
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
+                        new ProblemPosition(2, Range.closed(58, 63))));
+    }
+
+    @Test
     public void markerIsReported_whenImportingUnknownLibraryByName() {
         validateLibraryImport("ExampleLibrary");
 
@@ -807,6 +851,34 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_1() {
+        final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
+
+        validateLibraryImport("Remote  timeout=2 days 3 hours 20 minutes 2 seconds 10 miliseconds", libs,
+                new HashMap<>());
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_2() {
+        final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
+
+        validateLibraryImport("Remote  timeout=2d3h20m2s10ms", libs, new HashMap<>());
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_3() {
+        final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
+
+        validateLibraryImport("Remote  timeout=2:3:20:2:10", libs, new HashMap<>());
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
