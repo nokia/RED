@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
@@ -138,20 +139,30 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     private void reportProblemOnRemoteLibraryArguments(final String name, final RobotToken nameToken,
             final List<RobotToken> arguments) {
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Optional<String> timeout = resolver.getTimeout();
         final Optional<String> address = resolver.getUri();
-        final RobotToken markerToken = resolver.getUriToken().isPresent() ? resolver.getUriToken().get() : nameToken;
+        final RobotToken uriOrNameToken = resolver.getUriToken().orElse(nameToken);
         if (address.isPresent()) {
             try {
-                reportProblemOnRemoteLocation(markerToken, address.get());
+                reportProblemOnRemoteLocation(uriOrNameToken, address.get());
             } catch (final IllegalArgumentException e) {
                 final RobotProblem problem = RobotProblem
                         .causedBy(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT)
                         .formatMessageWith(e.getCause().getMessage());
-                reporter.handleProblem(problem, validationContext.getFile(), markerToken);
+                reporter.handleProblem(problem, validationContext.getFile(), uriOrNameToken);
             }
         } else {
             new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
                     resolver.getDescriptor(), arguments).validate(new NullProgressMonitor());
+        }
+        if (timeout.isPresent()) {
+            final RobotToken timeoutToken = resolver.getTimeoutToken().get();
+            if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.get())) {
+                final RobotProblem problem = RobotProblem
+                        .causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
+                        .formatMessageWith(timeout.get());
+                reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
+            }
         }
     }
 
