@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IFile;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
@@ -31,8 +31,8 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class KeywordProposalInputTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordProposalInputTest.class);
+    @Rule
+    public ProjectProvider projectProvider = new ProjectProvider(KeywordProposalInputTest.class);
 
     private static RobotModel model = new RobotModel();
 
@@ -154,7 +154,7 @@ public class KeywordProposalInputTest {
         assertThat(raw).contains("Arguments: [x, y]");
     }
 
-    private static RobotKeywordCall createCall(final String calledKeywordName) throws Exception {
+    private RobotKeywordCall createCall(final String calledKeywordName) throws Exception {
         projectProvider.createFile("res.robot",
                 "*** Keywords ***",
                 "Res Kw 1",
