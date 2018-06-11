@@ -137,8 +137,8 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 .stream()
                 .map(ExcludedFolderPath::getPath)
                 .collect(toList());
-        final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(projectConfig)
-                .createExecutionEnvironmentSearchPaths(robotProject.getProject());
+        final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getProject(),
+                projectConfig).createExecutionEnvironmentSearchPaths();
 
         robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSource, projectLocation,
                 recursiveInVirtualenv, excludedPaths, additionalPaths);
@@ -233,8 +233,8 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
         private Optional<File> findPythonLibraryModulePath(final RobotDryRunLibraryImport libraryImport) {
             try {
-                final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(config)
-                        .createAdditionalEnvironmentSearchPaths(robotProject.getProject());
+                final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getProject(),
+                        config).createAdditionalEnvironmentSearchPaths();
                 return robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(), additionalPaths);
             } catch (final RobotEnvironmentException e) {
                 return Optional.empty();

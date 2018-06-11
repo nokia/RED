@@ -12,12 +12,15 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.RedURI;
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -31,28 +34,55 @@ import com.google.common.escape.Escaper;
 
 public class RedEclipseProjectConfig {
 
+    private static final Pattern SYS_VAR_PATTERN = Pattern.compile("\\%\\{[^\\%\\{\\}]+\\}");
+
+    private final IProject project;
+
     private final RobotProjectConfig config;
 
-    public RedEclipseProjectConfig(final RobotProjectConfig config) {
-        this.config = config;
+    private final SystemVariableAccessor variableAccessor;
+
+    public RedEclipseProjectConfig(final IProject project, final RobotProjectConfig config) {
+        this(project, config, new SystemVariableAccessor());
     }
 
-    public Optional<File> toAbsolutePath(final SearchPath path, final IProject containingProject) {
-        final IPath asPath = new Path(path.getLocation());
+    @VisibleForTesting
+    RedEclipseProjectConfig(final IProject project, final RobotProjectConfig config,
+            final SystemVariableAccessor variableAccessor) {
+        this.project = project;
+        this.config = config;
+        this.variableAccessor = variableAccessor;
+    }
+
+    public Optional<File> toAbsolutePath(final SearchPath path) {
+        final IPath asPath = new Path(replaceKnownSystemVariables(path.getLocation()));
         if (asPath.isAbsolute()) {
             return Optional.of(asPath.toFile());
         }
-        final Optional<File> wsAbsolute = resolveToAbsolutePath(
-                getRelativityLocation(config.getRelativityPoint(), containingProject), asPath).map(IPath::toFile);
+        final Optional<File> wsAbsolute = resolveToAbsolutePath(getRelativityLocation(config.getRelativityPoint()),
+                asPath).map(IPath::toFile);
         return wsAbsolute.map(file -> {
             final IPath wsRelative = Paths.toWorkspaceRelativeIfPossible(new Path(file.getAbsolutePath()));
-            final IResource member = containingProject.getWorkspace().getRoot().findMember(wsRelative);
+            final IResource member = project.getWorkspace().getRoot().findMember(wsRelative);
             if (member == null) {
                 return file;
             } else {
                 return member.getLocation().toFile();
             }
         });
+    }
+
+    private String replaceKnownSystemVariables(final String path) {
+        final Matcher matcher = SYS_VAR_PATTERN.matcher(path);
+        final StringBuffer result = new StringBuffer();
+        while (matcher.find()) {
+            final String matched = matcher.group();
+            final String matchedName = matched.substring(2, matched.length() - 1);
+            final String replacement = variableAccessor.getValue(matchedName).orElse(matched);
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(result);
+        return result.toString();
     }
 
     @VisibleForTesting
@@ -73,33 +103,32 @@ public class RedEclipseProjectConfig {
         }
     }
 
-    private static IPath getRelativityLocation(final RelativityPoint relativityPoint,
-            final IProject containingProject) {
+    private IPath getRelativityLocation(final RelativityPoint relativityPoint) {
         final IPath result = relativityPoint.getRelativeTo() == RelativeTo.WORKSPACE
-                ? containingProject.getWorkspace().getRoot().getLocation()
-                : containingProject.getLocation();
+                ? project.getWorkspace().getRoot().getLocation()
+                : project.getLocation();
         return result.addTrailingSeparator();
     }
 
-    public EnvironmentSearchPaths createAdditionalEnvironmentSearchPaths(final IProject project) {
-        return new EnvironmentSearchPaths(getResolvedPaths(project, config.getClassPath()),
-                getResolvedPaths(project, config.getPythonPath()));
+    public EnvironmentSearchPaths createAdditionalEnvironmentSearchPaths() {
+        return new EnvironmentSearchPaths(getResolvedPaths(config.getClassPath()),
+                getResolvedPaths(config.getPythonPath()));
     }
 
-    public EnvironmentSearchPaths createExecutionEnvironmentSearchPaths(final IProject project) {
+    public EnvironmentSearchPaths createExecutionEnvironmentSearchPaths() {
         final List<String> classPaths = new ArrayList<>();
         classPaths.add(".");
         classPaths.addAll(getReferenceLibPaths(LibraryType.JAVA));
-        classPaths.addAll(getResolvedPaths(project, config.getClassPath()));
+        classPaths.addAll(getResolvedPaths(config.getClassPath()));
         final List<String> pythonPaths = new ArrayList<>();
         pythonPaths.addAll(getReferenceLibPaths(LibraryType.PYTHON));
-        pythonPaths.addAll(getResolvedPaths(project, config.getPythonPath()));
+        pythonPaths.addAll(getResolvedPaths(config.getPythonPath()));
         return new EnvironmentSearchPaths(classPaths, pythonPaths);
     }
 
-    private List<String> getResolvedPaths(final IProject containingProject, final List<SearchPath> paths) {
+    private List<String> getResolvedPaths(final List<SearchPath> paths) {
         return paths.stream()
-                .map(path -> toAbsolutePath(path, containingProject))
+                .map(this::toAbsolutePath)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(File::getPath)
