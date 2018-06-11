@@ -37,12 +37,14 @@ import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.execution.server.AgentServerVersionsChecker;
 import org.rf.ide.core.execution.server.AgentServerVersionsDebugChecker;
 import org.rf.ide.core.execution.server.TestsPidReader;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotBreakpoints;
@@ -62,6 +64,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionServi
 import org.robotframework.ide.eclipse.main.plugin.launch.TestsExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
@@ -210,12 +213,18 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             builder.addUserArgumentsForExecutableFile(parseArguments(robotConfig.getExecutableFileArguments()));
             builder.useSingleRobotCommandLineArg(preferences.shouldUseSingleCommandLineArgument());
         }
-        builder.addLocationsToClassPath(robotProject.getClasspath());
-        builder.addLocationsToPythonPath(robotProject.getPythonpath());
         builder.addUserArgumentsForInterpreter(parseArguments(robotConfig.getInterpreterArguments()));
         builder.addUserArgumentsForRobot(parseArguments(robotConfig.getRobotArguments()));
 
-        builder.addVariableFiles(robotProject.getVariableFilePaths());
+        final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
+        if (projectConfig != null) {
+            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(projectConfig);
+            final EnvironmentSearchPaths searchPaths = redConfig
+                    .createExecutionEnvironmentSearchPaths(robotConfig.getProject());
+            builder.addLocationsToClassPath(searchPaths.getClassPaths());
+            builder.addLocationsToPythonPath(searchPaths.getPythonPaths());
+            builder.addVariableFiles(redConfig.getVariableFilePaths());
+        }
 
         if (shouldUseSingleTestPathInCommandLine(robotConfig, preferences)) {
             builder.withProject(robotConfig.getSuiteResources().get(0).getLocation().toFile());

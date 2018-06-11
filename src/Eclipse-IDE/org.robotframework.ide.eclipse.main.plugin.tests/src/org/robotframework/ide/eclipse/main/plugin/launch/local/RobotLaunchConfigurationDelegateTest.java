@@ -33,6 +33,9 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
 import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -76,6 +79,7 @@ public class RobotLaunchConfigurationDelegateTest {
         projectProvider.createFile(Path.fromPortableString("001__suites_a/s1.robot"), "*** Test Cases ***",
                 "001__case1", "  Log  10", "001__case2", "  Log  20");
         projectProvider.createFile("executable_script.bat");
+        projectProvider.configure();
     }
 
     @AfterClass
@@ -236,6 +240,31 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     @Test
+    public void commandLineContainsPythonPathsForPythonLibrariesAddedToRedXml() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldLaunchUsingArgumentsFile()).thenReturn(true);
+
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "PyLib1", PROJECT_NAME + "/folder1"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2"));
+        projectProvider.configure(config);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getArgumentFile().get().generateContent()).contains("--pythonpath " + projectAbsPath
+                + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
+    }
+
+    @Test
     public void commandLineContainsClassPathsDefinedInRedXml_1() throws Exception {
         final RedPreferences preferences = mock(RedPreferences.class);
         when(preferences.shouldLaunchUsingArgumentsFile()).thenReturn(true);
@@ -291,6 +320,60 @@ public class RobotLaunchConfigurationDelegateTest {
         assertThat(commandLine.getCommandLine()).containsSequence("-J-cp",
                 "." + File.pathSeparator + projectAbsPath + File.separator + "JavaLib1.jar" + File.pathSeparator
                         + projectAbsPath + File.separator + "JavaLib2.jar");
+    }
+
+    @Test
+    public void commandLineContainsClassPathsForJavaLibrariesAddedToRedXml() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldLaunchUsingArgumentsFile()).thenReturn(true);
+
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.JAVA, "JavaLib1", PROJECT_NAME + "/JavaLib1.jar"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.JAVA, "JavaLib2", PROJECT_NAME + "/JavaLib2.jar"));
+        projectProvider.configure(config);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidJythonRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getCommandLine()).containsSequence("-J-cp",
+                "." + File.pathSeparator + projectAbsPath + File.separator + "JavaLib1.jar" + File.pathSeparator
+                        + projectAbsPath + File.separator + "JavaLib2.jar");
+    }
+
+    @Test
+    public void commandLineContainsPathsForVariableFiles() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldLaunchUsingArgumentsFile()).thenReturn(true);
+
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars1.py"));
+        config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars2.py", "a", "b", "c"));
+        projectProvider.configure(config);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getArgumentFile().get().generateContent()).containsSequence(
+                "--variablefile " + projectAbsPath + File.separator + "vars1.py",
+                "--variablefile " + projectAbsPath + File.separator + "vars2.py:a:b:c");
     }
 
     @Test
