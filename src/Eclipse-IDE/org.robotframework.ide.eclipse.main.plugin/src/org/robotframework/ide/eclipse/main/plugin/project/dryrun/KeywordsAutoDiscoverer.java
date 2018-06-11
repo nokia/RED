@@ -25,6 +25,7 @@ import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
 /**
  * @author bembenek
@@ -80,8 +81,8 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     void startDryRunClient(final int port, final File dataSource) throws CoreException {
-        final EnvironmentSearchPaths additionalPaths = new EnvironmentSearchPaths(robotProject.getClasspath(),
-                robotProject.getPythonpath());
+        final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
+                .createExecutionEnvironmentSearchPaths(robotProject.getProject());
 
         robotProject.getRuntimeEnvironment().startKeywordAutoDiscovering(port, dataSource, additionalPaths);
     }
