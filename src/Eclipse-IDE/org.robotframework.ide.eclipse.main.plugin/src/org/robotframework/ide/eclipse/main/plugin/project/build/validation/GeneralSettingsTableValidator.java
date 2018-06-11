@@ -28,9 +28,9 @@ import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DeprecatedSettingHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DocumentationDeclarationSettingValidator;
@@ -254,7 +254,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             if (!tags.getTags().isEmpty()) {
                 wasAllEmpty = false;
                 final Set<String> accessibleVariables = validationContext.getAccessibleVariables();
-                unknownVarsValidator.reportUnknownVars(tags.getTags(), accessibleVariables);
+                unknownVarsValidator.reportUnknownVars(accessibleVariables, tags.getTags());
             }
         }
 
