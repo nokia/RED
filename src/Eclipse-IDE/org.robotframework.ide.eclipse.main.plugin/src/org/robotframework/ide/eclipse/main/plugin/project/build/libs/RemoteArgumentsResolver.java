@@ -19,11 +19,17 @@ public class RemoteArgumentsResolver {
 
     private final Optional<String> uri;
 
+    private final Optional<RobotToken> timeoutToken;
+
+    private final Optional<String> timeout;
+
     private final ArgumentsDescriptor descriptor;
 
     public RemoteArgumentsResolver(final List<RobotToken> arguments) {
         this.uriToken = selectUriToken(arguments);
         this.uri = selectUri(uriToken, arguments);
+        this.timeoutToken = selectTimeoutToken(arguments);
+        this.timeout = selectTimeout(timeoutToken, arguments);
         this.descriptor = ArgumentsDescriptor.createDescriptor("uri=" + RemoteLocation.DEFAULT_ADDRESS, "timeout=None");
     }
 
@@ -33,6 +39,14 @@ public class RemoteArgumentsResolver {
 
     public Optional<String> getUri() {
         return uri;
+    }
+
+    public Optional<RobotToken> getTimeoutToken() {
+        return timeoutToken;
+    }
+
+    public Optional<String> getTimeout() {
+        return timeout;
     }
 
     public ArgumentsDescriptor getDescriptor() {
@@ -60,7 +74,34 @@ public class RemoteArgumentsResolver {
         } else if (arguments.size() == 1 && isTimeout(arguments.get(0).getText())) {
             return Optional.of(RemoteLocation.DEFAULT_ADDRESS);
         } else if (uriToken.isPresent()) {
-            return Optional.of(addProtocolIfNecessary(stripArgumentPrefixIfNecessary(uriToken.get().getText())));
+            return Optional.of(addProtocolIfNecessary(stripUriArgumentPrefixIfNecessary(uriToken.get().getText())));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<RobotToken> selectTimeoutToken(final List<RobotToken> arguments) {
+        if (arguments.size() == 1) {
+            if (isTimeout(arguments.get(0).getText())) {
+                return Optional.of(arguments.get(0));
+            }
+        }
+        if (arguments.size() == 2) {
+            if (isPositional(arguments.get(1).getText())) {
+                return Optional.of(arguments.get(1));
+            } else {
+                final List<RobotToken> allTimeouts = arguments.stream().filter(timeout -> isTimeout(timeout.getText())).collect(
+                        Collectors.toList());
+                if (allTimeouts.size() == 1) {
+                    return Optional.of(allTimeouts.get(0));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> selectTimeout(final Optional<RobotToken> timeoutToken, final List<RobotToken> arguments) {
+        if (timeoutToken.isPresent()) {
+            return Optional.of(stripTimeoutArgumentPrefixIfNecessary(timeoutToken.get().getText()));
         }
         return Optional.empty();
     }
@@ -77,8 +118,12 @@ public class RemoteArgumentsResolver {
         return argument.toLowerCase().startsWith("timeout=");
     }
 
-    private static String stripArgumentPrefixIfNecessary(final String string) {
+    private static String stripUriArgumentPrefixIfNecessary(final String string) {
         return string.toLowerCase().startsWith("uri=") ? string.substring(4, string.length()) : string;
+    }
+
+    private static String stripTimeoutArgumentPrefixIfNecessary(final String string) {
+        return string.toLowerCase().startsWith("timeout=") ? string.substring(8, string.length()) : string;
     }
 
     public static String addProtocolIfNecessary(final String argument) {
