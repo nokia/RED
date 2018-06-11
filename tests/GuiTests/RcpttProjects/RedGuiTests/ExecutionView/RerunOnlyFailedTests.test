@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _GGNqcF4ZEeWeit3EM6sPPA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/23/18 11:20 AM
+Save-Time: 6/11/18 3:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,6 +33,12 @@ proc "execution-for-only-failed-cases"{
 	}
 }
 
+proc "wait-for-rerun-button"{
+	try -times 3 -delay 500 -command{
+		get-view "Execution View" | get-button "Rerun Failed Tests" | get-property enablement | equals true | verify-true
+	}
+}
+
 //open view and run test with mixed cases
 get-tab-folder -index 4 | get-tab-item "Execution View" | click
 get-view "Project Explorer" | get-tree | select "ExecutionViewProject/normal_cases.robot" 
@@ -43,21 +49,22 @@ wait-for-console -times 5 -delay 1000
 //set focus on view to enable all buttons
 get-view "Execution View" | click
 
-try -times 3 -delay 500 -command{
-	get-view "Execution View" | get-button "Rerun Failed Tests" | get-property enablement | equals true | verify-true
-}
+wait-for-rerun-button
 execution-view-for-mixed-test
 check-execution-view-labels -pass 7 -fail 4 -current_test 11 -all 11 -bar_color "red"
 
 //run fail test
 get-view "Execution View" | get-button "Rerun Failed Tests"| click
+
 wait-for-console -times 5 -delay 1000
+wait-for-rerun-button
 check-execution-view-labels -pass 0 -fail 4 -current_test 4 -all 4 -bar_color "red"
 execution-for-only-failed-cases
 
 //rerun tests - only failed tests will be run
 get-view "Execution View" | get-button "Rerun Tests" | click
 wait-for-console -times 5 -delay 1000
+wait-for-rerun-button
 check-execution-view-labels -pass 0 -fail 4 -current_test 4 -all 4 -bar_color "red"
 execution-for-only-failed-cases
 
@@ -67,7 +74,7 @@ get-view "Project Explorer" | get-tree | select "ExecutionViewProject/normal_cas
     | get-menu "Run As/1 Robot Test" | click
     
 wait-for-console -times 5 -delay 1000
-
+wait-for-rerun-button
 with [get-tab-folder -index 4] {
     double-click
     get-tab-item "Execution View" | click
