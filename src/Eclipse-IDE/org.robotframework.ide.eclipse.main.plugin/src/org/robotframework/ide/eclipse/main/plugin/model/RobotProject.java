@@ -13,12 +13,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -45,10 +43,8 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
@@ -69,6 +65,7 @@ public class RobotProject extends RobotContainer {
     private RobotProjectConfig configuration;
 
     private Map<LibraryDescriptor, LibrarySpecification> stdLibsSpecs;
+
     private Map<LibraryDescriptor, LibrarySpecification> refLibsSpecs;
 
     private List<ReferencedVariableFile> referencedVariableFiles;
@@ -349,64 +346,6 @@ public class RobotProject extends RobotContainer {
         return getRobotProjectHolder().getModuleSearchPaths();
     }
 
-    public synchronized List<String> getPythonpath() {
-        readProjectConfigurationIfNeeded();
-        final Set<String> pp = new LinkedHashSet<>();
-        if (configuration != null) {
-            pp.addAll(getReferenceLibPaths(LibraryType.PYTHON));
-            pp.addAll(getAdditionalPaths(configuration.getPythonPath()));
-        }
-        return new ArrayList<>(pp);
-    }
-
-    public synchronized List<String> getClasspath() {
-        readProjectConfigurationIfNeeded();
-        final Set<String> cp = new LinkedHashSet<>();
-        cp.add(".");
-        if (configuration != null) {
-            cp.addAll(getReferenceLibPaths(LibraryType.JAVA));
-            cp.addAll(getAdditionalPaths(configuration.getClassPath()));
-        }
-        return new ArrayList<>(cp);
-    }
-
-    private synchronized List<String> getReferenceLibPaths(final LibraryType libType) {
-        final List<String> paths = new ArrayList<>();
-        for (final ReferencedLibrary lib : configuration.getLibraries()) {
-            if (lib.provideType() == libType) {
-                paths.add(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath()))
-                        .toOSString());
-            }
-        }
-        return paths;
-    }
-
-    private synchronized List<String> getAdditionalPaths(final List<SearchPath> searchPaths) {
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
-        return searchPaths.stream()
-                .map(path -> redConfig.toAbsolutePath(path, getProject()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(File::getPath)
-                .collect(toList());
-    }
-
-    public List<String> getVariableFilePaths() {
-        readProjectConfigurationIfNeeded();
-
-        final List<String> list = new ArrayList<>();
-        if (configuration != null) {
-            for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
-                final String path = RedWorkspace.Paths
-                        .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(variableFile.getPath())).toOSString();
-                final List<String> args = variableFile.getArguments();
-                final String arguments = args == null || args.isEmpty() ? "" : ":" + String.join(":", args);
-                list.add(path + arguments);
-            }
-        }
-        return list;
-    }
-
     @VisibleForTesting
     public void setReferencedVariablesFiles(final List<ReferencedVariableFile> varFiles) {
         this.referencedVariableFiles = varFiles;
@@ -440,10 +379,6 @@ public class RobotProject extends RobotContainer {
             return referencedVariableFiles;
         }
         return new ArrayList<>();
-    }
-
-    public String resolve(final String expression) {
-        return RobotExpressions.resolve(getRobotProjectHolder().getVariableMappings(), expression);
     }
 
     public void addKeywordSource(final RobotDryRunKeywordSource keywordSource) {

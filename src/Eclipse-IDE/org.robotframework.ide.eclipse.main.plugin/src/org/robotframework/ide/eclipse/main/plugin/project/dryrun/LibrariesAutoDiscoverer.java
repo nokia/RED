@@ -36,6 +36,7 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -131,13 +132,13 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         final boolean recursiveInVirtualenv = RedPlugin.getDefault()
                 .getPreferences()
                 .isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
-        final List<String> excludedPaths = robotProject.getRobotProjectConfig()
-                .getExcludedPath()
+        final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
+        final List<String> excludedPaths = projectConfig.getExcludedPath()
                 .stream()
                 .map(ExcludedFolderPath::getPath)
                 .collect(toList());
-        final EnvironmentSearchPaths additionalPaths = new EnvironmentSearchPaths(robotProject.getClasspath(),
-                robotProject.getPythonpath());
+        final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(projectConfig)
+                .createExecutionEnvironmentSearchPaths(robotProject.getProject());
 
         robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSource, projectLocation,
                 recursiveInVirtualenv, excludedPaths, additionalPaths);
@@ -232,9 +233,9 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
         private Optional<File> findPythonLibraryModulePath(final RobotDryRunLibraryImport libraryImport) {
             try {
-                final EnvironmentSearchPaths envSearchPaths = new RedEclipseProjectConfig(config)
-                        .createEnvironmentSearchPaths(robotProject.getProject());
-                return robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(), envSearchPaths);
+                final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(config)
+                        .createAdditionalEnvironmentSearchPaths(robotProject.getProject());
+                return robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(), additionalPaths);
             } catch (final RobotEnvironmentException e) {
                 return Optional.empty();
             }

@@ -94,8 +94,8 @@ public class JarStructureBuilderTest {
 
         builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(new File(moduleLocation),
-                new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(projectProvider.getProject()));
+        verify(environment).getClassesFromModule(new File(moduleLocation), new RedEclipseProjectConfig(config)
+                .createAdditionalEnvironmentSearchPaths(projectProvider.getProject()));
     }
 
     @Test
