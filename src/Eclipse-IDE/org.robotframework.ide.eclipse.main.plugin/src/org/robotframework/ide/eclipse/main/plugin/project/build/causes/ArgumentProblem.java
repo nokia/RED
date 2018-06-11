@@ -26,14 +26,7 @@ public enum ArgumentProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Invalid number of arguments. %s";
-        }
-    },
-    INVALID_NUMBER_OF_NON_KEYWORD_PARAMETERS {
-
-        @Override
-        public String getProblemDescription() {
-            return "Invalid number of non-keyword arguments. %s";
+            return "Keyword '%s' expects %s but %s %s provided";
         }
     },
     POSITIONAL_ARGUMENT_AFTER_NAMED {
@@ -47,7 +40,7 @@ public enum ArgumentProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Argument '%s' has value already passed (%s)";
+            return "Argument '%s' has value already passed: %s";
         }
     },
     OVERRIDDEN_NAMED_ARGUMENT {

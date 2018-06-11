@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -25,8 +26,6 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Streams;
 
 public class SpecialKeywords {
@@ -49,15 +48,15 @@ public class SpecialKeywords {
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Get Variable Value", "BuiltIn"));
     }
     
-    private static final Multimap<QualifiedKeywordName, Integer> VARS_SYNTAX_CHECKING_KEYWORDS = LinkedHashMultimap
-            .create();
+    // keywords for which some arguments should be validated for variable syntax
+    private static final Set<QualifiedKeywordName> VARS_SYNTAX_CHECKING_KEYWORDS = new HashSet<>();
     static {
-        VARS_SYNTAX_CHECKING_KEYWORDS.put(QualifiedKeywordName.create("Set Test Variable", "BuiltIn"), 0);
-        VARS_SYNTAX_CHECKING_KEYWORDS.put(QualifiedKeywordName.create("Set Suite Variable", "BuiltIn"), 0);
-        VARS_SYNTAX_CHECKING_KEYWORDS.put(QualifiedKeywordName.create("Set Global Variable", "BuiltIn"), 0);
-        VARS_SYNTAX_CHECKING_KEYWORDS.put(QualifiedKeywordName.create("Get Variable Value", "BuiltIn"), 0);
-        VARS_SYNTAX_CHECKING_KEYWORDS.put(QualifiedKeywordName.create("Variable Should Exist", "BuiltIn"), 0);
-        VARS_SYNTAX_CHECKING_KEYWORDS.put(QualifiedKeywordName.create("Variable Should Not Exist", "BuiltIn"), 0);
+        VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Set Test Variable", "BuiltIn"));
+        VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Set Suite Variable", "BuiltIn"));
+        VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Set Global Variable", "BuiltIn"));
+        VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Get Variable Value", "BuiltIn"));
+        VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Variable Should Exist", "BuiltIn"));
+        VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Variable Should Not Exist", "BuiltIn"));
     }
 
     private static final Map<QualifiedKeywordName, Integer> RUN_KEYWORD_VARIANTS = new HashMap<>();
@@ -99,13 +98,14 @@ public class SpecialKeywords {
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Import Resource", "BuiltIn"), 0);
     }
 
+    private static final Set<String> SPECIAL_KEYWORD_NAMES = Streams
+            .concat(VARS_CREATING_KEYWORDS.stream(), VARS_SYNTAX_CHECKING_KEYWORDS.stream(),
+                    VARS_OMITTING_KEYWORDS.stream(), RUN_KEYWORD_VARIANTS.keySet().stream())
+            .map(QualifiedKeywordName::getKeywordName)
+            .collect(toSet());
+
     public static boolean mayBeSpecialKeyword(final String keywordName) {
-        return Streams.concat(VARS_CREATING_KEYWORDS.stream(),
-                        VARS_SYNTAX_CHECKING_KEYWORDS.keySet().stream(),
-                        VARS_OMITTING_KEYWORDS.stream(),
-                        RUN_KEYWORD_VARIANTS.keySet().stream())
-                .map(QualifiedKeywordName::getKeywordName)
-                .anyMatch(qkn -> qkn.equals(QualifiedKeywordName.unifyDefinition(keywordName)));
+        return SPECIAL_KEYWORD_NAMES.contains(QualifiedKeywordName.unifyDefinition(keywordName));
     }
 
     /**
@@ -168,14 +168,22 @@ public class SpecialKeywords {
         return lineDescriptor.getUsedVariables();
     }
 
+    /**
+     * Returns tokens which should be checked if is provided with variable syntax. Currently
+     * supports:
+     * 
+     * BuiltIn.Set Test Variable
+     * BuiltIn.Set Suite Variable
+     * BuiltIn.Set Global Variable
+     * BuiltIn.Get Variable Value
+     * BuiltIn.Variable Should Exist
+     * BuiltIn.Variable Should Not Exist
+     */
     public static List<RobotToken> getArgumentsToValidateForVariablesSyntax(final QualifiedKeywordName keywordName,
             final List<RobotToken> args) {
-        if (VARS_SYNTAX_CHECKING_KEYWORDS.containsKey(keywordName)) {
-            return VARS_SYNTAX_CHECKING_KEYWORDS.get(keywordName)
-                    .stream()
-                    .filter(index -> index < args.size())
-                    .map(args::get)
-                    .collect(toList());
+        if (VARS_SYNTAX_CHECKING_KEYWORDS.contains(keywordName) && !args.isEmpty()) {
+            // as of now all those keywords takes variable as first argument
+            return newArrayList(args.get(0));
         }
         return new ArrayList<>();
     }

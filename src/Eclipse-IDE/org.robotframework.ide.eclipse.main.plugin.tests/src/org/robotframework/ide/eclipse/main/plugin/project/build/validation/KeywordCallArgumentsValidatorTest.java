@@ -33,14 +33,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 @RunWith(Enclosed.class)
-public class GeneralKeywordCallArgumentsValidatorTest {
+public class KeywordCallArgumentsValidatorTest {
 
     private static final String[] ALL = new String[] { "cause", "start", "end", "message" };
 
     private static final ArgumentProblem DESCRIPTOR_PROBLEM = ArgumentProblem.INVALID_ARGUMENTS_DESCRIPTOR;
     private static final ArgumentProblem ORDER_PROBLEM = ArgumentProblem.POSITIONAL_ARGUMENT_AFTER_NAMED;
     private static final ArgumentProblem NUMBER_PROBLEM = ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS;
-    private static final ArgumentProblem NUMBER_KW_PROBLEM = ArgumentProblem.INVALID_NUMBER_OF_NON_KEYWORD_PARAMETERS;
     private static final ArgumentProblem MULTIPLE_MATCH_PROBLEM = ArgumentProblem.MULTIPLE_MATCH_TO_SINGLE_ARG;
     private static final ArgumentProblem OVERRIDDEN_ARG_PROBLEM = ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT;
     private static final ArgumentProblem MISSING_PROBLEM = ArgumentProblem.NO_VALUE_PROVIDED_FOR_REQUIRED_ARG;
@@ -98,32 +97,23 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenThereIsAtLeastOneArgument() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35,"Keyword 'keyword' expects 0 arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("a=1")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("a=1", "b=2")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("a=1", "2")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("@{l}", "2")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but at least 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but at least 1 is provided"));
                 softly.assertThat(problemsOf(call("@{l}[0]")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("&{d}[a]")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 0 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 1 is provided"));
             });
         }
 
@@ -235,45 +225,32 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsDoesNotMatchNumberOfRequired() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 1 argument but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 argument but 0 are provided"));
                 softly.assertThat(problemsOf(call("1", "2")).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 1 argument but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 argument but 2 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 1 argument but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 argument but 2 are provided"));
                 softly.assertThat(problemsOf(call("@{l}", "2", "3")).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 1 argument but at least 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 argument but at least 2 are provided"));
 
                 softly.assertThat(problemsOf(call()).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but 4 are provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3", "4", "5")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but at least 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but at least 4 are provided"));
                 softly.assertThat(problemsOf(call("a=1")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("a=1", "b=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("${s}", "${l}")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects 3 arguments but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 3 arguments but 2 are provided"));
             });
         }
 
@@ -281,20 +258,20 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2", "c=3")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "a=2", "b=3", "c=4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -461,24 +438,18 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsExceedsMaxNumberOfArgs() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "2")).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects from 0 to 1 argument but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 1 argument but 2 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects from 0 to 1 argument but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 1 argument but 2 are provided"));
                 softly.assertThat(problemsOf(call("@{l}", "2", "3")).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects from 0 to 1 argument but at least 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 1 argument but at least 2 are provided"));
 
                 softly.assertThat(problemsOf(call("1", "2", "3", "4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects from 0 to 3 arguments but 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 3 arguments but 4 are provided"));
                 softly.assertThat(problemsOf(call("${s}", "${l}", "${d}", "${x}")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects from 0 to 3 arguments but 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 3 arguments but 4 are provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3", "4", "5")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects from 0 to 3 arguments but at least 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 3 arguments but at least 4 are provided"));
             });
         }
 
@@ -486,20 +457,20 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(oneArg)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "a=2", "c=3")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "a=2", "b=3", "c=4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -693,56 +664,39 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfNonKeywordArgumentsReported() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 3 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 4 are provided"));
                 softly.assertThat(problemsOf(call("1", "b=2")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("${s}", "${s}", "${s}")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 3 are provided"));
                 softly.assertThat(problemsOf(call("${l}[0]")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("${d}[a]")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("@{l}", "2", "3")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but at least 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but at least 2 are provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but at least 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but at least 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but at least 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but at least 2 are provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3", "4")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but at least 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but at least 3 are provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3", "4", "5")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but at least 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but at least 4 are provided"));
                 softly.assertThat(problemsOf(call("1", "&{d}")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "&{d}", "c=3")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "&{d}", "c=3", "d=4")).against(desc)).extracting(ALL).containsExactly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                            "Invalid number of non-keyword arguments. Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 non-keyword arguments but 1 is provided"));
             });
         }
     }
@@ -834,33 +788,24 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsIsTooLowOrTooHigh() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 1 to 2 arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 1 to 2 arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 1 to 2 arguments but 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 1 to 2 arguments but 3 are provided"));
                 softly.assertThat(problemsOf(call("@{l}", "2", "3", "4")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 1 to 2 arguments but at least 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 1 to 2 arguments but at least 3 are provided"));
 
                 softly.assertThat(problemsOf(call()).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 2 to 4 arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 2 to 4 arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 2 to 4 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 2 to 4 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 2 to 4 arguments but 5 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 2 to 4 arguments but 5 are provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3", "4", "5", "6")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 2 to 4 arguments but at least 5 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 2 to 4 arguments but at least 5 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5", "&{d}")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 2 to 4 arguments but 5 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 2 to 4 arguments but 5 are provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects from 2 to 4 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 2 to 4 arguments but 1 is provided"));
             });
         }
 
@@ -868,15 +813,15 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2", "c=3")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "a=2", "b=2", "c=3")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -1046,21 +991,16 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsIsTooLow() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects at least 1 argument but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 1 argument but 0 are provided"));
 
                 softly.assertThat(problemsOf(call()).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects at least 2 arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 2 arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("a=1")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                                "Invalid number of arguments. Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
             });
         }
 
@@ -1068,13 +1008,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -1193,63 +1133,44 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfNonKeywordArgumentsReported() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 1 non-keyword argument but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 non-keyword argument but 0 are provided"));
                 softly.assertThat(problemsOf(call("1", "2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 1 non-keyword argument but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 non-keyword argument but 2 are provided"));
                 softly.assertThat(problemsOf(call("@{l}", "2", "3", "4")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 1 non-keyword argument but at least 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 non-keyword argument but at least 3 are provided"));
                 softly.assertThat(problemsOf(call("x=1")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 1 non-keyword argument but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 non-keyword argument but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 1 non-keyword argument but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 1 non-keyword argument but 0 are provided"));
 
                 softly.assertThat(problemsOf(call()).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 3 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 4 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 5 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 5 are provided"));
                 softly.assertThat(problemsOf(call("x=1")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2", "z=3")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("a=1", "x=2", "c=3")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3", "4", "5")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but at least 4 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but at least 4 are provided"));
                 softly.assertThat(problemsOf(call("${l}")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5", "&{d}")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 5 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 5 are provided"));
                 softly.assertThat(problemsOf(call("${s}1", "${s}2", "${s}3")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 3 are provided"));
                 softly.assertThat(problemsOf(call("${l}", "${l}", "${l}")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects 2 non-keyword arguments but 3 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 2 non-keyword arguments but 3 are provided"));
             });
 
         }
@@ -1258,13 +1179,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -1279,7 +1200,7 @@ public class GeneralKeywordCallArgumentsValidatorTest {
                 softly.assertThat(problemsOf(call("@{l}", "2")).against(twoArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to be empty"));
 
-                 softly.assertThat(problemsOf(call("@{l}")).against(threeArgs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("@{l}")).against(threeArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to contain 2 items"));
                 softly.assertThat(problemsOf(call("@{l}", "@{l}")).against(threeArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to be empty"),
@@ -1426,13 +1347,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -1545,30 +1466,22 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfNonKeywordArgumentsReported() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "2")).against(twoArgs)).extracting(ALL).containsExactly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 0 to 1 non-keyword argument but 2 are provided"));
+                        NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 1 non-keyword argument but 2 are provided"));
                 softly.assertThat(problemsOf(call("@{l}", "2", "3", "4")).against(twoArgs)).extracting(ALL).containsExactly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                                "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 0 to 1 non-keyword argument but at least 3 are provided"));
+                        NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 1 non-keyword argument but at least 3 are provided"));
 
                 softly.assertThat(problemsOf(call("1", "2", "3")).against(threeArgs)).extracting(ALL).containsExactly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 3 are provided"));
+                        NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 3 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4")).against(threeArgs)).extracting(ALL).containsExactly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 4 are provided"));
+                        NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 4 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5")).against(threeArgs)).extracting(ALL).containsExactly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 5 are provided"));
+                        NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 5 are provided"));
                 softly.assertThat(problemsOf(call("${s}", "${s}2", "${s}3")).against(threeArgs)).extracting(ALL).containsExactly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 3 are provided"));
+                        NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 3 are provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3", "4", "5")).against(threeArgs)).extracting(ALL).containsExactly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 0 to 2 non-keyword arguments but at least 4 are provided"));
+                        NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 2 non-keyword arguments but at least 4 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5", "&{d}")).against(threeArgs)).extracting(ALL).containsExactly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 5 are provided"));
+                        NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 0 to 2 non-keyword arguments but 5 are provided"));
             });
         }
 
@@ -1576,13 +1489,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(twoArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -1782,21 +1695,16 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsExceedsMaxNumberOfArgs() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects at least 1 argument but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 1 argument but 0 are provided"));
 
                 softly.assertThat(problemsOf(call()).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects at least 2 arguments but 0 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 2 arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("a=1")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,
-                        "Invalid number of arguments. Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 2 arguments but 1 is provided"));
             });
         }
 
@@ -1804,13 +1712,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(fiveArgs)).extracting(ALL).containsOnly(
-                                problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                                problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -1946,48 +1854,48 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsExceedsMaxNumberOfArgs() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(threeArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 1 to 2 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 1 to 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3")).against(threeArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 1 to 2 non-keyword arguments but 3 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 1 to 2 non-keyword arguments but 3 are provided"));
                 softly.assertThat(problemsOf(call("x=1")).against(threeArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 1 to 2 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 1 to 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(threeArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 1 to 2 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 1 to 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("@{l}", "2", "3", "4")).against(threeArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 1 to 2 non-keyword arguments but at least 3 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 1 to 2 non-keyword arguments but at least 3 are provided"));
 
                 softly.assertThat(problemsOf(call()).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 1 is provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 5 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 5 are provided"));
                 softly.assertThat(problemsOf(call("x=1")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2", "z=3")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 1 is provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "@{l}", "3", "4", "5", "6")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but at least 5 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but at least 5 are provided"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5", "&{d}")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 5 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects from 2 to 4 non-keyword arguments but 5 are provided"));
             });
         }
 
@@ -1995,13 +1903,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -2149,48 +2057,48 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsExceedsMaxNumberOfArgs() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(threeArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1")).against(threeArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(threeArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
 
                 softly.assertThat(problemsOf(call()).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 1 is provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 2 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("x=1")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2", "z=3")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("a=1", "b=2")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 2 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("b=1", "a=2")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 2 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("c=1", "d=2")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 1 is provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "d=2")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 1 is provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(fiveArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 3 non-keyword arguments but 1 is provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 3 non-keyword arguments but 1 is provided"));
             });
         }
 
@@ -2198,13 +2106,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -2356,13 +2264,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(threeArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(fiveArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -2458,33 +2366,33 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsExceedsMaxNumberOfArgs() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(fourArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1")).against(fourArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(fourArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 1 non-keyword argument but 0 are provided"));
 
                 softly.assertThat(problemsOf(call()).against(sixArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 2 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("1")).against(sixArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 2 non-keyword arguments but 1 is provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 2 non-keyword arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("x=1")).against(sixArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 2 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2")).against(sixArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 2 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("x=1", "y=2", "z=2")).against(sixArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 2 non-keyword arguments but 0 are provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 2 non-keyword arguments but 0 are provided"));
                 softly.assertThat(problemsOf(call("${s}")).against(sixArgs)).extracting(ALL).containsOnly(problem(
-                        NUMBER_KW_PROBLEM, 28, 35,
-                        "Invalid number of non-keyword arguments. Keyword 'keyword' expects at least 2 non-keyword arguments but 1 is provided"));
+                        NUMBER_PROBLEM, 28, 35,
+                        "Keyword 'keyword' expects at least 2 non-keyword arguments but 1 is provided"));
             });
         }
 
@@ -2492,13 +2400,13 @@ public class GeneralKeywordCallArgumentsValidatorTest {
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "a=2")).against(fourArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
 
                 softly.assertThat(problemsOf(call("1", "a=2")).against(sixArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed (1)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
                 softly.assertThat(problemsOf(call("1", "2", "a=3", "b=4")).against(sixArgs)).extracting(ALL).containsOnly(
-                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed (1)"),
-                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed (2)"));
+                        problem(MULTIPLE_MATCH_PROBLEM, 49, 52, "Argument 'a' has value already passed: 1"),
+                        problem(MULTIPLE_MATCH_PROBLEM, 56, 59, "Argument 'b' has value already passed: 2"));
             });
         }
 
@@ -2592,7 +2500,7 @@ public class GeneralKeywordCallArgumentsValidatorTest {
             final RobotToken definingToken = executableRowDescriptor.getAction().getToken();
             final List<RobotToken> argumentTokens = executableRowDescriptor.getKeywordArguments();
 
-            final GeneralKeywordCallArgumentsValidator validator = new GeneralKeywordCallArgumentsValidator(
+            final KeywordCallArgumentsValidator validator = new KeywordCallArgumentsValidator(
                     call.getSuiteFile().getFile(), definingToken, reporter, descriptor, argumentTokens);
             validator.validate(null);
 
