@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -33,12 +32,15 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
     private final RobotRuntimeEnvironment environment;
 
-    private final EnvironmentSearchPaths additionalSearchPaths;
+    private final RobotProjectConfig config;
+
+    private final IProject project;
 
     public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config,
             final IProject project) {
         this.environment = environment;
-        this.additionalSearchPaths = new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(project);
+        this.config = config;
+        this.project = project;
     }
 
     @Override
@@ -52,7 +54,8 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
     private Collection<ILibraryClass> provideEntriesFromFile(final URI path,
             final Function<String, ILibraryClass> classNameMapper) throws RobotEnvironmentException {
-        final List<String> classes = environment.getClassesFromModule(new File(path), additionalSearchPaths);
+        final List<String> classes = environment.getClassesFromModule(new File(path),
+                new RedEclipseProjectConfig(config).createAdditionalEnvironmentSearchPaths(project));
         return classes.stream().map(classNameMapper).distinct().collect(Collectors.toList());
     }
 

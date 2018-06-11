@@ -26,6 +26,7 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -42,6 +43,20 @@ public class KeywordsAutoDiscovererTest {
         robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
         projectProvider.createDir("libs");
+    }
+
+    @Test
+    public void testKeywordFromStandardLibrary() throws Exception {
+        robotProject.setStandardLibraries(Libraries.createStdLib("BuiltIn", "Log"));
+
+        new KeywordsAutoDiscoverer(robotProject).start();
+
+        assertThat(robotProject.getKeywordSource("BuiltIn.Log")).hasValueSatisfying(kwSource -> {
+            assertThat(kwSource.getFilePath()).endsWith("BuiltIn.py");
+            assertThat(kwSource.getLine()).isPositive();
+            assertThat(kwSource.getOffset()).isPositive();
+            assertThat(kwSource.getLength()).isPositive();
+        });
     }
 
     @Test
@@ -155,6 +170,7 @@ public class KeywordsAutoDiscovererTest {
             config.addReferencedLibrary(referencedLibrary);
         }
         projectProvider.configure(config);
+        robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(libraries.entrySet().stream().collect(
                 toMap(entry -> LibraryDescriptor.ofReferencedLibrary(entry.getKey()), entry -> entry.getValue())));
     }

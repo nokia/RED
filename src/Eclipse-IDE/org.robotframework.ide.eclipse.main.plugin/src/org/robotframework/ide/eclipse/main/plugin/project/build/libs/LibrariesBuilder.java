@@ -97,7 +97,7 @@ public class LibrariesBuilder {
             final ILibdocGenerator generator = provideGenerator(descriptor, htmlTargetFile, LibdocFormat.HTML);
             generator.generateLibdoc(robotProject.getRuntimeEnvironment(),
                     new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
-                            .createEnvironmentSearchPaths(project));
+                            .createAdditionalEnvironmentSearchPaths(project));
             return htmlTargetFile;
         } else {
             throw new IllegalStateException("Unable to generate HTML documentation file. Missing library descriptor");
@@ -128,7 +128,7 @@ public class LibrariesBuilder {
                     if (project.exists()) {
                         generator.generateLibdoc(runtimeEnvironment,
                                 new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
-                                        .createEnvironmentSearchPaths(project));
+                                        .createAdditionalEnvironmentSearchPaths(project));
                     }
                 } catch (final RobotEnvironmentException e) {
                     final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
@@ -214,7 +214,7 @@ public class LibrariesBuilder {
             monitor.subTask(generator.getMessage());
             try {
                 generator.generateLibdoc(environment, new RedEclipseProjectConfig(configuration)
-                        .createEnvironmentSearchPaths(robotProject.getProject()));
+                        .createAdditionalEnvironmentSearchPaths(robotProject.getProject()));
             } catch (final RobotEnvironmentException e) {
                 // the libraries with missing libspec are reported in validation phase
             }
