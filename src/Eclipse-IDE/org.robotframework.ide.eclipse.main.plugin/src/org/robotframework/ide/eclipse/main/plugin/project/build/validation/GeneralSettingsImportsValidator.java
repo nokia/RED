@@ -81,7 +81,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         } else {
             final String pathOrName = RobotExpressions.unescapeSpaces(pathOrNameToken.getText());
             if (RobotExpressions.isParameterized(pathOrName)) {
-                final String resolved = suiteFile.getProject().resolve(pathOrName);
+                final String resolved = RobotExpressions
+                        .resolve(suiteFile.getProject().getRobotProjectHolder().getVariableMappings(), pathOrName);
                 if (RobotExpressions.isParameterized(resolved)) {
                     // still parameterized after resolving
                     reportUnresolvedParameterizedImport(pathOrNameToken);
