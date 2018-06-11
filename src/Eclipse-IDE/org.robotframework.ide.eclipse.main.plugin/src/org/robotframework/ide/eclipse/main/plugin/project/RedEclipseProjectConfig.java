@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,10 +20,11 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.RedURI;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
 import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace.Paths;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.escape.Escaper;
@@ -43,7 +45,7 @@ public class RedEclipseProjectConfig {
         final Optional<File> wsAbsolute = resolveToAbsolutePath(
                 getRelativityLocation(config.getRelativityPoint(), containingProject), asPath).map(IPath::toFile);
         return wsAbsolute.map(file -> {
-            final IPath wsRelative = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(file.getAbsolutePath()));
+            final IPath wsRelative = Paths.toWorkspaceRelativeIfPossible(new Path(file.getAbsolutePath()));
             final IResource member = containingProject.getWorkspace().getRoot().findMember(wsRelative);
             if (member == null) {
                 return file;
@@ -79,9 +81,20 @@ public class RedEclipseProjectConfig {
         return result.addTrailingSeparator();
     }
 
-    public EnvironmentSearchPaths createEnvironmentSearchPaths(final IProject project) {
+    public EnvironmentSearchPaths createAdditionalEnvironmentSearchPaths(final IProject project) {
         return new EnvironmentSearchPaths(getResolvedPaths(project, config.getClassPath()),
                 getResolvedPaths(project, config.getPythonPath()));
+    }
+
+    public EnvironmentSearchPaths createExecutionEnvironmentSearchPaths(final IProject project) {
+        final List<String> classPaths = new ArrayList<>();
+        classPaths.add(".");
+        classPaths.addAll(getReferenceLibPaths(LibraryType.JAVA));
+        classPaths.addAll(getResolvedPaths(project, config.getClassPath()));
+        final List<String> pythonPaths = new ArrayList<>();
+        pythonPaths.addAll(getReferenceLibPaths(LibraryType.PYTHON));
+        pythonPaths.addAll(getResolvedPaths(project, config.getPythonPath()));
+        return new EnvironmentSearchPaths(classPaths, pythonPaths);
     }
 
     private List<String> getResolvedPaths(final IProject containingProject, final List<SearchPath> paths) {
@@ -91,5 +104,22 @@ public class RedEclipseProjectConfig {
                 .map(Optional::get)
                 .map(File::getPath)
                 .collect(toList());
+    }
+
+    private List<String> getReferenceLibPaths(final LibraryType libType) {
+        return config.getLibraries()
+                .stream()
+                .filter(lib -> lib.provideType() == libType)
+                .map(lib -> Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath())).toOSString())
+                .collect(toList());
+    }
+
+    public List<String> getVariableFilePaths() {
+        return config.getReferencedVariableFiles().stream().map(file -> {
+            final String path = Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(file.getPath())).toOSString();
+            final List<String> args = file.getArguments();
+            final String arguments = args.isEmpty() ? "" : ":" + String.join(":", args);
+            return path + arguments;
+        }).collect(toList());
     }
 }
