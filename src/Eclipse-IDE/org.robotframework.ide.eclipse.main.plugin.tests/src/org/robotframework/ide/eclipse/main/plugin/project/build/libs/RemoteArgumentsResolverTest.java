@@ -244,7 +244,53 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsTooManyNamedArguments() throws Exception {
+    public void timeoutArgumentIsFound_whenRemoteArgumentsListContainsOnlyNamedTimeout() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30s");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getTimeoutToken().get().getText()).isEqualTo("timeout=30s");
+        assertThat(resolver.getTimeout()).contains("30s");
+    }
+
+    @Test
+    public void timeoutArgumentIsFound_whenRemoteArgumentsListContainsNamedTimeoutAndUri() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=127.0.0.1.9000  timeout=30");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getTimeoutToken().get().getText()).isEqualTo("timeout=30");
+        assertThat(resolver.getTimeout()).contains("30");
+    }
+
+    @Test
+    public void timeoutArgumentIsFound_whenRemoteArgumentsListContainsInvertedNamedTimeoutAndUri() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30  uri=127.0.0.1.9000");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getTimeoutToken().get().getText()).isEqualTo("timeout=30");
+        assertThat(resolver.getTimeout()).contains("30");
+    }
+
+    @Test
+    public void timeoutArgumentIsFound_whenRemoteArgumentsListContainsPositionalTimeoutAndUri() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport(
+                "Library  Remote  127.0.0.1.9000  30 hours 20 minutes");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getTimeoutToken().get().getText()).isEqualTo("30 hours 20 minutes");
+        assertThat(resolver.getTimeout()).contains("30 hours 20 minutes");
+    }
+
+    @Test
+    public void uriAndTimeoutArgumentsAreNotFound_whenRemoteArgumentsListContainsTooManyNamedArguments()
+            throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  timeout=30  timeout=30  uri=127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
@@ -253,10 +299,13 @@ public class RemoteArgumentsResolverTest {
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
+        assertThat(resolver.getTimeoutToken()).isEmpty();
+        assertThat(resolver.getTimeout()).isEmpty();
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsTooManyNamedArgumentsAndAlias() throws Exception {
+    public void uriAndTimeoutArgumentsAreNotFound_whenRemoteArgumentsListContainsTooManyNamedArgumentsAndAlias()
+            throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  timeout=30  timeout=30  uri=127.0.0.1.9000/  WITH NAME  alias");
         final LibraryImport libImport = getImport(suite);
@@ -265,10 +314,13 @@ public class RemoteArgumentsResolverTest {
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
+        assertThat(resolver.getTimeoutToken()).isEmpty();
+        assertThat(resolver.getTimeout()).isEmpty();
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsTooManyPositionalArguments() throws Exception {
+    public void uriAndTimeoutArgumentsAreNotFound_whenRemoteArgumentsListContainsTooManyPositionalArguments()
+            throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://127.0.0.1.9000/  30  60");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
@@ -276,10 +328,12 @@ public class RemoteArgumentsResolverTest {
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
+        assertThat(resolver.getTimeoutToken()).isEmpty();
+        assertThat(resolver.getTimeout()).isEmpty();
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsTooManyPositionalArgumentsAndAlias()
+    public void uriAndTimeoutArgumentsAreNotFound_whenRemoteArgumentsListContainsTooManyPositionalArgumentsAndAlias()
             throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  http://127.0.0.1.9000/  30  60  WITH NAME  alias");
@@ -289,6 +343,21 @@ public class RemoteArgumentsResolverTest {
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
+        assertThat(resolver.getTimeoutToken()).isEmpty();
+        assertThat(resolver.getTimeout()).isEmpty();
+    }
+
+    @Test
+    public void uriAndTimeoutArgumentsAreNotFound_whenRemoteArgumentsListContainsTwoNamedTokens() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30   timeout=60");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+
+        assertThat(resolver.getUriToken()).isEmpty();
+        assertThat(resolver.getUri()).isEmpty();
+        assertThat(resolver.getTimeoutToken()).isEmpty();
+        assertThat(resolver.getTimeout()).isEmpty();
     }
 
     @Test
@@ -304,18 +373,18 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsTwoNamedTokens() throws Exception {
-        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30   timeout=60");
+    public void timeoutArgumentIsNotFound_whenRemoteArgumentsListContainsNoArguments() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
-        assertThat(resolver.getUriToken()).isEmpty();
-        assertThat(resolver.getUri()).isEmpty();
+        assertThat(resolver.getTimeoutToken()).isEmpty();
+        assertThat(resolver.getTimeout()).isEmpty();
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUriWithoutScheme()
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidPositionalUriWithoutScheme()
             throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  ://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
@@ -327,7 +396,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUriWithoutAddress()
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidPositionalUriWithoutAddress()
             throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://");
         final LibraryImport libImport = getImport(suite);
@@ -339,7 +408,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUriWithoutScheme() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidNamedUriWithoutScheme() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
@@ -350,7 +419,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUriWithoutAddress() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidNamedUriWithoutAddress() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=http://");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
@@ -361,7 +430,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUri1() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidPositionalUri1() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  urrri=http://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
@@ -374,7 +443,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUri2() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidPositionalUri2() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  ^://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
@@ -386,7 +455,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUri3() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidPositionalUri3() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  [urihttp://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
@@ -398,7 +467,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUri4() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidPositionalUri4() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://127.0.0.1:8270/%");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
@@ -410,7 +479,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidPositionalUriAndTimeout() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidPositionalUriAndTimeout() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  urrri=http://127.0.0.1:8270/  60");
         final LibraryImport libImport = getImport(suite);
@@ -423,7 +492,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUri1() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidNamedUri1() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  uri=urrri(http://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
@@ -436,7 +505,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUri2() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidNamedUri2() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  uri=}://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
@@ -448,7 +517,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUri3() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidNamedUri3() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  uri=1urihttp://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
@@ -461,7 +530,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUri4() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidNamedUri4() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=http://127.0.0.1:8270/%");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
@@ -473,7 +542,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvalidNamedUriAndTimeout() throws Exception {
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvalidNamedUriAndTimeout() throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  uri=urrri=http://127.0.0.1:8270/  timeout=60");
         final LibraryImport libImport = getImport(suite);
@@ -486,7 +555,7 @@ public class RemoteArgumentsResolverTest {
     }
 
     @Test
-    public void uriArgumentIsNotFound_whenRemoteArgumentsListContainsInvertedInvalidNamedUriAndTimeout()
+    public void uriArgumentIsFound_whenRemoteArgumentsListContainsInvertedInvalidNamedUriAndTimeout()
             throws Exception {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport(
                 "Library  Remote  timeout=60  uri=;urrrihttp://127.0.0.1:8270/");
