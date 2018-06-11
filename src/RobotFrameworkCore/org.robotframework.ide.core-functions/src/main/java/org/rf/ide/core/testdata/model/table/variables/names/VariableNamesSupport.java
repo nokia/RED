@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
@@ -24,15 +25,10 @@ import com.google.common.collect.Multimap;
  */
 public class VariableNamesSupport {
 
-    private VariableNamesSupport() {
-    }
+    private static final Pattern VAR_PATTERN = Pattern.compile("^[@\\$&]\\{[^\\}]+\\}$");
 
-    public static List<String> extractUnifiedVariableNames(final List<VariableDeclaration> assignments) {
-        final List<String> vars = new ArrayList<>();
-        for (final VariableDeclaration variableDeclaration : assignments) {
-            vars.add(extractUnifiedVariableName(variableDeclaration.asToken().getText()));
-        }
-        return vars;
+    public static boolean isCleanVariable(final String input) {
+        return VAR_PATTERN.matcher(input).matches();
     }
 
     public static Multimap<String, RobotToken> extractUnifiedVariables(final List<RobotToken> assignments,
@@ -46,6 +42,10 @@ public class VariableNamesSupport {
             }
         }
         return vars;
+    }
+
+    public static String extractUnifiedVariableName(final VariableDeclaration variable) {
+        return extractUnifiedVariableName(variable.asToken().getText());
     }
 
     public static String extractUnifiedVariableName(final String variable) {
