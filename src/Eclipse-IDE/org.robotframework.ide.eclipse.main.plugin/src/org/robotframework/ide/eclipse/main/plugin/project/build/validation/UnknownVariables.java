@@ -20,8 +20,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 
 import com.google.common.collect.ImmutableMap;
@@ -38,62 +38,48 @@ class UnknownVariables {
         this.reporter = reporter;
     }
 
-    void reportUnknownVars(final List<RobotToken> tokens, final Set<String> variables) {
+    private static Predicate<VariableDeclaration> isInvalidVariableDeclaration(final Set<String> definedVariables) {
+        return declaration ->
+                   !declaration.asToken().getTypes().contains(RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION)
+                && !declaration.isDynamic()
+                && !(declaration.getVariableType() instanceof Number)
+                && !VariableNamesSupport.isDefinedVariable(declaration, definedVariables)
+                && !VariableNamesSupport.isDefinedVariableInsideComputation(declaration, definedVariables);
+    }
+
+    void reportUnknownVars(final Set<String> knownVariables, final List<RobotToken> tokens) {
         final String filename = validationContext.getFile().getName();
-        final Predicate<VariableDeclaration> isInvalid = isInvalidVariableDeclaration(variables);
         for (final RobotToken token : tokens) {
             final List<VariableDeclaration> declarations = new VariableExtractor().extract(token, filename)
                     .getCorrectVariables();
-            if (!declarations.isEmpty()) {
-                reportUnknownVariables(declarations, isInvalid);
-            }
+            reportUnknownVariables(knownVariables, declarations);
         }
     }
 
-    static Predicate<VariableDeclaration> isInvalidVariableDeclaration(final Set<String> definedVariables) {
-        return new Predicate<VariableDeclaration>() {
+    void reportUnknownVariables(final Set<String> knownVariables,
+            final List<VariableDeclaration> variablesDeclarations) {
+        final Predicate<VariableDeclaration> isInvalid = isInvalidVariableDeclaration(knownVariables);
 
-            @Override
-            public boolean test(final VariableDeclaration variableDeclaration) {
-                return !variableDeclaration.asToken().getTypes().contains(
-                        RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION) && !variableDeclaration.isDynamic()
-                        && !VariableNamesSupport.isDefinedVariable(variableDeclaration, definedVariables)
-                        && !isSpecificVariableDeclaration(definedVariables, variableDeclaration);
-            }
-        };
-    }
-
-    private static boolean isSpecificVariableDeclaration(final Set<String> definedVariables,
-            final VariableDeclaration variableDeclaration) {
-        return variableDeclaration.getVariableType() instanceof Number
-                || VariableNamesSupport.isDefinedVariableInsideComputation(variableDeclaration, definedVariables);
-    }
-
-    void reportUnknownVariables(final List<VariableDeclaration> variablesDeclarations,
-            final Predicate<VariableDeclaration> isInvalid) {
-
-        for (final VariableDeclaration variableDeclaration : variablesDeclarations) {
-            if (isInvalid.test(variableDeclaration)) {
-                final String variableName = getVariableName(variableDeclaration);
+        for (final VariableDeclaration declaration : variablesDeclarations) {
+            if (isInvalid.test(declaration)) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
-                        .formatMessageWith(variableName);
-                final int variableOffset = variableDeclaration.getStartFromFile().getOffset();
-                final ProblemPosition position = new ProblemPosition(variableDeclaration.getStartFromFile().getLine(),
-                        Range.closed(variableOffset, variableOffset
-                                + ((variableDeclaration.getEndFromFile().getOffset() + 1) - variableOffset)));
+                        .formatMessageWith(getVariableName(declaration));
+
+                final int variableOffset = declaration.getStartFromFile().getOffset();
+                final ProblemPosition position = new ProblemPosition(declaration.getStartFromFile().getLine(),
+                        Range.closed(variableOffset,
+                                variableOffset + ((declaration.getEndFromFile().getOffset() + 1) - variableOffset)));
+
                 final Map<String, Object> additionalArguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
-                        getVariableNameWithBrackets(variableDeclaration));
+                        getVariableNameWithBrackets(declaration));
                 reporter.handleProblem(problem, validationContext.getFile(), position, additionalArguments);
             }
         }
     }
 
     private String getVariableName(final VariableDeclaration variableDeclaration) {
-        final Optional<TextPosition> extractVariableName = variableDeclaration.getTextWithoutComputation();
-        if (extractVariableName.isPresent()) {
-            return extractVariableName.get().getText();
-        }
-        return variableDeclaration.getVariableName().getText();
+        return variableDeclaration.getTextWithoutComputation().map(TextPosition::getText).orElseGet(
+                () -> variableDeclaration.getVariableName().getText());
     }
 
     private String getVariableNameWithBrackets(final VariableDeclaration variableDeclaration) {
