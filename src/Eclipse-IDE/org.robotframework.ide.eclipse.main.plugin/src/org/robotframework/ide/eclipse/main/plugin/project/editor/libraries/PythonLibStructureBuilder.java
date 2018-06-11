@@ -55,7 +55,7 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
     private Collection<ILibraryClass> provideEntriesFromFile(final URI path,
             final Function<String, ILibraryClass> classNameMapper) throws RobotEnvironmentException {
         final List<String> classes = environment.getClassesFromModule(new File(path),
-                new RedEclipseProjectConfig(config).createAdditionalEnvironmentSearchPaths(project));
+                new RedEclipseProjectConfig(project, config).createAdditionalEnvironmentSearchPaths());
         return classes.stream().map(classNameMapper).distinct().collect(Collectors.toList());
     }
 

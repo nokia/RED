@@ -81,8 +81,8 @@ class PathsLabelProvider extends RedCommonLabelProvider {
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(element);
             if (problems.isEmpty()) {
                 final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(
-                        editorInput.getProjectConfiguration());
-                return redConfig.toAbsolutePath(path, editorInput.getRobotProject().getProject())
+                        editorInput.getRobotProject().getProject(), editorInput.getProjectConfiguration());
+                return redConfig.toAbsolutePath(path)
                         .map(File::getPath)
                         .map(tooltipPath -> path.isSystem()
                                 ? tooltipPath + " [already defined in " + pathVariableName + " variable]"
