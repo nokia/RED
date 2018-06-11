@@ -120,7 +120,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final ArgumentsDescriptor descriptor = specification.getConstructor() == null
                     ? ArgumentsDescriptor.createDescriptor()
                     : specification.getConstructor().createArgumentsDescriptor();
-            new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
+            new KeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
                     importArguments).validate(new NullProgressMonitor());
         } else {
             if (!pathOrName.equals("Remote")) {
@@ -152,7 +152,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                 reporter.handleProblem(problem, validationContext.getFile(), uriOrNameToken);
             }
         } else {
-            new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
+            new KeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
                     resolver.getDescriptor(), arguments).validate(new NullProgressMonitor());
         }
         if (timeout.isPresent()) {

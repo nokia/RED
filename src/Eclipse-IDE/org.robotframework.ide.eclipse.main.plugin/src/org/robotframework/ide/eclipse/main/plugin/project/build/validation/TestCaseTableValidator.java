@@ -347,7 +347,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
     private static KeywordCallArgumentsValidator createKeywordCallArgumentsValidator(final IFile file,
             final RobotToken definingToken, final ArgumentsDescriptor argumentsDescriptor,
             final List<RobotToken> arguments, final ValidationReportingStrategy reporter) {
-        return new GeneralKeywordCallArgumentsValidator(file, definingToken, reporter, argumentsDescriptor, arguments);
+        return new KeywordCallArgumentsValidator(file, definingToken, reporter, argumentsDescriptor, arguments);
     }
 
     private void reportUnknownVariables(final List<TestCase> cases) {
