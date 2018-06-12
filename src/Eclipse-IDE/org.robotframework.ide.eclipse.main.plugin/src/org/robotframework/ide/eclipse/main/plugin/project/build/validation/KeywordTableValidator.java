@@ -36,9 +36,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DeprecatedKeywordHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
@@ -264,7 +264,7 @@ class KeywordTableValidator implements ModelUnitValidator {
 
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
         for (final KeywordTags tag : tags) {
-            unknownVarsValidator.reportUnknownVars(tag.getTags(), variables);
+            unknownVarsValidator.reportUnknownVars(variables, tag.getTags());
         }
     }
 
