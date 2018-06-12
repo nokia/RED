@@ -70,4 +70,19 @@ public class InsertCellToRightHandlerTest {
         verify(commandsStack).execute(refEq(new InsertCellCommand(call, 1, null)));
         verifyNoMoreInteractions(commandsStack);
     }
+
+    @Test
+    public void nothingExecuted_whenJustAfterTheWholeLineComment() {
+        final AModelElement<?> linkedElement = new RobotExecutableRow<TestCase>();
+        final RobotKeywordCall call = new RobotKeywordCall(null, linkedElement);
+        call.setComment("#cmt"); // this is at 1st position in model but 0th column in table view
+        when(selection.getFirstElement()).thenReturn(call);
+        when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);
+        when(selectionLayerAccessor.getSelectedPositions())
+                .thenReturn(new PositionCoordinate[] { new PositionCoordinate(null, 0, 0) });
+
+        new E4InsertCellToRightHandler().insertCellToRight(commandsStack, editor, selection);
+
+        verifyZeroInteractions(commandsStack);
+    }
 }

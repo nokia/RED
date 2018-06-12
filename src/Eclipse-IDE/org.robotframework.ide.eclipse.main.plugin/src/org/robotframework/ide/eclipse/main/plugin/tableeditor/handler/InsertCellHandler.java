@@ -34,7 +34,11 @@ public class InsertCellHandler extends DIParameterizedHandler<E4InsertCellHandle
             final RobotKeywordCall call = (RobotKeywordCall) selection.getFirstElement();
             final int column = editor.getSelectionLayerAccessor().getSelectedPositions()[0].getColumnPosition();
 
-            if (column < call.getLinkedElement().getElementTokens().size()) {
+            final boolean isWholeLineComment = call.getAction().isPresent()
+                    && call.getAction().get().getText().isEmpty() && call.getAction().get().getFilePosition().isNotSet()
+                    && call.getArgumentTokens().isEmpty();
+
+            if (column < call.getLinkedElement().getElementTokens().size() - (isWholeLineComment ? 1 : 0)) {
                 commandsStack.execute(new InsertCellCommand(call, column, null));
             }
         }
