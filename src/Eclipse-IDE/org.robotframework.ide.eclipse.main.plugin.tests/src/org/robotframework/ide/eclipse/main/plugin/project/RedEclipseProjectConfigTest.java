@@ -5,10 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IProject;
@@ -18,7 +20,11 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.SystemVariableAccessor;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
 import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -26,8 +32,10 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class RedEclipseProjectConfigTest {
 
+    private static final String PROJECT_NAME = RedEclipseProjectConfigTest.class.getSimpleName();
+
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedEclipseProjectConfigTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     private static IProject project;
 
@@ -42,9 +50,9 @@ public class RedEclipseProjectConfigTest {
         final RobotProjectConfig projectConfig = new RobotProjectConfig();
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
-        final SearchPath toResolve = SearchPath.create(project.getLocation().append("file.txt").toOSString());
 
-        assertThat(redConfig.toAbsolutePath(toResolve)).hasValue(project.getLocation().append("file.txt").toFile());
+        assertThat(redConfig.toAbsolutePath(project.getLocation().append("file.txt")))
+                .hasValue(project.getLocation().append("file.txt").toFile());
     }
 
     @Test
@@ -53,9 +61,8 @@ public class RedEclipseProjectConfigTest {
         projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.WORKSPACE));
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
-        final SearchPath toResolve = SearchPath.create("resource.txt");
 
-        assertThat(redConfig.toAbsolutePath(toResolve))
+        assertThat(redConfig.toAbsolutePath(path("resource.txt")))
                 .hasValue(project.getWorkspace().getRoot().getLocation().append("resource.txt").toFile());
     }
 
@@ -65,9 +72,9 @@ public class RedEclipseProjectConfigTest {
         projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
-        final SearchPath toResolve = SearchPath.create("resource.txt");
 
-        assertThat(redConfig.toAbsolutePath(toResolve)).hasValue(project.getLocation().append("resource.txt").toFile());
+        assertThat(redConfig.toAbsolutePath(path("resource.txt")))
+                .hasValue(project.getLocation().append("resource.txt").toFile());
     }
 
     @Test
@@ -76,9 +83,8 @@ public class RedEclipseProjectConfigTest {
         projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.WORKSPACE));
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
-        final SearchPath toResolve = SearchPath.create("file.txt");
 
-        assertThat(redConfig.toAbsolutePath(toResolve))
+        assertThat(redConfig.toAbsolutePath(path("file.txt")))
                 .hasValue(project.getWorkspace().getRoot().getLocation().append("file.txt").toFile());
     }
 
@@ -88,55 +94,84 @@ public class RedEclipseProjectConfigTest {
         projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
-        final SearchPath toResolve = SearchPath.create("file.txt");
 
-        assertThat(redConfig.toAbsolutePath(toResolve)).hasValue(project.getLocation().append("file.txt").toFile());
+        assertThat(redConfig.toAbsolutePath(path("file.txt")))
+                .hasValue(project.getLocation().append("file.txt").toFile());
     }
 
     @Test
-    public void pathWithSystemVariableIsResolved_whenContainsSingleSystemVariable() throws Exception {
+    public void additionalEnvironmentSearchPathsContainOnlyUniqueCorrectPathsWithResolvedEnvironmentVariables()
+            throws Exception {
+        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
+        when(variableAccessor.getValue("KNOWN_1")).thenReturn(Optional.of("java"));
+        when(variableAccessor.getValue("KNOWN_2")).thenReturn(Optional.of("python"));
+        when(variableAccessor.getValue("JAR")).thenReturn(Optional.of("lib.jar"));
+        when(variableAccessor.getValue("FOLDER")).thenReturn(Optional.of("folder"));
+
         final RobotProjectConfig projectConfig = new RobotProjectConfig();
         projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
-        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
-        when(variableAccessor.getValue("var"))
-                .thenReturn(Optional.of(project.getLocation().append("resource.txt").toOSString()));
+        projectConfig.addClassPath(SearchPath.create("%{KNOWN_1}/lib.jar"));
+        projectConfig.addClassPath(SearchPath.create("%{UNKNOWN_1}/unknown.jar"));
+        projectConfig.addClassPath(SearchPath.create("${INCORRECT_1}/incorrect.jar"));
+        projectConfig.addClassPath(SearchPath.create("%{KNOWN_1}/%{JAR}"));
+        projectConfig.addPythonPath(SearchPath.create("%{KNOWN_2}/folder"));
+        projectConfig.addPythonPath(SearchPath.create("%{UNKNOWN_2}/unknown"));
+        projectConfig.addPythonPath(SearchPath.create("${INCORRECT_2}/incorrect"));
+        projectConfig.addPythonPath(SearchPath.create("%{KNOWN_2}/%{FOLDER}"));
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
-        final SearchPath toResolve = SearchPath.create("%{var}");
 
-        assertThat(redConfig.toAbsolutePath(toResolve)).hasValue(project.getLocation().append("resource.txt").toFile());
+        assertThat(redConfig.createAdditionalEnvironmentSearchPaths()).isEqualTo(new EnvironmentSearchPaths(
+                newArrayList(absolutePath("java", "lib.jar")), newArrayList(absolutePath("python", "folder"))));
     }
 
     @Test
-    public void pathWithSystemVariableIsResolved_whenContainsSeveralSystemVariables() throws Exception {
+    public void executionEnvironmentSearchPathsContainOnlyUniqueCorrectPathsWithResolvedEnvironmentVariables()
+            throws Exception {
+        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
+        when(variableAccessor.getValue("KNOWN_1")).thenReturn(Optional.of("java"));
+        when(variableAccessor.getValue("KNOWN_2")).thenReturn(Optional.of("python"));
+        when(variableAccessor.getValue("JAR")).thenReturn(Optional.of("lib.jar"));
+        when(variableAccessor.getValue("FOLDER")).thenReturn(Optional.of("folder"));
+
         final RobotProjectConfig projectConfig = new RobotProjectConfig();
         projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
-        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
-        when(variableAccessor.getValue("var1")).thenReturn(Optional.of("a"));
-        when(variableAccessor.getValue("var2")).thenReturn(Optional.of("b"));
-        when(variableAccessor.getValue("var3")).thenReturn(Optional.of("c"));
+        projectConfig.addClassPath(SearchPath.create("%{KNOWN_1}/lib.jar"));
+        projectConfig.addClassPath(SearchPath.create("%{UNKNOWN_1}/unknown.jar"));
+        projectConfig.addClassPath(SearchPath.create("${INCORRECT_1}/incorrect.jar"));
+        projectConfig.addClassPath(SearchPath.create("%{KNOWN_1}/%{JAR}"));
+        projectConfig.addClassPath(SearchPath.create("lib1.jar"));
+        projectConfig.addPythonPath(SearchPath.create("%{KNOWN_2}/folder"));
+        projectConfig.addPythonPath(SearchPath.create("%{UNKNOWN_2}/unknown"));
+        projectConfig.addPythonPath(SearchPath.create("${INCORRECT_2}/incorrect"));
+        projectConfig.addPythonPath(SearchPath.create("%{KNOWN_2}/%{FOLDER}"));
+        projectConfig.addPythonPath(SearchPath.create("folder1"));
+        projectConfig.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.JAVA, "JavaLib1", PROJECT_NAME + "/lib1.jar"));
+        projectConfig.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.JAVA, "JavaLib2", PROJECT_NAME + "/lib2.jar"));
+        projectConfig.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib1", PROJECT_NAME + "/folder1"));
+        projectConfig.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2"));
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
-        final SearchPath toResolve = SearchPath.create("%{var1}/%{var2}/%{var3}/file.txt");
 
-        assertThat(redConfig.toAbsolutePath(toResolve))
-                .hasValue(project.getLocation().append("a/b/c/file.txt").toFile());
+        assertThat(redConfig.createExecutionEnvironmentSearchPaths()).isEqualTo(new EnvironmentSearchPaths(
+                newArrayList(".", absolutePath("lib1.jar"), absolutePath("lib2.jar"), absolutePath("java", "lib.jar")),
+                newArrayList(absolutePath("folder1"), absolutePath("folder2"), absolutePath("python", "folder"))));
     }
 
     @Test
-    public void pathWithSystemVariableIsNotResolved_whenContainsUnknownSystemVariable() throws Exception {
+    public void variableFilePathsAreReturned() throws Exception {
         final RobotProjectConfig projectConfig = new RobotProjectConfig();
-        projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
-        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
-        when(variableAccessor.getValue("known1")).thenReturn(Optional.of("a"));
-        when(variableAccessor.getValue("known2")).thenReturn(Optional.of("b"));
-        when(variableAccessor.getValue("unknown1")).thenReturn(Optional.empty());
-        when(variableAccessor.getValue("unknown2")).thenReturn(Optional.empty());
+        projectConfig.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars1.py"));
+        projectConfig.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars2.py", "a", "b"));
 
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
-        final SearchPath toResolve = SearchPath.create("%{known1}/%{known2}/%{unknown1}/%{unknown2}/file.txt");
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
 
-        assertThat(redConfig.toAbsolutePath(toResolve)).isNotPresent();
+        assertThat(redConfig.getVariableFilePaths()).containsExactly(absolutePath("vars1.py"),
+                absolutePath("vars2.py:a:b"));
     }
 
     @Test
@@ -181,5 +216,10 @@ public class RedEclipseProjectConfigTest {
 
     private static IPath path(final String path) {
         return new Path(path);
+    }
+
+    private static String absolutePath(final String... projectRelativeParts) {
+        final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
+        return projectAbsPath + File.separator + String.join(File.separator, projectRelativeParts);
     }
 }
