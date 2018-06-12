@@ -81,8 +81,8 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     void startDryRunClient(final int port, final File dataSource) throws CoreException {
-        final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
-                .createExecutionEnvironmentSearchPaths(robotProject.getProject());
+        final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getProject(),
+                robotProject.getRobotProjectConfig()).createExecutionEnvironmentSearchPaths();
 
         robotProject.getRuntimeEnvironment().startKeywordAutoDiscovering(port, dataSource, additionalPaths);
     }
