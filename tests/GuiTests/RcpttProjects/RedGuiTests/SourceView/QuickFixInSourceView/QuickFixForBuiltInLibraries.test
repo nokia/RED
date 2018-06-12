@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XKnisIcCEeWrUbOa1Nzguw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/13/18 2:20 PM
+Save-Time: 6/12/18 12:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -95,7 +95,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 with [get-view Problems | get-tree] {
     get-item "Errors \\(2 items\\)" | get-property childCount | equals 2 | verify-true
     get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "Invalid number of arguments. Keyword 'Convert Time' expects from 1 to 3 arguments, but 0 are provided" 
+        | equals "Invalid number of arguments. Keyword 'Convert Time' expects from 1 to 3 arguments but 0 are provided" 
         | verify-true
     get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals "Unknown keyword 'Get Element'" | verify-true

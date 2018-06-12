@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ZB4rYGuFEeaVB7Q9BJdfQg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/31/17 11:04 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/12/18 12:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -29,9 +29,9 @@ with [get-editor "test.robot" | get-text-viewer] {
 
 //check that are noe 2 errors
 with [get-view Problems | get-tree] {
-    get-item "Errors \\(2 items\\)/Invalid number of arguments. Keyword 'log' expects from 1 to 5 arguments, but 0 are provided" 
+    get-item "Errors \\(2 items\\)/Invalid number of arguments. Keyword 'log' expects from 1 to 5 arguments but 0 are provided" 
         | get-property caption 
-        | equals "Invalid number of arguments. Keyword 'log' expects from 1 to 5 arguments, but 0 are provided" 
+        | equals "Invalid number of arguments. Keyword 'log' expects from 1 to 5 arguments but 0 are provided" 
         | verify-true
     get-item "Errors \\(2 items\\)/Resource import 'space before.py' is invalid: file does not exist. Check file name and path." 
         | get-property caption 
@@ -48,9 +48,9 @@ with [get-editor "test.robot" | get-text-viewer] {
 
 //now is one error
 get-view Problems | get-tree 
-    | get-item "Errors \\(1 item\\)/Invalid number of arguments. Keyword 'log' expects from 1 to 5 arguments, but 0 are provided" 
+    | get-item "Errors \\(1 item\\)/Invalid number of arguments. Keyword 'log' expects from 1 to 5 arguments but 0 are provided" 
     | get-property caption 
-    | equals "Invalid number of arguments. Keyword 'log' expects from 1 to 5 arguments, but 0 are provided" 
+    | equals "Invalid number of arguments. Keyword 'log' expects from 1 to 5 arguments but 0 are provided" 
     | verify-true
     
 //checif variables is visible form that file    
