@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
 @RunWith(Enclosed.class)
 public class KeywordCallArgumentsValidatorTest {
 
-    private static final String[] ALL = new String[] { "cause", "start", "end", "message" };
+    static final String[] ALL = new String[] { "cause", "start", "end", "message" };
 
     private static final ArgumentProblem DESCRIPTOR_PROBLEM = ArgumentProblem.INVALID_ARGUMENTS_DESCRIPTOR;
     private static final ArgumentProblem ORDER_PROBLEM = ArgumentProblem.POSITIONAL_ARGUMENT_AFTER_NAMED;
@@ -2470,7 +2470,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
-    private static RobotKeywordCall call(final String... args) {
+    static RobotKeywordCall call(final String... args) {
         final String separator = Strings.repeat(" ", 4);
 
         return new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
@@ -2485,7 +2485,7 @@ public class KeywordCallArgumentsValidatorTest {
                 .get(0);
     }
 
-    private static Tuple problem(final Object... properties) {
+    static Tuple problem(final Object... properties) {
         // adding synonym for better readablity
         return tuple(properties);
     }
@@ -2514,7 +2514,7 @@ public class KeywordCallArgumentsValidatorTest {
     }
 
     @FunctionalInterface
-    private static interface ValidationStep {
+    static interface ValidationStep {
 
         Collection<Problem> against(ArgumentsDescriptor descriptor);
     }
