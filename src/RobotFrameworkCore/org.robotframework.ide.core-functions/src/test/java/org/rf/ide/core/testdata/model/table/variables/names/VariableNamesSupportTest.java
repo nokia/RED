@@ -5,12 +5,10 @@
  */
 package org.rf.ide.core.testdata.model.table.variables.names;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.extractUnifiedVariableName;
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets;
-import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.extractUnifiedVariableNames;
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.hasEqualNames;
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.isDefinedVariable;
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.isDefinedVariableInsideComputation;
@@ -26,7 +24,7 @@ public class VariableNamesSupportTest {
 
     @Test
     public void testExtractUnifiedVariableName() {
-        assertThat(extractUnifiedVariableName(null)).isEmpty();
+        assertThat(extractUnifiedVariableName((String) null)).isEmpty();
         assertThat(extractUnifiedVariableName("")).isEmpty();
 
         assertThat(extractUnifiedVariableName("${var 1}")).isEqualTo("${var1}");
@@ -96,8 +94,8 @@ public class VariableNamesSupportTest {
 
     @Test
     public void testExtractUnifiedVariableNames() {
-        assertThat(extractUnifiedVariableNames(newArrayList(varDeclaration("${VAR_1}"), varDeclaration("@{VAR 2}"))))
-                .containsExactly("${var1}", "@{var2}");
+        assertThat(extractUnifiedVariableName(varDeclaration("${VAR_1}"))).isEqualTo("${var1}");
+        assertThat(extractUnifiedVariableName(varDeclaration("@{VAR_2}"))).isEqualTo("@{var2}");
     }
 
     private VariableDeclaration varDeclaration(final String text) {

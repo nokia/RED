@@ -13,12 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
@@ -26,7 +24,6 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
@@ -46,9 +43,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
@@ -195,6 +192,10 @@ class TestCaseTableValidator implements ModelUnitValidator {
         }
     }
 
+    private boolean isTemplateFromTestCasesTable(final RobotCase testCase) {
+        return testCase.getLinkedElement().getRobotViewAboutTestTemplate() != null;
+    }
+
     static void reportKeywordUsageProblemsInSetupAndTeardownSetting(final FileValidationContext validationContext,
             final ValidationReportingStrategy reporter, final RobotToken keywordNameToken,
             final Optional<List<RobotToken>> arguments) {
@@ -284,29 +285,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
             final List<KeywordEntity> keywordEntities = keywords.get(scope);
             if (keywordEntities.size() == 1) {
                 final ValidationKeywordEntity keyword = (ValidationKeywordEntity) keywordEntities.get(0);
-                if (keyword.isDeprecated()) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD).formatMessageWith(name),
-                            validationContext.getFile(), position);
-                }
-                if (keyword.isFromNestedLibrary(validationContext.getFile())) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY).formatMessageWith(name),
-                            validationContext.getFile(), position);
-                }
-                if (keyword.hasInconsistentName(name)) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
-                                    .formatMessageWith(name, keyword.getNameFromDefinition()),
-                            validationContext.getFile(), position,
-                            ImmutableMap.of(AdditionalMarkerAttributes.NAME, name,
-                                    AdditionalMarkerAttributes.ORIGINAL_NAME, keyword.getNameFromDefinition(),
-                                    AdditionalMarkerAttributes.SOURCES, keyword.getSourceNameInUse()));
-                }
-                if (arguments.isPresent()) {
-                    createKeywordCallArgumentsValidator(validationContext, reporter, keywordName,
-                            keyword.getArgumentsDescriptor(), arguments.get()).validate(new NullProgressMonitor());
-                }
+                validateFoundKeyword(validationContext.getFile(), keywordName, name, arguments, position, keyword,
+                        reporter);
                 break;
             } else if (keywordEntities.size() > 1) {
                 final List<String> sources = keywordEntities.stream().map(KeywordEntity::getSourceNameInUse).collect(
@@ -322,18 +302,52 @@ class TestCaseTableValidator implements ModelUnitValidator {
         }
     }
 
-    private static KeywordCallArgumentsValidator createKeywordCallArgumentsValidator(
-            final FileValidationContext validationContext, final ValidationReportingStrategy reporter,
-            final RobotToken definingToken, final ArgumentsDescriptor argumentsDescriptor,
-            final List<RobotToken> arguments) {
-        final BuiltinKeyword builtinKw = BuiltinKeyword.from(definingToken, validationContext);
-        if (builtinKw == BuiltinKeyword.VARIABLE_SETTER || builtinKw == BuiltinKeyword.VARIABLE_GETTER) {
-            return new VariableSetterOrGetterCallArgumentsValidator(validationContext.getFile(), definingToken,
-                    reporter, argumentsDescriptor, arguments);
-        } else {
-            return new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), definingToken, reporter,
-                    argumentsDescriptor, arguments);
+    private static void validateFoundKeyword(final IFile file, final RobotToken nameToken, final String actualName,
+            final Optional<List<RobotToken>> arguments, final ProblemPosition position,
+            final ValidationKeywordEntity keyword, final ValidationReportingStrategy reporter) {
+
+        if (keyword.isDeprecated()) {
+            reporter.handleProblem(
+                    RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD).formatMessageWith(actualName), file,
+                    position);
         }
+        if (keyword.isFromNestedLibrary(file)) {
+            reporter.handleProblem(
+                    RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY).formatMessageWith(actualName),
+                    file,
+                    position);
+        }
+        if (keyword.hasInconsistentName(actualName)) {
+            reporter.handleProblem(
+                    RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
+                            .formatMessageWith(actualName, keyword.getNameFromDefinition()),
+                    file, position,
+                    ImmutableMap.of(AdditionalMarkerAttributes.NAME, actualName,
+                            AdditionalMarkerAttributes.ORIGINAL_NAME,
+                            keyword.getNameFromDefinition(), AdditionalMarkerAttributes.SOURCES,
+                            keyword.getSourceNameInUse()));
+        }
+        if (arguments.isPresent()) {
+            final KeywordCallArgumentsValidator argsValidator = createKeywordCallArgumentsValidator(file, nameToken,
+                    keyword.getArgumentsDescriptor(), arguments.get(), reporter);
+            argsValidator.validate(null);
+
+            final List<RobotToken> varsForSyntaxCheck = SpecialKeywords.getArgumentsToValidateForVariablesSyntax(
+                    QualifiedKeywordName.create(keyword.getKeywordName(), keyword.getSourceName()), arguments.get());
+            for (final RobotToken varToken : varsForSyntaxCheck) {
+                if (!VariableNamesSupport.isCleanVariable(varToken.getText())) {
+                    final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_VARIABLE_SYNTAX)
+                            .formatMessageWith(varToken.getText());
+                    reporter.handleProblem(problem, file, varToken);
+                }
+            }
+        }
+    }
+
+    private static KeywordCallArgumentsValidator createKeywordCallArgumentsValidator(final IFile file,
+            final RobotToken definingToken, final ArgumentsDescriptor argumentsDescriptor,
+            final List<RobotToken> arguments, final ValidationReportingStrategy reporter) {
+        return new GeneralKeywordCallArgumentsValidator(file, definingToken, reporter, argumentsDescriptor, arguments);
     }
 
     private void reportUnknownVariables(final List<TestCase> cases) {
@@ -378,7 +392,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
 
             if (containsVariables(validationContext, timeoutToken)) {
                 final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
-                unknownVarsValidator.reportUnknownVars(newArrayList(timeoutToken), variables);
+                unknownVarsValidator.reportUnknownVars(variables, newArrayList(timeoutToken));
             } else {
                 final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
                         .formatMessageWith(timeout);
@@ -398,7 +412,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
 
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
         for (final TestCaseTags tag : tags) {
-            unknownVarsValidator.reportUnknownVars(tag.getTags(), variables);
+            unknownVarsValidator.reportUnknownVars(variables, tag.getTags());
         }
     }
 
@@ -416,95 +430,47 @@ class TestCaseTableValidator implements ModelUnitValidator {
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reportingStrategy);
         for (final RobotExecutableRow<?> row : executables) {
             if (row.isExecutable()) {
-                final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
-                final Predicate<VariableDeclaration> isInvalid = isInvalidVariableDeclaration(validationContext,
-                        definedVariables, lineDescription);
-                unknownVarsValidator.reportUnknownVariables(lineDescription.getUsedVariables(), isInvalid);
-                definedVariables.addAll(
-                        VariableNamesSupport.extractUnifiedVariableNames(lineDescription.getCreatedVariables()));
+                final IExecutableRowDescriptor<?> lineDescriptor = row.buildLineDescription();
+                final QualifiedKeywordName keywordName = getSpecialKeywordName(validationContext, lineDescriptor);
+
+                final List<VariableDeclaration> variableUsedInCall = SpecialKeywords.getUsedVariables(keywordName,
+                        lineDescriptor);
+                unknownVarsValidator.reportUnknownVariables(definedVariables, variableUsedInCall);
+
+                SpecialKeywords.getCreatedVariables(keywordName, lineDescriptor)
+                        .forEach(var -> definedVariables.add(VariableNamesSupport.extractUnifiedVariableName(var)));
+                lineDescriptor.getCreatedVariables()
+                        .forEach(var -> definedVariables.add(VariableNamesSupport.extractUnifiedVariableName(var)));
             }
         }
     }
 
-    static Predicate<VariableDeclaration> isInvalidVariableDeclaration(final FileValidationContext validationContext,
-            final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription) {
-        return new Predicate<VariableDeclaration>() {
-
-            @Override
-            public boolean test(final VariableDeclaration variableDeclaration) {
-                return UnknownVariables.isInvalidVariableDeclaration(definedVariables).test(variableDeclaration)
-                        && !isVariableInSetterOrGetterOrCommentKeyword(validationContext, definedVariables,
-                                lineDescription, variableDeclaration);
-            }
-
-            private boolean isVariableInSetterOrGetterOrCommentKeyword(final FileValidationContext validationContext,
-                    final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription,
-                    final VariableDeclaration variableDeclaration) {
-                final BuiltinKeyword builtinKw = BuiltinKeyword.from(getKeyword(lineDescription), validationContext);
-                if (builtinKw == BuiltinKeyword.VARIABLE_SETTER) {
-                    final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
-                    if (!usedVariables.isEmpty()) {
-                        definedVariables.add(VariableNamesSupport
-                                .extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
-                        return true;
-                    }
-                } else if (builtinKw == BuiltinKeyword.VARIABLE_GETTER) {
-                    final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
-                    if (!usedVariables.isEmpty() && usedVariables.get(0).equals(variableDeclaration)) {
-                        return true;
-                    }
-                } else if (builtinKw == BuiltinKeyword.COMMENT) {
-                    return true;
-                }
-                return false;
-            }
-
-            private RobotToken getKeyword(final IExecutableRowDescriptor<?> lineDescription) {
-                final RobotAction action;
-                if (lineDescription.getRowType() == ERowType.FOR_CONTINUE) {
-                    action = ((ForLoopContinueRowDescriptor<?>) lineDescription).getKeywordAction();
-                } else {
-                    action = lineDescription.getAction();
-                }
-                return action.getToken();
-            }
-        };
-    }
-
-    private boolean isTemplateFromTestCasesTable(final RobotCase testCase) {
-        return testCase.getLinkedElement().getRobotViewAboutTestTemplate() != null;
-    }
-
-    private enum BuiltinKeyword {
-        VARIABLE_SETTER,
-        VARIABLE_GETTER,
-        COMMENT,
-        UNKNOWN;
-
-        private static BuiltinKeyword from(final RobotToken keyword, final FileValidationContext validationContext) {
-            final String keywordName = QualifiedKeywordName.fromOccurrence(keyword.getText()).getKeywordName();
-            if ((keywordName.equals("setglobalvariable") || keywordName.equals("setsuitevariable")
-                    || keywordName.equals("settestvariable")) && isFromBuiltin(keywordName, validationContext)) {
-                return VARIABLE_SETTER;
-            } else if (keywordName.equals("getvariablevalue") && isFromBuiltin(keywordName, validationContext)) {
-                return VARIABLE_GETTER;
-            } else if (keywordName.equals("comment") && isFromBuiltin(keywordName, validationContext)) {
-                return COMMENT;
-            }
-            return UNKNOWN;
+    private static QualifiedKeywordName getSpecialKeywordName(final FileValidationContext validationContext,
+            final IExecutableRowDescriptor<?> lineDescriptor) {
+        final String originalName = getKeywordToken(lineDescriptor).getText();
+        final QualifiedKeywordName keywordName = QualifiedKeywordName.fromOccurrence(originalName);
+        if (!keywordName.getKeywordSource().isEmpty()) {
+            return keywordName;
         }
-
-        private static boolean isFromBuiltin(final String keywordName, final FileValidationContext validationContext) {
+        if (SpecialKeywords.mayBeSpecialKeyword(originalName)) {
             for (final KeywordScope scope : KeywordScope.defaultOrder()) {
-                final List<KeywordEntity> possible = validationContext.getPossibleKeywords(keywordName, true)
+                final List<KeywordEntity> possible = validationContext.getPossibleKeywords(originalName, true)
                         .get(scope);
-                if (scope != KeywordScope.STD_LIBRARY && !possible.isEmpty()) {
-                    return false;
-                } else if (scope == KeywordScope.STD_LIBRARY) {
-                    return possible.size() == 1 && possible.get(0).getSourceNameInUse().equals("BuiltIn");
+                if (possible.isEmpty()) {
+                    continue;
+                } else if (possible.size() == 1) {
+                    return QualifiedKeywordName.create(originalName, possible.get(0).getSourceNameInUse());
                 }
             }
-            return false;
+        }
+        return null;
+    }
+
+    private static RobotToken getKeywordToken(final IExecutableRowDescriptor<?> lineDescription) {
+        if (lineDescription.getRowType() == ERowType.FOR_CONTINUE) {
+            return ((ForLoopContinueRowDescriptor<?>) lineDescription).getKeywordAction().getToken();
+        } else {
+            return lineDescription.getAction().getToken();
         }
     }
 }
