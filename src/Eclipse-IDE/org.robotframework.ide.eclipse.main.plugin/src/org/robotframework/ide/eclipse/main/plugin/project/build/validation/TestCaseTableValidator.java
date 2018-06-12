@@ -17,7 +17,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -36,7 +35,9 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -328,14 +329,23 @@ class TestCaseTableValidator implements ModelUnitValidator {
                             keyword.getSourceNameInUse()));
         }
         if (arguments.isPresent()) {
-            final KeywordCallArgumentsValidator argsValidator = createKeywordCallArgumentsValidator(file, nameToken,
-                    keyword.getArgumentsDescriptor(), arguments.get(), reporter);
+            final QualifiedKeywordName qualifiedKeywordName = QualifiedKeywordName.create(keyword.getKeywordName(),
+                    keyword.getSourceName());
+
+            final KeywordCallArgumentsValidator argsValidator;
+            if (SpecialKeywords.isRunKeywordVariant(qualifiedKeywordName)) {
+                argsValidator = new KeywordCallOfRunKwVariantArgumentsValidator(file, nameToken, reporter,
+                        keyword.getArgumentsDescriptor(), arguments.get());
+            } else {
+                argsValidator = new KeywordCallArgumentsValidator(file, nameToken, reporter,
+                        keyword.getArgumentsDescriptor(), arguments.get());
+            }
             argsValidator.validate(null);
 
             final List<RobotToken> varsForSyntaxCheck = SpecialKeywords.getArgumentsToValidateForVariablesSyntax(
-                    QualifiedKeywordName.create(keyword.getKeywordName(), keyword.getSourceName()), arguments.get());
+                    qualifiedKeywordName, arguments.get());
             for (final RobotToken varToken : varsForSyntaxCheck) {
-                if (!VariableNamesSupport.isCleanVariable(varToken.getText())) {
+                if (!hasValidVarSyntax(varToken)) {
                     final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_VARIABLE_SYNTAX)
                             .formatMessageWith(varToken.getText());
                     reporter.handleProblem(problem, file, varToken);
@@ -344,10 +354,13 @@ class TestCaseTableValidator implements ModelUnitValidator {
         }
     }
 
-    private static KeywordCallArgumentsValidator createKeywordCallArgumentsValidator(final IFile file,
-            final RobotToken definingToken, final ArgumentsDescriptor argumentsDescriptor,
-            final List<RobotToken> arguments, final ValidationReportingStrategy reporter) {
-        return new KeywordCallArgumentsValidator(file, definingToken, reporter, argumentsDescriptor, arguments);
+    private static boolean hasValidVarSyntax(final RobotToken varToken) {
+        final List<IRobotTokenType> types = varToken.getTypes();
+        final String text = varToken.getText();
+        return (types.contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION)
+                || types.contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
+                || types.contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION))
+                && (text.startsWith("${") || text.startsWith("@{") || text.startsWith("&{")) && text.endsWith("}");
     }
 
     private void reportUnknownVariables(final List<TestCase> cases) {
