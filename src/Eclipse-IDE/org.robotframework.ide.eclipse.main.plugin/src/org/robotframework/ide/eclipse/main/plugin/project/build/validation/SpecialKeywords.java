@@ -46,6 +46,8 @@ public class SpecialKeywords {
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Set Suite Variable", "BuiltIn"));
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Set Global Variable", "BuiltIn"));
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Get Variable Value", "BuiltIn"));
+        VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Variable Should Exist", "BuiltIn"));
+        VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Variable Should Not Exist", "BuiltIn"));
     }
     
     // keywords for which some arguments should be validated for variable syntax
@@ -99,13 +101,19 @@ public class SpecialKeywords {
     }
 
     private static final Set<String> SPECIAL_KEYWORD_NAMES = Streams
-            .concat(VARS_CREATING_KEYWORDS.stream(), VARS_SYNTAX_CHECKING_KEYWORDS.stream(),
-                    VARS_OMITTING_KEYWORDS.stream(), RUN_KEYWORD_VARIANTS.keySet().stream())
+            .concat(VARS_CREATING_KEYWORDS.stream(),
+                    VARS_SYNTAX_CHECKING_KEYWORDS.stream(),
+                    VARS_OMITTING_KEYWORDS.stream(),
+                    RUN_KEYWORD_VARIANTS.keySet().stream())
             .map(QualifiedKeywordName::getKeywordName)
             .collect(toSet());
 
     public static boolean mayBeSpecialKeyword(final String keywordName) {
         return SPECIAL_KEYWORD_NAMES.contains(QualifiedKeywordName.unifyDefinition(keywordName));
+    }
+
+    public static boolean isRunKeywordVariant(final QualifiedKeywordName keywordName) {
+        return RUN_KEYWORD_VARIANTS.containsKey(keywordName);
     }
 
     /**
