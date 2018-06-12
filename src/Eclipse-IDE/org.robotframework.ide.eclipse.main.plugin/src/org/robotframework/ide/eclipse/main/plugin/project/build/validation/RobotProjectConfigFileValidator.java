@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -38,6 +39,7 @@ import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigu
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.EnvironmentVariableReplacer;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -56,11 +58,20 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
     private final ValidationReportingStrategy reporter;
 
+    private final SystemVariableAccessor variableAccessor;
+
     public RobotProjectConfigFileValidator(final ValidationContext context, final IFile configFile,
             final ValidationReportingStrategy reporter) {
+        this(context, configFile, reporter, new SystemVariableAccessor());
+    }
+
+    @VisibleForTesting
+    RobotProjectConfigFileValidator(final ValidationContext context, final IFile configFile,
+            final ValidationReportingStrategy reporter, final SystemVariableAccessor variableAccessor) {
         this.context = context;
         this.configFile = configFile;
         this.reporter = reporter;
+        this.variableAccessor = variableAccessor;
     }
 
     @Override
@@ -218,8 +229,16 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             return;
         }
         final ProblemPosition position = new ProblemPosition(config.getLineFor(searchPath));
-        final Optional<File> absoluteLocation = new RedEclipseProjectConfig(configFile.getProject(),
-                config.getConfigurationModel()).toAbsolutePath(searchPath);
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configFile.getProject(),
+                config.getConfigurationModel());
+        final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer(variableAccessor,
+                varName -> {
+                    final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.UNKNOWN_ENV_VARIABLE)
+                            .formatMessageWith(varName);
+                    reporter.handleProblem(problem, configFile, position);
+                });
+        final IPath pathWithReplacedVariables = variableReplacer.replaceKnownSystemVariables(searchPath);
+        final Optional<File> absoluteLocation = redConfig.toAbsolutePath(pathWithReplacedVariables);
         if (absoluteLocation.isPresent()) {
             if (!absoluteLocation.get().exists()) {
                 final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
@@ -228,7 +247,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             }
         } else {
             final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.INVALID_SEARCH_PATH)
-                    .formatMessageWith(searchPath.getLocation());
+                    .formatMessageWith(pathWithReplacedVariables.toString());
             reporter.handleProblem(problem, configFile, position);
         }
     }

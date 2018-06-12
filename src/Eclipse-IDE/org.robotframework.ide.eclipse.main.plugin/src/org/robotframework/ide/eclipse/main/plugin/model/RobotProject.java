@@ -48,6 +48,7 @@ import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.project.EnvironmentVariableReplacer;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
@@ -403,9 +404,11 @@ public class RobotProject extends RobotContainer {
             if (configuration == null) {
                 return new ArrayList<>();
             }
+            final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer();
             final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(getProject(), configuration);
             return configuration.getPythonPath()
                     .stream()
+                    .map(variableReplacer::replaceKnownSystemVariables)
                     .map(redConfig::toAbsolutePath)
                     .filter(Optional::isPresent)
                     .map(Optional::get)

@@ -12,8 +12,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -34,8 +32,6 @@ import com.google.common.escape.Escaper;
 
 public class RedEclipseProjectConfig {
 
-    private static final Pattern SYS_VAR_PATTERN = Pattern.compile("\\%\\{[^\\%\\{\\}]+\\}");
-
     private final IProject project;
 
     private final RobotProjectConfig config;
@@ -54,13 +50,12 @@ public class RedEclipseProjectConfig {
         this.variableAccessor = variableAccessor;
     }
 
-    public Optional<File> toAbsolutePath(final SearchPath path) {
-        final IPath asPath = new Path(replaceKnownSystemVariables(path.getLocation()));
-        if (asPath.isAbsolute()) {
-            return Optional.of(asPath.toFile());
+    public Optional<File> toAbsolutePath(final IPath path) {
+        if (path.isAbsolute()) {
+            return Optional.of(path.toFile());
         }
         final Optional<File> wsAbsolute = resolveToAbsolutePath(getRelativityLocation(config.getRelativityPoint()),
-                asPath).map(IPath::toFile);
+                path).map(IPath::toFile);
         return wsAbsolute.map(file -> {
             final IPath wsRelative = Paths.toWorkspaceRelativeIfPossible(new Path(file.getAbsolutePath()));
             final IResource member = project.getWorkspace().getRoot().findMember(wsRelative);
@@ -70,19 +65,6 @@ public class RedEclipseProjectConfig {
                 return member.getLocation().toFile();
             }
         });
-    }
-
-    private String replaceKnownSystemVariables(final String path) {
-        final Matcher matcher = SYS_VAR_PATTERN.matcher(path);
-        final StringBuffer result = new StringBuffer();
-        while (matcher.find()) {
-            final String matched = matcher.group();
-            final String matchedName = matched.substring(2, matched.length() - 1);
-            final String replacement = variableAccessor.getValue(matchedName).orElse(matched);
-            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
-        }
-        matcher.appendTail(result);
-        return result.toString();
     }
 
     @VisibleForTesting
@@ -127,7 +109,9 @@ public class RedEclipseProjectConfig {
     }
 
     private List<String> getResolvedPaths(final List<SearchPath> paths) {
+        final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer(variableAccessor);
         return paths.stream()
+                .map(variableReplacer::replaceKnownSystemVariables)
                 .map(this::toAbsolutePath)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
