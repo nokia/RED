@@ -218,8 +218,8 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             return;
         }
         final ProblemPosition position = new ProblemPosition(config.getLineFor(searchPath));
-        final Optional<File> absoluteLocation = new RedEclipseProjectConfig(config.getConfigurationModel())
-                .toAbsolutePath(searchPath, configFile.getProject());
+        final Optional<File> absoluteLocation = new RedEclipseProjectConfig(configFile.getProject(),
+                config.getConfigurationModel()).toAbsolutePath(searchPath);
         if (absoluteLocation.isPresent()) {
             if (!absoluteLocation.get().exists()) {
                 final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)

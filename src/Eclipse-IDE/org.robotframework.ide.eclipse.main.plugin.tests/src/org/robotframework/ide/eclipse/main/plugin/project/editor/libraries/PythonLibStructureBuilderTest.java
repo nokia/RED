@@ -83,8 +83,9 @@ public class PythonLibStructureBuilderTest {
 
         builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(new File(moduleLocation), new RedEclipseProjectConfig(config)
-                .createAdditionalEnvironmentSearchPaths(projectProvider.getProject()));
+        verify(environment).getClassesFromModule(new File(moduleLocation),
+                new RedEclipseProjectConfig(projectProvider.getProject(), config)
+                        .createAdditionalEnvironmentSearchPaths());
     }
 
     @Test
