@@ -11,12 +11,14 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.project.EnvironmentVariableReplacer;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
@@ -80,9 +82,11 @@ class PathsLabelProvider extends RedCommonLabelProvider {
             final SearchPath path = (SearchPath) element;
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(element);
             if (problems.isEmpty()) {
+                final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer();
+                final IPath pathWithReplacedVariables = variableReplacer.replaceKnownSystemVariables(path);
                 final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(
                         editorInput.getRobotProject().getProject(), editorInput.getProjectConfiguration());
-                return redConfig.toAbsolutePath(path)
+                return redConfig.toAbsolutePath(pathWithReplacedVariables)
                         .map(File::getPath)
                         .map(tooltipPath -> path.isSystem()
                                 ? tooltipPath + " [already defined in " + pathVariableName + " variable]"
