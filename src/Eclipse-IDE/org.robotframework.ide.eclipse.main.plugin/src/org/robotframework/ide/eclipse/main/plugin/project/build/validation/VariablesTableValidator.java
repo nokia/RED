@@ -198,7 +198,7 @@ class VariablesTableValidator implements ModelUnitValidator {
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
 
         for (final AVariable variableDef : variableTable.getVariables()) {
-            unknownVarsValidator.reportUnknownVars(variableDef.getValueTokens(), variables);
+            unknownVarsValidator.reportUnknownVars(variables, variableDef.getValueTokens());
         }
     }
 
