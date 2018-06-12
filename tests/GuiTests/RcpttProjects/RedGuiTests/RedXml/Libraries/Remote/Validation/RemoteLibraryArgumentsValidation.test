@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _khwPUCKpEei2ypVbzE5QqA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/17/18 12:55 PM
+Save-Time: 6/12/18 3:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -119,9 +119,9 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 // verify errors
 wait-for-errors -amount 7 -times 2 -delay 500
 get-view Problems | get-tree | get-item 
-    -path "Errors \\(7 items\\)/Invalid number of arguments. Keyword 'Remote' expects from 0 to 2 arguments, but 3 are provided" 
+    -path "Errors \\(7 items\\)/Invalid number of arguments. Keyword 'Remote' expects from 0 to 2 arguments but 3 are provided" 
     | get-property caption 
-    | equals "Invalid number of arguments. Keyword 'Remote' expects from 0 to 2 arguments, but 3 are provided" 
+    | equals "Invalid number of arguments. Keyword 'Remote' expects from 0 to 2 arguments but 3 are provided" 
     | verify-true
 // run PythonRemoteServer
 run-python-remote-server-in-background -lib_name my_remote_lib.py -timeout 10
@@ -157,9 +157,9 @@ get-editor "TestFile.robot" | click
 // verify if there is one warning and one error
 wait-for-errors -amount 1 -times 4 -delay 500
 get-view Problems | get-tree | get-item 
-    -path "Errors \\(1 item\\)/Invalid number of arguments. Keyword 'Remote' expects from 0 to 2 arguments, but 3 are provided" 
+    -path "Errors \\(1 item\\)/Invalid number of arguments. Keyword 'Remote' expects from 0 to 2 arguments but 3 are provided" 
     | get-property caption 
-    | equals "Invalid number of arguments. Keyword 'Remote' expects from 0 to 2 arguments, but 3 are provided" 
+    | equals "Invalid number of arguments. Keyword 'Remote' expects from 0 to 2 arguments but 3 are provided" 
     | verify-true
 
 with [get-editor "TestFile.robot" | get-text-viewer] {
