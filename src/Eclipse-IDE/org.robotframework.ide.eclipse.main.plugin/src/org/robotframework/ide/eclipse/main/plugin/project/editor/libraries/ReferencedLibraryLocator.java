@@ -70,8 +70,8 @@ public class ReferencedLibraryLocator {
 
     private Optional<File> findLibraryFileByName(final RobotSuiteFile suiteFile, final String name) {
         final String currentFileDirectoryPath = suiteFile.getFile().getParent().getLocation().toOSString();
-        final EnvironmentSearchPaths searchPaths = new RedEclipseProjectConfig(projectConfig)
-                .createAdditionalEnvironmentSearchPaths(robotProject.getProject());
+        final EnvironmentSearchPaths searchPaths = new RedEclipseProjectConfig(robotProject.getProject(), projectConfig)
+                .createAdditionalEnvironmentSearchPaths();
         searchPaths.addPythonPath(currentFileDirectoryPath);
         searchPaths.addClassPath(currentFileDirectoryPath);
         return robotProject.getRuntimeEnvironment().getModulePath(name, searchPaths);

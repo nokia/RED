@@ -403,10 +403,10 @@ public class RobotProject extends RobotContainer {
             if (configuration == null) {
                 return new ArrayList<>();
             }
-            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
+            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(getProject(), configuration);
             return configuration.getPythonPath()
                     .stream()
-                    .map(path -> redConfig.toAbsolutePath(path, getProject()))
+                    .map(redConfig::toAbsolutePath)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(toList());

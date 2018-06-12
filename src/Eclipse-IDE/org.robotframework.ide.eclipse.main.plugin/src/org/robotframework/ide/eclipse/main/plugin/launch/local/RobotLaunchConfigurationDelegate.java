@@ -218,9 +218,9 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
         if (projectConfig != null) {
-            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(projectConfig);
-            final EnvironmentSearchPaths searchPaths = redConfig
-                    .createExecutionEnvironmentSearchPaths(robotConfig.getProject());
+            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotConfig.getProject(),
+                    projectConfig);
+            final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();
             builder.addLocationsToClassPath(searchPaths.getClassPaths());
             builder.addLocationsToPythonPath(searchPaths.getPythonPaths());
             builder.addVariableFiles(redConfig.getVariableFilePaths());

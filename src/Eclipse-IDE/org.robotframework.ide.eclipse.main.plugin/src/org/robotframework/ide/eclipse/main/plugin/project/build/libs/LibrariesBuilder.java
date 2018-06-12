@@ -96,8 +96,8 @@ public class LibrariesBuilder {
 
             final ILibdocGenerator generator = provideGenerator(descriptor, htmlTargetFile, LibdocFormat.HTML);
             generator.generateLibdoc(robotProject.getRuntimeEnvironment(),
-                    new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
-                            .createAdditionalEnvironmentSearchPaths(project));
+                    new RedEclipseProjectConfig(project, robotProject.getRobotProjectConfig())
+                            .createAdditionalEnvironmentSearchPaths());
             return htmlTargetFile;
         } else {
             throw new IllegalStateException("Unable to generate HTML documentation file. Missing library descriptor");
@@ -127,8 +127,8 @@ public class LibrariesBuilder {
                 try {
                     if (project.exists()) {
                         generator.generateLibdoc(runtimeEnvironment,
-                                new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
-                                        .createAdditionalEnvironmentSearchPaths(project));
+                                new RedEclipseProjectConfig(project, robotProject.getRobotProjectConfig())
+                                        .createAdditionalEnvironmentSearchPaths());
                     }
                 } catch (final RobotEnvironmentException e) {
                     final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
@@ -213,8 +213,9 @@ public class LibrariesBuilder {
             logger.log("BUILDING: " + generator.getMessage());
             monitor.subTask(generator.getMessage());
             try {
-                generator.generateLibdoc(environment, new RedEclipseProjectConfig(configuration)
-                        .createAdditionalEnvironmentSearchPaths(robotProject.getProject()));
+                generator.generateLibdoc(environment,
+                        new RedEclipseProjectConfig(robotProject.getProject(), configuration)
+                                .createAdditionalEnvironmentSearchPaths());
             } catch (final RobotEnvironmentException e) {
                 // the libraries with missing libspec are reported in validation phase
             }
