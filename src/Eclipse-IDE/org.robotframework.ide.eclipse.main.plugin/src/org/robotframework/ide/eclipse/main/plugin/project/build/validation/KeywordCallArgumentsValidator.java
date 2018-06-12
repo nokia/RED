@@ -46,9 +46,9 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
     private final ValidationReportingStrategy reporter;
 
-    private final ArgumentsDescriptor descriptor;
+    protected final ArgumentsDescriptor descriptor;
 
-    private final List<RobotToken> arguments;
+    protected final List<RobotToken> arguments;
 
     KeywordCallArgumentsValidator(final IFile file, final RobotToken definingToken,
             final ValidationReportingStrategy reporter, final ArgumentsDescriptor descriptor,
@@ -160,7 +160,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateNumberOfArgs(final TaggedCallSiteArguments taggedArguments) {
+    protected final void validateNumberOfArgs(final TaggedCallSiteArguments taggedArguments) {
         final int actual = descriptor.supportsKwargs() ? taggedArguments.getNumberOfNonKeywordArguments(arguments)
                 : taggedArguments.getNumberOfArguments(arguments);
         final Range<Integer> possibleRange = descriptor.supportsKwargs()
@@ -366,7 +366,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         return amount == 1 ? noun : noun + "s";
     }
 
-    private static class TaggedCallSiteArguments {
+    static class TaggedCallSiteArguments {
 
         private static final Pattern LIST_PATTERN = Pattern.compile("^@\\{[\\w ]+\\}$");
 
@@ -455,7 +455,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             return bindings.getRightRelated(ArgumentTag.NAMED);
         }
 
-        private static TaggedCallSiteArguments tagArguments(final List<RobotToken> callSiteArguments,
+        static TaggedCallSiteArguments tagArguments(final List<RobotToken> callSiteArguments,
                 final Map<String, Argument> argsByNames, final boolean kwargsAreSupported) {
 
             final SymmetricRelation<RobotToken, ArgumentTag> bindings = new SymmetricRelation<>();
@@ -640,7 +640,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         COLLECTION
     }
 
-    private static class ArgumentsProblemFoundException extends RuntimeException {
+    static class ArgumentsProblemFoundException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
 
