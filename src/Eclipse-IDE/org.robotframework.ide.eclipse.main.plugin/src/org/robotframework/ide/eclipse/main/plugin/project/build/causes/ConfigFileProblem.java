@@ -152,6 +152,13 @@ public enum ConfigFileProblem implements IProblemCause {
             return "The path '%s' is invalid";
         }
     },
+    UNKNOWN_ENV_VARIABLE {
+
+        @Override
+        public String getProblemDescription() {
+            return "Environment variable '%s' is not defined";
+        }
+    },
     LIBRARY_SPEC_CANNOT_BE_GENERATED {
 
         @Override

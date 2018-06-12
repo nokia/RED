@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
@@ -23,6 +24,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -62,16 +64,17 @@ public class RobotProjectConfigFileValidatorTest {
     public void beforeTest() throws Exception {
         reporter = new MockReporter();
         model = new RobotModel();
-        validator = createValidator(SuiteExecutor.Python);
+        validator = createValidator(SuiteExecutor.Python, mock(SystemVariableAccessor.class));
     }
 
-    private RobotProjectConfigFileValidator createValidator(final SuiteExecutor executor) {
+    private RobotProjectConfigFileValidator createValidator(final SuiteExecutor executor,
+            final SystemVariableAccessor variableAccessor) {
         final ValidationContext context = mock(ValidationContext.class);
         when(context.getModel()).thenReturn(model);
         when(context.getExecutorInUse()).thenReturn(executor);
         final IFile file = mock(IFile.class);
         when(file.getProject()).thenReturn(projectProvider.getProject());
-        return new RobotProjectConfigFileValidator(context, file, reporter);
+        return new RobotProjectConfigFileValidator(context, file, reporter, variableAccessor);
     }
 
     @Test
@@ -323,7 +326,7 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
                 new TreeSet<>(), locations);
 
-        final RobotProjectConfigFileValidator validator = createValidator(SuiteExecutor.Jython);
+        validator = createValidator(SuiteExecutor.Jython, mock(SystemVariableAccessor.class));
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems())
@@ -493,6 +496,54 @@ public class RobotProjectConfigFileValidatorTest {
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(ConfigFileProblem.INVALID_SEARCH_PATH, new ProblemPosition(42)));
+    }
+
+    @Test
+    public void whenPathContainsKnownEnvironmentVariable_nothingIsReported() throws Exception {
+        projectProvider.createDir(Path.fromPortableString("folder"));
+
+        final SearchPath searchPath = SearchPath.create("%{ENV_VAR}");
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addPythonPath(searchPath);
+
+        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
+        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(PROJECT_NAME + "/folder"));
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
+
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator = createValidator(SuiteExecutor.Python, variableAccessor);
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void whenPathContainsUnknownEnvironmentVariables_unknownEnvAndInvalidLocationProblemsAreReported()
+            throws Exception {
+        final SearchPath searchPath = SearchPath
+                .create("environment/%{UNKNOWN_ENV_VARIABLE_1}/%{UNKNOWN_ENV_VARIABLE_2}/path");
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addPythonPath(searchPath);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
+
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator = createValidator(SuiteExecutor.Python, mock(SystemVariableAccessor.class));
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ConfigFileProblem.UNKNOWN_ENV_VARIABLE, new ProblemPosition(42)),
+                new Problem(ConfigFileProblem.UNKNOWN_ENV_VARIABLE, new ProblemPosition(42)),
+                new Problem(ConfigFileProblem.INVALID_SEARCH_PATH, new ProblemPosition(42)));
     }
 
     @Test
