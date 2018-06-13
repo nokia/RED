@@ -48,7 +48,7 @@ class GeneralSettingsImportsFixes {
             final IPath invalidPath) {
         final IFile problematicFile = (IFile) marker.getResource();
 
-        final List<IPath> filePaths = findFilePathsWithSameLastSegment(invalidPath.lastSegment());
+        final List<IPath> filePaths = findNotLinkedFilePathsWithSameLastSegment(invalidPath.lastSegment());
         return filePaths.stream()
                 .sorted(createPathsComparator(problematicFile.getProject()))
                 .map(path -> path.makeRelativeTo(problematicFile.getFullPath()).removeFirstSegments(1))
@@ -58,11 +58,12 @@ class GeneralSettingsImportsFixes {
                 .collect(toList());
     }
 
-    private static List<IPath> findFilePathsWithSameLastSegment(final String lastSegment) {
+    private static List<IPath> findNotLinkedFilePathsWithSameLastSegment(final String lastSegment) {
         final List<IPath> paths = new ArrayList<>();
         try {
             ResourcesPlugin.getWorkspace().getRoot().accept(resource -> {
-                if (resource.getType() == IResource.FILE && resource.getFullPath().lastSegment().equals(lastSegment)) {
+                if (resource.getType() == IResource.FILE && resource.getFullPath().lastSegment().equals(lastSegment)
+                        && !resource.isLinked(IResource.CHECK_ANCESTORS)) {
                     paths.add(resource.getFullPath());
                 }
                 return true;
