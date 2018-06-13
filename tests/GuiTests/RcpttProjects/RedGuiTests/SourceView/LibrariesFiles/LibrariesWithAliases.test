@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PV3F4L4iEeaIos8Jik5jow
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/12/18 12:39 PM
+Save-Time: 6/13/18 5:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,10 +22,10 @@ with [get-view Problems | get-tree] {
         | equals "Ambiguous keyword 'Append To List' reference. Matching keywords are defined in: [lib, Collections, Collection]" 
         | verify-true
     get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "Invalid number of arguments. Keyword 'OperatingSystem' expects 0 arguments but 1 is provided" 
+        | equals "Keyword 'OperatingSystem' expects 0 arguments but 1 is provided" 
         | verify-true
     get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-        | equals "Invalid number of arguments. Keyword 'String' expects 0 arguments but 1 is provided" | verify-true
+        | equals "Keyword 'String' expects 0 arguments but 1 is provided" | verify-true
     get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals "Setting 'with name' not in upper case is deprecated from Robot Framework 3.0.\n"
         + "Use WITH NAME instead." | verify-true
@@ -195,10 +195,10 @@ with [get-view Problems | get-tree] {
         | equals "Ambiguous keyword 'Append To List' reference. Matching keywords are defined in: [lib, Collections, Collection]" 
         | verify-true
     get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "Invalid number of arguments. Keyword 'OperatingSystem' expects 0 arguments but 1 is provided" 
+        | equals "Keyword 'OperatingSystem' expects 0 arguments but 1 is provided" 
         | verify-true
     get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-        | equals "Invalid number of arguments. Keyword 'String' expects 0 arguments but 1 is provided" | verify-true
+        | equals "Keyword 'String' expects 0 arguments but 1 is provided" | verify-true
     get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals "Unknown keyword 'Collections.Sort List'" | verify-true
 }
