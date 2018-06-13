@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 virtualenv $1/ve
-$1/ve/bin/pip install robotframework
+source $1/ve/bin/activate
+pip list
+pip install robotframework
+deactivate
