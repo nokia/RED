@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project;
+package org.rf.ide.core;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -11,11 +11,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.SystemVariableAccessor;
-import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 
 public class EnvironmentVariableReplacer {
 
@@ -41,10 +36,14 @@ public class EnvironmentVariableReplacer {
         this.problemHandler = problemHandler;
     }
 
-    public IPath replaceKnownSystemVariables(final SearchPath path) {
+    public boolean hasUnknownEnvironmentVariables(final String path) {
+        return ENV_VAR_PATTERN.matcher(path).find();
+    }
+
+    public String replaceKnownEnvironmentVariables(final String path) {
         final Set<String> undefinedVarNames = new LinkedHashSet<>();
 
-        String before = path.getLocation();
+        String before = path;
         String after = replaceWithProblemReporting(before, undefinedVarNames);
         while (!before.equals(after)) {
             before = after;
@@ -53,7 +52,7 @@ public class EnvironmentVariableReplacer {
 
         undefinedVarNames.forEach(problemHandler);
 
-        return new Path(after);
+        return after;
     }
 
     private String replaceWithProblemReporting(final String path, final Set<String> undefinedVarNames) {

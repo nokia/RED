@@ -523,13 +523,15 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenPathContainsUnknownEnvironmentVariables_unknownEnvAndInvalidLocationProblemsAreReported()
+    public void whenPathContainsKnownEnvironmentVariableButDoesNotExist_missingLocationProblemIsReported()
             throws Exception {
-        final SearchPath searchPath = SearchPath
-                .create("environment/%{UNKNOWN_ENV_VARIABLE_1}/%{UNKNOWN_ENV_VARIABLE_2}/path");
+        final SearchPath searchPath = SearchPath.create("%{ENV_VAR}");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addPythonPath(searchPath);
+
+        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
+        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(PROJECT_NAME + "/folder"));
 
         final Map<Object, FilePosition> locations = new HashMap<>();
         locations.put(searchPath, new FilePosition(42, 0));
@@ -537,13 +539,69 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
                 new TreeSet<>(), locations);
 
-        validator = createValidator(SuiteExecutor.Python, mock(SystemVariableAccessor.class));
+        validator = createValidator(SuiteExecutor.Python, variableAccessor);
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.MISSING_SEARCH_PATH, new ProblemPosition(42)));
+        assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage))
+                .containsExactly("The path '" + projectProvider.getProject().getLocation().append("folder").toOSString()
+                        + "' points to non-existing location");
+    }
+
+    @Test
+    public void whenPathContainsKnownEnvironmentVariableButIsIncorrect_invalidLocationProblemIsReported()
+            throws Exception {
+        final SearchPath searchPath = SearchPath.create("%{ENV_VAR}/${INCORRECT}");
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addPythonPath(searchPath);
+
+        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
+        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(PROJECT_NAME + "/folder"));
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
+
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator = createValidator(SuiteExecutor.Python, variableAccessor);
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.INVALID_SEARCH_PATH, new ProblemPosition(42)));
+        assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage))
+                .containsExactly("The path '" + PROJECT_NAME + "/folder/${INCORRECT}' is invalid");
+    }
+
+    @Test
+    public void whenPathContainsUnknownEnvironmentVariables_unknownEnvVariableProblemsAreReported()
+            throws Exception {
+        final SearchPath searchPath = SearchPath
+                .create("%{ENV_VAR}/%{UNKNOWN_ENV_VARIABLE_1}/%{UNKNOWN_ENV_VARIABLE_2}/path");
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addPythonPath(searchPath);
+
+        final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
+        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(PROJECT_NAME + "/folder"));
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
+
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator = createValidator(SuiteExecutor.Python, variableAccessor);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(ConfigFileProblem.UNKNOWN_ENV_VARIABLE, new ProblemPosition(42)),
-                new Problem(ConfigFileProblem.UNKNOWN_ENV_VARIABLE, new ProblemPosition(42)),
-                new Problem(ConfigFileProblem.INVALID_SEARCH_PATH, new ProblemPosition(42)));
+                new Problem(ConfigFileProblem.UNKNOWN_ENV_VARIABLE, new ProblemPosition(42)));
+        assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage)).containsExactly(
+                "Environment variable '%{UNKNOWN_ENV_VARIABLE_1}' is not defined",
+                "Environment variable '%{UNKNOWN_ENV_VARIABLE_2}' is not defined");
     }
 
     @Test
