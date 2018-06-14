@@ -71,7 +71,7 @@ public class EmbeddedKeywordNamesSupport {
             return false;
         }
 
-        final String regex = "(?i)^" + substituteVariablesWithRegex(definitionName) + "$";
+        final String regex = "(?iu)^" + substituteVariablesWithRegex(definitionName) + "$";
         try {
             return Pattern.matches(regex, occurrenceName);
         } catch (final PatternSyntaxException e) {
