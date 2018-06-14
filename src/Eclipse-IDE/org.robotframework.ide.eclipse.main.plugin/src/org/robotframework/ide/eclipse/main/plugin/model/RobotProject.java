@@ -31,6 +31,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
@@ -43,12 +44,12 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.project.EnvironmentVariableReplacer;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
@@ -408,7 +409,9 @@ public class RobotProject extends RobotContainer {
             final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(getProject(), configuration);
             return configuration.getPythonPath()
                     .stream()
-                    .map(variableReplacer::replaceKnownSystemVariables)
+                    .map(SearchPath::getLocation)
+                    .map(variableReplacer::replaceKnownEnvironmentVariables)
+                    .map(Path::new)
                     .map(redConfig::toAbsolutePath)
                     .filter(Optional::isPresent)
                     .map(Optional::get)

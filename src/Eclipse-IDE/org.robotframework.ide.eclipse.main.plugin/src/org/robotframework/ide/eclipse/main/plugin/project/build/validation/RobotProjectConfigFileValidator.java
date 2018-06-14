@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -39,7 +40,6 @@ import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigu
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.EnvironmentVariableReplacer;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -234,21 +234,24 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer(variableAccessor,
                 varName -> {
                     final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.UNKNOWN_ENV_VARIABLE)
-                            .formatMessageWith(varName);
+                            .formatMessageWith("%{" + varName + "}");
                     reporter.handleProblem(problem, configFile, position);
                 });
-        final IPath pathWithReplacedVariables = variableReplacer.replaceKnownSystemVariables(searchPath);
-        final Optional<File> absoluteLocation = redConfig.toAbsolutePath(pathWithReplacedVariables);
-        if (absoluteLocation.isPresent()) {
-            if (!absoluteLocation.get().exists()) {
-                final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
-                        .formatMessageWith(absoluteLocation.get().getPath());
+        final String pathWithReplacedVariables = variableReplacer
+                .replaceKnownEnvironmentVariables(searchPath.getLocation());
+        if (!variableReplacer.hasUnknownEnvironmentVariables(pathWithReplacedVariables)) {
+            final Optional<File> absoluteLocation = redConfig.toAbsolutePath(new Path(pathWithReplacedVariables));
+            if (absoluteLocation.isPresent()) {
+                if (!absoluteLocation.get().exists()) {
+                    final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
+                            .formatMessageWith(absoluteLocation.get().getPath());
+                    reporter.handleProblem(problem, configFile, position);
+                }
+            } else {
+                final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.INVALID_SEARCH_PATH)
+                        .formatMessageWith(pathWithReplacedVariables);
                 reporter.handleProblem(problem, configFile, position);
             }
-        } else {
-            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.INVALID_SEARCH_PATH)
-                    .formatMessageWith(pathWithReplacedVariables.toString());
-            reporter.handleProblem(problem, configFile, position);
         }
     }
 
