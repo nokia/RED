@@ -91,7 +91,7 @@ public class KeywordSearcher {
                         isEmbeddedKeywordName, nameCombination);
 
                 if (matcher.test(null) || matcher.test(keyword.getSourceNameInUse())) {
-                    foundByMatch.put(nameCombination, keyword);
+                    foundByMatch.put(QualifiedKeywordName.unifyDefinition(nameCombination), keyword);
                     if (stopIfOneWasMatching) {
                         break;
                     } else {
