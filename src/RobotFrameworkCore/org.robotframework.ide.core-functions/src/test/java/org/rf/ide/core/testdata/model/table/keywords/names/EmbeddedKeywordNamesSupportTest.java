@@ -111,6 +111,13 @@ public class EmbeddedKeywordNamesSupportTest {
     }
 
     @Test
+    public void nameMatchesTest_whenUnicodeIsUsed() {
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("Łączę ${x}", "łączę z serwerem")).isTrue();
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("Łączę ${x}", "ŁĄCZĘ Z SERWEREM")).isTrue();
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("Łączę ${x}", "ŁąCzĘ z SeRwErEm")).isTrue();
+    }
+
+    @Test
     public void variableRangesAreFoundProperly() {
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("")).is(empty());
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("abc")).is(empty());
