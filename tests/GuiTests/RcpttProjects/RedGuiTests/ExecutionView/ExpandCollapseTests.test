@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _1EvckF4PEeWeit3EM6sPPA
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/2/16 3:58 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/14/18 2:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,7 +21,10 @@ with [get-view "Project Explorer" | get-tree] {
     select ExecutionViewProject | get-menu "Run As/1 Robot Test" | click
 }
 
-wait 2000
+wait-for-console
+try -times 3 -delay 500 -command{
+	get-view "Execution View" | get-button "Rerun Failed Tests" | get-property enablement | equals true | verify-true
+}
 get-menu "Window/Show View/Execution View" | click
 
 //make full screen
