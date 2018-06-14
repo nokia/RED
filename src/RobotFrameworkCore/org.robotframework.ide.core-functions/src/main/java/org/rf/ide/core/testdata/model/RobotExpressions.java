@@ -9,7 +9,6 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -21,10 +20,12 @@ import com.google.common.collect.Range;
 
 public class RobotExpressions {
 
+    private static final Pattern VAR_PATTERN = Pattern.compile("[@$&%]\\{[^\\}]+\\}");
+
     /**
      * Removes escaping characters proceeding spaces (multiple spaces may
      * be escaped in robot format cells)
-     * 
+     *
      * @param str
      * @return
      */
@@ -77,26 +78,21 @@ public class RobotExpressions {
 
     public static String resolve(final Map<String, String> knownVariables, final String expression) {
         final List<Range<Integer>> positions = getVariablesPositions(expression);
-        Collections.sort(positions, new Comparator<Range<Integer>>() {
-            @Override
-            public int compare(final Range<Integer> o1, final Range<Integer> o2) {
-                return o2.lowerEndpoint().compareTo(o1.lowerEndpoint());
-            }
-        });
-        
+        Collections.sort(positions, (o1, o2) -> o2.lowerEndpoint().compareTo(o1.lowerEndpoint()));
+
         final StringBuilder resolved = new StringBuilder(expression);
         for (final Range<Integer> position : positions) {
-            final String variable = VariableNamesSupport.extractUnifiedVariableName(expression.substring(
-                    position.lowerEndpoint(), position.upperEndpoint() + 1));
+            final String variable = VariableNamesSupport.extractUnifiedVariableName(
+                    expression.substring(position.lowerEndpoint(), position.upperEndpoint() + 1));
             if (knownVariables.containsKey(variable)) {
                 resolved.replace(position.lowerEndpoint(), position.upperEndpoint() + 1, knownVariables.get(variable));
             }
         }
         return resolved.toString();
     }
-    
+
     public static boolean isParameterized(final String pathOrName) {
-        return Pattern.compile("[@$&%]\\{[^\\}]+\\}").matcher(pathOrName).find();
+        return VAR_PATTERN.matcher(pathOrName).find();
     }
 
     private static Character lookahead(final String expression, final int index) {

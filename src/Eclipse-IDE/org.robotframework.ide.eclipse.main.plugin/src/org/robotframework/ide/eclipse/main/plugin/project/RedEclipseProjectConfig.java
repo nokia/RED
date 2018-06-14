@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.RedURI;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
@@ -111,7 +112,9 @@ public class RedEclipseProjectConfig {
     private List<String> getResolvedPaths(final List<SearchPath> paths) {
         final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer(variableAccessor);
         return paths.stream()
-                .map(variableReplacer::replaceKnownSystemVariables)
+                .map(SearchPath::getLocation)
+                .map(variableReplacer::replaceKnownEnvironmentVariables)
+                .map(Path::new)
                 .map(this::toAbsolutePath)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
