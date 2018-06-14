@@ -187,12 +187,12 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
             final List<RobotDryRunLibraryImport> result = new ArrayList<>();
             for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
-                if (libraryImport.getType() != DryRunLibraryType.UNKNOWN) {
-                    if (existingLibraryNames.contains(libraryImport.getName())) {
-                        libraryImport.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
-                    } else {
-                        result.add(libraryImport);
-                    }
+                if (libraryImport.getType() == DryRunLibraryType.UNKNOWN) {
+                    libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
+                } else if (existingLibraryNames.contains(libraryImport.getName())) {
+                    libraryImport.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
+                } else {
+                    result.add(libraryImport);
                 }
             }
             result.sort((import1, import2) -> import1.getName().compareToIgnoreCase(import2.getName()));
