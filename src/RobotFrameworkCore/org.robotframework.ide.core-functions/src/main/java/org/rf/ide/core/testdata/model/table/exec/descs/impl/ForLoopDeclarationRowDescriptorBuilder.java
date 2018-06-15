@@ -31,14 +31,13 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBuilder {
 
     @Override
-    public <T> AcceptResult acceptable(final RobotExecutableRow<T> execRowLine) {
-        return new AcceptResult(ForDescriptorInfo.isForToken(execRowLine.getAction())
-                && execRowLine.getParent() instanceof IExecutableStepsHolder<?>);
+    public <T> boolean isAcceptable(final RobotExecutableRow<T> execRowLine) {
+        return ForDescriptorInfo.isForToken(execRowLine.getAction())
+                && execRowLine.getParent() instanceof IExecutableStepsHolder<?>;
     }
 
     @Override
-    public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine,
-            final AcceptResult acceptResult) {
+    public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine) {
         final ForLoopDeclarationRowDescriptor<T> loopDescriptor = new ForLoopDeclarationRowDescriptor<>(execRowLine);
 
         final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine.getParent();
@@ -59,7 +58,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
 
             // value is keyword if is on the first place and have in it nested
             // variables and when contains text on the beginning or end of field
-            FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
+            final FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
             loopDescriptor.addCommentedVariables(filteredVars.getCommented());
             final List<VariableDeclaration> correctVariables = filteredVars.getUsed();
             final List<IElementDeclaration> mappedElements = mappingResult.getMappedElements();

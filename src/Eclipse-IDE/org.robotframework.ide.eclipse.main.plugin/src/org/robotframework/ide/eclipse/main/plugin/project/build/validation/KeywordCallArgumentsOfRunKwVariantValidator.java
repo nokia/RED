@@ -19,9 +19,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReport
 
 import com.google.common.collect.Streams;
 
-class KeywordCallOfRunKwVariantArgumentsValidator extends KeywordCallArgumentsValidator {
+class KeywordCallArgumentsOfRunKwVariantValidator extends KeywordCallArgumentsValidator {
 
-    KeywordCallOfRunKwVariantArgumentsValidator(final IFile file, final RobotToken definingToken,
+    KeywordCallArgumentsOfRunKwVariantValidator(final IFile file, final RobotToken definingToken,
             final ValidationReportingStrategy reporter, final ArgumentsDescriptor argumentsDescriptor,
             final List<RobotToken> arguments) {
         super(file, definingToken, reporter, argumentsDescriptor, arguments);

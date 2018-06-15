@@ -26,8 +26,6 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.collect.Streams;
-
 public class SpecialKeywords {
 
     // keywords which creates variables from given arguments
@@ -98,18 +96,6 @@ public class SpecialKeywords {
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Import Library", "BuiltIn"), 0);
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Import Variables", "BuiltIn"), 0);
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Import Resource", "BuiltIn"), 0);
-    }
-
-    private static final Set<String> SPECIAL_KEYWORD_NAMES = Streams
-            .concat(VARS_CREATING_KEYWORDS.stream(),
-                    VARS_SYNTAX_CHECKING_KEYWORDS.stream(),
-                    VARS_OMITTING_KEYWORDS.stream(),
-                    RUN_KEYWORD_VARIANTS.keySet().stream())
-            .map(QualifiedKeywordName::getKeywordName)
-            .collect(toSet());
-
-    public static boolean mayBeSpecialKeyword(final String keywordName) {
-        return SPECIAL_KEYWORD_NAMES.contains(QualifiedKeywordName.unifyDefinition(keywordName));
     }
 
     public static boolean isRunKeywordVariant(final QualifiedKeywordName keywordName) {
