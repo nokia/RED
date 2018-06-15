@@ -221,7 +221,15 @@ public class RobotArtifactsValidator {
 
     public interface ModelUnitValidator {
 
-        void validate(IProgressMonitor monitor) throws CoreException;
+        public void validate(IProgressMonitor monitor) throws CoreException;
+
+        public default void validate() {
+            try {
+                validate(new NullProgressMonitor());
+            } catch (final CoreException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
     public interface ModelUnitValidatorConfig {

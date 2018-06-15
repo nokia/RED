@@ -8,52 +8,32 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.newBuiltInKeyword;
+import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.newResourceKeyword;
+import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.prepareContext;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.executor.SuiteExecutor;
-import org.rf.ide.core.libraries.ArgumentsDescriptor;
-import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities.AccessibleKeywordsCollector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 
 public class GeneralSettingsTableValidatorTest {
-
-    private MockReporter reporter;
-
-    @Before
-    public void beforeTest() {
-        reporter = new MockReporter();
-    }
 
     @Test
     public void unknownSettingIsReported() throws CoreException {
@@ -62,12 +42,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(2, Range.closed(17, 32))));
     }
 
@@ -83,12 +60,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(6);
-        assertThat(reporter.getReportedProblems()).contains(
+        assertThat(problems).contains(
                 new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(2, Range.closed(17, 27))),
                 new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(3, Range.closed(28, 41))),
                 new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(4, Range.closed(42, 50))),
@@ -104,12 +78,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        assertThat(problems).containsOnly(
                 new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(30, 32))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(34, 40))));
     }
@@ -121,12 +92,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        assertThat(problems).containsOnly(
                 new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(33, 35))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(37, 43))));
     }
@@ -138,12 +106,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        assertThat(problems).containsOnly(
                 new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(29, 31))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(33, 39))));
     }
@@ -155,12 +120,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        assertThat(problems).containsOnly(
                 new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(32, 34))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(36, 42))));
     }
@@ -171,18 +133,11 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Suite Setup    kw   %{PATH}")
                 .build();
 
-        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
-                new Path("/res.robot"), "var");
-        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                newArrayList(entity));
-
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot"), "arg"));
         final FileValidationContext context = prepareContext(accessibleKws);
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
-        assertThat(reporter.getReportedProblems()).isEmpty();
+        assertThat(problems).isEmpty();
     }
 
     @Test
@@ -194,19 +149,12 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Test Teardown  kw  ${var}")
                 .build();
 
-        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
-                new Path("/suite.robot"), "arg");
-        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                newArrayList(entity));
-
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot"), "arg"));
         final Set<String> accessibleVariables = newHashSet("${var}");
-
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(problems).isEmpty();
     }
 
     @Test
@@ -219,14 +167,10 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final Set<String> accessibleVariables = newHashSet("${var}");
+        final FileValidationContext context = prepareContext(accessibleVariables);
+        final Collection<Problem> problems = validate(context, file);
 
-        final FileValidationContext context = prepareContext(new HashMap<>(), accessibleVariables);
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
-
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(4);
-        assertThat(reporter.getReportedProblems()).contains(
+        assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
                         new ProblemPosition(2, Range.closed(30, 36))),
                 new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
@@ -238,6 +182,44 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     @Test
+    public void variablesSyntaxOfSpecialKeywordsIsReportedInSetupAndTeardowns() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Suite Setup  Set Global Variable     a1   1")
+                .appendLine("Test Setup  Set Global Variable      a2   2")
+                .appendLine("Suite Teardown  Set Global Variable  a3   3")
+                .appendLine("Test Teardown  Set Global Variable   a4   4")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Set Global Variable", "var", "*values"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).containsOnly(
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(2, Range.closed(54, 56))),
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(3, Range.closed(98, 100))),
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(4, Range.closed(142, 144))),
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(5, Range.closed(186, 188))));
+    }
+
+    @Test
+    public void variablesCreatedInExecutablesAreVisibleInNextOnes() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Suite Setup  Set Global Variable     ${a1}   1")
+                .appendLine("Test Setup  Set Global Variable      ${a2}   ${a1}")
+                .appendLine("Test Teardown  Set Global Variable   ${a3}   ${a2}")
+                .appendLine("Suite Teardown  Set Global Variable  ${a4}   ${a3}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Set Global Variable", "var", "*values"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
     public void undeclaredVariableInTagsIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Default Tags  ${var}  ${var1}")
@@ -245,14 +227,10 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final Set<String> accessibleVariables = newHashSet("${var}");
+        final FileValidationContext context = prepareContext(accessibleVariables);
+        final Collection<Problem> problems = validate(context, file);
 
-        final FileValidationContext context = prepareContext(new HashMap<>(), accessibleVariables);
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
-
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-        assertThat(reporter.getReportedProblems()).contains(
+        assertThat(problems).contains(
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(39, 46))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(67, 74))));
     }
@@ -260,36 +238,41 @@ public class GeneralSettingsTableValidatorTest {
     @Test
     public void undeclaredKeywordInTemplateIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
-                .appendLine("Test Template  kw1 ${var}")
+                .appendLine("Test Template  kw1  ${var}")
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-        assertThat(reporter.getReportedProblems())
-                .contains(new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(32, 42))));
+        assertThat(problems)
+                .contains(new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(32, 35))));
+    }
+
+    @Test
+    public void unexpectedArgumentsInTemplateAreReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Template  kw  1  2")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot"), "arg"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).containsOnly(new Problem(GeneralSettingsProblem.SETTING_ARGUMENTS_NOT_APPLICABLE,
+                new ProblemPosition(2, Range.closed(17, 30))));
     }
 
     @Test
     public void declaredKeywordInTemplateIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
-                .appendLine("Test Template  kw1 ${arg}")
+                .appendLine("Test Template  kw")
                 .build();
 
-        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw1 ${arg}",
-                new Path("/suite.robot"), "arg");
-        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw1 ${arg}",
-                newArrayList(entity));
-
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot"), "arg"));
         final FileValidationContext context = prepareContext(accessibleKws);
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(problems).isEmpty();
     }
 
     @Test
@@ -299,12 +282,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-        assertThat(reporter.getReportedProblems()).contains(
+        assertThat(problems).contains(
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(31, 37))));
     }
 
@@ -315,12 +295,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-        assertThat(reporter.getReportedProblems()).contains(
+        assertThat(problems).contains(
                 new Problem(ArgumentProblem.INVALID_TIME_FORMAT, new ProblemPosition(2, Range.closed(31, 35))));
     }
 
@@ -331,11 +308,9 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(problems).isEmpty();
     }
 
     @Test
@@ -346,39 +321,66 @@ public class GeneralSettingsTableValidatorTest {
 
         final Set<String> accessibleVariables = newHashSet("${var}");
 
-        final FileValidationContext context = prepareContext(new HashMap<>(), accessibleVariables);
-        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
-                file.findSection(RobotSettingsSection.class), reporter);
-        validator.validate(null);
+        final FileValidationContext context = prepareContext(accessibleVariables);
+        final Collection<Problem> problems = validate(context, file);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(problems).isEmpty();
     }
 
-    private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
-            final String name, final IPath exposingPath, final String... args) {
-        return new ValidationKeywordEntity(scope, sourceName, name, Optional.empty(), false, exposingPath, 0,
-                ArgumentsDescriptor.createDescriptor(args));
+    @Test
+    public void outdatedDocumentationSyntaxIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Document  doc")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).contains(
+                new Problem(GeneralSettingsProblem.DOCUMENT_SYNONYM, new ProblemPosition(2, Range.closed(17, 25))));
     }
 
-    private static FileValidationContext prepareContext() {
-        return prepareContext(new HashMap<>());
+    @Test
+    public void outdatedMetadataSyntaxIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Meta  data")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).contains(
+                new Problem(GeneralSettingsProblem.META_SYNONYM, new ProblemPosition(2, Range.closed(17, 21))));
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws) {
-        return prepareContext(() -> accessibleKws, new HashSet<>());
+    @Test
+    public void outdatedSetupAndTeardownSyntaxAreReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Suite Precondition  kw")
+                .appendLine("Suite Postcondition  kw")
+                .appendLine("Test Precondition  kw")
+                .appendLine("Test Postcondition  kw")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).contains(
+                new Problem(GeneralSettingsProblem.SUITE_PRECONDITION_SYNONYM,
+                        new ProblemPosition(2, Range.closed(17, 35))),
+                new Problem(GeneralSettingsProblem.SUITE_POSTCONDITION_SYNONYM,
+                        new ProblemPosition(3, Range.closed(40, 59))),
+                new Problem(GeneralSettingsProblem.TEST_PRECONDITION_SYNONYM,
+                        new ProblemPosition(4, Range.closed(64, 81))),
+                new Problem(GeneralSettingsProblem.TEST_POSTCONDITION_SYNONYM,
+                        new ProblemPosition(5, Range.closed(86, 104))));
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws,
-            final Set<String> accessibleVariables) {
-        return prepareContext(() -> accessibleKws, accessibleVariables);
-    }
-
-    private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector,
-            final Set<String> accessibleVariables) {
-        final ValidationContext parentContext = new ValidationContext(null, new RobotModel(), RobotVersion.from("0.0"),
-                SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
-        final IFile file = mock(IFile.class);
-        when(file.getFullPath()).thenReturn(new Path("/suite.robot"));
-        return new FileValidationContext(parentContext, file, collector, accessibleVariables);
+    private Collection<Problem> validate(final FileValidationContext context, final RobotSuiteFile fileModel)
+            throws CoreException {
+        final MockReporter reporter = new MockReporter();
+        new GeneralSettingsTableValidator(context, fileModel.findSection(RobotSettingsSection.class), reporter)
+                .validate(new NullProgressMonitor());
+        return reporter.getReportedProblems();
     }
 }

@@ -5,15 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +20,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
@@ -36,9 +36,11 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 
@@ -80,7 +82,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         reportTeardownProblems();
         reportArgumentsProblems();
 
-        reportKeywordUsageProblemsInUserKeywordSettings();
+        reportOutdatedSettingsSynonyms();
+        reportUnknownVariablesInNonExecutables();
     }
 
     private void reportUnknownSettings() {
@@ -94,42 +97,53 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportReturnProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final KeywordReturn returns : keyword.getReturns()) {
-            declarationIsEmpty.put(returns.getDeclaration(), returns.getReturnValues().isEmpty());
-        }
+        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getReturns().stream().collect(
+                toMap(KeywordReturn::getDeclaration, ret -> ret.getReturnValues().isEmpty()));
+
         reportCommonProblems(declarationIsEmpty);
     }
 
     private void reportTagsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final KeywordTags tag : keyword.getTags()) {
-            declarationIsEmpty.put(tag.getDeclaration(), tag.getTags().isEmpty());
-        }
+        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getTags().stream().collect(
+                toMap(KeywordTags::getDeclaration, tag -> tag.getTags().isEmpty()));
+
         reportCommonProblems(declarationIsEmpty);
     }
 
     private void reportTimeoutsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final KeywordTimeout timeout : keyword.getTimeouts()) {
-            declarationIsEmpty.put(timeout.getDeclaration(), timeout.getTimeout() == null);
-        }
+        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getTimeouts().stream().collect(
+                toMap(KeywordTimeout::getDeclaration, timeout -> timeout.getTimeout() == null));
+
         reportCommonProblems(declarationIsEmpty);
+        reportInvalidTimeoutSyntax(keyword.getTimeouts());
+    }
+
+    private void reportInvalidTimeoutSyntax(final List<KeywordTimeout> timeouts) {
+        for (final KeywordTimeout kwTimeout : timeouts) {
+            final RobotToken timeoutToken = kwTimeout.getTimeout();
+            if (timeoutToken != null) {
+                final String timeout = timeoutToken.getText();
+                if (!timeoutToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
+                        && !RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
+                    final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
+                            .formatMessageWith(timeout);
+                    reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
+                }
+            }
+        }
     }
 
     private void reportDocumentationsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final KeywordDocumentation doc : keyword.getDocumentation()) {
-            declarationIsEmpty.put(doc.getDeclaration(), doc.getDocumentationText().isEmpty());
-        }
+        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getDocumentation().stream().collect(
+                toMap(KeywordDocumentation::getDeclaration, tag -> tag.getDocumentationText().isEmpty()));
+
         reportCommonProblems(declarationIsEmpty);
     }
 
     private void reportTeardownProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final KeywordTeardown teardown : keyword.getTeardowns()) {
-            declarationIsEmpty.put(teardown.getDeclaration(), teardown.getKeywordName() == null);
-        }
+        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getTeardowns().stream().collect(
+                toMap(KeywordTeardown::getDeclaration, teardown -> teardown.getKeywordName() == null));
+
         reportCommonProblems(declarationIsEmpty);
     }
 
@@ -151,6 +165,37 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, file, defToken);
             }
         });
+    }
+
+    private void reportOutdatedSettingsSynonyms() {
+        reportOutdatedSettings(keyword.getDocumentation(), KeywordsProblem.DOCUMENT_SYNONYM, "documentation");
+        reportOutdatedSettings(keyword.getTeardowns(), KeywordsProblem.POSTCONDITION_SYNONYM, "teardown");
+    }
+
+    private void reportOutdatedSettings(final List<? extends AModelElement<?>> settings, final IProblemCause cause,
+            final String correctRepresentation) {
+        for (final AModelElement<?> setting : settings) {
+            final RobotToken declarationToken = setting.getDeclaration();
+            final String text = declarationToken.getText();
+            final String canonicalText = text.replaceAll("\\s", "").toLowerCase();
+            final String canonicalCorrectRepresentation = correctRepresentation.replaceAll("\\s", "").toLowerCase();
+            if (!canonicalText.contains(canonicalCorrectRepresentation)) {
+                reporter.handleProblem(RobotProblem.causedBy(cause).formatMessageWith(text),
+                        validationContext.getFile(), declarationToken);
+            }
+        }
+    }
+
+    private void reportUnknownVariablesInNonExecutables() {
+        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
+
+        for (final KeywordTimeout kwTimeout : keyword.getTimeouts()) {
+            unknownVarsValidator.reportUnknownVars(kwTimeout.getTimeout());
+        }
+        for (final KeywordTags tag : keyword.getTags()) {
+            unknownVarsValidator.reportUnknownVars(tag.getTags());
+        }
+        // KeywordReturn are validated in KeywordValidator, since it requires variables created by executables
     }
 
     private void reportArgumentsProblems() {
@@ -223,7 +268,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
         // first add arguments embedded in name, then from [Arguments] setting
         final Multimap<String, RobotToken> embeddedArguments = VariableNamesSupport
-                .extractUnifiedVariables(newArrayList(keyword.getKeywordName()), extractor, fileName);
+                .extractUnifiedVariables(keyword.getKeywordName(), extractor, fileName);
         for (final String argName : embeddedArguments.keySet()) {
             arguments.putAll(EmbeddedKeywordNamesSupport.removeRegex(argName), embeddedArguments.get(argName));
         }
@@ -236,12 +281,12 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                     final String def = splitted.get(0);
                     final String unifiedDefinitionName = VariableNamesSupport.extractUnifiedVariableName(def);
                     final Multimap<String, RobotToken> usedVariables = VariableNamesSupport
-                            .extractUnifiedVariables(newArrayList(token), new VariableExtractor(), null);
+                            .extractUnifiedVariables(token, new VariableExtractor(), null);
                     arguments.put(unifiedDefinitionName,
                             Iterables.getFirst(usedVariables.get(unifiedDefinitionName), null));
                 } else {
                     arguments.putAll(
-                            VariableNamesSupport.extractUnifiedVariables(newArrayList(token), extractor, fileName));
+                            VariableNamesSupport.extractUnifiedVariables(token, extractor, fileName));
                 }
             }
         }
@@ -301,7 +346,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
                     final String unifiedDefinitionName = VariableNamesSupport.extractUnifiedVariableName(def);
                     final Multimap<String, RobotToken> usedVariables = VariableNamesSupport.extractUnifiedVariables(
-                            newArrayList(argToken), new VariableExtractor(), validationContext.getFile().getName());
+                            argToken, new VariableExtractor(), validationContext.getFile().getName());
 
                     for (final Entry<String, RobotToken> entry : usedVariables.entries()) {
                         if (isInvalidVariableDeclaration(definedVariables, unifiedDefinitionName, entry)) {
@@ -331,15 +376,5 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
     private boolean isDefaultArgument(final RobotToken argumentToken) {
         return argumentToken.getText().contains("}=");
-    }
-
-    private void reportKeywordUsageProblemsInUserKeywordSettings() {
-        for (final KeywordTeardown keywordTeardown : keyword.getTeardowns()) {
-            final RobotToken keywordNameToken = keywordTeardown.getKeywordName();
-            if (keywordNameToken != null) {
-                TestCaseTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
-                        keywordNameToken, Optional.of(keywordTeardown.getArguments()));
-            }
-        }
     }
 }

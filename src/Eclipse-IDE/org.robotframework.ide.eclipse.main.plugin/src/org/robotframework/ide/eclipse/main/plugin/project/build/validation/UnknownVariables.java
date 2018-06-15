@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,18 +50,31 @@ class UnknownVariables {
                 && !VariableNamesSupport.isDefinedVariableInsideComputation(declaration, definedVariables);
     }
 
-    void reportUnknownVars(final Set<String> knownVariables, final List<RobotToken> tokens) {
+    void reportUnknownVars(final RobotToken token) {
+        reportUnknownVars(newArrayList(token));
+    }
+
+    void reportUnknownVars(final List<RobotToken> tokens) {
+        reportUnknownVars(new HashSet<>(), tokens);
+    }
+
+    void reportUnknownVars(final Set<String> additionalKnownVariables, final List<RobotToken> tokens) {
         final String filename = validationContext.getFile().getName();
         for (final RobotToken token : tokens) {
-            final List<VariableDeclaration> declarations = new VariableExtractor().extract(token, filename)
-                    .getCorrectVariables();
-            reportUnknownVariables(knownVariables, declarations);
+            if (token != null) {
+                final List<VariableDeclaration> declarations = new VariableExtractor().extract(token, filename)
+                        .getCorrectVariables();
+                reportUnknownVarsDeclarations(additionalKnownVariables, declarations);
+            }
         }
     }
 
-    void reportUnknownVariables(final Set<String> knownVariables,
+    void reportUnknownVarsDeclarations(final Set<String> additionalKnownVariables,
             final List<VariableDeclaration> variablesDeclarations) {
-        final Predicate<VariableDeclaration> isInvalid = isInvalidVariableDeclaration(knownVariables);
+        final Set<String> allVariables = new HashSet<>(validationContext.getAccessibleVariables());
+        allVariables.addAll(additionalKnownVariables);
+
+        final Predicate<VariableDeclaration> isInvalid = isInvalidVariableDeclaration(allVariables);
 
         for (final VariableDeclaration declaration : variablesDeclarations) {
             if (isInvalid.test(declaration)) {

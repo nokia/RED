@@ -26,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.Keywo
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 
 
-public class KeywordCallOfRunKwVariantArgumentsValidatorTest {
+public class KeywordCallArgumentsOfRunKwVariantValidatorTest {
 
     private static final ArgumentProblem NUMBER_PROBLEM = ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS;
 
@@ -67,7 +67,7 @@ public class KeywordCallOfRunKwVariantArgumentsValidatorTest {
             final RobotToken definingToken = executableRowDescriptor.getAction().getToken();
             final List<RobotToken> argumentTokens = executableRowDescriptor.getKeywordArguments();
 
-            final KeywordCallOfRunKwVariantArgumentsValidator validator = new KeywordCallOfRunKwVariantArgumentsValidator(
+            final KeywordCallArgumentsOfRunKwVariantValidator validator = new KeywordCallArgumentsOfRunKwVariantValidator(
                     call.getSuiteFile().getFile(), definingToken, reporter, descriptor, argumentTokens);
             validator.validate(null);
 

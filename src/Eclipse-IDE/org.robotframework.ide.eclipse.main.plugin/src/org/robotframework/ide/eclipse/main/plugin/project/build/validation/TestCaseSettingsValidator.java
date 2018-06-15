@@ -5,15 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Maps.newHashMap;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
@@ -23,9 +23,13 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 
 /**
@@ -48,7 +52,7 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
     }
 
     @Override
-    public void validate(final IProgressMonitor monitor) throws CoreException {
+    public void validate(final IProgressMonitor monitor) {
         reportUnknownSettings();
 
         reportTagsProblems();
@@ -58,7 +62,8 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
         reportTeardownProblems();
         reportTemplateProblems();
 
-        reportKeywordUsageProblemsInTestCaseSettings();
+        reportOutdatedSettingsSynonyms();
+        reportUnknownVariablesInNonExecutables();
     }
 
     private void reportUnknownSettings() {
@@ -72,50 +77,93 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportTagsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final TestCaseTags tag : testCase.getTags()) {
-            declarationIsEmpty.put(tag.getDeclaration(), tag.getTags().isEmpty());
-        }
+        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getTags().stream().collect(
+                toMap(TestCaseTags::getDeclaration, tag -> tag.getTags().isEmpty()));
+
         reportCommonProblems(declarationIsEmpty);
     }
 
     private void reportTimeoutsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final TestCaseTimeout timeout : testCase.getTimeouts()) {
-            declarationIsEmpty.put(timeout.getDeclaration(), timeout.getTimeout() == null);
-        }
+        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getTimeouts().stream().collect(
+                toMap(TestCaseTimeout::getDeclaration, timeout -> timeout.getTimeout() == null));
+
         reportCommonProblems(declarationIsEmpty);
+        reportInvalidTimeoutSyntax(testCase.getTimeouts());
+    }
+
+    private void reportInvalidTimeoutSyntax(final List<TestCaseTimeout> timeouts) {
+        for (final TestCaseTimeout testTimeout : timeouts) {
+            final RobotToken timeoutToken = testTimeout.getTimeout();
+            if (timeoutToken != null) {
+                final String timeout = timeoutToken.getText();
+                if (!timeoutToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
+                        && !RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
+                    final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
+                            .formatMessageWith(timeout);
+                    reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
+                }
+            }
+        }
     }
 
     private void reportDocumentationsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final TestDocumentation doc : testCase.getDocumentation()) {
-            declarationIsEmpty.put(doc.getDeclaration(), doc.getDocumentationText().isEmpty());
-        }
+        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getDocumentation().stream().collect(
+                toMap(TestDocumentation::getDeclaration, doc -> doc.getDocumentationText().isEmpty()));
+
         reportCommonProblems(declarationIsEmpty);
     }
 
     private void reportTemplateProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final TestCaseTemplate template : testCase.getTemplates()) {
-            declarationIsEmpty.put(template.getDeclaration(), template.getKeywordName() == null);
+        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getTemplates().stream().collect(
+                toMap(TestCaseTemplate::getDeclaration, template -> template.getKeywordName() == null));
+
+        reportCommonProblems(declarationIsEmpty);
+        reportTemplateUnexpectedArguments(testCase.getTemplates());
+        reportTemplateKeywordProblems(testCase.getTemplates());
+    }
+
+    private void reportTemplateUnexpectedArguments(final List<TestCaseTemplate> templates) {
+        for (final TestCaseTemplate template : templates) {
+            if (!template.getUnexpectedTrashArguments().isEmpty()) {
+                final RobotToken settingToken = template.getDeclaration();
+                final String actualArgs = template.getUnexpectedTrashArguments()
+                        .stream()
+                        .map(RobotToken::getText)
+                        .map(String::trim)
+                        .collect(joining(", ", "[", "]"));
+                final String additionalMsg = "Only keyword name should be specified for templates.";
+                final RobotProblem problem = RobotProblem
+                        .causedBy(GeneralSettingsProblem.SETTING_ARGUMENTS_NOT_APPLICABLE)
+                        .formatMessageWith(settingToken.getText(), actualArgs, additionalMsg);
+                reporter.handleProblem(problem, validationContext.getFile(), settingToken);
+            }
         }
+    }
+
+    private void reportTemplateKeywordProblems(final List<TestCaseTemplate> templates) {
+        for (final TestCaseTemplate template : templates) {
+            final RobotToken keywordToken = template.getKeywordName();
+            if (keywordToken != null) {
+                final String keywordName = keywordToken.getText();
+                if (keywordName.toLowerCase().equals("none")) {
+                    continue;
+                }
+                new KeywordCallInTemplateValidator(validationContext, keywordToken, reporter).validate();
+            }
+        }
+    }
+
+    private void reportSetupProblems() {
+        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getSetups().stream().collect(
+                toMap(TestCaseSetup::getDeclaration, setup -> setup.getKeywordName() == null));
+
         reportCommonProblems(declarationIsEmpty);
     }
 
     private void reportTeardownProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final TestCaseSetup setup : testCase.getSetups()) {
-            declarationIsEmpty.put(setup.getDeclaration(), setup.getKeywordName() == null);
-        }
-        reportCommonProblems(declarationIsEmpty);
-    }
+        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getTeardowns().stream().collect(
+                toMap(TestCaseTeardown::getDeclaration, teardown -> teardown.getKeywordName() == null));
 
-    private void reportSetupProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
-        for (final TestCaseTeardown teardown : testCase.getTeardowns()) {
-            declarationIsEmpty.put(teardown.getDeclaration(), teardown.getKeywordName() == null);
-        }
         reportCommonProblems(declarationIsEmpty);
     }
 
@@ -139,21 +187,34 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
         });
     }
 
-    private void reportKeywordUsageProblemsInTestCaseSettings() {
-        for (final TestCaseSetup setup : testCase.getSetups()) {
-            final RobotToken keywordNameToken = setup.getKeywordName();
-            if (keywordNameToken != null) {
-                TestCaseTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
-                        keywordNameToken, Optional.of(setup.getArguments()));
+    private void reportOutdatedSettingsSynonyms() {
+        reportOutdatedSettings(testCase.getDocumentation(), TestCasesProblem.DOCUMENT_SYNONYM, "documentation");
+        reportOutdatedSettings(testCase.getSetups(), TestCasesProblem.PRECONDITION_SYNONYM, "setup");
+        reportOutdatedSettings(testCase.getTeardowns(), TestCasesProblem.POSTCONDITION_SYNONYM, "teardown");
+    }
+
+    private void reportOutdatedSettings(final List<? extends AModelElement<?>> settings, final IProblemCause cause,
+            final String correctRepresentation) {
+        for (final AModelElement<?> setting : settings) {
+            final RobotToken declarationToken = setting.getDeclaration();
+            final String text = declarationToken.getText();
+            final String canonicalText = text.replaceAll("\\s", "").toLowerCase();
+            final String canonicalCorrectRepresentation = correctRepresentation.replaceAll("\\s", "").toLowerCase();
+            if (!canonicalText.contains(canonicalCorrectRepresentation)) {
+                reporter.handleProblem(RobotProblem.causedBy(cause).formatMessageWith(text),
+                        validationContext.getFile(), declarationToken);
             }
         }
+    }
 
-        for (final TestCaseTeardown teardown : testCase.getTeardowns()) {
-            final RobotToken name = teardown.getKeywordName();
-            if (name != null) {
-                TestCaseTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
-                        name, Optional.of(teardown.getArguments()));
-            }
+    private void reportUnknownVariablesInNonExecutables() {
+        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
+
+        for (final TestCaseTimeout testTimeout : testCase.getTimeouts()) {
+            unknownVarsValidator.reportUnknownVars(testTimeout.getTimeout());
+        }
+        for (final TestCaseTags tag : testCase.getTags()) {
+            unknownVarsValidator.reportUnknownVars(tag.getTags());
         }
     }
 }
