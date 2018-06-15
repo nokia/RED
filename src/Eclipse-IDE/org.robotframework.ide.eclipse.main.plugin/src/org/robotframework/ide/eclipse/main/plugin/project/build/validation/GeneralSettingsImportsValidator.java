@@ -239,16 +239,19 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         reporter.handleProblem(problem, validationContext.getFile(), pathToken, attributes);
     }
 
+    @SuppressWarnings("unused")
     protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
             throws CoreException {
         // nothing to do; override if needed
     }
 
+    @SuppressWarnings("unused")
     protected void validateResource(final IResource resource, final String path, final RobotToken pathToken,
             final List<RobotToken> arguments) {
         // nothing to do; override if needed
     }
 
+    @SuppressWarnings("unused")
     protected void validateFile(final File file, final String path, final RobotToken pathToken,
             final List<RobotToken> arguments) {
         // nothing to do; override if needed

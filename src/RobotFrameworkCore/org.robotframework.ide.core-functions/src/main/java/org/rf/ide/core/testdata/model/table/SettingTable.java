@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.model.table;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,6 +79,21 @@ public class SettingTable extends ARobotSectionTable {
 
     public List<AImported> getImports() {
         return Collections.unmodifiableList(imports);
+    }
+
+    public List<VariablesImport> getVariablesImports() {
+        return getImports().stream().filter(VariablesImport.class::isInstance).map(VariablesImport.class::cast).collect(
+                toList());
+    }
+
+    public List<ResourceImport> getResourcesImports() {
+        return getImports().stream().filter(ResourceImport.class::isInstance).map(ResourceImport.class::cast).collect(
+                toList());
+    }
+
+    public List<LibraryImport> getLibraryImports() {
+        return getImports().stream().filter(LibraryImport.class::isInstance).map(LibraryImport.class::cast).collect(
+                toList());
     }
 
     public LibraryImport newLibraryImport() {

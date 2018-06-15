@@ -31,15 +31,13 @@ public class VariableNamesSupport {
         return VAR_PATTERN.matcher(input).matches();
     }
 
-    public static Multimap<String, RobotToken> extractUnifiedVariables(final List<RobotToken> assignments,
+    public static Multimap<String, RobotToken> extractUnifiedVariables(final RobotToken assignment,
             final VariableExtractor extractor, final String fileName) {
         final Multimap<String, RobotToken> vars = ArrayListMultimap.create();
-        for (final RobotToken token : assignments) {
-            final MappingResult mappingResult = extractor.extract(token, fileName);
-            for (final VariableDeclaration variableDeclaration : mappingResult.getCorrectVariables()) {
-                vars.put(extractUnifiedVariableName(variableDeclaration.asToken().getText()),
-                        variableDeclaration.asToken());
-            }
+        final MappingResult mappingResult = extractor.extract(assignment, fileName);
+        for (final VariableDeclaration variableDeclaration : mappingResult.getCorrectVariables()) {
+            vars.put(extractUnifiedVariableName(variableDeclaration.asToken().getText()),
+                    variableDeclaration.asToken());
         }
         return vars;
     }

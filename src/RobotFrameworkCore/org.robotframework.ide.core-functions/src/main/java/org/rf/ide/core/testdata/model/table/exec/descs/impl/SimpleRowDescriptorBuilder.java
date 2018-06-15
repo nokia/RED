@@ -28,13 +28,12 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
 
     @Override
-    public <T> AcceptResult acceptable(final RobotExecutableRow<T> execRowLine) {
-        return new AcceptResult(true);
+    public <T> boolean isAcceptable(final RobotExecutableRow<T> execRowLine) {
+        return true;
     }
 
     @Override
-    public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine,
-            final AcceptResult acceptResult) {
+    public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine) {
         final SimpleRowDescriptor<T> simple = new SimpleRowDescriptor<>(execRowLine);
         final ARobotSectionTable table;
         if (execRowLine.getParent() instanceof AModelElement) {
