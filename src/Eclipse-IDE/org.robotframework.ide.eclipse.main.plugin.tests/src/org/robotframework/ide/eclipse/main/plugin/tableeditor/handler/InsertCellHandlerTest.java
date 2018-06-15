@@ -64,7 +64,6 @@ public class InsertCellHandlerTest {
     public void commandExecuted_whenInsideTheCall() {
         final AModelElement<?> linkedElement = new RobotExecutableRow<TestCase>();
         linkedElement.getDeclaration().setText("kw");
-        ;
         final RobotKeywordCall call = new RobotKeywordCall(null, linkedElement);
         when(selection.getFirstElement()).thenReturn(call);
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);
