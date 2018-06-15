@@ -162,8 +162,10 @@ public class ExecutableUnitsFixer {
                         execLine.getAction().setText("\\");
                         execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                     }
-                } else {
+                } else if (execLine.getAction().getText().isEmpty()) {
                     execLine.getAction().setType(RobotTokenType.START_HASH_COMMENT);
+                } else {
+                    execLine.getAction().getTypes().remove(RobotTokenType.FOR_CONTINUE_TOKEN);
                 }
             } else if (rowType == ERowType.FOR || rowType == ERowType.SIMPLE) {
                 isContinue = false;
