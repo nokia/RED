@@ -3,7 +3,7 @@
 
 RED is modern editor based on Eclipse IDE to provide efficient and comfortable work with [RobotFramework](https://github.com/robotframework/robotframework) testware.
 
-**Latest release - [RED 0.8.5 (2018-05-16)](https://github.com/nokia/RED/releases/latest)**
+**Latest release - [RED 0.8.6 (2018-06-18)](https://github.com/nokia/RED/releases/latest)**
 
 ### Note about upgrading RED from 0.8.0 to 0.8.2 and newer
 Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
