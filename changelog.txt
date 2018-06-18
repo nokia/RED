@@ -1,4 +1,25 @@
-RED 0.8.4 - 2018/03/19
+RED 0.8.6 - 2018/06/18
+Enhancement
+
+    [RED-711] - GitHub #73 - red.xml - relative paths for RobotExec and ReferencedLibs
+    [RED-1113] - GitHub #204 Handle environment variables in red.xml for classpath and pythonpaths
+    [RED-1120] - [github #203] reload libraries with RobotCommandRpcExecutor
+    [RED-1123] - Remove raw field from RobotToken as unnecessary
+
+Bug
+
+    [RED-616] - Embedded KW with regex is not recogized
+    [RED-1034] - Marker should be shown when variables doesn't exist in nested variables
+    [RED-1079] - QuickFix for absolute paths in linked folders does wrong thing
+    [RED-1091] - GitHub #96 - Positional argument cannot be used after named arguments for usual KW (examples from RED_781)
+    [RED-1121] - Timeout argument validation for Remote lib import
+    [RED-1122] - URI protocol validation in Remote lib import
+    [RED-1125] - #210 GitHub - Autodiscovery don't work for RemoteSwingLibrary in RED 0.8.5
+    [RED-1131] - GitHub #220 Editor throws exception when opening specific .robot file
+    [RED-1140] - [github #225] Problems with unicode keywords using embedded variables
+
+
+RED 0.8.5 - 2018/05/16
 Enhancement
 
     [RED-1022] - allow html libdoc to be used in RED to support text formatting from robot
