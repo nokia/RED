@@ -1,3 +1,33 @@
+# RED - Robot Editor v0.8.6
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- Adding relative paths for RobotExec and ReferencedLibs in red.xml 
+- Handle environment variables in red.xml for classpath and pythonpaths
+
+## GitHub issues updates
+    #73 - red.xml - relative paths for RobotExec and ReferencedLibs
+    #204 - Handle environment variables in red.xml for classpath and pythonpaths
+    #203 - reload libraries with RobotCommandRpcExecutor
+    #96 - Positional argument cannot be used after named arguments for usual KW (examples from RED_781)
+    #210 - Autodiscovery don't work for RemoteSwingLibrary in RED 0.8.5
+    #220 - Editor throws exception when opening specific .robot file
+    #225 - Problems with unicode keywords using embedded variables
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.5
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
