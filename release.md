@@ -25,6 +25,7 @@ For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform:
     #210 - Autodiscovery don't work for RemoteSwingLibrary in RED 0.8.5
     #220 - Editor throws exception when opening specific .robot file
     #225 - Problems with unicode keywords using embedded variables
+    #179 - A wrong error message when using embedding arguments keyword name
 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 
