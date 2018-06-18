@@ -11,6 +11,7 @@ Bug
     [RED-616] - Embedded KW with regex is not recogized
     [RED-1034] - Marker should be shown when variables doesn't exist in nested variables
     [RED-1079] - QuickFix for absolute paths in linked folders does wrong thing
+    [RED-1084] - GitHub #179 - A wrong error message when using embedding arguments keyword name
     [RED-1091] - GitHub #96 - Positional argument cannot be used after named arguments for usual KW (examples from RED_781)
     [RED-1121] - Timeout argument validation for Remote lib import
     [RED-1122] - URI protocol validation in Remote lib import
