@@ -18,14 +18,14 @@ For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform:
 - Handle environment variables in red.xml for classpath and pythonpaths
 
 ## GitHub issues updates
-    #73 - red.xml - relative paths for RobotExec and ReferencedLibs
-    #204 - Handle environment variables in red.xml for classpath and pythonpaths
-    #203 - reload libraries with RobotCommandRpcExecutor
-    #96 - Positional argument cannot be used after named arguments for usual KW (examples from RED_781)
-    #210 - Autodiscovery don't work for RemoteSwingLibrary in RED 0.8.5
-    #220 - Editor throws exception when opening specific .robot file
-    #225 - Problems with unicode keywords using embedded variables
-    #179 - A wrong error message when using embedding arguments keyword name
+ - #73 - red.xml - relative paths for RobotExec and ReferencedLibs
+ - #204 - Handle environment variables in red.xml for classpath and pythonpaths
+ - #203 - reload libraries with RobotCommandRpcExecutor
+ - #96 - Positional argument cannot be used after named arguments for usual KW (examples from RED_781)
+ - #210 - Autodiscovery don't work for RemoteSwingLibrary in RED 0.8.5
+ - #220 - Editor throws exception when opening specific .robot file
+ - #225 - Problems with unicode keywords using embedded variables
+ - #179 - A wrong error message when using embedding arguments keyword name
 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 
@@ -53,13 +53,13 @@ For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform:
 - Autodiscovery and quick fix improvements
 
 ## GitHub issues updates
-    #125 - try to look for python2/python3 filenames when looking for python installations
-    #170 - interrupt tests processes instead of killing them
-    #185 - Libdoc view from PE - does not show docs when doc contains &lt; and &gt; strings
-    #180 - Add command line filed to Rflint
-    #184 - Resolve Eclipse parameters in fields for launching stuff (rflint,run configs)
-    #187 - Keyword with parameterized name coloring
-    #194 - Coloring variables using square brackets
+ - #125 - try to look for python2/python3 filenames when looking for python installations
+ - #170 - interrupt tests processes instead of killing them
+ - #185 - Libdoc view from PE - does not show docs when doc contains &lt; and &gt; strings
+ - #180 - Add command line filed to Rflint
+ - #184 - Resolve Eclipse parameters in fields for launching stuff (rflint,run configs)
+ - #187 - Keyword with parameterized name coloring
+ - #194 - Coloring variables using square brackets
 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 
@@ -230,7 +230,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - #122 - red.xml charsets issues - encoding of red.xml is no in UTF-8
 - #128 - better handle projects without red.xml - for now,projects without red.xml can use Robot and system variables. Handling built-in libs will be done later. 
 - #138 - do not override existing red.xml file
-    
+ - 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 
 # RED - Robot Editor v0.7.9
@@ -254,7 +254,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - Autodiscovery now discovers libs  inside resources
 - Autodiscovery now uses Remote Session Server if defined
 
-    
+ - 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 
 
@@ -289,10 +289,10 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - Messege Log view could wrap its content and save it
 - Changing red.xml file after renaming of project
 
-    
+ - 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
-    
-    
+ - 
+ - 
 --------------------------------------------------------------------------------------------------------------------------   
 # RED - Robot Editor v0.7.7-fix
 ## Introduction
@@ -308,7 +308,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 RED 0.7.7-fix is available only in GitHub binaries,Update Site has not been updated with this version. If you whish to update RED to 0.7.7-fix, either download RED Product zip or RED feature and perform Install New Software action from Help menu with selected RED feature zip file.
 
 ## Updates
-#105  - fix for running tests with Jython with classpath variable defined in OS     
+#105  - fix for running tests with Jython with classpath variable defined in OS -  
 
 --------------------------------------------------------------------------------------------------------------------------   
 # RED - Robot Editor v0.7.7
@@ -336,10 +336,10 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - RED help moved to GitHub pages: (http://nokia.github.io/RED/)[http://nokia.github.io/RED/]
 - changed some help images to animations
 
-    
+ - 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 
-        
+ -  - 
 --------------------------------------------------------------------------------------------------------------------------   
 # RED - Robot Editor v0.7.6
 ## Introduction
@@ -376,11 +376,11 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - added jump to Keyword definitions in cell with multiple keywords
 - content assist can show resource names while typing in Settings section
 - RED asks when running testsuites with Fatal errors which will fail due to Robot exception
-    
+ - 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 
-        
---------------------------------------------------------------------------------------------------------------------------    
+ -  - 
+-------------------------------------------------------------------------------------------------------------------------- - 
 # RED - Robot Editor v0.7.5-fix
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
@@ -395,10 +395,10 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 RED 0.7.5-fix is available only in GitHub binaries,Update Site has not been updated with this version. If you whish to update RED to 0.7.5-fix, either download RED Product zip or RED feature and perform Install New Software action from Help menu with selected RED feature zip file.
 
 ## Updates
-#81 - fix for autodiscovery of Selenium2Library, from now Selenium2Lib will be discovered like in pre 0.7.5 but no jump to line in python sources will be available. This is due to specific Selenium2Lib keywords definition type.     
-    
-    
-    
+#81 - fix for autodiscovery of Selenium2Library, from now Selenium2Lib will be discovered like in pre 0.7.5 but no jump to line in python sources will be available. This is due to specific Selenium2Lib keywords definition type. -  
+ - 
+ - 
+ - 
 --------------------------------------------------------------------------------------------------------------------------
 # RED - Robot Editor v0.7.5
 ## Introduction
