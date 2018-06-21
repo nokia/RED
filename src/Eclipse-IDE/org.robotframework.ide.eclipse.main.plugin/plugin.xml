@@ -1331,6 +1331,11 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertCellToRight"
+          name="Insert cell to the right">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.deleteCell"
           name="Delete cell">
     </command>
@@ -2060,6 +2065,20 @@
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertCellHandler"
           commandId="org.robotframework.ide.eclipse.insertCell">
+       <activeWhen>
+         <reference
+               definitionId="org.robotframework.editorContextIsActive">
+         </reference>
+       </activeWhen>
+       <enabledWhen>
+        <reference
+            definitionId="org.robotframework.oneKeywordOrSettingArgumentSelected">
+        </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertCellToRightHandler"
+          commandId="org.robotframework.ide.eclipse.insertCellToRight">
        <activeWhen>
          <reference
                definitionId="org.robotframework.editorContextIsActive">
@@ -3392,6 +3411,12 @@
           sequence="M1+I">
     </key>
     <key
+          commandId="org.robotframework.ide.eclipse.insertCellToRight"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+M2+I">
+    </key>
+    <key
           commandId="org.robotframework.ide.eclipse.deleteCell"
           contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -3849,6 +3874,11 @@
                 style="push">
           </command>
           <command
+                commandId="org.robotframework.ide.eclipse.insertCellToRight"
+                label="Insert cell to the right"
+                style="push">
+          </command>
+          <command
                 commandId="org.robotframework.ide.eclipse.deleteCell"
                 label="Delete cell"
                 style="push">
@@ -4043,6 +4073,11 @@
           <command
                 commandId="org.robotframework.ide.eclipse.insertCell"
                 label="Insert cell"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.insertCellToRight"
+                label="Insert cell to the right"
                 style="push">
           </command>
           <command
@@ -4342,6 +4377,11 @@
                 style="push">
           </command>
           <command
+                commandId="org.robotframework.ide.eclipse.insertCellToRight"
+                label="Insert cell to the right"
+                style="push">
+          </command>
+          <command
                 commandId="org.robotframework.ide.eclipse.deleteCell"
                 label="Delete cell"
                 style="push">
@@ -4523,6 +4563,11 @@
           <command
                 commandId="org.robotframework.ide.eclipse.insertCell"
                 label="Insert cell"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.insertCellToRight"
+                label="Insert cell to the right"
                 style="push">
           </command>
           <command

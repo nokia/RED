@@ -28,11 +28,10 @@ public class GeneralSettingsDataProvider
 
     private SortedList<Entry<String, RobotElement>> generalSettings;
     private FilterList<Entry<String, RobotElement>> filteredGeneralSettings;
-    
+
     private SettingsMatchesFilter filter;
 
     private final GeneralSettingsColumnsPropertyAccessor propertyAccessor;
-    
 
     public GeneralSettingsDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotSettingsSection section) {
@@ -49,7 +48,7 @@ public class GeneralSettingsDataProvider
     }
 
     private int countGeneralSettingsTableColumnsNumber() {
-        return calculateLongestArgumentsLength() + 2; // setting name + args + comment
+        return calculateLongestArgumentsLength() + 3; // setting name + args + empty cell + comment
     }
 
     private int calculateLongestArgumentsLength() {
@@ -69,7 +68,7 @@ public class GeneralSettingsDataProvider
         if (generalSettings == null) {
             @SuppressWarnings("unchecked")
             final EventList<Entry<String, RobotElement>> eventList = GlazedLists
-                    .<Entry<String, RobotElement>> eventListOf();
+                    .<Entry<String, RobotElement>>eventListOf();
             generalSettings = new SortedList<>(eventList, null);
             filteredGeneralSettings = new FilterList<>(generalSettings);
         }

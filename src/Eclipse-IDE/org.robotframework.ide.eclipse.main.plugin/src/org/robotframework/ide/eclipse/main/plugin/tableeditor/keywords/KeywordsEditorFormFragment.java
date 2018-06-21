@@ -591,8 +591,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private void whenKeywordCallDetailIsChanged(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotKeywordCall keywordCall) {
         if (keywordCall.getParent() instanceof RobotKeywordDefinition && keywordCall.getSuiteFile() == fileModel) {
-            table.refresh();
-            setDirty();
+            tableInputIsReplaced().run();
         }
     }
 

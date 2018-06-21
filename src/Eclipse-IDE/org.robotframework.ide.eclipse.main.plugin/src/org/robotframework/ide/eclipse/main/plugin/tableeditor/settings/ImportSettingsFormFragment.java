@@ -456,9 +456,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         if (setting.getSuiteFile() == fileModel) {
-            table.update();
-            table.refresh();
-            setDirty();
+            tableInputIsReplaced().run();
         }
     }
 
