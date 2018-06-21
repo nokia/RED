@@ -14,32 +14,32 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertCellCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertCellHandler.E4InsertCellHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertCellToRightHandler.E4InsertCellToRightHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class InsertCellHandler extends DIParameterizedHandler<E4InsertCellHandler> {
+public class InsertCellToRightHandler extends DIParameterizedHandler<E4InsertCellToRightHandler> {
 
-    public InsertCellHandler() {
-        super(E4InsertCellHandler.class);
+    public InsertCellToRightHandler() {
+        super(E4InsertCellToRightHandler.class);
     }
 
-    public static class E4InsertCellHandler {
+    public static class E4InsertCellToRightHandler {
 
         @Execute
-        public void insertCell(final RobotEditorCommandsStack commandsStack,
+        public void insertCellToRight(final RobotEditorCommandsStack commandsStack,
                 @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
 
             final RobotKeywordCall call = (RobotKeywordCall) selection.getFirstElement();
             final int column = editor.getSelectionLayerAccessor().getSelectedPositions()[0].getColumnPosition();
-
+            
             final boolean isWholeLineComment = call.getAction().isPresent()
                     && call.getAction().get().getText().isEmpty() && call.getAction().get().getFilePosition().isNotSet()
                     && call.getArgumentTokens().isEmpty();
 
-            if (column < call.getLinkedElement().getElementTokens().size() - (isWholeLineComment ? 1 : 0)) {
-                commandsStack.execute(new InsertCellCommand(call, column, null));
+            if (column < call.getLinkedElement().getElementTokens().size() - (isWholeLineComment ? 2 : 1)) {
+                commandsStack.execute(new InsertCellCommand(call, column + 1, null));
             }
         }
     }

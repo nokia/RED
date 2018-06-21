@@ -64,7 +64,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
 
     private void createLists(final RobotKeywordsSection section) {
         if (keywords == null) {
-            keywordsSortedList = new SortedList<>(GlazedLists.<Object> eventListOf(), null);
+            keywordsSortedList = new SortedList<>(GlazedLists.<Object>eventListOf(), null);
             filteredList = new FilterList<>(keywordsSortedList);
             keywords = new TreeList<>(filteredList, keywordsTreeFormat, TreeList.nodesStartExpanded());
         }
@@ -112,7 +112,8 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
                 } else if (element instanceof RobotKeywordCall) {
                     final RobotKeywordCall keyword = (RobotKeywordCall) element;
                     if (keyword.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
-                        max = Math.max(max, ExecutablesRowHolderCommentService.execRowView(keyword).size());
+                        // add 1 for empty cell
+                        max = Math.max(max, ExecutablesRowHolderCommentService.execRowView(keyword).size() + 1);
                     }
                 }
             }
