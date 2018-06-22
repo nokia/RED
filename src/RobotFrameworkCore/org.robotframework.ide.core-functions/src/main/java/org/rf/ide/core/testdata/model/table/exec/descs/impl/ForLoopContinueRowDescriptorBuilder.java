@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.model.table.exec.descs.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -24,11 +25,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
-import com.google.common.base.Optional;
-
 public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilder {
 
-    private Optional<Integer> forLoopDeclarationLine = Optional.absent();
+    private Optional<Integer> forLoopDeclarationLine = Optional.empty();
 
     @Override
     public <T> boolean isAcceptable(final RobotExecutableRow<T> execRowLine) {
