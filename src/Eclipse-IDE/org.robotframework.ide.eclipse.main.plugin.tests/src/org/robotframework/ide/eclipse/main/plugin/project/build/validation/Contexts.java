@@ -77,7 +77,7 @@ class Contexts {
     static FileValidationContext prepareContext(final Collection<KeywordEntity> accessibleKeywords,
             final Set<String> accessibleVariables) {
         final Map<String, Collection<KeywordEntity>> accessibleKws = accessibleKeywords.stream()
-                .collect(groupingBy(kwEntity -> kwEntity.getKeywordName(), toCollection(() -> new ArrayList<>())));
+                .collect(groupingBy(KeywordEntity::getKeywordName, toCollection(ArrayList::new)));
 
         final ValidationContext parentContext = new ValidationContext(null, new RobotModel(), RobotVersion.from("0.0"),
                 SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());

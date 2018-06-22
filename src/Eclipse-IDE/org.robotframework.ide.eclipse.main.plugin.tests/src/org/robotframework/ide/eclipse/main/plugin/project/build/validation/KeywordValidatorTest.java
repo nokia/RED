@@ -114,7 +114,7 @@ public class KeywordValidatorTest {
     }
 
     @Test
-    public void keywordOverriddingOtherImportedKeywordIsReported() throws CoreException {
+    public void keywordOverridingOtherImportedKeywordIsReported() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("    kw")
