@@ -1,6 +1,6 @@
-#/*
-#* Copyright 2017 Nokia Solutions and Networks
-#* Licensed under the Apache License, Version 2.0,
+# /*
+# * Copyright 2017 Nokia Solutions and Networks
+# * Licensed under the Apache License, Version 2.0,
 # * see license.txt file for details.
 # */
 
@@ -17,80 +17,69 @@
 # start PyDev remote debug server from Debug perspective (Remote debug server can be running constantly - check PyDev Preferences under PyDev/Debug)
 # run Robot Debug configuration with this script
 
-
-
-import os,sys,re
+import os
+import sys
 import subprocess
-#import pydevd
+import inspect
+
 
 def run_process(command):
-    print("Running command: " + command)
-    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE)
 
     while True:
-        if sys.version_info >= (3, 0):
-            nextline = str(p.stdout.readline(),"utf-8")
-        else:
-            nextline = p.stdout.readline()
-        if nextline == '' and p.poll() is not None:
+        nextline = p.stdout.readline() if sys.version_info < (3, 0, 0) else str(p.stdout.readline(), 'utf-8')
+        if not nextline and p.poll() is not None:
             break
         sys.stdout.write(nextline)
         sys.stdout.flush()
 
 
-
-def LocalPythonDebug(pathToPyDevD,pydevdIp,pydevdPort):
-
-
-    #try to get run.py path from local Python interpreter to run Robot tests
-    try: # try to guess run.py path from local robot installation
-        import robot
-        import inspect
-        path=inspect.getfile(robot)
-    except Exception as inst:
-        # if not found use user defined
-        runPath = 'c:\\Python36\\Lib\\site-packages\\robot\\run.py'
-
-    path=path.replace('\\','/').split('/')
-    path.pop()
-    path='/'.join(path)
-    runPath=path+'/run.py'
-
-    if not os.path.isfile(runPath):
-        print('run.py file not found under following path:'+runPath)
-
-    #try to find pydevd either from installed module or from pydevdPath
+def find_robot_run_path(custom_path):
     try:
-        # if pydevd is installed from pip or in PythonPath, pydevdPath can be shortened to string: -m pydevd
+        # try to get path from local Python interpreter
+        import robot
+        path = os.path.join(os.path.dirname(inspect.getfile(robot)), 'run.py')
+    except:
+        # if not found use user defined
+        path = custom_path
+
+    if not os.path.isfile(path):
+        raise RuntimeError('"%s" does not point to an existing file' % (path))
+
+    return path
+
+
+def find_pydevd_path(custom_path):
+    try:
+        # try to get path from local Python interpreter
         import pydevd
-        pydevdPath = '-m pydevd'
-    except Exception as inst:
-        # if pydevd module not found,use user defined pydevd src
-        pydevdPath = pathToPyDevD
-        if not os.path.isfile(pydevdPath):
-            print('pydevd.py file not found under following path:' + pydevdPath)
-            exit()
+        path = os.path.join(os.path.dirname(inspect.getfile(pydevd)), 'pydevd.py')
+    except:
+        # if not found use user defined
+        path = custom_path
 
-    pydevdArgs='--multiprocess --print-in-debugger-startup --vm_type python --client '+pydevdIp+' --port '+pydevdPort+' --file '+runPath
+    if not os.path.isfile(path):
+        raise RuntimeError('"%s" does not point to an existing file' % (path))
 
-    argumentList = sys.argv
-    argumentList=['"' + arg_item + '"' for arg_item in argumentList] #wrap argument lists in quotes to avoid problems with spaces in paths 
-    argumentList.pop(0) # remove path to current interpreter
-    argumentList[1]='-u' #Force stdin, stdout and stderr to be totally unbuffered. On systems where it matters, also put stdin, stdout and stderr in binary mode.
-    argumentList.insert(2,pydevdPath+' '+pydevdArgs)
+    return path
 
-    argumentList.pop(3)  # remove robot.run from command
-    command = ' '.join(argumentList)
+
+def run_local_python_debug(pydevd_ip, pydevd_port, pydevd_path, robot_run_path):
+    pydevd_args = ['--multiprocess', '--print-in-debugger-startup', '--vm_type', 'python',
+                   '--client', pydevd_ip, '--port', pydevd_port, '--file', find_robot_run_path(robot_run_path)]
+    robot_run_args = sys.argv[sys.argv.index('robot.run') + 1:]
+
+    command = [sys.executable, '-u', find_pydevd_path(pydevd_path)] + pydevd_args + robot_run_args
+
+    print('Running command: ' + ' '.join(command))
     run_process(command)
 
 
+if __name__ == '__main__':
 
-if __name__ == "__main__":
+    pydevd_ip = '127.0.0.1'
+    pydevd_port = '5678'
+    pydevd_path = 'change this to reflect to pydevd.py file, check your local Eclipse/Red with installed PyDev <eclipse_or_RED_with_PyDev>/plugins/org.python.pydev/pysrc/pydevd.py'
+    robot_run_path = 'change this to reflect to run.py file, for example C:/Python36/Lib/site-packages/robot/run.py'
 
-
-    pathToPyDevD='change this to reflect to pydevd.py file, check your local Eclipse/Red with installed PyDev <eclipse_or_RED_with_PyDev>/plugins/org.python.pydev/pysrc/pydevd.py'
-    pydevdIp = '127.0.0.1'
-    pydevdPort = '5678'
-
-    LocalPythonDebug(pathToPyDevD,pydevdIp,pydevdPort)
-
+    run_local_python_debug(pydevd_ip, pydevd_port, pydevd_path, robot_run_path)
