@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _2DXt4Em1EeaRB_Xz0tiYpg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/8/17 5:28 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/25/18 11:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -32,7 +32,7 @@ proc "check-column-amount-in-settings" [val tab_label] [val col_nr] [val row 0]
 	}
 }
 
-proc "check-columns-in-all-tables" [val tc 7] [val kw 9] [val gen 9] [val imports 12]{
+proc "check-columns-in-all-tables" [val tc 8] [val kw 10] [val gen 10] [val imports 13]{
 
 	//check test cases
 	check-column-amount-for-main_view -view "Test Cases" -tab_label "Test Cases" -col_nr $tc -row_nr 7
@@ -167,7 +167,7 @@ get-editor "TestFile.robot" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click 
 
 get-editor "TestFile.robot" | maximize
-check-columns-in-all-tables -tc 15 -kw 15 -gen 16 -imports 16
+check-columns-in-all-tables -tc 15 -kw 15 -gen 17 -imports 17
 
 //check cells inputs
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
