@@ -53,8 +53,8 @@ def _collect_source_paths(start_path, recursive=True, excluded_paths=[]):
             # stop traversing
             del dirs[:]
 
-    # ensure fixed traversing order
-    dirs.sort()
+        # ensure fixed traversing order
+        dirs.sort()
 
     return python_paths, class_paths
 
