@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _46WUAFTXEea8WJ7bbC6OBw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/16/17 11:12 AM
+Save-Time: 6/25/18 2:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -43,33 +43,40 @@ proc "check-submenu-for-kw" [val row_enabled true] [val is_move_enabled true] [v
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
 		//table
 		
-		//insert cell
-	    get-property [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().length" $start_index]| equals 5 | verify-true
+	    get-property [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().length" $start_index]| equals 6 | verify-true
+	    
+	    //insert cell
 	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].isEnabled()" $start_index] | equals $cell_option 
 	        | verify-true
 	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].getText()" $start_index ]
 	        | equals "Insert cell\\9M1+I" | verify-true
-	    
-	    //delete cell    
+	        
+	     //insert cell on the right
 	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].isEnabled()" $start_index] | equals $cell_option 
 	        | verify-true
 	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].getText()" $start_index ]
+	        | equals "Insert cell to the right\\9M1+M2+I" | verify-true    
+	    
+	    //delete cell    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[2].isEnabled()" $start_index] | equals $cell_option 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[2].getText()" $start_index ]
 	        | equals "Delete cell\\9M1+D" | verify-true
 	        
 	    //sep    
-	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[2].getStyle()"  $start_index]| equals "[SEPARATOR]" 
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[3].getStyle()"  $start_index]| equals "[SEPARATOR]" 
 	        | verify-true
 
 		//expand all	        
 	    
-	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[3].getText()" $start_index ]| equals "Expand All" 
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].getText()" $start_index ]| equals "Expand All" 
 	        | verify-true
 	        
 	    //colapse all    
-	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].isEnabled()" $start_index] | equals true 
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[5].isEnabled()" $start_index] | equals true 
 	        | verify-true
 	    
-	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].getText()" $start_index ]| equals "Collapse All" 
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[5].getText()" $start_index ]| equals "Collapse All" 
 	        | verify-true
 	    get-property  [format "getMenu().getItems().MenuItem[%s].getStyle()"  $start_index ]| equals "[CASCADE]" | verify-true
 	    
