@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RBRS8DlIEeaMk_UgyvYHpA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 5:43 PM
+Save-Time: 6/25/18 2:41 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -29,7 +29,7 @@ with [get-editor "Script.robot"] {
     maximize
 }
 
-check-row-for-test-setup-default -file "Script.robot" -row 1 -setting "Suite Setup" -c1 "Convert To Binary" -c2 "888888888" -c6 "#bin value"
+check-row-for-test-setup-default -file "Script.robot" -row 1 -setting "Suite Setup" -c1 "Convert To Binary" -c2 "888888888" -c7 "#bin value"
 check-row-for-test-setup-default -file "Script.robot" -row 2 -setting "Suite Teardown"
 check-row-for-test-setup-default -file "Script.robot"  -row 3 -setting "Test Setup" 
 
@@ -38,7 +38,7 @@ check-row-for-test-setup-default -file "Script.robot"  -row 5 -setting "Test Tem
 check-row-for-test-setup-default -file "Script.robot"  -row 6 -setting "Test Timeout"
 
 check-row-for-test-setup-default -file "Script.robot"  -row 7 -setting "Force Tags"
-check-row-for-test-setup-default -file "Script.robot"  -row 8 -setting "Default Tags" -c1 "@{TAGS}" -c6 "# | ok"
+check-row-for-test-setup-default -file "Script.robot"  -row 8 -setting "Default Tags" -c1 "@{TAGS}" -c7 "# | ok"
 
 
 with [get-editor "Script.robot"] {
@@ -61,7 +61,7 @@ with [get-editor "Script.robot"] {
 }
 
 get-editor "Script.robot" | maximize
-check-imports-row-for-default-or_11_columns -file "Script.robot" -row 1 -import "Resource" -name "res3.robot" -c1 "res2" -c2 "${param}" -c11 "#here is param" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 1 -import "Resource" -name "res3.robot" -c1 "res2" -c2 "${param}" -c12 "#here is param" -default_length false
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 2 -import "Library" -name "String" -default_length false
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 3 -import "Library" -name "Collections" -default_length false
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 4 -import "Library" -name "Telnet" -default_length false
@@ -72,7 +72,7 @@ check-imports-row-for-default-or_11_columns -file "Script.robot" -row 7 -import 
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 8 -import "Library" -name "MyLibrary"  -c1 "my1" -c2 "\\" -c3 "my2" -c4 "\\\\" -c5 "my3" -default_length false
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 9 -import "Library" -name "${LIBRARY}" -default_length false
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 10 -import "Variables" -name "${a}/\ folder/file.py"  -default_length false
-check-imports-row-for-default-or_11_columns -file "Script.robot" -row 11 -import  "Variables" -name "libs/lib1.py" -c1 "val1" -c2 "val2" -c11 "#my value | # no more vals" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 11 -import  "Variables" -name "libs/lib1.py" -c1 "val1" -c2 "val2" -c12 "#my value | # no more vals" -default_length false
 
 get-editor "Script.robot" | restore
 
@@ -95,7 +95,7 @@ with [get-editor "Test.tsv"] {
 }
 
 check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 1 -import "Variables" -name "../../no lib/libs/lib1.py" -c1 "this is arg to variables"
-check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 2 -import "Library" -name "${CURDIR}${/}..${/}resource${/}throughput_check.py" -c5 "# here is error"
+check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 2 -import "Library" -name "${CURDIR}${/}..${/}resource${/}throughput_check.py" -c6 "# here is error"
 check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 3 -import "Library" -name "Collections" -c1 "collect1" -c2 "collect2"
 check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 4 -import "Library" -name "XML"
 check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 5 -import "Resource" -name "folder\\inside\\res2.tsv"
