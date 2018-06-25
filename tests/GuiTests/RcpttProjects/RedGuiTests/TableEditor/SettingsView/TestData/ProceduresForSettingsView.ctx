@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/23/17 3:48 PM
+Save-Time: 6/25/18 2:40 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -18,7 +18,7 @@ proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {
 
 
 //rows starts from 1
-proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""]  [val c5 ""]  [val c6 ""]
+proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""]  [val c5 ""]  [val c6 ""] [val c7 ""]
 {
 	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue
 	    |  my-assert-true -expected $setting -row $row -col 1 
@@ -34,6 +34,8 @@ proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val 
 		| my-assert-true -expected $c5 -row $row -col 6
 	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 	
 		| my-assert-true -expected $c6 -row $row -col 7
+	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 8 $row|  invoke getDataValue 	
+		| my-assert-true -expected $c7 -row $row -col 8	
 }
 
 proc "compare-general-setting-table" [val file] [val section] [val col_amount] [val row] [val ref_table]
@@ -72,7 +74,7 @@ proc "check-metadata-row" [val file] [val row] [val metadata] [val val] [val com
 
 
 proc "check-imports-row-for-default-or_11_columns" [val file] [val row] [val import] [val name] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] 
-  [val c5 ""] [val c6 ""] [val c7 ""] [val c8 ""] [val c9 ""] [val c10 ""] [val c11 ""] [val default_length true]
+  [val c5 ""] [val c6 ""] [val c7 ""] [val c8 ""] [val c9 ""] [val c10 ""] [val c11 ""] [val c12 ""] [val default_length true]
 {
 	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 	    | my-assert-true -expected $import -row $row -col 1
@@ -102,6 +104,8 @@ proc "check-imports-row-for-default-or_11_columns" [val file] [val row] [val imp
 			| my-assert-true -expected $c10 -row $row -col 12
 		get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 13 $row|  invoke getDataValue 
 			| my-assert-true -expected $c11 -row $row -col 13
+		get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 14 $row|  invoke getDataValue 
+			| my-assert-true -expected $c12 -row $row -col 14	
 	}
 }
 
