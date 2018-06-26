@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m9ukQKs4Eea8FqgKy4fLvA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/25/18 6:25 PM
+Save-Time: 6/26/18 5:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -345,11 +345,11 @@ get-editor "res.tsv" | get-text-viewer | get-property text | equals "*** Keyword
     
 get-editor "res.tsv" | get-tab-folder | get-tab-item Keywords | click
 
-check-keyword-row -file "res.tsv" -row 1 -kw "kw" 
-check-keyword-row -file "res.tsv" -row 2 -kw "Log"  -c1 "#wrong place"
-check-keyword-row -file "res.tsv" -row 3 -kw "#line1" -c1 "line2" -c2 "line3" -c3 "line 4" -c4	"#line 5" -c5 "line 6"
-check-keyword-row -file "res.tsv" -row 4 -kw "#k1" -c1 "#k2"  -c2 "#k3" -c3 "#k4" -c4 "#k5" -c5 "#k6"
-check-keyword-row -file "res.tsv" -row 5 -kw "..." 
+check-keyword-row -file "res.tsv" -extended_col true -row 1 -kw "kw" 
+check-keyword-row -file "res.tsv" -extended_col true -row 2 -kw "Log"  -c1 "#wrong place"
+check-keyword-row -file "res.tsv" -extended_col true -row 3 -kw "#line1" -c1 "line2" -c2 "line3" -c3 "line 4" -c4	"#line 5" -c5 "line 6"
+check-keyword-row -file "res.tsv" -extended_col true -row 4 -kw "#k1" -c1 "#k2"  -c2 "#k3" -c3 "#k4" -c4 "#k5" -c5 "#k6"
+check-keyword-row -file "res.tsv" -extended_col true -row 5 -kw "..." 
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
