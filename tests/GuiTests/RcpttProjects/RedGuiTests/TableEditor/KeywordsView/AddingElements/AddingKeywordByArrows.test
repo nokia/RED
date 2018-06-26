@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _1a2hUFVmEeaLgpF-R5GRxw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/15/16 10:50 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/26/18 12:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -68,6 +68,9 @@ with [get-editor "TestFile.robot"] {
         type-text "#com"
         key-type Enter 
     }
+    wait 200
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Enter 
+    
     get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
     //add kw: line 2
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
@@ -115,6 +118,10 @@ with [get-editor "TestFile.robot"] {
         type-text "#only comment"
         key-type Enter
     }
+    wait 200
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Enter 
+    
+    //new line 
     get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
         type-text "empty kw"
@@ -148,6 +155,8 @@ with [get-editor "TestFile.robot"] {
         type-text "${s5}"
         key-type Enter
     }
+    wait 200
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Down
     //go down and add new kw
     get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
     
@@ -163,11 +172,12 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
+get-editor "TestFile.robot" | maximize
 check-keyword-row -file "TestFile.robot" -row  1 -kw "My KW"
 check-keyword-row -file "TestFile.robot" -row  2 -kw "line1" -c1 "arg1" -c2 "arg2" -c3 "arg3" -c4 "arg4" -c5 "#com"
 check-keyword-row -file "TestFile.robot" -row  3 -kw "line2" -c1 "b1" 
 check-keyword-row -file "TestFile.robot" -row  4 -kw "\\" -c1 "\\" -c2 "c2" -c3 "\\" -c4 "c4"
-check-keyword-row -file "TestFile.robot" -row  5 -kw "\\" -c1 "\\" -c2 "\\" -c3 "\\" -c4 "\\" -c5 "#only comment"
+check-keyword-row -file "TestFile.robot" -row  5 -kw "\\" -c1 "\\" -c2 "\\" -c3 "\\" -c4 "\\" -c5  "\\" -c6 "#only comment"
 check-keyword-row -file "TestFile.robot" -row  6 -kw "empty kw" 
 check-keyword-row -file "TestFile.robot" -row  7 -kw "..." 
 
@@ -175,12 +185,11 @@ check-keyword-row -file "TestFile.robot" -row  8 -kw "second kw"  -c1 "${s1}" -c
 check-keyword-row -file "TestFile.robot" -row  9 -kw "Log" -c1 "12"
 check-keyword-row -file "TestFile.robot" -row  10 -kw "..."
 check-keyword-row -file "TestFile.robot" -row  11 -kw "...add new keyword"
+get-editor "TestFile.robot" | restore
 
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 
-with [get-editor "TestFile.robot"] {
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
-    get-tab-folder | get-tab-item Source | click
-}
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "test\n"
     + "    log  7\n"
@@ -189,7 +198,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    line1    arg1    arg2    arg3    arg4    #com\n"
     + "    line2    b1\n"
     + "    \\    \\    c2    \\    c4\n"
-    + "    \\    \\    \\    \\    \\    #only comment\n"
+    + "    \\    \\    \\    \\    \\    \\    #only comment\n"
     + "    empty kw\n"
     + "second kw\n"
     + "    [Arguments]    ${s1}    \\    \\    \\    ${s5}\n"
