@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/6/18 4:12 PM
+Save-Time: 6/26/18 11:48 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -37,7 +37,7 @@ proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 
 }
 
 //rows starts from 1
-proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 "" ] [val c4 "" ] [val c5 "" ]
+proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 "" ] [val c4 "" ] [val c5 "" ] [val c6 "" ] [val c7 "" ]
 {
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $kw -row $row -col 1 
@@ -51,6 +51,10 @@ proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""
 	    | my-assert-true -expected $c4 -row $row -col 5     
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c5 -row $row -col 6 
+	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
+	    | my-assert-true -expected $c6 -row $row -col 7
+	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 8 $row|  invoke getDataValue 
+	    | my-assert-true -expected $c7 -row $row -col 8         
 }
 
 proc "compare-markers-list-with-ref" [val markers -input] [val ref_markers] [val type]{
