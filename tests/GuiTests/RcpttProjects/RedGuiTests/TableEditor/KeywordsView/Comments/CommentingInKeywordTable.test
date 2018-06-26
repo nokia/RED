@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _aCDm4Bn4EeeFDPIa06fUxQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/11/17 11:55 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/26/18 5:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -94,25 +94,25 @@ with [get-editor "TestFile.robot"] {
     
 }
 
-check-keyword-row -file "TestFile.robot" -row 1 -kw "kw1"
-check-keyword-row -file "TestFile.robot" -row 2 -kw "[Documentation]" -c1 "this is doc continued here"
-check-keyword-row -file "TestFile.robot" -row 3 -kw "# log" -c1 "7z"
-check-keyword-row -file "TestFile.robot" -row 4 -kw "# Should Be Equal" -c1 "123g" -c2 "123g"
-check-keyword-row -file "TestFile.robot" -row 5 -kw "# Catenate" -c1 "r" -c2 "s" -c3 "t" -c4 "u" -c5 "w"
-check-keyword-row -file "TestFile.robot" -row 6 -kw "[Return]" -c1 game3
-check-keyword-row -file "TestFile.robot" -row 7 -kw ""
-check-keyword-row -file "TestFile.robot" -row 8 -kw "..."
+check-keyword-row -file "TestFile.robot" -extended_col true -row 1 -kw "kw1"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 2 -kw "[Documentation]" -c1 "this is doc continued here"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 3 -kw "# log" -c1 "7z"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 4 -kw "# Should Be Equal" -c1 "123g" -c2 "123g"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 5 -kw "# Catenate" -c1 "r" -c2 "s" -c3 "t" -c4 "u" -c5 "w"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 6 -kw "[Return]" -c1 game3
+check-keyword-row -file "TestFile.robot" -extended_col true -row 7 -kw ""
+check-keyword-row -file "TestFile.robot" -extended_col true -row 8 -kw "..."
 
 
-check-keyword-row -file "TestFile.robot" -row 9 -kw "kw 2"
-check-keyword-row -file "TestFile.robot" -row 10 -kw "# # fgh"
-check-keyword-row -file "TestFile.robot" -row 11 -kw "# fgh"
-check-keyword-row -file "TestFile.robot" -row 12 -kw "# [Teardown]" -c1 "Convert To Boolean" -c2 "false1" 
-check-keyword-row -file "TestFile.robot" -row 13 -kw "# :FOR" -c1 "${x}" -c2 "IN RANGE" -c3 "10"
-check-keyword-row -file "TestFile.robot" -row 14 -kw "# \\" -c1 "log" -c2 "${x}"
-check-keyword-row -file "TestFile.robot" -row 15 -kw "# \\" -c1 "Convert To Bytes" -c2 "cat"
-check-keyword-row -file "TestFile.robot" -row 16 -kw "..."
-check-keyword-row -file "TestFile.robot" -row 17 -kw "...add new keyword"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 9 -kw "kw 2"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 10 -kw "# # fgh"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 11 -kw "# fgh"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 12 -kw "# [Teardown]" -c1 "Convert To Boolean" -c2 "false1" 
+check-keyword-row -file "TestFile.robot" -extended_col true -row 13 -kw "# :FOR" -c1 "${x}" -c2 "IN RANGE" -c3 "10"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 14 -kw "# \\" -c1 "log" -c2 "${x}"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 15 -kw "# \\" -c1 "Convert To Bytes" -c2 "cat"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 16 -kw "..."
+check-keyword-row -file "TestFile.robot" -extended_col true -row 17 -kw "...add new keyword"
 
 get-editor "TestFile.robot"| get-tab-folder | get-tab-item Source | click
 //check source
@@ -159,24 +159,24 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
-check-keyword-row -file "TestFile.robot" -row 1 -kw "kw1"
-check-keyword-row -file "TestFile.robot" -row 2 -kw "[Documentation]" -c1 "this is doc continued here"
-check-keyword-row -file "TestFile.robot" -row 3 -kw "log" -c1 "7z"
-check-keyword-row -file "TestFile.robot" -row 4 -kw "Should Be Equal" -c1 "123g" -c2 "123g"
-check-keyword-row -file "TestFile.robot" -row 5 -kw "# Catenate" -c1 "r" -c2 "s" -c3 "t" -c4 "u" -c5 "w"
-check-keyword-row -file "TestFile.robot" -row 6 -kw "[Return]" -c1 game3
-check-keyword-row -file "TestFile.robot" -row 7 -kw ""
-check-keyword-row -file "TestFile.robot" -row 8 -kw "..."
+check-keyword-row -file "TestFile.robot" -extended_col true -row 1 -kw "kw1"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 2 -kw "[Documentation]" -c1 "this is doc continued here"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 3 -kw "log" -c1 "7z"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 4 -kw "Should Be Equal" -c1 "123g" -c2 "123g"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 5 -kw "# Catenate" -c1 "r" -c2 "s" -c3 "t" -c4 "u" -c5 "w"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 6 -kw "[Return]" -c1 game3
+check-keyword-row -file "TestFile.robot" -extended_col true -row 7 -kw ""
+check-keyword-row -file "TestFile.robot" -extended_col true -row 8 -kw "..."
 
-check-keyword-row -file "TestFile.robot" -row 9 -kw "kw 2"
-check-keyword-row -file "TestFile.robot" -row 10 -kw "# fgh"
-check-keyword-row -file "TestFile.robot" -row 11 -kw "fgh"
-check-keyword-row -file "TestFile.robot" -row 12 -kw "[Teardown]" -c1 "Convert To Boolean" -c2 "false1"
-check-keyword-row -file "TestFile.robot" -row 13 -kw ":FOR" -c1 "${x}" -c2 "IN RANGE" -c3 "10"
-check-keyword-row -file "TestFile.robot" -row 14 -kw "# \\" -c1 "log" -c2 "${x}"
-check-keyword-row -file "TestFile.robot" -row 15 -kw "# \\" -c1 "Convert To Bytes" -c2 "cat"
-check-keyword-row -file "TestFile.robot" -row 16 -kw "..."
-check-keyword-row -file "TestFile.robot" -row 17 -kw "...add new keyword"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 9 -kw "kw 2"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 10 -kw "# fgh"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 11 -kw "fgh"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 12 -kw "[Teardown]" -c1 "Convert To Boolean" -c2 "false1"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 13 -kw ":FOR" -c1 "${x}" -c2 "IN RANGE" -c3 "10"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 14 -kw "# \\" -c1 "log" -c2 "${x}"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 15 -kw "# \\" -c1 "Convert To Bytes" -c2 "cat"
+check-keyword-row -file "TestFile.robot" -extended_col true -row 16 -kw "..."
+check-keyword-row -file "TestFile.robot" -extended_col true -row 17 -kw "...add new keyword"
 
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
