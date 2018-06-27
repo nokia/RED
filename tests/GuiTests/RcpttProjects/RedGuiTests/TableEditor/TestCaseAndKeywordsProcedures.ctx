@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/26/18 6:09 PM
+Save-Time: 6/27/18 9:56 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -99,7 +99,7 @@ proc "set-list-with-markers-and-comapare"  [val file] [val table] [val ref_list]
 proc "compare-row-with-list" [val file] [val table] [val row] [val ref_table]
 {	
 	get-editor $file | get-canvas -after [get-label $table] -index 1 | get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | let [val col_amount -input]{
-		$ref_table | invoke getElements  | invoke size | eq $col_amount | verify-true
+		$ref_table | invoke getElements  | invoke size | eq $col_amount | assert-true -message [format "Column size is: %s and is different then list size"  $col_amount]
 	
 		repeat [val index] -times $col_amount -command{
 			$ref_table | get $index| let [val ref_value -input]{
