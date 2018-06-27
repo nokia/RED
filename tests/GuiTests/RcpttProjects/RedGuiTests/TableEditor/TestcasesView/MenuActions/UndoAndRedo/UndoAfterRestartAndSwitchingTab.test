@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Vm04wJxkEeaF69zyQwob4Q
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/13/17 11:16 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/27/18 12:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -52,7 +52,7 @@ with [get-editor "TestFile.robot"] {
     get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
 }
 
-check-test_case-row -file "TestFile.robot" -row 2 -tc "Should Be True" -c1 545
+check-test_case-row -file "TestFile.robot" -row 2  -extended_col true -tc "Should Be True" -c1 545
 
 
 //============================================ variables ======================================
@@ -72,9 +72,9 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
-check-test_case-row -file "TestFile.robot" -row 6 -tc "[Tags]" -c1 "newTag1" -c2  "3Tag"
+check-test_case-row -file "TestFile.robot" -row 6  -extended_col true -tc "[Tags]" -c1 "newTag1" -c2  "3Tag"
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
-check-test_case-row -file "TestFile.robot" -row 6 -tc "[Tags]" -c1 "newTag1" -c2 "nextTag" -c3 "3Tag"
+check-test_case-row -file "TestFile.robot" -row 6  -extended_col true -tc "[Tags]" -c1 "newTag1" -c2 "nextTag" -c3 "3Tag"
 
 
 
@@ -93,7 +93,7 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
-check-test_case-row -file "TestFile.robot" -row 7 -tc "Log"  -c1 "Log"  
+check-test_case-row -file "TestFile.robot" -row 7  -extended_col true -tc "Log"  -c1 "Log"  
 with [get-editor "TestFile.robot"] {  
     //go to setting and go back
     with [get-tab-folder] {
@@ -106,7 +106,7 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
-check-test_case-row -file "TestFile.robot" -row 7 -tc "Log"  -c1 2
+check-test_case-row -file "TestFile.robot" -row 7  -extended_col true -tc "Log"  -c1 2
 
 //====================================== KW ===================================================
 
@@ -138,33 +138,33 @@ with [get-editor "TestFile.robot"] {
     get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z" -times 2
 }
 
-check-test_case-row -file "TestFile.robot" -row 13 -tc "Last line"
+check-test_case-row -file "TestFile.robot" -row 13  -extended_col true -tc "Last line"
 
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
-check-test_case-row -file "TestFile.robot" -row 13 -tc ""
+check-test_case-row -file "TestFile.robot" -row 13  -extended_col true -tc ""
 
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
-check-test_case-row -file "TestFile.robot" -row 13 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 13  -extended_col true -tc "..."
 
 //check entire table
 
-check-test_case-row -file "TestFile.robot" -row 1 -tc "case" 
-check-test_case-row -file "TestFile.robot" -row 2 -tc "Should Be True" -c1 545
-check-test_case-row -file "TestFile.robot" -row 3 -tc "[Documentation]" -c1 "doc is here"
-check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 1  -extended_col true -tc "case" 
+check-test_case-row -file "TestFile.robot" -row 2  -extended_col true -tc "Should Be True" -c1 545
+check-test_case-row -file "TestFile.robot" -row 3  -extended_col true -tc "[Documentation]" -c1 "doc is here"
+check-test_case-row -file "TestFile.robot" -row 4  -extended_col true -tc "..."
 
 
-check-test_case-row -file "TestFile.robot" -row 5 -tc "test 1" 
-check-test_case-row -file "TestFile.robot" -row 6 -tc "[Tags]" -c1 "newTag1" -c2 "nextTag" -c3 "3Tag"
-check-test_case-row -file "TestFile.robot" -row 7 -tc "Log"  -c1 2
-check-test_case-row -file "TestFile.robot" -row 8 -tc "Convert To Boolean"  -c1 8
-check-test_case-row -file "TestFile.robot" -row 9 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 5  -extended_col true -tc "test 1" 
+check-test_case-row -file "TestFile.robot" -row 6  -extended_col true -tc "[Tags]" -c1 "newTag1" -c2 "nextTag" -c3 "3Tag"
+check-test_case-row -file "TestFile.robot" -row 7  -extended_col true -tc "Log"  -c1 2
+check-test_case-row -file "TestFile.robot" -row 8  -extended_col true -tc "Convert To Boolean"  -c1 8
+check-test_case-row -file "TestFile.robot" -row 9  -extended_col true -tc "..."
 
-check-test_case-row -file "TestFile.robot" -row 10 -tc "last test" 
-check-test_case-row -file "TestFile.robot" -row 11 -tc "Convert To Number"  -c1 text
-check-test_case-row -file "TestFile.robot" -row 12 -tc "Catenate"  -c1 1 -c2 2 -c3 3 -c4 4  -c5 5
-check-test_case-row -file "TestFile.robot" -row 13 -tc "..." 
-check-test_case-row -file "TestFile.robot" -row 14 -tc "...add new case"
+check-test_case-row -file "TestFile.robot" -row 10  -extended_col true -tc "last test" 
+check-test_case-row -file "TestFile.robot" -row 11  -extended_col true -tc "Convert To Number"  -c1 text
+check-test_case-row -file "TestFile.robot" -row 12  -extended_col true -tc "Catenate"  -c1 1 -c2 2 -c3 3 -c4 4  -c5 5
+check-test_case-row -file "TestFile.robot" -row 13  -extended_col true -tc "..." 
+check-test_case-row -file "TestFile.robot" -row 14  -extended_col true -tc "...add new case"
 
 
 //====================================== close and open =================================================
@@ -189,17 +189,17 @@ get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1" | click
 wait 200
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
 
-check-test_case-row -file "TestFile.robot" -row 1 -tc "test 1" 
-check-test_case-row -file "TestFile.robot" -row 2 -tc "[Tags]" -c1 "newTag1" -c2 "nextTag" -c3 "3Tag"
-check-test_case-row -file "TestFile.robot" -row 3 -tc "Log"  -c1 2
-check-test_case-row -file "TestFile.robot" -row 4 -tc "Convert To Boolean"  -c1 8
-check-test_case-row -file "TestFile.robot" -row 5 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 1  -extended_col true -tc "test 1" 
+check-test_case-row -file "TestFile.robot" -row 2  -extended_col true -tc "[Tags]" -c1 "newTag1" -c2 "nextTag" -c3 "3Tag"
+check-test_case-row -file "TestFile.robot" -row 3  -extended_col true -tc "Log"  -c1 2
+check-test_case-row -file "TestFile.robot" -row 4  -extended_col true -tc "Convert To Boolean"  -c1 8
+check-test_case-row -file "TestFile.robot" -row 5  -extended_col true -tc "..."
 
-check-test_case-row -file "TestFile.robot" -row 6 -tc "last test" 
-check-test_case-row -file "TestFile.robot" -row 7 -tc "Convert To Number"  -c1 text
-check-test_case-row -file "TestFile.robot" -row 8 -tc "Catenate"  -c1 1 -c2 2 -c3 3 -c4 4  -c5 5
-check-test_case-row -file "TestFile.robot" -row 9 -tc "..." 
-check-test_case-row -file "TestFile.robot" -row 10 -tc "...add new case"
+check-test_case-row -file "TestFile.robot" -row 6  -extended_col true -tc "last test" 
+check-test_case-row -file "TestFile.robot" -row 7  -extended_col true -tc "Convert To Number"  -c1 text
+check-test_case-row -file "TestFile.robot" -row 8  -extended_col true -tc "Catenate"  -c1 1 -c2 2 -c3 3 -c4 4  -c5 5
+check-test_case-row -file "TestFile.robot" -row 9  -extended_col true -tc "..." 
+check-test_case-row -file "TestFile.robot" -row 10  -extended_col true -tc "...add new case"
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
