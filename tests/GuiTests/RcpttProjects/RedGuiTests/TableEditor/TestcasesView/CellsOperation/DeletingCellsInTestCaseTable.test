@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cSDHIM-gEee4YdJy8LnSAg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/27/18 12:03 PM
+Save-Time: 6/27/18 3:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -133,15 +133,16 @@ get-editor "abc.tsv" | get-canvas -after [get-label "Test Cases"] -index 1 | key
 wait 1000
 get-editor "abc.tsv" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
     
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 6 -ref_table [list "test 2" "" "" "" "" "" "" ""]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 7 -ref_table [list ":FOR" "${x}" "IN RANGE" "10" "" "" "" ""]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 8 -ref_table [list "\\" "Log" "${x}" "" "" "" "" ""]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 9 -ref_table [list "Catenate" "1" "2" "3" "4" "5" "6" ""]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 10 -ref_table [list "Then Convert To Hex" "8555" "" "" "" "" "" ""]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 11 -ref_table [list "Log Many" "a" "b" "c" "d" "e" "" ""]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 12 -ref_table [list "..." "" "" "" "" "" "" ""]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 13 -ref_table [list "...add new case" "" "" "" "" "" "" ""]
- 
+get-editor "abc.tsv" | maximize    
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 6 -ref_table [list "test 2" "" "" "" "" "" "" "" "" ""]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 7 -ref_table [list ":FOR" "${x}" "IN RANGE" "10" "" "" "" "" "" ""]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 8 -ref_table [list "\\" "Log" "${x}" "" "" "" "" "" "" ""]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 9 -ref_table [list "Catenate" "1" "2" "3" "4" "5" "6" "7" "8" ""]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 10 -ref_table [list "Then Convert To Hex" "8555" "" "" "" "" "" "" "" ""]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 11 -ref_table [list "Log Many" "a" "b" "c" "d" "e" "" "" "" ""]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 12 -ref_table [list "..." "" "" "" "" "" "" "" "" ""]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 13 -ref_table [list "...add new case" "" "" "" "" "" "" "" "" ""]
+get-editor "abc.tsv" | restore 
  
 get-editor "abc.tsv" | get-tab-folder | get-tab-item Source | click
     
