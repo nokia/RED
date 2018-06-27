@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _I3FgsGXzEeayWasF5RXANg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/26/18 12:40 PM
+Save-Time: 6/27/18 11:26 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -234,11 +234,11 @@ with [get-editor "TestFile.robot"] {
  	
 }
 get-editor "TestFile.robot" | maximize
-compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 7 -row 1 -ref_table [list "no CA" "" "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 7 -row 2 -ref_table [list "Catenate" "Continue For Loop" "&{SUITE_METADATA}" "Log Many" "${a1111}" "@{myList}" "" ]
-compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 7 -row 3 -ref_table [list ":FOR" "" "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 7 -row 4 -ref_table [list "[Return]" "" "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "User Keywords" -col_amount 7 -row 5 -ref_table [list "..." "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords"-row 1 -ref_table [list "no CA" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords"-row 2 -ref_table [list "Catenate" "Continue For Loop" "&{SUITE_METADATA}" "Log Many" "${a1111}" "@{myList}" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords"-row 3 -ref_table [list ":FOR" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords"-row 4 -ref_table [list "[Return]" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords"-row 5 -ref_table [list "..." "" "" "" "" "" "" ]
 
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click

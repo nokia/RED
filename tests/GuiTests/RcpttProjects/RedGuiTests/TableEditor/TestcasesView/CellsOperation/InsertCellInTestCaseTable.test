@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _315ckM7CEee4YdJy8LnSAg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/25/18 4:13 PM
+Save-Time: 6/27/18 12:13 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -101,20 +101,20 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 1 -ref_table [list "test 1" "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 2 -ref_table [list "[Documentation]" "test 1" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 3 -ref_table [list "Here" "Catenate" "11" "22" "33" "44" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 4 -ref_table [list "Should Be Equal" "4" "middle" "6" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 5 -ref_table [list "   " "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 6 -ref_table [list "..." "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 7 -ref_table [list "test 2" "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 8 -ref_table [list "was setup" "[Setup]" "log" "8" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 9 -ref_table [list "But Convert To Hex" "89" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 10 -ref_table [list "[Timeout]" "56s" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 11 -ref_table [list "    " "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 12 -ref_table [list "..." "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 13 -ref_table [list "test" "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 14 -ref_table [list "\\" "\\" "\\" "Convert To Boolean" "66" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 1 -ref_table [list "test 1" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 2 -ref_table [list "[Documentation]" "test 1" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 3 -ref_table [list "Here" "Catenate" "11" "22" "33" "44" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 4 -ref_table [list "Should Be Equal" "4" "middle" "6" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 5 -ref_table [list "   " "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 6 -ref_table [list "..." "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 7 -ref_table [list "test 2" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 8 -ref_table [list "was setup" "[Setup]" "log" "8" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 9 -ref_table [list "But Convert To Hex" "89" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 10 -ref_table [list "[Timeout]" "56s" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 11 -ref_table [list "    " "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 12 -ref_table [list "..." "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 13 -ref_table [list "test" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 14 -ref_table [list "\\" "\\" "\\" "Convert To Boolean" "66" "" ]
 
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
@@ -233,19 +233,19 @@ with [get-tab-folder -index 1] {
 }   
 
 get-editor "abc.tsv" | maximize
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 1 -ref_table [list "test 1" "" "" "" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 2 -ref_table [list "here" "[Tags]" "tag2" "dada" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 3 -ref_table [list "Get Count" "item1" "item1a" "item2" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 4 -ref_table [list "	" "" "" "" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 5 -ref_table [list "..." "" "" "" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 6 -ref_table [list "test 2" "" "" "" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 7 -ref_table [list "\\" "\\" ":FOR" "${x}" "IN RANGE" "10" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 8 -ref_table [list "\\" "Log" "${x}" "" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 9 -ref_table [list "Catenate" "1" "2" "2a" "33" "changed" "5" "6" "7" "8" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 10 -ref_table [list "Then Convert To Hex" "8555" "" "" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 11 -ref_table [list "Log Many" "a" "b" "c" "d" "e" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 12 -ref_table [list "..." "" "" "" "" "" "" "" "" "" ]
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 13 -ref_table [list "...add new case" "" "" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 1 -ref_table [list "test 1" "" "" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 2 -ref_table [list "here" "[Tags]" "tag2" "dada" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 3 -ref_table [list "Get Count" "item1" "item1a" "item2" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 4 -ref_table [list "	" "" "" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 5 -ref_table [list "..." "" "" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 6 -ref_table [list "test 2" "" "" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 7 -ref_table [list "\\" "\\" ":FOR" "${x}" "IN RANGE" "10" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 8 -ref_table [list "\\" "Log" "${x}" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 9 -ref_table [list "Catenate" "1" "2" "2a" "33" "changed" "5" "6" "7" "8" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 10 -ref_table [list "Then Convert To Hex" "8555" "" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 11 -ref_table [list "Log Many" "a" "b" "c" "d" "e" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 12 -ref_table [list "..." "" "" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 13 -ref_table [list "...add new case" "" "" "" "" "" "" "" "" "" ]
 
 //add 2 empty cell before value 8555
 with [get-editor "abc.tsv" | get-canvas -after [get-label "Test Cases"] -index 1] {
@@ -255,7 +255,7 @@ with [get-editor "abc.tsv" | get-canvas -after [get-label "Test Cases"] -index 1
 
 
 //check if 2 empty cell were added
-compare-row-with-list -file "abc.tsv" -table "Test Cases" -col_amount 10 -row 10 -ref_table [list "Then Convert To Hex"  "" "" "8555" "" "" "" "" "" "" ]
+compare-row-with-list -file "abc.tsv" -table "Test Cases" -row 10 -ref_table [list "Then Convert To Hex"  "" "" "8555" "" "" "" "" "" "" ]
 
 
 // add new cell for KW split into 2 lines
@@ -317,9 +317,9 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 3 -ref_table [list "Here" "" "Catenate" "11" "22" "33" "44" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 4 -ref_table [list "" "Should Be Equal" "4" "middle" "6" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 9 -ref_table [list "But Convert To Hex" "" "89" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 3 -ref_table [list "Here" "" "Catenate" "11" "22" "33" "44" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 4 -ref_table [list "" "Should Be Equal" "4" "middle" "6" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 9 -ref_table [list "But Convert To Hex" "" "89" "" "" "" "" ]
 
 get-canvas -after [get-label "Test Cases"] -index 1|  key-type "M1+z"
 wait 1000
@@ -327,9 +327,9 @@ get-canvas -after [get-label "Test Cases"] -index 1|  key-type "M1+z"
 wait 1000
 get-canvas -after [get-label "Test Cases"] -index 1|  key-type "M1+z"
 
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 3 -ref_table [list "Here"  "Catenate" "11" "22" "33" "44" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 4 -ref_table [list  "Should Be Equal" "4" "middle" "6" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6 -row 9 -ref_table [list "But Convert To Hex" "89" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 3 -ref_table [list "Here"  "Catenate" "11" "22" "33" "44" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 4 -ref_table [list  "Should Be Equal" "4" "middle" "6" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 9 -ref_table [list "But Convert To Hex" "89" "" "" "" "" ]
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"

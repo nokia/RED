@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5zRY8GVSEeayWasF5RXANg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/26/18 12:49 PM
+Save-Time: 6/27/18 11:47 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -118,34 +118,34 @@ with [get-editor "TestFile.robot"] {
 }
 get-editor "TestFile.robot" | maximize
 
-check-test_case-row -file "TestFile.robot" -row 1 -tc "my test"
-check-test_case-row -file "TestFile.robot" -row 2 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 1  -extended_col true -tc "my test"
+check-test_case-row -file "TestFile.robot" -row 2  -extended_col true -tc "..."
 
-check-test_case-row -file "TestFile.robot" -row 3 -tc "case"
-check-test_case-row -file "TestFile.robot" -row 4 -tc "Log"
-check-test_case-row -file "TestFile.robot" -row 5 -tc ""
-check-test_case-row -file "TestFile.robot" -row 6 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 3  -extended_col true -tc "case"
+check-test_case-row -file "TestFile.robot" -row 4  -extended_col true -tc "Log"
+check-test_case-row -file "TestFile.robot" -row 5  -extended_col true -tc ""
+check-test_case-row -file "TestFile.robot" -row 6  -extended_col true -tc "..."
 
-check-test_case-row -file "TestFile.robot" -row 7 -tc "case 1"
-check-test_case-row -file "TestFile.robot" -row 8 -tc "Catenate" -c1 "1" -c2 "2" -c3 "3" -c4 "4" -c5 "#com"
-check-test_case-row -file "TestFile.robot" -row 9 -tc "New line"
-check-test_case-row -file "TestFile.robot" -row 10 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 7  -extended_col true -tc "case 1"
+check-test_case-row -file "TestFile.robot" -row 8  -extended_col true -tc "Catenate" -c1 "1" -c2 "2" -c3 "3" -c4 "4" -c5 "#com"
+check-test_case-row -file "TestFile.robot" -row 9  -extended_col true -tc "New line"
+check-test_case-row -file "TestFile.robot" -row 10  -extended_col true -tc "..."
 
 
-check-test_case-row -file "TestFile.robot" -row 11 -tc "case 653"
-check-test_case-row -file "TestFile.robot" -row 12 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 11  -extended_col true -tc "case 653"
+check-test_case-row -file "TestFile.robot" -row 12  -extended_col true -tc "..."
 
-check-test_case-row -file "TestFile.robot" -row 13 -tc "case 654"
-check-test_case-row -file "TestFile.robot" -row 14 -tc "[tags]" -c1 "this is tag"
+check-test_case-row -file "TestFile.robot" -row 13  -extended_col true -tc "case 654"
+check-test_case-row -file "TestFile.robot" -row 14  -extended_col true -tc "[tags]" -c1 "this is tag"
 
-check-test_case-row -file "TestFile.robot" -row 15 -tc "..."
-check-test_case-row -file "TestFile.robot" -row 16 -tc "...add new case"
+check-test_case-row -file "TestFile.robot" -row 15  -extended_col true -tc "..."
+check-test_case-row -file "TestFile.robot" -row 16  -extended_col true -tc "...add new case"
 
 get-eclipse-window | key-type "M1+s"
 //get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M1+s"
 
 //check if no \ is added to new line
-check-test_case-row -file "TestFile.robot" -row 5 -tc "    " 
+check-test_case-row -file "TestFile.robot" -row 5  -extended_col true -tc "    " 
 
 // go left and change tag  - checking if after saving user can move focus
 with [get-editor "TestFile.robot"] {
