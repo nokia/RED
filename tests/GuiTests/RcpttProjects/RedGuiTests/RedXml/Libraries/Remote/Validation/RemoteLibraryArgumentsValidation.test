@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _khwPUCKpEei2ypVbzE5QqA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/26/18 12:09 PM
+Save-Time: 6/27/18 5:24 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -164,6 +164,8 @@ try -command{
 	
 	// verify if there is one warning and one error
 	wait-for-errors -amount 1 -times 4 -delay 500
+	
+	
 	get-view Problems | get-tree | get-item 
 	    -path "Errors \\(1 item\\)/Keyword 'Remote' expects from 0 to 2 arguments but 3 are provided" 
 	    | get-property caption 
@@ -178,8 +180,7 @@ try -command{
 	    key-type "M1+s"
 	}
 }-finally{	
-	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
-	    | click
-}
+	stop-python-remote-server
+}	
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
