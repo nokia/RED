@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _M5zkMHXWEeaTdNH0nRm1gg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/27/17 10:02 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/27/18 11:28 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -83,24 +83,24 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
 
 get-editor "TestFile.robot" | maximize
 
-check-test_case-row -file "TestFile.robot" -row 1 -tc  "\\"
-check-test_case-row -file "TestFile.robot" -row 2 -tc  "test 1" -c1 1 -c2 2 -c3 3 -c4 "#log command"
-check-test_case-row -file "TestFile.robot" -row 3 -tc  "my_method" -c1 2
-check-test_case-row -file "TestFile.robot" -row 4 -tc  "Convert To Bytes" -c1 8
-check-test_case-row -file "TestFile.robot" -row 5 -tc  "my_kw" -c1 "\\" -c2 "#cov to bytes"
-check-test_case-row -file "TestFile.robot" -row 6 -tc  "..."
+check-test_case-row -file "TestFile.robot" -row 1 -extended_col true  -extended_col true -tc  "\\"
+check-test_case-row -file "TestFile.robot" -row 2  -extended_col true -tc  "test 1" -c1 1 -c2 2 -c3 3 -c4 "#log command"
+check-test_case-row -file "TestFile.robot" -row 3  -extended_col true -tc  "my_method" -c1 2
+check-test_case-row -file "TestFile.robot" -row 4  -extended_col true -tc  "Convert To Bytes" -c1 8
+check-test_case-row -file "TestFile.robot" -row 5  -extended_col true -tc  "my_kw" -c1 "\\" -c2 "#cov to bytes"
+check-test_case-row -file "TestFile.robot" -row 6  -extended_col true -tc  "..."
 
-check-test_case-row -file "TestFile.robot" -row 7 -tc  "test 22"
-check-test_case-row -file "TestFile.robot" -row 8 -tc  "Catenate" -c1 1 -c2 5
-check-test_case-row -file "TestFile.robot" -row 9 -tc  "Convert To Hex" -c1 33
-check-test_case-row -file "TestFile.robot" -row 10 -tc  "..."
+check-test_case-row -file "TestFile.robot" -row 7  -extended_col true -tc  "test 22"
+check-test_case-row -file "TestFile.robot" -row 8  -extended_col true -tc  "Catenate" -c1 1 -c2 5
+check-test_case-row -file "TestFile.robot" -row 9  -extended_col true -tc  "Convert To Hex" -c1 33
+check-test_case-row -file "TestFile.robot" -row 10  -extended_col true -tc  "..."
 
-check-test_case-row -file "TestFile.robot" -row 11 -tc  "last test"
-check-test_case-row -file "TestFile.robot" -row 12 -tc  "[Documentation]" -c1 "this is doc second line"
-check-test_case-row -file "TestFile.robot" -row 13 -tc  "None Shall Pass" -c1 who -c2 "\\" -c3 "\\" -c4 "\\" -c5 "#cov to bytes"
-check-test_case-row -file "TestFile.robot" -row 14 -tc  "\\"
-check-test_case-row -file "TestFile.robot" -row 15 -tc  "..."
-check-test_case-row -file "TestFile.robot" -row 16 -tc  "...add new case"
+check-test_case-row -file "TestFile.robot" -row 11  -extended_col true -tc  "last test"
+check-test_case-row -file "TestFile.robot" -row 12  -extended_col true -tc  "[Documentation]" -c1 "this is doc second line"
+check-test_case-row -file "TestFile.robot" -row 13  -extended_col true -tc  "None Shall Pass" -c1 who -c2 "\\" -c3 "\\" -c4 "\\" -c5 "#cov to bytes"
+check-test_case-row -file "TestFile.robot" -row 14  -extended_col true -tc  "\\"
+check-test_case-row -file "TestFile.robot" -row 15  -extended_col true -tc  "..."
+check-test_case-row -file "TestFile.robot" -row 16  -extended_col true -tc  "...add new case"
 
 get-editor "TestFile.robot" | restore
 

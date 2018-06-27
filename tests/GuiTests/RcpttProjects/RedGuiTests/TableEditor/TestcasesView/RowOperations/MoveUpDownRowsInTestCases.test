@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _pEYlwG6SEeaFMpJxhF5ZTQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/13/17 3:26 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/27/18 12:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -106,25 +106,25 @@ with [get-editor "TestFile.robot"] {
     
 }
 
-check-test_case-row -file  "TestFile.robot" -row 1 -tc "my test 2" 
-check-test_case-row -file  "TestFile.robot" -row 2 -tc "Fail"  -c1 "\"this wil fail\""
-check-test_case-row -file  "TestFile.robot" -row 3 -tc "       " 
-check-test_case-row -file  "TestFile.robot" -row 4 -tc "my kw" 
-check-test_case-row -file  "TestFile.robot" -row 5 -tc "..." 
+check-test_case-row -file  "TestFile.robot" -row 1  -extended_col true -tc "my test 2" 
+check-test_case-row -file  "TestFile.robot" -row 2  -extended_col true -tc "Fail"  -c1 "\"this wil fail\""
+check-test_case-row -file  "TestFile.robot" -row 3  -extended_col true -tc "       " 
+check-test_case-row -file  "TestFile.robot" -row 4  -extended_col true -tc "my kw" 
+check-test_case-row -file  "TestFile.robot" -row 5  -extended_col true -tc "..." 
 
-check-test_case-row -file  "TestFile.robot" -row 6 -tc "test 1" 
-check-test_case-row -file  "TestFile.robot" -row 7 -tc "Should Be True" -c1 "${True}"
-check-test_case-row -file  "TestFile.robot" -row 8 -tc "Catenate" -c1 1 -c2 2 -c3 3 -c4 4 -c5 5
-check-test_case-row -file  "TestFile.robot" -row 9 -tc "[Teardown]" -c1 "Convert To Hex" -c2 555
-check-test_case-row -file  "TestFile.robot" -row 10 -tc "" 
-check-test_case-row -file  "TestFile.robot" -row 11 -tc "..."
+check-test_case-row -file  "TestFile.robot" -row 6  -extended_col true -tc "test 1" 
+check-test_case-row -file  "TestFile.robot" -row 7  -extended_col true -tc "Should Be True" -c1 "${True}"
+check-test_case-row -file  "TestFile.robot" -row 8  -extended_col true -tc "Catenate" -c1 1 -c2 2 -c3 3 -c4 4 -c5 5
+check-test_case-row -file  "TestFile.robot" -row 9  -extended_col true -tc "[Teardown]" -c1 "Convert To Hex" -c2 555
+check-test_case-row -file  "TestFile.robot" -row 10  -extended_col true -tc "" 
+check-test_case-row -file  "TestFile.robot" -row 11  -extended_col true -tc "..."
 
-check-test_case-row -file  "TestFile.robot" -row 12 -tc "test 3"
-check-test_case-row -file  "TestFile.robot" -row 13 -tc "new item"
-check-test_case-row -file  "TestFile.robot" -row 14 -tc "\\" -c1 "log" -c2 "${x}"
-check-test_case-row -file  "TestFile.robot" -row 15 -tc "Evaluate" -c1 "expression" -c2 "No Operation"
-check-test_case-row -file  "TestFile.robot" -row 16 -tc ": FOR" -c1 "${x}" -c2 "IN RANGE" -c3 5
-check-test_case-row -file  "TestFile.robot" -row 17 -tc "..." 
+check-test_case-row -file  "TestFile.robot" -row 12  -extended_col true -tc "test 3"
+check-test_case-row -file  "TestFile.robot" -row 13  -extended_col true -tc "new item"
+check-test_case-row -file  "TestFile.robot" -row 14  -extended_col true -tc "\\" -c1 "log" -c2 "${x}"
+check-test_case-row -file  "TestFile.robot" -row 15  -extended_col true -tc "Evaluate" -c1 "expression" -c2 "No Operation"
+check-test_case-row -file  "TestFile.robot" -row 16  -extended_col true -tc ": FOR" -c1 "${x}" -c2 "IN RANGE" -c3 5
+check-test_case-row -file  "TestFile.robot" -row 17  -extended_col true -tc "..." 
 
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click

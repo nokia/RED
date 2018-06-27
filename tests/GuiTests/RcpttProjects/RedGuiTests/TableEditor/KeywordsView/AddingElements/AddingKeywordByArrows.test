@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1a2hUFVmEeaLgpF-R5GRxw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/26/18 12:18 PM
+Save-Time: 6/27/18 11:42 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -173,18 +173,17 @@ with [get-editor "TestFile.robot"] {
 }
 
 get-editor "TestFile.robot" | maximize
-check-keyword-row -file "TestFile.robot" -row  1 -kw "My KW"
-check-keyword-row -file "TestFile.robot" -row  2 -kw "line1" -c1 "arg1" -c2 "arg2" -c3 "arg3" -c4 "arg4" -c5 "#com"
-check-keyword-row -file "TestFile.robot" -row  3 -kw "line2" -c1 "b1" 
-check-keyword-row -file "TestFile.robot" -row  4 -kw "\\" -c1 "\\" -c2 "c2" -c3 "\\" -c4 "c4"
-check-keyword-row -file "TestFile.robot" -row  5 -kw "\\" -c1 "\\" -c2 "\\" -c3 "\\" -c4 "\\" -c5  "\\" -c6 "#only comment"
-check-keyword-row -file "TestFile.robot" -row  6 -kw "empty kw" 
-check-keyword-row -file "TestFile.robot" -row  7 -kw "..." 
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 1 -ref_table [list "My KW" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 2 -ref_table [list "line1" "arg1" "arg2" "arg3" "arg4" "#com" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 3 -ref_table [list "line2" "b1" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 4 -ref_table [list "\\" "\\" "c2" "\\" "c4" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 5 -ref_table [list "\\" "\\" "\\" "\\" "\\" "\\" "#only comment" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 6 -ref_table [list "empty kw" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 7 -ref_table [list "..." "" "" "" "" "" "" "" ]
 
-check-keyword-row -file "TestFile.robot" -row  8 -kw "second kw"  -c1 "${s1}" -c2 "\\" -c3 "\\" -c4 "\\" -c5 "${s5}"
-check-keyword-row -file "TestFile.robot" -row  9 -kw "Log" -c1 "12"
-check-keyword-row -file "TestFile.robot" -row  10 -kw "..."
-check-keyword-row -file "TestFile.robot" -row  11 -kw "...add new keyword"
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 8 -ref_table [list "second kw" "${s1}" "\\" "\\" "\\" "${s5}" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 9 -ref_table [list "Log" "12" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 10 -ref_table [list "..." "" "" "" "" "" "" "" ]
 get-editor "TestFile.robot" | restore
 
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
