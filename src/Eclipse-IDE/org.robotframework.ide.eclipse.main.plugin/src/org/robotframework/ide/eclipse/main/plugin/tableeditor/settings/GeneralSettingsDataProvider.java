@@ -48,7 +48,7 @@ public class GeneralSettingsDataProvider
     }
 
     private int countGeneralSettingsTableColumnsNumber() {
-        return calculateLongestArgumentsLength() + 3; // setting name + args + empty cell + comment
+        return calculateLongestArgumentsLength() + 2; // setting name + args + comment
     }
 
     private int calculateLongestArgumentsLength() {
@@ -57,7 +57,7 @@ public class GeneralSettingsDataProvider
             for (final Entry<String, RobotElement> element : generalSettings) {
                 final RobotSetting setting = (RobotSetting) element.getValue();
                 if (setting != null) {
-                    max = Math.max(max, setting.getArguments().size());
+                    max = Math.max(max, setting.getArguments().size() + 1); // +1 for empty cell
                 }
             }
         }
