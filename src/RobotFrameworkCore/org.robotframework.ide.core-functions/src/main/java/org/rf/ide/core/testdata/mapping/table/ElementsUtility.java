@@ -274,7 +274,8 @@ public class ElementsUtility {
                 if (type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION
                         || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
                         || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
-                        || type == RobotTokenType.VARIABLES_LIST_DECLARATION) {
+                        || type == RobotTokenType.VARIABLES_LIST_DECLARATION
+                        || type == RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION) {
                     if (!correctVariables.isEmpty()) {
                         final VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
                         if (typeByTokenType.getIdentificator()
