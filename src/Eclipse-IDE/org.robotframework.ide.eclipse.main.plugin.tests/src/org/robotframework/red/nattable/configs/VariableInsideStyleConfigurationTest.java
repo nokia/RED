@@ -144,4 +144,32 @@ public class VariableInsideStyleConfigurationTest {
 
         assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(1, 2, 3));
     }
+
+    @Test
+    public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariables_whenThereIsSingleEnvironmentVariable() {
+        final IConfigRegistry configRegistry = new ConfigRegistry();
+
+        final VariableInsideStyleConfiguration config = new VariableInsideStyleConfiguration(mock(TableTheme.class),
+                preferences);
+        config.configureRegistry(configRegistry);
+
+        final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
+                VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+
+        final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
+                .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
+        assertThat(decoratingFunction).isNotNull();
+
+        final RangeMap<Integer, Styler> styles = decoratingFunction
+                .apply("some%{home}text");
+        final Map<Range<Integer>, Styler> stylesAsMap = styles.asMapOfRanges();
+
+        assertThat(stylesAsMap).hasSize(1);
+        assertThat(stylesAsMap.keySet()).containsExactly(Range.closedOpen(4, 11));
+
+        final TextStyle styleToCheck = new TextStyle();
+        stylesAsMap.values().forEach(styler -> styler.applyStyles(styleToCheck));
+
+        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(1, 2, 3));
+    }
 }

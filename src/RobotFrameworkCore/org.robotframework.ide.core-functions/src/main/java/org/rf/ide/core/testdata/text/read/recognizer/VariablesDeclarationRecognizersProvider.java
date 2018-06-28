@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.DictionaryVariableDeclarationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.variables.EnvironmentVariableDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.ListVariableDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.ScalarVariableDeclarationRecognizer;
-
 
 public class VariablesDeclarationRecognizersProvider {
 
@@ -22,8 +22,8 @@ public class VariablesDeclarationRecognizersProvider {
         recognized.add(new ScalarVariableDeclarationRecognizer());
         recognized.add(new ListVariableDeclarationRecognizer());
         recognized.add(new DictionaryVariableDeclarationRecognizer());
+        recognized.add(new EnvironmentVariableDeclarationRecognizer());
     }
-
 
     public List<ATokenRecognizer> getRecognizers() {
         final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
