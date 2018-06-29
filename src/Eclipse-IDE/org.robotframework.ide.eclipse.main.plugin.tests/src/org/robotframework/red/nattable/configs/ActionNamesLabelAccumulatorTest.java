@@ -119,6 +119,15 @@ public class ActionNamesLabelAccumulatorTest {
         assertThat(labels.getLabels()).isEmpty();
     }
 
+    @Test
+    public void labelIsAdded_forSlashThenCommentCase_InKeywords() {
+        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
+                .get(0).getChildren().get(3);
+        when(dataProvider.getRowObject(3)).thenReturn(call);
+        labelAccumulator.accumulateConfigLabels(labels, 0, 3);
+        assertThat(labels.getLabels()).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+    }
+
     private static RobotSuiteFile createModel() {
         return new RobotSuiteFileCreator()
                 .appendLine("*** Test Cases ***")
@@ -131,6 +140,7 @@ public class ActionNamesLabelAccumulatorTest {
                 .appendLine("  [Teardown]   Log  kw exit")
                 .appendLine("  [Tags]   t1  t2")
                 .appendLine("  Log  keyword")
+                .appendLine("  \\  #cmt")
                 .build();
     }
 }
