@@ -173,6 +173,15 @@ public class CommentsLabelAccumulatorTest {
         assertThat(labels.getLabels()).isEmpty();
     }
 
+    @Test
+    public void labelIsNotAdded_forSlashThenCommentCase_InKeywords() {
+        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
+                .get(0).getChildren().get(4);
+        when(dataProvider.getRowObject(4)).thenReturn(call);
+        labelAccumulator.accumulateConfigLabels(labels, 0, 4);
+        assertThat(labels.getLabels()).isEmpty();
+    }
+
     private static RobotSuiteFile createModel() {
         return new RobotSuiteFileCreator()
                 .appendLine("*** Test Cases ***")
@@ -187,6 +196,7 @@ public class CommentsLabelAccumulatorTest {
                 .appendLine("  [Tags]   t1  t2  # cmt")
                 .appendLine("  Log  keyword")
                 .appendLine("  # comment  cmt continue")
+                .appendLine("  \\  #cmt")
                 .build();
     }
 }
