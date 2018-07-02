@@ -1,0 +1,98 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: InsertCellOnTheRightInTestCase
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _IcayMHoSEei-nLLniRADXQ
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/2/18 2:21 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    [Documentation]    test 1\n"
+    + "    Catenate    11    22    33    44\n"
+    + "    \\   #comment\n"
+    + "   \n"
+    + "test 2\n"
+    + "    [Setup]    log  8\n"
+    + "    But Convert To Hex    89  99\n"
+    + "    [Timeout]    56s\n"
+    + "    \n"
+    + "test\n"
+    + "    \\    Convert To Boolean    66\n"
+    + "    #com2" 
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 14 10
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+
+
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1/Catenate" | click
+wait 200
+
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+	//add 2 cell after "22" for Catenate
+    key-type Down
+    get-menu -path "Table/Insert cell to the right" | click
+    key-type Up
+    key-type Right -times 2
+    get-menu -path "Table/Insert cell to the right" | click
+    get-menu -path "Table/Insert cell to the right" | click
+    
+    //add cell after [setup]
+    key-type Down -times 5
+    key-type Left -times 2
+    get-menu -path "Table/Insert cell to the right" | click
+    
+    //add cell after "56s" - nothing should happen
+    key-type Down -times 2
+    key-type Right
+    key-type "M1+M2+i"
+    
+    //add cell after COnvert to boolean
+    key-type Down -times 4
+    key-type "M1+M2+i"
+    
+    //check if for Doc this menu is disbaled
+    key-type Up -times 12
+    key-type Left
+}
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu 
+    -path "Table/Insert cell to the right" | get-property enablement | equals false | verify-true
+    
+    
+//add cell after right and left       
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Down -times 7
+    get-menu -path "Table/Insert cell to the right" | click
+    get-menu -path "Table/Insert cell" | click
+}    
+
+//go to source
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    [Documentation]    test 1\n"
+    + "    Catenate    11    22    \\    \\    33    44\n"
+    + "    \\   \\   #comment\n"
+    + "   \n"
+    + "test 2\n"
+    + "    [Setup]    \\  log  8\n"
+    + "    \\    But Convert To Hex    \\    89  99\n"
+    + "    [Timeout]    56s\n"
+    + "    \n"
+    + "test\n"
+    + "    \\    Convert To Boolean    \\    66\n"
+    + "    #com2" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
