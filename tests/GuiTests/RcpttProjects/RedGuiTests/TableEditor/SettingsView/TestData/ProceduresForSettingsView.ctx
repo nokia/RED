@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/25/18 2:40 PM
+Save-Time: 6/29/18 5:21 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -18,7 +18,7 @@ proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {
 
 
 //rows starts from 1
-proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""]  [val c5 ""]  [val c6 ""] [val c7 ""]
+proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""]  [val c5 ""]  [val c6 ""] [val c7 ""] [val is_extended false]
 {
 	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue
 	    |  my-assert-true -expected $setting -row $row -col 1 
@@ -34,8 +34,10 @@ proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val 
 		| my-assert-true -expected $c5 -row $row -col 6
 	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 	
 		| my-assert-true -expected $c6 -row $row -col 7
-	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 8 $row|  invoke getDataValue 	
-		| my-assert-true -expected $c7 -row $row -col 8	
+	if [$is_extended | not-eq false]{		
+		get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 8 $row|  invoke getDataValue 	
+			| my-assert-true -expected $c7 -row $row -col 8	
+	}		
 }
 
 proc "compare-general-setting-table" [val file] [val section] [val col_amount] [val row] [val ref_table]
