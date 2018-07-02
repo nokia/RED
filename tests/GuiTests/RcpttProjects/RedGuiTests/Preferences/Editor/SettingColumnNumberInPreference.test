@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XxFF4JQgEeWNpL9oeriwCw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 10:25 AM
+Save-Time: 6/29/18 5:34 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -97,7 +97,7 @@ check-column-amount-in-settings -tab_label "Metadata" -col_nr 3
 
 //go to Imports
 get-editor "TestFile.robot" | get-section Imports | click
-check-column-amount-in-settings -tab_label "Imports" -col_nr 7
+check-column-amount-in-settings -tab_label "Imports" -col_nr 8
 
 //go to keywords
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
@@ -163,7 +163,7 @@ check-column-amount-in-settings -tab_label "Metadata" -col_nr 3
 
 //go to Imports
 get-editor "TestFile.robot" | get-section Imports | click
-check-column-amount-in-settings -tab_label "Imports" -col_nr 3
+check-column-amount-in-settings -tab_label "Imports" -col_nr 4
 
 check-column-amount-for-main_view -view "Variables" -tab_label "Variables" -col_nr 3
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
@@ -205,7 +205,7 @@ check-column-amount-in-settings -tab_label "Metadata" -col_nr 3
 
 //go to Imports
 get-editor "TestFile.robot" | get-section Imports | click
-check-column-amount-in-settings -tab_label "Imports" -col_nr 22
+check-column-amount-in-settings -tab_label "Imports" -col_nr 23
 
 check-column-amount-for-main_view -view "Variables" -tab_label "Variables" -col_nr 3 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
