@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/29/18 5:21 PM
+Save-Time: 7/2/18 3:57 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -52,16 +52,23 @@ proc "compare-general-setting-table" [val file] [val section] [val col_amount] [
 
 
 
-proc "generate-list" [val file]  [val section] [val col_amount] [val row_amount]
-{	concat [
-	repeat [val index1] -times $row_amount -command{	
-	concat "compare-general-setting-table -file \"" $file "\" -section " $section " -col_amount " $col_amount" -row " $index1  " -ref_table [list "[
-		repeat [val index2] -times $col_amount -command{		
-				concat "\""  [get-editor $file | get-section $section | get-canvas | get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
-		} ] "]" "\n"
-	} ]
+proc "generate-list" [val file]  [val section]
+{	
+	// 0 - row is table header
+	log "          ---------------------   Remove 1 row - it is header!!!!!!!! ----------------------------"
+	get-editor $file | get-section $section | get-canvas | get-property "getLayer().getBodyLayer().getColumnCount()" -raw | int | let [val col_amount -input]{
+		get-editor $file | get-section $section | get-canvas | get-property "getLayer().getBodyLayer().getRowCount()" -raw | int | plus 1 | let [val row_amount -input]{
+			concat [
+				repeat [val index1] -times $row_amount -command{	
+				concat "compare-general-setting-table -file \"" $file "\" -section " $section " -col_amount " $col_amount" -row " $index1  " -ref_table [list "[
+					repeat [val index2] -times $col_amount -command{		
+							concat "\""  [get-editor $file | get-section $section | get-canvas | get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
+					} ] "]" "\n"
+			} ]
+		}
+	}
 }
-//generate-list -file "for_settings.tsv"  -col_amount 8 -row_amount 5 | log
+//generate-list -file "TestFile.robot" -section General  | log 
 
 
 proc "check-metadata-row" [val file] [val row] [val metadata] [val val] [val comment ""]{

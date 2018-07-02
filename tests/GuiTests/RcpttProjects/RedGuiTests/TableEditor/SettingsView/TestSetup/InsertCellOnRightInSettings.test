@@ -1,0 +1,157 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2rVvIENaEeaEVfxTnoQ14g
+Element-Name: InsertCellOnRightInSettings
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _RoNqsH30Eeij1MsLUrnY1A
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/2/18 3:58 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add test and save
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Setting ***\n"
+    + "Suite Setup    Catenate    1    2    3    4\n"
+    + "Suite Teardown    log    text\n"
+    + "Force Tags    t1    t2    ${t3}\n"
+    + "Test Setup    \\    \\    \\    \\    \\    \\    #only comment\n\n"
+    + "Library    abc.py    1    2    3    4\n"
+    + "Resource    new.robot    n1    #this is comment\n"
+    + "Library\n"
+    + "*** Test Cases ***" 
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 2 3
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Settings | click
+    get-section Imports | click
+}
+get-view Outline | get-tree | select "TestFile.robot/Settings/Suite Setup" |click
+wait 200
+
+//set focus on Suite setup on KW "catenate" and check that menu is disabled
+get-editor "TestFile.robot" | get-section General | get-canvas | key-type Right
+with [get-editor "TestFile.robot" | get-section General | get-canvas] {
+    get-menu -path "Table/Insert cell" | get-property enablement | equals false | verify-true
+    get-menu -path "Table/Insert cell to the right" | get-property enablement | equals false | verify-true
+    get-menu -path "Table/Delete cell" | get-property enablement | equals false | verify-true
+}
+
+//add cell after "1" 
+with [get-editor "TestFile.robot" | get-section General | get-canvas] {
+    key-type Right
+    get-menu -path "Table/Insert cell to the right" | click
+    
+    //add cell after last arg ("4")  nothing happen
+    key-type Right -times 4
+    key-type "M1+M2+i"
+    
+    //add cell after las \ in teardown
+    key-type Down -times 2
+    key-type "M1+M2+i"
+    
+    // add cel after "t2"
+    key-type Down -times 4
+    key-type Left -times 4
+    get-menu -path "Table/Insert cell to the right" | click
+    key-type Right -times 2
+    get-menu -path "Table/Insert cell to the right" | click
+}
+get-editor "TestFile.robot" | maximize
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 10 -row 1 -ref_table [list "Suite Setup" "Catenate" "1" "" "2" "3" "4" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 10 -row 2 -ref_table [list "Suite Teardown" "log" "text" "" "" "" "" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 10 -row 3 -ref_table [list "Test Setup" "\\" "\\" "\\" "\\" "\\" "\\" "" "" "#only comment" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 10 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 10 -row 5 -ref_table [list "Test Template" "" "" "" "" "" "" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 10 -row 6 -ref_table [list "Test Timeout" "" "" "" "" "" "" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 10 -row 7 -ref_table [list "Force Tags" "t1" "t2" "" "${t3}" "" "" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 10 -row 8 -ref_table [list "Default Tags" "" "" "" "" "" "" "" "" "" ]
+
+
+//restore and add new values
+get-editor "TestFile.robot" | restore
+get-view Outline | get-tree | select "TestFile.robot/Settings/Suite Setup" | click
+with [get-editor "TestFile.robot" | get-section General] {
+    with [get-canvas] {
+        key-type End
+        key-type Left -times 2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1] {
+        type-text 5
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1] {
+        type-text 6
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1] {
+        type-text 7
+        key-type Enter
+    }
+    get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1 
+        | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas] {
+        key-type Down -times 2
+        type-text l
+    }
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1] {
+        type-text ast
+        key-type Enter
+    }
+}
+
+get-editor "TestFile.robot" | maximize
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 13 -row 1 -ref_table [list "Suite Setup" "Catenate" "1" "" "2" "3" "4" "5" "6" "7" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 13 -row 2 -ref_table [list "Suite Teardown" "log" "text" "" "" "" "" "" "" "" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section General -col_amount 13 -row 3 -ref_table [list "Test Setup" "\\" "\\" "\\" "\\" "\\" "\\" "" "\\" "\\" "last" "" "#only comment" ]
+get-editor "TestFile.robot" | restore
+
+
+//go to import
+with [get-editor "TestFile.robot"] {
+    get-section General | click
+    get-section Imports | click
+    restore
+}
+get-view Outline | get-tree | select "TestFile.robot/Settings/Library/abc.py" | click
+
+//set focus on Library
+with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
+    key-type Right
+    key-type Left
+}
+
+//check if menu is disabled
+with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
+    get-menu -path "Table/Insert cell" | get-property enablement | equals false | verify-true
+    get-menu -path "Table/Insert cell to the right" | get-property enablement | equals false | verify-true
+    get-menu -path "Table/Delete cell" | get-property enablement | equals false | verify-true
+}
+
+//check if menu is disbaled on paths
+get-editor "TestFile.robot" | get-section Imports | get-canvas | key-type Right
+with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
+    get-menu -path "Table/Insert cell" | get-property enablement | equals false | verify-true
+    get-menu -path "Table/Insert cell to the right" | get-property enablement | equals false | verify-true
+    get-menu -path "Table/Delete cell" | get-property enablement | equals false | verify-true
+}
+
+//go to '2' and add new cell
+with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
+    key-type Right -times 2
+    key-type "M1+M2+i"
+}
+
+
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

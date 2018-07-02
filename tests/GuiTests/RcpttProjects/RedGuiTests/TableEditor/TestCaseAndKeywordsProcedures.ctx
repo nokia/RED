@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/27/18 12:09 PM
+Save-Time: 7/2/18 4:15 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -125,13 +125,13 @@ proc "generate-list" [val file] [val table] [val col_amount] [val row_amount]
 
 proc "generate-list2" [val file] [val table]{	
 	get-editor $file | get-canvas -after [get-label $table] -index 1 | get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | let [val col_amount -input]{
-		get-editor $file | get-canvas -after [get-label $table] -index 1 |get-property "getLayer().getBodyLayer().getRowCount()" -raw | int | let [val row_amount -input]{
+		get-editor $file | get-canvas -after [get-label $table] -index 1 |get-property "getLayer().getBodyLayer().getRowCount()" -raw | int | plus 1| let [val row_amount -input]{
 			concat [
-				repeat [val index1] -times $row_amount -command{	
-				concat "compare-row-with-list -file \"" $file "\" -table \"" $table "\" -row " $index1  " -ref_table [list "[
-					repeat [val index2] -times $col_amount -command{		
+				repeat [val row_nr] -times $row_amount -command{	
+				concat "compare-row-with-list -file \"" $file "\" -table \"" $table "\" -row " $row_nr  " -ref_table [list "[
+					repeat [val col_nr] -times $col_amount -command{		
 							concat "\""  [get-editor $file | get-canvas -after [get-label $table] -index 1 | get-object
-							 | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
+							 | invoke getCellByPosition [plus $col_nr 1] $row_nr | invoke getDataValue ] "\" "
 					} ] "]" "\n"
 				} ]
 		 }		
