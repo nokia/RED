@@ -515,6 +515,19 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         }
     }
 
+    @Inject
+    @Optional
+    private void whenSettingIsAddedOrRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            if (sortModel != null) {
+                sortModel.clear();
+            }
+            refreshTable();
+            setDirty();
+        }
+    }
+
     private Runnable tableInputIsReplaced() {
         return () -> {
             refreshTable();
