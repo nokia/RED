@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RoNqsH30Eeij1MsLUrnY1A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/2/18 3:58 PM
+Save-Time: 7/4/18 10:42 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -129,6 +129,8 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
     key-type Left
 }
 
+get-button "Save (M1+S)" | click
+
 //check if menu is disabled
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
     get-menu -path "Table/Insert cell" | get-property enablement | equals false | verify-true
@@ -150,8 +152,29 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
     key-type "M1+M2+i"
 }
 
-
-
-
+//go to last cell and add two args
+with [get-editor "TestFile.robot" | get-section Imports] {
+    with [get-canvas] {
+        key-type Right -times 4
+        type-text 5
+    }
+    get-editbox | key-type Enter
+    with [get-editbox] {
+        type-text 6
+        key-type Enter
+    }
+    with [get-canvas] {
+        key-type ESC
+        key-type Left -times 2
+        get-menu -path "Table/Insert cell" | click
+        get-menu -path "Table/Insert cell to the right" | click
+    }
+}
+get-editor "TestFile.robot" | maximize
+compare-general-setting-table -file "TestFile.robot" -section Imports -col_amount 13 -row 1 -ref_table [list "Library" "abc.py" "1" "2" "" "3" "4" "" "" "5" "6" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section Imports -col_amount 13 -row 2 -ref_table [list "Resource" "new.robot" "n1" "" "" "" "" "" "" "" "" "" "#this is comment" ]
+compare-general-setting-table -file "TestFile.robot" -section Imports -col_amount 13 -row 3 -ref_table [list "Library" "" "" "" "" "" "" "" "" "" "" "" "" ]
+compare-general-setting-table -file "TestFile.robot" -section Imports -col_amount 13 -row 4 -ref_table [list "...add new import" "" "" "" "" "" "" "" "" "" "" "" "" ]
+get-editor "TestFile.robot" | restore
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
