@@ -59,6 +59,18 @@
             <target-file-name>oxygen.target</target-file-name>
         </properties>
     </profile>
+    <profile>
+        <id>photon-profile</id>
+        <activation>
+            <property>
+                <name>eclipse.version</name>
+                <value>photon</value>
+            </property>
+        </activation>
+        <properties>
+            <target-file-name>photon.target</target-file-name>
+        </properties>
+    </profile>
   </profiles>
   
   <build>
