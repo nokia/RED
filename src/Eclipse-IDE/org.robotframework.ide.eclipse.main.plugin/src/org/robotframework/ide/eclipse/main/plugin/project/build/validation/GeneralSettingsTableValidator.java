@@ -295,19 +295,19 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         final Set<String> additionalVariables = new HashSet<>();
 
         final List<ExecutableValidator> execValidators = new ArrayList<>();
-        if (settingsTable.getSuiteSetups().size() == 1) {
+        if (!settingsTable.getSuiteSetups().isEmpty()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
                     settingsTable.getSuiteSetups().get(0), reporter));
         }
-        if (settingsTable.getTestSetups().size() == 1) {
+        if (!settingsTable.getTestSetups().isEmpty()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
                     settingsTable.getTestSetups().get(0), reporter));
         }
-        if (settingsTable.getTestTeardowns().size() == 1) {
+        if (!settingsTable.getTestTeardowns().isEmpty()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
                     settingsTable.getTestTeardowns().get(0), reporter));
         }
-        if (settingsTable.getSuiteTeardowns().size() == 1) {
+        if (!settingsTable.getSuiteTeardowns().isEmpty()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
                     settingsTable.getSuiteTeardowns().get(0), reporter));
         }
