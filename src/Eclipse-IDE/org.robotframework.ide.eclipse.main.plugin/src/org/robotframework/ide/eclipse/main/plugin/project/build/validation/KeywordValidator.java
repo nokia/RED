@@ -139,15 +139,14 @@ class KeywordValidator implements ModelUnitValidator {
         additionalVariables.addAll(extractArgumentVariables());
 
         final List<ExecutableValidator> execValidators = new ArrayList<>();
-        keyword.getExecutionContext()
-                .stream()
+        keyword.getExecutionContext().stream()
                 .filter(RobotExecutableRow::isExecutable)
                 .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))
                 .forEach(execValidators::add);
-        if (keyword.getTeardowns().size() == 1) {
-            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
-                    keyword.getTeardowns().get(0), reporter));
-        }
+        keyword.getTeardowns().stream()
+                .findFirst()
+                .map(teardown -> ExecutableValidator.of(validationContext, additionalVariables, teardown, reporter))
+                .ifPresent(execValidators::add);
         execValidators.forEach(ExecutableValidator::validate);
 
         // also validate variables in [Return] after all executables were checked (that's why this
