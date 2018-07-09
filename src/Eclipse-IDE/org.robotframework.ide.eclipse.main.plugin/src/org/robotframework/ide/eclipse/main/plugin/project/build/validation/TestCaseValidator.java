@@ -78,22 +78,22 @@ class TestCaseValidator implements ModelUnitValidator {
 
         final Set<String> additionalVariables = new HashSet<>();
         final List<ExecutableValidator> execValidators = new ArrayList<>();
-        if (testCase.getSetups().size() == 1) {
-            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
-                    testCase.getSetups().get(0), reporter));
-        }
+
+        testCase.getSetups().stream()
+                .findFirst()
+                .map(setup -> ExecutableValidator.of(validationContext, additionalVariables, setup, reporter))
+                .ifPresent(execValidators::add);
         final String templateKeyword = testCase.getTemplateKeywordName();
         if (templateKeyword == null) {
-            testCase.getExecutionContext()
-                    .stream()
+            testCase.getExecutionContext().stream()
                     .filter(RobotExecutableRow::isExecutable)
                     .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))
                     .forEach(execValidators::add);
         }
-        if (testCase.getTeardowns().size() == 1) {
-            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
-                    testCase.getTeardowns().get(0), reporter));
-        }
+        testCase.getTeardowns().stream()
+                .findFirst()
+                .map(teardown -> ExecutableValidator.of(validationContext, additionalVariables, teardown, reporter))
+                .ifPresent(execValidators::add);
         execValidators.forEach(ExecutableValidator::validate);
     }
 }
