@@ -44,16 +44,21 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
         if (setupOrTeardown.getKeywordName() == null) {
             return;
         }
-        final RobotToken keywordNameToken = setupOrTeardown.getKeywordName();
+        final IExecutableRowDescriptor<?> descriptor = setupOrTeardown.asExecutableRow().buildLineDescription();
 
+        final RobotToken keywordNameToken = setupOrTeardown.getKeywordName();
         final MappingResult variablesExtraction = new VariableExtractor().extract(keywordNameToken,
                 validationContext.getFile().getName());
         final List<VariableDeclaration> variablesDeclarations = variablesExtraction.getCorrectVariables();
+
         if (variablesExtraction.getMappedElements().size() == 1 && variablesDeclarations.size() == 1) {
             final RobotProblem problem = RobotProblem
                     .causedBy(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING)
                     .formatMessageWith(variablesDeclarations.get(0).getVariableName().getText());
             reporter.handleProblem(problem, validationContext.getFile(), keywordNameToken);
+
+            final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
+            unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, descriptor.getUsedVariables());
 
         } else {
             final KeywordCallValidator keywordCallValidator = new KeywordCallValidator(validationContext,
@@ -63,7 +68,6 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
             final QualifiedKeywordName keywordName = keywordCallValidator.getFoundKeywordName().orElse(null);
             final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
 
-            final IExecutableRowDescriptor<?> descriptor = setupOrTeardown.asExecutableRow().buildLineDescription();
             final List<VariableDeclaration> variableUsedInCall = SpecialKeywords.getUsedVariables(keywordName,
                     descriptor);
             unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, variableUsedInCall);
