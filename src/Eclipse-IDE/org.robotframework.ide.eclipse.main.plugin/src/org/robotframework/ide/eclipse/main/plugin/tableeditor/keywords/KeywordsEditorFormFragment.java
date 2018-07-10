@@ -103,6 +103,8 @@ import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration
 import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.CommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
+import org.robotframework.red.nattable.configs.VariablesInElementsLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariablesInElementsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
@@ -115,8 +117,8 @@ import org.robotframework.red.nattable.configs.SpecialItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
-import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
-import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
+import org.robotframework.red.nattable.configs.VariablesInNamesLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariablesInNamesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -209,7 +211,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new KeywordsElementsLabelAccumulator(dataProvider),
                 new ActionNamesLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(dataProvider),
-                new VariableInsideLabelAccumulator());
+                new VariablesInElementsLabelAccumulator(),
+                new VariablesInNamesLabelAccumulator());
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
                 dataProvider.getTreeList());
         final GlazedListTreeData<Object> treeData = new GlazedListTreeData<>(dataProvider.getTreeList());
@@ -321,7 +324,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
-        table.addConfiguration(new VariableInsideStyleConfiguration(theme));
+        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme));
+        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {

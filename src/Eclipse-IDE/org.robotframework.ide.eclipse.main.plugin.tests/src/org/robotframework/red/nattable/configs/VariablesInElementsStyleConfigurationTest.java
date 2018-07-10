@@ -36,7 +36,7 @@ import com.google.common.collect.RangeMap;
  * @author lwlodarc
  *
  */
-public class VariableInsideStyleConfigurationTest {
+public class VariablesInElementsStyleConfigurationTest {
 
     private final RedPreferences preferences = mock(RedPreferences.class);
 
@@ -50,18 +50,19 @@ public class VariableInsideStyleConfigurationTest {
     public void sameStyleIsRegisteredForEachDisplayMode() throws Exception {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariableInsideStyleConfiguration config = new VariableInsideStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
+                mock(TableTheme.class), preferences);
         config.configureRegistry(configRegistry);
 
         final IStyle style1 = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
-                VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
         final IStyle style2 = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.HOVER,
-                VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
         final IStyle style3 = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.SELECT,
-                VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
         final IStyle style4 = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE,
-                DisplayMode.SELECT_HOVER, VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                DisplayMode.SELECT_HOVER,
+                VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
 
         assertThat(style1).isSameAs(style2);
         assertThat(style2).isSameAs(style3);
@@ -72,12 +73,13 @@ public class VariableInsideStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesIsDefinedButDoesNotFindAnyVariable_whenThereAreNoVariables() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariableInsideStyleConfiguration config = new VariableInsideStyleConfiguration(mock(TableTheme.class),
+        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
+                mock(TableTheme.class),
                 preferences);
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
-                VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
 
         final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
                 .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
@@ -93,12 +95,13 @@ public class VariableInsideStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariables_whenThereAreMultipleSophisticatedVariables() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariableInsideStyleConfiguration config = new VariableInsideStyleConfiguration(mock(TableTheme.class),
+        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
+                mock(TableTheme.class),
                 preferences);
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
-                VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
 
         final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
                 .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
@@ -121,12 +124,13 @@ public class VariableInsideStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariables_whenThereIsSingleVariable() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariableInsideStyleConfiguration config = new VariableInsideStyleConfiguration(mock(TableTheme.class),
+        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
+                mock(TableTheme.class),
                 preferences);
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
-                VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
 
         final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
                 .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
@@ -146,15 +150,16 @@ public class VariableInsideStyleConfigurationTest {
     }
 
     @Test
-    public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariables_whenThereIsSingleEnvironmentVariable() {
+    public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariable_whenThereIsSingleEnvironmentVariable() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariableInsideStyleConfiguration config = new VariableInsideStyleConfiguration(mock(TableTheme.class),
+        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
+                mock(TableTheme.class),
                 preferences);
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
-                VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
 
         final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
                 .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
