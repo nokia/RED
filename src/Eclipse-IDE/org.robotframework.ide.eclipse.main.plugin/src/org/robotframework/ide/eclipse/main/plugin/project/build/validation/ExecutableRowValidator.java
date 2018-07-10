@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDe
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
@@ -60,8 +61,9 @@ class ExecutableRowValidator implements ExecutableValidator {
             keywordCallValidator.validate();
 
             final QualifiedKeywordName keywordName = keywordCallValidator.getFoundKeywordName().orElse(null);
-            final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
 
+            final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext,
+                    AttributesAugmentingReportingStrategy.withLocalVarFixer(reporter));
             final List<VariableDeclaration> variableUsedInCall = SpecialKeywords.getUsedVariables(keywordName,
                     descriptor);
             unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, variableUsedInCall);
