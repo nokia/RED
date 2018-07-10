@@ -11,7 +11,13 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.validation.ProblemPosition;
 
+import com.google.common.collect.ImmutableMap;
+
 public class AttributesAugmentingReportingStrategy extends ValidationReportingStrategy {
+
+    public static ValidationReportingStrategy withLocalVarFixer(final ValidationReportingStrategy reporter) {
+        return create(reporter, ImmutableMap.of(AdditionalMarkerAttributes.DEFINE_VAR_LOCALLY, Boolean.TRUE));
+    }
 
     public static ValidationReportingStrategy create(final ValidationReportingStrategy wrappedStrategy,
             final Map<String, Object> additionalMarkerAttributes) {
