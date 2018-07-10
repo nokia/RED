@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.validation.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
@@ -46,11 +47,11 @@ public class ExecutableForValidator implements ExecutableValidator {
                     .formatMessageWith(buildMessage.getMessage());
             reporter.handleProblem(problem, validationContext.getFile(), position);
         }
-        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
+        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext,
+                AttributesAugmentingReportingStrategy.withLocalVarFixer(reporter));
         unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, descriptor.getUsedVariables());
 
         descriptor.getCreatedVariables()
                 .forEach(var -> additionalVariables.add(VariableNamesSupport.extractUnifiedVariableName(var)));
     }
-
 }
