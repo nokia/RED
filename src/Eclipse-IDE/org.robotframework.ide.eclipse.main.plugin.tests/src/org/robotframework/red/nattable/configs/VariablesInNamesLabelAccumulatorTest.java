@@ -15,28 +15,29 @@ import org.junit.Test;
  * @author lwlodarc
  *
  */
-public class VariableInsideLabelAccumulatorTest {
+public class VariablesInNamesLabelAccumulatorTest {
 
     private LabelStack labels;
-    private VariableInsideLabelAccumulator labelAccumulator;
+    private VariablesInNamesLabelAccumulator labelAccumulator;
 
     @Before
     public void cleanData() {
         labels = new LabelStack();
-        labelAccumulator = new VariableInsideLabelAccumulator();
+        labelAccumulator = new VariablesInNamesLabelAccumulator();
     }
 
     @Test
-    public void labelIsAdded_forZerothColumn() {
+    public void labelIsAdded_forName() {
+        labels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
         labelAccumulator.accumulateConfigLabels(labels, 0, 0);
         assertThat(labels.getLabels())
-                .containsExactly(VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                .containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL,
+                        VariablesInNamesLabelAccumulator.POSSIBLE_VARIABLES_IN_NAMES_CONFIG_LABEL);
     }
 
     @Test
-    public void labelIsAdded_forNonZerothColumn() {
-        labelAccumulator.accumulateConfigLabels(labels, 1, 0);
-        assertThat(labels.getLabels())
-                .containsExactly(VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+    public void labelIsNotAdded_forNonName() {
+        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
+        assertThat(labels.getLabels()).isEmpty();
     }
 }
