@@ -84,6 +84,8 @@ import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
 import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
+import org.robotframework.red.nattable.configs.VariablesInElementsLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariablesInElementsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
@@ -93,8 +95,8 @@ import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
-import org.robotframework.red.nattable.configs.VariableInsideLabelAccumulator;
-import org.robotframework.red.nattable.configs.VariableInsideStyleConfiguration;
+import org.robotframework.red.nattable.configs.VariablesInNamesLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariablesInNamesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -165,7 +167,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 new AlternatingRowConfigLabelAccumulator(),
                 new AddingElementLabelAccumulator(dataProvider, true),
                 new VariableTypesAndColumnsLabelAccumulator(dataProvider),
-                new VariableInsideLabelAccumulator());
+                new VariablesInElementsLabelAccumulator(),
+                new VariablesInNamesLabelAccumulator());
         final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory.createGlazedListEventsLayer(bodyDataLayer,
                 dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -264,7 +267,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
-        table.addConfiguration(new VariableInsideStyleConfiguration(theme));
+        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme));
+        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme));
     }
 
     private boolean hasWrappedCells() {
