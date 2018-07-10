@@ -36,14 +36,14 @@ import com.google.common.collect.TreeRangeMap;
  * @author lwlodarc
  *
  */
-public class VariableInsideStyleConfiguration extends RobotElementsStyleConfiguration {
+public class VariablesInElementsStyleConfiguration extends RobotElementsStyleConfiguration {
 
-    public VariableInsideStyleConfiguration(final TableTheme theme) {
+    public VariablesInElementsStyleConfiguration(final TableTheme theme) {
         super(theme, RedPlugin.getDefault().getPreferences());
     }
 
     @VisibleForTesting
-    VariableInsideStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
+    VariablesInElementsStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
         super(theme, preferences);
     }
 
@@ -55,7 +55,7 @@ public class VariableInsideStyleConfiguration extends RobotElementsStyleConfigur
 
         Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
             configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, regularStyle, mode,
-                    VariableInsideLabelAccumulator.POSSIBLE_VARIABLE_INSIDE_CONFIG_LABEL);
+                    VariablesInElementsLabelAccumulator.POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);
         });
     }
 
@@ -78,7 +78,7 @@ public class VariableInsideStyleConfiguration extends RobotElementsStyleConfigur
         };
     }
 
-    public static List<Range<Integer>> markVariables(final String label) {
+    private static List<Range<Integer>> markVariables(final String label) {
         final List<Range<Integer>> variableRanges = new ArrayList<Range<Integer>>();
         final Matcher bracketsMatcher = Pattern.compile("([$@&%]\\{|\\}(\\[[^\\]]+\\])?)").matcher(label);
         int deepLevel = 0;
