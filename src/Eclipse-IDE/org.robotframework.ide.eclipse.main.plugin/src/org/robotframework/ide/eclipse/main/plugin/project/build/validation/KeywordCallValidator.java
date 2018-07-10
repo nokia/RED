@@ -100,6 +100,7 @@ class KeywordCallValidator implements ModelUnitValidator {
                                     AdditionalMarkerAttributes.ORIGINAL_NAME, kwName,
                                     AdditionalMarkerAttributes.SOURCES, String.join(";", sources)));
                 }
+                break;
             }
         }
     }
