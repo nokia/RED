@@ -89,6 +89,9 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         if (robotFileOutput == null) {
             return;
         }
+        // make sure variable files are loaded as this proccess can report problems
+        fileModel.getVariablesFromLocalReferencedFiles();
+
         if (robotFileOutput.getStatus() == Status.FAILED) {
             final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.FILE_PARSING_FAILED)
                     .formatMessageWith(file.getName());
