@@ -269,7 +269,8 @@ public class RobotRuntimeEnvironment {
     }
 
     @VisibleForTesting
-    RobotRuntimeEnvironment(final RobotCommandsExecutors executors, final File location, final String version) {
+    public RobotRuntimeEnvironment(final RobotCommandsExecutors executors, final File location,
+            final String version) {
         this.executors = executors;
         this.location = location;
         this.version = version;

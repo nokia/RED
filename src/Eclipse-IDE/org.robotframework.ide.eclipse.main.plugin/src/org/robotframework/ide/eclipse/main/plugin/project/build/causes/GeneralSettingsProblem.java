@@ -417,7 +417,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Setting '%s' in the same column with Metadata Key is removed in Robot Framework 3.0";
+            return "Setting metadata using key in first column syntax is deprecated in RF 2.9 and removed in RF 3.0";
         }
 
         @Override
@@ -428,50 +428,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new MetadataKeyInSameColumnFixer());
-        }
-    },
-    METADATA_SETTING_JOINED_WITH_KEY_IN_COLUMN_30 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' in the same column with Metadata Key is removed in Robot Framework 3.0";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new MetadataKeyInSameColumnFixer());
-        }
-    },
-    META_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Metadata syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("Metadata"));
         }
     },
     DOCUMENT_SYNONYM {

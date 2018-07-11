@@ -123,7 +123,6 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         reportOutdated(table.getSuiteTeardowns(), GeneralSettingsProblem.SUITE_POSTCONDITION_SYNONYM, "suiteteardown");
         reportOutdated(table.getTestSetups(), GeneralSettingsProblem.TEST_PRECONDITION_SYNONYM, "testsetup");
         reportOutdated(table.getTestTeardowns(), GeneralSettingsProblem.TEST_POSTCONDITION_SYNONYM, "testteardown");
-        reportOutdated(table.getMetadatas(), GeneralSettingsProblem.META_SYNONYM, "metadata");
     }
 
     private void reportOutdated(final List<? extends AModelElement<?>> settings, final IProblemCause cause,

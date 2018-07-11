@@ -148,8 +148,10 @@ public enum RobotTokenType implements IRobotTokenType {
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata:").build(),
-            VersionAvailabilityInfoBuilder.create().deprecatedFrom("3.0").addRepresentation("Meta").build(),
-            VersionAvailabilityInfoBuilder.create().deprecatedFrom("3.0").addRepresentation("Meta:").build()),
+            VersionAvailabilityInfoBuilder.create().deprecatedFrom("2.9").removedFrom("3.0")
+                .addRepresentation("Meta").build(),
+            VersionAvailabilityInfoBuilder.create().deprecatedFrom("2.9").removedFrom("3.0")
+                .addRepresentation("Meta:").build()),
     /**
      */
     SETTING_METADATA_KEY(TableType.SETTINGS),
