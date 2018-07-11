@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.mapping.TwoModelReferencesLinker.DifferentOutputFile;
@@ -43,7 +44,7 @@ public class FileOutputsMatchUpdaterTest {
         final String fContentOld = "*** Settings ***\nLibrary\tnowy\tok\t#bad";
         final String fContentNew = "*** Settings ***\nLibrary\tnowy2\tok2\t#bad2";
 
-        final RobotProjectHolder holder = new RobotProjectHolder();
+        final RobotProjectHolder holder = new RobotProjectHolder(new RobotRuntimeEnvironment(null, null, "3.0.0"));
         final RobotParser parser = RobotParser.create(holder, RobotParserConfig.allImportsLazy());
         final RobotFileOutput oldContent = parser.parseEditorContent(fContentOld, new File("fake.txt"));
         final RobotFileOutput newContent = parser.parseEditorContent(fContentNew, new File("fake.txt"));

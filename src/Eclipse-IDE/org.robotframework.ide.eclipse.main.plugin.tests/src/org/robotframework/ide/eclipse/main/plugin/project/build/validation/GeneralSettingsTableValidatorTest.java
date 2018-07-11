@@ -341,19 +341,6 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     @Test
-    public void outdatedMetadataSyntaxIsReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
-                .appendLine("Meta  data")
-                .build();
-
-        final FileValidationContext context = prepareContext();
-        final Collection<Problem> problems = validate(context, file);
-
-        assertThat(problems).contains(
-                new Problem(GeneralSettingsProblem.META_SYNONYM, new ProblemPosition(2, Range.closed(17, 21))));
-    }
-
-    @Test
     public void outdatedSetupAndTeardownSyntaxAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Suite Precondition  kw")
