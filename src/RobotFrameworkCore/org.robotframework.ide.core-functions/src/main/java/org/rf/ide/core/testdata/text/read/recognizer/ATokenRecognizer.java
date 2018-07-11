@@ -8,13 +8,15 @@ package org.rf.ide.core.testdata.text.read.recognizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.rf.ide.core.testdata.model.RobotVersion;
+
 import com.google.common.annotations.VisibleForTesting;
 
 public abstract class ATokenRecognizer {
 
     private final Pattern pattern;
 
-    private Matcher m;
+    private Matcher matcher;
 
     private int lineNumber = -1;
 
@@ -24,9 +26,13 @@ public abstract class ATokenRecognizer {
 
     private String text;
 
-    protected ATokenRecognizer(final Pattern p, final RobotTokenType type) {
-        this.pattern = p;
+    protected ATokenRecognizer(final Pattern pattern, final RobotTokenType type) {
+        this.pattern = pattern;
         this.type = type;
+    }
+
+    public boolean isApplicableFor(@SuppressWarnings("unused") final RobotVersion robotVersion) {
+        return true;
     }
 
     public abstract ATokenRecognizer newInstance();
@@ -37,23 +43,22 @@ public abstract class ATokenRecognizer {
     }
 
     public boolean hasNext(final String newText, final int currentLineNumber, final int currentColumnNumber) {
-        if (m == null || lineNumber != currentLineNumber || !text.equals(newText)
+        if (matcher == null || lineNumber != currentLineNumber || !text.equals(newText)
                 || columnNumber != currentColumnNumber) {
-            m = pattern.matcher(newText);
+            this.matcher = pattern.matcher(newText);
             this.text = newText;
             this.lineNumber = currentLineNumber;
             this.columnNumber = currentColumnNumber;
         }
-
-        return m.find();
+        return matcher.find();
     }
 
     public RobotToken next() {
         final RobotToken t = new RobotToken();
         t.setLineNumber(lineNumber);
-        final int start = m.start();
+        final int start = matcher.start();
         t.setStartColumn(start);
-        final int end = m.end();
+        final int end = matcher.end();
 
         t.setText(text.substring(start, end));
         t.setType(getProducedType());

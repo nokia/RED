@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.DefaultTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ForceTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryDeclarationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.MetaRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.MetadataRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ResourceDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SettingDocumentationRecognizer;
@@ -29,24 +31,28 @@ import org.rf.ide.core.testdata.text.read.recognizer.settings.VariableDeclaratio
 public class SettingsRecognizersProvider {
 
     private static final List<ATokenRecognizer> RECOGNIZED = Arrays.asList(
-            new SettingsTableHeaderRecognizer(), new HashCommentRecognizer(),
+            new SettingsTableHeaderRecognizer(),
+            new HashCommentRecognizer(),
             new PreviousLineContinueRecognizer(),
             new LibraryDeclarationRecognizer(), new LibraryAliasRecognizer(),
             new VariableDeclarationRecognizer(),
             new ResourceDeclarationRecognizer(),
 
-            new SettingDocumentationRecognizer(), new MetadataRecognizer(),
+            new SettingDocumentationRecognizer(),
+            new MetadataRecognizer(), new MetaRecognizer(),
             new SuiteSetupRecognizer(), new SuiteTeardownRecognizer(),
             new ForceTagsRecognizer(), new DefaultTagsRecognizer(),
             new TestSetupRecognizer(), new TestTeardownRecognizer(),
             new TestTemplateRecognizer(), new TestTimeoutRecognizer());
 
 
-    public List<ATokenRecognizer> getRecognizers() {
+    public List<ATokenRecognizer> getRecognizers(final RobotVersion robotVersion) {
         final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
         synchronized (RECOGNIZED) {
             for (final ATokenRecognizer rec : RECOGNIZED) {
-                recognizersProvided.add(rec.newInstance());
+                if (rec.isApplicableFor(robotVersion)) {
+                    recognizersProvided.add(rec.newInstance());
+                }
             }
         }
         return recognizersProvided;

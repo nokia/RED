@@ -49,6 +49,7 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.TableHeader;
@@ -108,11 +109,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         this.positionResolvers = new ElementPositionResolver();
         this.postFixerActions = new PostProcessingFixActions();
 
-        recognized.addAll(new SettingsRecognizersProvider().getRecognizers());
-        recognized.addAll(new VariablesDeclarationRecognizersProvider().getRecognizers());
-        recognized.addAll(new TestCaseRecognizersProvider().getRecognizers());
-        recognized.addAll(new UserKeywordRecognizersProvider().getRecognizers());
-
         mappers.addAll(new SettingsMapperProvider().getMappers());
         mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());
         mappers.addAll(new TestCaseMapperProvider().getMappers());
@@ -131,6 +127,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     @Override
     public void parse(final RobotFileOutput parsingOutput, final InputStream inputStream, final File robotFile) {
+        initalizeRecognizers(parsingOutput.getRobotVersion());
+
         boolean wasProcessingError = false;
         try {
             parse(parsingOutput, robotFile, new InputStreamReader(inputStream, Charset.forName("UTF-8")));
@@ -154,6 +152,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     @Override
     public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
+        initalizeRecognizers(parsingOutput.getRobotVersion());
+
         boolean wasProcessingError = false;
         try {
             final FileInputStream fis = new FileInputStream(robotFile);
@@ -179,6 +179,15 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         }
 
         parsingOutput.setProcessedFile(robotFile);
+    }
+
+    private void initalizeRecognizers(final RobotVersion robotVersion) {
+        recognized.clear();
+
+        recognized.addAll(new SettingsRecognizersProvider().getRecognizers(robotVersion));
+        recognized.addAll(new VariablesDeclarationRecognizersProvider().getRecognizers());
+        recognized.addAll(new TestCaseRecognizersProvider().getRecognizers());
+        recognized.addAll(new UserKeywordRecognizersProvider().getRecognizers());
     }
 
     private RobotFileOutput parse(final RobotFileOutput parsingOutput, final File robotFile, final Reader reader) {

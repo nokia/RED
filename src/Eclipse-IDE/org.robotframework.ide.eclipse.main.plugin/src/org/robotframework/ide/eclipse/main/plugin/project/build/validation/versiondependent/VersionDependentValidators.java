@@ -33,7 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versi
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTeardownValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTimeoutInOlderValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTimeoutValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.MetadataKeyInColumnOfSettingValidatorStartFromRF30;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.MetadataKeyInColumnOfSettingValidatorUntilRF30;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.DictionaryExistenceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.ScalarAsListInOlderRobotValidator;
@@ -77,8 +76,7 @@ public class VersionDependentValidators {
                 new DuplicatedDefaultTagsValidator(file, section, reporter),
                 new DuplicatedDocumentationInOlderValidator(file, section, reporter),
                 new DuplicatedDocumentationValidator(file, section, reporter),
-                new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, section, reporter),
-                new MetadataKeyInColumnOfSettingValidatorStartFromRF30(file, section, reporter));
+                new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, section, reporter));
 
         return filter(allValidators, validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
