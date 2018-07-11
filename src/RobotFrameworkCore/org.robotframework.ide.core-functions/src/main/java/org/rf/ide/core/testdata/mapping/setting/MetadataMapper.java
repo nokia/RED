@@ -21,14 +21,48 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class MetadataMapper implements IParsingMapper {
 
     private final ElementPositionResolver positionResolver;
 
     public MetadataMapper() {
         this.positionResolver = new ElementPositionResolver();
+    }
+
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+        final List<IRobotTokenType> types = rt.getTypes();
+        if (containsOnlyMetadata(types) && positionResolver.isCorrectPosition(
+                PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION, robotFileOutput.getFileModel(), currentLine, rt)) {
+            if (isIncludedInSettingTable(processingState)) {
+                return true;
+            } else {
+                // FIXME: it is in wrong place means no settings table
+                // declaration
+            }
+        } else {
+            // FIXME: wrong place | | Library or | Library | Library X |
+            // case.
+        }
+        return false;
+    }
+
+    private boolean containsOnlyMetadata(final List<IRobotTokenType> types) {
+        boolean result = false;
+        for (final IRobotTokenType type : types) {
+            if (type == RobotTokenType.SETTING_METADATA_DECLARATION) {
+                result = true;
+            } else if (type != RobotTokenType.UNKNOWN) {
+                return false;
+            }
+        }
+        return result;
+    }
+
+    private boolean isIncludedInSettingTable(final Stack<ParsingState> processingState) {
+        return !processingState.isEmpty()
+                && processingState.get(processingState.size() - 1) == ParsingState.SETTING_TABLE_INSIDE;
     }
 
     @Override
@@ -43,55 +77,5 @@ public class MetadataMapper implements IParsingMapper {
         processingState.push(ParsingState.SETTING_METADATA);
 
         return rt;
-    }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
-            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final List<IRobotTokenType> types = rt.getTypes();
-        if (isOkContainsOnlyMetadata(types)) {
-            if (positionResolver.isCorrectPosition(PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION,
-                    robotFileOutput.getFileModel(), currentLine, rt)) {
-                if (isIncludedInSettingTable(currentLine, processingState)) {
-                    result = true;
-                } else {
-                    // FIXME: it is in wrong place means no settings table
-                    // declaration
-                }
-            } else {
-                // FIXME: wrong place | | Library or | Library | Library X |
-                // case.
-            }
-        }
-
-        return result;
-    }
-
-    private boolean isOkContainsOnlyMetadata(final List<IRobotTokenType> types) {
-        boolean result = false;
-        for (final IRobotTokenType type : types) {
-            if (type == RobotTokenType.UNKNOWN) {
-                continue;
-            } else if (type == RobotTokenType.SETTING_METADATA_DECLARATION) {
-                result = true;
-            } else {
-                result = false;
-                break;
-            }
-        }
-        return result;
-    }
-
-    @VisibleForTesting
-    protected boolean isIncludedInSettingTable(final RobotLine line, final Stack<ParsingState> processingState) {
-        boolean result;
-        if (!processingState.isEmpty()) {
-            result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_TABLE_INSIDE);
-        } else {
-            result = false;
-        }
-
-        return result;
     }
 }

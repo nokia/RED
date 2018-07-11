@@ -7,20 +7,25 @@ package org.rf.ide.core.testdata.text.read.recognizer.settings;
 
 import java.util.regex.Pattern;
 
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class MetadataRecognizer extends ATokenRecognizer {
+public class MetaRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern.compile("[ ]?(" + createUpperLowerCaseWord("Metadata") + "[\\s]*:"
-            + "|" + createUpperLowerCaseWord("Metadata") + ")");
+    public static final Pattern EXPECTED = Pattern.compile("[ ]?(" + createUpperLowerCaseWord("Meta") + ":)");
 
-    public MetadataRecognizer() {
+    public MetaRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_METADATA_DECLARATION);
     }
 
     @Override
+    public boolean isApplicableFor(final RobotVersion robotVersion) {
+        return robotVersion != null && robotVersion.isOlderThan(new RobotVersion(3, 0));
+    }
+
+    @Override
     public ATokenRecognizer newInstance() {
-        return new MetadataRecognizer();
+        return new MetaRecognizer();
     }
 }

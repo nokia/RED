@@ -6,7 +6,6 @@
 package org.rf.ide.core.testdata.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -332,8 +331,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
 
     @BeforeClass
     public static void setup() throws Exception {
-        final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
-        final RobotProjectHolder projectHolder = new RobotProjectHolder(robotRuntime);
+        final RobotProjectHolder projectHolder = new RobotProjectHolder(
+                new RobotRuntimeEnvironment(null, null, "3.0.0"));
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(getFile("presenter//DocPositionsFind.robot"),
                 RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy()));
         out = modelFile.getParent();
