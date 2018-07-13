@@ -142,15 +142,3 @@ def _find_names_in_archive_module(module, name):
                 result.append(obj.__module__)
 
     return result
-
-
-if __name__ == '__main__':
-    import sys
-    import json
-
-    module_location = sys.argv[1]
-
-    if len(sys.argv) > 2:
-        sys.path.extend(sys.argv[2].split(';'))
-
-    print(json.dumps(get_classes_from_module(module_location)))

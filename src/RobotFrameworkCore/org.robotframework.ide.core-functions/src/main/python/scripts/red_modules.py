@@ -48,20 +48,3 @@ def _find_jar_source_path(module_name):
         return source
     else:
         return module.getResource('/' + module_name.replace('.', '/') + ".class").getPath()
-
-
-if __name__ == '__main__':
-    import sys
-    import json
-
-    if sys.argv[1] == '-pythonpath':
-        print(json.dumps(get_modules_search_paths()))
-    elif sys.argv[1] == '-modulename':
-        module_name = sys.argv[2]
-
-        if len(sys.argv) > 3:
-            sys.path.extend(sys.argv[3].split(';'))
-
-        print(get_module_path(module_name))
-    else:
-        raise Exception('Unrecognized argument:' + sys.argv[1])
