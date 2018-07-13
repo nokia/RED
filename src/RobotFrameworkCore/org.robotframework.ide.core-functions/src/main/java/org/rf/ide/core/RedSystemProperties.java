@@ -12,8 +12,6 @@ public class RedSystemProperties {
 
     public static final String RED_CONNECT_TO_SERVER_AT = "red.connectToServerAt";
 
-    public static final String RED_USE_DIRECT_INTERPRETER = "red.useDirectInterpreter";
-
     public static final String RED_SHOW_SESSION_CONSOLE = "red.showSessionConsole";
 
     public static final String RED_USE_OLD_REPARSED_LINK_MODE = "red.useOldReparsedLinkMode";
@@ -26,10 +24,6 @@ public class RedSystemProperties {
 
     public static String getSessionServerAddress() {
         return System.getProperty(RED_CONNECT_TO_SERVER_AT);
-    }
-
-    public static boolean shouldUseDirectExecutor() {
-        return Boolean.valueOf(System.getProperty(RED_USE_DIRECT_INTERPRETER));
     }
 
     public static boolean shouldShowSessionConsole() {

@@ -7,12 +7,13 @@ package org.rf.ide.core.executor;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.rf.ide.core.SystemVariableAccessor;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Anglart
@@ -32,8 +33,8 @@ public final class EnvironmentSearchPaths {
         this.pythonPaths.addAll(pythonPaths);
     }
 
-    public Collection<String> getClassPaths() {
-        return ImmutableSet.copyOf(classPaths);
+    public List<String> getClassPaths() {
+        return ImmutableList.copyOf(classPaths);
     }
 
     public boolean hasClassPaths() {
@@ -48,8 +49,8 @@ public final class EnvironmentSearchPaths {
         classPaths.remove(path);
     }
 
-    public Collection<String> getPythonPaths() {
-        return ImmutableSet.copyOf(pythonPaths);
+    public List<String> getPythonPaths() {
+        return ImmutableList.copyOf(pythonPaths);
     }
 
     public boolean hasPythonPaths() {
@@ -64,13 +65,13 @@ public final class EnvironmentSearchPaths {
         pythonPaths.remove(path);
     }
 
-    public Collection<String> getExtendedPythonPaths(final SuiteExecutor interpreter) {
+    public List<String> getExtendedPythonPaths(final SuiteExecutor interpreter) {
         final Set<String> extendedPythonPaths = new LinkedHashSet<>(pythonPaths);
         if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
             // Both Jython and IronPython does not include paths from PYTHONPATH into sys.path list
             extendedPythonPaths.addAll(new SystemVariableAccessor().getPaths("PYTHONPATH"));
         }
-        return ImmutableSet.copyOf(extendedPythonPaths);
+        return ImmutableList.copyOf(extendedPythonPaths);
     }
 
     @Override
