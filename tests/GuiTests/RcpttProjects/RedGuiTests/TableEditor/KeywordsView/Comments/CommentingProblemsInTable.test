@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yr34UDPuEeebFPUdPe-j2A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/29/18 4:48 PM
+Save-Time: 7/13/18 12:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -243,15 +243,20 @@ with [get-editor "TestFile.robot"] {
         set-caret-pos 3 6
         type-text "  #comment"
         key-type "M1+s"
-        key-type F4
     }
-    with [get-canvas -after [get-label "Test Cases"] -index 1] {
-        key-type Right
-        key-type Left
-        get-menu -path "Table/Insert cell" | click
-    }
-    get-tab-folder | get-tab-item Source | click
 }
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/k1" | click
+
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Down
+	get-menu -path "Table/Insert cell" | click
+}
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases***\n"
     + "k1\n"
     + "    \\    \\  #comment" | verify-true
