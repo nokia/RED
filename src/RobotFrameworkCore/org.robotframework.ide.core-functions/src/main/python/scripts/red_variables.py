@@ -158,14 +158,3 @@ def _escape_unicode(data):
       return _escape_unicode('None')
     else:
       return _escape_unicode(str(data))
-
-
-if __name__ == '__main__':
-    import json
-    import sys
-    if sys.argv[1] == '-global':
-        print(json.dumps(get_global_variables()))
-    elif sys.argv[1] == '-variables':
-        path = sys.argv[2]
-        args = list(sys.argv[3:])
-        print(json.dumps(get_variables(path, args)))

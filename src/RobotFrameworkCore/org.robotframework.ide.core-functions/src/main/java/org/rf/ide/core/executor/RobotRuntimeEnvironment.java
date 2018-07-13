@@ -99,7 +99,7 @@ public class RobotRuntimeEnvironment {
                     "There is no " + interpreter.name() + " interpreter in system PATH environment variable");
         }
         final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                .getDirectRobotCommandExecutor(installationDirectory.get());
+                .getRobotCommandExecutor(installationDirectory.get());
         return exactVersion(interpreter, executor.getRobotVersion());
     }
 
@@ -546,9 +546,8 @@ public class RobotRuntimeEnvironment {
 
         private final SuiteExecutor interpreter;
 
-        // we dont' want anyone to create those objects; they should only be
-        // created
-        // when given uri is valid python location
+        // we don't want anyone to create those objects; they should only be created when given uri
+        // is valid python location
         PythonInstallationDirectory(final URI uri, final SuiteExecutor interpreter) {
             super(uri);
             this.interpreter = interpreter;
@@ -556,6 +555,10 @@ public class RobotRuntimeEnvironment {
 
         public SuiteExecutor getInterpreter() {
             return interpreter;
+        }
+
+        public String getInterpreterPath() {
+            return toPath().resolve(interpreter.executableName()).toAbsolutePath().toString();
         }
 
         @Override
