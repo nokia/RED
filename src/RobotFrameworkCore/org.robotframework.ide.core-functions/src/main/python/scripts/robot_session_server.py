@@ -204,7 +204,7 @@ def start_library_auto_discovering(port, data_source_path, project_location_path
     command.append(__encode_unicode_if_needed(project_location_path))
     command.append(str(recursiveInVirtualenv))
     if excluded_paths:
-        command.append('-excluded')
+        command.append('-exclude')
         command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
     command.append(';'.join(__encode_unicode_if_needed(python_paths + class_paths)))
 

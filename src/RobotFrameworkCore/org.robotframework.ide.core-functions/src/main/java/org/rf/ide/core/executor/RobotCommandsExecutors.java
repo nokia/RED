@@ -9,9 +9,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirect
 
 public interface RobotCommandsExecutors {
 
-    RobotCommandExecutor getRobotCommandExecutor(final PythonInstallationDirectory interpreterPath);
-
-    RobotCommandExecutor getDirectRobotCommandExecutor(PythonInstallationDirectory location);
+    RobotCommandExecutor getRobotCommandExecutor(PythonInstallationDirectory interpreterPath);
 
     void resetExecutorFor(PythonInstallationDirectory location);
 
