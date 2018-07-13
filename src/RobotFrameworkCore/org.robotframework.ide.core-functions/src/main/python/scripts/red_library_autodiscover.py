@@ -85,7 +85,7 @@ if __name__ == '__main__':
     additional_paths = []
 
     if len(sys.argv) > 5:
-        if sys.argv[5] == '-excluded':
+        if sys.argv[5] == '-exclude':
             excluded_paths = __decode_unicode_if_needed(sys.argv[6].split(';'))
             if len(sys.argv) > 7:
                 additional_paths = __decode_unicode_if_needed(sys.argv[7].split(';'))
