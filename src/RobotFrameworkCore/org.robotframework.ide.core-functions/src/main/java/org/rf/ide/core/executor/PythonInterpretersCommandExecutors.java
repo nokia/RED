@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.executor.RobotCommandRpcExecutor.RobotCommandExecutorException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 
@@ -32,7 +31,7 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
     private final Map<String, RobotCommandRpcExecutor> executors = new HashMap<>();
 
-    private final List<PythonProcessListener> processListeners = new ArrayList<>(0);
+    private final List<PythonProcessListener> processListeners = new ArrayList<>();
 
     private File xmlRpcServerScriptFile;
 
@@ -68,10 +67,7 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
     @Override
     public synchronized void resetExecutorFor(final PythonInstallationDirectory interpreterPath) {
-        final String pathAsName = interpreterPath.toPath()
-                .resolve(interpreterPath.getInterpreter().executableName())
-                .toAbsolutePath()
-                .toString();
+        final String pathAsName = interpreterPath.getInterpreterPath();
         final RobotCommandRpcExecutor executor = executors.remove(pathAsName);
         if (executor != null) {
             executor.kill();
@@ -81,40 +77,22 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
     @Override
     public synchronized RobotCommandExecutor getRobotCommandExecutor(
             final PythonInstallationDirectory interpreterPath) {
-        final SuiteExecutor interpreter = interpreterPath.getInterpreter();
-        final String pathAsName = interpreterPath.toPath()
-                .resolve(interpreter.executableName())
-                .toAbsolutePath()
-                .toString();
-
-        if (!RedSystemProperties.shouldUseDirectExecutor() && xmlRpcServerScriptFile != null) {
+        final String pathAsName = interpreterPath.getInterpreterPath();
+        if (xmlRpcServerScriptFile != null) {
             RobotCommandRpcExecutor executor = executors.get(pathAsName);
             if (executor != null && (executor.isAlive() || executor.isExternal())) {
                 return executor;
             } else if (executor != null) {
                 executors.remove(pathAsName);
             }
-            try {
-                executor = new RobotCommandRpcExecutor(pathAsName, interpreter, xmlRpcServerScriptFile);
-                executor.waitForEstablishedConnection();
-                if (executor.isAlive() || executor.isExternal()) {
-                    executors.put(pathAsName, executor);
-                    return executor;
-                }
-            } catch (final RobotCommandExecutorException e) {
-                // direct executor will be returned
+            executor = new RobotCommandRpcExecutor(pathAsName, interpreterPath.getInterpreter(),
+                    xmlRpcServerScriptFile);
+            executor.waitForEstablishedConnection();
+            if (executor.isAlive() || executor.isExternal()) {
+                executors.put(pathAsName, executor);
+                return executor;
             }
         }
-
-        return new RobotCommandDirectExecutor(pathAsName, interpreter);
-    }
-
-    @Override
-    public RobotCommandExecutor getDirectRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
-        final String pathAsName = interpreterPath.toPath()
-                .resolve(interpreterPath.getInterpreter().executableName())
-                .toAbsolutePath()
-                .toString();
-        return new RobotCommandDirectExecutor(pathAsName, interpreterPath.getInterpreter());
+        throw new RobotCommandExecutorException("Unable to start XML-RPC server");
     }
 }
