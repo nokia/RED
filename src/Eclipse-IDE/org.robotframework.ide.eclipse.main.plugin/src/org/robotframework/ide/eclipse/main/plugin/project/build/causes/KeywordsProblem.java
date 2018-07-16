@@ -349,6 +349,13 @@ public enum KeywordsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Variable '%s' is given as a keyword name";
         }
+    },
+    INVALID_NESTED_EXECUTABLES_SYNTAX {
+
+        @Override
+        public String getProblemDescription() {
+            return "Invalid nested executables syntax. %s";
+        }
     };
 
     @Override
