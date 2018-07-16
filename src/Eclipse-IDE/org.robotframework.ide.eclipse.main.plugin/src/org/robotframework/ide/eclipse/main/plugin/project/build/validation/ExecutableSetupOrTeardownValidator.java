@@ -10,12 +10,11 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
@@ -44,7 +43,8 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
         if (setupOrTeardown.getKeywordName() == null) {
             return;
         }
-        final IExecutableRowDescriptor<?> descriptor = setupOrTeardown.asExecutableRow().buildLineDescription();
+        final RobotExecutableRow<?> row = setupOrTeardown.asExecutableRow();
+        final IExecutableRowDescriptor<?> descriptor = row.buildLineDescription();
 
         final RobotToken keywordNameToken = setupOrTeardown.getKeywordName();
         final MappingResult variablesExtraction = new VariableExtractor().extract(keywordNameToken,
@@ -61,21 +61,8 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
             unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, descriptor.getUsedVariables());
 
         } else {
-            final KeywordCallValidator keywordCallValidator = new KeywordCallValidator(validationContext,
-                    keywordNameToken, setupOrTeardown.getArguments(), reporter);
-            keywordCallValidator.validate();
-
-            final QualifiedKeywordName keywordName = keywordCallValidator.getFoundKeywordName().orElse(null);
-            final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
-
-            final List<VariableDeclaration> variableUsedInCall = SpecialKeywords.getUsedVariables(keywordName,
-                    descriptor);
-            unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, variableUsedInCall);
-
-            SpecialKeywords.getCreatedVariables(keywordName, descriptor)
-                    .forEach(var -> additionalVariables.add(VariableNamesSupport.extractUnifiedVariableName(var)));
-            descriptor.getCreatedVariables()
-                    .forEach(var -> additionalVariables.add(VariableNamesSupport.extractUnifiedVariableName(var)));
+            new ExecutableNestedRowValidator(validationContext, additionalVariables, row, descriptor, reporter)
+                    .validate(monitor);
         }
     }
 }
