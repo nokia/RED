@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
+package org.rf.ide.core.validation;
 
 import java.util.regex.Pattern;
 
@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
  * @author Michal Anglart
  *
  */
-class RobotTimeFormat {
+public class RobotTimeFormat {
 
-    static boolean isValidRobotTimeArgument(final String argument) {
+    public static boolean isValidRobotTimeArgument(final String argument) {
         return isPlainNumber(argument) || isTimeString(argument) || isTimerString(argument);
     }
 

@@ -18,12 +18,13 @@ import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDe
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.validation.SpecialKeywords;
+import org.rf.ide.core.validation.SpecialKeywords.NestedExecutables;
+import org.rf.ide.core.validation.SpecialKeywords.NestedKeywordsSyntaxException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.SpecialKeywords.NestedExecutables;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.SpecialKeywords.NestedKeywordsSyntaxException;
 
 class ExecutableNestedRowValidator implements ExecutableValidator {
 
@@ -68,7 +69,7 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
                     new ExecutableNestedRowValidator(validationContext, additionalVariables, nestedRow,
                             nestedRow.buildLineDescription(), reporter).validate(monitor);
                 }
-                unknownVarsValidator.reportUnknownVars(additionalVariables, nested.getOmmittedTokens());
+                unknownVarsValidator.reportUnknownVars(additionalVariables, nested.getOmittedTokens());
 
             } else {
                 final List<VariableDeclaration> variableUsedInCall = SpecialKeywords.getUsedVariables(keywordName,
