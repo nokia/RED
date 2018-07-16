@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.newBuiltInKeyword;
 import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.newResourceKeyword;
 import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.prepareContext;
@@ -16,6 +17,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.groups.Tuple;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -34,6 +37,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockR
 import com.google.common.collect.Range;
 
 public class GeneralSettingsTableValidatorTest {
+
+    static final String[] CAUSE_AND_LOCATION = new String[] { "cause", "start", "end" };
+
+    static final String[] ALL = new String[] { "cause", "start", "end", "message" };
 
     @Test
     public void unknownSettingIsReported() throws CoreException {
@@ -362,12 +369,956 @@ public class GeneralSettingsTableValidatorTest {
                 new Problem(GeneralSettingsProblem.TEST_POSTCONDITION_SYNONYM,
                         new ProblemPosition(5, Range.closed(86, 104))));
     }
+    
+    @Test
+    public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inSuiteSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*keywords"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
 
-    private Collection<Problem> validate(final FileValidationContext context, final RobotSuiteFile fileModel)
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Run Keyword", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keywords", "No Args Kw", "No Args Kw", "No Args Kw"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keywords", "Log", "1", "AND", "Log", "1", "AND","Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "1", "ELSE", "Log", "2"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
+        });
+    }
+    
+    @Test
+    public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inSuiteTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*keywords"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Run Keyword", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keywords", "No Args Kw", "No Args Kw", "No Args Kw"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keywords", "Log", "1", "AND", "Log", "1", "AND","Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "1", "ELSE", "Log", "2"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
+        });
+    }
+    
+    @Test
+    public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inTestSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*keywords"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Run Keyword", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testSetup("Run Keywords", "No Args Kw", "No Args Kw", "No Args Kw"))).isEmpty();
+            softly.assertThat(problemsOf(context, testSetup("Run Keywords", "Log", "1", "AND", "Log", "1", "AND","Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "1", "ELSE", "Log", "2"))).isEmpty();
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
+        });
+    }
+    
+    @Test
+    public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inTestTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*keywords"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Run Keyword", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testTeardown("Run Keywords", "No Args Kw", "No Args Kw", "No Args Kw"))).isEmpty();
+            softly.assertThat(problemsOf(context, testTeardown("Run Keywords", "Log", "1", "AND", "Log", "1", "AND","Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log", "1", "ELSE", "Log", "2"))).isEmpty();
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
+        });
+    }
+
+    @Test
+    public void keywordProblemsInNestedKeywordsAreReporter_whenArgumentsAreMissing_inSuiteSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*keywords"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 43, 46));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Run Keyword")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 43, 54));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Run Keyword", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 56, 59));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keywords", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 44, 47));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keywords", "Log", "Log", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 44, 47),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 49, 52),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 54, 57));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keywords", "Log", "1", "AND", "Log", "AND", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 57, 60),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 67, 70));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 52, 55));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 52, 55),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 63, 66));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "1", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 66, 69));
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keyword If", "cond", "Log", "ELSE IF", "cond", "Log", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 52, 55),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 72, 75),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 83, 86));
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 89, 92));
+        });
+    }
+
+    @Test
+    public void keywordProblemsInNestedKeywordsAreReporter_whenArgumentsAreMissing_inSuiteTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*keywords"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 46, 49));
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Run Keyword")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 46, 57));
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Run Keyword", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 59, 62));
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keywords", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 47, 50));
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keywords", "Log", "Log", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 47, 50),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 52, 55),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 57, 60));
+            softly.assertThat(
+                    problemsOf(context, suiteTeardown("Run Keywords", "Log", "1", "AND", "Log", "AND", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 60, 63),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 70, 73));
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 55, 58));
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 55, 58),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 66, 69));
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "1", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 69, 72));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keyword If", "cond", "Log", "ELSE IF", "cond", "Log", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 55, 58),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 75, 78),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 86, 89));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE",
+                            "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 92, 95));
+        });
+    }
+
+    @Test
+    public void keywordProblemsInNestedKeywordsAreReporter_whenArgumentsAreMissing_inTestSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*keywords"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 42, 45));
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Run Keyword")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 42, 53));
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Run Keyword", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 55, 58));
+            softly.assertThat(problemsOf(context, testSetup("Run Keywords", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 43, 46));
+            softly.assertThat(problemsOf(context, testSetup("Run Keywords", "Log", "Log", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 43, 46),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 48, 51),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 53, 56));
+            softly.assertThat(problemsOf(context, testSetup("Run Keywords", "Log", "1", "AND", "Log", "AND", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 56, 59),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 66, 69));
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 51, 54));
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 51, 54),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 62, 65));
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "1", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 65, 68));
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keyword If", "cond", "Log", "ELSE IF", "cond", "Log", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 51, 54),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 71, 74),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 82, 85));
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 88, 91));
+        });
+    }
+
+    @Test
+    public void keywordProblemsInNestedKeywordsAreReporter_whenArgumentsAreMissing_inTestTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*keywords"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 45, 48));
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Run Keyword")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 45, 56));
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Run Keyword", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 58, 61));
+            softly.assertThat(problemsOf(context, testTeardown("Run Keywords", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 46, 49));
+            softly.assertThat(problemsOf(context, testTeardown("Run Keywords", "Log", "Log", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 46, 49),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 51, 54),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 56, 59));
+            softly.assertThat(
+                    problemsOf(context, testTeardown("Run Keywords", "Log", "1", "AND", "Log", "AND", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 59, 62),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 69, 72));
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 54, 57));
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 54, 57),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 65, 68));
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log", "1", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 68, 71));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keyword If", "cond", "Log", "ELSE IF", "cond", "Log", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 54, 57),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 74, 77),
+                            problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 85, 88));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, 91, 94));
+        });
+    }
+
+    @Test
+    public void nonExistingVariablesAreReported_inArgumentsNotBelongingToNestedKeyword_inSuiteSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteSetup("Repeat Keyword", "${x}", "No Args Kw")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 46, 50));
+            softly.assertThat(
+                    problemsOf(context, suiteSetup("Repeat Keyword", "${x}", "Repeat Keyword", "${y}", "No Args Kw")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 46, 50),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 68, 72));
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keyword If", "${x}", "No Args Kw", "ELSE IF", "${y}", "No Args Kw", "ELSE", "Log",
+                            "${z}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 46, 50),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 73, 77),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 102, 106));
+        });
+    }
+
+    @Test
+    public void nonExistingVariablesAreReported_inArgumentsNotBelongingToNestedKeyword_inSuiteTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteTeardown("Repeat Keyword", "${x}", "No Args Kw")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 49, 53));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Repeat Keyword", "${x}", "Repeat Keyword", "${y}", "No Args Kw")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 49, 53),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 71, 75));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keyword If", "${x}", "No Args Kw", "ELSE IF", "${y}", "No Args Kw", "ELSE",
+                            "Log", "${z}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 49, 53),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 76, 80),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 105, 109));
+        });
+    }
+
+    @Test
+    public void nonExistingVariablesAreReported_inArgumentsNotBelongingToNestedKeyword_inTestSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testSetup("Repeat Keyword", "${x}", "No Args Kw")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 45, 49));
+            softly.assertThat(
+                    problemsOf(context, testSetup("Repeat Keyword", "${x}", "Repeat Keyword", "${y}", "No Args Kw")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 45, 49),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 67, 71));
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keyword If", "${x}", "No Args Kw", "ELSE IF", "${y}", "No Args Kw", "ELSE", "Log",
+                            "${z}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 45, 49),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 72, 76),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 101, 105));
+        });
+    }
+
+    @Test
+    public void nonExistingVariablesAreReported_inArgumentsNotBelongingToNestedKeyword_inTestTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testTeardown("Repeat Keyword", "${x}", "No Args Kw")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 48, 52));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Repeat Keyword", "${x}", "Repeat Keyword", "${y}", "No Args Kw")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 48, 52),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 70, 74));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keyword If", "${x}", "No Args Kw", "ELSE IF", "${y}", "No Args Kw", "ELSE",
+                            "Log", "${z}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 48, 52),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 75, 79),
+                            problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 104, 108));
+        });
+    }
+
+    @Test
+    public void nonExistingVariablesAreNotReported_inArgumentsBelongingToNestedKeywordWhichSkipsVarValidation_inSuiteSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Comment", "*msgs"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Comment", "${x}"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteSetup("Repeat Keyword", "${x}", "Comment", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 46, 50));
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keywords", "Comment", "${x}", "AND", "Comment", "${x}", "AND", "Log", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 89, 93));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Comment", "${x}"))).isEmpty();
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keyword If", "cond", "Comment", "${x}", "ELSE IF", "cond", "Log", "${x}", "ELSE",
+                            "Comment", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 87, 91));
+        });
+    }
+
+    @Test
+    public void nonExistingVariablesAreNotReported_inArgumentsBelongingToNestedKeywordWhichSkipsVarValidation_inSuiteTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Comment", "*msgs"), newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"), newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Comment", "${x}"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteTeardown("Repeat Keyword", "${x}", "Comment", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 49, 53));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keywords", "Comment", "${x}", "AND", "Comment", "${x}", "AND", "Log", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 92, 96));
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Comment", "${x}")))
+                    .isEmpty();
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keyword If", "cond", "Comment", "${x}", "ELSE IF", "cond", "Log", "${x}",
+                            "ELSE", "Comment", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 90, 94));
+        });
+    }
+
+    @Test
+    public void nonExistingVariablesAreNotReported_inArgumentsBelongingToNestedKeywordWhichSkipsVarValidation_inTestSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Comment", "*msgs"), newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"), newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Comment", "${x}"))).isEmpty();
+            softly.assertThat(problemsOf(context, testSetup("Repeat Keyword", "${x}", "Comment", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 45, 49));
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keywords", "Comment", "${x}", "AND", "Comment", "${x}", "AND", "Log", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 88, 92));
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Comment", "${x}"))).isEmpty();
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keyword If", "cond", "Comment", "${x}", "ELSE IF", "cond", "Log", "${x}", "ELSE",
+                            "Comment", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 86, 90));
+        });
+    }
+
+    @Test
+    public void nonExistingVariablesAreNotReported_inArgumentsBelongingToNestedKeywordWhichSkipsVarValidation_inTestTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Comment", "*msgs"), newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"), newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Comment", "${x}"))).isEmpty();
+            softly.assertThat(problemsOf(context, testTeardown("Repeat Keyword", "${x}", "Comment", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 48, 52));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keywords", "Comment", "${x}", "AND", "Comment", "${x}", "AND", "Log", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 91, 95));
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Comment", "${x}")))
+                    .isEmpty();
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keyword If", "cond", "Comment", "${x}", "ELSE IF", "cond", "Log", "${x}", "ELSE",
+                            "Comment", "${x}")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(VariablesProblem.UNDECLARED_VARIABLE_USE, 89, 93));
+        });
+    }
+
+    @Test
+    public void variablesSyntaxProblemsAreReported_whenSyntaxCheckingKeywordAreNested_inSuiteSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Variable Should Exist", "var"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 66, 67));
+            softly.assertThat(problemsOf(context, suiteSetup("Repeat Keyword", "count", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 76, 77));
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keywords", "Variable Should Exist", "x", "AND", "Variable Should Exist", "y")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 67, 68),
+                            problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 98, 99));
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 75, 76));
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keyword If", "cond", "Variable Should Exist", "x", "ELSE", "Variable Should Exist",
+                            "y")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 75, 76),
+                            problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 107, 108));
+        });
+    }
+
+    @Test
+    public void variablesSyntaxProblemsAreReported_whenSyntaxCheckingKeywordAreNested_inSuiteTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Variable Should Exist", "var"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 69, 70));
+            softly.assertThat(
+                    problemsOf(context, suiteTeardown("Repeat Keyword", "count", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 79, 80));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keywords", "Variable Should Exist", "x", "AND", "Variable Should Exist", "y")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 70, 71),
+                            problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 101, 102));
+            softly.assertThat(
+                    problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 78, 79));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keyword If", "cond", "Variable Should Exist", "x", "ELSE",
+                            "Variable Should Exist", "y")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 78, 79),
+                            problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 110, 111));
+        });
+    }
+
+    @Test
+    public void variablesSyntaxProblemsAreReported_whenSyntaxCheckingKeywordAreNested_inTestSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Variable Should Exist", "var"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 65, 66));
+            softly.assertThat(problemsOf(context, testSetup("Repeat Keyword", "count", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 75, 76));
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keywords", "Variable Should Exist", "x", "AND", "Variable Should Exist", "y")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 66, 67),
+                            problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 97, 98));
+            softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 74, 75));
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keyword If", "cond", "Variable Should Exist", "x", "ELSE", "Variable Should Exist",
+                            "y")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 74, 75),
+                            problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 106, 107));
+        });
+    }
+
+    @Test
+    public void variablesSyntaxProblemsAreReported_whenSyntaxCheckingKeywordAreNested_inTestTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Variable Should Exist", "var"),
+                newBuiltInKeyword("Repeat Keyword", "repeat", "name", "*args"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 68, 69));
+            softly.assertThat(
+                    problemsOf(context, testTeardown("Repeat Keyword", "count", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 78, 79));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keywords", "Variable Should Exist", "x", "AND", "Variable Should Exist", "y")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 69, 70),
+                            problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 100, 101));
+            softly.assertThat(
+                    problemsOf(context, testTeardown("Run Keyword If", "cond", "Variable Should Exist", "x")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 77, 78));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keyword If", "cond", "Variable Should Exist", "x", "ELSE",
+                            "Variable Should Exist", "y")))
+                    .extracting(CAUSE_AND_LOCATION)
+                    .containsOnly(problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 77, 78),
+                            problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, 109, 110));
+        });
+    }
+
+    @Test
+    public void nothingIsReported_whenVariablesAreCreatedUsingSpecialKeywordsNestedInOtherKeywords_inSuiteSetup_1() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Suite Setup  Run Keyword  Set Global Variable  ${a}  1")
+                .appendLine("Suite Teardown  Log  ${a}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Set Global Variable", "name", "*values"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenVariablesAreCreatedUsingSpecialKeywordsNestedInOtherKeywords_inSuiteSetup_2() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Suite Setup  Run Keywords  Set Global Variable  ${a}  2  AND  Set Global Variable  ${b}  3")
+                .appendLine("Suite Teardown  Log  ${a}, ${b}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Set Global Variable", "name", "*values"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenVariablesAreCreatedUsingSpecialKeywordsNestedInOtherKeywords_inSuiteTeardown_3() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Suite Setup  Run Keyword If  cond  Set Global Variable  ${a}  4")
+                .appendLine("Suite Teardown  Log  ${a}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Set Global Variable", "name", "*values"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenVariablesAreCreatedUsingSpecialKeywordsNestedInOtherKeywords_inSuiteTeardown_4() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Settinsg ***")
+                .appendLine("Suite Setup  Run Keyword If  cond  Set Global Variable  ${a}  5  ELSE  Set Global Variable  ${b}  6")
+                .appendLine("Suite Teardown  Log  ${a}, ${b}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Set Global Variable", "name", "*values"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenVariablesAreCreatedUsingSpecialKeywordsNestedInOtherKeywords_inTestSetup() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Setup  Run Keyword  Set Global Variable  ${a}  1")
+                .appendLine("Suite Teardown  Log  ${a}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Set Global Variable", "name", "*values"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenVariablesAreCreatedUsingSpecialKeywordsNestedInOtherKeywords_inTestTeardown() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Teardown  Run Keyword  Set Global Variable  ${a}  1")
+                .appendLine("Suite Teardown  Log  ${a}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
+                newBuiltInKeyword("Set Global Variable", "name", "*values"),
+                newBuiltInKeyword("Run Keyword", "name", "*args"),
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newBuiltInKeyword("Run Keywords", "*kws"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void syntaxProblemsInNestedConstructionsAreReported_inSuiteSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keyword If", "cond", "No Args Kw", "ELSE", "No Args Kw", "ELSE IF", "cond",
+                            "No Args Kw")))
+                .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 64, 68,
+                        "Invalid nested executables syntax. ELSE branch should not be followed by ELSE IF branches"));
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keyword If", "cond", "No Args Kw", "ELSE", "No Args Kw", "ELSE", "No Args Kw")))
+                .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 64, 68,
+                            "Invalid nested executables syntax. Multiple ELSE branches are defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 82, 86,
+                            "Invalid nested executables syntax. Multiple ELSE branches are defined"));
+            softly.assertThat(problemsOf(context,
+                    suiteSetup("Run Keyword If", "cond", "No Args Kw", "ELSE IF", "ELSE IF", "cond", "ELSE")))
+                .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 64, 71,
+                            "Invalid nested executables syntax. ELSE IF branch requires condition and keyword to be defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 73, 80,
+                            "Invalid nested executables syntax. ELSE IF branch requires condition and keyword to be defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 88, 92,
+                            "Invalid nested executables syntax. ELSE branch requires keyword to be defined"));
+
+        });
+    }
+
+    @Test
+    public void syntaxProblemsInNestedConstructionsAreReported_inSuiteTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keyword If", "cond", "No Args Kw", "ELSE", "No Args Kw", "ELSE IF", "cond",
+                            "No Args Kw")))
+                    .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 67, 71,
+                            "Invalid nested executables syntax. ELSE branch should not be followed by ELSE IF branches"));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keyword If", "cond", "No Args Kw", "ELSE", "No Args Kw", "ELSE",
+                            "No Args Kw")))
+                    .extracting(ALL)
+                    .containsOnly(
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 67, 71,
+                                    "Invalid nested executables syntax. Multiple ELSE branches are defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 85, 89,
+                                    "Invalid nested executables syntax. Multiple ELSE branches are defined"));
+            softly.assertThat(problemsOf(context,
+                    suiteTeardown("Run Keyword If", "cond", "No Args Kw", "ELSE IF", "ELSE IF", "cond", "ELSE")))
+                    .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 67, 74,
+                            "Invalid nested executables syntax. ELSE IF branch requires condition and keyword to be defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 76, 83,
+                                    "Invalid nested executables syntax. ELSE IF branch requires condition and keyword to be defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 91, 95,
+                                    "Invalid nested executables syntax. ELSE branch requires keyword to be defined"));
+
+        });
+    }
+
+    @Test
+    public void syntaxProblemsInNestedConstructionsAreReported_inTestSetup() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keyword If", "cond", "No Args Kw", "ELSE", "No Args Kw", "ELSE IF", "cond",
+                            "No Args Kw")))
+                    .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 63, 67,
+                            "Invalid nested executables syntax. ELSE branch should not be followed by ELSE IF branches"));
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keyword If", "cond", "No Args Kw", "ELSE", "No Args Kw", "ELSE", "No Args Kw")))
+                    .extracting(ALL)
+                    .containsOnly(
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 63, 67,
+                                    "Invalid nested executables syntax. Multiple ELSE branches are defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 81, 85,
+                                    "Invalid nested executables syntax. Multiple ELSE branches are defined"));
+            softly.assertThat(problemsOf(context,
+                    testSetup("Run Keyword If", "cond", "No Args Kw", "ELSE IF", "ELSE IF", "cond", "ELSE")))
+                    .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 63, 70,
+                            "Invalid nested executables syntax. ELSE IF branch requires condition and keyword to be defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 72, 79,
+                                    "Invalid nested executables syntax. ELSE IF branch requires condition and keyword to be defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 87, 91,
+                                    "Invalid nested executables syntax. ELSE branch requires keyword to be defined"));
+
+        });
+    }
+
+    @Test
+    public void syntaxProblemsInNestedConstructionsAreReported_inTestTeardown() {
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Run Keyword If", "condition", "name", "*args"),
+                newResourceKeyword("No Args Kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keyword If", "cond", "No Args Kw", "ELSE", "No Args Kw", "ELSE IF", "cond",
+                            "No Args Kw")))
+                    .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 66, 70,
+                            "Invalid nested executables syntax. ELSE branch should not be followed by ELSE IF branches"));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keyword If", "cond", "No Args Kw", "ELSE", "No Args Kw", "ELSE", "No Args Kw")))
+                    .extracting(ALL)
+                    .containsOnly(
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 66, 70,
+                                    "Invalid nested executables syntax. Multiple ELSE branches are defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 84, 88,
+                                    "Invalid nested executables syntax. Multiple ELSE branches are defined"));
+            softly.assertThat(problemsOf(context,
+                    testTeardown("Run Keyword If", "cond", "No Args Kw", "ELSE IF", "ELSE IF", "cond", "ELSE")))
+                    .extracting(ALL)
+                    .containsOnly(problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 66, 73,
+                            "Invalid nested executables syntax. ELSE IF branch requires condition and keyword to be defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 75, 82,
+                                    "Invalid nested executables syntax. ELSE IF branch requires condition and keyword to be defined"),
+                            problem(KeywordsProblem.INVALID_NESTED_EXECUTABLES_SYNTAX, 90, 94,
+                                    "Invalid nested executables syntax. ELSE branch requires keyword to be defined"));
+
+        });
+    }
+
+    private static Collection<Problem> problemsOf(final FileValidationContext context, final RobotSuiteFile fileModel) {
+        try {
+            return validate(context, fileModel);
+        } catch (final CoreException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static Collection<Problem> validate(final FileValidationContext context, final RobotSuiteFile fileModel)
             throws CoreException {
         final MockReporter reporter = new MockReporter();
         new GeneralSettingsTableValidator(context, fileModel.findSection(RobotSettingsSection.class), reporter)
                 .validate(new NullProgressMonitor());
         return reporter.getReportedProblems();
+    }
+
+    static Tuple problem(final Object... properties) {
+        // adding synonym for better readablity
+        return tuple(properties);
+    }
+
+    private static RobotSuiteFile suiteSetup(final String... callCells) {
+        return new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Suite Setup  " + String.join("  ", callCells))
+                .build();
+    }
+
+    private static RobotSuiteFile suiteTeardown(final String... callCells) {
+        return new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Suite Teardown  " + String.join("  ", callCells))
+                .build();
+    }
+
+    private static RobotSuiteFile testSetup(final String... callCells) {
+        return new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Setup  " + String.join("  ", callCells))
+                .build();
+    }
+
+    private static RobotSuiteFile testTeardown(final String... callCells) {
+        return new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Teardown  " + String.join("  ", callCells))
+                .build();
     }
 }
