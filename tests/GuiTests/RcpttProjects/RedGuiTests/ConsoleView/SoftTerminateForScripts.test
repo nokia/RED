@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Low2MFeTEeilE_DD4P7SbQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/25/18 11:28 AM
+Save-Time: 7/13/18 2:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -46,10 +46,11 @@ with [get-window "Run Configurations"] {
 exec-with-options -disableJobWaiting -command{
 	get-view "Project Explorer" | get-tree | select "Soft/test.robot" | get-menu -path "Run As/1 Robot Test" | click
 	try -times 4  -delay 500 -command{
-		get-view Console | get-button "Terminate gracefully" | get-property enablement | equals true | verify-true
+		get-view Console | get-text-viewer | get-property text | contains "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
 	}
 	wait 500
 	get-view Console | get-button "Terminate gracefully" | click
+	log "I clicked"
 	
 	if [get-by-os -win "Windows" -linux "Linux" | eq "Windows"]{
 		try -times 4 -delay 1000 -command{

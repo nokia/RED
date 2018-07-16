@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Sxwy4OOvEeaJ-cAS1pFGxQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/25/18 12:19 PM
+Save-Time: 7/13/18 12:23 PM
 Testcase-Type: ecl
 Verifications: _XqT4gPqgEeaJ8_kc5pFRQQ
 
@@ -119,6 +119,7 @@ get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1/kw from r
 get-editor "res.robot" | get-text-viewer | get-property "getSelectionText()" | equals "kw from res" | verify-true
 
 get-view Outline | get-button "Expand All" | click
+wait 200
 get-view Outline | get-tree | select "res.robot/Keywords/kw from res/log" | get-menu "Open Declaration" | click
 get-editor "BuiltIn.py" | get-text-viewer | get-property "getSelectionText()" | equals log | verify-true
 
