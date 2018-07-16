@@ -3,11 +3,12 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
+package org.rf.ide.core.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.rf.ide.core.validation.RobotTimeFormat;
 
 public class RobotTimeFormatTest {
 
