@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _4lAb8OldEea0ALtmCcrmfA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/7/17 6:00 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/16/18 2:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -129,10 +129,10 @@ get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
     get-tree | select "Robot/TestFile.robot"
     get-button "Delete selected launch configuration(s)" | click
-    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-window "Confirm Launch Configuration Deletion" | get-button  "(Yes|Delete)" | click
     get-tree | select "Robot/TestFile.robot (Selected Test Cases)"
     get-button "Delete selected launch configuration(s)" | click
-    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-window "Confirm Launch Configuration Deletion" | get-button  "(Yes|Delete)" | click
     get-button Close | click
 }
 //------------------------------------------------------ run and debug ----------------------------------------

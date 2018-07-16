@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _j2wUgCr0EeW667Afdo4DcA
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 8/25/17 7:54 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/16/18 2:42 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -194,7 +194,7 @@ with [get-window "Run Configurations"] {
         select "Robot/new_test.robot" "Robot/REDProject"
         key-type Del
     }
-    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-window "Confirm Launch Configuration Deletion" | get-button "(Yes|Delete)" | click
     get-button Close | click
 }
 
