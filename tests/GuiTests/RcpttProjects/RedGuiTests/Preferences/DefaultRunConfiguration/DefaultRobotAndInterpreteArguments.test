@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/4/17 12:12 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/17/18 4:37 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -61,7 +61,7 @@ with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
 //remove run config
 with [get-window "Run Configurations"] {
     get-button "Delete selected launch configuration(s)" | click
-    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-window "Confirm Launch Configuration Deletion" | get-button "(Yes|Delete)" | click
     get-button Close | click
 }
 
@@ -257,7 +257,7 @@ with [get-window "Run Configurations"] {
         select "Robot/new.tsv" "Robot/test_for_run_config.robot" "Robot/test_for_run_config.robot (Selected Test Cases)"
     }
     get-button "Delete selected launch configuration(s)" | click
-    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-window "Confirm Launch Configuration Deletion" | get-button "(Yes|Delete)" | click
     get-button Close | click
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _LjxJUB3SEeehL98jfxP8Sw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 4:38 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/17/18 4:37 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -125,7 +125,7 @@ exec-with-options -disableJobWaiting -command {
 
 //remove all BP
 get-view Breakpoints | get-button "Remove All Breakpoints" | click
-get-window "Remove All Breakpoints" | get-button Yes | click
+get-window "Remove All Breakpoints" | get-button "(Yes|Delete)" | click
 
 //check if all vlaues are removed from boxes
 with [get-view Breakpoints] {
