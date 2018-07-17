@@ -15,12 +15,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
@@ -139,6 +141,13 @@ class KeywordValidator implements ModelUnitValidator {
         additionalVariables.addAll(extractArgumentVariables());
 
         final List<ExecutableValidator> execValidators = new ArrayList<>();
+        // not validated; will just add variables if any
+        getGeneralSettingsSuiteSetups().stream()
+                .findFirst()
+                .map(suiteSetup -> ExecutableValidator.of(validationContext, additionalVariables, suiteSetup,
+                        new SilentReporter()))
+                .ifPresent(execValidators::add);
+
         keyword.getExecutionContext().stream()
                 .filter(RobotExecutableRow::isExecutable)
                 .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))
@@ -180,5 +189,10 @@ class KeywordValidator implements ModelUnitValidator {
                 .flatMap(Set::stream)
                 .forEach(arguments::add);
         return arguments;
+    }
+
+    private List<SuiteSetup> getGeneralSettingsSuiteSetups() {
+        final RobotFile fileModel = keyword.getParent().getParent();
+        return fileModel.getSettingTable().getSuiteSetups();
     }
 }
