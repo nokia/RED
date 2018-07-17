@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _OdaRMJbhEeaa4JtzzKMFzw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 5:24 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/17/18 4:56 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -76,7 +76,7 @@ with [get-view Breakpoints] {
     click
     get-button "Remove All Breakpoints" | click
 }
-get-window "Remove All Breakpoints" | get-button Yes | click
+get-window "Remove All Breakpoints" | get-button "(Yes|Remove)" | click
 
 //add new 2 BP
 with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {

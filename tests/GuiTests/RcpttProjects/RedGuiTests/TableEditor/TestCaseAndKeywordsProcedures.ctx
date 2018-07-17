@@ -5,8 +5,8 @@ Element-Name: TestCaseAndKeywordsProcedures
 Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/2/18 4:15 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/16/18 3:47 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -23,9 +23,11 @@ proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {
 proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
 {	
 	if [$extended_col | eq false]{
-		get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 | get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | equals 6 | verify-true
+		get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 
+			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | equals 6 | verify-true
 	}-else{
-		get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 | get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | equals 7 | verify-true
+		get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 
+			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | equals 7 | verify-true
 	}
 		
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
@@ -52,9 +54,11 @@ proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 
 proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 "" ] [val c4 "" ] [val c5 "" ] [val c6 "" ] [val extended_col false]
 {
 	if [$extended_col | eq false]{
-		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 | get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | eq 6 | verify-true
+		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 
+			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | eq 6 | verify-true
 	}-else{
-		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 | get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | eq 7 | verify-true
+		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 
+			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | eq 7 | verify-true
 	}
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $kw -row $row -col 1 
@@ -99,7 +103,8 @@ proc "set-list-with-markers-and-comapare"  [val file] [val table] [val ref_list]
 proc "compare-row-with-list" [val file] [val table] [val row] [val ref_table]
 {	
 	get-editor $file | get-canvas -after [get-label $table] -index 1 | get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | let [val col_amount -input]{
-		$ref_table | invoke getElements  | invoke size | eq $col_amount | assert-true -message [format "Column size in row %s is: %s and is different then list size" $row  $col_amount]
+		$ref_table | invoke getElements  | invoke size | eq $col_amount 
+			| assert-true -message [format "Column size in row %s is: %s and is different then list size" $row  $col_amount]
 	
 		repeat [val index] -times $col_amount -command{
 			$ref_table | get $index| let [val ref_value -input]{
@@ -116,7 +121,8 @@ proc "generate-list" [val file] [val table] [val col_amount] [val row_amount]
 	repeat [val index1] -times $row_amount -command{	
 	concat "compare-row-with-list -file \"" $file "\" -table \""  $table "\" -row " $index1  " -ref_table [list "[
 		repeat [val index2] -times $col_amount -command{		
-				concat "\""  [get-editor $file | get-canvas -after [get-label $table] -index 1 | get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
+				concat "\""  [get-editor $file | get-canvas -after [get-label $table] -index 1 
+					| get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
 		} ] "]" "\n"
 	} ]
 }
@@ -161,9 +167,11 @@ proc "is-row-fully-selected" [val row] [val table] [val file_name "TestFile.robo
 //tables: "User Keywords" and "Test Cases"
 proc "is-cell-selected" [val row] [val col] [val table] [val file_name "TestFile.robot"]{
 	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
-			| invoke getUnderlyingLayerByPosition 0 0 | invoke isCellPositionSelected $col $row | eq true |  assert-true -message [format "Cell in row %s and col %s is not selected" $row $col]
+			| invoke getUnderlyingLayerByPosition 0 0 | invoke isCellPositionSelected $col $row | eq true 
+			| assert-true -message [format "Cell in row %s and col %s is not selected" $row $col]
 			
 	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
-			| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected $row | eq false |   assert-true -message  [format "Row %s is fully selected, but should not!" $row ]	
+			|invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected $row | eq false 
+			| assert-true -message  [format "Row %s is fully selected, but should not!" $row ]	
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

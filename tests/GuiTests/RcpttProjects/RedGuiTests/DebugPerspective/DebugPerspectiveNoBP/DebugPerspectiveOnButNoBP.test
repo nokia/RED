@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _0JFPYBQ-EeWWV9IuysVI_A
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/7/17 2:45 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/17/18 5:46 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -46,12 +46,10 @@ with [get-editor "SimpleLoggingTestCase.robot" | get-tab-folder] {
 }
 
 //check tab list with BP and Variables
-with [get-tab-folder -index 1] {
-    get-property "pages[0]" | equals Variables | verify-true
-    get-property "pages[1]" | equals Breakpoints | verify-true
-    get-property activePage | equals Variables | verify-true
-    get-property tabCount | equals 2 | verify-true
-}
+
+check-tab-folder -tab_index 1 -active_page "Variables" -pages [list "Variables"  "Breakpoints"] 
+//check-tab-folder -tab_index 3 -active_page "Variables" -pages [list "Variables"  "Breakpoints" "Expressions"]
+
 get-view Breakpoints | get-tree | get-property itemCount | equals 0 | verify-true
 get-view Variables | get-tree | get-property itemCount | equals 0 | verify-true
 
