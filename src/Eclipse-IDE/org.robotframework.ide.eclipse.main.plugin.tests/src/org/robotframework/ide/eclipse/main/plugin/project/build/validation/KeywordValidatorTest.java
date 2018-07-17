@@ -617,6 +617,24 @@ public class KeywordValidatorTest {
         final Collection<Problem> problems = validate(context, fileModel);
         assertThat(problems).isEmpty();
     }
+
+    @Test
+    public void nothingIsReported_whenVariablesInGeneralSettingsSetups() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("    use  ${a}")
+                .appendLine("*** Settings ***")
+                .appendLine("Suite Setup    Set Global Variable    ${a}    1")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Set Global Variable", "var", "*values"),
+                newResourceKeyword("use", new Path("/res.robot"), "*values"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).isEmpty();
+    }
     
     @Test
     public void noProblemsInNestedKeywordsAreReported_whenUsedProperly() {

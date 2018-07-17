@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
@@ -75,14 +78,32 @@ class TestCaseValidator implements ModelUnitValidator {
     }
 
     private void validateKeywordsAndVariablesUsages() {
-
         final Set<String> additionalVariables = new HashSet<>();
         final List<ExecutableValidator> execValidators = new ArrayList<>();
 
-        testCase.getSetups().stream()
+        final SilentReporter silentReporter = new SilentReporter();
+        
+        // not validated; will just add variables if any
+        getGeneralSettingsSuiteSetups().stream()
                 .findFirst()
-                .map(setup -> ExecutableValidator.of(validationContext, additionalVariables, setup, reporter))
+                .map(suiteSetup -> ExecutableValidator.of(validationContext, additionalVariables, suiteSetup,
+                        silentReporter))
                 .ifPresent(execValidators::add);
+
+        if (!testCase.getSetups().isEmpty()) {
+            testCase.getSetups().stream()
+                    .findFirst()
+                    .map(setup -> ExecutableValidator.of(validationContext, additionalVariables, setup, reporter))
+                    .ifPresent(execValidators::add);
+        } else {
+            // not validated; will just add variables if any
+            getGeneralSettingsTestSetup().stream()
+                    .findFirst()
+                    .map(setup -> ExecutableValidator.of(validationContext, additionalVariables, setup, silentReporter))
+                    .ifPresent(execValidators::add);
+        }
+
+
         final String templateKeyword = testCase.getTemplateKeywordName();
         if (templateKeyword == null) {
             testCase.getExecutionContext().stream()
@@ -95,5 +116,15 @@ class TestCaseValidator implements ModelUnitValidator {
                 .map(teardown -> ExecutableValidator.of(validationContext, additionalVariables, teardown, reporter))
                 .ifPresent(execValidators::add);
         execValidators.forEach(ExecutableValidator::validate);
+    }
+
+    private List<TestSetup> getGeneralSettingsTestSetup() {
+        final RobotFile fileModel = testCase.getParent().getParent();
+        return fileModel.getSettingTable().getTestSetups();
+    }
+
+    private List<SuiteSetup> getGeneralSettingsSuiteSetups() {
+        final RobotFile fileModel = testCase.getParent().getParent();
+        return fileModel.getSettingTable().getSuiteSetups();
     }
 }
