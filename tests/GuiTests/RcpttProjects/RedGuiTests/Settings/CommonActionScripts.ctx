@@ -5,8 +5,8 @@ Element-Name: CommonActionScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/27/18 11:21 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/17/18 5:49 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -203,4 +203,18 @@ proc "release-files-handle"{
     }
 
 }
+
+proc "check-tab-folder"  [val tab_index 1] [val active_page] [val pages] {
+	$pages | invoke getElements  | invoke size | let [val col_amount -input]{
+		get-tab-folder -index [$tab_index | int] | get-property tabCount | equals $col_amount | verify-true
+		get-tab-folder -index [$tab_index | int] | get-property activePage | equals $active_page | verify-true
+	
+		repeat [val index] -times $col_amount -command{
+			get-tab-folder -index [$tab_index | int] | get-property [format "pages[%s]" $index] | equals[$pages | get $index]  | verify-true
+	
+		}
+	}  
+}
+
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

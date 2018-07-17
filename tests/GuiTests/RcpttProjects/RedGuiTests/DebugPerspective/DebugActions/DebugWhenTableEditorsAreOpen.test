@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _KIn6oA8kEeePcNCRX_abWA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 6:13 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 7/17/18 6:15 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -62,11 +62,8 @@ exec-with-options -disableJobWaiting -command {
 	get-editor "my_keywords.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
 	get-button "Terminate (M1+F2)" | click
 }
-with [get-tab-folder -index 2] {
-	get-property "pages[0]" | equals "BigScript.robot" | verify-true
-	get-property "pages[1]" | equals "my_keywords.robot" | verify-true
-  	get-property tabCount | equals 2 | verify-true
-} 
+
+check-tab-folder -active_page "my_keywords.robot" -pages [list "BigScript.robot" "my_keywords.robot"]
  
 //----------------------------------- set table view in debug perspective ---------------------------------------
  
@@ -126,11 +123,8 @@ exec-with-options -disableJobWaiting -command {
 	
 }	
 //because of preference always one editor will be open
-with [get-tab-folder -index 2] {
-	get-property "pages[0]" | equals "my_keywords.robot" | verify-true
-  	get-property tabCount | equals 1 | verify-true
-} 
- 
+
+check-tab-folder -active_page "my_keywords.robot" -pages [list "my_keywords.robot"]
 
 //----------------------------------------------- chanage prefernce to open editor tables -----------------------------
 get-preferences-menu | click
@@ -162,10 +156,6 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Terminate (M1+F2)" | click
 }	
 
-with [get-tab-folder -index 2] {
-	get-property "pages[0]" | equals "my_keywords.robot" | verify-true
-  	get-property tabCount | equals 1 | verify-true
-} 
- 
+check-tab-folder -active_page "my_keywords.robot" -pages [list "my_keywords.robot"]
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
