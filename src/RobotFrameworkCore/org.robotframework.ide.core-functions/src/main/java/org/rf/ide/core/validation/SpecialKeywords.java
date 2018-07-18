@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
+package org.rf.ide.core.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
@@ -369,7 +369,7 @@ public class SpecialKeywords {
             tokensToCheckForVariables.addAll(tokens);
         }
 
-        public List<RobotToken> getOmmittedTokens() {
+        public List<RobotToken> getOmittedTokens() {
             return tokensToCheckForVariables;
         }
 
@@ -409,7 +409,7 @@ public class SpecialKeywords {
 
         public void forEachProblem(final BiConsumer<String, RobotToken> problemsConsumer) {
             if (messages == null) {
-                problematicTokens.stream().forEach(token -> problemsConsumer.accept(getMessage(), token));
+                problematicTokens.forEach(token -> problemsConsumer.accept(getMessage(), token));
             } else {
                 Streams.forEachPair(messages.stream(), problematicTokens.stream(), problemsConsumer);
             }
