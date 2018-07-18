@@ -598,6 +598,25 @@ public class TestCaseValidatorTest {
     }
 
     @Test
+    public void nothingIsReported_whenVariablesInGeneralSettingsSetups() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    use  ${a}  ${b}")
+                .appendLine("*** Settings ***")
+                .appendLine("Suite Setup    Set Global Variable    ${a}    1")
+                .appendLine("Test Setup    Set Global Variable    ${b}    2")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newBuiltInKeyword("Set Global Variable", "var", "*values"),
+                newResourceKeyword("use", new Path("/res.robot"), "*values"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
     public void noProblemsInNestedKeywordsAreReported_whenUsedProperly() {
         final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Log", "msg"),
                 newBuiltInKeyword("Run Keyword", "name", "*args"),
