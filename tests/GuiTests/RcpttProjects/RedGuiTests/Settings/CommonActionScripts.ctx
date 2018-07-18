@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 7/17/18 5:49 PM
+Save-Time: 7/18/18 11:33 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -204,7 +204,7 @@ proc "release-files-handle"{
 
 }
 
-proc "check-tab-folder"  [val tab_index 1] [val active_page] [val pages] {
+proc "check-tab-folder"  [val tab_index 2] [val active_page] [val pages] {
 	$pages | invoke getElements  | invoke size | let [val col_amount -input]{
 		get-tab-folder -index [$tab_index | int] | get-property tabCount | equals $col_amount | verify-true
 		get-tab-folder -index [$tab_index | int] | get-property activePage | equals $active_page | verify-true
