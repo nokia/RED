@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -34,11 +33,9 @@ public class InTokenRuleTest {
 
     @Test
     public void inTokenIsRecognized() {
-        final List<IRobotLineElement> previousTokens = new ArrayList<>();
-
         boolean thereWasName = false;
         for (final RobotToken token : TokensSource.createTokens()) {
-            final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0, previousTokens);
+            final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0, new ArrayList<>());
 
             if (token.getText().equals("IN RANGE")) {
                 thereWasName = true;
@@ -51,7 +48,6 @@ public class InTokenRuleTest {
             } else {
                 assertThat(evaluatedToken).isNotPresent();
             }
-            previousTokens.add(token);
         }
         assertThat(thereWasName).isTrue();
     }
