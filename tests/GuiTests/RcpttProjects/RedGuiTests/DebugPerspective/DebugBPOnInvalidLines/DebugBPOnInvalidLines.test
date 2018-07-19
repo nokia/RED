@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ljgl0BEMEeWWSplrwZ3vkg
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 7/17/18 3:53 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/19/18 10:31 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -39,7 +39,8 @@ try -times 10 -delay 300 -command {
     
 get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
 get-view Variables | get-tree | get-property itemCount | equals 0 | verify-true
-get-tab-folder -index 3 | get-tab-item Breakpoints | click
+get-view Breakpoints | click
+
 with [get-view Breakpoints | get-tree] {
     get-property itemCount | equals 0 | verify-true
 }
