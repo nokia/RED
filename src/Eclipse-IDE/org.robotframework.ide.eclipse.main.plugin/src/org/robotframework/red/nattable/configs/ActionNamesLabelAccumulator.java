@@ -5,17 +5,22 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
+import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.validation.SpecialKeywords;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 
 /**
@@ -34,6 +39,7 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
 
     @Override
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
+
         final Object rowObject = dataProvider.getRowObject(rowPosition);
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall call = (RobotKeywordCall) rowObject;
@@ -51,14 +57,47 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                     if (actual.getText().equals(action.getText())
                             && actual.getStartOffset() == action.getStartOffset()) {
                         configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+
+                    } else {
+                        for (int i = columnPosition - 1; i >= 0; i--) {
+                            final QualifiedKeywordName qualifiedKwName = QualifiedKeywordName
+                                    .fromOccurrence(tokens.get(i).getText());
+                            if (SpecialKeywords.isNestingKeyword(qualifiedKwName) && SpecialKeywords
+                                    .isKeywordNestedInKeyword(qualifiedKwName, i, columnPosition - i, tokens)) {
+                                configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+                                break;
+                            }
+                        }
                     }
-                } else {
+                } else if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isKeywordBased()) {
                     final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
                     if (types.contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME)
                             || types.contains(RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME)
                             || types.contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME)
                             || types.contains(RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME)) {
                         configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+                        
+                    } else if (types.contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT)
+                            || types.contains(RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT)
+                            || types.contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT)) {
+                        final AKeywordBaseSetting<?> kwBasedSetting = (AKeywordBaseSetting<?>) linked;
+
+                        final List<RobotToken> allTokens = new ArrayList<>();
+                        allTokens.add(kwBasedSetting.getKeywordName());
+                        allTokens.addAll(kwBasedSetting.getArguments());
+
+                        if (columnPosition - 1 < allTokens.size()) {
+                            for (int i = columnPosition - 2; i >= 0; i--) {
+                                final QualifiedKeywordName qualifiedKwName = QualifiedKeywordName
+                                        .fromOccurrence(allTokens.get(i).getText());
+                                if (SpecialKeywords.isNestingKeyword(qualifiedKwName)
+                                        && SpecialKeywords.isKeywordNestedInKeyword(qualifiedKwName, i,
+                                                columnPosition - i - 1, allTokens)) {
+                                    configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }

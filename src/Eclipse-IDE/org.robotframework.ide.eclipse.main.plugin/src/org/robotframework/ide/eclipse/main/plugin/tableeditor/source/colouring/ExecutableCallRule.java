@@ -82,7 +82,7 @@ public class ExecutableCallRule extends VariableUsageRule {
         if (!isNestedKeyword(token, context, tokensBefore)) {
             for (final RobotToken prevToken : tokensBefore) {
                 final List<IRobotTokenType> types = prevToken.getTypes();
-                if (!prevToken.getText().isEmpty() 
+                if (!prevToken.getText().isEmpty()
                         && !types.contains(RobotTokenType.VARIABLE_USAGE)
                         && !types.contains(RobotTokenType.ASSIGNMENT)
                         && !types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
@@ -116,7 +116,7 @@ public class ExecutableCallRule extends VariableUsageRule {
         final List<RobotToken> tokens = new ArrayList<>();
 
         final int line = token.getLineNumber();
-        linesLoop: for (int i = line - 1; i >= 0; i--) {
+        for (int i = line - 1; i >= 0; i--) {
             final RobotLine robotLine = lines.get(i);
             final int previousElemIndex = line - 1 == i ? robotLine.getLineElements().indexOf(token) - 1
                     : robotLine.getLineElements().size() - 1;
@@ -125,7 +125,7 @@ public class ExecutableCallRule extends VariableUsageRule {
                 final IRobotLineElement element = robotLine.getLineElements().get(j);
                 if (element instanceof RobotToken && !isContinuation(element)) {
                     if (shouldStopOnElement.test(element)) {
-                        break linesLoop;
+                        return tokens;
                     }
                     tokens.add(0, (RobotToken) element);
                 }
