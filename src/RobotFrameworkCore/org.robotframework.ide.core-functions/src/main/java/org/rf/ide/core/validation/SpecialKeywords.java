@@ -213,10 +213,76 @@ public class SpecialKeywords {
         return new ArrayList<>();
     }
 
+    public static boolean isNestingKeyword(final QualifiedKeywordName qualifiedKeywordName) {
+        return NESTED_EXECUTABLE_KEYWORDS.containsKey(qualifiedKeywordName) || NESTED_EXECUTABLE_KEYWORDS
+                .containsKey(QualifiedKeywordName.create(qualifiedKeywordName.getKeywordName(), "BuiltIn"));
+    }
+
+    public static boolean isNestedSyntaxSpecialToken(final QualifiedKeywordName qualifiedKeywordName,
+            final RobotToken token) {
+        final QualifiedKeywordName actualKeyword = getActualName(qualifiedKeywordName);
+        if (QualifiedKeywordName.create("Run Keyword If", "BuiltIn").equals(actualKeyword)) {
+            return token.getText().equals("ELSE") || token.getText().equals("ELSE IF");
+
+        } else if (QualifiedKeywordName.create("Run Keywords", "BuiltIn").equals(actualKeyword)) {
+            return token.getText().equals("AND");
+        }
+        return false;
+    }
+
+    public static boolean isKeywordNestedInKeyword(final QualifiedKeywordName qualifiedKeywordName,
+            final int argIndex, final int offsetFromNested, final List<RobotToken> executableTokens) {
+
+        final QualifiedKeywordName actualKeyword = getActualName(qualifiedKeywordName);
+
+        if (actualKeyword == null) {
+            return false;
+
+        } else if (QualifiedKeywordName.create("Run Keyword If", "BuiltIn").equals(actualKeyword)) {
+            final RobotToken token = executableTokens.get(argIndex + offsetFromNested);
+            if (token.getText().equals("ELSE") || token.getText().equals("ELSE IF")) {
+                return false;
+            }
+            return offsetFromNested == 2
+                    || offsetFromNested > 0
+                            && executableTokens.get(argIndex + offsetFromNested - 1).getText().equals("ELSE")
+                    || offsetFromNested > 1
+                            && executableTokens.get(argIndex + offsetFromNested - 2).getText().equals("ELSE IF")
+                            && !executableTokens.get(argIndex + offsetFromNested - 1).getText().equals("ELSE")
+                            && !executableTokens.get(argIndex + offsetFromNested - 1).getText().equals("ELSE IF");
+            
+        } else if (QualifiedKeywordName.create("Run Keywords", "BuiltIn").equals(actualKeyword)) {
+            if (executableTokens.stream().skip(argIndex + 1).anyMatch(token -> token.getText().equals("AND"))) {
+                final RobotToken token = executableTokens.get(argIndex + offsetFromNested);
+                if (token.getText().equals("AND")) {
+                    return false;
+                }
+                return offsetFromNested == 1 || offsetFromNested > 0
+                        && executableTokens.get(argIndex + offsetFromNested - 1).getText().equals("AND");
+
+            } else {
+                return true;
+            }
+            
+        } else {
+            return NESTED_EXECUTABLE_KEYWORDS.get(actualKeyword).intValue() == offsetFromNested - 1;
+        }
+    }
+
+    private static QualifiedKeywordName getActualName(final QualifiedKeywordName qualifiedKeywordName) {
+        if (NESTED_EXECUTABLE_KEYWORDS.containsKey(qualifiedKeywordName)) {
+            return qualifiedKeywordName;
+        } else if (NESTED_EXECUTABLE_KEYWORDS
+                .containsKey(QualifiedKeywordName.create(qualifiedKeywordName.getKeywordName(), "BuiltIn"))) {
+            return QualifiedKeywordName.create(qualifiedKeywordName.getKeywordName(), "BuiltIn");
+        } else {
+            return null;
+        }
+    }
+
     public static NestedExecutables getNestedExecutables(final QualifiedKeywordName qualifiedKeywordName,
             final Object nestedExecutableParent, final List<RobotToken> arguments)
             throws NestedKeywordsSyntaxException {
-
 
         if (QualifiedKeywordName.create("Run Keyword If", "BuiltIn").equals(qualifiedKeywordName)) {
             return parseRunKeywordIfNestedExecutables(nestedExecutableParent, arguments);
@@ -325,6 +391,9 @@ public class SpecialKeywords {
                     nested.addExecutable(createExecutable(nestedExecutableParent, action, args));
                     action = null;
                     args.clear();
+
+                } else if (arg.getText().equals("AND") && action == null) {
+                    throw new NestedKeywordsSyntaxException("AND cannot be followed by another AND", newArrayList(arg));
 
                 } else if (action == null) {
                     action = arg;

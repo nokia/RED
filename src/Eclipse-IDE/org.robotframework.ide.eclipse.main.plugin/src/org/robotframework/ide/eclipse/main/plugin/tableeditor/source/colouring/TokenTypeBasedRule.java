@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
@@ -33,7 +34,7 @@ class TokenTypeBasedRule implements ISyntaxColouringRule {
 
     @Override
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInRobotToken,
-            final List<IRobotLineElement> analyzedTokens) {
+            final List<RobotLine> context) {
         final IRobotTokenType type = token.getTypes().get(0);
 
         if (types.contains(type)) {

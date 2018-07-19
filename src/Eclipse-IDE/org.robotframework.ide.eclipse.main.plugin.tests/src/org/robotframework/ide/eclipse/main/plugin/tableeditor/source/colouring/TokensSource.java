@@ -25,6 +25,15 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 public class TokensSource {
 
     static List<RobotToken> createTokens() {
+        final List<RobotLine> lines = createTokensInLines();
+        final List<RobotToken> tokens = new ArrayList<>();
+        for (final RobotLine line : lines) {
+            tokens.addAll(newArrayList(filter(line.getLineElements(), RobotToken.class)));
+        }
+        return tokens;
+    }
+
+    static List<RobotLine> createTokensInLines() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case 1")
                 .appendLine("  [Documentation]  abc  def  # comment")
@@ -33,7 +42,7 @@ public class TokensSource {
                 .appendLine("  [Teardown]  tc_setting_call  a1  a2  #comment")
                 .appendLine("  [Timeout]  10  a  b  c  # comment")
                 .appendLine("  [UnkownTcSetting]  a  b  c  # comment")
-                .appendLine("  [Template]  tc_setting_call  b  c  # comment")
+                .appendLine("  [Template]  tc_setting_template  b  c  # comment")
                 .appendLine("  call  arg  ${x}  # comment   comment")
                 .appendLine("case 2")
                 .appendLine("  call  arg  ${x}  # comment   comment")
@@ -93,16 +102,11 @@ public class TokensSource {
                 .appendLine("Suite Teardown  general_setting_call  def  # comment")
                 .appendLine("Test Setup  general_setting_call  def  # comment")
                 .appendLine("Test Teardown  general_setting_call  def  # comment")
-                .appendLine("Test Template  general_setting_call  def  # comment")
+                .appendLine("Test Template  general_setting_template  def  # comment")
                 .appendLine("Test Timeout  abc  def  # comment")
                 .appendLine("UnkownSetting  abc  def  # comment")
                 .build();
-        final List<RobotLine> lines = model.getLinkedElement().getFileContent();
-        final List<RobotToken> tokens = new ArrayList<>();
-        for (final RobotLine line : lines) {
-            tokens.addAll(newArrayList(filter(line.getLineElements(), RobotToken.class)));
-        }
-        return tokens;
+        return model.getLinkedElement().getFileContent();
     }
 
     static List<RobotLine> lines(final RobotLine... lines) {
