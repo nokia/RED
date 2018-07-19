@@ -9,14 +9,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 
 /**
@@ -25,75 +25,103 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
  */
 public class SettingsActionNamesLabelAccumulatorTest {
 
-    private IRowDataProvider<Object> dataProvider;
-    private LabelStack labels;
-    private SettingsActionNamesLabelAccumulator labelAccumulator;
-
-    @SuppressWarnings("unchecked")
-    @Before
-    public void cleanData() {
-        dataProvider = mock(IRowDataProvider.class);
-        labels = new LabelStack();
-        labelAccumulator = new SettingsActionNamesLabelAccumulator(dataProvider);
+    @Test
+    public void labelIsNotAdded_forMissingSetting() {
+        for (int i = 0; i < 10; i++) {
+            assertThat(labelsAt(entry("Setting", null), i)).isEmpty();
+        }
     }
 
     @Test
-    public void labelIsNotAdded_forEmptyLine() {
-        final RobotKeywordCall call = new RobotKeywordCall(null, new RobotExecutableRow<>());
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        assertThat(labels.getLabels()).isEmpty();
-    }
-
-    @Test
-    public void labelIsNotAdded_forNonFirstColumnKeywordBased() {
+    public void labelIsNotAdded_forNonKeywordBasedSetting() {
         final RobotSetting setting = mock(RobotSetting.class);
-        final Entry<String, RobotSetting> entry = createEntry(setting);
-        when(setting.isKeywordBased()).thenReturn(true);
-        when(dataProvider.getRowObject(0)).thenReturn(entry);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        labelAccumulator.accumulateConfigLabels(labels, 2, 0);
-        assertThat(labels.getLabels()).isEmpty();
-    }
-
-    @Test
-    public void labelIsNotAdded_forNonKeywordBased() {
-        final RobotSetting setting = mock(RobotSetting.class);
-        final Entry<String, RobotSetting> entry = createEntry(setting);
         when(setting.isKeywordBased()).thenReturn(false);
-        when(dataProvider.getRowObject(0)).thenReturn(entry);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 0);
-        labelAccumulator.accumulateConfigLabels(labels, 2, 0);
-        assertThat(labels.getLabels()).isEmpty();
+        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+
+        assertThat(labelsAt(entry, 0)).isEmpty();
+        assertThat(labelsAt(entry, 1)).isEmpty();
+        assertThat(labelsAt(entry, 2)).isEmpty();
     }
 
     @Test
-    public void labelIsAdded_forFirstColumnKeywordBased() {
+    public void labelIsNotAdded_forFirstColumnOfKeywordBasedSetting() {
         final RobotSetting setting = mock(RobotSetting.class);
-        final Entry<String, RobotSetting> entry = createEntry(setting);
         when(setting.isKeywordBased()).thenReturn(true);
-        when(dataProvider.getRowObject(0)).thenReturn(entry);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 0);
-        assertThat(labels.getLabels()).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+
+        assertThat(labelsAt(entry, 0)).isEmpty();
     }
 
-    private static Entry<String, RobotSetting> createEntry(final RobotSetting setting) {
-        return new Entry<String, RobotSetting>() {
+    @Test
+    public void labelIsAdded_forSecondColumnOfKeywordBasedSetting() {
+        final RobotSetting setting = mock(RobotSetting.class);
+        when(setting.isKeywordBased()).thenReturn(true);
+        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+
+        assertThat(labelsAt(entry, 1)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelIsNotAdded_forColumnsGreaterThanSecondInKwBasedSettingWithOrdinaryKeyword() {
+        final SuiteSetup setup = new SuiteSetup(RobotToken.create("[Setup]"));
+        setup.setKeywordName("keyword");
+        setup.addArgument("arg1");
+        setup.addArgument("arg2");
+        final RobotSetting setting = new RobotSetting(null, setup);
+        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+
+        for (int i = 2; i < 10; i++) {
+            assertThat(labelsAt(entry, i)).isEmpty();
+        }
+    }
+
+    @Test
+    public void labelIsAdded_forNestedKeywordsUsedInsideSpecialKeywordInKwBasedSetting() {
+        final SuiteSetup setup = new SuiteSetup(RobotToken.create("[Setup]"));
+        setup.setKeywordName("Run Keyword If");
+        setup.addArgument("condition");
+        setup.addArgument("kw");
+        setup.addArgument("ELSE");
+        setup.addArgument("kw");
+        final RobotSetting setting = new RobotSetting(null, setup);
+        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+
+        assertThat(labelsAt(entry, 0)).isEmpty();
+        assertThat(labelsAt(entry, 1)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        assertThat(labelsAt(entry, 2)).isEmpty();
+        assertThat(labelsAt(entry, 3)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        assertThat(labelsAt(entry, 4)).isEmpty();
+        assertThat(labelsAt(entry, 5)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+    }
+
+    private static List<String> labelsAt(final Entry<String, RobotSetting> entry, final int column) {
+        @SuppressWarnings("unchecked")
+        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
+        when(dataProvider.getRowObject(0)).thenReturn(entry);
+
+        final LabelStack labels = new LabelStack();
+        final SettingsActionNamesLabelAccumulator labelAccumulator = new SettingsActionNamesLabelAccumulator(
+                dataProvider);
+        labelAccumulator.accumulateConfigLabels(labels, column, 0);
+        return labels.getLabels();
+    }
+
+    private static <K, V> Entry<K, V> entry(final K key, final V value) {
+        return new Entry<K, V>() {
 
             @Override
-            public RobotSetting setValue(RobotSetting value) {
-                return null;
+            public V setValue(final V value) {
+                return value;
             }
 
             @Override
-            public RobotSetting getValue() {
-                return setting;
+            public V getValue() {
+                return value;
             }
 
             @Override
-            public String getKey() {
-                return null;
+            public K getKey() {
+                return key;
             }
         };
     }
