@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
@@ -25,11 +26,11 @@ public class KeywordNameRule extends VariableUsageRule {
 
     @Override
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
-            final List<IRobotLineElement> analyzedTokens) {
+            final List<RobotLine> context) {
         final IRobotTokenType type = token.getTypes().get(0);
 
         if (type == RobotTokenType.KEYWORD_NAME) {
-            final Optional<PositionedTextToken> evaluated = super.evaluate(token, offsetInToken, analyzedTokens);
+            final Optional<PositionedTextToken> evaluated = super.evaluate(token, offsetInToken, context);
             if (evaluated.isPresent()) {
                 return evaluated;
             }

@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,8 @@ public class RedTokenScanner implements IRedTokenScanner {
     private final List<ISyntaxColouringRule> rules;
 
     private Deque<IRobotLineElement> tokensToAnalyze;
-    private final List<IRobotLineElement> analyzedTokens = new ArrayList<>();
+
+    private List<RobotLine> lines;
 
     private Position lastTokenPosition;
 
@@ -57,7 +57,7 @@ public class RedTokenScanner implements IRedTokenScanner {
 
         if (lastTokenPosition == null || lastTokenPosition.getOffset() + lastTokenPosition.getLength() != offset) {
             this.tokensToAnalyze = null;
-            this.analyzedTokens.clear();
+            this.lines = null;
 
             this.rangeOffset = offset;
             this.rangeLength = length;
@@ -74,7 +74,7 @@ public class RedTokenScanner implements IRedTokenScanner {
             @Override
             public Deque<IRobotLineElement> get() {
                 try {
-                    final List<RobotLine> lines = document.getNewestModel().getFileContent();
+                    lines = document.getNewestModel().getFileContent();
                     return new RedTokensQueueBuilder().buildQueue(rangeOffset, rangeLength, lines, rangeLine);
                 } catch (final InterruptedException e) {
                     throw new UnableToScanTokensException("Unable to build tokens queue", e);
@@ -104,7 +104,7 @@ public class RedTokenScanner implements IRedTokenScanner {
             if (!rule.isApplicable(nextToken)) {
                 continue;
             }
-            final Optional<PositionedTextToken> tok = rule.evaluate(nextToken, currentOffsetInToken, analyzedTokens);
+            final Optional<PositionedTextToken> tok = rule.evaluate(nextToken, currentOffsetInToken, lines);
             if (tok.isPresent()) {
                 final PositionedTextToken textToken = tok.get();
                 lastTokenPosition = textToken.getPosition();
@@ -113,7 +113,6 @@ public class RedTokenScanner implements IRedTokenScanner {
                         + nextToken.getText().length()) {
                     // rule have consumed whole Robot Token
                     currentOffsetInToken = 0;
-                    analyzedTokens.add(nextToken);
                 } else {
                     // the token needs more coloring, so return it to queue and shift the
                     // offset
@@ -127,7 +126,6 @@ public class RedTokenScanner implements IRedTokenScanner {
         lastTokenPosition = new Position(nextToken.getStartOffset() + currentOffsetInToken,
                 nextToken.getText().length() - currentOffsetInToken);
         currentOffsetInToken = 0;
-        analyzedTokens.add(nextToken);
         return ISyntaxColouringRule.DEFAULT_TOKEN;
     }
 

@@ -198,7 +198,7 @@ public class RedTokenScannerTest {
 
             @Override
             public Optional<PositionedTextToken> evaluate(final IRobotLineElement robotToken, final int offsetInToken,
-                    final List<IRobotLineElement> analyzedTokens) {
+                    final List<RobotLine> context) {
                 if (robotToken.getText().equals(text)) {
                     return Optional.of(
                             new PositionedTextToken(token, robotToken.getStartOffset(), robotToken.getText().length()));
@@ -217,8 +217,8 @@ public class RedTokenScannerTest {
             }
 
             @Override
-            public Optional<PositionedTextToken> evaluate(final IRobotLineElement robotToken, final int offsetInToken,
-                    final List<IRobotLineElement> analyzedTokens) {
+            public Optional<PositionedTextToken> evaluate(final IRobotLineElement robotToken,
+                    final int offsetInToken, final List<RobotLine> context) {
                 if (robotToken.getText().equals(text)) {
                     // matches only second and third character inside token
                     if (offsetInToken >= 1 && offsetInToken <= 2) {
@@ -244,7 +244,7 @@ public class RedTokenScannerTest {
 
             @Override
             public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
-                    final List<IRobotLineElement> analyzedTokens) {
+                    final List<RobotLine> context) {
                 return Optional.empty();
             }
         };
@@ -260,7 +260,7 @@ public class RedTokenScannerTest {
 
             @Override
             public Optional<PositionedTextToken> evaluate(final IRobotLineElement robotToken, final int offsetInToken,
-                    final List<IRobotLineElement> analyzedTokens) {
+                    final List<RobotLine> context) {
                 return Optional
                         .of(new PositionedTextToken(token, robotToken.getStartOffset(), robotToken.getText().length()));
             }
