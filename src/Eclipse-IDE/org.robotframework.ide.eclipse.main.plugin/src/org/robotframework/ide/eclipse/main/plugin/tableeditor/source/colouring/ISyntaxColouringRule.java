@@ -12,6 +12,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 
 import com.google.common.base.Objects;
 
@@ -22,7 +23,7 @@ public interface ISyntaxColouringRule {
     public boolean isApplicable(IRobotLineElement nextToken);
 
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement nextToken, int offsetInToken,
-            List<IRobotLineElement> context);
+            List<RobotLine> context);
 
 
     public static final class PositionedTextToken {
