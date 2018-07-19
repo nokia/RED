@@ -1,5 +1,5 @@
 /*
-* Copyright 2017 Nokia Solutions and Networks
+* Copyright 2016 Nokia Solutions and Networks
 * Licensed under the Apache License, Version 2.0,
 * see license.txt file for details.
 */
@@ -20,9 +20,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
 
-public class WithNameRuleTest {
+public class SettingsTemplateRuleTest {
 
-    private final WithNameRule testedRule = new WithNameRule(new Token("token"));
+    private final SettingsTemplateRule testedRule = new SettingsTemplateRule(new Token("token"));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
@@ -32,12 +32,12 @@ public class WithNameRuleTest {
     }
 
     @Test
-    public void inTokenIsRecognized() {
+    public void generalSettingKeywordCallIsRecognized() {
         boolean thereWasName = false;
         for (final RobotToken token : TokensSource.createTokens()) {
-            final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0, new ArrayList<>());
+            final Optional<PositionedTextToken> evaluatedToken = evaluate(token);
 
-            if (token.getText().equals("WITH NAME")) {
+            if (token.getText().equals("general_setting_template") || token.getText().equals("tc_setting_template")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();
@@ -53,14 +53,13 @@ public class WithNameRuleTest {
     }
 
     @Test
-    public void withNameIsRecognized_evenWhenPositionIsInsideToken() {
+    public void generalSettingKeywordCallIsRecognized_evenWhenPositionIsInsideToken() {
         boolean thereWasName = false;
         for (final RobotToken token : TokensSource.createTokens()) {
             final int positionInsideToken = new Random().nextInt(token.getText().length());
-            final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, positionInsideToken,
-                    new ArrayList<>());
+            final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken);
 
-            if (token.getText().equals("WITH NAME")) {
+            if (token.getText().equals("general_setting_template") || token.getText().equals("tc_setting_template")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();
@@ -73,5 +72,13 @@ public class WithNameRuleTest {
             }
         }
         assertThat(thereWasName).isTrue();
+    }
+
+    private Optional<PositionedTextToken> evaluate(final RobotToken token) {
+        return evaluate(token, 0);
+    }
+
+    private Optional<PositionedTextToken> evaluate(final RobotToken token, final int position) {
+        return testedRule.evaluate(token, position, new ArrayList<>());
     }
 }
