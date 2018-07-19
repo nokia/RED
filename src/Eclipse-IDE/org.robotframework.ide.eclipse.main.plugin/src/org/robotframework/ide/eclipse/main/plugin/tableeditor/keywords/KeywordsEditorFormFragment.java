@@ -103,11 +103,10 @@ import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration
 import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.CommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
-import org.robotframework.red.nattable.configs.VariablesInElementsLabelAccumulator;
-import org.robotframework.red.nattable.configs.VariablesInElementsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
+import org.robotframework.red.nattable.configs.NestedExecsSpecialTokensLabelAccumulator;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
@@ -117,6 +116,8 @@ import org.robotframework.red.nattable.configs.SpecialItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
+import org.robotframework.red.nattable.configs.VariablesInElementsLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariablesInElementsStyleConfiguration;
 import org.robotframework.red.nattable.configs.VariablesInNamesLabelAccumulator;
 import org.robotframework.red.nattable.configs.VariablesInNamesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
@@ -210,6 +211,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new CommentsLabelAccumulator(dataProvider),
                 new KeywordsElementsLabelAccumulator(dataProvider),
                 new ActionNamesLabelAccumulator(dataProvider),
+                new NestedExecsSpecialTokensLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(dataProvider),
                 new VariablesInElementsLabelAccumulator(),
                 new VariablesInNamesLabelAccumulator());
