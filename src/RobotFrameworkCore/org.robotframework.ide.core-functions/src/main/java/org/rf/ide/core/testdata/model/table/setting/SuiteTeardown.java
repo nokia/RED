@@ -5,9 +5,6 @@
  */
 package org.rf.ide.core.testdata.model.table.setting;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
@@ -26,14 +23,6 @@ public class SuiteTeardown extends AKeywordBaseSetting<SettingTable> {
     @Override
     public ModelType getModelType() {
         return ModelType.SUITE_TEARDOWN;
-    }
-
-    @Override
-    protected List<AKeywordBaseSetting<SettingTable>> getAllThisKindSettings() {
-        final List<AKeywordBaseSetting<SettingTable>> settings = new ArrayList<>(0);
-        settings.addAll(getParent().getSuiteTeardowns());
-
-        return settings;
     }
 
     @Override

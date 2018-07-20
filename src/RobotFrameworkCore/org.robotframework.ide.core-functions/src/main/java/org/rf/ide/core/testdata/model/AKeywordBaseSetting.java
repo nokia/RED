@@ -86,20 +86,20 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
     }
 
     @Override
-    public void setComment(String comment) {
+    public void setComment(final String comment) {
         final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -141,41 +141,27 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         return tokens;
     }
 
-    protected abstract List<AKeywordBaseSetting<T>> getAllThisKindSettings();
-
     public RobotExecutableRow<T> asExecutableRow() {
         final RobotExecutableRow<T> execRow = new RobotExecutableRow<>();
         execRow.setParent(getParent());
 
-        boolean wasAction = false;
-        final List<AKeywordBaseSetting<T>> allThisKindSettings = getAllThisKindSettings();
-        for (final AKeywordBaseSetting<T> baseSetting : allThisKindSettings) {
-            if (baseSetting.getKeywordName() != null && !baseSetting.getKeywordName().getFilePosition().isNotSet()) {
-                if (!wasAction) {
-                    execRow.setAction(baseSetting.getKeywordName().copy());
-                    wasAction = true;
-                } else {
-                    execRow.addArgument(baseSetting.getKeywordName().copy());
-                }
-            }
-            for (final RobotToken arg : baseSetting.getArguments()) {
-                execRow.addArgument(arg.copy());
-            }
-            for (final RobotToken c : baseSetting.getComment()) {
-                execRow.addCommentPart(c.copy());
-            }
+        execRow.setAction(getKeywordName().copy());
+        for (final RobotToken arg : getArguments()) {
+            execRow.addArgument(arg.copy());
         }
-
+        for (final RobotToken c : getComment()) {
+            execRow.addCommentPart(c.copy());
+        }
         return execRow;
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(arguments, index);
     }
 
     @Override
-    public void insertValueAt(String value, int position) {
+    public void insertValueAt(final String value, final int position) {
         final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position == 1) { // new keyword name

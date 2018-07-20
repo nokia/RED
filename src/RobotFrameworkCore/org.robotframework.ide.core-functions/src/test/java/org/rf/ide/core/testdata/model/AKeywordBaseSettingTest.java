@@ -173,18 +173,13 @@ public class AKeywordBaseSettingTest {
 
         private static final long serialVersionUID = 4570317373970770339L;
 
-        public ADummyKeywordBaseSettingForKeywords(RobotToken declaration) {
+        public ADummyKeywordBaseSettingForKeywords(final RobotToken declaration) {
             super(declaration);
         }
 
         @Override
         protected RobotTokenType getDeclarationType() {
             return RobotTokenType.SETTING_SUITE_SETUP_DECLARATION;
-        }
-
-        @Override
-        protected List<AKeywordBaseSetting<Object>> getAllThisKindSettings() {
-            return null;
         }
 
         @Override
