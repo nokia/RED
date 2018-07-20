@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDe
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.SpecialKeywords;
 import org.rf.ide.core.validation.SpecialKeywords.NestedExecutables;
 import org.rf.ide.core.validation.SpecialKeywords.NestedKeywordsSyntaxException;
@@ -66,8 +67,10 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
                     descriptor.getKeywordArguments());
             if (nested.hasNestedExecutables()) {
                 for (final RobotExecutableRow<?> nestedRow : nested.getExecutables()) {
-                    new ExecutableNestedRowValidator(validationContext, additionalVariables, nestedRow,
-                            nestedRow.buildLineDescription(), reporter).validate(monitor);
+                    if (!nestedRow.getAction().getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
+                        new ExecutableNestedRowValidator(validationContext, additionalVariables, nestedRow,
+                                nestedRow.buildLineDescription(), reporter).validate(monitor);
+                    }
                 }
                 unknownVarsValidator.reportUnknownVars(additionalVariables, nested.getOmittedTokens());
 
