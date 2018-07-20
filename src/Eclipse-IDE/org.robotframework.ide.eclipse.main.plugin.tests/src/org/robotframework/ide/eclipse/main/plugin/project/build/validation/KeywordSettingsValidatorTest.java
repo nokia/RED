@@ -504,7 +504,19 @@ public class KeywordSettingsValidatorTest {
     public void nothingIsReported_whenDefaultValuesUsesVariableDefinedJustBefore() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
-                .appendLine("  [Arguments]  ${x}  ${y}=${x}")
+                .appendLine("  [Arguments]  ${x}  ${y}=${x}  ${z}=${y}")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenDefaultValuesUsesNumbersOrComputations() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${x}=${0}  ${y}=${1+2}")
                 .appendLine("  [Return]  10")
                 .build();
 
