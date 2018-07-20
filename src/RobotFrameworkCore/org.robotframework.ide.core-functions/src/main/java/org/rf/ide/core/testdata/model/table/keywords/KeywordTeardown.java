@@ -5,9 +5,6 @@
  */
 package org.rf.ide.core.testdata.model.table.keywords;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -25,14 +22,6 @@ public class KeywordTeardown extends AKeywordBaseSetting<UserKeyword> {
     @Override
     public ModelType getModelType() {
         return ModelType.USER_KEYWORD_TEARDOWN;
-    }
-
-    @Override
-    protected List<AKeywordBaseSetting<UserKeyword>> getAllThisKindSettings() {
-        final List<AKeywordBaseSetting<UserKeyword>> settings = new ArrayList<>(0);
-        settings.addAll(getParent().getTeardowns());
-
-        return settings;
     }
 
     @Override
