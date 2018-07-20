@@ -66,9 +66,9 @@ public class TokensSource {
                 .appendLine("  ${var_asgn_1}  ${var_asgn_2}  call  arg  ${x}  # comment   comment")
                 .appendLine("  :FOR  ${i}  IN RANGE  10")
                 .appendLine("  \\  call  arg  ${x}  # comment   comment")
-                .appendLine("  \\  ${var_asgn}=  call  arg  ${x}  # comment   comment")
+                .appendLine("  \\  ${var_asgn}=  call  AND  ${x}  # comment   comment")
                 .appendLine("  \\  ${var_asgn}  call  arg  ${x}  # comment   comment")
-                .appendLine("  \\  ${var_asgn_1}  ${var_asgn_2}=  call  arg  ${x}  # comment   comment")
+                .appendLine("  \\  ${var_asgn_1}  ${var_asgn_2}=  call  ELSE  ${x}  # comment   comment")
                 .appendLine("  \\  ${var_asgn_1}  ${var_asgn_2}  call  arg  ${x}  # comment   comment")
                 .appendLine("  \\  given gherkin_call  # comment")
                 .appendLine("  \\  when then gherkin_call  # comment")
@@ -102,6 +102,69 @@ public class TokensSource {
                 .appendLine("Suite Teardown  general_setting_call  def  # comment")
                 .appendLine("Test Setup  general_setting_call  def  # comment")
                 .appendLine("Test Teardown  general_setting_call  def  # comment")
+                .appendLine("Test Template  general_setting_template  def  # comment")
+                .appendLine("Test Timeout  abc  def  # comment")
+                .appendLine("UnkownSetting  abc  def  # comment")
+                .build();
+        return model.getLinkedElement().getFileContent();
+    }
+
+    static List<RobotLine> createTokensInLinesWithSpecialNestingKeywords() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Documentation]  abc  def  # comment")
+                .appendLine("  [Tags]  t1  t2  # comment")
+                .appendLine(
+                        "  [Setup]  Run Keyword If  cond  settings_nestedkw  arg  ELSE IF  condition  settings_nestedkw  arg  ELSE  settings_nestedkw  arg  # comment")
+                .appendLine(
+                        "  [Teardown]  Run Keywords  settings_nestedkw  arg  AND  settings_nestedkw  arg  AND  settings_nestedkw  arg  #comment")
+                .appendLine("  [Timeout]  10  a  b  c  # comment")
+                .appendLine("  [UnkownTcSetting]  a  b  c  # comment")
+                .appendLine("  [Template]  tc_setting_template  b  c  # comment")
+                .appendLine(
+                        "  Run Keyword If  cond  nestedkw  arg  ELSE IF  condition  nestedkw  arg  ELSE  nestedkw  arg")
+                .appendLine("  Run Keywords  nestedkw  arg  AND  nestedkw  arg  AND  nestedkw  arg")
+                .appendLine("*Keywords")
+                .appendLine("userkw 1")
+                .appendLine("  [arguments]  ${a}  # comment")
+                .appendLine("  [documentation]  abc  def  # comment")
+                .appendLine("  [tags]  t1  t2  # comment")
+                .appendLine(
+                        "  [teardown]  Run Keyword If  cond  settings_nestedkw  arg  ELSE IF  condition  settings_nestedkw  arg  ELSE  settings_nestedkw  arg  #comment")
+                .appendLine("  [timeout]  10  a  b  c  # comment")
+                .appendLine("  [unkownKwSetting]  a  b  c  # comment")
+                .appendLine("  [return]  a  b  c  # comment")
+                .appendLine(
+                        "  Run Keyword If  cond  nestedkw  arg  ELSE IF  condition  nestedkw  arg  ELSE  nestedkw  arg")
+                .appendLine("  Run Keywords  nestedkw  arg  AND  nestedkw  arg  AND  nestedkw  arg")
+                .appendLine(
+                        "  ${var_asgn}=  Run Keyword If  cond  nestedkw  arg  ELSE IF  condition  nestedkw  arg  ELSE  nestedkw  arg")
+                .appendLine("  ${var_asgn}=  Run Keywords  nestedkw  arg  AND  nestedkw  arg  AND  nestedkw  arg")
+                .appendLine(
+                        "  ${xvar_asgn1}  ${var_asgn2}=  Run Keyword If  cond  nestedkw  arg  ELSE IF  condition  nestedkw  arg  ELSE  nestedkw  arg")
+                .appendLine(
+                        "  ${var_asgn1}  ${var_asgn2}=  Run Keywords  nestedkw  arg  AND  nestedkw  arg  AND  nestedkw  arg")
+                .appendLine("  :FOR  ${i}  IN RANGE  10")
+                .appendLine(
+                        "  \\  Run Keyword If  cond  nestedkw  arg  ELSE IF  condition  nestedkw  arg  ELSE  nestedkw  arg")
+                .appendLine("  \\  Run Keywords  nestedkw  arg  AND  nestedkw  arg  AND  nestedkw  arg")
+                .appendLine("*** Settings ***")
+                .appendLine("Documentation  abc  def  # comment")
+                .appendLine("Library  abc  def  # comment")
+                .appendLine("Library  abc  WITH NAME  def  # comment")
+                .appendLine("Resource  abc  def  # comment")
+                .appendLine("Variables  abc  def  # comment")
+                .appendLine("Metadata  abc  def  # comment")
+                .appendLine("Force Tags  abc  def  # comment")
+                .appendLine("Default Tags  abc  def  # comment")
+                .appendLine(
+                        "Suite Setup  Run Keyword If  cond  settings_nestedkw  arg  ELSE IF  condition  settings_nestedkw  arg  ELSE  settings_nestedkw  arg  #comment")
+                .appendLine(
+                        "Suite Teardown  Run Keyword If  cond  settings_nestedkw  arg  ELSE IF  condition  settings_nestedkw  arg  ELSE  settings_nestedkw  arg  #comment  # comment")
+                .appendLine(
+                        "Test Setup  Run Keyword If  cond  settings_nestedkw  arg  ELSE IF  condition  settings_nestedkw  arg  ELSE  settings_nestedkw  arg  #comment  # comment")
+                .appendLine(
+                        "Test Teardown  Run Keyword If  cond  settings_nestedkw  arg  ELSE IF  condition  settings_nestedkw  arg  ELSE  settings_nestedkw  arg  #comment  # comment")
                 .appendLine("Test Template  general_setting_template  def  # comment")
                 .appendLine("Test Timeout  abc  def  # comment")
                 .appendLine("UnkownSetting  abc  def  # comment")

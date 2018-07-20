@@ -169,6 +169,34 @@ public class ExecutableCallRuleTest {
     }
 
     @Test
+    public void nestedKeywordsAreRecognized() {
+        boolean thereAreNestedKw = false;
+        final List<RobotLine> lines = TokensSource.createTokensInLinesWithSpecialNestingKeywords();
+        for (final RobotLine line : lines) {
+            for (final IRobotLineElement token : line.getLineElements()) {
+                final int positionInsideToken = new Random().nextInt(token.getText().length());
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken, lines);
+
+                if (token.getText().equals("nestedkw")) {
+                    thereAreNestedKw = true;
+
+                    assertThat(evaluatedToken).isPresent();
+                    assertThat(evaluatedToken.get().getPosition())
+                            .isEqualTo(new Position(token.getStartOffset() + positionInsideToken,
+                                    token.getText().length() - positionInsideToken));
+                    assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("call_token");
+
+                } else if (!token.getText().equals("Run Keyword If") && !token.getText().equals("Run Keywords")
+                        && !token.getText().equals(":FOR") && !token.getText().equals("\\")
+                        && !token.getText().contains("var_asgn")) {
+                    assertThat(evaluatedToken).isNotPresent();
+                }
+            }
+        }
+        assertThat(thereAreNestedKw).isTrue();
+    }
+
+    @Test
     public void variableTokenIsDetected_whenPositionedInsideVariable() {
         final String var1 = "${var}";
         final String var2 = "@{list}";
