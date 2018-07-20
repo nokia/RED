@@ -6,13 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,18 +36,15 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.RobotTimeFormat;
-import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
@@ -337,7 +334,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
     private void reportArgumentsDefaultValuesUnknownVariables() {
         for (final KeywordArguments argSetting : keyword.getArguments()) {
-            final Set<String> definedVariables = newHashSet(validationContext.getAccessibleVariables());
+            final Set<String> additionalKnownVariables = new HashSet<>();
 
             for (final RobotToken argToken : argSetting.getArguments()) {
                 final boolean hasDefault = argToken.getText().contains("=");
@@ -349,30 +346,19 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                     final Multimap<String, RobotToken> usedVariables = VariableNamesSupport.extractUnifiedVariables(
                             argToken, new VariableExtractor(), validationContext.getFile().getName());
 
-                    for (final Entry<String, RobotToken> entry : usedVariables.entries()) {
-                        if (isInvalidVariableDeclaration(definedVariables, unifiedDefinitionName, entry)) {
-                            final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
-                                    .formatMessageWith(entry.getValue().getText());
-                            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
-                                    entry.getKey());
-                            reporter.handleProblem(problem, validationContext.getFile(), entry.getValue(), additional);
-                        }
-                    }
-                    definedVariables.add(unifiedDefinitionName);
+                    final List<RobotToken> varTokens = usedVariables.values()
+                            .stream()
+                            .filter(varToken -> varToken.getStartOffset() != argToken.getStartOffset()
+                                    || varToken.getEndOffset() != argToken.getStartOffset() + def.length())
+                            .collect(toList());
+                    new UnknownVariables(validationContext, reporter).reportUnknownVars(additionalKnownVariables,
+                            varTokens);
+                    additionalKnownVariables.add(unifiedDefinitionName);
                 } else {
-                    definedVariables.add(VariableNamesSupport.extractUnifiedVariableName(argToken.getText()));
+                    additionalKnownVariables.add(VariableNamesSupport.extractUnifiedVariableName(argToken.getText()));
                 }
             }
         }
-    }
-
-    private boolean isInvalidVariableDeclaration(final Set<String> definedVariables, final String unifiedDefinitionName,
-            final Entry<String, RobotToken> entry) {
-        return !entry.getValue().getTypes().contains(RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION)
-                && !unifiedDefinitionName.equals(entry.getKey())
-                && !VariableNamesSupport.isDefinedVariable(
-                VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(entry.getKey()), "$",
-                definedVariables);
     }
 
     private boolean isDefaultArgument(final RobotToken argumentToken) {
