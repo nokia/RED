@@ -208,6 +208,25 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
+    public List<List<String>> getSitePackagesLibrariesNames() {
+        try {
+            final List<List<String>> libraries = new ArrayList<>();
+            final Object[] objects = (Object[]) callRpcFunction("getSitePackagesLibrariesNames");
+            for (final Object o : objects) {
+                final Object[] libArray = (Object[]) o;
+                final List<String> libs = new ArrayList<>();
+                for (final Object lib : libArray) {
+                    libs.add((String) lib);
+                }
+                libraries.add(libs);
+            }
+            return libraries;
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+        }
+    }
+
+    @Override
     public String getRobotVersion() {
         try {
             return (String) callRpcFunction("getRobotVersion");

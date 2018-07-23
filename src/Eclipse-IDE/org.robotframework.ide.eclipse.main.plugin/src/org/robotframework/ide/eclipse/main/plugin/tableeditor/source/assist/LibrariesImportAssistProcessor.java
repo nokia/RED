@@ -63,8 +63,12 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
                 .create(SettingsGroup.LIBRARIES, assist.getModel())
                 .getFilesLocationsProposals(userContent);
 
+        final List<? extends AssistProposal> sitePackagesLibraries = new RedLibraryProposals(assist.getModel())
+                .getSitePackagesLibrariesProposals(userContent);
+
         libProposals.addAll(librariesProposals);
         libProposals.addAll(libFilesProposals);
+        libProposals.addAll(sitePackagesLibraries);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal libProposal : libProposals) {

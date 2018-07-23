@@ -69,6 +69,14 @@ public class AssistProposals {
         return new RedLibraryProposal(suiteFile.getProject(), libSpec, isImported, match);
     }
 
+    static RedSitePackagesLibraryProposal createSitePackagesLibraryProposal(final String name,
+            final RobotSuiteFile suiteFile, final ProposalMatch match) {
+
+        final boolean isImported = suiteFile.getImportedLibraries().keys().stream().anyMatch(
+                libSpec -> libSpec.getName().equals(name));
+        return new RedSitePackagesLibraryProposal(name, isImported, match);
+    }
+
     static RedKeywordProposal createNotAccessibleLibraryKeywordProposal(final LibrarySpecification spec,
             final KeywordSpecification keyword, final String bddPrefix, final KeywordScope scope,
             final Optional<String> alias, final IPath exposingFilepath,
@@ -244,6 +252,21 @@ public class AssistProposals {
 
             @Override
             public int compare(final RedLibraryProposal proposal1, final RedLibraryProposal proposal2) {
+                final int result = Boolean.compare(proposal1.isImported(), proposal2.isImported());
+                if (result != 0) {
+                    return result;
+                }
+                return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+            }
+        };
+    }
+
+    public static Comparator<RedSitePackagesLibraryProposal> sortedByLabelsNotImportedFirstForSitePackagesLibraries() {
+        return new Comparator<RedSitePackagesLibraryProposal>() {
+
+            @Override
+            public int compare(final RedSitePackagesLibraryProposal proposal1,
+                    final RedSitePackagesLibraryProposal proposal2) {
                 final int result = Boolean.compare(proposal1.isImported(), proposal2.isImported());
                 if (result != 0) {
                     return result;
