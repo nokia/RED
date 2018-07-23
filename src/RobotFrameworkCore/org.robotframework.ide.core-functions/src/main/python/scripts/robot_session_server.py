@@ -185,6 +185,13 @@ def get_standard_library_path(libname):
 @logresult
 @encode_result_or_exception
 @logargs
+def get_site_packages_libraries_names():
+    import red_libraries
+    return red_libraries.get_site_packages_libraries_names()
+
+@logresult
+@encode_result_or_exception
+@logargs
 def get_robot_version():
     return __get_robot_version()
 
@@ -351,6 +358,7 @@ if __name__ == '__main__':
     server.register_function(get_global_variables, 'getGlobalVariables')
     server.register_function(get_standard_libraries_names, 'getStandardLibrariesNames')
     server.register_function(get_standard_library_path, 'getStandardLibraryPath')
+    server.register_function(get_site_packages_libraries_names, 'getSitePackagesLibrariesNames')
     server.register_function(get_robot_version, 'getRobotVersion')
     server.register_function(start_library_auto_discovering, 'startLibraryAutoDiscovering')
     server.register_function(start_keyword_auto_discovering, 'startKeywordAutoDiscovering')
