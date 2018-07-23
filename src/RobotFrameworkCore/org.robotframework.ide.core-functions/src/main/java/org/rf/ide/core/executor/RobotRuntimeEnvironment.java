@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
+import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.rf.ide.core.rflint.RfLintRule;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -401,6 +402,16 @@ public class RobotRuntimeEnvironment {
             return Optional.of(executor.getStandardLibraryPath(libraryName));
         }
         return Optional.empty();
+    }
+
+    public SitePackagesLibraries getSitePackagesLibrariesNames() {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = executors
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            final List<List<String>> libs = executor.getSitePackagesLibrariesNames();
+            return new SitePackagesLibraries(libs);
+        }
+        return new SitePackagesLibraries();
     }
 
     /**

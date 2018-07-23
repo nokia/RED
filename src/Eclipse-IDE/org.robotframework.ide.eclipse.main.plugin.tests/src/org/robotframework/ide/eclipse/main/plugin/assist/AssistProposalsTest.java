@@ -252,6 +252,21 @@ public class AssistProposalsTest {
     }
 
     @Test
+    public void verifySitePackagesLibraryProposalProperties() {
+        final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
+
+        final RedSitePackagesLibraryProposal proposal = AssistProposals
+                .createSitePackagesLibraryProposal("sitePackagesLibrary", suiteFile, ProposalMatch.EMPTY);
+        assertThat(proposal.getContent()).isEqualTo("sitePackagesLibrary");
+        assertThat(proposal.getArguments()).isEmpty();
+        assertThat(proposal.isImported()).isFalse();
+        assertThat(proposal.getImage()).isEqualTo(RedImages.getPythonSitePackagesLibraryImage());
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("sitePackagesLibrary");
+        assertThat(proposal.isDocumented()).isFalse();
+        assertThat(proposal.getDescription()).isEmpty();
+    }
+
+    @Test
     public void verifyRemoteLibraryProposalProperties() {
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
         final LibrarySpecification libSpec = new LibrarySpecification();
@@ -477,6 +492,21 @@ public class AssistProposalsTest {
         Collections.sort(proposals, AssistProposals.sortedByLabelsNotImportedFirst());
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("abc1", "klm1", "Xyz1", "abc2", "klm2", "Xyz2");
+    }
+
+    @Test
+    public void libraryProposalsSortedByImportedFlagAndThenByName_forSitePackagesLibs() {
+        final List<RedSitePackagesLibraryProposal> proposals = new ArrayList<>();
+        proposals.add(new RedSitePackagesLibraryProposal("libOne", false, ProposalMatch.EMPTY));
+        proposals.add(new RedSitePackagesLibraryProposal("libTwo", true, ProposalMatch.EMPTY));
+        proposals.add(new RedSitePackagesLibraryProposal("oneLib", false, ProposalMatch.EMPTY));
+        proposals.add(new RedSitePackagesLibraryProposal("myLib", true, ProposalMatch.EMPTY));
+        proposals.add(new RedSitePackagesLibraryProposal("library", false, ProposalMatch.EMPTY));
+        Collections.sort(proposals, AssistProposals.sortedByLabelsNotImportedFirstForSitePackagesLibraries());
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("libOne", "library", "oneLib",
+                "libTwo",
+                "myLib");
     }
 
     private AssistProposal proposal(final String content) {
