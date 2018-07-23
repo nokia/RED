@@ -128,6 +128,33 @@ public class VariableUsageRuleTest {
         assertThat(evaluatedIndex.get().getToken().getData()).isEqualTo("token");
     }
 
+    @Test
+    public void variableUsageIsDetected_forSimpleEnvironmentVariable() {
+        final RobotToken token = createToken("%{env_var}");
+
+        final Optional<PositionedTextToken> evaluatedToken = evaluate(token);
+
+        assertThat(evaluatedToken).isPresent();
+        assertThat(evaluatedToken.get().getPosition())
+                .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
+        assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
+    }
+
+    @Test
+    public void variableUsageIsNotDetected_forEnvironmentVariableInKeywordName() {
+        final String kwName = "kw";
+        final String variable = "%{env_var}";
+        final RobotToken token = createToken(kwName + variable);
+        token.getTypes().add(RobotTokenType.KEYWORD_NAME);
+
+        final Optional<PositionedTextToken> evaluatedToken = evaluate(token);
+
+        assertThat(evaluatedToken).isPresent();
+        assertThat(evaluatedToken.get().getPosition())
+                .isEqualTo(new Position(token.getStartOffset(), kwName.length()));
+        assertThat(evaluatedToken.get().getToken().getData()).isNull();
+    }
+
     private RobotToken createToken(final String content) {
         final RobotToken token = RobotToken.create(content, EnumSet.of(RobotTokenType.VARIABLE_USAGE));
         token.setLineNumber(1);
