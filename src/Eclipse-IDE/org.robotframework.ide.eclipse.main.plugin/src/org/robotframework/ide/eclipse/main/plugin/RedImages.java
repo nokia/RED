@@ -30,7 +30,7 @@ import com.google.common.io.Files;
 public class RedImages {
 
     public static final VariableImages VARIABLES = new VariableImages();
-    
+
     private static final Map<ImageDescriptor, ImageDescriptor> GRAY_IMAGES = new HashMap<>(0);
 
 
@@ -268,6 +268,10 @@ public class RedImages {
 
     public static ImageDescriptor getPythonLibraryImage() {
         return RedPlugin.getImageDescriptor("resources/library_python.png");
+    }
+
+    public static ImageDescriptor getPythonSitePackagesLibraryImage() {
+        return RedPlugin.getImageDescriptor("resources/library_python_site_packages.png");
     }
 
     public static ImageDescriptor getVirtualLibraryImage() {
