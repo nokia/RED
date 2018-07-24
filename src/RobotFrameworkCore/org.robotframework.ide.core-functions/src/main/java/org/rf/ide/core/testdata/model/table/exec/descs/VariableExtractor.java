@@ -24,6 +24,11 @@ public class VariableExtractor {
         this.mapper = new DeclarationMapper();
     }
 
+    public VariableExtractor(final DeclarationMapper mapper) {
+        this.structureExtractor = new VariableStructureExtractor();
+        this.mapper = mapper;
+    }
+
     public MappingResult extract(final FilePosition fp, final String text, final String fileName) {
         try {
             final Container mainContainer = structureExtractor.buildStructureTree(text);

@@ -3,15 +3,15 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.execution.debug;
+package org.rf.ide.core.testdata.model;
 
 import java.net.URISyntaxException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
-import org.rf.ide.core.execution.debug.ExecutableLineChecker;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.model.ExecutableLineChecker;
 import org.rf.ide.core.testdata.model.RobotFile;
 
 public class ExecutableLineCheckerTest {
