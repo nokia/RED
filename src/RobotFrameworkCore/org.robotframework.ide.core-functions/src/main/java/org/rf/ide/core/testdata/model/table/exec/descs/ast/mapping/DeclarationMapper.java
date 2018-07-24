@@ -330,30 +330,19 @@ public class DeclarationMapper {
         return varElements;
     }
 
-    private IElementDeclaration getPossibleVariableIdentifier(final List<IElementDeclaration> mappedElements) {
-        IElementDeclaration elem = null;
+    IElementDeclaration getPossibleVariableIdentifier(final List<IElementDeclaration> mappedElements) {
         if (mappedElements != null) {
             final int numberOfMapped = mappedElements.size();
-            if (numberOfMapped >= 2) {
-                final IElementDeclaration lastSubContainer = mappedElements.get(numberOfMapped - 1);
-                if (lastSubContainer instanceof VariableDeclaration) {
-                    final IElementDeclaration previous = mappedElements.get(numberOfMapped - 2);
-                    final JoinedTextDeclarations text = new JoinedTextDeclarations();
-                    text.addElementDeclarationInside(previous);
-                    final String idText = text.getText();
-                    if (idText != null) {
-                        final String trimmed = idText.trim();
-                        if (trimmed.length() >= 1) {
-                            if (ContainerElementType.VARIABLE_TYPE_ID.getRepresentation().contains(trimmed.charAt(0))) {
-                                elem = previous;
-                            }
-                        }
-                    }
+            if (numberOfMapped >= 2 && mappedElements.get(numberOfMapped - 1) instanceof VariableDeclaration) {
+                final IElementDeclaration previous = mappedElements.get(numberOfMapped - 2);
+                final String idText = previous.getStart().getText().trim();
+                if (idText.length() >= 1 && ContainerElementType.VARIABLE_TYPE_ID
+                        .getRepresentation().contains(idText.charAt(0))) {
+                    return previous;
                 }
             }
         }
-
-        return elem;
+        return null;
     }
 
     public String getFileMapped() {
