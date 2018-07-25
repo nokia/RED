@@ -146,11 +146,11 @@ public class LibrariesImportAssistProcessorTest {
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        assertThat(proposals).hasSize(3).haveExactly(3,
+        assertThat(proposals).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(transformedDocuments).contains(
                 new Document("*** Settings ***", "Resources  cell", "Library  StdLib1  ", "Library  cell1  cell2"),
                 new Document("*** Settings ***", "Resources  cell", "Library  StdLib2  ", "Library  cell1  cell2"),
                 new Document("*** Settings ***", "Resources  cell", "Library  cRefLib  ", "Library  cell1  cell2"));
@@ -171,11 +171,11 @@ public class LibrariesImportAssistProcessorTest {
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        assertThat(proposals).hasSize(3).haveExactly(3,
+        assertThat(proposals).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(transformedDocuments).contains(
                 new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  StdLib1  cell2"),
                 new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  StdLib2  cell2"),
                 new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  cRefLib  cell2"));
@@ -196,12 +196,12 @@ public class LibrariesImportAssistProcessorTest {
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        assertThat(proposals).hasSize(1).haveExactly(1,
+        assertThat(proposals).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
-                new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  cRefLib  cell2"));
+        assertThat(transformedDocuments)
+                .contains(new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  cRefLib  cell2"));
     }
 
     private static IDocument documentFromSuiteFile() throws Exception {

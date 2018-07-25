@@ -32,6 +32,8 @@ interface RobotCommandExecutor {
 
     File getStandardLibraryPath(String libName);
 
+    List<List<String>> getSitePackagesLibrariesNames();
+
     String getRobotVersion();
 
     void createLibdoc(String libName, File outputFile, LibdocFormat format, EnvironmentSearchPaths additionalPaths);

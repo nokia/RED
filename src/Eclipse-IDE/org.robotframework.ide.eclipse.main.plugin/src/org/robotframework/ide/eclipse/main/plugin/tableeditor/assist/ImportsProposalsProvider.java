@@ -20,6 +20,8 @@ import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+import com.google.common.collect.Streams;
+
 public abstract class ImportsProposalsProvider implements RedContentProposalProvider {
 
     private final RobotSuiteFile model;
@@ -50,8 +52,11 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
                 .create(importType, model)
                 .getFilesLocationsProposals(prefix)
                 .stream();
+        final Stream<? extends AssistProposal> sitePackagesLibrariesProposals = importType == SettingsGroup.LIBRARIES
+                ? new RedLibraryProposals(model).getSitePackagesLibrariesProposals(prefix).stream()
+                : Stream.empty();
         final RobotRuntimeEnvironment env = model.getProject().getRuntimeEnvironment();
-        return Stream.concat(librariesProposals, fileLocationProposals)
+        return Streams.concat(librariesProposals, fileLocationProposals, sitePackagesLibrariesProposals)
                 .map(proposal -> new AssistProposalAdapter(env, proposal, p -> true))
                 .toArray(RedContentProposal[]::new);
     }
