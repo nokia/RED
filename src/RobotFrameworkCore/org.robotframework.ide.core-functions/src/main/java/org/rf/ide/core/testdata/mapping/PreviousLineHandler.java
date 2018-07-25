@@ -36,12 +36,12 @@ public class PreviousLineHandler {
 
     private final Stack<ParsingState> storedStack = new Stack<>();
 
-    public LineContinueType computeLineContinue(final Stack<ParsingState> parsingStates, boolean isNewLine,
+    public LineContinueType computeLineContinue(final Stack<ParsingState> parsingStates, final boolean isNewLine,
             final RobotFile model, final RobotLine currentLine, final RobotToken currentToken) {
         LineContinueType continueType = LineContinueType.NONE;
 
         if (isPreviousLineContinueToken(currentLine, currentToken) || isCommentContinue(currentToken, storedStack)) {
-            ParsingState currentState = stateHelper.getCurrentStatus(parsingStates);
+            final ParsingState currentState = stateHelper.getCurrentStatus(parsingStates);
 
             if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
                 if (isNewLine && containsAnySetting(model) && isSomethingToContinue(model)) {
@@ -62,7 +62,7 @@ public class PreviousLineHandler {
                 if (isNewLine) {
                     if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_NEWLINE_FOR_TESTCASE_TABLE, model,
                             currentLine, currentToken)) {
-                        ParsingState state = stateHelper.getCurrentStatus(storedStack);
+                        final ParsingState state = stateHelper.getCurrentStatus(storedStack);
                         if (state == ParsingState.TEST_CASE_TABLE_HEADER) {
                             storedStack.remove(ParsingState.TEST_CASE_TABLE_HEADER);
                             storedStack.push(ParsingState.TEST_CASE_TABLE_INSIDE);
@@ -80,7 +80,7 @@ public class PreviousLineHandler {
                 if (isNewLine) {
                     if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_NEWLINE_FOR_KEYWORD_TABLE, model,
                             currentLine, currentToken)) {
-                        ParsingState state = stateHelper.getCurrentStatus(storedStack);
+                        final ParsingState state = stateHelper.getCurrentStatus(storedStack);
                         if (state == ParsingState.KEYWORD_TABLE_HEADER) {
                             storedStack.remove(ParsingState.KEYWORD_TABLE_HEADER);
                             storedStack.push(ParsingState.KEYWORD_TABLE_INSIDE);
@@ -122,7 +122,7 @@ public class PreviousLineHandler {
     }
 
     @VisibleForTesting
-    protected boolean isCommentContinue(RobotToken currentToken, Stack<ParsingState> storedStack) {
+    protected boolean isCommentContinue(final RobotToken currentToken, final Stack<ParsingState> storedStack) {
         boolean result = false;
 
         if (currentToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
@@ -136,15 +136,15 @@ public class PreviousLineHandler {
 
     public boolean isSomethingToContinue(final RobotFile model) {
         boolean result = false;
-        List<RobotLine> fileContent = model.getFileContent();
+        final List<RobotLine> fileContent = model.getFileContent();
         boolean notFoundYet = true;
         for (int i = fileContent.size() - 1; i > 0 && notFoundYet; i--) {
-            RobotLine robotLine = fileContent.get(i);
-            List<IRobotLineElement> lineElements = robotLine.getLineElements();
+            final RobotLine robotLine = fileContent.get(i);
+            final List<IRobotLineElement> lineElements = robotLine.getLineElements();
             if (!lineElements.isEmpty()) {
                 for (int k = 0; k < lineElements.size() && k < 2; k++) {
-                    IRobotLineElement elem = lineElements.get(k);
-                    List<IRobotTokenType> types = elem.getTypes();
+                    final IRobotLineElement elem = lineElements.get(k);
+                    final List<IRobotTokenType> types = elem.getTypes();
                     if (types.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)
                             || types.contains(RobotTokenType.SETTINGS_TABLE_HEADER)
                             || types.contains(RobotTokenType.VARIABLES_TABLE_HEADER)
@@ -193,13 +193,10 @@ public class PreviousLineHandler {
         return (type != LineContinueType.NONE);
     }
 
-    public void restorePreviousStack(final LineContinueType continueType, final Stack<ParsingState> parsingStates,
-            final RobotLine currentLine, final RobotToken currentToken) {
-        if (isSomethingToDo(continueType)) {
-            parsingStates.clear();
-            removeLastNotWantedStates(storedStack);
-            parsingStates.addAll(storedStack);
-        }
+    public void restorePreviousStack(final Stack<ParsingState> parsingStates) {
+        parsingStates.clear();
+        removeLastNotWantedStates(storedStack);
+        parsingStates.addAll(storedStack);
     }
 
     public void flushNew(final Stack<ParsingState> parsingStates) {
@@ -223,8 +220,9 @@ public class PreviousLineHandler {
     @VisibleForTesting
     protected void removeLastNotWantedStates(final Stack<ParsingState> parsingStates) {
         for (int i = parsingStates.size() - 1; i >= 0; i--) {
-            ParsingState state = parsingStates.get(i);
-            if (state == ParsingState.COMMENT) {
+            final ParsingState state = parsingStates.get(i);
+            if (state == ParsingState.COMMENT || state == ParsingState.TEST_CASE_EMPTY_LINE
+                    || state == ParsingState.KEYWORD_EMPTY_LINE) {
                 parsingStates.remove(i);
             } else {
                 break;
