@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9iY88ENOEeaEVfxTnoQ14g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/4/18 11:27 AM
+Save-Time: 7/25/18 4:26 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -23,9 +23,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Setting ***\n"
 with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }    
-get-editor "TestFile.robot" |  close
 
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 get-editor "TestFile.robot" | maximize
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
@@ -73,19 +71,19 @@ with [get-editor "TestFile.robot"] {
 //check if columns number was not increased
 with [get-editor "TestFile.robot" | get-section General | get-canvas] {
     get-property "getLayer().getBodyLayer().getRowCount()" | equals 8 | verify-true
-    get-property "getLayer().getBodyLayer().getColumnCount()" | equals 8 | verify-true
+    get-property "getLayer().getBodyLayer().getColumnCount()" | equals 7 | verify-true
 }
 
 //check of if "\" are visible in table
 check-row-for-test-setup-default -file "TestFile.robot"  -row 1 -setting "Suite Setup" -c1 "log" -c2 "\\" -c3 "second arg"
-check-row-for-test-setup-default -file "TestFile.robot"  -row 2 -setting "Suite Teardown" -c1 "\\" -c2 "\\" -c3 "\\" -c4 "\\" -c5 "\\" -c6 "#coment in line 2"
+check-row-for-test-setup-default -file "TestFile.robot"  -row 2 -setting "Suite Teardown" -c1 "" -c2 "" -c3 "" -c4 "" -c5 "" -c6 "#coment in line 2"
 check-row-for-test-setup-default -file "TestFile.robot"  -row 3 -setting "Test Setup" -c1 "Catenate"
 
 //check Source
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "Suite Setup    log    \\    second arg\n"
-    + "Suite Teardown    \\    \\    \\    \\    \\    #coment in line 2\n"
+    + "Suite Teardown    #coment in line 2\n"
     + "Test Setup    Catenate\n"
     + "*** Test Cases ***" | verify-true
     
@@ -103,7 +101,7 @@ with [get-editor "TestFile.robot"] {
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "Suite Setup    log    \\    second arg\n"
-    + "Suite Teardown    \\    \\    \\    \\    \\    #coment in line 2\n"
+    + "Suite Teardown    #coment in line 2\n"
     + "Test Setup    Catenate\n"
     + "Force Tags    this is force tag\n"
     + "*** Test Cases ***" | verify-true
@@ -129,7 +127,7 @@ with [get-editor "TestFile.robot"] {
 //check Source if default tag was added at the end (not as was previous and in RIDE at the beggining)
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "Suite Setup    log    \\    second arg\n"
-    + "Suite Teardown    \\    \\    \\    \\    \\    #coment in line 2\n"
+    + "Suite Teardown    #coment in line 2\n"
     + "Test Setup    Catenate\n"
     + "Force Tags    this is force tag\n"
     + "Default Tags    def tag\n"
@@ -201,7 +199,7 @@ with [get-editor "TestFile.robot"] {
 //go to Source and check if default tag was added as last
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "Suite Setup    log    \\    second arg\n"
-    + "Suite Teardown    \\    \\    \\    \\    \\    #coment in line 2\n"
+    + "Suite Teardown    #coment in line 2\n"
     + "Test Setup    Catenate\n\n"
     + "Default Tags    my tag    #this is def tag\n"
     + "*** Test Cases ***" | verify-true
@@ -252,7 +250,7 @@ with [get-editor "TestFile.robot" | get-section General] {
 get-editor "TestFile.robot" | maximize
 
 check-row-for-test-setup-default -file "TestFile.robot"  -row 1 -setting "Suite Setup" -c1 "log" -c2 "\\" -c3 "second arg"
-check-row-for-test-setup-default -file "TestFile.robot"  -row 2 -setting "Suite Teardown" -c1 "\\" -c2 "\\" -c3 "\\" -c4 "\\" -c5 "\\" -c6 "#coment in line 2"
+check-row-for-test-setup-default -file "TestFile.robot"  -row 2 -setting "Suite Teardown" -c1 "" -c2 "" -c3 "" -c4 "" -c5 "" -c6 "#coment in line 2"
 check-row-for-test-setup-default -file "TestFile.robot"  -row 3 -setting "Test Setup" -c1 "Catenate"
 
 check-row-for-test-setup-default -file "TestFile.robot"  -row 4 -setting "Test Teardown" -c1 "tear" -c2 "\\" -c3 "\\" -c4 "arg for teardown"
