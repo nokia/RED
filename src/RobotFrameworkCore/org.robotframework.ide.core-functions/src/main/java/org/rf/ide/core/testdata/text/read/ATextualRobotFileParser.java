@@ -443,9 +443,9 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         if (lineContinueType == LineContinueType.LINE_CONTINUE_INLINED) {
             processThisElement = false;
         } else if (previousLineHandler.isSomethingToDo(lineContinueType)) {
-            previousLineHandler.restorePreviousStack(lineContinueType, processingState, currentLine, robotToken);
+            previousLineHandler.restorePreviousStack(processingState);
 
-            processThisElement = (processingState.size() > 1)
+            processThisElement = processingState.size() > 1
                     && !robotToken.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE);
         }
 

@@ -11,10 +11,8 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -49,10 +47,7 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) {
-        final RobotAction action = descriptor.getRowType() == ERowType.FOR_CONTINUE
-                ? ((ForLoopContinueRowDescriptor<?>) descriptor).getKeywordAction()
-                : descriptor.getAction();
-        final RobotToken keywordNameToken = action.getToken();
+        final RobotToken keywordNameToken = descriptor.getKeywordAction().getToken();
 
         final KeywordCallValidator keywordCallValidator = new KeywordCallValidator(validationContext, keywordNameToken,
                 descriptor.getKeywordArguments(), reporter);

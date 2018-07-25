@@ -32,6 +32,11 @@ public class SettingDescriptor<T> implements IExecutableRowDescriptor<T>{
     }
 
     @Override
+    public RobotAction getKeywordAction() {
+        return null;
+    }
+
+    @Override
     public List<VariableDeclaration> getUsedVariables() {
         return null;
     }
