@@ -23,24 +23,25 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 
 import com.google.common.collect.ImmutableBiMap;
 
-public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAccessor<Entry<String,RobotElement>> {
-    
+public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAccessor<Entry<String, RobotElement>> {
+
     private static ImmutableBiMap<Integer, String> properties = ImmutableBiMap.of(0, "name", 1, "value");
-    
+
     private RobotSettingsSection section;
-    
+
     private final RobotEditorCommandsStack commandsStack;
-    
+
     private int numberOfColumns;
-    
-    public GeneralSettingsColumnsPropertyAccessor(final RobotSettingsSection section, final RobotEditorCommandsStack commandsStack, final int numberOfColumns) {
+
+    public GeneralSettingsColumnsPropertyAccessor(final RobotSettingsSection section,
+            final RobotEditorCommandsStack commandsStack, final int numberOfColumns) {
         this.section = section;
         this.commandsStack = commandsStack;
         this.numberOfColumns = numberOfColumns;
     }
 
     @Override
-    public Object getDataValue(Entry<String,RobotElement> rowObject, int columnIndex) {
+    public Object getDataValue(Entry<String, RobotElement> rowObject, int columnIndex) {
         if (rowObject != null) {
             final RobotElement robotElement = rowObject.getValue();
             RobotSetting setting = null;
@@ -73,11 +74,12 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
                     commandsStack.execute(new SetKeywordCallCommentCommand(setting, newStringValue));
                 }
             } else if (columnIndex > 0 && newValue != null && section != null) {
-                final List<String> args = newArrayList(Collections.nCopies(columnIndex - 1, "\\"));
                 if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(
-                            new CreateFreshSettingCommand(section, rowObject.getKey(), args, newStringValue));
+                            new CreateFreshSettingCommand(section, rowObject.getKey(), new ArrayList<>(),
+                                    newStringValue));
                 } else {
+                    final List<String> args = newArrayList(Collections.nCopies(columnIndex - 1, "\\"));
                     args.add((String) newValue);
                     commandsStack.execute(new CreateFreshSettingCommand(section, rowObject.getKey(), args));
                 }
