@@ -52,7 +52,8 @@ public class ExecutableCallRule extends VariableUsageRule {
 
     @Override
     public boolean isApplicable(final IRobotLineElement token) {
-        return super.isApplicable(token) && acceptableTypes.contains(token.getTypes().get(0));
+        return super.isApplicable(token) && acceptableTypes.contains(token.getTypes().get(0))
+                && !token.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN);
     }
 
     @Override
@@ -104,8 +105,11 @@ public class ExecutableCallRule extends VariableUsageRule {
                 execTokens.add((RobotToken) token);
                 execTokens.addAll(getNextTokensInThisExecutable(token, context));
 
-                return SpecialKeywords.isKeywordNestedInKeyword(qualifiedKeywordName, j, tokensBefore.size() - j,
-                        execTokens);
+                if (SpecialKeywords.isKeywordNestedInKeyword(qualifiedKeywordName, j, tokensBefore.size() - j,
+                        execTokens)) {
+                    return true;
+                }
+                // return false;
             }
         }
         return false;
@@ -118,12 +122,16 @@ public class ExecutableCallRule extends VariableUsageRule {
         final int line = token.getLineNumber();
         for (int i = line - 1; i >= 0; i--) {
             final RobotLine robotLine = lines.get(i);
+            if (isComment(robotLine)) {
+                continue;
+            }
+
             final int previousElemIndex = line - 1 == i ? robotLine.getLineElements().indexOf(token) - 1
                     : robotLine.getLineElements().size() - 1;
 
             for (int j = previousElemIndex; j >= 0; j--) {
                 final IRobotLineElement element = robotLine.getLineElements().get(j);
-                if (element instanceof RobotToken && !isContinuation(element)) {
+                if (shouldBeAdded(element)) {
                     if (shouldStopOnElement.test(element)) {
                         return tokens;
                     }
@@ -137,6 +145,33 @@ public class ExecutableCallRule extends VariableUsageRule {
         return tokens;
     }
 
+    private static boolean isComment(final RobotLine robotLine) {
+        for (final IRobotLineElement element : robotLine.getLineElements()) {
+            if (element instanceof RobotToken) {
+                final List<IRobotTokenType> types = element.getTypes();
+                return types.contains(RobotTokenType.START_HASH_COMMENT)
+                        || types.contains(RobotTokenType.COMMENT_CONTINUE)
+                        || types.contains(RobotTokenType.KEYWORD_EMPTY_CELL)
+                        || types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL);
+            }
+        }
+        return false;
+    }
+
+    private static boolean isContinuation(final RobotLine robotLine) {
+        boolean isFirst = true;
+        for (final IRobotLineElement element : robotLine.getLineElements()) {
+            if (element instanceof RobotToken) {
+                if (isFirst && element.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
+                    isFirst = false;
+                } else {
+                    return element.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+                }
+            }
+        }
+        return false;
+    }
+
     private static List<RobotToken> getNextTokensInThisExecutable(final IRobotLineElement token,
             final List<RobotLine> lines) {
         final List<RobotToken> tokens = new ArrayList<>();
@@ -147,7 +182,7 @@ public class ExecutableCallRule extends VariableUsageRule {
 
             for (int j = nextElemIndex; j < robotLine.getLineElements().size(); j++) {
                 final IRobotLineElement element = robotLine.getLineElements().get(j);
-                if (element instanceof RobotToken && !isContinuation(element)) {
+                if (shouldBeAdded(element)) {
                     tokens.add(0, (RobotToken) element);
                 }
             }
@@ -158,16 +193,15 @@ public class ExecutableCallRule extends VariableUsageRule {
         return tokens;
     }
 
-    private static boolean isContinuation(final RobotLine robotLine) {
-        for (final IRobotLineElement element : robotLine.getLineElements()) {
-            if (element instanceof RobotToken) {
-                return isContinuation(element);
-            }
+    private static boolean shouldBeAdded(final IRobotLineElement element) {
+        if (element instanceof RobotToken) {
+            final List<IRobotTokenType> types = element.getTypes();
+            return !types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)
+                    && !types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                    && !types.contains(RobotTokenType.FOR_CONTINUE_TOKEN)
+                    && !types.contains(RobotTokenType.START_HASH_COMMENT)
+                    && !types.contains(RobotTokenType.COMMENT_CONTINUE);
         }
         return false;
-    }
-
-    private static boolean isContinuation(final IRobotLineElement element) {
-        return element.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE);
     }
 }

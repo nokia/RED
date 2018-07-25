@@ -59,6 +59,11 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         this.action = action;
     }
 
+    @Override
+    public RobotAction getKeywordAction() {
+        return getAction();
+    }
+
     public void moveCreatedVariablesToUsedVariables() {
         usedVariables.addAll(createdVariables);
         createdVariables.clear();

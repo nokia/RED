@@ -15,6 +15,7 @@ import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -50,7 +51,9 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                 if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW
                         || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
                     final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linked;
-                    final RobotToken action = row.buildLineDescription().getAction().getToken();
+                    final IExecutableRowDescriptor<?> description = row.buildLineDescription();
+                    final RobotToken action = description.getKeywordAction().getToken();
+
                     // don't worry about comments with artificial action token, it will be served by
                     // another case
                     final RobotToken actual = tokens.get(columnPosition);

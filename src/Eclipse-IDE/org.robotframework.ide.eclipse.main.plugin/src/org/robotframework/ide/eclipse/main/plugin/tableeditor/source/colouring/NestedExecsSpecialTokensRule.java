@@ -27,9 +27,11 @@ public class NestedExecsSpecialTokensRule implements ISyntaxColouringRule {
 
     public NestedExecsSpecialTokensRule(final IToken textToken) {
         this.textToken = textToken;
-        this.applicableTypes = EnumSet.of(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+        this.applicableTypes = EnumSet.of(RobotTokenType.TEST_CASE_ACTION_NAME,
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
                 RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT,
                 RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
+                RobotTokenType.KEYWORD_ACTION_NAME,
                 RobotTokenType.KEYWORD_ACTION_ARGUMENT,
                 RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
                 RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_ARGUMENT,
