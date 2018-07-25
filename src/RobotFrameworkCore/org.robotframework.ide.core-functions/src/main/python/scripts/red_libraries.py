@@ -26,6 +26,25 @@ def get_standard_library_path(libname):
     return source
 
 
+def get_site_packages_libraries_names():
+    robot_libs = list()
+    non_robot_libs = list()
+
+    try:
+        import pip
+        for package in pip.get_installed_distributions():
+            metadata = list(package._get_metadata("top_level.txt"))
+            if metadata:
+                if not metadata[0].startswith('_'):
+                    if 'robotframework-' in package.key:
+                        robot_libs.append(metadata[0])
+                    else:
+                        non_robot_libs.append(metadata[0])
+        return robot_libs, non_robot_libs
+    except:
+        return robot_libs, non_robot_libs
+
+
 def create_libdoc(libname, format):
     from tempfile import mkstemp
     import os

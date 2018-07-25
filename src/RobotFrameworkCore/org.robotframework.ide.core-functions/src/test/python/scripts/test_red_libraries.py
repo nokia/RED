@@ -3,6 +3,7 @@ import os
 
 from red_libraries import get_standard_library_names
 from red_libraries import get_standard_library_path
+from red_libraries import get_site_packages_libraries_names
 from red_libraries import create_libdoc
 from red_libraries import create_html_doc
 
@@ -17,6 +18,11 @@ class LibrariesRetrievingTests(unittest.TestCase):
         result = get_standard_library_path('BuiltIn')
 
         self.assertTrue(result.endswith('BuiltIn.py'))
+        
+    def test_if_site_packages_libraries_are_returned(self):
+        result = get_site_packages_libraries_names()
+
+        self.assertTrue(len(result) > 0)
 
     def test_if_libdoc_is_returned(self):
         result = create_libdoc('BuiltIn', 'XML')
