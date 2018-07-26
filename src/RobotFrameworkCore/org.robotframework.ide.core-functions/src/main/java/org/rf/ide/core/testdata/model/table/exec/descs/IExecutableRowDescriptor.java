@@ -19,6 +19,8 @@ public interface IExecutableRowDescriptor<T> {
 
     RobotAction getAction();
 
+    RobotAction getKeywordAction();
+
     List<VariableDeclaration> getUsedVariables();
 
     List<VariableDeclaration> getCommentedVariables();

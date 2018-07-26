@@ -13,6 +13,7 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.SpecialKeywords;
@@ -40,7 +41,8 @@ public class SettingsActionNamesLabelAccumulator implements IConfigLabelAccumula
                 // SettingsVariablesLabelAccumulator
                 configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
 
-            } else if (columnPosition > 1) {
+            } else if (columnPosition > 1
+                    && setting.getLinkedElement().getModelType() != ModelType.SUITE_TEST_TEMPLATE) {
                 final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();
                 final List<RobotToken> allTokens = new ArrayList<>();
                 allTokens.add(linkedSetting.getKeywordName());
