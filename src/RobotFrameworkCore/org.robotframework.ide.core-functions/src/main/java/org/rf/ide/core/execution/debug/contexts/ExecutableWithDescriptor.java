@@ -14,7 +14,6 @@ import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -70,26 +69,11 @@ class ExecutableWithDescriptor {
     }
 
     int getLine() {
-        return getKeywordCallToken().getLineNumber();
-    }
-
-    private RobotToken getKeywordCallToken() {
-        final IExecutableRowDescriptor<?> desc = getDescriptor();
-        if (desc instanceof ForLoopContinueRowDescriptor<?> && template == null) {
-            return ((ForLoopContinueRowDescriptor<?>) desc).getKeywordAction().getToken();
-        }
-        return desc.getAction().getToken();
+        return getDescriptor().getKeywordAction().getToken().getLineNumber();
     }
 
     String getCalledKeywordName() {
-        final IExecutableRowDescriptor<?> desc = getDescriptor();
-        if (template != null) {
-            return template;
-        } else if (desc instanceof ForLoopContinueRowDescriptor<?>) {
-            return ((ForLoopContinueRowDescriptor<?>) desc).getKeywordAction().getToken().getText();
-        } else {
-            return desc.getAction().getToken().getText();
-        }
+        return template != null ? template : getDescriptor().getKeywordAction().getToken().getText();
     }
 
     List<RobotToken> getForVariables() {

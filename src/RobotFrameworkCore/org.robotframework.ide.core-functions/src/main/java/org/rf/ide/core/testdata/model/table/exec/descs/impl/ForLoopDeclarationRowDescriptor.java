@@ -68,6 +68,11 @@ public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescrip
         this.forAction = forAction;
     }
 
+    @Override
+    public RobotAction getKeywordAction() {
+        return getAction();
+    }
+
     public RobotAction getInAction() {
         return inAction;
     }

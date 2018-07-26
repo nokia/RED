@@ -337,8 +337,10 @@ public class SpecialKeywords {
                         nestedExecTokens.subList(1, nestedExecTokens.size())));
             } else { // must be ELSE IF or IF
                 nested.addOmittedToken(nestedExecTokens.get(0)); // condition does not constitute nested exec
-                nested.addExecutable(createExecutable(nestedExecutableParent, nestedExecTokens.get(1),
-                        nestedExecTokens.subList(2, nestedExecTokens.size())));
+                if (nestedExecTokens.size() > 1) {
+                    nested.addExecutable(createExecutable(nestedExecutableParent, nestedExecTokens.get(1),
+                            nestedExecTokens.subList(2, nestedExecTokens.size())));
+                }
             }
         }
         return nested;
@@ -363,8 +365,11 @@ public class SpecialKeywords {
             final RobotToken type = types.get(i);
             
             if (type.getText().equals("ELSE IF") && splitted.get(i).size() < 2) {
-                messages.add("ELSE IF branch requires condition and keyword to be defined");
-                problematicTokens.add(type);
+                if (splitted.get(i).isEmpty()
+                        || !splitted.get(i).get(0).getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)) {
+                    messages.add("ELSE IF branch requires condition and keyword to be defined");
+                    problematicTokens.add(type);
+                }
 
             } else if (type.getText().equals("ELSE") && splitted.get(i).size() < 1) {
                 messages.add("ELSE branch requires keyword to be defined");
