@@ -1,0 +1,86 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: __pUKYMdqEeaVRsIP7EWHyA
+Element-Name: ContentAssistForSitePackagesLibs
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _1-5iYJDYEeire7gJDYnRIA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/26/18 4:01 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "PrefixProject/lib_with_variable.robot" | double-click
+
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 2 1
+    key-type "M1+SPACE"
+    type-text li
+    wait 300
+    key-type Enter
+}
+
+//check some site-packages libraries in CA
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {    
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "rflint" 
+    | get-property enablement | equals false | verify-true
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path rflint 
+    | get-property "image.path" | equals "org.robotframework.ide.eclipse.main.plugin/resources/library_python_site_packages.png" | verify-true
+    
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "Selenium2Library" 
+    | get-property enablement | equals false | verify-true
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path Selenium2Library 
+    | get-property "image.path" | equals "org.robotframework.ide.eclipse.main.plugin/resources/library_python_site_packages.png" | verify-true
+    
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "requests" 
+    | get-property enablement | equals false | verify-true
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path requests 
+    | get-property "image.path" | equals "org.robotframework.ide.eclipse.main.plugin/resources/library_python_site_packages.png" | verify-true
+    
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select rflint | click -default
+}
+// add rflint to red.xml config file
+with [get-editor "lib_with_variable.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 2 18
+        key-type "M1+1"
+    }
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'rflint' and add to configuration" | click -default
+get-editor "PrefixProject/red.xml" | get-section "Referenced libraries" | get-control Any 
+    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
+    -index 1 | key-type "M1+s"
+get-editor "lib_with_variable.robot" | click
+get-editor "PrefixProject/red.xml" | close
+// add another Library setting
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 2 18
+    key-type Enter
+    type-text Lib
+    key-type "M1+SPACE"
+    key-type Enter
+}
+// verify if rflint is already imported and has different image
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-item -path "rflint \\(already imported\\)" | get-property caption | equals "rflint (already imported)" 
+        | verify-true
+    get-item -path "rflint \\(already imported\\)" | get-property enablement | equals false | verify-true
+    get-item -path "rflint \\(already imported\\)" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/library.png" | verify-true
+}
+// verify if Selenium2Library is in CA and has proper image
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select Selenium2Library
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-item -path Selenium2Library | get-property caption | equals Selenium2Library | verify-true
+    get-item -path Selenium2Library | get-property enablement | equals false | verify-true
+    get-item -path Selenium2Library | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/library_python_site_packages.png" | verify-true
+}
+get-editor "lib_with_variable.robot" | get-text-viewer | set-caret-pos 6 1
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
