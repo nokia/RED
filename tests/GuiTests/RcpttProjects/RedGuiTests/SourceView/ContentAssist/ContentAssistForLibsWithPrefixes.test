@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Xe9eMMbZEeaVRsIP7EWHyA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/2/17 11:09 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/26/18 4:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -56,10 +56,20 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[25].getText()" | equals "libs/for_resource/res1.py" | verify-true
     get-property "getItems().TableItem[26].getText()" | equals "libs/subfolder/many_classes.py" | verify-true
     get-property "getItems().TableItem[27].getText()" | equals "libs/t/divide.py" | verify-true
-    get-property "getItems().TableItem[28].getText()" | equals "${/}" | verify-true
-    get-property "getItems().TableItem[29].getText()" | equals "${:}" | verify-true
-    get-property "getItems().TableItem[30].getText()" | equals "${\\n}" | verify-true
-    get-property "getItems().TableItem[31].getText()" | equals "${CURDIR}" | verify-true
+    
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "rflint" 
+    	| get-property enablement | equals false | verify-true
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "Selenium2Library" 
+    	| get-property enablement | equals false | verify-true
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "requests" 
+    	| get-property enablement | equals false | verify-true
+    
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "${\\/}" 
+    	| get-property enablement | equals false | verify-true
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "${:}" 
+    	| get-property enablement | equals false | verify-true
+   	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "${\\n}" 
+    	| get-property enablement | equals false | verify-true
 }
 
 //select Add
