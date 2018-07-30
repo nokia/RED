@@ -31,8 +31,12 @@ def get_site_packages_libraries_names():
     non_robot_libs = list()
 
     try:
-        import pip
-        for package in pip.get_installed_distributions():
+        from pip._internal.utils.misc import get_installed_distributions
+    except ImportError:  # for pip<10
+        from pip import get_installed_distributions
+
+    try:
+        for package in get_installed_distributions():
             metadata = list(package._get_metadata("top_level.txt"))
             if metadata:
                 if not metadata[0].startswith('_'):
