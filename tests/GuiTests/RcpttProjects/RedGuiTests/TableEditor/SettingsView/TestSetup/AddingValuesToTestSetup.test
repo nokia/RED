@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9iY88ENOEeaEVfxTnoQ14g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/25/18 4:26 PM
+Save-Time: 7/31/18 5:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -230,6 +230,7 @@ with [get-editor "TestFile.robot" | get-section General] {
     	//use keyword to go to test teardown
         key-type Up -times 2  //test template
         key-type Left -times 10  //move max to left and selecion will jump one line up to teardow)
+        wait 300
         key-type Enter
     }
     //add arg1
