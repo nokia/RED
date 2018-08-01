@@ -5,23 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
+import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.RobotTimeFormat;
@@ -32,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentP
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 /**
  * @author Michal Anglart
@@ -45,15 +40,19 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
 
     private final ValidationReportingStrategy reporter;
 
+    private final VersionDependentValidators versionDependentValidators;
+
     TestCaseSettingsValidator(final FileValidationContext validationContext, final TestCase testCase,
             final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.testCase = testCase;
         this.reporter = reporter;
+        this.versionDependentValidators = new VersionDependentValidators();
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) {
+        reportVersionSpecificProblems();
         reportUnknownSettings();
 
         reportTagsProblems();
@@ -67,6 +66,11 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
         reportUnknownVariablesInNonExecutables();
     }
 
+    private void reportVersionSpecificProblems() {
+        versionDependentValidators.getTestCaseSettingsValidators(validationContext, testCase, reporter)
+                .forEach(ModelUnitValidator::validate);
+    }
+
     private void reportUnknownSettings() {
         final List<TestCaseUnknownSettings> unknownSettings = testCase.getUnknownSettings();
         for (final TestCaseUnknownSettings unknownSetting : unknownSettings) {
@@ -78,17 +82,16 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportTagsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getTags().stream().collect(
-                toMap(TestCaseTags::getDeclaration, tag -> tag.getTags().isEmpty()));
-
-        reportCommonProblems(declarationIsEmpty);
+        testCase.getTags().stream()
+            .filter(tag -> tag.getTags().isEmpty())
+            .forEach(this::reportEmptySetting);
     }
 
     private void reportTimeoutsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getTimeouts().stream().collect(
-                toMap(TestCaseTimeout::getDeclaration, timeout -> timeout.getTimeout() == null));
+        testCase.getTimeouts().stream()
+                .filter(timeout -> timeout.getTimeout() == null)
+                .forEach(this::reportEmptySetting);
 
-        reportCommonProblems(declarationIsEmpty);
         reportInvalidTimeoutSyntax(testCase.getTimeouts());
     }
 
@@ -108,34 +111,26 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportDocumentationsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getDocumentation().stream().collect(
-                toMap(TestDocumentation::getDeclaration, doc -> doc.getDocumentationText().isEmpty()));
-
-        reportCommonProblems(declarationIsEmpty);
+        testCase.getDocumentation().stream().findFirst()
+                .filter(doc -> doc.getDocumentationText().isEmpty())
+                .ifPresent(this::reportEmptySetting);
     }
 
     private void reportTemplateProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getTemplates().stream().collect(
-                toMap(TestCaseTemplate::getDeclaration, template -> template.getKeywordName() == null));
+        testCase.getTemplates().stream()
+                .filter(template -> template.getKeywordName() == null)
+                .forEach(this::reportEmptySetting);
 
-        reportCommonProblems(declarationIsEmpty);
-        reportTemplateUnexpectedArguments(testCase.getTemplates());
+        reportTemplateWrittenInMultipleCells(testCase.getTemplates());
         reportTemplateKeywordProblems(testCase.getTemplates());
     }
 
-    private void reportTemplateUnexpectedArguments(final List<TestCaseTemplate> templates) {
+    private void reportTemplateWrittenInMultipleCells(final List<TestCaseTemplate> templates) {
         for (final TestCaseTemplate template : templates) {
             if (!template.getUnexpectedTrashArguments().isEmpty()) {
                 final RobotToken settingToken = template.getDeclaration();
-                final String actualArgs = template.getUnexpectedTrashArguments()
-                        .stream()
-                        .map(RobotToken::getText)
-                        .map(String::trim)
-                        .collect(joining(", ", "[", "]"));
-                final String additionalMsg = "Only keyword name should be specified for templates.";
                 final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.SETTING_ARGUMENTS_NOT_APPLICABLE)
-                        .formatMessageWith(settingToken.getText(), actualArgs, additionalMsg);
+                        .causedBy(GeneralSettingsProblem.TEMPLATE_KEYWORD_NAME_IN_MULTIPLE_CELLS);
                 reporter.handleProblem(problem, validationContext.getFile(), settingToken);
             }
         }
@@ -145,47 +140,35 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
         for (final TestCaseTemplate template : templates) {
             final RobotToken keywordToken = template.getKeywordName();
             if (keywordToken != null) {
-                final String keywordName = keywordToken.getText();
+                final List<String> keywordParts = newArrayList(keywordToken.getText());
+                template.getUnexpectedTrashArguments().stream().map(RobotToken::getText).forEach(keywordParts::add);
+
+                final String keywordName = String.join(" ", keywordParts);
                 if (keywordName.toLowerCase().equals("none")) {
                     continue;
                 }
-                new KeywordCallInTemplateValidator(validationContext, keywordToken, reporter).validate();
+                new KeywordCallInTemplateValidator(validationContext, keywordName, keywordToken, reporter).validate();
             }
         }
     }
 
     private void reportSetupProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getSetups().stream().collect(
-                toMap(TestCaseSetup::getDeclaration, setup -> setup.getKeywordName() == null));
-
-        reportCommonProblems(declarationIsEmpty);
+        testCase.getSetups().stream()
+                .filter(setup -> setup.getKeywordName() == null)
+                .forEach(this::reportEmptySetting);
     }
 
     private void reportTeardownProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = testCase.getTeardowns().stream().collect(
-                toMap(TestCaseTeardown::getDeclaration, teardown -> teardown.getKeywordName() == null));
-
-        reportCommonProblems(declarationIsEmpty);
+        testCase.getTeardowns().stream()
+                .filter(teardown -> teardown.getKeywordName() == null)
+                .forEach(this::reportEmptySetting);
     }
 
-    private void reportCommonProblems(final Map<RobotToken, Boolean> declarationTokens) {
-        final String caseName = testCase.getTestName().getText();
-        final IFile file = validationContext.getFile();
-        final boolean tooManySettings = declarationTokens.size() > 1;
-
-        declarationTokens.forEach((defToken, isEmpty) -> {
-            if (tooManySettings) {
-                final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.DUPLICATED_CASE_SETTING)
-                        .formatMessageWith(caseName, defToken.getText());
-                reporter.handleProblem(problem, file, defToken);
-            }
-
-            if (isEmpty) {
-                final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE_SETTING)
-                        .formatMessageWith(defToken.getText());
-                reporter.handleProblem(problem, file, defToken);
-            }
-        });
+    private void reportEmptySetting(final AModelElement<?> element) {
+        final RobotToken defToken = element.getDeclaration();
+        final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE_SETTING)
+                .formatMessageWith(defToken.getText());
+        reporter.handleProblem(problem, validationContext.getFile(), defToken);
     }
 
     private void reportOutdatedSettingsSynonyms() {

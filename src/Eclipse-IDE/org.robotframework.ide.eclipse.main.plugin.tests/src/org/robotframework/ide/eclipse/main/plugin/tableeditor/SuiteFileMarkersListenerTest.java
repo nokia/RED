@@ -193,8 +193,8 @@ public class SuiteFileMarkersListenerTest {
 
         assertThat(severityFor(listener, settings.get(3))).isEqualTo(Severity.ERROR);
         assertThat(messageFor(listener, settings.get(3))).containsOnly(
-                "Setting 'Test Template' is not applicable for arguments: [1, 2]. Only keyword name should be specified for templates.",
-                "Unknown keyword 'unknown'");
+                "The name of template keyword is written in multiple cells",
+                "Unknown keyword 'unknown 1 2'");
     }
 
     @Test

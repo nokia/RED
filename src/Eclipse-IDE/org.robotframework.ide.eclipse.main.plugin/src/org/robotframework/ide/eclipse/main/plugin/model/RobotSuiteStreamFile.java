@@ -11,11 +11,12 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.eclipse.core.runtime.content.IContentDescriber;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
@@ -75,29 +76,16 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     @Override
     public List<RobotSuiteFileSection> getSections() {
-        return getSections(new ParsingStrategy() {
-
-            @Override
-            public RobotFileOutput parse() {
-                final RobotParser parser = RobotParser.create(
-                        new RobotProjectHolder(RedPlugin.getDefault().getActiveRobotInstallation()),
-                        (PathsProvider) null);
-                return parser.parseEditorContent("", new File(name));
-            }
-        });
+        return getSections(createReparsingStrategy(""));
     }
 
     @Override
     protected ParsingStrategy createReparsingStrategy(final String newContent) {
-        return new ParsingStrategy() {
-
-            @Override
-            public RobotFileOutput parse() {
-                final RobotParser parser = RobotParser.create(
-                        new RobotProjectHolder(RedPlugin.getDefault().getActiveRobotInstallation()),
-                        (PathsProvider) null);
-                return parser.parseEditorContent(newContent, new File(name));
-            }
+        return () -> {
+            final RobotRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
+            final RobotVersion version = env == null ? RobotVersion.UNKNOWN : RobotVersion.from(env.getVersion());
+            final RobotParser parser = RobotParser.create(new RobotProjectHolder(env), version, (PathsProvider) null);
+            return parser.parseEditorContent(newContent, new File(name));
         };
     }
 

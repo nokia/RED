@@ -20,78 +20,46 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class TestCaseTimeoutMessageMapper implements IParsingMapper {
 
-    private final ParsingStateHelper stateHelper;
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
-    public TestCaseTimeoutMessageMapper() {
-        this.stateHelper = new ParsingStateHelper();
+
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+
+        final ParsingState currentState = stateHelper.getCurrentStatus(processingState);
+        if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT) {
+            final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
+            final List<TestCaseTimeout> timeouts = testCases.get(testCases.size() - 1).getTimeouts();
+            return checkIfHasAlreadyValue(timeouts);
+        }
+        return currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE
+                || currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS;
+    }
+
+    private boolean checkIfHasAlreadyValue(final List<TestCaseTimeout> testCaseTimeouts) {
+        return !testCaseTimeouts.isEmpty() && testCaseTimeouts.get(testCaseTimeouts.size() - 1).getTimeout() != null;
     }
 
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+
         final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE);
-
         rt.setText(text);
 
         final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
         final TestCase testCase = testCases.get(testCases.size() - 1);
         final List<TestCaseTimeout> timeouts = testCase.getTimeouts();
-        if (timeouts.size() == 1) {
-            timeouts.get(0).addMessagePart(rt);
-        } else {
-            for (final TestCaseTimeout timeout : timeouts) {
-                if (timeout.getTimeout() != null && !timeout.getTimeout().getFilePosition().isNotSet()) {
-                    timeout.addMessagePart(rt);
-                    break;
-                }
-            }
+        if (!timeouts.isEmpty()) {
+            timeouts.get(timeouts.size() - 1).addMessagePart(rt);
         }
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS);
-
         return rt;
     }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
-            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        boolean result;
-        if (!processingState.isEmpty()) {
-            final ParsingState currentState = stateHelper.getCurrentStatus(processingState);
-            if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE
-                    || currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS) {
-                result = true;
-            } else if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT) {
-                final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
-                final List<TestCaseTimeout> timeouts = testCases.get(testCases.size() - 1).getTimeouts();
-                result = checkIfHasAlreadyValue(timeouts);
-            } else {
-                result = false;
-            }
-        } else {
-            result = false;
-        }
-        return result;
-    }
-
-    @VisibleForTesting
-    protected boolean checkIfHasAlreadyValue(final List<TestCaseTimeout> testCaseTimeouts) {
-        boolean result = false;
-        for (final TestCaseTimeout setting : testCaseTimeouts) {
-            result = (setting.getTimeout() != null);
-            result = result || !setting.getMessage().isEmpty();
-            if (result) {
-                break;
-            }
-        }
-
-        return result;
-    }
-
 }

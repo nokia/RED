@@ -8,10 +8,12 @@ package org.rf.ide.core.testdata.model.table.setting.views;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.getText;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -21,7 +23,8 @@ public class ForceTagsViewTest {
     @Test
     public void test_tags_retrival_twoForceTags() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -39,11 +42,11 @@ public class ForceTagsViewTest {
         settingTable.addForceTags(defaultTwo);
 
         // execute
-        final Optional<ForceTags> defaultTags = settingTable.forceTags();
+        final List<ForceTags> defaultTags = settingTable.getForceTagsViews();
 
         // verify
-        assertThat(defaultTags.isPresent()).isTrue();
-        final ForceTags joined = defaultTags.get();
+        assertThat(defaultTags).hasSize(1);
+        final ForceTags joined = defaultTags.get(0);
         assertThat(joined.getTags()).hasSize(4);
         assertThat(getText(joined.getTags())).containsExactly("tag1", "tag2", "tag1a", "tag2a");
         assertThat(settingTable.getForceTags()).hasSize(2);
@@ -52,7 +55,8 @@ public class ForceTagsViewTest {
     @Test
     public void test_tags_retrival_afterTagRemove_singleForceTags() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -70,12 +74,12 @@ public class ForceTagsViewTest {
         settingTable.addForceTags(defaultTwo);
 
         // execute
-        final Optional<ForceTags> defaultTags = settingTable.forceTags();
-        defaultTags.get().addTag("tag3");
+        final List<ForceTags> defaultTags = settingTable.getForceTagsViews();
+        defaultTags.get(0).addTag("tag3");
 
         // verify
-        assertThat(defaultTags.isPresent()).isTrue();
-        final ForceTags joined = defaultTags.get();
+        assertThat(defaultTags).hasSize(1);
+        final ForceTags joined = defaultTags.get(0);
         assertThat(joined.getTags()).hasSize(5);
         assertThat(getText(joined.getTags())).containsExactly("tag1", "tag2", "tag1a", "tag2a", "tag3");
         assertThat(settingTable.getForceTags()).hasSize(1);
@@ -85,7 +89,8 @@ public class ForceTagsViewTest {
     @Test
     public void test_tags_retrival_afterModification_twoForceTags() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -103,12 +108,12 @@ public class ForceTagsViewTest {
         settingTable.addForceTags(defaultTwo);
 
         // execute
-        final Optional<ForceTags> defaultTags = settingTable.forceTags();
+        final List<ForceTags> defaultTags = settingTable.getForceTagsViews();
         defaultTwo.getTags().get(0).setText("mod");
 
         // verify
-        assertThat(defaultTags.isPresent()).isTrue();
-        final ForceTags joined = defaultTags.get();
+        assertThat(defaultTags).hasSize(1);
+        final ForceTags joined = defaultTags.get(0);
         assertThat(joined.getTags()).hasSize(4);
         assertThat(getText(joined.getTags())).containsExactly("tag1", "tag2", "mod", "tag2a");
         assertThat(settingTable.getForceTags()).hasSize(2);

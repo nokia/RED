@@ -456,17 +456,12 @@ public class ElementsUtility {
         return result;
     }
 
-    public boolean checkIfHasAlreadyKeywordName(final List<? extends AKeywordBaseSetting<?>> keywordBases) {
-        boolean result = false;
-        for (final AKeywordBaseSetting<?> setting : keywordBases) {
-            result = (setting.getKeywordName() != null);
-            result = result || !setting.getArguments().isEmpty();
-            if (result) {
-                break;
-            }
-        }
+    public boolean checkIfFirstHasKeywordNameAlready(final List<? extends AKeywordBaseSetting<?>> keywordBased) {
+        return !keywordBased.isEmpty() && keywordBased.get(0).getKeywordName() != null;
+    }
 
-        return result;
+    public boolean checkIfLastHasKeywordNameAlready(final List<? extends AKeywordBaseSetting<?>> keywordBased) {
+        return !keywordBased.isEmpty() && keywordBased.get(keywordBased.size() - 1).getKeywordName() != null;
     }
 
     public boolean isNotOnlySeparatorOrEmptyLine(final RobotLine currentLine) {
@@ -478,7 +473,6 @@ public class ElementsUtility {
                 break;
             }
         }
-
         return anyValuableToken;
     }
 
@@ -530,12 +524,12 @@ public class ElementsUtility {
                                     || state == ParsingState.KEYWORD_DECLARATION) {
                                 /**
                                  * <pre>
-                                 *  *** Test Cases *** 
+                                 *  *** Test Cases ***
                                  *  | x | | ... | Log | ... |
-                                 *  
+                                 * 
                                  *  is not inline:
-                                 *  
-                                 * ** Test Cases *** 
+                                 * 
+                                 * ** Test Cases ***
                                  * | | x | | ... | Log | ... |
                                  * </pre>
                                  */

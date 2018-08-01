@@ -16,8 +16,8 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
@@ -69,17 +70,17 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedReturnsAreReported() throws CoreException {
+    public void duplicatedReturnsAreReported_inRf30() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Return]    1")
                 .appendLine("  [Return]    2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 35))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(43, 51))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(27, 35))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(43, 51))));
     }
 
     @Test
@@ -106,17 +107,17 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedTagsAreReported() throws CoreException {
+    public void duplicatedTagsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]    tag1")
                 .appendLine("  [Tags]    tag2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 33))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(44, 50))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(27, 33))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(44, 50))));
     }
 
     @Test
@@ -154,19 +155,18 @@ public class KeywordSettingsValidatorTest {
         assertThat(problems).isEmpty();
     }
 
-    @Ignore("see RED-1036")
     @Test
-    public void duplicatedDocumentationsAreReported() throws CoreException {
+    public void duplicatedDocumentationsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Documentation]    doc1")
                 .appendLine("  [Documentation]    doc2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 42))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(53, 68))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(27, 42))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(53, 68))));
     }
 
     @Test
@@ -204,19 +204,18 @@ public class KeywordSettingsValidatorTest {
         assertThat(problems).isEmpty();
     }
 
-    @Ignore("see RED-1036")
     @Test
-    public void duplicatedTimeoutsAreReported() throws CoreException {
+    public void duplicatedTimeoutsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Timeout]    1")
                 .appendLine("  [Timeout]    2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 36))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(44, 53))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(27, 36))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(44, 53))));
     }
 
     @Test
@@ -268,9 +267,8 @@ public class KeywordSettingsValidatorTest {
         assertThat(problems).isEmpty();
     }
 
-    @Ignore("see RED-1036")
     @Test
-    public void duplicatedTeardownsAreReported() throws CoreException {
+    public void duplicatedTeardownsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("kw")
                 .appendLine("  [Teardown]    keyword")
@@ -279,10 +277,10 @@ public class KeywordSettingsValidatorTest {
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
 
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(22, 32))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(46, 56))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(22, 32))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(46, 56))));
     }
 
     @Test
@@ -352,7 +350,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedArgumentsAreReported_whenDefinedInDuplicatedSettings() throws CoreException {
+    public void duplicatedArgumentsAreReported_whenDefinedInDuplicatedSettings_inRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword ${x:\\d+} rest of name")
                 .appendLine("  [Arguments]  ${a}  ${x}")
@@ -360,11 +358,11 @@ public class KeywordSettingsValidatorTest {
                 .appendLine("  [Return]  10")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(49, 60))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(75, 86))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(2, Range.closed(17, 46))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(49, 60))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(75, 86))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(2, Range.closed(17, 46))),
                 new Problem(KeywordsProblem.ARGUMENT_DEFINED_TWICE, new ProblemPosition(2, Range.closed(25, 33))),
                 new Problem(KeywordsProblem.ARGUMENT_DEFINED_TWICE, new ProblemPosition(3, Range.closed(68, 72))),
                 new Problem(KeywordsProblem.ARGUMENT_DEFINED_TWICE, new ProblemPosition(4, Range.closed(88, 92))));

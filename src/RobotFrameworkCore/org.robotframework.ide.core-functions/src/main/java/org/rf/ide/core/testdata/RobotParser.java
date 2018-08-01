@@ -37,35 +37,21 @@ public class RobotParser {
 
     private final RobotParserConfig parserCfg;
 
-    private final String robotVersionFromCommand;
-
-    private final RobotVersion robotVersion;
-
     private final RobotProjectHolder robotProject;
 
     private final PathsProvider pathsProvider;
 
     /**
-     * Creates parser which eagerly parses given file with all dependent
-     * resources (resource files, variables)
-     * 
-     * @param projectHolder
-     * @return eager parser
-     */
-    public static RobotParser createEager(final RobotProjectHolder projectHolder, final PathsProvider pathsProvider) {
-        final RobotParserConfig cfg = new RobotParserConfig();
-        cfg.setEagerImport(true);
-        return create(projectHolder, cfg, pathsProvider);
-    }
-
-    /**
      * Creates parser which parses only given file without dependencies.
      * 
      * @param projectHolder
+     * @param version
+     * @parem pathsProvider
      * @return normal parser
      */
-    public static RobotParser create(final RobotProjectHolder projectHolder, final PathsProvider pathsProvider) {
-        return new RobotParser(projectHolder, new RobotParserConfig(), pathsProvider);
+    public static RobotParser create(final RobotProjectHolder projectHolder, final RobotVersion version,
+            final PathsProvider pathsProvider) {
+        return new RobotParser(projectHolder, new RobotParserConfig(version), pathsProvider);
     }
 
     public static RobotParser create(final RobotProjectHolder projectHolder, final RobotParserConfig cfg,
@@ -81,14 +67,11 @@ public class RobotParser {
             final PathsProvider pathsProvider) {
         this.robotProject = robotProject;
         this.pathsProvider = pathsProvider;
-        this.robotVersionFromCommand = robotProject.getRobotRuntime() != null
-                ? robotProject.getRobotRuntime().getVersion() : null;
-        this.robotVersion = robotVersionFromCommand != null ? RobotVersion.from(robotVersionFromCommand) : null;
         this.parserCfg = cfg;
     }
 
     public final RobotVersion getRobotVersion() {
-        return robotVersion;
+        return parserCfg.getVersion();
     }
 
     public boolean isImportingEagerly() {
@@ -104,7 +87,7 @@ public class RobotParser {
      * @return
      */
     public RobotFileOutput parseEditorContent(final String fileContent, final File fileOrDir) {
-        final RobotFileOutput robotFile = new RobotFileOutput(robotVersion);
+        final RobotFileOutput robotFile = new RobotFileOutput(getRobotVersion());
 
         final IRobotFileParser parserToUse = getParser(fileOrDir, true);
 
@@ -160,7 +143,7 @@ public class RobotParser {
                 final IRobotFileParser parserToUse = getParser(fileOrDir, false);
 
                 if (parserToUse != null) {
-                    final RobotFileOutput robotFile = new RobotFileOutput(robotVersion);
+                    final RobotFileOutput robotFile = new RobotFileOutput(getRobotVersion());
                     output.add(robotFile);
 
                     // do not change order !!! for performance reason is better
@@ -219,23 +202,33 @@ public class RobotParser {
 
     public static class RobotParserConfig {
 
-        public static RobotParserConfig allImportsEager() {
-            final RobotParserConfig config = new RobotParserConfig();
+        public static RobotParserConfig allImportsEager(final RobotVersion version) {
+            final RobotParserConfig config = new RobotParserConfig(version);
             config.shouldEagerImport = true;
             config.shouldImportVariables = true;
             return config;
         }
 
-        public static RobotParserConfig allImportsLazy() {
-            final RobotParserConfig config = new RobotParserConfig();
+        public static RobotParserConfig allImportsLazy(final RobotVersion version) {
+            final RobotParserConfig config = new RobotParserConfig(version);
             config.shouldEagerImport = false;
             config.shouldImportVariables = false;
             return config;
         }
 
+        private final RobotVersion version;
+
         private boolean shouldEagerImport = false;
 
         private boolean shouldImportVariables = true;
+
+        public RobotParserConfig(final RobotVersion version) {
+            this.version = version;
+        }
+
+        public RobotVersion getVersion() {
+            return version;
+        }
 
         public void setEagerImport(final boolean shouldEagerImport) {
             this.shouldEagerImport = shouldEagerImport;

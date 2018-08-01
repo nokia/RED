@@ -23,22 +23,33 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordTeardownNameMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementsUtility utility = new ElementsUtility();
 
-    private final ParsingStateHelper stateHelper;
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
-    public KeywordTeardownNameMapper() {
-        this.utility = new ElementsUtility();
-        this.stateHelper = new ParsingStateHelper();
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+
+        if (stateHelper.getCurrentStatus(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN) {
+            final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
+            final UserKeyword keyword = keywords.get(keywords.size() - 1);
+            final List<KeywordTeardown> teardowns = keyword.getTeardowns();
+
+            return !utility.checkIfLastHasKeywordNameAlready(teardowns);
+        }
+        return false;
     }
 
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+
         final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME);
         rt.setText(text);
+
         final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
         final UserKeyword keyword = keywords.get(keywords.size() - 1);
         final List<KeywordTeardown> teardowns = keyword.getTeardowns();
@@ -47,24 +58,6 @@ public class KeywordTeardownNameMapper implements IParsingMapper {
         keywordTeardown.setKeywordName(rt);
 
         processingState.push(ParsingState.KEYWORD_SETTING_TEARDOWN_KEYWORD);
-
         return rt;
     }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
-            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
-        if (state == ParsingState.KEYWORD_SETTING_TEARDOWN) {
-            final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
-            final UserKeyword keyword = keywords.get(keywords.size() - 1);
-            final List<KeywordTeardown> teardowns = keyword.getTeardowns();
-
-            result = !utility.checkIfHasAlreadyKeywordName(teardowns);
-        }
-
-        return result;
-    }
-
 }

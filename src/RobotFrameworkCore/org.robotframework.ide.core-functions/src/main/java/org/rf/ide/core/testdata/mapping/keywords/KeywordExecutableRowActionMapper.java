@@ -44,8 +44,7 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState, final RobotFileOutput robotFileOutput,
             final RobotToken rt, final FilePosition fp, final String text) {
-        final UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(currentLine, processingState, robotFileOutput,
-                rt, fp);
+        final UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(currentLine, robotFileOutput);
         final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.KEYWORD_ACTION_NAME);
         types.remove(RobotTokenType.UNKNOWN);
@@ -55,7 +54,7 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
             types.addAll(token.getTypes());
         }
 
-        final RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<UserKeyword>();
+        final RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<>();
         if (text.startsWith("#") || RobotExecutableRow.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.KEYWORD_ACTION_NAME);
             types.remove(RobotTokenType.KEYWORD_ACTION_ARGUMENT);
