@@ -13,8 +13,10 @@ import java.util.Optional;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class InsertSettingCommand extends EditorCommand {
 
@@ -50,7 +52,9 @@ public class InsertSettingCommand extends EditorCommand {
             shift++;
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_SETTING_ADDED, section);
+        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                .to(insertedSettings.isEmpty() ? SettingsGroup.NO_GROUP : insertedSettings.get(0).getGroup())
+                .send(RobotModelEvents.ROBOT_SETTING_ADDED, section);
     }
 
     @Override

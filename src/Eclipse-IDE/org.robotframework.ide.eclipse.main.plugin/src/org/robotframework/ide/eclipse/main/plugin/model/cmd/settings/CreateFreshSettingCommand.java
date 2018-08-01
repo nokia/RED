@@ -13,6 +13,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class CreateFreshSettingCommand extends EditorCommand {
 
@@ -43,7 +44,9 @@ public class CreateFreshSettingCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         newSetting = settingsSection.createSetting(keywordName, comment, args.toArray(new String[0]));
 
-        eventBroker.send(RobotModelEvents.ROBOT_SETTING_ADDED, settingsSection);
+        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                .to(newSetting.getGroup())
+                .send(RobotModelEvents.ROBOT_SETTING_ADDED, settingsSection);
     }
 
     @Override

@@ -483,8 +483,12 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     @Inject
     @Optional
     private void whenSettingIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_ADDED) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_ADDED) final Event event) {
+
+        final RobotSuiteFileSection section = Events.get(event, IEventBroker.DATA, RobotSuiteFileSection.class);
+        final SettingsGroup settingGroup = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, SettingsGroup.class);
+
+        if (section.getSuiteFile() == fileModel && SettingsGroup.getImportsGroupsSet().contains(settingGroup)) {
             sortModel.clear();
             selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
@@ -512,8 +516,12 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     @Inject
     @Optional
     private void whenSettingIsMoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final Event event) {
+
+        final RobotSuiteFileSection section = Events.get(event, IEventBroker.DATA, RobotSuiteFileSection.class);
+        final SettingsGroup settingGroup = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, SettingsGroup.class);
+
+        if (section.getSuiteFile() == fileModel && SettingsGroup.getImportsGroupsSet().contains(settingGroup)) {
             sortModel.clear();
             selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
         }
