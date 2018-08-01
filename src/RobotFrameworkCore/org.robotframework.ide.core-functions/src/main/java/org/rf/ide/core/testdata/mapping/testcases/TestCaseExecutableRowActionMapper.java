@@ -44,8 +44,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState, final RobotFileOutput robotFileOutput,
             final RobotToken rt, final FilePosition fp, final String text) {
-        final TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput,
-                rt, fp);
+        final TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, robotFileOutput);
         final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_ACTION_NAME);
         types.remove(RobotTokenType.UNKNOWN);
@@ -55,7 +54,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
             types.addAll(token.getTypes());
         }
 
-        final RobotExecutableRow<TestCase> row = new RobotExecutableRow<TestCase>();
+        final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
         if (text.startsWith(" #") || text.startsWith("#")
                 || RobotExecutableRow.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.TEST_CASE_ACTION_NAME);

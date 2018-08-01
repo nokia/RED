@@ -38,8 +38,7 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState, final RobotFileOutput robotFileOutput,
             final RobotToken rt, final FilePosition fp, final String text) {
-        final TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput,
-                rt, fp);
+        final TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, robotFileOutput);
         final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
         types.remove(RobotTokenType.UNKNOWN);
@@ -86,11 +85,8 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine, final RobotToken rt,
             final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
-        result = (state == ParsingState.TEST_CASE_INSIDE_ACTION
-                || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT);
 
-        return result;
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        return state == ParsingState.TEST_CASE_INSIDE_ACTION || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT;
     }
 }

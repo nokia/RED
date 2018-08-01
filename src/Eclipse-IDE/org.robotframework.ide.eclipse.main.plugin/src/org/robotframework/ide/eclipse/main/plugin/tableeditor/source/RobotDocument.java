@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -220,10 +221,11 @@ public class RobotDocument extends Document {
     }
 
     private static RobotParser createParser(final RobotSuiteFile model) {
+        final RobotVersion version = model.getProject().getRobotVersion();
         final RobotProjectHolder holder = isNonFileModel(model) ? new RobotProjectHolder()
                 : model.getProject().getRobotProjectHolder();
         final PathsProvider pathsProvider = isNonFileModel(model) ? null : model.getProject().createPathsProvider();
-        return RobotParser.create(holder, RobotParserConfig.allImportsLazy(), pathsProvider);
+        return RobotParser.create(holder, RobotParserConfig.allImportsLazy(version), pathsProvider);
     }
     
     private static boolean isNonFileModel(final RobotSuiteFile model) {

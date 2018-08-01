@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static java.util.stream.Collectors.joining;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -29,6 +29,10 @@ import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
+import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TestSetup;
+import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.setting.UnknownSetting;
@@ -73,7 +77,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         final RobotSuiteFile suiteFile = settingsSection.get().getSuiteFile();
         final SettingTable settingsTable = settingsSection.get().getLinkedElement();
 
-        reportVersionSpecificProblems(settingsSection.get(), monitor);
+        reportVersionSpecificProblems(settingsTable, monitor);
         reportOutdatedTableName(settingsTable);
         reportOutdatedSettings(settingsTable);
         reportUnknownSettings(settingsTable.getUnknownSettings());
@@ -86,8 +90,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         validateSetupsAndTeardowns(settingsTable.getSuiteTeardowns());
         validateSetupsAndTeardowns(settingsTable.getTestSetups());
         validateSetupsAndTeardowns(settingsTable.getTestTeardowns());
-        validateTestTemplates(settingsTable.getTestTemplates());
-        validateTestTimeouts(settingsTable.getTestTimeouts());
+        validateTestTemplates(settingsTable.getTestTemplatesViews());
+        validateTestTimeouts(settingsTable.getTestTimeoutsViews());
         validateTags(settingsTable.getDefaultTags());
         validateTags(settingsTable.getForceTags());
         validateDocumentations(settingsTable.getDocumentation());
@@ -97,10 +101,10 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         reportUnknownVariablesInNonExecutables(settingsTable);
     }
 
-    private void reportVersionSpecificProblems(final RobotSettingsSection section, final IProgressMonitor monitor)
+    private void reportVersionSpecificProblems(final SettingTable table, final IProgressMonitor monitor)
             throws CoreException {
         final Iterable<VersionDependentModelUnitValidator> validators = versionDependentValidators
-                .getGeneralSettingsValidators(validationContext, section, reporter);
+                .getGeneralSettingsValidators(validationContext, table, reporter);
         for (final ModelUnitValidator validator : validators) {
             validator.validate(monitor);
         }
@@ -201,23 +205,16 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             reportEmptySettings(testTemplates);
         }
 
-        reportTemplateUnexpectedArguments(testTemplates);
+        reportTemplateWrittenInMultipleCells(testTemplates);
         reportTemplateKeywordProblems(testTemplates);
     }
 
-    private void reportTemplateUnexpectedArguments(final List<TestTemplate> testTemplates) {
+    private void reportTemplateWrittenInMultipleCells(final List<TestTemplate> testTemplates) {
         for (final TestTemplate template : testTemplates) {
             if (!template.getUnexpectedTrashArguments().isEmpty()) {
                 final RobotToken settingToken = template.getDeclaration();
-                final String actualArgs = template.getUnexpectedTrashArguments()
-                        .stream()
-                        .map(RobotToken::getText)
-                        .map(String::trim)
-                        .collect(joining(", ", "[", "]"));
-                final String additionalMsg = "Only keyword name should be specified for templates.";
                 final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.SETTING_ARGUMENTS_NOT_APPLICABLE)
-                        .formatMessageWith(settingToken.getText(), actualArgs, additionalMsg);
+                        .causedBy(GeneralSettingsProblem.TEMPLATE_KEYWORD_NAME_IN_MULTIPLE_CELLS);
                 reporter.handleProblem(problem, validationContext.getFile(), settingToken);
             }
         }
@@ -227,11 +224,14 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         for (final TestTemplate template : testTemplates) {
             final RobotToken keywordToken = template.getKeywordName();
             if (keywordToken != null) {
-                final String keywordName = keywordToken.getText();
+                final List<String> keywordParts = newArrayList(keywordToken.getText());
+                template.getUnexpectedTrashArguments().stream().map(RobotToken::getText).forEach(keywordParts::add);
+
+                final String keywordName = String.join(" ", keywordParts);
                 if (keywordName.toLowerCase().equals("none")) {
                     continue;
                 }
-                new KeywordCallInTemplateValidator(validationContext, keywordToken, reporter).validate();
+                new KeywordCallInTemplateValidator(validationContext, keywordName, keywordToken, reporter).validate();
             }
         }
     }
@@ -295,21 +295,17 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         final Set<String> additionalVariables = new HashSet<>();
 
         final List<ExecutableValidator> execValidators = new ArrayList<>();
-        if (!settingsTable.getSuiteSetups().isEmpty()) {
-            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
-                    settingsTable.getSuiteSetups().get(0), reporter));
+        for (final SuiteSetup suiteSetup : settingsTable.getSuiteSetupsViews()) {
+            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, suiteSetup, reporter));
         }
-        if (!settingsTable.getTestSetups().isEmpty()) {
-            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
-                    settingsTable.getTestSetups().get(0), reporter));
+        for (final TestSetup testSetup : settingsTable.getTestSetupsViews()) {
+            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, testSetup, reporter));
         }
-        if (!settingsTable.getTestTeardowns().isEmpty()) {
-            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
-                    settingsTable.getTestTeardowns().get(0), reporter));
+        for (final TestTeardown testTeardown : settingsTable.getTestTeardownsViews()) {
+            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, testTeardown, reporter));
         }
-        if (!settingsTable.getSuiteTeardowns().isEmpty()) {
-            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables,
-                    settingsTable.getSuiteTeardowns().get(0), reporter));
+        for (final SuiteTeardown suiteTeardown : settingsTable.getSuiteTeardownsViews()) {
+            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, suiteTeardown, reporter));
         }
         execValidators.forEach(ExecutableValidator::validate);
     }

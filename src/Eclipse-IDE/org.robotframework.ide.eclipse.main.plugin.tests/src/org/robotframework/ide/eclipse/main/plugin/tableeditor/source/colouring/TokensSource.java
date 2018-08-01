@@ -42,7 +42,7 @@ public class TokensSource {
                 .appendLine("  [Teardown]  tc_setting_call  a1  a2  #comment")
                 .appendLine("  [Timeout]  10  a  b  c  # comment")
                 .appendLine("  [UnkownTcSetting]  a  b  c  # comment")
-                .appendLine("  [Template]  tc_setting_template  b  c  # comment")
+                .appendLine("  [Template]  tc_setting_template  tc_setting_template_arg1  tc_setting_template_arg2  # comment")
                 .appendLine("  call  arg  ${x}  # comment   comment")
                 .appendLine("case 2")
                 .appendLine("  call  arg  ${x}  # comment   comment")
@@ -102,7 +102,7 @@ public class TokensSource {
                 .appendLine("Suite Teardown  general_setting_call  def  # comment")
                 .appendLine("Test Setup  general_setting_call  def  # comment")
                 .appendLine("Test Teardown  general_setting_call  def  # comment")
-                .appendLine("Test Template  general_setting_template  def  # comment")
+                .appendLine("Test Template  general_setting_template  general_setting_template_arg  # comment")
                 .appendLine("Test Timeout  abc  def  # comment")
                 .appendLine("UnkownSetting  abc  def  # comment")
                 .build();

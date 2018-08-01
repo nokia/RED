@@ -5,38 +5,20 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDefaultTagsInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDefaultTagsValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDocumentationInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDocumentationValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedForceTagsInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedForceTagsValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedSuiteSetupInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedSuiteSetupValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedSuiteTeardownInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedSuiteTeardownValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTemplateInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTemplateValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestSetupInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestSetupValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTeardownInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTeardownValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTimeoutInOlderValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTimeoutValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.MetadataKeyInColumnOfSettingValidatorUntilRF30;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.DictionaryExistenceValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.ScalarAsListInOlderRobotValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.ScalarAsListValidator;
 
 public class VersionDependentValidators {
 
@@ -45,39 +27,90 @@ public class VersionDependentValidators {
             final ValidationReportingStrategy reporter) {
         final IFile file = validationContext.getFile();
 
-        final List<VersionDependentModelUnitValidator> allValidators = newArrayList(
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
                 new DictionaryExistenceValidator(file, variable, reporter),
                 new ScalarAsListInOlderRobotValidator(file, variable, reporter),
                 new ScalarAsListValidator(file, variable, reporter));
 
-        return filter(allValidators, validator -> validator.isApplicableFor(validationContext.getVersion()));
+        return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()))
+                .collect(toList());
     }
 
     public Iterable<VersionDependentModelUnitValidator> getGeneralSettingsValidators(
-            final FileValidationContext validationContext, final RobotSettingsSection section,
+            final FileValidationContext validationContext, final SettingTable table,
             final ValidationReportingStrategy reporter) {
         final IFile file = validationContext.getFile();
-        final List<VersionDependentModelUnitValidator> allValidators = newArrayList(
-                new DuplicatedTemplateInOlderValidator(file, section, reporter),
-                new DuplicatedTemplateValidator(file, section, reporter),
-                new DuplicatedSuiteSetupInOlderValidator(file, section, reporter),
-                new DuplicatedSuiteSetupValidator(file, section, reporter),
-                new DuplicatedSuiteTeardownInOlderValidator(file, section, reporter),
-                new DuplicatedSuiteTeardownValidator(file, section, reporter),
-                new DuplicatedTestSetupInOlderValidator(file, section, reporter),
-                new DuplicatedTestSetupValidator(file, section, reporter),
-                new DuplicatedTestTeardownInOlderValidator(file, section, reporter),
-                new DuplicatedTestTeardownValidator(file, section, reporter),
-                new DuplicatedTestTimeoutInOlderValidator(file, section, reporter),
-                new DuplicatedTestTimeoutValidator(file, section, reporter),
-                new DuplicatedForceTagsInOlderValidator(file, section, reporter),
-                new DuplicatedForceTagsValidator(file, section, reporter),
-                new DuplicatedDefaultTagsInOlderValidator(file, section, reporter),
-                new DuplicatedDefaultTagsValidator(file, section, reporter),
-                new DuplicatedDocumentationInOlderValidator(file, section, reporter),
-                new DuplicatedDocumentationValidator(file, section, reporter),
-                new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, section, reporter));
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
+                new SettingsDuplicationInOldRfValidator<>(file, table::getTestTemplates, reporter),
+                new SettingsDuplicationValidator<>(file, table::getTestTemplates, reporter, ". No template will be used"),
+                
+                new SettingsDuplicationInOldRfValidator<>(file, table::getSuiteSetups, reporter),
+                new SettingsDuplicationValidator<>(file, table::getSuiteSetups, reporter, ". No Suite Setup will be executed"),
+                
+                new SettingsDuplicationInOldRfValidator<>(file, table::getSuiteTeardowns, reporter),
+                new SettingsDuplicationValidator<>(file, table::getSuiteTeardowns, reporter, ". No Suite Teardown will be executed"),
+                
+                new SettingsDuplicationInOldRfValidator<>(file, table::getTestSetups, reporter),
+                new SettingsDuplicationValidator<>(file, table::getTestSetups, reporter, ". No Test Setup will be executed"),
+                
+                new SettingsDuplicationInOldRfValidator<>(file, table::getTestTeardowns, reporter),
+                new SettingsDuplicationValidator<>(file, table::getTestTeardowns, reporter, ". No Test Teardown will be executed"),
+                
+                new SettingsDuplicationInOldRfValidator<>(file, table::getTestTimeouts, reporter),
+                new SettingsDuplicationValidator<>(file, table::getTestTimeouts, reporter, ". No timeout will be checked"),
+                
+                new SettingsDuplicationInOldRfValidator<>(file, table::getForceTags, reporter),
+                new SettingsDuplicationValidator<>(file, table::getForceTags, reporter),
+                
+                new SettingsDuplicationInOldRfValidator<>(file, table::getDefaultTags, reporter),
+                new SettingsDuplicationValidator<>(file, table::getDefaultTags, reporter),
+                
+                new SettingsDuplicationInOldRfValidator<>(file, table::getDocumentation, reporter),
+                new SettingsDuplicationValidator<>(file, table::getDocumentation, reporter),
+                
+                new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, table, reporter),
+                new TimeoutMessageValidator<>(file, table::getTestTimeouts, timeout -> timeout.getMessageArguments(),
+                        reporter));
 
-        return filter(allValidators, validator -> validator.isApplicableFor(validationContext.getVersion()));
+        return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()))
+                .collect(toList());
+    }
+
+    public Stream<VersionDependentModelUnitValidator> getTestCaseSettingsValidators(
+            final FileValidationContext validationContext, final TestCase testCase,
+            final ValidationReportingStrategy reporter) {
+        final IFile file = validationContext.getFile();
+        final List<RobotLine> fileContent = testCase.getParent().getParent().getFileContent();
+        return Stream
+                .<VersionDependentModelUnitValidator> of(
+                        new LocalSettingsDuplicationInOldRfValidator(file, fileContent,
+                                RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION, reporter),
+                        new SettingsDuplicationValidator<>(file, testCase::getSetups, reporter, ". No Setup will be executed"),
+                        new SettingsDuplicationValidator<>(file, testCase::getTeardowns, reporter, ". No Teardown will be executed"),
+                        new SettingsDuplicationValidator<>(file, testCase::getTemplates, reporter, ". No template will be used"),
+                        new SettingsDuplicationValidator<>(file, testCase::getTimeouts, reporter, ". No timeout will be checked"),
+                        new SettingsDuplicationValidator<>(file, testCase::getTags, reporter),
+                        new SettingsDuplicationValidator<>(file, testCase::getDocumentation, reporter),
+                        new TimeoutMessageValidator<>(file, testCase::getTimeouts, timeout -> timeout.getMessage(), reporter))
+                .filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
+    }
+
+    public Stream<VersionDependentModelUnitValidator> getKeywordSettingsValidators(
+            final FileValidationContext validationContext, final UserKeyword keyword,
+            final ValidationReportingStrategy reporter) {
+        final IFile file = validationContext.getFile();
+        final List<RobotLine> fileContent = keyword.getParent().getParent().getFileContent();
+        return Stream
+                .<VersionDependentModelUnitValidator> of(
+                        new LocalSettingsDuplicationInOldRfValidator(file, fileContent,
+                                RobotTokenType.KEYWORD_SETTING_NAME_DUPLICATION, reporter),
+                        new SettingsDuplicationValidator<>(file, keyword::getArguments, reporter),
+                        new SettingsDuplicationValidator<>(file, keyword::getTeardowns, reporter, ". No Teardown will be executed"),
+                        new SettingsDuplicationValidator<>(file, keyword::getReturns, reporter),
+                        new SettingsDuplicationValidator<>(file, keyword::getTimeouts, reporter, ". No timeout will be checked"),
+                        new SettingsDuplicationValidator<>(file, keyword::getTags, reporter),
+                        new SettingsDuplicationValidator<>(file, keyword::getDocumentation, reporter),
+                        new TimeoutMessageValidator<>(file, keyword::getTimeouts, timeout -> timeout.getMessage(), reporter))
+                .filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 }

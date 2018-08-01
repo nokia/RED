@@ -34,13 +34,12 @@ public class TestCaseEmptyLineMapper implements IParsingMapper {
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
-        final TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, processingState,
-                robotFileOutput, rt, fp);
+        final TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, robotFileOutput);
         final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.TEST_CASE_EMPTY_CELL);
         types.remove(RobotTokenType.UNKNOWN);
 
-        final RobotEmptyRow<TestCase> emptyLine = new RobotEmptyRow<TestCase>();
+        final RobotEmptyRow<TestCase> emptyLine = new RobotEmptyRow<>();
         emptyLine.setEmptyToken(rt);
         testCase.addElement(emptyLine);
 

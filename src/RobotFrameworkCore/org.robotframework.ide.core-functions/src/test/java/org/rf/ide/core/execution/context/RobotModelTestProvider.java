@@ -20,6 +20,7 @@ import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class RobotModelTestProvider {
@@ -29,17 +30,28 @@ public class RobotModelTestProvider {
     }
 
     public static RobotParser getParser() {
+        return getParser("3.0a1");
+    }
+
+    public static RobotParser getParser(final String version) {
         final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
-        when(runEnv.getVersion()).thenReturn("3.0a1");
+        when(runEnv.getVersion()).thenReturn(version);
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        return RobotParser.create(robotProject, RobotParserConfig.allImportsEager());
+        return RobotParser.create(robotProject, RobotParserConfig.allImportsEager(RobotVersion.from(version)));
     }
 
     public static RobotParser getLazyParser() {
         final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn("3.0a1");
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        return RobotParser.create(robotProject, RobotParserConfig.allImportsLazy());
+        return RobotParser.create(robotProject, RobotParserConfig.allImportsLazy(new RobotVersion(3, 0)));
+    }
+
+    public static RobotParser getLazyParser(final String version) {
+        final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
+        when(runEnv.getVersion()).thenReturn(version);
+        final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
+        return RobotParser.create(robotProject, RobotParserConfig.allImportsLazy(RobotVersion.from(version)));
     }
 
     public static RobotFile getModelFile(final String fileContent, final FileFormat format, final RobotParser parser) {

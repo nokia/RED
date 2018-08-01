@@ -92,9 +92,8 @@ class TestCaseValidator implements ModelUnitValidator {
 
         if (!testCase.getSetups().isEmpty()) {
             testCase.getSetups().stream()
-                    .findFirst()
                     .map(setup -> ExecutableValidator.of(validationContext, additionalVariables, setup, reporter))
-                    .ifPresent(execValidators::add);
+                    .forEach(execValidators::add);
         } else {
             // not validated; will just add variables if any
             getGeneralSettingsTestSetup().stream()
@@ -112,9 +111,8 @@ class TestCaseValidator implements ModelUnitValidator {
                     .forEach(execValidators::add);
         }
         testCase.getTeardowns().stream()
-                .findFirst()
                 .map(teardown -> ExecutableValidator.of(validationContext, additionalVariables, teardown, reporter))
-                .ifPresent(execValidators::add);
+                .forEach(execValidators::add);
         execValidators.forEach(ExecutableValidator::validate);
     }
 

@@ -146,6 +146,10 @@ public enum ProblemCategory {
             ProblemCategoryType.CODE_STYLE,
             "Variable given as keyword name",
             "Occurs when variable is used as keyword call in test suite setup or teardown."),
+    ARGUMENT_IN_MULTIPLE_CELLS(
+            ProblemCategoryType.CODE_STYLE,
+            "Template keyword written in multiple cells",
+            "Occurs when template keyword name is written in multiple cells instead of single one."),
     COLLECTION_ARGUMENT_SIZE(
             ProblemCategoryType.CODE_STYLE,
             "Collection size should be equal to keyword arguments number",
