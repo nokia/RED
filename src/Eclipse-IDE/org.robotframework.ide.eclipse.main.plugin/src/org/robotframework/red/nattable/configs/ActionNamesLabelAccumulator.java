@@ -72,6 +72,11 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                             }
                         }
                     }
+                } else if (call instanceof RobotDefinitionSetting
+                        && call.getLinkedElement().getModelType() == ModelType.TEST_CASE_TEMPLATE
+                        && columnPosition > 1) {
+                    configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+
                 } else if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isKeywordBased()) {
                     final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
                     if (types.contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME)
