@@ -21,8 +21,6 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class TestCaseNameMapper implements IParsingMapper {
 
     private final ElementPositionResolver positionResolver;
@@ -57,7 +55,7 @@ public class TestCaseNameMapper implements IParsingMapper {
         boolean result = false;
         if (positionResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME,
                 robotFileOutput.getFileModel(), currentLine, rt)) {
-            if (isIncludedInTestCaseTable(currentLine, processingState)) {
+            if (processingState.contains(ParsingState.TEST_CASE_TABLE_INSIDE)) {
                 boolean wasUpdated = false;
                 final String testCaseName = rt.getText().toString();
                 if (testCaseName != null) {
@@ -81,12 +79,5 @@ public class TestCaseNameMapper implements IParsingMapper {
         }
 
         return result;
-    }
-
-    @VisibleForTesting
-    protected boolean isIncludedInTestCaseTable(final RobotLine line,
-            final Stack<ParsingState> processingState) {
-
-        return processingState.contains(ParsingState.TEST_CASE_TABLE_INSIDE);
     }
 }

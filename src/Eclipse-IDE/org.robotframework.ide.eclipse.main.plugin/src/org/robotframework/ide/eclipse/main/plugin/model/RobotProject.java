@@ -48,6 +48,7 @@ import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
@@ -90,7 +91,7 @@ public class RobotProject extends RobotContainer {
     }
 
     public RobotParser getRobotParser() {
-        return RobotParser.create(getRobotProjectHolder(), createPathsProvider());
+        return RobotParser.create(getRobotProjectHolder(), getRobotVersion(), createPathsProvider());
     }
 
     public IProject getProject() {
@@ -99,6 +100,12 @@ public class RobotProject extends RobotContainer {
 
     public LibspecsFolder getLibspecsFolder() {
         return LibspecsFolder.get(getProject());
+    }
+
+    public RobotVersion getRobotVersion() {
+        readProjectConfigurationIfNeeded();
+        final RobotRuntimeEnvironment env = getRuntimeEnvironment();
+        return env == null ? RobotVersion.UNKNOWN : RobotVersion.from(env.getVersion());
     }
 
     public String getVersion() {

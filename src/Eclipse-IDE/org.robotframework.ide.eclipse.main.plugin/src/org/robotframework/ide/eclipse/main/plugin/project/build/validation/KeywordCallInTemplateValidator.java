@@ -12,9 +12,18 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReport
 
 class KeywordCallInTemplateValidator extends KeywordCallValidator {
 
-    KeywordCallInTemplateValidator(final FileValidationContext validationContext, final RobotToken keywordNameToken,
+    private final String keywordName;
+
+    KeywordCallInTemplateValidator(final FileValidationContext validationContext, final String keywordName,
+            final RobotToken keywordNameToken,
             final ValidationReportingStrategy reporter) {
         super(validationContext, keywordNameToken, new ArrayList<>(), reporter);
+        this.keywordName = keywordName;
+    }
+
+    @Override
+    protected String getActualKeywordName() {
+        return keywordName;
     }
 
     @Override

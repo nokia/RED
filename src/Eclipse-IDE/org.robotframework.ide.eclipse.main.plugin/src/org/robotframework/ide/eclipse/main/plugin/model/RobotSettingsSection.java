@@ -77,12 +77,11 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         for (final ATags<?> tagSetting : getTagsSettings(settingsTable)) {
             elements.add(new RobotSetting(this, tagSetting));
         }
-        for (final TestTemplate templateSetting : settingsTable.getTestTemplates()) {
+        for (final TestTemplate templateSetting : settingsTable.getTestTemplatesViews()) {
             elements.add(new RobotSetting(this, templateSetting));
         }
-        final Optional<TestTimeout> timeoutSetting = settingsTable.testTimeout();
-        if (timeoutSetting.isPresent()) {
-            elements.add(new RobotSetting(this, timeoutSetting.get()));
+        for (final TestTimeout timeoutSetting : settingsTable.getTestTimeoutsViews()) {
+            elements.add(new RobotSetting(this, timeoutSetting));
         }
         Collections.sort(elements, new Comparator<RobotFileInternalElement>() {
 
@@ -227,34 +226,32 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {
         final List<AKeywordBaseSetting<?>> elements = newArrayList();
-        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
-        if (suiteSetup.isPresent()) {
-            elements.add(suiteSetup.get());
+        final List<SuiteSetup> suiteSetups = settingTable.getSuiteSetupsViews();
+        if (!suiteSetups.isEmpty()) {
+            elements.add(suiteSetups.get(0));
         }
-        final Optional<SuiteTeardown> suiteTeardown = settingTable.suiteTeardown();
-        if (suiteTeardown.isPresent()) {
-            elements.add(suiteTeardown.get());
+        final List<SuiteTeardown> suiteTeardowns = settingTable.getSuiteTeardownsViews();
+        if (!suiteTeardowns.isEmpty()) {
+            elements.add(suiteTeardowns.get(0));
         }
-        final Optional<TestSetup> testSetup = settingTable.testSetup();
-        if (testSetup.isPresent()) {
-            elements.add(testSetup.get());
+        final List<TestSetup> testSetups = settingTable.getTestSetupsViews();
+        if (!testSetups.isEmpty()) {
+            elements.add(testSetups.get(0));
         }
-        final Optional<TestTeardown> testTeardown = settingTable.testTeardown();
-        if (testTeardown.isPresent()) {
-            elements.add(testTeardown.get());
+        final List<TestTeardown> testTeardowns = settingTable.getTestTeardownsViews();
+        if (!testTeardowns.isEmpty()) {
+            elements.add(testTeardowns.get(0));
         }
         return elements;
     }
 
     private static List<? extends ATags<?>> getTagsSettings(final SettingTable settingTable) {
         final List<ATags<?>> elements = newArrayList();
-        final Optional<ForceTags> forceTags = settingTable.forceTags();
-        if (forceTags.isPresent()) {
-            elements.add(forceTags.get());
+        for (final ForceTags forceTags : settingTable.getForceTagsViews()) {
+            elements.add(forceTags);
         }
-        final Optional<DefaultTags> defaultTags = settingTable.defaultTags();
-        if (defaultTags.isPresent()) {
-            elements.add(defaultTags.get());
+        for (final DefaultTags defaultTags : settingTable.getDefaultTagsViews()) {
+            elements.add(defaultTags);
         }
         return elements;
     }

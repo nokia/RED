@@ -9,10 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.createToken;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.getText;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
 
@@ -21,7 +23,8 @@ public class SuiteTeardownViewTest {
     @Test
     public void test_twoSuiteTeardownDeclarations_shouldReturn_commonView() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -37,11 +40,11 @@ public class SuiteTeardownViewTest {
         settingTable.addSuiteTeardown(teardownTwo);
 
         // execute
-        final Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
+        final List<SuiteTeardown> suiteTeardowns = settingTable.getSuiteTeardownsViews();
 
         // verify
-        assertThat(suiteSetup.isPresent()).isTrue();
-        final SuiteTeardown common = suiteSetup.get();
+        assertThat(suiteTeardowns).hasSize(1);
+        final SuiteTeardown common = suiteTeardowns.get(0);
         assertThat(getText(common)).containsExactly("key1", "arg1", "key2", "arg2");
         assertThat(settingTable.getSuiteTeardowns()).hasSize(2);
     }
@@ -49,7 +52,8 @@ public class SuiteTeardownViewTest {
     @Test
     public void test_twoSuiteTeardownDeclarations_addOneArgument_shouldReturn_singleElement() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -65,9 +69,9 @@ public class SuiteTeardownViewTest {
         settingTable.addSuiteTeardown(teardownTwo);
 
         // execute
-        final Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
-        assertThat(suiteSetup.isPresent()).isTrue();
-        final SuiteTeardown common = suiteSetup.get();
+        final List<SuiteTeardown> suiteTeardown = settingTable.getSuiteTeardownsViews();
+        assertThat(suiteTeardown).hasSize(1);
+        final SuiteTeardown common = suiteTeardown.get(0);
         common.addArgument(createToken("newArg"));
 
         // verify
@@ -79,7 +83,8 @@ public class SuiteTeardownViewTest {
     @Test
     public void test_twoSuiteTeardownDeclarations_modificationOfOneArgument_shouldReturn_twoElementsStill() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -95,9 +100,9 @@ public class SuiteTeardownViewTest {
         settingTable.addSuiteTeardown(teardownTwo);
 
         // execute
-        final Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
-        assertThat(suiteSetup.isPresent()).isTrue();
-        final SuiteTeardown common = suiteSetup.get();
+        final List<SuiteTeardown> suiteTeardowns = settingTable.getSuiteTeardownsViews();
+        assertThat(suiteTeardowns).hasSize(1);
+        final SuiteTeardown common = suiteTeardowns.get(0);
         common.getArguments().get(2).setText("mod");
 
         // verify

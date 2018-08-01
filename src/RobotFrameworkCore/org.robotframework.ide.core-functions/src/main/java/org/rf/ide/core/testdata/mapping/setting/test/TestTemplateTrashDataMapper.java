@@ -21,15 +21,32 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestTemplateTrashDataMapper implements IParsingMapper {
 
-    private final ParsingStateHelper stateHelper;
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
-    public TestTemplateTrashDataMapper() {
-        this.stateHelper = new ParsingStateHelper();
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+        
+        final ParsingState currentState = stateHelper.getCurrentStatus(processingState);
+
+        if (currentState == ParsingState.SETTING_TEST_TEMPLATE) {
+            final List<TestTemplate> testTemplates = robotFileOutput.getFileModel()
+                    .getSettingTable()
+                    .getTestTemplates();
+            return checkIfHasAlreadyKeywordName(testTemplates);
+        }
+        return currentState == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD
+                || currentState == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS;
+    }
+
+    protected boolean checkIfHasAlreadyKeywordName(final List<TestTemplate> testTemplates) {
+        return !testTemplates.isEmpty() && testTemplates.get(testTemplates.size() - 1).getKeywordName() != null;
     }
 
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+
         rt.getTypes().add(0, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
         rt.setText(text);
 
@@ -37,27 +54,9 @@ public class TestTemplateTrashDataMapper implements IParsingMapper {
         final List<TestTemplate> templates = settings.getTestTemplates();
         if (!templates.isEmpty()) {
             templates.get(templates.size() - 1).addUnexpectedTrashArgument(rt);
-        } else {
-            // FIXME: some error
         }
-        processingState.push(ParsingState.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS);
 
+        processingState.push(ParsingState.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS);
         return rt;
     }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
-            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        if (!processingState.isEmpty()) {
-            final ParsingState currentState = stateHelper.getCurrentStatus(processingState);
-            if (currentState == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD
-                    || currentState == ParsingState.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS) {
-                result = true;
-            }
-        }
-
-        return result;
-    }
-
 }
