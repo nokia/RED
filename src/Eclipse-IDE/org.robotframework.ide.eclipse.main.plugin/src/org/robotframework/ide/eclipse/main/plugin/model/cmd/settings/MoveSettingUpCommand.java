@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class MoveSettingUpCommand extends EditorCommand {
 
@@ -37,7 +38,7 @@ public class MoveSettingUpCommand extends EditorCommand {
             return;
         }
         Collections.swap(section.getChildren(), currentIndex, upIndex);
-        
+
         final ARobotSectionTable linkedElement = section.getLinkedElement();
         if (linkedElement != null && linkedElement instanceof SettingTable) {
             if (setting.getGroup() == SettingsGroup.METADATA) {
@@ -47,7 +48,8 @@ public class MoveSettingUpCommand extends EditorCommand {
             }
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_SETTING_MOVED, section);
+        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(setting.getGroup())
+                .send(RobotModelEvents.ROBOT_SETTING_MOVED, section);
     }
 
     private int findNextIndexUp(final int currentIndex, final RobotSetting setting) {

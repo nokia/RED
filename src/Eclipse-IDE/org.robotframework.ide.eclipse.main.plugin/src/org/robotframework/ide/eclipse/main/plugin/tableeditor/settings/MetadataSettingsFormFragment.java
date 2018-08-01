@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.osgi.service.event.Event;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
@@ -68,6 +69,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -99,8 +101,6 @@ import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
 import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
-import org.robotframework.red.nattable.configs.VariablesInElementsLabelAccumulator;
-import org.robotframework.red.nattable.configs.VariablesInElementsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
@@ -112,11 +112,14 @@ import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
+import org.robotframework.red.nattable.configs.VariablesInElementsLabelAccumulator;
+import org.robotframework.red.nattable.configs.VariablesInElementsStyleConfiguration;
 import org.robotframework.red.nattable.configs.VariablesInNamesLabelAccumulator;
 import org.robotframework.red.nattable.configs.VariablesInNamesStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
+import org.robotframework.services.event.Events;
 
 public class MetadataSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
@@ -457,8 +460,12 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     @Inject
     @Optional
     private void whenSettingIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_ADDED) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_ADDED) final Event event) {
+
+        final RobotSuiteFileSection section = Events.get(event, IEventBroker.DATA, RobotSuiteFileSection.class);
+        final SettingsGroup settingGroup = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, SettingsGroup.class);
+
+        if (section.getSuiteFile() == fileModel && settingGroup == SettingsGroup.METADATA) {
             sortModel.clear();
             selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
@@ -486,8 +493,12 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     @Inject
     @Optional
     private void whenSettingIsMoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final Event event) {
+
+        final RobotSuiteFileSection section = Events.get(event, IEventBroker.DATA, RobotSuiteFileSection.class);
+        final SettingsGroup settingGroup = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, SettingsGroup.class);
+
+        if (section.getSuiteFile() == fileModel && settingGroup == SettingsGroup.METADATA) {
             sortModel.clear();
             selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
         }
