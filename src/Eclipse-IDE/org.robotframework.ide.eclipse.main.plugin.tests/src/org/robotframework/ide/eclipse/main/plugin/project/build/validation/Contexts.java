@@ -63,23 +63,41 @@ class Contexts {
     }
 
     static FileValidationContext prepareContext() {
-        return prepareContext(new ArrayList<>());
+        return prepareContext(new ArrayList<>(), new HashSet<>());
+    }
+
+    static FileValidationContext prepareContext(final RobotVersion version) {
+        return prepareContext(new ArrayList<>(), new HashSet<>(), version);
     }
 
     static FileValidationContext prepareContext(final List<KeywordEntity> accessibleKeywords) {
         return prepareContext(accessibleKeywords, new HashSet<>());
     }
 
+    static FileValidationContext prepareContext(final List<KeywordEntity> accessibleKeywords,
+            final RobotVersion version) {
+        return prepareContext(accessibleKeywords, new HashSet<>(), version);
+    }
+
     static FileValidationContext prepareContext(final Set<String> accessibleVariables) {
         return prepareContext(new ArrayList<>(), accessibleVariables);
     }
 
+    static FileValidationContext prepareContext(final Set<String> accessibleVariables, final RobotVersion version) {
+        return prepareContext(new ArrayList<>(), accessibleVariables, version);
+    }
+
     static FileValidationContext prepareContext(final Collection<KeywordEntity> accessibleKeywords,
             final Set<String> accessibleVariables) {
+        return prepareContext(accessibleKeywords, accessibleVariables, RobotVersion.from("0.0"));
+    }
+
+    static FileValidationContext prepareContext(final Collection<KeywordEntity> accessibleKeywords,
+            final Set<String> accessibleVariables, final RobotVersion version) {
         final Map<String, Collection<KeywordEntity>> accessibleKws = accessibleKeywords.stream()
                 .collect(groupingBy(KeywordEntity::getKeywordName, toCollection(ArrayList::new)));
 
-        final ValidationContext parentContext = new ValidationContext(null, new RobotModel(), RobotVersion.from("0.0"),
+        final ValidationContext parentContext = new ValidationContext(null, new RobotModel(), version,
                 SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
         final IFile file = mock(IFile.class);
         when(file.getFullPath()).thenReturn(new Path("/suite.robot"));

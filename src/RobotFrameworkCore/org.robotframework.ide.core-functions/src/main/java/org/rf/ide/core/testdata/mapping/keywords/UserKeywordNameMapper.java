@@ -21,73 +21,41 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class UserKeywordNameMapper implements IParsingMapper {
 
-    private final ElementPositionResolver positionResolver;
+    private final ElementPositionResolver positionResolver = new ElementPositionResolver();
 
-    public UserKeywordNameMapper() {
-        this.positionResolver = new ElementPositionResolver();
-    }
-
-    @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
-        final List<IRobotTokenType> types = rt.getTypes();
-        types.remove(RobotTokenType.UNKNOWN);
-        types.add(0, RobotTokenType.KEYWORD_NAME);
-        rt.setText(text);
-
-        final KeywordTable keywordTable = robotFileOutput.getFileModel()
-                .getKeywordTable();
-        final UserKeyword keyword = new UserKeyword(rt);
-        keywordTable.addKeyword(keyword);
-
-        processingState.push(ParsingState.KEYWORD_DECLARATION);
-
-        return rt;
-    }
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
             final RobotLine currentLine, final RobotToken rt, final String text,
             final Stack<ParsingState> processingState) {
-        boolean result = false;
-        if (positionResolver.isCorrectPosition(
-                PositionExpected.USER_KEYWORD_NAME,
-                robotFileOutput.getFileModel(), currentLine, rt)) {
-            if (isIncludedInKeywordTable(currentLine, processingState)) {
-                boolean wasUpdated = false;
+
+        if (positionResolver.isCorrectPosition(PositionExpected.USER_KEYWORD_NAME, robotFileOutput.getFileModel(),
+                currentLine, rt)) {
+            if (processingState.contains(ParsingState.KEYWORD_TABLE_INSIDE)) {
                 final String keywordName = rt.getText();
-                if (keywordName != null) {
-                    result = !keywordName.trim().startsWith(
-                            RobotTokenType.START_HASH_COMMENT
-                                    .getRepresentation().get(0));
-                    wasUpdated = true;
-                }
-
-                if (!wasUpdated) {
-                    result = true;
-                }
-            } else {
-                // FIXME: it is in wrong place means no keyword table
-                // declaration
+                return keywordName == null
+                        || !keywordName.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0));
             }
-        } else {
-            // FIXME: wrong place | | Library or | Library | Library X |
-            // case.
         }
-
-        return result;
+        return false;
     }
 
-    @VisibleForTesting
-    protected boolean isIncludedInKeywordTable(final RobotLine line,
-            final Stack<ParsingState> processingState) {
+    @Override
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
 
-        return processingState.contains(ParsingState.KEYWORD_TABLE_INSIDE);
+        final List<IRobotTokenType> types = rt.getTypes();
+        types.remove(RobotTokenType.UNKNOWN);
+        types.add(0, RobotTokenType.KEYWORD_NAME);
+        rt.setText(text);
+
+        final KeywordTable keywordTable = robotFileOutput.getFileModel().getKeywordTable();
+        final UserKeyword keyword = new UserKeyword(rt);
+        keywordTable.addKeyword(keyword);
+
+        processingState.push(ParsingState.KEYWORD_DECLARATION);
+        return rt;
     }
 }

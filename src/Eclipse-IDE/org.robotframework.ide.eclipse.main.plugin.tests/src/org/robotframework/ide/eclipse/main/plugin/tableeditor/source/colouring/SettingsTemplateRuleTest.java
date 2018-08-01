@@ -37,7 +37,8 @@ public class SettingsTemplateRuleTest {
         for (final RobotToken token : TokensSource.createTokens()) {
             final Optional<PositionedTextToken> evaluatedToken = evaluate(token);
 
-            if (token.getText().equals("general_setting_template") || token.getText().equals("tc_setting_template")) {
+            if (token.getText().startsWith("general_setting_template")
+                    || token.getText().startsWith("tc_setting_template")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();
@@ -59,7 +60,8 @@ public class SettingsTemplateRuleTest {
             final int positionInsideToken = new Random().nextInt(token.getText().length());
             final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken);
 
-            if (token.getText().equals("general_setting_template") || token.getText().equals("tc_setting_template")) {
+            if (token.getText().startsWith("general_setting_template")
+                    || token.getText().startsWith("tc_setting_template")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();

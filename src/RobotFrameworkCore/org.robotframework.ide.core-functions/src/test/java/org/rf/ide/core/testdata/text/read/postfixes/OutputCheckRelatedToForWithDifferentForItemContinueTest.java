@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
@@ -367,7 +368,8 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
+        final RobotParser parser = RobotParser.create(projectHolder,
+                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify

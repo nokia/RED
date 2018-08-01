@@ -7,57 +7,39 @@ package org.rf.ide.core.testdata.model.table.setting.views;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class TestSetupView extends TestSetup implements ISingleElementViewer {
+public class TestSetupView extends TestSetup {
 
     private static final long serialVersionUID = 507193410421635171L;
 
     private final List<TestSetup> setups;
 
-    private final boolean changeForceRebuild;
-
     public TestSetupView(final List<TestSetup> setups) {
-        this(setups, false);
-    }
-
-    public TestSetupView(final List<TestSetup> setups, final boolean changeForceRebuild) {
         super(setups.get(0).getDeclaration());
         this.setups = setups;
-        this.changeForceRebuild = changeForceRebuild;
-        // join setup for this view
-        final TestSetup setup = new TestSetup(getDeclaration());
-        OneSettingJoinerHelper.joinKeywordBase(setup, setups);
-        copyWithoutJoinIfNeededExecution(setup);
+
+        initialize();
     }
 
-    @Override
-    public boolean isForceRebuild() {
-        return changeForceRebuild;
-    }
-
-    private void copyWithoutJoinIfNeededExecution(final TestSetup setup) {
-        super.setKeywordName(setup.getKeywordName());
-        for (final RobotToken arg : setup.getArguments()) {
-            super.addArgument(arg);
+    private void initialize() {
+        for (final AKeywordBaseSetting<?> setup : setups) {
+            if (setup.getKeywordName() != null) {
+                if (getKeywordName() != null) {
+                    super.addArgument(setup.getKeywordName());
+                } else {
+                    super.setKeywordName(setup.getKeywordName());
+                }
+            }
+            for (final RobotToken arg : setup.getArguments()) {
+                super.addArgument(arg);
+            }
+            for (final RobotToken commentText : setup.getComment()) {
+                super.addCommentPart(commentText);
+            }
         }
-
-        for (final RobotToken commentText : setup.getComment()) {
-            super.addCommentPart(commentText);
-        }
-    }
-
-    @Override
-    public void setKeywordName(final String keywordName) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
-        super.setKeywordName(keywordName);
-    }
-
-    @Override
-    public void setKeywordName(final RobotToken keywordName) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
-        super.setKeywordName(keywordName);
     }
 
     @Override
@@ -74,13 +56,19 @@ public class TestSetupView extends TestSetup implements ISingleElementViewer {
 
     @Override
     public void setArgument(final int index, final String argument) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getArguments(), index);
+        final List<RobotToken> tokens = super.getArguments();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 
     @Override
     public void setArgument(final int index, final RobotToken argument) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getArguments(), index);
+        final List<RobotToken> tokens = super.getArguments();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 
@@ -102,11 +90,8 @@ public class TestSetupView extends TestSetup implements ISingleElementViewer {
         super.addCommentPart(rt);
     }
 
-    @Override
-    public synchronized void joinIfNeeded() {
+    private synchronized void joinIfNeeded() {
         if (setups.size() > 1) {
-            TestSetup joined = new TestSetup(getDeclaration());
-            OneSettingJoinerHelper.joinKeywordBase(joined, setups);
             setups.clear();
             setups.add(this);
         }

@@ -333,6 +333,7 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
     /**
      */
+    TEST_CASE_SETTING_NAME_DUPLICATION(TableType.TEST_CASES, true),
     TEST_CASE_SETTING_UNKNOWN_DECLARATION(TableType.TEST_CASES, true),
     /**
      */
@@ -425,6 +426,7 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
     /**
      */
+    KEYWORD_SETTING_NAME_DUPLICATION(TableType.KEYWORDS, true),
     KEYWORD_SETTING_UNKNOWN_DECLARATION(TableType.KEYWORDS, true),
     /**
      */

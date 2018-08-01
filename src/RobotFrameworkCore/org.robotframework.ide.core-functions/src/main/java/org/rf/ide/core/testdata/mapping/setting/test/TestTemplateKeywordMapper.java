@@ -19,19 +19,31 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class TestTemplateKeywordMapper implements IParsingMapper {
 
-    private final ParsingStateHelper stateHelper;
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
-    public TestTemplateKeywordMapper() {
-        this.stateHelper = new ParsingStateHelper();
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+
+        if (stateHelper.getCurrentStatus(processingState) == ParsingState.SETTING_TEST_TEMPLATE) {
+            final List<TestTemplate> testTemplates = robotFileOutput.getFileModel()
+                    .getSettingTable()
+                    .getTestTemplates();
+            return !checkIfHasAlreadyKeywordName(testTemplates);
+        }
+        return false;
+    }
+
+    protected boolean checkIfHasAlreadyKeywordName(final List<TestTemplate> testTemplates) {
+        return !testTemplates.isEmpty() && testTemplates.get(testTemplates.size() - 1).getKeywordName() != null;
     }
 
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+
         rt.getTypes().add(0, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
         rt.setText(text);
 
@@ -39,37 +51,9 @@ public class TestTemplateKeywordMapper implements IParsingMapper {
         final List<TestTemplate> templates = settings.getTestTemplates();
         if (!templates.isEmpty()) {
             templates.get(templates.size() - 1).setKeywordName(rt);
-        } else {
-            // FIXME: some internal error
         }
+
         processingState.push(ParsingState.SETTING_TEST_TEMPLATE_KEYWORD);
-
         return rt;
-    }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
-            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
-
-        if (state == ParsingState.SETTING_TEST_TEMPLATE) {
-            final List<TestTemplate> testTemplates = robotFileOutput.getFileModel()
-                    .getSettingTable()
-                    .getTestTemplates();
-            result = !checkIfHasAlreadyKeywordName(testTemplates);
-        }
-        return result;
-    }
-
-    @VisibleForTesting
-    protected boolean checkIfHasAlreadyKeywordName(final List<TestTemplate> testTemplates) {
-        boolean result = false;
-        if (!testTemplates.isEmpty()) {
-            final TestTemplate lastTemplate = testTemplates.get(testTemplates.size() - 1);
-            result = (lastTemplate.getKeywordName() != null);
-        }
-
-        return result;
     }
 }

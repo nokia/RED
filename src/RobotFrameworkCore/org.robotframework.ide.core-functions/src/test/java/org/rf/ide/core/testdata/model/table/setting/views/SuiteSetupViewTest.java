@@ -9,10 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.createToken;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.getText;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 
@@ -21,7 +23,8 @@ public class SuiteSetupViewTest {
     @Test
     public void test_twoSuiteSetupDeclarationsOnlyKeywords_andAddThenArgumentInPosition2_shouldReturn_singleSuite() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -35,9 +38,9 @@ public class SuiteSetupViewTest {
         settingTable.addSuiteSetup(setupTwo);
 
         // execute
-        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
-        assertThat(suiteSetup.isPresent()).isTrue();
-        final SuiteSetup common = suiteSetup.get();
+        final List<SuiteSetup> suiteSetup = settingTable.getSuiteSetupsViews();
+        assertThat(suiteSetup).hasSize(1);
+        final SuiteSetup common = suiteSetup.get(0);
         common.setArgument(2, "arg");
         // verify
         assertThat(getText(common)).containsExactly("key1", "key2", "", "arg");
@@ -48,7 +51,8 @@ public class SuiteSetupViewTest {
     @Test
     public void test_twoSuiteSetupDeclarations_shouldReturn_commonView() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -64,11 +68,11 @@ public class SuiteSetupViewTest {
         settingTable.addSuiteSetup(setupTwo);
 
         // execute
-        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
+        final List<SuiteSetup> suiteSetup = settingTable.getSuiteSetupsViews();
 
         // verify
-        assertThat(suiteSetup.isPresent()).isTrue();
-        final SuiteSetup common = suiteSetup.get();
+        assertThat(suiteSetup).hasSize(1);
+        final SuiteSetup common = suiteSetup.get(0);
         assertThat(getText(common)).containsExactly("key1", "arg1", "key2", "arg2");
         assertThat(settingTable.getSuiteSetups()).hasSize(2);
     }
@@ -76,7 +80,8 @@ public class SuiteSetupViewTest {
     @Test
     public void test_twoSuiteSetupDeclarations_addOneArgument_shouldReturn_singleElement() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -92,9 +97,9 @@ public class SuiteSetupViewTest {
         settingTable.addSuiteSetup(setupTwo);
 
         // execute
-        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
-        assertThat(suiteSetup.isPresent()).isTrue();
-        final SuiteSetup common = suiteSetup.get();
+        final List<SuiteSetup> suiteSetup = settingTable.getSuiteSetupsViews();
+        assertThat(suiteSetup).hasSize(1);
+        final SuiteSetup common = suiteSetup.get(0);
         common.addArgument(createToken("newArg"));
 
         // verify
@@ -105,7 +110,8 @@ public class SuiteSetupViewTest {
     @Test
     public void test_twoSuiteSetupDeclarations_modificationOfOneArgument_shouldReturn_twoElementsStill() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(2, 9));
+        final RobotFile robotFile = new RobotFile(rfo);
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -121,9 +127,9 @@ public class SuiteSetupViewTest {
         settingTable.addSuiteSetup(setupTwo);
 
         // execute
-        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
-        assertThat(suiteSetup.isPresent()).isTrue();
-        final SuiteSetup common = suiteSetup.get();
+        final List<SuiteSetup> suiteSetup = settingTable.getSuiteSetupsViews();
+        assertThat(suiteSetup).hasSize(1);
+        final SuiteSetup common = suiteSetup.get(0);
         common.getArguments().get(2).setText("mod");
 
         // verify

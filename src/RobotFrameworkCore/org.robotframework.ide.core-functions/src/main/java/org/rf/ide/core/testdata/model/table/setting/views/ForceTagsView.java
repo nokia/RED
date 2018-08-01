@@ -7,43 +7,31 @@ package org.rf.ide.core.testdata.model.table.setting.views;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.ATags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class ForceTagsView extends ForceTags implements ISingleElementViewer {
+public class ForceTagsView extends ForceTags {
 
     private static final long serialVersionUID = 5413048519586897277L;
 
     private final List<ForceTags> forceTags;
 
-    private final boolean changeForceRebuild;
-
     public ForceTagsView(final List<ForceTags> forceTags) {
-        this(forceTags, false);
-    }
-
-    public ForceTagsView(final List<ForceTags> forceTags, final boolean changeForceRebuild) {
         super(forceTags.get(0).getDeclaration());
         this.forceTags = forceTags;
-        this.changeForceRebuild = changeForceRebuild;
-        // join tags for this view
-        final ForceTags tags = new ForceTags(getDeclaration());
-        OneSettingJoinerHelper.joinATag(tags, forceTags);
-        copyWithoutJoinIfNeededExecution(tags);
+
+        initialize();
     }
 
-    @Override
-    public boolean isForceRebuild() {
-        return changeForceRebuild;
-    }
-
-    private void copyWithoutJoinIfNeededExecution(final ForceTags tags) {
-        for (final RobotToken token : tags.getTags()) {
-            super.addTag(token);
-        }
-
-        for (final RobotToken comment : tags.getComment()) {
-            super.addCommentPart(comment);
+    private void initialize() {
+        for (final ATags<?> forceTag : forceTags) {
+            for (final RobotToken tag : forceTag.getTags()) {
+                super.addTag(tag);
+            }
+            for (final RobotToken comment : forceTag.getComment()) {
+                super.addCommentPart(comment);
+            }
         }
     }
 
@@ -61,13 +49,19 @@ public class ForceTagsView extends ForceTags implements ISingleElementViewer {
 
     @Override
     public void setTag(final int index, final String tag) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getTags(), index);
+        final List<RobotToken> tokens = super.getTags();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setTag(index, tag);
     }
 
     @Override
     public void setTag(final int index, final RobotToken tag) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getTags(), index);
+        final List<RobotToken> tokens = super.getTags();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setTag(index, tag);
     }
 
@@ -89,14 +83,10 @@ public class ForceTagsView extends ForceTags implements ISingleElementViewer {
         super.addCommentPart(rt);
     }
 
-    @Override
-    public synchronized void joinIfNeeded() {
+    private synchronized void joinIfNeeded() {
         if (forceTags.size() > 1) {
-            ForceTags joined = new ForceTags(getDeclaration());
-            OneSettingJoinerHelper.joinATag(joined, forceTags);
             forceTags.clear();
             forceTags.add(this);
         }
     }
-
 }

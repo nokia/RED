@@ -32,11 +32,12 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         final String inFileName = convert("Input_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition");
         final String outputFileName = convert("Output_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getParser("2.9"));
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
-        final SuiteSetup suiteSetup = settingTable.suiteSetup().get();
+        final SuiteSetup suiteSetup = settingTable.getSuiteSetupsViews().get(0);
         suiteSetup.setArgument(2, "arg3");
         suiteSetup.setArgument(3, "");
 
@@ -54,7 +55,8 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         final String inFileName = convert("Input_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove");
         final String outputFileName = convert("Output_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getParser("2.9"));
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
@@ -71,7 +73,8 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         final String inFileName = convert("Input_KeywordSetNoOtherElements");
         final String outputFileName = convert("Output_KeywordSetNoOtherElements");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getParser("2.9"));
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
@@ -88,7 +91,8 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         final String inFileName = convert("Input_CommentSetNoOtherElements");
         final String outputFileName = convert("Output_CommentSetNoOtherElements");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getParser("2.9"));
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
@@ -114,7 +118,8 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         final String inFileName = convert("Input_KeywordExistsAndCommentSetNoOtherElements");
         final String outputFileName = convert("Output_KeywordExistsAndCommentSetNoOtherElements");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getParser("2.9"));
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
@@ -141,7 +146,8 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         final String inFileName = convert("Input_KeywordArgumentInDifferentLine");
         final String outputFileName = convert("Ouput_KeywordArgumentInDifferentLine");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getParser("2.9"));
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();

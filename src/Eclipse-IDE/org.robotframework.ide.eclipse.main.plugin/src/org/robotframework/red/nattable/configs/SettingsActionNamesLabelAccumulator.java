@@ -59,6 +59,9 @@ public class SettingsActionNamesLabelAccumulator implements IConfigLabelAccumula
                         }
                     }
                 }
+            } else if (columnPosition > 1
+                    && setting.getLinkedElement().getModelType() == ModelType.SUITE_TEST_TEMPLATE) {
+                configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
             }
         }
     }

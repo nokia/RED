@@ -23,53 +23,40 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestCaseTeardownKeywordArgumentMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
+    private final ElementsUtility utility = new ElementsUtility();
 
-    private final ParsingStateHelper stateHelper;
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
-    public TestCaseTeardownKeywordArgumentMapper() {
-        this.utility = new ElementsUtility();
-        this.stateHelper = new ParsingStateHelper();
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        if (state == ParsingState.TEST_CASE_SETTING_TEARDOWN) {
+            final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
+            final List<TestCaseTeardown> teardowns = tests.get(tests.size() - 1).getTeardowns();
+            return utility.checkIfLastHasKeywordNameAlready(teardowns);
+        }
+        return state == ParsingState.TEST_CASE_SETTING_TEARDOWN_KEYWORD
+                || state == ParsingState.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT;
     }
 
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+
         final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT);
-
         rt.setText(text);
+
         final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
         final TestCase testCase = testCases.get(testCases.size() - 1);
         final List<TestCaseTeardown> teardowns = testCase.getTeardowns();
-        for (final TestCaseTeardown tct : teardowns) {
-            if (tct.getKeywordName() != null && !tct.getKeywordName().getFilePosition().isNotSet()) {
-                tct.addArgument(rt);
-                break;
-            }
-        }
+        final TestCaseTeardown teardown = teardowns.get(teardowns.size() - 1);
+        teardown.addArgument(rt);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT);
-
         return rt;
     }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
-            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
-        if (state == ParsingState.TEST_CASE_SETTING_TEARDOWN) {
-            final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
-            final List<TestCaseTeardown> teardowns = tests.get(tests.size() - 1).getTeardowns();
-            result = utility.checkIfHasAlreadyKeywordName(teardowns);
-        } else if (state == ParsingState.TEST_CASE_SETTING_TEARDOWN_KEYWORD
-                || state == ParsingState.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT) {
-            result = true;
-        }
-
-        return result;
-    }
-
 }
