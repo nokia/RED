@@ -31,12 +31,12 @@ public class TestCaseTemplateKeywordMapper implements IParsingMapper {
         if (stateHelper.getCurrentStatus(processingState) == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE) {
             final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
             final List<TestCaseTemplate> templates = tests.get(tests.size() - 1).getTemplates();
-            return !checkIfHasAlreadyKeywordName(templates);
+            return !hasKeywordNameAlready(templates);
         }
         return false;
     }
 
-    private boolean checkIfHasAlreadyKeywordName(final List<TestCaseTemplate> templates) {
+    private boolean hasKeywordNameAlready(final List<TestCaseTemplate> templates) {
         return !templates.isEmpty() && templates.get(templates.size() - 1).getKeywordName() != null;
     }
 
