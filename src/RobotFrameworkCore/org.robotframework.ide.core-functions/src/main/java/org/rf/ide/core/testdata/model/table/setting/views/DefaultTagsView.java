@@ -7,44 +7,31 @@ package org.rf.ide.core.testdata.model.table.setting.views;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.ATags;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class DefaultTagsView extends DefaultTags implements ISingleElementViewer {
+public class DefaultTagsView extends DefaultTags {
 
     private static final long serialVersionUID = 737877218936160644L;
 
     private final List<DefaultTags> defaultTags;
 
-    private final boolean changeForceRebuild;
-
     public DefaultTagsView(final List<DefaultTags> defaultTags) {
-        this(defaultTags, false);
-    }
-
-    public DefaultTagsView(final List<DefaultTags> defaultTags, final boolean changeForceRebuild) {
         super(defaultTags.get(0).getDeclaration());
         this.defaultTags = defaultTags;
-        this.changeForceRebuild = changeForceRebuild;
 
-        // join tags for this view
-        final DefaultTags tags = new DefaultTags(getDeclaration());
-        OneSettingJoinerHelper.joinATag(tags, defaultTags);
-        copyWithoutJoinIfNeededExecution(tags);
+        initialize();
     }
 
-    @Override
-    public boolean isForceRebuild() {
-        return changeForceRebuild;
-    }
-
-    private void copyWithoutJoinIfNeededExecution(final DefaultTags tags) {
-        for (final RobotToken token : tags.getTags()) {
-            super.addTag(token);
-        }
-
-        for (final RobotToken comment : tags.getComment()) {
-            super.addCommentPart(comment);
+    private void initialize() {
+        for (final ATags<?> defaultTag : defaultTags) {
+            for (final RobotToken tag : defaultTag.getTags()) {
+                super.addTag(tag);
+            }
+            for (final RobotToken comment : defaultTag.getComment()) {
+                super.addCommentPart(comment);
+            }
         }
     }
 
@@ -62,13 +49,19 @@ public class DefaultTagsView extends DefaultTags implements ISingleElementViewer
 
     @Override
     public void setTag(final int index, final String tag) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getTags(), index);
+        final List<RobotToken> tokens = super.getTags();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setTag(index, tag);
     }
 
     @Override
     public void setTag(final int index, final RobotToken tag) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getTags(), index);
+        final List<RobotToken> tokens = super.getTags();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setTag(index, tag);
     }
 
@@ -90,14 +83,10 @@ public class DefaultTagsView extends DefaultTags implements ISingleElementViewer
         super.addCommentPart(rt);
     }
 
-    @Override
-    public synchronized void joinIfNeeded() {
+    private synchronized void joinIfNeeded() {
         if (defaultTags.size() > 1) {
-            DefaultTags joined = new DefaultTags(getDeclaration());
-            OneSettingJoinerHelper.joinATag(joined, defaultTags);
             defaultTags.clear();
             defaultTags.add(this);
         }
     }
-
 }

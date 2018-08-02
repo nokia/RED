@@ -261,11 +261,13 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Test Template  kw  1  2")
                 .build();
 
-        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot"), "arg"));
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw 1 2", new Path("/res.robot"), "arg"));
         final FileValidationContext context = prepareContext(accessibleKws);
         final Collection<Problem> problems = validate(context, file);
 
-        assertThat(problems).containsOnly(new Problem(GeneralSettingsProblem.SETTING_ARGUMENTS_NOT_APPLICABLE,
+        assertThat(problems).containsOnly(
+                new Problem(GeneralSettingsProblem.TEMPLATE_KEYWORD_NAME_IN_MULTIPLE_CELLS,
                 new ProblemPosition(2, Range.closed(17, 30))));
     }
 

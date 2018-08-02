@@ -128,13 +128,6 @@ public enum TestCasesProblem implements IProblemCause {
         public String getProblemDescription() {
             return "The %s test case setting is empty";
         }
-    },
-    DUPLICATED_CASE_SETTING {
-
-        @Override
-        public String getProblemDescription() {
-            return "Test case '%s' %s setting is defined in multiple ways";
-        }
     };
 
     @Override

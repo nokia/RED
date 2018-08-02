@@ -15,13 +15,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -37,16 +37,14 @@ public class RobotParserSimpleExecutableContinueTest {
     public void givenTwoKeywords_oneWithNormalName_andSecondWithTripleDotsName_shouldReturnTwoKeywords()
             throws Exception {
         // prepare
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
         final String mainPath = "parser/bugs/";
         final File file = new File(this.getClass().getResource(mainPath + "KeywordNameAsTripleDots.robot").toURI());
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
+        final RobotParser parser = RobotParser.create(projectHolder,
+                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify
@@ -68,10 +66,7 @@ public class RobotParserSimpleExecutableContinueTest {
     public void test_givenMultipleRobotExecutableLines_withCommentsJoinedByPreviouseLineContinue_shouldGives_4RobotExecutableLines()
             throws Exception {
         // prepare
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
         final String mainPath = "parser/bugs/";
         final File file = new File(this.getClass()
                 .getResource(mainPath + "KeywordsExecWithHashCommentAndPreviousLineContinue.robot")
@@ -79,7 +74,8 @@ public class RobotParserSimpleExecutableContinueTest {
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
+        final RobotParser parser = RobotParser.create(projectHolder,
+                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify

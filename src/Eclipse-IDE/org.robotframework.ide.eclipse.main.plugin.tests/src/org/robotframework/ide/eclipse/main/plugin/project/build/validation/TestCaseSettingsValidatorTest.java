@@ -16,8 +16,8 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -76,21 +76,18 @@ public class TestCaseSettingsValidatorTest {
         assertThat(problems).isEmpty();
     }
 
-    @Ignore("see RED-1036")
     @Test
-    public void duplicatedTagsAreReported() throws CoreException {
+    public void duplicatedTagsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Tags]    tag1")
                 .appendLine("  [Tags]    tag2")
                 .build();
 
-        final FileValidationContext context = prepareContext();
-
-        final Collection<Problem> problems = validate(context, fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 32))),
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(43, 49))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 32))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(43, 49))));
     }
 
     @Test
@@ -134,21 +131,18 @@ public class TestCaseSettingsValidatorTest {
         assertThat(problems).isEmpty();
     }
 
-    @Ignore("see RED-1036")
     @Test
-    public void duplicatedDocumentationsAreReported() throws CoreException {
+    public void duplicatedDocumentationsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Documentation]    tag1")
                 .appendLine("  [Documentation]    tag2")
                 .build();
 
-        final FileValidationContext context = prepareContext();
-
-        final Collection<Problem> problems = validate(context, fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 41))),
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(52, 67))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 41))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(52, 67))));
     }
 
     @Test
@@ -190,21 +184,18 @@ public class TestCaseSettingsValidatorTest {
         assertThat(problems).isEmpty();
     }
 
-    @Ignore("see RED-1036")
     @Test
-    public void duplicatedTimeoutsAreReported() throws CoreException {
+    public void duplicatedTimeoutsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Timeout]    1")
                 .appendLine("  [Timeout]    2")
                 .build();
 
-        final FileValidationContext context = prepareContext();
-
-        final Collection<Problem> problems = validate(context, fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 35))),
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(43, 52))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 35))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(43, 52))));
     }
 
     @Test
@@ -262,7 +253,7 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedTemplatesAreReported() throws CoreException {
+    public void duplicatedTemplatesAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Template]    kw1")
@@ -270,12 +261,11 @@ public class TestCaseSettingsValidatorTest {
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw1", new Path("/res.robot")));
-        final FileValidationContext context = prepareContext(accessibleKws);
 
-        final Collection<Problem> problems = validate(context, fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 36))),
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(46, 56))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 36))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(46, 56))));
     }
 
     @Test
@@ -299,11 +289,12 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Template]  kw  1")
                 .build();
 
-        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot")));
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw 1", new Path("/res.robot")));
         final FileValidationContext context = prepareContext(accessibleKws);
 
         final Collection<Problem> problems = validate(context, fileModel);
-        assertThat(problems).containsExactly(new Problem(GeneralSettingsProblem.SETTING_ARGUMENTS_NOT_APPLICABLE,
+        assertThat(problems).containsExactly(
+                new Problem(GeneralSettingsProblem.TEMPLATE_KEYWORD_NAME_IN_MULTIPLE_CELLS,
                 new ProblemPosition(3, Range.closed(26, 36))));
     }
 
@@ -363,9 +354,8 @@ public class TestCaseSettingsValidatorTest {
         assertThat(problems).isEmpty();
     }
 
-    @Ignore("see RED-1036")
     @Test
-    public void duplicatedSetupsAreReported() throws CoreException {
+    public void duplicatedSetupsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Setup]    keyword")
@@ -373,12 +363,11 @@ public class TestCaseSettingsValidatorTest {
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/res.robot")));
-        final FileValidationContext context = prepareContext(accessibleKws);
 
-        final Collection<Problem> problems = validate(context, fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 33))),
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(47, 54))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 33))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(47, 54))));
     }
 
     @Test
@@ -423,9 +412,8 @@ public class TestCaseSettingsValidatorTest {
         assertThat(problems).isEmpty();
     }
 
-    @Ignore("see RED-1036")
     @Test
-    public void duplicatedTeardownsAreReported() throws CoreException {
+    public void duplicatedTeardownsAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Teardown]    keyword")
@@ -433,12 +421,11 @@ public class TestCaseSettingsValidatorTest {
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/res.robot")));
-        final FileValidationContext context = prepareContext(accessibleKws);
 
-        final Collection<Problem> problems = validate(context, fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 36))),
-                new Problem(TestCasesProblem.DUPLICATED_CASE_SETTING, new ProblemPosition(4, Range.closed(50, 60))));
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 36))),
+                new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(50, 60))));
     }
 
     @Test

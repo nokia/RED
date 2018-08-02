@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.text.read.recognizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseSetupRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseTagsRecognizer;
@@ -31,11 +32,13 @@ public class TestCaseRecognizersProvider {
     }
 
 
-    public List<ATokenRecognizer> getRecognizers() {
+    public List<ATokenRecognizer> getRecognizers(final RobotVersion robotVersion) {
         final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
         synchronized (recognized) {
             for (final ATokenRecognizer rec : recognized) {
-                recognizersProvided.add(rec.newInstance());
+                if (rec.isApplicableFor(robotVersion)) {
+                    recognizersProvided.add(rec.newInstance());
+                }
             }
         }
         return recognizersProvided;

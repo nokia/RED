@@ -5,14 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Maps.newHashMap;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,10 +21,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -40,8 +34,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
@@ -62,15 +58,19 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
     private final ValidationReportingStrategy reporter;
 
+    private final VersionDependentValidators versionDependentValidators;
+
     KeywordSettingsValidator(final FileValidationContext validationContext, final UserKeyword keyword,
             final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.keyword = keyword;
         this.reporter = reporter;
+        this.versionDependentValidators = new VersionDependentValidators();
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
+        reportVersionSpecificProblems();
         reportUnknownSettings();
 
         reportReturnProblems();
@@ -84,6 +84,11 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         reportUnknownVariablesInNonExecutables();
     }
 
+    private void reportVersionSpecificProblems() {
+        versionDependentValidators.getKeywordSettingsValidators(validationContext, keyword, reporter)
+                .forEach(ModelUnitValidator::validate);
+    }
+
     private void reportUnknownSettings() {
         final List<KeywordUnknownSettings> unknownSettings = keyword.getUnknownSettings();
         for (final KeywordUnknownSettings unknownSetting : unknownSettings) {
@@ -95,24 +100,18 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportReturnProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getReturns().stream().collect(
-                toMap(KeywordReturn::getDeclaration, ret -> ret.getReturnValues().isEmpty()));
-
-        reportCommonProblems(declarationIsEmpty);
+        keyword.getReturns().stream().filter(ret -> ret.getReturnValues().isEmpty()).forEach(this::reportEmptySetting);
     }
 
     private void reportTagsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getTags().stream().collect(
-                toMap(KeywordTags::getDeclaration, tag -> tag.getTags().isEmpty()));
-
-        reportCommonProblems(declarationIsEmpty);
+        keyword.getTags().stream().filter(tag -> tag.getTags().isEmpty()).forEach(this::reportEmptySetting);
     }
 
     private void reportTimeoutsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getTimeouts().stream().collect(
-                toMap(KeywordTimeout::getDeclaration, timeout -> timeout.getTimeout() == null));
+        keyword.getTimeouts().stream()
+                .filter(timeout -> timeout.getTimeout() == null)
+                .forEach(this::reportEmptySetting);
 
-        reportCommonProblems(declarationIsEmpty);
         reportInvalidTimeoutSyntax(keyword.getTimeouts());
     }
 
@@ -132,37 +131,22 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportDocumentationsProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getDocumentation().stream().collect(
-                toMap(KeywordDocumentation::getDeclaration, tag -> tag.getDocumentationText().isEmpty()));
-
-        reportCommonProblems(declarationIsEmpty);
+        keyword.getDocumentation().stream().findFirst()
+                .filter(doc -> doc.getDocumentationText().isEmpty())
+                .ifPresent(this::reportEmptySetting);
     }
 
     private void reportTeardownProblems() {
-        final Map<RobotToken, Boolean> declarationIsEmpty = keyword.getTeardowns().stream().collect(
-                toMap(KeywordTeardown::getDeclaration, teardown -> teardown.getKeywordName() == null));
-
-        reportCommonProblems(declarationIsEmpty);
+        keyword.getTeardowns().stream()
+                .filter(teardown -> teardown.getKeywordName() == null)
+                .forEach(this::reportEmptySetting);
     }
 
-    private void reportCommonProblems(final Map<RobotToken, Boolean> declarationTokens) {
-        final String kwName = keyword.getKeywordName().getText();
-        final IFile file = validationContext.getFile();
-        final boolean tooManySettings = declarationTokens.size() > 1;
-
-        declarationTokens.forEach((defToken, isEmpty) -> {
-            if (tooManySettings) {
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD_SETTING)
-                        .formatMessageWith(kwName, defToken.getText());
-                reporter.handleProblem(problem, file, defToken);
-            }
-
-            if (isEmpty) {
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD_SETTING)
-                        .formatMessageWith(defToken.getText());
-                reporter.handleProblem(problem, file, defToken);
-            }
-        });
+    private void reportEmptySetting(final AModelElement<?> element) {
+        final RobotToken defToken = element.getDeclaration();
+        final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD_SETTING)
+                .formatMessageWith(defToken.getText());
+        reporter.handleProblem(problem, validationContext.getFile(), defToken);
     }
 
     private void reportOutdatedSettingsSynonyms() {
@@ -200,14 +184,14 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         final IFile file = validationContext.getFile();
         final String fileName = file.getName();
 
-        final Map<RobotToken, Boolean> declarationTokens = newHashMap();
-        for (final KeywordArguments arg : keyword.getArguments()) {
-            declarationTokens.put(arg.getDeclaration(), arg.getArguments().isEmpty());
+        keyword.getArguments().stream().filter(args -> args.getArguments().isEmpty()).forEach(this::reportEmptySetting);
+
+        if (!keyword.getArguments().isEmpty() && hasEmbeddedArguments(fileName, keyword)) {
+            reporter.handleProblem(
+                    RobotProblem.causedBy(GeneralSettingsProblem.DUPLICATED_SETTING)
+                            .formatMessageWith("[Arguments]", ". There are variables defined in keyword name"),
+                    file, keyword.getDeclaration());
         }
-        if (hasEmbeddedArguments(fileName, keyword)) {
-            declarationTokens.put(keyword.getKeywordName(), false);
-        }
-        reportCommonProblems(declarationTokens);
 
         final boolean shouldContinue = reportArgumentsSyntaxProblems();
         if (shouldContinue) {

@@ -130,13 +130,6 @@ public enum KeywordsProblem implements IProblemCause {
             return "Keyword '%s' is from a library nested in a resource file";
         }
     },
-    DUPLICATED_KEYWORD_SETTING {
-
-        @Override
-        public String getProblemDescription() {
-            return "Keyword '%s' %s setting is defined in multiple ways";
-        }
-    },
     ARGUMENT_DEFINED_TWICE {
 
         @Override

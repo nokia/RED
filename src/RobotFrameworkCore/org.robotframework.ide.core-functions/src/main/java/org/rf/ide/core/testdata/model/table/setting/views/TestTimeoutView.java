@@ -10,56 +10,35 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class TestTimeoutView extends TestTimeout implements ISingleElementViewer {
+public class TestTimeoutView extends TestTimeout {
 
     private static final long serialVersionUID = -4081479282712030528L;
 
     private final List<TestTimeout> timeouts;
 
-    private final boolean changeForceRebuild;
-
     public TestTimeoutView(final List<TestTimeout> timeouts) {
-        this(timeouts, false);
-    }
-
-    public TestTimeoutView(final List<TestTimeout> timeouts, final boolean changeForceRebuild) {
         super(timeouts.get(0).getDeclaration());
         this.timeouts = timeouts;
-        this.changeForceRebuild = changeForceRebuild;
 
-        // join timeout for this view
-        final TestTimeout timeout = new TestTimeout(getDeclaration());
-        joinTimeout(timeout, timeouts);
-        copyWithoutJoinIfNeededExecution(timeout);
+        initialize();
     }
 
-    @Override
-    public boolean isForceRebuild() {
-        return changeForceRebuild;
-    }
-
-    private void copyWithoutJoinIfNeededExecution(final TestTimeout timeout) {
-        super.setTimeout(timeout.getTimeout());
-
-        for (final RobotToken token : timeout.getMessageArguments()) {
-            super.addMessageArgument(token);
+    private void initialize() {
+        for (final TestTimeout timeout : timeouts) {
+            if (timeout.getTimeout() != null) {
+                if (getTimeout() != null) {
+                    super.addMessageArgument(timeout.getTimeout());
+                } else {
+                    super.setTimeout(timeout.getTimeout());
+                }
+            }
+            for (final RobotToken msg : timeout.getMessageArguments()) {
+                super.addMessageArgument(msg);
+            }
+            for (final RobotToken comment : timeout.getComment()) {
+                super.addCommentPart(comment);
+            }
         }
-
-        for (final RobotToken comment : timeout.getComment()) {
-            super.addCommentPart(comment);
-        }
-    }
-
-    @Override
-    public void setTimeout(final RobotToken timeout) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
-        super.setTimeout(timeout);
-    }
-
-    @Override
-    public void setTimeout(final String timeout) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
-        super.setTimeout(timeout);
     }
 
     @Override
@@ -76,13 +55,19 @@ public class TestTimeoutView extends TestTimeout implements ISingleElementViewer
 
     @Override
     public void setMessageArgument(final int index, final String argument) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getMessageArguments(), index);
+        final List<RobotToken> tokens = super.getMessageArguments();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setMessageArgument(index, argument);
     }
 
     @Override
     public void setMessageArgument(final int index, final RobotToken argument) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getMessageArguments(), index);
+        final List<RobotToken> tokens = super.getMessageArguments();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setMessageArgument(index, argument);
     }
 
@@ -104,33 +89,10 @@ public class TestTimeoutView extends TestTimeout implements ISingleElementViewer
         super.setComment(rt);
     }
 
-    @Override
-    public synchronized void joinIfNeeded() {
+    private synchronized void joinIfNeeded() {
         if (timeouts.size() > 1) {
-            TestTimeout joined = new TestTimeout(getDeclaration());
-            joinTimeout(joined, timeouts);
             timeouts.clear();
             timeouts.add(this);
-        }
-    }
-
-    private void joinTimeout(final TestTimeout target, final List<TestTimeout> timeouts) {
-        for (final TestTimeout time : timeouts) {
-            if (time.getTimeout() != null) {
-                if (target.getTimeout() != null) {
-                    target.addMessageArgument(time.getTimeout());
-                } else {
-                    target.setTimeout(time.getTimeout());
-                }
-            }
-
-            for (final RobotToken msg : time.getMessageArguments()) {
-                target.addMessageArgument(msg);
-            }
-
-            for (final RobotToken comment : time.getComment()) {
-                target.addCommentPart(comment);
-            }
         }
     }
 }

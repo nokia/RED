@@ -10,39 +10,25 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class SuiteDocumentationView extends SuiteDocumentation implements ISingleElementViewer {
+public class SuiteDocumentationView extends SuiteDocumentation {
 
     private final List<SuiteDocumentation> suiteDocs;
 
-    private final boolean changeForceRebuild;
-
     public SuiteDocumentationView(final List<SuiteDocumentation> suiteDocs) {
-        this(suiteDocs, false);
-    }
-
-    public SuiteDocumentationView(final List<SuiteDocumentation> suiteDocs, final boolean changeForceRebuild) {
         super(suiteDocs.get(0).getDeclaration());
         this.suiteDocs = suiteDocs;
-        this.changeForceRebuild = changeForceRebuild;
-
-        // join tags for this view
-        final SuiteDocumentation doc = new SuiteDocumentation(getDeclaration());
-        joinDoc(doc, suiteDocs);
-        copyWithoutJoinIfNeededExecution(doc);
+        
+        initialize();
     }
 
-    @Override
-    public boolean isForceRebuild() {
-        return changeForceRebuild;
-    }
-
-    private void copyWithoutJoinIfNeededExecution(final SuiteDocumentation doc) {
-        for (final RobotToken token : doc.getDocumentationText()) {
-            super.addDocumentationText(token);
-        }
-
-        for (final RobotToken comment : doc.getComment()) {
-            super.addCommentPart(comment);
+    private void initialize() {
+        for (final SuiteDocumentation suiteDoc : suiteDocs) {
+            for (final RobotToken text : suiteDoc.getDocumentationText()) {
+                super.addDocumentationText(text);
+            }
+            for (final RobotToken comment : suiteDoc.getComment()) {
+                super.addCommentPart(comment);
+            }
         }
     }
 
@@ -60,13 +46,19 @@ public class SuiteDocumentationView extends SuiteDocumentation implements ISingl
 
     @Override
     public void setDocumentationText(final int index, final String docText) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getDocumentationText(), index);
+        final List<RobotToken> tokens = super.getDocumentationText();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setDocumentationText(index, docText);
     }
 
     @Override
     public void setDocumentationText(final int index, final RobotToken docText) {
-        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getDocumentationText(), index);
+        final List<RobotToken> tokens = super.getDocumentationText();
+        if (tokens.size() <= index) {
+            joinIfNeeded();
+        }
         super.setDocumentationText(index, docText);
     }
 
@@ -88,25 +80,10 @@ public class SuiteDocumentationView extends SuiteDocumentation implements ISingl
         super.setComment(rt);
     }
 
-    @Override
-    public synchronized void joinIfNeeded() {
+    private synchronized void joinIfNeeded() {
         if (suiteDocs.size() > 1) {
-            SuiteDocumentation joined = new SuiteDocumentation(getDeclaration());
-            joinDoc(joined, suiteDocs);
             suiteDocs.clear();
             suiteDocs.add(this);
-        }
-    }
-
-    private void joinDoc(final SuiteDocumentation target, final List<SuiteDocumentation> suiteDocs) {
-        for (final SuiteDocumentation sd : suiteDocs) {
-            for (final RobotToken text : sd.getDocumentationText()) {
-                target.addDocumentationText(text);
-            }
-
-            for (final RobotToken comment : sd.getComment()) {
-                target.addCommentPart(comment);
-            }
         }
     }
 }

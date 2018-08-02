@@ -60,7 +60,7 @@ class KeywordCallValidator implements ModelUnitValidator {
     }
 
     void validateKeywordCall() {
-        final String kwName = keywordNameToken.getText();
+        final String kwName = getActualKeywordName();
         final ListMultimap<String, KeywordEntity> keywordProposal = validationContext.findPossibleKeywords(kwName);
 
         final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(kwName,
@@ -69,13 +69,15 @@ class KeywordCallValidator implements ModelUnitValidator {
                         : Optional.empty());
         final String name = nameToUse.filter(not(String::isEmpty)).orElse(kwName);
         final int offset = keywordNameToken.getStartOffset() + (kwName.length() - name.length());
-        final ProblemPosition position = new ProblemPosition(keywordNameToken.getLineNumber(),
-                Range.closed(offset, offset + name.length()));
+        final ProblemPosition position = nameToUse.isPresent()
+                ? new ProblemPosition(keywordNameToken.getLineNumber(), Range.closed(offset, offset + name.length()))
+                : new ProblemPosition(keywordNameToken.getLineNumber(),
+                        Range.closed(keywordNameToken.getStartOffset(), keywordNameToken.getEndOffset()));
 
         if (!nameToUse.isPresent()) {
             reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD).formatMessageWith(name),
                     validationContext.getFile(), position, ImmutableMap.of(AdditionalMarkerAttributes.NAME, name,
-                            AdditionalMarkerAttributes.ORIGINAL_NAME, keywordNameToken.getText()));
+                            AdditionalMarkerAttributes.ORIGINAL_NAME, getActualKeywordName()));
         } else {
             final ListMultimap<KeywordScope, KeywordEntity> keywords = validationContext
                     .getPossibleKeywords(keywordProposal, name);
@@ -104,6 +106,10 @@ class KeywordCallValidator implements ModelUnitValidator {
                 break;
             }
         }
+    }
+
+    protected String getActualKeywordName() {
+        return keywordNameToken.getText();
     }
 
     private void validateFoundKeyword(final String actualName, final ProblemPosition position) {

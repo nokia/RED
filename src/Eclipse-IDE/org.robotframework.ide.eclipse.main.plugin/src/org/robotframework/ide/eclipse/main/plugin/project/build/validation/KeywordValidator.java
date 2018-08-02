@@ -153,9 +153,8 @@ class KeywordValidator implements ModelUnitValidator {
                 .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))
                 .forEach(execValidators::add);
         keyword.getTeardowns().stream()
-                .findFirst()
                 .map(teardown -> ExecutableValidator.of(validationContext, additionalVariables, teardown, reporter))
-                .ifPresent(execValidators::add);
+                .forEach(execValidators::add);
         execValidators.forEach(ExecutableValidator::validate);
 
         // also validate variables in [Return] after all executables were checked (that's why this

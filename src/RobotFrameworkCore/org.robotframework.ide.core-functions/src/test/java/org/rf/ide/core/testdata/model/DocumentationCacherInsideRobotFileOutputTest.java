@@ -332,9 +332,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     @BeforeClass
     public static void setup() throws Exception {
         final RobotProjectHolder projectHolder = new RobotProjectHolder(
-                new RobotRuntimeEnvironment(null, null, "3.0.0"));
+                new RobotRuntimeEnvironment(null, null, "2.9.0"));
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(getFile("presenter//DocPositionsFind.robot"),
-                RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy()));
+                RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
         out = modelFile.getParent();
         assertThat(out).isNotNull();
 
