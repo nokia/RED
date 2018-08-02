@@ -32,12 +32,12 @@ public class KeywordTimeoutValueMapper implements IParsingMapper {
         if (utility.getCurrentStatus(processingState) == ParsingState.KEYWORD_SETTING_TIMEOUT) {
             final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
             final List<KeywordTimeout> timeouts = keywords.get(keywords.size() - 1).getTimeouts();
-            return !checkIfHasAlreadyValue(timeouts);
+            return !hasValueAlready(timeouts);
         }
         return false;
     }
 
-    private boolean checkIfHasAlreadyValue(final List<KeywordTimeout> keywordTimeouts) {
+    private boolean hasValueAlready(final List<KeywordTimeout> keywordTimeouts) {
         return !keywordTimeouts.isEmpty() && keywordTimeouts.get(keywordTimeouts.size() - 1).getTimeout() != null;
     }
 

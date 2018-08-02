@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Nokia Solutions and Networks
+ * Copyright 2018 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -32,13 +32,13 @@ import com.google.common.collect.Range;
 
 public class JoinTemplateNameFixer extends RedSuiteMarkerResolution {
 
-    // Removes Test Timeout message:
+    // Joins Test Template keyword written in multiple cells:
     // *** Settings ***
-    // Test Timeout    2 min    my custom    message
+    // Test Template    key    word
     //
     // ->
     // *** Settings ***
-    // Metadata key val
+    // Test Template    key word
 
     @Override
     public String getLabel() {
