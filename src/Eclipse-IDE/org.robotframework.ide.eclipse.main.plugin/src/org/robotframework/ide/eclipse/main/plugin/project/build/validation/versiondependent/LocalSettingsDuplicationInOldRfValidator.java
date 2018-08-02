@@ -10,6 +10,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -26,14 +27,21 @@ class LocalSettingsDuplicationInOldRfValidator extends VersionDependentModelUnit
 
     private final List<RobotLine> fileContent;
 
+    private final FilePosition startPosition;
+
+    private final FilePosition endPosition;
+
     private final RobotTokenType duplicatedTokenType;
 
     private final ValidationReportingStrategy reporter;
 
     LocalSettingsDuplicationInOldRfValidator(final IFile file, final List<RobotLine> fileContent,
-            final RobotTokenType duplicatedTokenType, final ValidationReportingStrategy reporter) {
+            final FilePosition startPosition, final FilePosition endPosition, final RobotTokenType duplicatedTokenType,
+            final ValidationReportingStrategy reporter) {
         this.file = file;
         this.fileContent = fileContent;
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
         this.duplicatedTokenType = duplicatedTokenType;
         this.reporter = reporter;
     }
@@ -45,7 +53,8 @@ class LocalSettingsDuplicationInOldRfValidator extends VersionDependentModelUnit
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        for (final RobotLine line : fileContent) {
+        for (int i = startPosition.getLine(); i <= endPosition.getLine(); i++) {
+            final RobotLine line = fileContent.get(i - 1);
             for (final RobotToken token : line.getLineTokens()) {
                 if (token.getTypes().contains(duplicatedTokenType)) {
                     reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.DUPLICATED_SETTING_OLD)
