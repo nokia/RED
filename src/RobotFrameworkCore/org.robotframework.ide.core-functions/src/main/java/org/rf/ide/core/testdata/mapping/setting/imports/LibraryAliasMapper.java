@@ -12,6 +12,7 @@ import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.ParsingState;
@@ -30,9 +31,14 @@ public class LibraryAliasMapper implements IParsingMapper {
     public LibraryAliasMapper() {
         this.utility = new ElementsUtility();
         this.parsingStateHelper = new ParsingStateHelper();
-        this.libraryFixer = new LibraryAliasFixer(utility, parsingStateHelper);
+        this.libraryFixer = new LibraryAliasFixer(null, utility, parsingStateHelper);
     }
 
+    @Override
+    public boolean isApplicableFor(final RobotVersion robotVersion) {
+        libraryFixer.setRobotVersion(robotVersion);
+        return IParsingMapper.super.isApplicableFor(robotVersion);
+    }
 
     @Override
     public RobotToken map(final RobotLine currentLine,
