@@ -12,23 +12,24 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
-public class LibraryAliasRecognizer extends ATokenRecognizer {
+public class LibraryAliasRecognizerOld extends ATokenRecognizer {
 
     public static final Pattern EXPECTED = Pattern
-            .compile("^(\\s)*WITH[\\s]+NAME(\\s)*$");
+            .compile("^(\\s)*" + createUpperLowerCaseWord("WITH") + "[\\s]+" + createUpperLowerCaseWord("NAME")
+                    + "(\\s)*$");
 
 
-    public LibraryAliasRecognizer() {
+    public LibraryAliasRecognizerOld() {
         super(EXPECTED, RobotTokenType.SETTING_LIBRARY_ALIAS);
     }
 
     @Override
     public boolean isApplicableFor(final RobotVersion robotVersion) {
-        return robotVersion.isNewerOrEqualTo(new RobotVersion(3, 1));
+        return robotVersion.isOlderThan(new RobotVersion(3, 1));
     }
 
     @Override
     public ATokenRecognizer newInstance() {
-        return new LibraryAliasRecognizer();
+        return new LibraryAliasRecognizerOld();
     }
 }

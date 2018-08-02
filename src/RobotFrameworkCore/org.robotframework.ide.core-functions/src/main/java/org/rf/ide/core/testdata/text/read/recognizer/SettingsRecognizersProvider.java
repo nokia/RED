@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.DefaultTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ForceTagsRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizerOld;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.MetaRecognizer;
@@ -34,7 +35,7 @@ public class SettingsRecognizersProvider {
             new SettingsTableHeaderRecognizer(),
             new HashCommentRecognizer(),
             new PreviousLineContinueRecognizer(),
-            new LibraryDeclarationRecognizer(), new LibraryAliasRecognizer(),
+            new LibraryDeclarationRecognizer(), new LibraryAliasRecognizerOld(), new LibraryAliasRecognizer(),
             new VariableDeclarationRecognizer(),
             new ResourceDeclarationRecognizer(),
 

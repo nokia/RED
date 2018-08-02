@@ -20,7 +20,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 @SuppressWarnings("PMD.MethodNamingConventions")
-public class LibraryAliasRecognizerTest {
+public class LibraryAliasRecognizerOldTest {
 
     @ForClean
     private ATokenRecognizer rec;
@@ -101,7 +101,7 @@ public class LibraryAliasRecognizerTest {
 
     @Before
     public void setUp() {
-        rec = new LibraryAliasRecognizer();
+        rec = new LibraryAliasRecognizerOld();
     }
 
     @After

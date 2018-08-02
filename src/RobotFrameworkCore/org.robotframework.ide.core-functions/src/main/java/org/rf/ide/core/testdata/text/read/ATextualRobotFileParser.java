@@ -85,7 +85,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     private final ParsingStateHelper parsingStateHelper;
 
-    private final LibraryAliasFixer libraryFixer;
+    private LibraryAliasFixer libraryFixer;
 
     private final PreviousLineHandler previousLineHandler;
 
@@ -104,7 +104,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         this.alignUtility = new PrettyAlignSpaceUtility();
         this.variableHelper = new CommonVariableHelper();
         this.parsingStateHelper = new ParsingStateHelper();
-        this.libraryFixer = new LibraryAliasFixer(utility, parsingStateHelper);
         this.previousLineHandler = new PreviousLineHandler();
         this.positionResolvers = new ElementPositionResolver();
         this.postFixerActions = new PostProcessingFixActions();
@@ -177,6 +176,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
     }
 
     private void initalizeRecognizersAndMappers(final RobotVersion robotVersion) {
+        libraryFixer = new LibraryAliasFixer(robotVersion, utility, parsingStateHelper);
+
         mappers.clear();
         mappers.addAll(new SettingsMapperProvider().getMappers(robotVersion));
         mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());

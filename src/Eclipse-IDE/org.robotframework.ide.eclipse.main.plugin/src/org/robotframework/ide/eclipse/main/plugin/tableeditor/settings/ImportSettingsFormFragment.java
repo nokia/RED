@@ -112,7 +112,6 @@ import org.robotframework.red.nattable.configs.VariablesInElementsLabelAccumulat
 import org.robotframework.red.nattable.configs.VariablesInElementsStyleConfiguration;
 import org.robotframework.red.nattable.configs.VariablesInNamesLabelAccumulator;
 import org.robotframework.red.nattable.configs.VariablesInNamesStyleConfiguration;
-import org.robotframework.red.nattable.configs.WithNameLabelAccumulator;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
@@ -221,7 +220,6 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 new ImportTypesLabelAccumulator(dataProvider),
                 new SettingsCommentsLabelAccumulator(dataProvider),
                 new SettingsItemsLabelAccumulator(),
-                new WithNameLabelAccumulator(dataProvider),
                 new VariablesInElementsLabelAccumulator(),
                 new VariablesInNamesLabelAccumulator());
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
