@@ -25,6 +25,7 @@ import org.rf.ide.core.testdata.mapping.TwoModelReferencesLinker.DifferentOutput
 import org.rf.ide.core.testdata.mapping.collect.RobotTokensCollector;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -45,7 +46,7 @@ public class FileOutputsMatchUpdaterTest {
         final String fContentNew = "*** Settings ***\nLibrary\tnowy2\tok2\t#bad2";
 
         final RobotProjectHolder holder = new RobotProjectHolder(new RobotRuntimeEnvironment(null, null, "3.0.0"));
-        final RobotParser parser = RobotParser.create(holder, RobotParserConfig.allImportsLazy());
+        final RobotParser parser = RobotParser.create(holder, RobotParserConfig.allImportsLazy(new RobotVersion(3, 0)));
         final RobotFileOutput oldContent = parser.parseEditorContent(fContentOld, new File("fake.txt"));
         final RobotFileOutput newContent = parser.parseEditorContent(fContentNew, new File("fake.txt"));
 

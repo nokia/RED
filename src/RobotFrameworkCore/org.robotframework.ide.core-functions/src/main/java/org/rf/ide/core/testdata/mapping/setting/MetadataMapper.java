@@ -23,29 +23,16 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class MetadataMapper implements IParsingMapper {
 
-    private final ElementPositionResolver positionResolver;
-
-    public MetadataMapper() {
-        this.positionResolver = new ElementPositionResolver();
-    }
+    private final ElementPositionResolver positionResolver = new ElementPositionResolver();
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         final List<IRobotTokenType> types = rt.getTypes();
-        if (containsOnlyMetadata(types) && positionResolver.isCorrectPosition(
-                PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION, robotFileOutput.getFileModel(), currentLine, rt)) {
-            if (isIncludedInSettingTable(processingState)) {
-                return true;
-            } else {
-                // FIXME: it is in wrong place means no settings table
-                // declaration
-            }
-        } else {
-            // FIXME: wrong place | | Library or | Library | Library X |
-            // case.
-        }
-        return false;
+        return containsOnlyMetadata(types)
+                && positionResolver.isCorrectPosition(PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION,
+                        robotFileOutput.getFileModel(), currentLine, rt)
+                && isIncludedInSettingTable(processingState);
     }
 
     private boolean containsOnlyMetadata(final List<IRobotTokenType> types) {
@@ -68,14 +55,14 @@ public class MetadataMapper implements IParsingMapper {
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+
         rt.setType(RobotTokenType.SETTING_METADATA_DECLARATION);
         rt.setText(text);
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
-        final Metadata metadata = new Metadata(rt);
-        settings.addMetadata(metadata);
-        processingState.push(ParsingState.SETTING_METADATA);
+        settings.addMetadata(new Metadata(rt));
 
+        processingState.push(ParsingState.SETTING_METADATA);
         return rt;
     }
 }

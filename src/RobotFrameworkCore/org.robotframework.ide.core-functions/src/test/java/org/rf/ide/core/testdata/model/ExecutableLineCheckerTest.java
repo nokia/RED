@@ -33,7 +33,8 @@ public class ExecutableLineCheckerTest {
 
     private void checkExecutableLines(final int[] lines) {
         for (int i = 0; i < lines.length; i++) {
-            Assert.assertTrue(ExecutableLineChecker.isExecutableLine(modelFile, lines[i]));
+            boolean isEx = ExecutableLineChecker.isExecutableLine(modelFile, lines[i]);
+            Assert.assertTrue(isEx);
         }
     }
 

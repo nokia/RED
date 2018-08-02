@@ -27,7 +27,7 @@ import org.rf.ide.core.testdata.mapping.keywords.KeywordExecutableRowActionMappe
 import org.rf.ide.core.testdata.mapping.keywords.KeywordExecutableRowArgumentMapper;
 import org.rf.ide.core.testdata.mapping.setting.UnknownSettingArgumentMapper;
 import org.rf.ide.core.testdata.mapping.setting.UnknownSettingMapper;
-import org.rf.ide.core.testdata.mapping.setting.library.LibraryAliasFixer;
+import org.rf.ide.core.testdata.mapping.setting.imports.LibraryAliasFixer;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
@@ -109,11 +109,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         this.positionResolvers = new ElementPositionResolver();
         this.postFixerActions = new PostProcessingFixActions();
 
-        mappers.addAll(new SettingsMapperProvider().getMappers());
-        mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());
-        mappers.addAll(new TestCaseMapperProvider().getMappers());
-        mappers.addAll(new UserKeywordMapperProvider().getMappers());
-
         unknownTableElementsMapper.add(new UnknownSettingMapper());
         unknownTableElementsMapper.add(new UnknownSettingArgumentMapper());
         unknownTableElementsMapper.add(new UnknownVariableMapper());
@@ -127,7 +122,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     @Override
     public void parse(final RobotFileOutput parsingOutput, final InputStream inputStream, final File robotFile) {
-        initalizeRecognizers(parsingOutput.getRobotVersion());
+        initalizeRecognizersAndMappers(parsingOutput.getRobotVersion());
 
         boolean wasProcessingError = false;
         try {
@@ -152,7 +147,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     @Override
     public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
-        initalizeRecognizers(parsingOutput.getRobotVersion());
+        initalizeRecognizersAndMappers(parsingOutput.getRobotVersion());
 
         boolean wasProcessingError = false;
         try {
@@ -181,13 +176,18 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         parsingOutput.setProcessedFile(robotFile);
     }
 
-    private void initalizeRecognizers(final RobotVersion robotVersion) {
-        recognized.clear();
+    private void initalizeRecognizersAndMappers(final RobotVersion robotVersion) {
+        mappers.clear();
+        mappers.addAll(new SettingsMapperProvider().getMappers(robotVersion));
+        mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());
+        mappers.addAll(new TestCaseMapperProvider().getMappers(robotVersion));
+        mappers.addAll(new UserKeywordMapperProvider().getMappers(robotVersion));
 
+        recognized.clear();
         recognized.addAll(new SettingsRecognizersProvider().getRecognizers(robotVersion));
         recognized.addAll(new VariablesDeclarationRecognizersProvider().getRecognizers());
-        recognized.addAll(new TestCaseRecognizersProvider().getRecognizers());
-        recognized.addAll(new UserKeywordRecognizersProvider().getRecognizers());
+        recognized.addAll(new TestCaseRecognizersProvider().getRecognizers(robotVersion));
+        recognized.addAll(new UserKeywordRecognizersProvider().getRecognizers(robotVersion));
     }
 
     private RobotFileOutput parse(final RobotFileOutput parsingOutput, final File robotFile, final Reader reader) {

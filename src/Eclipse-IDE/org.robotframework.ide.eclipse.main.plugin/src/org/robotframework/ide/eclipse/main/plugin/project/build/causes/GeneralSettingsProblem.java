@@ -22,7 +22,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddRemoteLib
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResourceFileFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.JoinTemplateNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveTimeoutMessageFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -55,7 +57,29 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "The setting '%s' is duplicated";
+            return "The setting '%s' is duplicated%s";
+        }
+    },
+    DUPLICATED_SETTING_OLD {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is duplicated. Line continuation (...) should be used instead";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new ChangeToFixer("..."));
         }
     },
     MISSING_LIBRARY_NAME {
@@ -293,119 +317,48 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Resource import '%s' is invalid: file does not exist. Check file name and path.";
         }
     },
-    SETTING_ARGUMENTS_NOT_APPLICABLE {
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is not applicable for arguments: %s. %s";
-        }
-    },
-    DUPLICATED_TEMPLATE_28 {
+    TEMPLATE_KEYWORD_NAME_IN_MULTIPLE_CELLS {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
+            return ProblemCategory.ARGUMENT_IN_MULTIPLE_CELLS;
         }
 
         @Override
         public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use '%s' keyword as template";
+            return "The name of template keyword is written in multiple cells";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new JoinTemplateNameFixer());
         }
     },
-    DUPLICATED_SUITE_SETUP_28 {
+    TIMEOUT_MESSAGE_DEPRECATED {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
+            return ProblemCategory.DEPRECATED_API;
         }
 
         @Override
         public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use '%s' keyword as suite setup";
-        }
-    },
-    DUPLICATED_SUITE_TEARDOWN_28 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
+            return "Specifying custom timeout messages is deprecated";
         }
 
         @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use '%s' keyword as suite teardown";
-        }
-    },
-    DUPLICATED_TEST_SETUP_28 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
+        public boolean hasResolution() {
+            return true;
         }
 
         @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use '%s' keyword as test setup";
-        }
-    },
-    DUPLICATED_TEST_TEARDOWN_28 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use '%s' keyword as test teardown";
-        }
-    },
-    DUPLICATED_TEST_TIMEOUT_28 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use '%s' as test timeout";
-        }
-    },
-    DUPLICATED_FORCE_TAGS_28 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use '%s' merged elements as force tags";
-        }
-    },
-    DUPLICATED_DEFAULT_TAGS_28 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use '%s' merged elements as default tags";
-        }
-    },
-    DUPLICATED_DOCUMENTATION_28 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Robot will try to use merged elements as documentation";
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveTimeoutMessageFixer());
         }
     },
     METADATA_SETTING_JOINED_WITH_KEY_IN_COLUMN_29 {

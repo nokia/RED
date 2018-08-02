@@ -24,8 +24,12 @@ public class ExecutableCallInSettingsRule extends ExecutableCallRule {
                         RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT,
                         RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME,
                         RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT),
+
                 elem -> elem.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_SETUP)
-                        || elem.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN));
+                        || elem.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN),
+
+                elem -> elem.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME)
+                        || elem.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME));
     }
 
     public static ExecutableCallRule forExecutableInKeywordTeardown(final IToken textToken,
@@ -33,7 +37,10 @@ public class ExecutableCallInSettingsRule extends ExecutableCallRule {
         return new ExecutableCallInSettingsRule(textToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME,
                         RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT),
-                elem -> elem.getTypes().contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN));
+
+                elem -> elem.getTypes().contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN),
+
+                elem -> elem.getTypes().contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME));
     }
 
     public static ExecutableCallRule forExecutableInGeneralSettingsSetupsOrTeardowns(final IToken textToken,
@@ -47,21 +54,31 @@ public class ExecutableCallInSettingsRule extends ExecutableCallRule {
                         RobotTokenType.SETTING_TEST_SETUP_KEYWORD_ARGUMENT,
                         RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME,
                         RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT),
+
                 elem -> elem.getTypes().contains(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION)
                         || elem.getTypes().contains(RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION)
                         || elem.getTypes().contains(RobotTokenType.SETTING_TEST_SETUP_DECLARATION)
-                        || elem.getTypes().contains(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION));
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION),
+
+                elem -> elem.getTypes().contains(RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME)
+                        || elem.getTypes().contains(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME)
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME)
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME));
     }
 
+    private final Predicate<IRobotLineElement> isKeywordName;
+
     protected ExecutableCallInSettingsRule(final IToken textToken, final IToken embeddedVariablesToken,
-            final EnumSet<RobotTokenType> acceptableTypes, final Predicate<IRobotLineElement> shouldStopOnElement) {
+            final EnumSet<RobotTokenType> acceptableTypes, final Predicate<IRobotLineElement> shouldStopOnElement,
+            final Predicate<IRobotLineElement> isKeywordName) {
         super(textToken, embeddedVariablesToken, acceptableTypes, shouldStopOnElement);
+        this.isKeywordName = isKeywordName;
     }
 
     @Override
     protected boolean shouldBeColored(final IRobotLineElement token, final List<RobotLine> context,
             final Predicate<IRobotLineElement> shouldStopOnElement) {
         final List<RobotToken> tokensBefore = getPreviousTokensInThisExecutable(token, context, shouldStopOnElement);
-        return tokensBefore.isEmpty() || isNestedKeyword(token, context, tokensBefore);
+        return (tokensBefore.isEmpty() && isKeywordName.test(token)) || isNestedKeyword(token, context, tokensBefore);
     }
 }

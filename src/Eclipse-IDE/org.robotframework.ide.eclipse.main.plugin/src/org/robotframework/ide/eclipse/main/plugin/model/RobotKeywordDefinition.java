@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toCollection;
 
 import java.io.ObjectStreamException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -114,13 +114,13 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     }
 
     public ArgumentsDescriptor createArgumentsDescriptor() {
-        return ArgumentsDescriptor.createDescriptor(getArguments());
+        final List<RobotDefinitionSetting> argSettings = findSettings(ModelType.USER_KEYWORD_ARGUMENTS);
+        return ArgumentsDescriptor.createDescriptor(getArguments(argSettings.size() == 1 ? argSettings.get(0) : null));
     }
 
-    private List<String> getArguments() {
+    private List<String> getArguments(final RobotDefinitionSetting argumentsSetting) {
         // embedded arguments are not provided for descriptor or documentation
-        final List<String> args = newArrayList();
-        final RobotDefinitionSetting argumentsSetting = getArgumentsSetting();
+        final List<String> args = new ArrayList<>();
         if (argumentsSetting != null) {
             final KeywordArguments arguments = (KeywordArguments) argumentsSetting.getLinkedElement();
             for (final RobotToken token : arguments.getArguments()) {

@@ -55,7 +55,8 @@ public class RobotParserTest {
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
+        final RobotParser parser = RobotParser.create(projectHolder,
+                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
         // verify
@@ -78,7 +79,8 @@ public class RobotParserTest {
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
+        final RobotParser parser = RobotParser.create(projectHolder,
+                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
         // verify
@@ -114,27 +116,13 @@ public class RobotParserTest {
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
+        final RobotParser parser = RobotParser.create(projectHolder,
+                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
 
         // verify
         final RobotVersion robotVersion = parser.getRobotVersion();
         assertThat(robotVersion).isNotNull();
         assertThat(robotVersion.isEqualTo(new RobotVersion(2, 9))).isTrue();
-    }
-
-    @Test
-    public void test_create_when_robotFramework_isNotPresent() {
-        // prepare
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn(null);
-        final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
-
-        // execute
-        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
-
-        // verify
-        assertThat(parser.getRobotVersion()).isNull();
     }
 
     @Test(timeout = 10000)
@@ -145,7 +133,8 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
-        final RobotParser parser = spy(RobotParser.create(projectHolder, RobotParserConfig.allImportsEager()));
+        final RobotParser parser = spy(
+                RobotParser.create(projectHolder, RobotParserConfig.allImportsEager(new RobotVersion(2, 9))));
 
         //// prepare paths
         final String mainPath = "parser/bugs/RED_352_ReadManyTimesPrevReadReferenceFile_LoopPrevent/";
@@ -255,7 +244,8 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
-        final RobotParser parser = spy(RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy()));
+        final RobotParser parser = spy(
+                RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
 
         //// prepare paths
         final File startFile = new File(this.getClass().getResource(filename).toURI());
@@ -307,7 +297,8 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
-        final RobotParser parser = spy(RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy()));
+        final RobotParser parser = spy(
+                RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
 
         // prepare paths
         final File startFile = new File(this.getClass().getResource("parser/bugs/tsv_positionCheck.tsv").toURI());

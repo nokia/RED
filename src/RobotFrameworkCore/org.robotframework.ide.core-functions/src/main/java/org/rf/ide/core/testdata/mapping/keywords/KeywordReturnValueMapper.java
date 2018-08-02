@@ -23,24 +23,26 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordReturnValueMapper implements IParsingMapper {
 
-    private final ParsingStateHelper utility;
+    private final ParsingStateHelper utility = new ParsingStateHelper();
 
-    public KeywordReturnValueMapper() {
-        this.utility = new ParsingStateHelper();
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+
+        final ParsingState state = utility.getCurrentStatus(processingState);
+        return state == ParsingState.KEYWORD_SETTING_RETURN || state == ParsingState.KEYWORD_SETTING_RETURN_VALUE;
     }
 
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+
         final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE);
         rt.setText(text);
 
-        final KeywordTable keywordTable = robotFileOutput.getFileModel()
-                .getKeywordTable();
+        final KeywordTable keywordTable = robotFileOutput.getFileModel().getKeywordTable();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
         final UserKeyword keyword = keywords.get(keywords.size() - 1);
         final List<KeywordReturn> returns = keyword.getReturns();
@@ -48,19 +50,6 @@ public class KeywordReturnValueMapper implements IParsingMapper {
         keywordReturn.addReturnValue(rt);
 
         processingState.push(ParsingState.KEYWORD_SETTING_RETURN_VALUE);
-
         return rt;
     }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState state = utility.getCurrentStatus(processingState);
-        result = (state == ParsingState.KEYWORD_SETTING_RETURN || state == ParsingState.KEYWORD_SETTING_RETURN_VALUE);
-
-        return result;
-    }
-
 }
