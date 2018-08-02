@@ -7,18 +7,17 @@ Element-Version: 3.0
 External-Reference: 
 Id: _r5GksKJxEeWiTrudgyrHcQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/4/17 11:15 AM
+Save-Time: 8/2/18 4:40 PM
 Testcase-Type: ecl
-Verifications: _tzjjIKMJEeWor7xq1AExKg,_rGj6IM83EeWblO0vn84SSw,_mhM64N7VEeWvV6AMcH1t9Q
+Verifications: _tzjjIKMJEeWor7xq1AExKg,_rGj6IM83EeWblO0vn84SSw,_SyHxsJZhEeiNw-r9eDVnKg,_mhM64N7VEeWvV6AMcH1t9Q
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
-    | double-click
-
-get-view "Project Explorer" | get-tree | select "RobotProject/settings_colour.robot" | double-click    
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-view "Project Explorer" | get-tree | select "RobotProject/kw_settings_color.robot" | double-click  
+get-view "Project Explorer" | get-tree | select "RobotProject/global_settings.robot" | double-click  
     
 //select keyword that is twice and go to another (bug for leaving one character from previouse selection)    
 with [get-editor "TestFile.robot"] {
@@ -39,5 +38,5 @@ get-window Clean | get-button $OK_Clean_button | click
 
 get-view Problems|  get-tree | get-item ".*" -index 0 | expand-all
 
-wait-for-errors -amount 9 -times 3 -delay 3000
+wait-for-errors -amount 10 -times 3 -delay 3000
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
