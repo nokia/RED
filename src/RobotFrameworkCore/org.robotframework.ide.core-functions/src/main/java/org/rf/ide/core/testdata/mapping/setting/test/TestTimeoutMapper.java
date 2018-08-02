@@ -19,7 +19,8 @@ public class TestTimeoutMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addTestTimeout(new TestTimeout(token));
+        return settingTable.getTestTimeouts().size() > 1;
     }
 }
