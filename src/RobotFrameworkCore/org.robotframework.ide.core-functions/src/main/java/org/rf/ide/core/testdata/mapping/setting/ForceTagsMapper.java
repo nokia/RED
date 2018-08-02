@@ -18,7 +18,8 @@ public class ForceTagsMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addForceTags(new ForceTags(token));
+        return settingTable.getForceTags().size() > 1;
     }
 }

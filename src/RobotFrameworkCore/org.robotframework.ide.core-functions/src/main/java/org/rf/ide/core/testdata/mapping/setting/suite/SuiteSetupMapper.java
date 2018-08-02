@@ -19,7 +19,8 @@ public class SuiteSetupMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addSuiteSetup(new SuiteSetup(token));
+        return settingTable.getSuiteSetups().size() > 1;
     }
 }

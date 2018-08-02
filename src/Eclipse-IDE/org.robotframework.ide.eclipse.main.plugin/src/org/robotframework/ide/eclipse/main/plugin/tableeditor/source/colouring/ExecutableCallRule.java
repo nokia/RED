@@ -165,7 +165,10 @@ public class ExecutableCallRule extends VariableUsageRule {
                 if (isFirst && element.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
                     isFirst = false;
                 } else {
-                    return element.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+                    return element.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)
+                            || element.getTypes().contains(RobotTokenType.SETTING_NAME_DUPLICATION)
+                            || element.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION)
+                            || element.getTypes().contains(RobotTokenType.KEYWORD_SETTING_NAME_DUPLICATION);
                 }
             }
         }
@@ -200,7 +203,10 @@ public class ExecutableCallRule extends VariableUsageRule {
                     && !types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
                     && !types.contains(RobotTokenType.FOR_CONTINUE_TOKEN)
                     && !types.contains(RobotTokenType.START_HASH_COMMENT)
-                    && !types.contains(RobotTokenType.COMMENT_CONTINUE);
+                    && !types.contains(RobotTokenType.COMMENT_CONTINUE)
+                    && !types.contains(RobotTokenType.SETTING_NAME_DUPLICATION)
+                    && !types.contains(RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION)
+                    && !types.contains(RobotTokenType.KEYWORD_SETTING_NAME_DUPLICATION);
         }
         return false;
     }
