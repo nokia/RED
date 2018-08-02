@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oqiBUMD5EeWqU8ILayOzQw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/13/18 12:03 PM
+Save-Time: 8/2/18 6:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -30,7 +30,8 @@ get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
     + "Library    OperatingSystem    With Name    os\n"
     + "Library    OperatingSystem   WITH NAME     os2\n\n"
     + "Suite Setup    log something\n"
-    + "Suite Teardown    Log\n\n"
+    + "Suite Teardown    Log\n"
+    + "Test Timeout    52s   This is old\n"
     + "*** Test Cases ***\n"
     + "T1\n"
     + "    [Document]    doc\n"
@@ -48,7 +49,8 @@ get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
     + "*** User Keywords ***\n"
     + "log something\n"
     + "    log   5" 
-
+    
+    
 with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }
@@ -120,64 +122,71 @@ if [$robot_version | matches "^Robot Framework 2\.9\.\d .*"] {
 }
 if [$robot_version | matches "^Robot Framework 3\.0.*"] {
 
-	get-view Problems | get-label "19 errors, 0 warnings, 0 others" | get-property caption 
-    | equals "19 errors, 0 warnings, 0 others" | verify-true
+	get-view Problems | get-label "22 errors, 1 warning, 0 others" | get-property caption 
+    | equals "22 errors, 1 warning, 0 others" | verify-true
 	    
-	with [get-view Problems | get-tree] {
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().length" | equals 19 | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+		with [get-view Problems | get-tree] {
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "Keyword 'Log' expects from 1 to 5 arguments but 0 are provided" | verify-true
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[1].getText()" 
 	        | equals "Keyword setting '[Document]' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[2].getText()" 
 	        | equals "Setting '[Postcondition]' is deprecated from Robot Framework 3.0. Use Teardown syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[3].getText()" 
 	        | equals "Setting '[Postcondition]' is deprecated from Robot Framework 3.0. Use Teardown syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[4].getText()" 
 	        | equals "Setting '[Precondition]' is deprecated from Robot Framework 3.0. Use Setup syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[5].getText()" 
 	        | equals "Setting 'Document' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[6].getText()" 
 	        | equals "Setting 'Suite Postcondition' is deprecated from Robot Framework 3.0. Use Suite Teardown syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[7].getText()" 
 	        | equals "Setting 'Suite Precondition' is deprecated from Robot Framework 3.0. Use Suite Setup syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[8].getText()" 
 	        | equals "Setting 'Test Postcondition' is deprecated from Robot Framework 3.0. Use Test Teardown syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[8].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[9].getText()" 
 	        | equals "Setting 'Test Precondition' is deprecated from Robot Framework 3.0. Use Test Setup syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[9].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[10].getText()" 
 	        | equals "Setting 'With Name' not in upper case is deprecated from Robot Framework 3.0.\n"
 	        + "Use WITH NAME instead." | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[10].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[11].getText()" 
 	        | equals "Table header '*** Metadata ***' is deprecated from Robot Framework 3.0. Use *** Settings *** syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[11].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[12].getText()" 
 	        | equals "Table header '*** User Keyword ***' is deprecated from Robot Framework 3.0. Use *** Keywords *** or *** Keyword *** syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[12].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[13].getText()" 
 	        | equals "Table header '*** User Keywords ***' is deprecated from Robot Framework 3.0. Use *** Keywords *** or *** Keyword *** syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[13].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[14].getText()" 
 	        | equals "Test Case setting '[Document]' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current." 
 	        | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[14].getText()" 
-	        | equals "The setting 'Suite Setup' is duplicated" | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[15].getText()" 
-	        | equals "The setting 'Suite Teardown' is duplicated" | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[16].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[15].getText()" 
+	        | equals "The setting 'Suite Postcondition' is duplicated. No Suite Teardown will be executed" | verify-true
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[16].getText()" 
+	        | equals "The setting 'Suite Precondition' is duplicated. No Suite Setup will be executed" | verify-true
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[17].getText()" 
+	        | equals "The setting 'Suite Setup' is duplicated. No Suite Setup will be executed" | verify-true
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[18].getText()" 
+	        | equals "The setting 'Suite Teardown' is duplicated. No Suite Teardown will be executed" | verify-true
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[19].getText()" 
 	        | equals "Unknown 'Meta: Name' setting" | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[17].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[20].getText()" 
 	        | equals "Unknown 'Meta: Name' setting" | verify-true
-	    get-item -path "Errors \\(19 items\\)" | get-property "getItems().TreeItem[18].getText()" 
+	    get-item -path "Errors \\(22 items\\)" | get-property "getItems().TreeItem[21].getText()" 
 	        | equals "Unknown 'Meta:' setting" | verify-true
 	}
+	get-view Problems | get-tree | get-item -path "Warnings \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+      | equals "Specifying custom timeout messages is deprecated" | verify-true
 
 }
 //------------------------------- adding quick fix ---------------------------------------------------------------------------
@@ -217,9 +226,15 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Change to 'Documentation'" 
     | click -default
-get-editor "TestFile.robot" | get-text-viewer | key-type "M1+a"
 
-
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 17 27
+    hover-text 17 28
+    key-type "M1+1"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Remove Test Timeout message" 
+    | click -default
+    
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Meta:\tName2\tValue\n"
     + "Meta: Name  Value\n"
@@ -232,7 +247,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Library    OperatingSystem    With Name    os\n"
     + "Library    OperatingSystem   WITH NAME     os2\n\n"
     + "Suite Setup    log something\n"
-    + "Suite Teardown    Log\n\n"
+    + "Suite Teardown    Log\n"
+    + "Test Timeout    52s\n"
     + "*** Test Cases ***\n"
     + "T1\n"
     + "    [Document]    doc\n"
