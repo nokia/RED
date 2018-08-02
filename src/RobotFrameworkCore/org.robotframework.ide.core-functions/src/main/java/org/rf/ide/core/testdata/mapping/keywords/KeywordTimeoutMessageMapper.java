@@ -33,13 +33,13 @@ public class KeywordTimeoutMessageMapper implements IParsingMapper {
         if (currentState == ParsingState.KEYWORD_SETTING_TIMEOUT) {
             final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
             final List<KeywordTimeout> keywordTimeouts = keywords.get(keywords.size() - 1).getTimeouts();
-            return checkIfHasAlreadyValue(keywordTimeouts);
+            return hasValueAlready(keywordTimeouts);
         }
         return currentState == ParsingState.KEYWORD_SETTING_TIMEOUT_VALUE
                 || currentState == ParsingState.KEYWORD_SETTING_TIMEOUT_MESSAGE_ARGUMENTS;
     }
 
-    private boolean checkIfHasAlreadyValue(final List<KeywordTimeout> keywordTimeouts) {
+    private boolean hasValueAlready(final List<KeywordTimeout> keywordTimeouts) {
         return !keywordTimeouts.isEmpty() && keywordTimeouts.get(keywordTimeouts.size() - 1).getTimeout() != null;
     }
 
