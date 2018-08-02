@@ -18,7 +18,8 @@ public class DefaultTagsMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addDefaultTags(new DefaultTags(token));
+        return settingTable.getDefaultTags().size() > 1;
     }
 }

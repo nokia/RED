@@ -19,7 +19,8 @@ public class SuiteTeardownMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addSuiteTeardown(new SuiteTeardown(token));
+        return settingTable.getSuiteTeardowns().size() > 1;
     }
 }

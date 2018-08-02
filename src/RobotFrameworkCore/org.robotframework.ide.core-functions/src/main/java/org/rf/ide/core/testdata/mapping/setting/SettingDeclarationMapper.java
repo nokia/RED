@@ -58,11 +58,14 @@ public abstract class SettingDeclarationMapper implements IParsingMapper {
         rt.setText(text);
 
         final SettingTable settingTable = robotFileOutput.getFileModel().getSettingTable();
-        addSetting(settingTable, rt);
+        final boolean isDuplicated = addSetting(settingTable, rt);
+        if (isDuplicated) {
+            rt.getTypes().add(RobotTokenType.SETTING_NAME_DUPLICATION);
+        }
 
         processingState.push(newParsingState);
         return rt;
     }
 
-    protected abstract void addSetting(final SettingTable settingTable, final RobotToken token);
+    protected abstract boolean addSetting(final SettingTable settingTable, final RobotToken token);
 }
