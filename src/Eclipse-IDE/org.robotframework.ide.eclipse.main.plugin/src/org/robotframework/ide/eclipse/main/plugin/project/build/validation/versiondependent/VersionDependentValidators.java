@@ -70,7 +70,9 @@ public class VersionDependentValidators {
                 
                 new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, table, reporter),
                 new TimeoutMessageValidator<>(file, table::getTestTimeouts, timeout -> timeout.getMessageArguments(),
-                        reporter));
+                        reporter),
+                new LibraryAliasNotInUpperCaseValidator(file, table, reporter),
+                new LibraryAliasNotInUpperCaseValidator31(file, table, reporter));
 
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()))
                 .collect(toList());

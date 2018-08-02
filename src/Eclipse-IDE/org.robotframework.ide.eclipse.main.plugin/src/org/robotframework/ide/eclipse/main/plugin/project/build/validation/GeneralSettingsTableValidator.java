@@ -24,7 +24,6 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
-import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
@@ -155,27 +154,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private void validateLibraries(final RobotSuiteFile suiteFile, final List<LibraryImport> libraryImports,
             final IProgressMonitor monitor) throws CoreException {
-
-        reportInvalidWithNameUsage(libraryImports);
-        
         new GeneralSettingsLibrariesImportValidator(validationContext, suiteFile, libraryImports, reporter)
                 .validate(monitor);
-    }
-
-    private void reportInvalidWithNameUsage(final List<LibraryImport> libraryImports) {
-        for (final LibraryImport libImport : libraryImports) {
-            final LibraryAlias alias = libImport.getAlias();
-            if (alias.isPresent()) {
-                final RobotToken withNameDeclaration = alias.getDeclaration();
-                final String withName = withNameDeclaration.getText();
-                if (withName.chars().anyMatch(Character::isLowerCase)) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(GeneralSettingsProblem.LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION)
-                                    .formatMessageWith(withName),
-                            validationContext.getFile(), withNameDeclaration);
-                }
-            }
-        }
     }
 
     private void validateResources(final RobotSuiteFile suiteFile, final List<ResourceImport> resourcesImports,

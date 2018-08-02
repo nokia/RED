@@ -7,10 +7,12 @@ package org.rf.ide.core.testdata.mapping.setting.imports;
 
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.ParsingState;
@@ -18,39 +20,52 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizerOld;
 
 import com.google.common.annotations.VisibleForTesting;
 
 public class LibraryAliasFixer {
 
+    private RobotVersion robotVersion;
+
     private final ElementsUtility utility;
 
     private final ParsingStateHelper parsingStateHelper;
 
-    public LibraryAliasFixer(final ElementsUtility utility, final ParsingStateHelper parsingStateHelper) {
+    public LibraryAliasFixer(final RobotVersion robotVersion, final ElementsUtility utility,
+            final ParsingStateHelper parsingStateHelper) {
+        this.robotVersion = robotVersion;
         this.utility = utility;
         this.parsingStateHelper = parsingStateHelper;
     }
 
+    void setRobotVersion(final RobotVersion robotVersion) {
+        this.robotVersion = robotVersion;
+    }
+
     public void checkAndFixLine(final RobotFileOutput robotFileOutput, final Stack<ParsingState> processingState) {
-        ParsingState state = parsingStateHelper.findNearestNotCommentState(processingState);
+        final ParsingState state = parsingStateHelper.findNearestNotCommentState(processingState);
         if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
-            LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
+            final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
 
             applyFixes(robotFileOutput, lib, null, processingState);
         } else if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
-            LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
+            final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
 
-            List<RobotToken> arguments = lib.getArguments();
-            int argumentsSize = arguments.size();
+            final List<RobotToken> arguments = lib.getArguments();
+            final int argumentsSize = arguments.size();
             if (argumentsSize >= 2) {
-                RobotToken argumentPossibleAlias = arguments.get(argumentsSize - 2);
-                ATokenRecognizer rec = new LibraryAliasRecognizer();
+                final RobotToken argumentPossibleAlias = arguments.get(argumentsSize - 2);
+
+                final ATokenRecognizer rec = Stream.of(new LibraryAliasRecognizerOld(), new LibraryAliasRecognizer())
+                        .filter(recognizer -> recognizer.isApplicableFor(robotVersion))
+                        .findFirst()
+                        .get();
                 if (rec.hasNext(argumentPossibleAlias.getText(), argumentPossibleAlias.getLineNumber(),
                         argumentPossibleAlias.getStartColumn())) {
                     argumentPossibleAlias.setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
-                    LibraryAlias alias = new LibraryAlias(argumentPossibleAlias);
-                    RobotToken aliasValue = arguments.get(argumentsSize - 1);
+                    final LibraryAlias alias = new LibraryAlias(argumentPossibleAlias);
+                    final RobotToken aliasValue = arguments.get(argumentsSize - 1);
                     aliasValue.setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
                     alias.setLibraryAlias(aliasValue);
 
@@ -67,7 +82,7 @@ public class LibraryAliasFixer {
     protected void replaceArgumentsByAliasDeclaration(final Stack<ParsingState> processingState) {
         int removedArguments = 0;
         for (int i = processingState.size() - 1; i >= 0; i--) {
-            ParsingState state = processingState.get(i);
+            final ParsingState state = processingState.get(i);
             if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
                 if (removedArguments == 0) {
                     // it is value
@@ -84,14 +99,14 @@ public class LibraryAliasFixer {
 
     public void applyFixes(final RobotFileOutput robotFileOutput, final LibraryImport lib,
             final RobotToken additionalToken, final Stack<ParsingState> processingState) {
-        LibraryAlias alias = lib.getAlias();
+        final LibraryAlias alias = lib.getAlias();
         if (additionalToken == null) {
             // end of line
             if (alias.isPresent()) {
                 if (alias.getLibraryAlias() == null) {
                     // FIXME: add info that WITH NAME do not have any aliases so
                     // will be get as argument
-                    RobotToken aliasToken = alias.getLibraryAliasDeclaration();
+                    final RobotToken aliasToken = alias.getLibraryAliasDeclaration();
                     aliasToken.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
                     aliasToken.getTypes().add(RobotTokenType.SETTING_LIBRARY_ALIAS);
                     lib.addArgument(aliasToken);
@@ -102,24 +117,24 @@ public class LibraryAliasFixer {
         } else {
             // case when we check if we have alias value
             if (alias.isPresent()) {
-                RobotToken libraryAlias = alias.getLibraryAlias();
-                ATokenRecognizer rec = new LibraryAliasRecognizer();
+                final RobotToken libraryAlias = alias.getLibraryAlias();
+                final ATokenRecognizer rec = new LibraryAliasRecognizerOld();
                 if (rec.hasNext(libraryAlias.getText(), libraryAlias.getLineNumber(), libraryAlias.getStartColumn())) {
                     // alias value has WITH NAME case and we have additional
                     // argument case: WITH NAME (lib argument) WITH NAME p
-                    RobotToken aliasDeclared = alias.getLibraryAliasDeclaration();
+                    final RobotToken aliasDeclared = alias.getLibraryAliasDeclaration();
                     aliasDeclared.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
                     aliasDeclared.getTypes().add(RobotTokenType.SETTING_LIBRARY_ALIAS);
                     lib.addArgument(aliasDeclared);
                     libraryAlias.setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
-                    LibraryAlias correctedAlias = new LibraryAlias(libraryAlias);
+                    final LibraryAlias correctedAlias = new LibraryAlias(libraryAlias);
                     additionalToken.setType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
                     correctedAlias.setLibraryAlias(additionalToken);
                     lib.setAlias(correctedAlias);
                 } else {
                     // case when we have already correct alias and we get
                     // additional value for alias
-                    RobotToken libraryAliasDeclaration = alias.getLibraryAliasDeclaration();
+                    final RobotToken libraryAliasDeclaration = alias.getLibraryAliasDeclaration();
                     libraryAliasDeclaration.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
                     lib.addArgument(libraryAliasDeclaration);
                     libraryAlias.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
@@ -140,9 +155,9 @@ public class LibraryAliasFixer {
     }
 
     @VisibleForTesting
-    protected void removeLibraryAliasValueState(Stack<ParsingState> processingState) {
+    protected void removeLibraryAliasValueState(final Stack<ParsingState> processingState) {
         for (int i = processingState.size() - 1; i >= 0; i--) {
-            ParsingState state = processingState.get(i);
+            final ParsingState state = processingState.get(i);
             if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE) {
                 processingState.remove(i);
             } else {
@@ -152,9 +167,9 @@ public class LibraryAliasFixer {
     }
 
     @VisibleForTesting
-    protected void removeLibraryAliasState(Stack<ParsingState> processingState) {
+    protected void removeLibraryAliasState(final Stack<ParsingState> processingState) {
         for (int i = processingState.size() - 1; i >= 0; i--) {
-            ParsingState state = processingState.get(i);
+            final ParsingState state = processingState.get(i);
             if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
                 processingState.remove(i);
             } else {
