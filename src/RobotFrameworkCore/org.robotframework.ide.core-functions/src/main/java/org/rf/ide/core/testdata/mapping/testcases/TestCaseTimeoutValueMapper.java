@@ -31,12 +31,12 @@ public class TestCaseTimeoutValueMapper implements IParsingMapper {
         if (utility.getCurrentStatus(processingState) == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT) {
             final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
             final List<TestCaseTimeout> timeouts = tests.get(tests.size() - 1).getTimeouts();
-            return !checkIfHasAlreadyValue(timeouts);
+            return !hasValueAlready(timeouts);
         }
         return false;
     }
 
-    private boolean checkIfHasAlreadyValue(final List<TestCaseTimeout> testCaseTimeouts) {
+    private boolean hasValueAlready(final List<TestCaseTimeout> testCaseTimeouts) {
         return !testCaseTimeouts.isEmpty() && testCaseTimeouts.get(testCaseTimeouts.size() - 1).getTimeout() != null;
     }
 
