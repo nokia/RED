@@ -519,6 +519,28 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_API;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting alias using '%s' not in upper case is deprecated";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(ChangeToFixer.createFixers(newArrayList("WITH NAME")));
+        }
+    },
+    LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION_NOT_RECOGNIZED {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
             return ProblemCategory.REMOVED_API;
         }
 
@@ -529,7 +551,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Setting '%s' not in upper case is deprecated from Robot Framework 3.0.\nUse WITH NAME instead.";
+            return "Setting alias using '%s' not in upper case is removed from RF 3.1. This is now treated as an argument to library import.";
         }
 
         @Override
