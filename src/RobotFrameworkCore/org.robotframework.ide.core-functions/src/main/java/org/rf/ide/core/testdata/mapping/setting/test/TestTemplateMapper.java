@@ -19,7 +19,8 @@ public class TestTemplateMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addTestTemplate(new TestTemplate(token));
+        return settingTable.getTestTemplates().size() > 1;
     }
 }

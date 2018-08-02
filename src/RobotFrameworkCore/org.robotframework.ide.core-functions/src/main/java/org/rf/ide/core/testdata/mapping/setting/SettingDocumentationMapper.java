@@ -18,7 +18,8 @@ public class SettingDocumentationMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addDocumentation(new SuiteDocumentation(token));
+        return settingTable.getDocumentation().size() > 1;
     }
 }

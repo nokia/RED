@@ -20,7 +20,8 @@ public class ResourceDeclarationMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addImported(new ResourceImport(token));
+        return false;
     }
 }
