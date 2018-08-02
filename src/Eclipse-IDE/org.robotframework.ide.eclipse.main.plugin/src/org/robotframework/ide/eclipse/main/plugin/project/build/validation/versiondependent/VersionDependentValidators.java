@@ -79,12 +79,13 @@ public class VersionDependentValidators {
     public Stream<VersionDependentModelUnitValidator> getTestCaseSettingsValidators(
             final FileValidationContext validationContext, final TestCase testCase,
             final ValidationReportingStrategy reporter) {
+
         final IFile file = validationContext.getFile();
         final List<RobotLine> fileContent = testCase.getParent().getParent().getFileContent();
         return Stream
                 .<VersionDependentModelUnitValidator> of(
-                        new LocalSettingsDuplicationInOldRfValidator(file, fileContent,
-                                RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION, reporter),
+                        new LocalSettingsDuplicationInOldRfValidator(file, fileContent, testCase.getBeginPosition(),
+                                testCase.getEndPosition(), RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION, reporter),
                         new SettingsDuplicationValidator<>(file, testCase::getSetups, reporter, ". No Setup will be executed"),
                         new SettingsDuplicationValidator<>(file, testCase::getTeardowns, reporter, ". No Teardown will be executed"),
                         new SettingsDuplicationValidator<>(file, testCase::getTemplates, reporter, ". No template will be used"),
@@ -98,11 +99,13 @@ public class VersionDependentValidators {
     public Stream<VersionDependentModelUnitValidator> getKeywordSettingsValidators(
             final FileValidationContext validationContext, final UserKeyword keyword,
             final ValidationReportingStrategy reporter) {
+
         final IFile file = validationContext.getFile();
         final List<RobotLine> fileContent = keyword.getParent().getParent().getFileContent();
         return Stream
                 .<VersionDependentModelUnitValidator> of(
                         new LocalSettingsDuplicationInOldRfValidator(file, fileContent,
+                                keyword.getBeginPosition(), keyword.getEndPosition(),
                                 RobotTokenType.KEYWORD_SETTING_NAME_DUPLICATION, reporter),
                         new SettingsDuplicationValidator<>(file, keyword::getArguments, reporter),
                         new SettingsDuplicationValidator<>(file, keyword::getTeardowns, reporter, ". No Teardown will be executed"),

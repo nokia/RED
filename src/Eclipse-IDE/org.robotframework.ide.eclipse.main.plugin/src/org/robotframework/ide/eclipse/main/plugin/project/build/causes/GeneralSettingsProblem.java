@@ -548,6 +548,18 @@ public enum GeneralSettingsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Variable '%s' is given as keyword name.";
         }
+    },
+    PARAMETERIZED_KEYWORD_NAME_USAGE {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.PARAMETERIZED_KEYWORD_NAME_USAGE;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Keyword name '%s' contains variables. RED is unable to validate arguments given to this keyword";
+        }
     };
 
     @Override

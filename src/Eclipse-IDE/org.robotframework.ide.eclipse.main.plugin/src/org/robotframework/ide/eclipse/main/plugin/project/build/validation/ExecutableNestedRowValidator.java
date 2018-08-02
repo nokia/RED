@@ -5,13 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
@@ -23,6 +24,7 @@ import org.rf.ide.core.validation.SpecialKeywords.NestedKeywordsSyntaxException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
 class ExecutableNestedRowValidator implements ExecutableValidator {
@@ -65,6 +67,14 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
                     if (!nestedRow.getAction().getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
                         new ExecutableNestedRowValidator(validationContext, additionalVariables, nestedRow,
                                 nestedRow.buildLineDescription(), reporter).validate(monitor);
+                    } else {
+                        final RobotToken action = nestedRow.getAction();
+                        final RobotProblem problem = RobotProblem
+                                .causedBy(GeneralSettingsProblem.PARAMETERIZED_KEYWORD_NAME_USAGE)
+                                .formatMessageWith(action.getText());
+                        reporter.handleProblem(problem, validationContext.getFile(), action);
+
+                        unknownVarsValidator.reportUnknownVars(additionalVariables, newArrayList(action));
                     }
                 }
                 unknownVarsValidator.reportUnknownVars(additionalVariables, nested.getOmittedTokens());
