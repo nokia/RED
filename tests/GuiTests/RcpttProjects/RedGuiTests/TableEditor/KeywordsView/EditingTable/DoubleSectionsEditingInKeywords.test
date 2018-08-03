@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _GWpiMGRcEeayWasF5RXANg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 2:39 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 8/3/18 3:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -53,7 +53,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    [Documentation]    my doc\n"
     + "    Convert To Binary    42442\n"
     + "    [Teardown]    a    b    c    d\n"
-    + "    [Teardown]" | verify-true
+    + "    [Teardown]  fff" | verify-true
     
 //reset
 
@@ -96,8 +96,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "my kw\n"
     + "    [Documentation]    my doc\n"
     + "    Convert To Binary    42442\n"
-    + "    [Teardown]    a    b    c    fff    new item\n"
-    + "    [Teardown]\n"
+    + "    [Teardown]    a    b    c    \    new item\n"
+    + "    [Teardown]  fff\n"
     + "    \n" | verify-true  
         
 
@@ -198,10 +198,11 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Keyword 2\n"
     + "    [Documentation]  44 aa\n"
     + "    log  6\n"
-    + "    [Teardown]    Log   55    Convert To Binary    66\n"
-    + "    [Teardown]" | verify-true
-//restet text
-
+    + "    [Teardown]    Log   55\n"
+    + "    [Teardown]    Convert To Binary    66" | verify-true
+    
+    
+//reset text
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "*** Keyword ***\n"
     + "Keyword 2\n"
@@ -239,9 +240,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Keyword 2\n"
     + "    [Documentation]  44 aa\n"
     + "    log  6\n"
-    + "    [Teardown]    Log   999    Convert To Binary    66    new item\n"
-    + "    [Teardown]\n"
-    + "    \n" | verify-true
+    + "    [Teardown]    Log   999    \    \    new item\n"
+    + "    [Teardown]    Convert To Binary    66" | verify-true
 
 //----------------------------------------------- arguments --------------------------------------------
 

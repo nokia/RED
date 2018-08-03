@@ -1,0 +1,102 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: DuplicatedSettingsErrors
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _KpgnkJcsEeiNw-r9eDVnKg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 8/3/18 5:01 PM
+Testcase-Type: ecl
+Verifications: _2vHDwJctEeiNw-r9eDVnKg,_-Ts2kJctEeiNw-r9eDVnKg
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
+    + "# Resource  simple_resource.robot\n"
+    + "# Resource  ../../resource_file.robot\n\n\n"
+    + "Library  Collections\n"
+    + "Library  DateTime\n"
+    + "Library  Dialogs\n"
+    + "Library  Easter\n"
+    + "Library  OperatingSystem\n"
+    + "Library  Process\n"
+    + "Library  Reserved\n"
+    + "Library  Screenshot\n"
+    + "Library  String\n"
+    + "Library  Telnet\n"
+    + "Library  XML\n"
+    + "Library  String\n\n\n\n"
+    + "Documentation  \"this is simple text\"\n"
+    + "Documentation  Mulitline \\n"
+    + " doc \\t\n"
+    + "Documentation  ${dda}\n"
+    + "Documentation    An example test suite documentation with *some* _formatting_.\n"
+    + "...              See test documentation for more documentation examples.  \n\n"
+    + "# Variables    test_var.py\n"
+    + "# Variables    ../data/common_var.py\n"
+    + "# Variables    test_var.py    arg1    ${ARG2}\n\n"
+    + "Metadata  this is test\n"
+    + "Metadata  Version       45\n"
+    + "Metadata    Executed At    ${HOST}\n\n"
+    + "Suite Setup  check if varaible from python file is visible\n"
+    + "Suite Setup     suite setup kw         @{KW ARGS}  # nie dziala\n"
+    + "Suite Setup     ${KEYWORD}          @{KW ARGS} \n\n\n"
+    + "Suite Teardown  teardown kw\n"
+    + "Suite Teardown     suite setup kw       @{KW ARGS} \n"
+    + "Suite Teardown     ${KEYWORD}          @{KW ARGS} \n\n\n"
+    + "Force Tags  tags new line\n"
+    + "Force Tags  ${param}\n"
+    + "Force Tags  \"tag1\"    \"tag2 \n\n\n"
+    + "Default Tags  red test  redt test2\n"
+    + "Default Tags\n"
+    + "Default Tags  ${tag}\n\n"
+    + "Test Timeout  1\n"
+    + "Test Timeout  99 min\n"
+    + "Test Timeout  89.57575\n"
+    + "Test Timeout  0\n"
+    + "Test Timeout  -99923\n"
+    + "Test Timeout  ${None}\n"
+    + "Test Timeout   ${timeout}\n\n"
+    + "Test Timeout  1 min 30 secs\n"
+    + "Test Timeout  1.5 minutes\n"
+    + "Test Timeout  90 s\n"
+    + "Test Timeout  1 day 2 hours 3 minutes 4 seconds 5 milliseconds\n"
+    + "Test Timeout  1d 2h 3m 4s 5ms\n"
+    + "Test Timeout  - 10 seconds\n\n\n"
+    + "Test Setup  Open Aplication  eclipse\n"
+    + "Test Setup  open aplication\n"
+    + "Test Setup  open Aplication  ${param}\n\n\n"
+    + "Test Teardown  Close Aplication  eclipse\n"
+    + "Test Teardown  close aplication    ${param}\n"
+    + "Test Teardown  Close Aplication  eclipse\n\n"
+    + "Test Template  Schema template\n\n"
+    + "*** Variables ***\n"
+    + "${ARG2}  3\n"
+    + "${timeout}  99\n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    ${list} =   Create List  1  2  3\n"
+    + "    Sort List  $list\n\n"
+    + "    \n"
+    + "*** Keywords ***\n\n"
+    + "Schema template\n"
+    + "   Log  template\n\n\n"
+    + "check if varaible from python file is visible\n"
+    + "    Log  ${ARG2} \n"
+    + "    \n"
+    + "teardown kw\n"
+    + "    Log  ${ARG2} \n"
+    + "    \n"
+    + "suite setup kw \n"
+    + "    log  suit setup\n"
+    + "    \n"
+    + "Open Aplication\n"
+    + "    log  opening app\n\n"
+    + "Close Aplication\n"
+    + "    log  opening app" 
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
