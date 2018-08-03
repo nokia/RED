@@ -19,7 +19,8 @@ public class TestTeardownMapper extends SettingDeclarationMapper {
     }
 
     @Override
-    protected void addSetting(final SettingTable settingTable, final RobotToken token) {
+    protected boolean addSetting(final SettingTable settingTable, final RobotToken token) {
         settingTable.addTestTeardown(new TestTeardown(token));
+        return settingTable.getTestTeardowns().size() > 1;
     }
 }

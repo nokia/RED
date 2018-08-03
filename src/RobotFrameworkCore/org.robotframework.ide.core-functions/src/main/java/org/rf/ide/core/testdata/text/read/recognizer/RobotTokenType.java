@@ -78,6 +78,7 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create().addRepresentation("...").build()),
     /**
      */
+    SETTING_NAME_DUPLICATION(TableType.SETTINGS, true),
     SETTING_LIBRARY_DECLARATION(
             TableType.SETTINGS,
             true,
