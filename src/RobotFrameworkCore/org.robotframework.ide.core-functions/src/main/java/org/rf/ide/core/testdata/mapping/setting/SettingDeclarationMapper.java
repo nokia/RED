@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.mapping.setting;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -13,6 +14,7 @@ import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionEx
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
@@ -29,10 +31,20 @@ public abstract class SettingDeclarationMapper implements IParsingMapper {
 
     private final ElementPositionResolver positionResolver;
 
+    private final EnumSet<RobotTokenType> additionalTypes = EnumSet.noneOf(RobotTokenType.class);
+
     public SettingDeclarationMapper(final RobotTokenType declarationType, final ParsingState newParsingState) {
         this.declarationType = declarationType;
         this.newParsingState = newParsingState;
         this.positionResolver = new ElementPositionResolver();
+    }
+
+    @Override
+    public boolean isApplicableFor(final RobotVersion robotVersion) {
+        if (robotVersion.isOlderThan(new RobotVersion(3, 0))) {
+            additionalTypes.add(RobotTokenType.SETTING_NAME_DUPLICATION);
+        }
+        return IParsingMapper.super.isApplicableFor(robotVersion);
     }
 
     @Override
@@ -60,7 +72,7 @@ public abstract class SettingDeclarationMapper implements IParsingMapper {
         final SettingTable settingTable = robotFileOutput.getFileModel().getSettingTable();
         final boolean isDuplicated = addSetting(settingTable, rt);
         if (isDuplicated) {
-            rt.getTypes().add(RobotTokenType.SETTING_NAME_DUPLICATION);
+            rt.getTypes().addAll(additionalTypes);
         }
 
         processingState.push(newParsingState);
