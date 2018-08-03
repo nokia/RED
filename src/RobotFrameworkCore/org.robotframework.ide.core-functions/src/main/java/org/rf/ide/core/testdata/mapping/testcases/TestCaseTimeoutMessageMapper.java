@@ -33,13 +33,13 @@ public class TestCaseTimeoutMessageMapper implements IParsingMapper {
         if (currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT) {
             final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
             final List<TestCaseTimeout> timeouts = testCases.get(testCases.size() - 1).getTimeouts();
-            return checkIfHasAlreadyValue(timeouts);
+            return hasValueAlready(timeouts);
         }
         return currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE
                 || currentState == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS;
     }
 
-    private boolean checkIfHasAlreadyValue(final List<TestCaseTimeout> testCaseTimeouts) {
+    private boolean hasValueAlready(final List<TestCaseTimeout> testCaseTimeouts) {
         return !testCaseTimeouts.isEmpty() && testCaseTimeouts.get(testCaseTimeouts.size() - 1).getTimeout() != null;
     }
 
