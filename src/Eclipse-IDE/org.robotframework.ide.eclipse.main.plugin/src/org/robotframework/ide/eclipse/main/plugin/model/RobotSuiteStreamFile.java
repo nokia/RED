@@ -80,11 +80,17 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     }
 
     @Override
+    public RobotVersion getRobotVersion() {
+        final RobotRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
+        return env == null ? RobotVersion.UNKNOWN : RobotVersion.from(env.getVersion());
+    }
+
+    @Override
     protected ParsingStrategy createReparsingStrategy(final String newContent) {
         return () -> {
             final RobotRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
-            final RobotVersion version = env == null ? RobotVersion.UNKNOWN : RobotVersion.from(env.getVersion());
-            final RobotParser parser = RobotParser.create(new RobotProjectHolder(env), version, (PathsProvider) null);
+            final RobotParser parser = RobotParser.create(new RobotProjectHolder(env), getRobotVersion(),
+                    (PathsProvider) null);
             return parser.parseEditorContent(newContent, new File(name));
         };
     }
