@@ -45,6 +45,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -380,6 +381,10 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             current = current.getParent();
         }
         return (RobotProject) current;
+    }
+
+    public RobotVersion getRobotVersion() {
+        return getProject().getRobotVersion();
     }
 
     public RobotRuntimeEnvironment getRuntimeEnvironment() {

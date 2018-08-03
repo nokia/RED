@@ -221,7 +221,7 @@ public class RobotDocument extends Document {
     }
 
     private static RobotParser createParser(final RobotSuiteFile model) {
-        final RobotVersion version = model.getProject().getRobotVersion();
+        final RobotVersion version = model.getRobotVersion();
         final RobotProjectHolder holder = isNonFileModel(model) ? new RobotProjectHolder()
                 : model.getProject().getRobotProjectHolder();
         final PathsProvider pathsProvider = isNonFileModel(model) ? null : model.getProject().createPathsProvider();
