@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _6U5P0FsAEearwpaEcDJbag
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/26/18 6:12 PM
+Save-Time: 8/3/18 5:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -121,8 +121,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    Log   Show detailed view: : ${output2}\n"
     + "Doc here\n"
     + "    [Documentation]    Create txt file with path to 'resultDir'.\n"
-    + "    [Teardown]    Print output    teObj    Convert To Hex    899\n"
-    + "    [Teardown]\n"
+    + "    [Teardown]    Print output    teObj\n"
+    + "    [Teardown]    Convert To Hex    899\n"
     + "    Should Be Equal As Strings      ${OUTPUT_DIR}${/}robotReportTargetDir.txt    ${result}" | verify-true
  
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
@@ -189,7 +189,7 @@ compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 15 -ref
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 16 -ref_table [list "..."  ""  ""  ""  ""  ""]
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 17 -ref_table [list  "Last kw"  ""  ""  ""  ""  ""]
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 18 -ref_table [list "[Documentation]"  "Create txt file with path to 'resultDir'."  ""  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 19 -ref_table [list "[Teardown]"  "Print output"  "abc"  "Convert To Hex"  "899"  ""]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 19 -ref_table [list "[Teardown]"  "Print output"  "abc"  ""  ""  ""]
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 20 -ref_table [list "Should Be Equal As Strings"  "${OUTPUT_DIR}${/}robotReportTargetDir.txt"  "${result}"  ""  ""  ""]
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 21 -ref_table [list "..."  ""  ""  ""  ""  ""]
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row  22 -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""]
@@ -219,8 +219,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    Log   Show detailed view: : ${output2}\n"
     + "Last kw\n"
     + "    [Documentation]    Create txt file with path to 'resultDir'.\n"
-    + "    [Teardown]    Print output    abc    Convert To Hex    899\n"
-    + "    [Teardown]\n"
+    + "    [Teardown]    Print output    abc\n"
+    + "    [Teardown]    Convert To Hex    899\n"
     + "    Should Be Equal As Strings      ${OUTPUT_DIR}${/}robotReportTargetDir.txt    ${result}" | verify-true
 
 
@@ -243,6 +243,7 @@ with [get-editor "TestFile.robot"] {
         key-type Enter
     }
 }
-
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 10 -ref_table [list "\\"  "${teObj}"  "${arg2}"  "normal text"  ""  ""]  
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

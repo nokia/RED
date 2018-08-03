@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UUQjsLrCEeW29Kbu_epUIA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/13/18 5:03 PM
+Save-Time: 8/3/18 4:55 PM
 Testcase-Type: ecl
 Verifications: _UEHU0NGWEeaZNMwBvlrsag,_KRyuULrEEeW29Kbu_epUIA
 
@@ -49,19 +49,17 @@ with [get-view "Project Explorer" | get-tree] {
 wait 2000
 
 //double click on problems
-get-view Problems | get-tree 
-    | select "Errors \\(.* items\\)/Keyword 'Close Aplication' expects 0 arguments but 1 is provided" | double-click
+get-view Problems | get-tree | select "Errors \\(59 items\\)/Keyword 'KW with comment' contains no keywords to execute" 
+    | double-click
+get-editor "empty_TC_KW.robot" | get-text-viewer | get-property "getSelectionText()" | equals "KW with comment" 
+    | verify-true
     
-with [get-editor "all_settings.robot" | get-text-viewer] {
-    get-property "getSelectionText()" | equals "Close Aplication" | verify-true
-}    		
-
-//double click on problems	
-get-view Problems | get-tree | select "Errors \\(.* items\\)/Test case 'Empty test' contains no keywords to execute" 
-    | double-click   
     
-get-editor "empty_TC_KW.robot" | get-text-viewer | get-property "getSelectionText()" | equals "Empty test" | verify-true	
+get-view Problems | get-tree | select "Errors \\(59 items\\)/Unknown keyword's setting definition '\\[\\]'" 
+    | double-click
+get-editor "test_case_settings.robot" | get-text-viewer | get-property "getSelectionText()" | equals "[]" | verify-true
 
+//double click on warning
 get-view Problems | get-tree 
     | select "Warnings \\(.* items\\)/Dictionary argument '&{f 1}' has to contain from 1 to 5 mappings. Required key: \\(message\\), possible keys: \\(level, html, console, repr\\)" 
     | double-click
