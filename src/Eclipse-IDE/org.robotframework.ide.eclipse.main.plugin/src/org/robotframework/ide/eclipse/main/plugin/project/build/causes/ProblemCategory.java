@@ -146,6 +146,10 @@ public enum ProblemCategory {
             ProblemCategoryType.CODE_STYLE,
             "Variable given as keyword name",
             "Occurs when variable is used as keyword call in test suite setup or teardown."),
+    PARAMETERIZED_KEYWORD_NAME_USAGE(
+            ProblemCategoryType.CODE_STYLE,
+            "Variables are given in nested keyword name",
+            "Occurs when variables are used in name of nested keyword."),
     ARGUMENT_IN_MULTIPLE_CELLS(
             ProblemCategoryType.CODE_STYLE,
             "Template keyword written in multiple cells",

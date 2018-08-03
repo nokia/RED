@@ -58,7 +58,8 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                     // another case
                     final RobotToken actual = tokens.get(columnPosition);
                     if (actual.getText().equals(action.getText())
-                            && actual.getStartOffset() == action.getStartOffset()) {
+                            && actual.getStartOffset() == action.getStartOffset()
+                            && !actual.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
                         configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
                     } else {
@@ -72,6 +73,11 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                             }
                         }
                     }
+                } else if (call instanceof RobotDefinitionSetting
+                        && call.getLinkedElement().getModelType() == ModelType.TEST_CASE_TEMPLATE
+                        && columnPosition > 1) {
+                    configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+
                 } else if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isKeywordBased()) {
                     final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
                     if (types.contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME)
