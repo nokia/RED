@@ -41,14 +41,16 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.RobotTimeFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
+
+import com.google.common.collect.ImmutableMap;
 
 class GeneralSettingsTableValidator implements ModelUnitValidator {
 
@@ -78,7 +80,6 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
         reportVersionSpecificProblems(settingsTable, monitor);
         reportOutdatedTableName(settingsTable);
-        reportOutdatedSettings(settingsTable);
         reportUnknownSettings(settingsTable.getUnknownSettings());
 
         validateLibraries(suiteFile, settingsTable.getLibraryImports(), monitor);
@@ -121,34 +122,15 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         }
     }
 
-    private void reportOutdatedSettings(final SettingTable table) {
-        reportOutdated(table.getDocumentation(), GeneralSettingsProblem.DOCUMENT_SYNONYM, "documentation");
-        reportOutdated(table.getSuiteSetups(), GeneralSettingsProblem.SUITE_PRECONDITION_SYNONYM, "suitesetup");
-        reportOutdated(table.getSuiteTeardowns(), GeneralSettingsProblem.SUITE_POSTCONDITION_SYNONYM, "suiteteardown");
-        reportOutdated(table.getTestSetups(), GeneralSettingsProblem.TEST_PRECONDITION_SYNONYM, "testsetup");
-        reportOutdated(table.getTestTeardowns(), GeneralSettingsProblem.TEST_POSTCONDITION_SYNONYM, "testteardown");
-    }
-
-    private void reportOutdated(final List<? extends AModelElement<?>> settings, final IProblemCause cause,
-            final String correctRepresentation) {
-        for (final AModelElement<?> setting : settings) {
-            final RobotToken declarationToken = setting.getDeclaration();
-            final String text = declarationToken.getText();
-            final String canonicalText = text.replaceAll("\\s", "").toLowerCase();
-            final String canonicalCorrectRepresentation = correctRepresentation.replaceAll("\\s", "").toLowerCase();
-            if (!canonicalText.contains(canonicalCorrectRepresentation)) {
-                reporter.handleProblem(RobotProblem.causedBy(cause).formatMessageWith(text),
-                        validationContext.getFile(), declarationToken);
-            }
-        }
-    }
-
     private void reportUnknownSettings(final List<UnknownSetting> unknownSettings) {
         for (final UnknownSetting unknownSetting : unknownSettings) {
             final RobotToken token = unknownSetting.getDeclaration();
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNKNOWN_SETTING)
                     .formatMessageWith(token.getText());
-            reporter.handleProblem(problem, validationContext.getFile(), token);
+            final String robotVersion = validationContext.getVersion().asString();
+            reporter.handleProblem(problem, validationContext.getFile(), token,
+                    ImmutableMap.of(AdditionalMarkerAttributes.NAME, token.getText(),
+                            AdditionalMarkerAttributes.ROBOT_VERSION, robotVersion));
         }
     }
 

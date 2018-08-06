@@ -5,18 +5,20 @@
  */
 package org.rf.ide.core.testdata.text.read.recognizer.testcases;
 
-import org.rf.ide.core.testdata.text.read.recognizer.AExecutableElementSettingsRecognizer;
+import java.util.regex.Pattern;
+
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
-public class TestCaseSetupRecognizer extends
-        AExecutableElementSettingsRecognizer {
+public class TestCaseSetupRecognizer extends ATokenRecognizer {
+
+    public static final Pattern EXPECTED = Pattern
+            .compile("[ ]?((\\[\\s*" + createUpperLowerCaseWord("Setup") + "\\s*\\]))");
 
     public TestCaseSetupRecognizer() {
-        super(RobotTokenType.TEST_CASE_SETTING_SETUP);
+        super(EXPECTED, RobotTokenType.TEST_CASE_SETTING_SETUP);
     }
-
 
     @Override
     public ATokenRecognizer newInstance() {

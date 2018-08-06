@@ -137,8 +137,16 @@ public enum RobotTokenType implements IRobotTokenType {
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Documentation").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Documentation:").build(),
-            VersionAvailabilityInfoBuilder.create().deprecatedFrom("3.0").addRepresentation("Document").build(),
-            VersionAvailabilityInfoBuilder.create().deprecatedFrom("3.0").addRepresentation("Document:").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .addRepresentation("Document")
+                    .build(),
+            VersionAvailabilityInfoBuilder.create()
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .addRepresentation("Document:")
+                    .build()),
     /**
      */
     SETTING_DOCUMENTATION_TEXT(TableType.SETTINGS),
@@ -169,10 +177,12 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create()
                     .addRepresentation("Suite Precondition")
                     .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
                     .build(),
             VersionAvailabilityInfoBuilder.create()
                     .addRepresentation("Suite Precondition:")
                     .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
                     .build()),
     /**
      */
@@ -190,10 +200,12 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create()
                     .addRepresentation("Suite Postcondition")
                     .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
                     .build(),
             VersionAvailabilityInfoBuilder.create()
                     .addRepresentation("Suite Postcondition:")
                     .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
                     .build()),
     /**
      */
@@ -231,10 +243,12 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create()
                     .addRepresentation("Test Precondition")
                     .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
                     .build(),
             VersionAvailabilityInfoBuilder.create()
                     .addRepresentation("Test Precondition:")
                     .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
                     .build()),
     /**
      * 
@@ -255,10 +269,12 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create()
                     .addRepresentation("Test Postcondition")
                     .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
                     .build(),
             VersionAvailabilityInfoBuilder.create()
                     .addRepresentation("Test Postcondition:")
                     .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
                     .build()),
     /**
      */
@@ -345,7 +361,11 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.TEST_CASES,
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Documentation]").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("[Document]").deprecatedFrom("3.0").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("[Document]")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     TEST_CASE_SETTING_DOCUMENTATION_TEXT(TableType.TEST_CASES),
@@ -364,7 +384,11 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.TEST_CASES,
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Setup]").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("[Precondition]").deprecatedFrom("3.0").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("[Precondition]")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     TEST_CASE_SETTING_SETUP_KEYWORD_NAME(TableType.TEST_CASES),
@@ -377,7 +401,11 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.TEST_CASES,
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Teardown]").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("[Postcondition]").deprecatedFrom("3.0").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("[Postcondition]")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME(TableType.TEST_CASES),
@@ -438,7 +466,11 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.KEYWORDS,
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Documentation]").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("[Document]").deprecatedFrom("3.0").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("[Document]")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     KEYWORD_SETTING_DOCUMENTATION_TEXT(TableType.KEYWORDS),
@@ -476,7 +508,11 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.KEYWORDS,
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Teardown]").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("[Postcondition]").deprecatedFrom("3.0").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("[Postcondition]")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME(TableType.KEYWORDS),

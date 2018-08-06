@@ -13,15 +13,20 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.DefaultTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ForceTagsRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizerOld;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizerOld;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.MetaRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.MetadataRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ResourceDeclarationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.SettingDocumentRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SettingDocumentationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.SuitePostconditionRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.SuitePreconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SuiteSetupRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SuiteTeardownRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.TestPostconditionRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.TestPreconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.TestSetupRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.TestTeardownRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.TestTemplateRecognizer;
@@ -39,11 +44,13 @@ public class SettingsRecognizersProvider {
             new VariableDeclarationRecognizer(),
             new ResourceDeclarationRecognizer(),
 
-            new SettingDocumentationRecognizer(),
+            new SettingDocumentationRecognizer(), new SettingDocumentRecognizer(),
             new MetadataRecognizer(), new MetaRecognizer(),
             new SuiteSetupRecognizer(), new SuiteTeardownRecognizer(),
+            new SuitePreconditionRecognizer(), new SuitePostconditionRecognizer(),
             new ForceTagsRecognizer(), new DefaultTagsRecognizer(),
             new TestSetupRecognizer(), new TestTeardownRecognizer(),
+            new TestPreconditionRecognizer(), new TestPostconditionRecognizer(),
             new TestTemplateRecognizer(), new TestTimeoutRecognizer());
 
 
