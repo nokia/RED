@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -337,39 +338,112 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     @Test
-    public void outdatedDocumentationSyntaxIsReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+    public void documentSettingIsNotReported_whenRobotIsOld() throws CoreException {
+        final RobotVersion version = new RobotVersion(2, 9);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Settings ***")
                 .appendLine("Document  doc")
                 .build();
 
-        final FileValidationContext context = prepareContext();
+        final FileValidationContext context = prepareContext(version);
         final Collection<Problem> problems = validate(context, file);
 
-        assertThat(problems).contains(
-                new Problem(GeneralSettingsProblem.DOCUMENT_SYNONYM, new ProblemPosition(2, Range.closed(17, 25))));
+        assertThat(problems).isEmpty();
     }
 
     @Test
-    public void outdatedSetupAndTeardownSyntaxAreReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+    public void documentSettingIsReportedToBeDeprecated_whenRobotIs30() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Settings ***")
+                .appendLine("Document  doc")
+                .build();
+
+        final FileValidationContext context = prepareContext(version);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).contains(
+                new Problem(GeneralSettingsProblem.DEPRECATED_SETTING_NAME,
+                        new ProblemPosition(2, Range.closed(17, 25))));
+    }
+
+    @Test
+    public void documentSettingIsUnknown_whenRobotIs31() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Settings ***")
+                .appendLine("Document  doc")
+                .build();
+
+        final FileValidationContext context = prepareContext(version);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).contains(
+                new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(2, Range.closed(17, 25))));
+    }
+
+    @Test
+    public void outdatedSetupAndTeardownSyntaxAreNotReported_whenRobotIsOld() throws CoreException {
+        final RobotVersion version = new RobotVersion(2, 9);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Settings ***")
                 .appendLine("Suite Precondition  kw")
                 .appendLine("Suite Postcondition  kw")
                 .appendLine("Test Precondition  kw")
                 .appendLine("Test Postcondition  kw")
                 .build();
 
-        final FileValidationContext context = prepareContext();
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/file.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws, version);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void outdatedSetupAndTeardownSyntaxAreReportedToBeDeprecated_whenRobotIs30() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Settings ***")
+                .appendLine("Suite Precondition  kw")
+                .appendLine("Suite Postcondition  kw")
+                .appendLine("Test Precondition  kw")
+                .appendLine("Test Postcondition  kw")
+                .build();
+
+        final FileValidationContext context = prepareContext(version);
         final Collection<Problem> problems = validate(context, file);
 
         assertThat(problems).contains(
-                new Problem(GeneralSettingsProblem.SUITE_PRECONDITION_SYNONYM,
+                new Problem(GeneralSettingsProblem.DEPRECATED_SETTING_NAME,
                         new ProblemPosition(2, Range.closed(17, 35))),
-                new Problem(GeneralSettingsProblem.SUITE_POSTCONDITION_SYNONYM,
+                new Problem(GeneralSettingsProblem.DEPRECATED_SETTING_NAME,
                         new ProblemPosition(3, Range.closed(40, 59))),
-                new Problem(GeneralSettingsProblem.TEST_PRECONDITION_SYNONYM,
+                new Problem(GeneralSettingsProblem.DEPRECATED_SETTING_NAME,
                         new ProblemPosition(4, Range.closed(64, 81))),
-                new Problem(GeneralSettingsProblem.TEST_POSTCONDITION_SYNONYM,
+                new Problem(GeneralSettingsProblem.DEPRECATED_SETTING_NAME,
                         new ProblemPosition(5, Range.closed(86, 104))));
+    }
+
+    @Test
+    public void outdatedSetupAndTeardownSettingsAreUnknown_whenRobotIs31() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Settings ***")
+                .appendLine("Suite Precondition  kw")
+                .appendLine("Suite Postcondition  kw")
+                .appendLine("Test Precondition  kw")
+                .appendLine("Test Postcondition  kw")
+                .build();
+
+        final FileValidationContext context = prepareContext(version);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).contains(
+                new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(2, Range.closed(17, 35))),
+                new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(3, Range.closed(40, 59))),
+                new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(4, Range.closed(64, 81))),
+                new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(5, Range.closed(86, 104))));
     }
     
     @Test

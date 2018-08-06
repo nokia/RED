@@ -27,13 +27,13 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_documentationColonWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("Documentation:");
+        final List<String> combinations = new CombinationGenerator().combinations("Documentation:");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -44,10 +44,10 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_twoSpacesAndDocumentationColonThanWord() {
-        StringBuilder text = new StringBuilder(" Documentation:");
-        StringBuilder d = new StringBuilder(" ").append(text);
+        final StringBuilder text = new StringBuilder(" Documentation:");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
@@ -57,11 +57,11 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_singleSpaceAndDocumentationColonThanWord() {
-        StringBuilder text = new StringBuilder(" Documentation:");
-        StringBuilder d = new StringBuilder(text).append("C");
+        final StringBuilder text = new StringBuilder(" Documentation:");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -71,11 +71,11 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_singleDocumentationColonThanLetterCWord() {
-        StringBuilder text = new StringBuilder("Documentation:");
-        StringBuilder d = new StringBuilder(text).append("C");
+        final StringBuilder text = new StringBuilder("Documentation:");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -85,10 +85,10 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_singleDocumentationColonWord() {
-        StringBuilder text = new StringBuilder("Documentation:");
+        final StringBuilder text = new StringBuilder("Documentation:");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -98,13 +98,13 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_documentationWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("Documentation");
+        final List<String> combinations = new CombinationGenerator().combinations("Documentation");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -115,10 +115,10 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_twoSpacesAndDocumentationThanWord() {
-        StringBuilder text = new StringBuilder(" Documentation");
-        StringBuilder d = new StringBuilder(" ").append(text);
+        final StringBuilder text = new StringBuilder(" Documentation");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
@@ -128,11 +128,11 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_singleSpaceAndDocumentationThanWord() {
-        StringBuilder text = new StringBuilder(" Documentation");
-        StringBuilder d = new StringBuilder(text).append("C");
+        final StringBuilder text = new StringBuilder(" Documentation");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -142,11 +142,11 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_singleDocumentationThanLetterCWord() {
-        StringBuilder text = new StringBuilder("Documentation");
-        StringBuilder d = new StringBuilder(text).append("C");
+        final StringBuilder text = new StringBuilder("Documentation");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -156,10 +156,10 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_singleDocumentationWord() {
-        StringBuilder text = new StringBuilder("Documentation");
+        final StringBuilder text = new StringBuilder("Documentation");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -171,9 +171,7 @@ public class SettingDocumentationRecognizerTest {
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern())
                 .isEqualTo("[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Documentation") + "[\\s]*:" + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Documentation") + ")|("
-                        + ATokenRecognizer.createUpperLowerCaseWord("Document") + "[\\s]*:" + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Document") + ")");
+                        + ATokenRecognizer.createUpperLowerCaseWord("Documentation") + ")");
 
     }
 

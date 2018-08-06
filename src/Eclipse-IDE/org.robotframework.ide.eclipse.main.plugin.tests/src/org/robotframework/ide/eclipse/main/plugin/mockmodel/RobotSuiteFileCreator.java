@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 
@@ -21,6 +22,13 @@ import com.google.common.base.Joiner;
 public class RobotSuiteFileCreator {
 
     private final List<String> lines = new ArrayList<>();
+
+    private RobotVersion version;
+
+    public RobotSuiteFileCreator setVersion(final RobotVersion version) {
+        this.version = version;
+        return this;
+    }
 
     public RobotSuiteFileCreator appendLine(final String line) {
         lines.add(line);
@@ -56,6 +64,9 @@ public class RobotSuiteFileCreator {
         final String content = getContent();
         final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
         final RobotSuiteStreamFile model = new RobotSuiteStreamFile(filename, stream, readOnly);
+        if (version != null) {
+            model.setRobotVersion(version);
+        }
         model.reparseEverything(content);
         return model;
     }

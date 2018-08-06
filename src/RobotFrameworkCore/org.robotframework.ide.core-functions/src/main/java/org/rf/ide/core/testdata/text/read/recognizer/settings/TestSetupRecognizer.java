@@ -13,15 +13,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestSetupRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern.compile("[ ]?(("
+    public static final Pattern EXPECTED = Pattern.compile("[ ]?"
             + createUpperLowerCaseWord("Test") + "[\\s]+"
-            + createUpperLowerCaseWord("Setup") + "[\\s]*:" + "|"
-            + createUpperLowerCaseWord("Test") + "[\\s]+"
-            + createUpperLowerCaseWord("Setup") + ")|("
-            + createUpperLowerCaseWord("Test") + "[\\s]+"
-            + createUpperLowerCaseWord("Precondition") + "[\\s]*:" + "|"
-            + createUpperLowerCaseWord("Test") + "[\\s]+"
-            + createUpperLowerCaseWord("Precondition") + "))");
+            + createUpperLowerCaseWord("Setup") + "([\\s]*:)?");
 
 
     public TestSetupRecognizer() {

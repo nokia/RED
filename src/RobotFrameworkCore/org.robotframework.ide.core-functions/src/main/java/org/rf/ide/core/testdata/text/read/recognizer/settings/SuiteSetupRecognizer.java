@@ -13,15 +13,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class SuiteSetupRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern.compile("[ ]?(("
+    public static final Pattern EXPECTED = Pattern.compile("[ ]?"
             + createUpperLowerCaseWord("Suite") + "[\\s]+"
-            + createUpperLowerCaseWord("Setup") + "[\\s]*:" + "|"
-            + createUpperLowerCaseWord("Suite") + "[\\s]+"
-            + createUpperLowerCaseWord("Setup") + ")|("
-            + createUpperLowerCaseWord("Suite") + "[\\s]+"
-            + createUpperLowerCaseWord("Precondition") + "[\\s]*:" + "|"
-            + createUpperLowerCaseWord("Suite") + "[\\s]+"
-            + createUpperLowerCaseWord("Precondition") + "))");
+            + createUpperLowerCaseWord("Setup") + "([\\s]*:)?");
 
 
     public SuiteSetupRecognizer() {

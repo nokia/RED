@@ -15,8 +15,7 @@ public class SettingDocumentationRecognizer extends ATokenRecognizer {
     public static final RobotTokenType TOKEN_TYPE = RobotTokenType.SETTING_DOCUMENTATION_DECLARATION;
 
     public static final Pattern EXPECTED = Pattern.compile("[ ]?(" + createUpperLowerCaseWord("Documentation")
-            + "[\\s]*:" + "|" + createUpperLowerCaseWord("Documentation") + ")|("
-            + createUpperLowerCaseWord("Document") + "[\\s]*:" + "|" + createUpperLowerCaseWord("Document") + ")");
+            + "[\\s]*:" + "|" + createUpperLowerCaseWord("Documentation") + ")");
 
     public SettingDocumentationRecognizer() {
         super(EXPECTED, RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
