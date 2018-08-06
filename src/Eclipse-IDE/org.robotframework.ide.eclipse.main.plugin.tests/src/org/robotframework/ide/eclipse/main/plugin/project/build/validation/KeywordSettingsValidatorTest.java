@@ -170,15 +170,44 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void outdatedDocumentationSynonymIsReported() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+    public void documentSettingIsNotReported_inOlderRobot() throws CoreException {
+        final RobotVersion version = new RobotVersion(2, 9);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Document]    doc1")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void documentSettingIsReportedAsDeprecated_inRf3() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Document]    doc1")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
+        assertThat(problems).containsOnly(new Problem(KeywordsProblem.DEPRECATED_KEYWORD_SETTING_NAME,
+                new ProblemPosition(3, Range.closed(27, 37))));
+    }
+
+    @Test
+    public void documentSettingIsNotRecognized_inRf31() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Document]    doc1")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(KeywordsProblem.DOCUMENT_SYNONYM, new ProblemPosition(3, Range.closed(27, 37))));
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 37))));
     }
 
     @Test
@@ -284,17 +313,51 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void outdatedTeardownSynonymIsReported() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+    public void postconditionSettingIsNotRecognized_inOlderRobot() throws CoreException {
+        final RobotVersion version = new RobotVersion(2, 9);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Keywords ***")
                 .appendLine("kw")
                 .appendLine("  [Postcondition]    keyword")
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
 
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(KeywordsProblem.POSTCONDITION_SYNONYM, new ProblemPosition(3, Range.closed(22, 37))));
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(22, 37))));
+    }
+
+    @Test
+    public void postconditionSettingIsReportedAsDeprecated_inRf30() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Keywords ***")
+                .appendLine("kw")
+                .appendLine("  [Postcondition]    keyword")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
+
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
+        assertThat(problems).containsOnly(new Problem(KeywordsProblem.DEPRECATED_KEYWORD_SETTING_NAME,
+                new ProblemPosition(3, Range.closed(22, 37))));
+    }
+
+    @Test
+    public void postconditionSettingIsNotRecognized_inRf31() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Keywords ***")
+                .appendLine("kw")
+                .appendLine("  [Postcondition]    keyword")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
+
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(22, 37))));
     }
 
     @Test

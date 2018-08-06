@@ -18,4 +18,6 @@ public class AdditionalMarkerAttributes {
     public static final String VALUE = "value";
 
     public static final String DEFINE_VAR_LOCALLY = "define_var_locally";
+
+    public static final String ROBOT_VERSION = "robot_version";
 }

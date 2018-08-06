@@ -146,15 +146,44 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void outdatedDocumentationSynonymIsReported() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+    public void documentSettingIsNotReported_inOlderRobot() throws CoreException {
+        final RobotVersion version = new RobotVersion(2, 9);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Document]    doc1")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void documentSettingIsReportedAsDeprecated_inRf30() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Document]    doc1")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
+        assertThat(problems).containsOnly(new Problem(TestCasesProblem.DEPRECATED_CASE_SETTING_NAME,
+                new ProblemPosition(3, Range.closed(26, 36))));
+    }
+
+    @Test
+    public void documentSettingIsNotRecognized_inRf31() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Document]    doc1")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.DOCUMENT_SYNONYM, new ProblemPosition(3, Range.closed(26, 36))));
+                new Problem(TestCasesProblem.UNKNOWN_TEST_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 36))));
     }
 
     @Test
@@ -371,17 +400,51 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void outdatedSetupSynonymIsReported() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+    public void preconditionSettingIsNotReported_inOlderRobot() throws CoreException {
+        final RobotVersion version = new RobotVersion(2, 9);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Precondition]    keyword")
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
 
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void preconditionSettingIsReportedAsDeprecated_inRf30() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Precondition]    keyword")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
+
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.PRECONDITION_SYNONYM, new ProblemPosition(3, Range.closed(26, 40))));
+                new Problem(TestCasesProblem.DEPRECATED_CASE_SETTING_NAME,
+                        new ProblemPosition(3, Range.closed(26, 40))));
+    }
+
+    @Test
+    public void precondtionSettingIsNotRecognizedInRf31() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Precondition]    keyword")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
+
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(TestCasesProblem.UNKNOWN_TEST_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 40))));
     }
 
     @Test
@@ -429,17 +492,50 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void outdatedTeardownSynonymIsReported() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+    public void postconditionSettingIsNotReported_forOlderRobot() throws CoreException {
+        final RobotVersion version = new RobotVersion(2, 9);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Postcondition]    keyword")
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
 
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void postconditionSettingIsReportedAsDeprecated_inRf30() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Postcondition]    keyword")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
+
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
         assertThat(problems).containsOnly(
-                new Problem(TestCasesProblem.POSTCONDITION_SYNONYM, new ProblemPosition(3, Range.closed(26, 41))));
+                new Problem(TestCasesProblem.DEPRECATED_CASE_SETTING_NAME, new ProblemPosition(3, Range.closed(26, 41))));
+    }
+
+    @Test
+    public void postconditionSettingIsNotRecognized_inRf31() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Postcondition]    keyword")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
+
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(TestCasesProblem.UNKNOWN_TEST_CASE_SETTING, new ProblemPosition(3, Range.closed(26, 41))));
     }
 
     private Collection<Problem> validate(final FileValidationContext context, final RobotSuiteFile fileModel)

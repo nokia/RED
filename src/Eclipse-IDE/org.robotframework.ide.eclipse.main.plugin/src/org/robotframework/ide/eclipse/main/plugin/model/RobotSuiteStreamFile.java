@@ -30,6 +30,8 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     private final boolean readOnly;
 
+    private RobotVersion version;
+
     public RobotSuiteStreamFile(final String name, final InputStream input, final boolean readOnly) {
         super(null, null);
         this.name = name;
@@ -81,6 +83,9 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     @Override
     public RobotVersion getRobotVersion() {
+        if (version != null) {
+            return version;
+        }
         final RobotRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
         return env == null ? RobotVersion.UNKNOWN : RobotVersion.from(env.getVersion());
     }
@@ -103,6 +108,10 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     @Override
     public boolean isEditable() {
         return !readOnly;
+    }
+
+    public void setRobotVersion(final RobotVersion version) {
+        this.version = version;
     }
 
     @Override

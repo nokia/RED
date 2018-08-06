@@ -8,14 +8,10 @@ package org.rf.ide.core.test.helpers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.atIndex;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 
 
 /**
@@ -27,11 +23,9 @@ import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
  * @see CombinationGenerator#convertTo(java.util.List)
  * @see CombinationGenerator#combinations(String)
  */
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class CombinationGeneratorTest {
 
-    @ForClean
-    private CombinationGenerator combiner;
+    private final CombinationGenerator combiner = new CombinationGenerator();
 
 
     @Test
@@ -100,11 +94,7 @@ public class CombinationGeneratorTest {
         assertThat(combinationsExpected).isNotNull();
         assertThat(combinationsGet).isNotNull();
         assertThat(combinationsGet).hasSize(combinationsExpected.size());
-
-        for (int index = 0; index < combinationsExpected.size(); index++) {
-            assertThat(combinationsGet).contains(
-                    combinationsExpected.get(index), atIndex(index));
-        }
+        assertThat(combinationsExpected).containsOnlyElementsOf(combinationsGet);
     }
 
 
@@ -140,42 +130,5 @@ public class CombinationGeneratorTest {
         // verify
         assertThat(combinations).isNotNull();
         assertThat(combinations).isEmpty();
-    }
-
-
-    @Test
-    public void test_convertTo_notEmptyList() {
-        // prepare
-        final StringBuilder text_1 = new StringBuilder("text_1");
-        final StringBuilder text_2 = new StringBuilder("text_2");
-        final List<StringBuilder> listOfBuilders = Arrays.asList(text_1, text_2);
-
-        // execute
-        final List<String> strList = combiner.convertTo(listOfBuilders);
-
-        // verify
-        assertThat(strList).hasSize(2);
-        assertThat(strList).contains(text_1.toString(), atIndex(0)).contains(
-                text_2.toString(), atIndex(1));
-    }
-
-
-    @Test
-    public void test_convertTo_emptyList() {
-        assertThat(combiner.convertTo(new ArrayList<StringBuilder>()))
-                .isEmpty();
-    }
-
-
-    @Before
-    public void setUp() {
-        combiner = new CombinationGenerator();
-    }
-
-
-    @After
-    public void tearDown() throws IllegalArgumentException,
-            IllegalAccessException {
-        ClassFieldCleaner.init(this);
     }
 }
