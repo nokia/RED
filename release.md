@@ -1,3 +1,33 @@
+# RED - Robot Editor v0.8.7
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- Added coloring and validation for nested keywords in "Run Keyword" group
+- Showing libraries from site-package in content assist
+
+## GitHub issues updates
+ - #28 - Keywords after a Run Keyword If condition are not validated
+ - #179 - A wrong error message when using embedding arguments keyword name
+ - #197 - No proper marker about deprecated attribute message in Timeout settings in RF 3.0.1
+ - #208 - argument file starting from home directory is not working
+ - #221 - Code coloring when a kw as a kw as arg
+ - #227 - Eclipse Oxygen.3a, RED 0.8.6.201806181254, pydevd-1.2.0 and runPyDevDebug.py 
+ - #229 - Integer as default values are considered as variables in keyword arguments definition
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.6
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
