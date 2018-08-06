@@ -1,3 +1,28 @@
+RED 0.8.7 - 2018/08/06
+Enhancement
+
+    [RED-672] - [github #28] Keyword not checked after Run Keyword If...
+    [RED-1056] - in content assist for Library import show list of folders from python/lib/site-packages
+    [RED-1075] - Variables used in setting calls
+    [RED-1087] - add handling for %{env_vars}
+    [RED-1106] - GitHub #197 - set deprecated attribute message in Timeout settings in RF 3.0.1
+    [RED-1124] - table editor - what to do when not enough columns
+    [RED-1148] - Environment variables in keywords should be just a plaintext
+    [RED-1154] - remove direct robot command executor
+    [RED-1156] - [GitHub #221] Coloring of nested keywords
+
+Bug
+
+    [RED-1084] - GitHub #179 - A wrong error message when using embedding arguments keyword name
+    [RED-1126] - #208 GitHub: argument file starting from home directory is not working
+    [RED-1136] - Problems with "\" in first column - coloring and insert cell
+    [RED-1137] - Insert cell on empty cell after comments makes file dirty
+    [RED-1145] - GitHub #227 runPyDevDebug.py script fixes
+    [RED-1146] - [Github #229] Integer as arguments is recognized as undefined variabe
+    [RED-1150] - General Settings tab adds empty cell after comment in new setting
+    [RED-1158] - Focus is in the same line after moving lin up/down is Imports table
+
+
 RED 0.8.6 - 2018/06/18
 Enhancement
 
