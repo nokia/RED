@@ -24,10 +24,39 @@ public class GherkinPrefixRule implements ISyntaxColouringRule {
                 ExecutableCallRule.forExecutableInTestCase(null, null));
     }
 
+    public static GherkinPrefixRule forExecutableInTestCaseSetting(final IToken textToken) {
+        return new GherkinPrefixRule(textToken,
+                EnumSet.of(RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME,
+                        RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT,
+                        RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME,
+                        RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT),
+                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(null, null));
+    }
+
     public static GherkinPrefixRule forExecutableInKeyword(final IToken textToken) {
         return new GherkinPrefixRule(textToken,
                 EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT),
                 ExecutableCallRule.forExecutableInTestCase(null, null));
+    }
+
+    public static GherkinPrefixRule forExecutableInKeywordSetting(final IToken textToken) {
+        return new GherkinPrefixRule(textToken,
+                EnumSet.of(RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME,
+                        RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT),
+                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(null, null));
+    }
+
+    public static GherkinPrefixRule forExecutableInSetting(final IToken textToken) {
+        return new GherkinPrefixRule(textToken,
+                EnumSet.of(RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME,
+                        RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_ARGUMENT,
+                        RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME,
+                        RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT,
+                        RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME,
+                        RobotTokenType.SETTING_TEST_SETUP_KEYWORD_ARGUMENT,
+                        RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME,
+                        RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT),
+                ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(null, null));
     }
 
     private final IToken textToken;
@@ -51,7 +80,7 @@ public class GherkinPrefixRule implements ISyntaxColouringRule {
     @Override
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<RobotLine> context) {
-        
+
         final String textAfterPrefix = GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(token.getText());
         final int prefixLength = token.getText().length() - textAfterPrefix.length();
         if (prefixLength > 0 && shouldBeColored(token, offsetInToken, context)) {
