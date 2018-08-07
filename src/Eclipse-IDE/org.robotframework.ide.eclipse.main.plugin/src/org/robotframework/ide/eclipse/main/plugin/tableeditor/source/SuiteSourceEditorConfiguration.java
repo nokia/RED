@@ -325,9 +325,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     private void createDefaultAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
             final AssistantCallbacks assistantAccessor) {
-        // we are adding all the assistants for default content type. Most of them (excluding
-        // section headers assistant) are working in default content type only at the very last
-        // position in file (this position always has default content type, but it can be actually
+        // we are adding all the assistants for default content type. Most of them
+        // (excluding
+        // section headers assistant) are working in default content type only at the
+        // very last
+        // position in file (this position always has default content type, but it can
+        // be actually
         // prepended with some valid meaningful content type
 
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
@@ -421,8 +424,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new SettingsTemplateRule(call),
-                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, variable),
+                GherkinPrefixRule.forExecutableInTestCaseSetting(gherkin),
                 GherkinPrefixRule.forExecutableInTestCase(gherkin),
+                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, variable),
                 ExecutableCallRule.forExecutableInTestCase(call, variable),
                 new NestedExecsSpecialTokensRule(specialToken), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new InTokenRule(specialToken) };
@@ -430,8 +434,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
-                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, variable),
+                GherkinPrefixRule.forExecutableInKeywordSetting(gherkin),
                 GherkinPrefixRule.forExecutableInKeyword(gherkin),
+                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, variable),
                 ExecutableCallRule.forExecutableInKeyword(call, variable),
                 new NestedExecsSpecialTokensRule(specialToken), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new InTokenRule(specialToken) };
@@ -439,6 +444,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsTemplateRule(call),
+                GherkinPrefixRule.forExecutableInSetting(gherkin),
                 ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, variable),
                 new NestedExecsSpecialTokensRule(specialToken), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new WithNameRule(specialToken) };
