@@ -68,6 +68,7 @@ public class VersionDependentValidators {
                 new SettingsDuplicationInOldRfValidator<>(file, table::getDocumentation, reporter),
                 new SettingsDuplicationValidator<>(file, table::getDocumentation, reporter),
                 
+                new DeprecatedGeneralSettingNameValidator(file, table, reporter),
                 new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, table, reporter),
                 new TimeoutMessageValidator<>(file, table::getTestTimeouts, timeout -> timeout.getMessageArguments(),
                         reporter),
@@ -94,6 +95,7 @@ public class VersionDependentValidators {
                         new SettingsDuplicationValidator<>(file, testCase::getTimeouts, reporter, ". No timeout will be checked"),
                         new SettingsDuplicationValidator<>(file, testCase::getTags, reporter),
                         new SettingsDuplicationValidator<>(file, testCase::getDocumentation, reporter),
+                        new DeprecatedTestCaseSettingNameValidator(file, testCase, reporter),
                         new TimeoutMessageValidator<>(file, testCase::getTimeouts, timeout -> timeout.getMessage(), reporter))
                 .filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
@@ -115,6 +117,7 @@ public class VersionDependentValidators {
                         new SettingsDuplicationValidator<>(file, keyword::getTimeouts, reporter, ". No timeout will be checked"),
                         new SettingsDuplicationValidator<>(file, keyword::getTags, reporter),
                         new SettingsDuplicationValidator<>(file, keyword::getDocumentation, reporter),
+                        new DeprecatedKeywordSettingNameValidator(file, keyword, reporter),
                         new TimeoutMessageValidator<>(file, keyword::getTimeouts, timeout -> timeout.getMessage(), reporter))
                 .filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }

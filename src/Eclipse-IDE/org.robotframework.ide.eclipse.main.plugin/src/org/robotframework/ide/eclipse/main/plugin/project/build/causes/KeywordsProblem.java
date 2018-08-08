@@ -6,13 +6,22 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordPostconditionRecognizer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddPrefixToKeywordUsage;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
@@ -230,11 +239,11 @@ public enum KeywordsProblem implements IProblemCause {
                     + "Use '%s' in this suite file if the latter is desired";
         }
     },
-    DOCUMENT_SYNONYM {
+    DEPRECATED_KEYWORD_SETTING_NAME {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
+            return ProblemCategory.DEPRECATED_API;
         }
 
         @Override
@@ -244,34 +253,13 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Keyword setting '%s' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current.";
+            return "Keyword setting name '%s' is deprecated. Use '%s' instead";
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("[Documentation]"));
-        }
-    },
-    POSTCONDITION_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Teardown syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("[Teardown]"));
+            final String targetName = marker.getAttribute(AdditionalMarkerAttributes.VALUE, "");
+            return newArrayList(new ChangeToFixer(targetName));
         }
     },
     USER_KEYWORD_TABLE_HEADER_SYNONYM {
@@ -301,6 +289,34 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Unknown keyword's setting definition '%s'";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+            final RobotVersion robotVersion = Optional
+                    .ofNullable(marker.getAttribute(AdditionalMarkerAttributes.ROBOT_VERSION, null))
+                    .map(RobotVersion::from)
+                    .orElse(new RobotVersion(3, 1));
+
+            final Map<Pattern, String> oldSettingName = new HashMap<>();
+            oldSettingName.put(KeywordDocumentRecognizer.EXPECTED,
+                    RobotTokenType.KEYWORD_SETTING_DOCUMENTATION.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+            oldSettingName.put(KeywordPostconditionRecognizer.EXPECTED,
+                    RobotTokenType.KEYWORD_SETTING_TEARDOWN.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+
+            return oldSettingName.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey().matcher(name).matches())
+                    .map(entry -> new ChangeToFixer(entry.getValue()))
+                    .collect(toList());
         }
     },
     EMPTY_KEYWORD_SETTING {

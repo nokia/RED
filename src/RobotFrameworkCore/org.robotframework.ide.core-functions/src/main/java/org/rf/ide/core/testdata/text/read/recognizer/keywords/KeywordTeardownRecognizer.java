@@ -5,18 +5,20 @@
  */
 package org.rf.ide.core.testdata.text.read.recognizer.keywords;
 
-import org.rf.ide.core.testdata.text.read.recognizer.AExecutableElementSettingsRecognizer;
+import java.util.regex.Pattern;
+
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
-public class KeywordTeardownRecognizer extends
-        AExecutableElementSettingsRecognizer {
+public class KeywordTeardownRecognizer extends ATokenRecognizer {
+
+    public static final Pattern EXPECTED = Pattern
+            .compile("[ ]?((\\[\\s*" + createUpperLowerCaseWord("Teardown") + "\\s*\\]))");
 
     public KeywordTeardownRecognizer() {
-        super(RobotTokenType.KEYWORD_SETTING_TEARDOWN);
+        super(EXPECTED, RobotTokenType.KEYWORD_SETTING_TEARDOWN);
     }
-
 
     @Override
     public ATokenRecognizer newInstance() {

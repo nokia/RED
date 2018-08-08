@@ -6,9 +6,14 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -16,6 +21,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IMarkerResolution;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.SettingDocumentRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.SuitePostconditionRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.SuitePreconditionRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.TestPostconditionRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.TestPreconditionRecognizer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddRemoteLibraryToRedXmlFixer;
@@ -32,6 +44,43 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Unknown '%s' setting";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+            final RobotVersion robotVersion = Optional
+                    .ofNullable(marker.getAttribute(AdditionalMarkerAttributes.ROBOT_VERSION, null))
+                    .map(RobotVersion::from)
+                    .orElse(new RobotVersion(3, 1));
+
+            final Map<Pattern, String> oldSettingName = new HashMap<>();
+            oldSettingName.put(SettingDocumentRecognizer.EXPECTED,
+                    RobotTokenType.SETTING_DOCUMENTATION_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+            oldSettingName.put(SuitePreconditionRecognizer.EXPECTED,
+                    RobotTokenType.SETTING_SUITE_SETUP_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+            oldSettingName.put(SuitePostconditionRecognizer.EXPECTED,
+                    RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+            oldSettingName.put(TestPreconditionRecognizer.EXPECTED,
+                    RobotTokenType.SETTING_TEST_SETUP_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+            oldSettingName.put(TestPostconditionRecognizer.EXPECTED,
+                    RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+
+            return oldSettingName.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey().matcher(name).matches())
+                    .map(entry -> new ChangeToFixer(entry.getValue()))
+                    .collect(toList());
         }
     },
     EMPTY_SETTING {
@@ -383,11 +432,11 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return newArrayList(new MetadataKeyInSameColumnFixer());
         }
     },
-    DOCUMENT_SYNONYM {
+    DEPRECATED_SETTING_NAME {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
+            return ProblemCategory.DEPRECATED_API;
         }
 
         @Override
@@ -397,100 +446,13 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current.";
+            return "Setting name '%s' is deprecated. Use '%s' instead";
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("Documentation"));
-        }
-    },
-    SUITE_PRECONDITION_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Suite Setup syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("Suite Setup"));
-        }
-    },
-    SUITE_POSTCONDITION_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Suite Teardown syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("Suite Teardown"));
-        }
-    },
-    TEST_PRECONDITION_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Test Setup syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("Test Setup"));
-        }
-    },
-    TEST_POSTCONDITION_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Test Teardown syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("Test Teardown"));
+            final String targetName = marker.getAttribute(AdditionalMarkerAttributes.VALUE, "");
+            return newArrayList(new ChangeToFixer(targetName));
         }
     },
     METADATA_TABLE_HEADER_SYNONYM {
