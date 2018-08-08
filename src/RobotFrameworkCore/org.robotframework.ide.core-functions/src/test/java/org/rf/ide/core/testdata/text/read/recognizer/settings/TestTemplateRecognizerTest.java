@@ -9,31 +9,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-@SuppressWarnings({ "PMD.MethodNamingConventions", "PMD.TooManyMethods" })
 public class TestTemplateRecognizerTest {
 
-    @ForClean
-    private ATokenRecognizer rec;
+    private final TestTemplateRecognizer rec = new TestTemplateRecognizer();
 
     @Test
     public void test_testTemplateColonWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("Test Template:");
+        final List<String> combinations = new CombinationGenerator().combinations("Test Template:");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -43,11 +37,11 @@ public class TestTemplateRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestTemplateColonThanWord() {
-        StringBuilder text = new StringBuilder(" Test Template:");
-        StringBuilder d = new StringBuilder(" ").append(text);
+    public void test_twoSpacesAndTestTemplateColonThenWord() {
+        final StringBuilder text = new StringBuilder(" Test Template:");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
@@ -56,12 +50,12 @@ public class TestTemplateRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestTemplateColonThanWord() {
-        StringBuilder text = new StringBuilder(" Test Template:");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleSpaceAndTestTemplateColonThenWord() {
+        final StringBuilder text = new StringBuilder(" Test Template:");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -70,12 +64,12 @@ public class TestTemplateRecognizerTest {
     }
 
     @Test
-    public void test_singleTestTemplateColonThanLetterCWord() {
-        StringBuilder text = new StringBuilder("Test Template:");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleTestTemplateColonThenLetterCWord() {
+        final StringBuilder text = new StringBuilder("Test Template:");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -85,10 +79,10 @@ public class TestTemplateRecognizerTest {
 
     @Test
     public void test_singleTestTemplateColonWord() {
-        StringBuilder text = new StringBuilder("Test Template:");
+        final StringBuilder text = new StringBuilder("Test Template:");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -98,13 +92,13 @@ public class TestTemplateRecognizerTest {
 
     @Test
     public void test_testTemplateWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("Test Template");
+        final List<String> combinations = new CombinationGenerator().combinations("Test Template");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -114,11 +108,11 @@ public class TestTemplateRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestTemplateThanWord() {
-        StringBuilder text = new StringBuilder(" Test Template");
-        StringBuilder d = new StringBuilder(" ").append(text);
+    public void test_twoSpacesAndTestTemplateThenWord() {
+        final StringBuilder text = new StringBuilder(" Test Template");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
@@ -127,12 +121,12 @@ public class TestTemplateRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestTemplateThanWord() {
-        StringBuilder text = new StringBuilder(" Test Template");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleSpaceAndTestTemplateThenWord() {
+        final StringBuilder text = new StringBuilder(" Test Template");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -141,12 +135,12 @@ public class TestTemplateRecognizerTest {
     }
 
     @Test
-    public void test_singleTestTemplateThanLetterCWord() {
-        StringBuilder text = new StringBuilder("Test Template");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleTestTemplateThenLetterCWord() {
+        final StringBuilder text = new StringBuilder("Test Template");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -156,10 +150,10 @@ public class TestTemplateRecognizerTest {
 
     @Test
     public void test_singleTestTemplateWord() {
-        StringBuilder text = new StringBuilder("Test Template");
+        final StringBuilder text = new StringBuilder("Test Template");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -179,15 +173,5 @@ public class TestTemplateRecognizerTest {
     @Test
     public void test_getProducedType() {
         assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION);
-    }
-
-    @Before
-    public void setUp() {
-        rec = new TestTemplateRecognizer();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

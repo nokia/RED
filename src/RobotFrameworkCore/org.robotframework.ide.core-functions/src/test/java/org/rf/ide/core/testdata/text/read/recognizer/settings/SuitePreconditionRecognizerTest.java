@@ -7,8 +7,6 @@ package org.rf.ide.core.testdata.text.read.recognizer.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.junit.Test;
@@ -22,7 +20,7 @@ public class SuitePreconditionRecognizerTest {
     private final SuitePreconditionRecognizer rec = new SuitePreconditionRecognizer();
 
     @Test
-    public void test_suitePreconditionColonWord_allCombinations() throws IOException, URISyntaxException {
+    public void test_suitePreconditionColonWord_allCombinations() {
         final List<String> combinations = new CombinationGenerator().combinations("Suite Precondition:");
         for (final String comb : combinations) {
             assertThat(rec.hasNext(comb, 1, 0)).isTrue();
@@ -36,7 +34,7 @@ public class SuitePreconditionRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndSuitePreconditionColonThanWord() {
+    public void test_twoSpacesAndSuitePreconditionColonThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Precondition:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -49,7 +47,7 @@ public class SuitePreconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndSuitePreconditionColonThanWord() {
+    public void test_singleSpaceAndSuitePreconditionColonThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Precondition:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -63,7 +61,7 @@ public class SuitePreconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleSuitePreconditionColonThanLetterCWord() {
+    public void test_singleSuitePreconditionColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Suite Precondition:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -90,7 +88,7 @@ public class SuitePreconditionRecognizerTest {
     }
 
     @Test
-    public void test_suitePreconditionWord_allCombinations() throws IOException, URISyntaxException {
+    public void test_suitePreconditionWord_allCombinations() {
         final List<String> combinations = new CombinationGenerator().combinations("Suite Precondition");
         for (final String comb : combinations) {
             assertThat(rec.hasNext(comb, 1, 0)).isTrue();
@@ -104,7 +102,7 @@ public class SuitePreconditionRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndSuitePreconditionThanWord() {
+    public void test_twoSpacesAndSuitePreconditionThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Precondition");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -117,7 +115,7 @@ public class SuitePreconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndSuitePreconditionThanWord() {
+    public void test_singleSpaceAndSuitePreconditionThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Precondition");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -131,7 +129,7 @@ public class SuitePreconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleSuitePreconditionThanLetterCWord() {
+    public void test_singleSuitePreconditionThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Suite Precondition");
         final StringBuilder d = new StringBuilder(text).append("C");
 

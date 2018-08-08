@@ -7,25 +7,20 @@ package org.rf.ide.core.testdata.text.read.separators;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class PipeSeparatorTest {
 
-    @ForClean
     private PipeSeparator separator;
 
     @Test
     public void testCaseLine_withMultipleSpaceInFirstColumn() {
-        String theFirstSeparator = "|";
-        String theSecondSeparator = "    | ";
-        String action = "${dict} =";
-        String lastSeparator = "  |   ";
-        String text = theFirstSeparator + theSecondSeparator + action + lastSeparator;
+        final String theFirstSeparator = "|";
+        final String theSecondSeparator = "    | ";
+        final String action = "${dict} =";
+        final String lastSeparator = "  |   ";
+        final String text = theFirstSeparator + theSecondSeparator + action + lastSeparator;
         separator = new PipeSeparator(0, text);
 
         assertThat(separator.hasNextSeparator()).isTrue();
@@ -62,9 +57,9 @@ public class PipeSeparatorTest {
 
     @Test
     public void twoSeparatorsAt_theBegin() {
-        String theFirstSeparator = "|";
-        String theSecondSeparator = " | ";
-        String text = theFirstSeparator + theSecondSeparator + "...    foobar";
+        final String theFirstSeparator = "|";
+        final String theSecondSeparator = " | ";
+        final String text = theFirstSeparator + theSecondSeparator + "...    foobar";
         separator = new PipeSeparator(0, text);
 
         assertThat(separator.hasNextSeparator()).isTrue();
@@ -90,11 +85,11 @@ public class PipeSeparatorTest {
 
     @Test
     public void singleSeparatorAt_theBegin() {
-        String theFirstSeparator = "| ";
+        final String theFirstSeparator = "| ";
         separator = new PipeSeparator(0, theFirstSeparator);
 
         assertThat(separator.hasNextSeparator()).isTrue();
-        Separator sep = separator.nextSeparator();
+        final Separator sep = separator.nextSeparator();
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(0);
@@ -110,10 +105,5 @@ public class PipeSeparatorTest {
         separator = new PipeSeparator(0, "  test");
 
         assertThat(separator.hasNextSeparator()).isFalse();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

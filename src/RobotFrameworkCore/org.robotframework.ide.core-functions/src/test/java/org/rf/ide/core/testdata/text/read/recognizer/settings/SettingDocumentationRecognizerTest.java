@@ -9,21 +9,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class SettingDocumentationRecognizerTest {
 
-    @ForClean
-    private ATokenRecognizer rec;
+    private final SettingDocumentationRecognizer rec = new SettingDocumentationRecognizer();
 
     @Test
     public void test_documentationColonWord_allCombinations() {
@@ -43,7 +37,7 @@ public class SettingDocumentationRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndDocumentationColonThanWord() {
+    public void test_twoSpacesAndDocumentationColonThenWord() {
         final StringBuilder text = new StringBuilder(" Documentation:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -56,7 +50,7 @@ public class SettingDocumentationRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndDocumentationColonThanWord() {
+    public void test_singleSpaceAndDocumentationColonThenWord() {
         final StringBuilder text = new StringBuilder(" Documentation:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -70,7 +64,7 @@ public class SettingDocumentationRecognizerTest {
     }
 
     @Test
-    public void test_singleDocumentationColonThanLetterCWord() {
+    public void test_singleDocumentationColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Documentation:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -114,7 +108,7 @@ public class SettingDocumentationRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndDocumentationThanWord() {
+    public void test_twoSpacesAndDocumentationThenWord() {
         final StringBuilder text = new StringBuilder(" Documentation");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -127,7 +121,7 @@ public class SettingDocumentationRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndDocumentationThanWord() {
+    public void test_singleSpaceAndDocumentationThenWord() {
         final StringBuilder text = new StringBuilder(" Documentation");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -141,7 +135,7 @@ public class SettingDocumentationRecognizerTest {
     }
 
     @Test
-    public void test_singleDocumentationThanLetterCWord() {
+    public void test_singleDocumentationThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Documentation");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -178,15 +172,5 @@ public class SettingDocumentationRecognizerTest {
     @Test
     public void test_getProducedType() {
         assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
-    }
-
-    @Before
-    public void setUp() {
-        rec = new SettingDocumentationRecognizer();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

@@ -7,8 +7,6 @@ package org.rf.ide.core.testdata.text.read.recognizer.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.junit.Test;
@@ -22,7 +20,7 @@ public class TestPostconditionRecognizerTest {
     private final TestPostconditionRecognizer rec = new TestPostconditionRecognizer();
 
     @Test
-    public void test_testPostconditionColonWord_allCombinations() throws IOException, URISyntaxException {
+    public void test_testPostconditionColonWord_allCombinations() {
         final List<String> combinations = new CombinationGenerator().combinations("Test Postcondition:");
         for (final String comb : combinations) {
             assertThat(rec.hasNext(comb, 1, 0)).isTrue();
@@ -36,7 +34,7 @@ public class TestPostconditionRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestPostconditionColonThanWord() {
+    public void test_twoSpacesAndTestPostconditionColonThenWord() {
         final StringBuilder text = new StringBuilder(" Test Postcondition:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -49,7 +47,7 @@ public class TestPostconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestPostconditionColonThanWord() {
+    public void test_singleSpaceAndTestPostconditionColonThenWord() {
         final StringBuilder text = new StringBuilder(" Test Postcondition:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -63,7 +61,7 @@ public class TestPostconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleTestPostconditionColonThanLetterCWord() {
+    public void test_singleTestPostconditionColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Test Postcondition:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -90,7 +88,7 @@ public class TestPostconditionRecognizerTest {
     }
 
     @Test
-    public void test_testPostconditionWord_allCombinations() throws IOException, URISyntaxException {
+    public void test_testPostconditionWord_allCombinations() {
         final List<String> combinations = new CombinationGenerator().combinations("Test Postcondition");
         for (final String comb : combinations) {
             assertThat(rec.hasNext(comb, 1, 0)).isTrue();
@@ -104,7 +102,7 @@ public class TestPostconditionRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestPostconditionThanWord() {
+    public void test_twoSpacesAndTestPostconditionThenWord() {
         final StringBuilder text = new StringBuilder(" Test Postcondition");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -117,7 +115,7 @@ public class TestPostconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestPostconditionThanWord() {
+    public void test_singleSpaceAndTestPostconditionThenWord() {
         final StringBuilder text = new StringBuilder(" Test Postcondition");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -131,7 +129,7 @@ public class TestPostconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleTestPostconditionThanLetterCWord() {
+    public void test_singleTestPostconditionThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Test Postcondition");
         final StringBuilder d = new StringBuilder(text).append("C");
 

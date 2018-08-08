@@ -9,21 +9,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class LibraryAliasRecognizerOldTest {
 
-    @ForClean
-    private ATokenRecognizer rec;
+    private final LibraryAliasRecognizerOld rec = new LibraryAliasRecognizerOld();
 
     @Test
     public void test_withNameWords_allCombinations() {
@@ -43,7 +37,7 @@ public class LibraryAliasRecognizerOldTest {
     }
 
     @Test
-    public void test_twoSpacesAnd_WITH_NAME_ThanWord() {
+    public void test_twoSpacesAnd_WITH_NAME_ThenWord() {
         final StringBuilder text = new StringBuilder(" WITH NAME");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -69,7 +63,7 @@ public class LibraryAliasRecognizerOldTest {
     }
 
     @Test
-    public void test_singleAliasThanLetterCWord() {
+    public void test_singleAliasThenLetterCWord() {
         final StringBuilder text = new StringBuilder("WITH NAMEC");
 
         assertThat(rec.hasNext(text, 1, 0)).isFalse();
@@ -97,15 +91,5 @@ public class LibraryAliasRecognizerOldTest {
     @Test
     public void test_getProducedType() {
         assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_LIBRARY_ALIAS);
-    }
-
-    @Before
-    public void setUp() {
-        rec = new LibraryAliasRecognizerOld();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

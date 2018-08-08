@@ -37,7 +37,7 @@ public class SuiteTeardownRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndSuiteTeardownColonThanWord() {
+    public void test_twoSpacesAndSuiteTeardownColonThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Teardown:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -50,7 +50,7 @@ public class SuiteTeardownRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndSuiteTeardownColonThanWord() {
+    public void test_singleSpaceAndSuiteTeardownColonThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Teardown:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -64,7 +64,7 @@ public class SuiteTeardownRecognizerTest {
     }
 
     @Test
-    public void test_singleSuiteTeardownColonThanLetterCWord() {
+    public void test_singleSuiteTeardownColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Suite Teardown:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -108,7 +108,7 @@ public class SuiteTeardownRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndSuiteTeardownThanWord() {
+    public void test_twoSpacesAndSuiteTeardownThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Teardown");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -121,7 +121,7 @@ public class SuiteTeardownRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndSuiteTeardownThanWord() {
+    public void test_singleSpaceAndSuiteTeardownThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Teardown");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -135,7 +135,7 @@ public class SuiteTeardownRecognizerTest {
     }
 
     @Test
-    public void test_singleSuiteTeardownThanLetterCWord() {
+    public void test_singleSuiteTeardownThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Suite Teardown");
         final StringBuilder d = new StringBuilder(text).append("C");
 

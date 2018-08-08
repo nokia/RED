@@ -15,14 +15,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -88,8 +84,7 @@ public class VariableComputationHelperExtractionParameterizedTest {
         return o;
     }
 
-    @ForClean
-    private VariableComputationHelper vch;
+    private final VariableComputationHelper vch = new VariableComputationHelper();
 
     private final String testName;
 
@@ -141,15 +136,5 @@ public class VariableComputationHelperExtractionParameterizedTest {
         final MappingResult extract = varExtractor.extract(token, "fileName_" + testName);
         final List<VariableDeclaration> correctVariables = extract.getCorrectVariables();
         return vch.extractVariableName(correctVariables.get(0));
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        vch = new VariableComputationHelper();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

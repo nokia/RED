@@ -9,22 +9,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 
-@SuppressWarnings({ "PMD.MethodNamingConventions", "PMD.TooManyMethods" })
 public class TestCasesTableHeaderRecognizerTest {
 
-    @ForClean
-    private ATokenRecognizer rec;
+    private final TestCasesTableHeaderRecognizer rec = new TestCasesTableHeaderRecognizer();
 
     @Test
     public void test_check_TestCasesAllPossibilities_withAsterisks_atTheBeginAndEnd() {
@@ -36,14 +30,14 @@ public class TestCasesTableHeaderRecognizerTest {
         assertAllCombinations("Test Case");
     }
 
-    private void assertAllCombinations(String text) {
-        List<String> combinations = new CombinationGenerator().combinations(text);
+    private void assertAllCombinations(final String text) {
+        final List<String> combinations = new CombinationGenerator().combinations(text);
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder("*** ").append(comb).append(" ***");
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder("*** ").append(comb).append(" ***");
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -54,11 +48,11 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_TestCases_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
-        String expectedToCut = " *  Test Cases *";
-        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+        final String expectedToCut = " *  Test Cases *";
+        final StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
@@ -68,10 +62,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_spaceLetterT_and_TestCases_withAsterisk_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder("T *  Test Cases ***");
+        final StringBuilder text = new StringBuilder("T *  Test Cases ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -81,10 +75,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_spaceTestCases_withAsterisk_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder(" *  Test Cases ***");
+        final StringBuilder text = new StringBuilder(" *  Test Cases ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -94,10 +88,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_TestCases_withAsterisk_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder("*  Test Cases ***");
+        final StringBuilder text = new StringBuilder("*  Test Cases ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -107,11 +101,11 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_TestCases_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
-        String expectedToCut = " ***  Test Cases ***";
-        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+        final String expectedToCut = " ***  Test Cases ***";
+        final StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
@@ -121,10 +115,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_spaceLetterT_and_TestCases_withAsterisks_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder("T ***  Test Cases ***");
+        final StringBuilder text = new StringBuilder("T ***  Test Cases ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -134,10 +128,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_spaceTestCases_withAsterisks_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder(" ***  Test Cases ***");
+        final StringBuilder text = new StringBuilder(" ***  Test Cases ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -147,10 +141,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_TestCases_withAsterisks_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder("***  Test Cases ***");
+        final StringBuilder text = new StringBuilder("***  Test Cases ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -160,11 +154,11 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_TestCase_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
-        String expectedToCut = " * Test Case *";
-        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+        final String expectedToCut = " * Test Case *";
+        final StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
@@ -174,10 +168,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_spaceLetterT_and_TestCase_withAsterisk_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder("T * Test Case ***");
+        final StringBuilder text = new StringBuilder("T * Test Case ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -187,10 +181,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_spaceTestCase_withAsterisk_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder(" * Test Case ***");
+        final StringBuilder text = new StringBuilder(" * Test Case ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -200,10 +194,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_TestCase_withAsterisk_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder("* Test Case ***");
+        final StringBuilder text = new StringBuilder("* Test Case ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -213,11 +207,11 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_TestCase_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
-        String expectedToCut = " *** Test Case ***";
-        StringBuilder text = new StringBuilder(expectedToCut).append(" T");
+        final String expectedToCut = " *** Test Case ***";
+        final StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
@@ -227,10 +221,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_spaceLetterT_and_TestCase_withAsterisks_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder("T *** Test Case ***");
+        final StringBuilder text = new StringBuilder("T *** Test Case ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -240,10 +234,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_spaceTestCase_withAsterisks_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder(" *** Test Case ***");
+        final StringBuilder text = new StringBuilder(" *** Test Case ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -253,10 +247,10 @@ public class TestCasesTableHeaderRecognizerTest {
 
     @Test
     public void test_check_TestCase_withAsterisks_atTheBeginAndEnd() {
-        StringBuilder text = new StringBuilder("*** Test Case ***");
+        final StringBuilder text = new StringBuilder("*** Test Case ***");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -275,15 +269,5 @@ public class TestCasesTableHeaderRecognizerTest {
     @Test
     public void test_getProducedType() {
         assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.TEST_CASES_TABLE_HEADER);
-    }
-
-    @Before
-    public void setUp() {
-        rec = new TestCasesTableHeaderRecognizer();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

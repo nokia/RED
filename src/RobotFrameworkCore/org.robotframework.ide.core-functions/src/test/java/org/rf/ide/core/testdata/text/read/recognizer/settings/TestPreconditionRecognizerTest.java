@@ -7,8 +7,6 @@ package org.rf.ide.core.testdata.text.read.recognizer.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.junit.Test;
@@ -22,7 +20,7 @@ public class TestPreconditionRecognizerTest {
     private final TestPreconditionRecognizer rec = new TestPreconditionRecognizer();
 
     @Test
-    public void test_testPreconditionColonWord_allCombinations() throws IOException, URISyntaxException {
+    public void test_testPreconditionColonWord_allCombinations() {
         final List<String> combinations = new CombinationGenerator().combinations("Test Precondition:");
         for (final String comb : combinations) {
             assertThat(rec.hasNext(comb, 1, 0)).isTrue();
@@ -36,7 +34,7 @@ public class TestPreconditionRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestPreconditionColonThanWord() {
+    public void test_twoSpacesAndTestPreconditionColonThenWord() {
         final StringBuilder text = new StringBuilder(" Test Precondition:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -49,7 +47,7 @@ public class TestPreconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestPreconditionColonThanWord() {
+    public void test_singleSpaceAndTestPreconditionColonThenWord() {
         final StringBuilder text = new StringBuilder(" Test Precondition:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -63,7 +61,7 @@ public class TestPreconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleTestPreconditionColonThanLetterCWord() {
+    public void test_singleTestPreconditionColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Test Precondition:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -90,7 +88,7 @@ public class TestPreconditionRecognizerTest {
     }
 
     @Test
-    public void test_testPreconditionWord_allCombinations() throws IOException, URISyntaxException {
+    public void test_testPreconditionWord_allCombinations() {
         final List<String> combinations = new CombinationGenerator().combinations("Test Precondition");
         for (final String comb : combinations) {
             assertThat(rec.hasNext(comb, 1, 0)).isTrue();
@@ -104,7 +102,7 @@ public class TestPreconditionRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestPreconditionThanWord() {
+    public void test_twoSpacesAndTestPreconditionThenWord() {
         final StringBuilder text = new StringBuilder(" Test Precondition");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -117,7 +115,7 @@ public class TestPreconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestPreconditionThanWord() {
+    public void test_singleSpaceAndTestPreconditionThenWord() {
         final StringBuilder text = new StringBuilder(" Test Precondition");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -131,7 +129,7 @@ public class TestPreconditionRecognizerTest {
     }
 
     @Test
-    public void test_singleTestPreconditionThanLetterCWord() {
+    public void test_singleTestPreconditionThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Test Precondition");
         final StringBuilder d = new StringBuilder(text).append("C");
 

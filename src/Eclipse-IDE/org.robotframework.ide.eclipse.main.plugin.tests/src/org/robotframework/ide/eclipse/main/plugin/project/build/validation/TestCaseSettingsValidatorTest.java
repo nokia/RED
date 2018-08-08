@@ -432,7 +432,7 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void precondtionSettingIsNotRecognizedInRf31() throws CoreException {
+    public void preconditionSettingIsNotRecognizedInRf31() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 1);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
                 .appendLine("*** Test Cases ***")
