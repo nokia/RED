@@ -43,7 +43,7 @@ public class SuiteSourceIndentLineAfterDefinitionStrategy implements IAutoEditSt
             return;
         }
         final Set<String> validContentTypes = newHashSet(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION);
 
         final int shift = command.offset;
 

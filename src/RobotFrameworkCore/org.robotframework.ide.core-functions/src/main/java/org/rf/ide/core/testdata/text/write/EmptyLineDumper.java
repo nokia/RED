@@ -24,19 +24,19 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
  */
 public class EmptyLineDumper {
 
-    private DumperHelper dumperHelper;
+    private final DumperHelper dumperHelper;
 
     public EmptyLineDumper(final DumperHelper dumperHelper) {
         this.dumperHelper = dumperHelper;
     }
 
-    public void dumpEmptyLines(final RobotFile model, final List<RobotLine> lines,
-            final AModelElement<ARobotSectionTable> setting, boolean isLastElement) {
+    public <T extends ARobotSectionTable> void dumpEmptyLines(final RobotFile model, final List<RobotLine> lines,
+            final AModelElement<T> setting) {
         final FilePosition fPosEnd = setting.getEndPosition();
         if (!fPosEnd.isNotSet()) {
             if (!lines.isEmpty()) {
-                RobotLine lastLine = lines.get(lines.size() - 1);
-                IRobotLineElement endOfLine = lastLine.getEndOfLine();
+                final RobotLine lastLine = lines.get(lines.size() - 1);
+                final IRobotLineElement endOfLine = lastLine.getEndOfLine();
                 if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
                         || endOfLine.getTypes().contains(EndOfLineTypes.NON)
                         || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
@@ -75,7 +75,7 @@ public class EmptyLineDumper {
 
         for (final IRobotLineElement elem : line.getLineElements()) {
             if (elem instanceof RobotToken) {
-                RobotToken tok = (RobotToken) elem;
+                final RobotToken tok = (RobotToken) elem;
                 if (!containsType(tok, RobotTokenType.PRETTY_ALIGN_SPACE)) {
                     isEmpty = false;
                     break;

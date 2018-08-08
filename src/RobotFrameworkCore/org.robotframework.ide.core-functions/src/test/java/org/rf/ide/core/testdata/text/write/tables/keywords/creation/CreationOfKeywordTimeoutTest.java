@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
@@ -76,18 +76,11 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTimeout.addCommentPart(cmTok1);
-        keyTimeout.addCommentPart(cmTok2);
-        keyTimeout.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyTimeout = uk.newTimeout(0);
+        keyTimeout.addCommentPart("cm1");
+        keyTimeout.addCommentPart("cm2");
+        keyTimeout.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -118,11 +111,9 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        final RobotToken timeout = new RobotToken();
-        timeout.setText("1 hours");
-        keyTimeout.setTimeout(timeout);
+        final LocalSetting<UserKeyword> keyTimeout = uk.newTimeout(0);
+        keyTimeout.addToken("1 hours");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -154,22 +145,12 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        final RobotToken timeout = new RobotToken();
-        timeout.setText("1 hours");
-        keyTimeout.setTimeout(timeout);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTimeout.addCommentPart(cmTok1);
-        keyTimeout.addCommentPart(cmTok2);
-        keyTimeout.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyTimeout = uk.newTimeout(0);
+        keyTimeout.addToken("1 hours");
+        keyTimeout.addCommentPart("cm1");
+        keyTimeout.addCommentPart("cm2");
+        keyTimeout.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -201,22 +182,12 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        final RobotToken timeout = new RobotToken();
-        timeout.setText("1 hours");
-        keyTimeout.setTimeout(timeout);
-
-        final RobotToken msg1 = new RobotToken();
-        msg1.setText("msg1");
-        final RobotToken msg2 = new RobotToken();
-        msg2.setText("msg2");
-        final RobotToken msg3 = new RobotToken();
-        msg3.setText("msg3");
-
-        keyTimeout.addMessagePart(msg1);
-        keyTimeout.addMessagePart(msg2);
-        keyTimeout.addMessagePart(msg3);
+        final LocalSetting<UserKeyword> keyTimeout = uk.newTimeout(0);
+        keyTimeout.addToken("1 hours");
+        keyTimeout.addToken("msg1");
+        keyTimeout.addToken("msg2");
+        keyTimeout.addToken("msg3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -250,33 +221,15 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        final RobotToken timeout = new RobotToken();
-        timeout.setText("1 hours");
-        keyTimeout.setTimeout(timeout);
-
-        final RobotToken msg1 = new RobotToken();
-        msg1.setText("msg1");
-        final RobotToken msg2 = new RobotToken();
-        msg2.setText("msg2");
-        final RobotToken msg3 = new RobotToken();
-        msg3.setText("msg3");
-
-        keyTimeout.addMessagePart(msg1);
-        keyTimeout.addMessagePart(msg2);
-        keyTimeout.addMessagePart(msg3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTimeout.addCommentPart(cmTok1);
-        keyTimeout.addCommentPart(cmTok2);
-        keyTimeout.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyTimeout = uk.newTimeout(0);
+        keyTimeout.addToken("1 hours");
+        keyTimeout.addToken("msg1");
+        keyTimeout.addToken("msg2");
+        keyTimeout.addToken("msg3");
+        keyTimeout.addCommentPart("cm1");
+        keyTimeout.addCommentPart("cm2");
+        keyTimeout.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

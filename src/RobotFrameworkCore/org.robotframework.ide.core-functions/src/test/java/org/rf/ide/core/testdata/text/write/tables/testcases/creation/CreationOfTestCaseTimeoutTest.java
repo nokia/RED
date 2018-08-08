@@ -8,9 +8,9 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
@@ -76,18 +76,11 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        final TestCaseTimeout testTimeout = test.newTimeout(0);
+        final LocalSetting<TestCase> testTimeout = test.newTimeout(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTimeout.addCommentPart(cmTok1);
-        testTimeout.addCommentPart(cmTok2);
-        testTimeout.addCommentPart(cmTok3);
+        testTimeout.addCommentPart("cm1");
+        testTimeout.addCommentPart("cm2");
+        testTimeout.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -119,11 +112,9 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        final TestCaseTimeout testTimeout = test.newTimeout(0);
+        final LocalSetting<TestCase> testTimeout = test.newTimeout(0);
 
-        final RobotToken timeout = new RobotToken();
-        timeout.setText("1 hours");
-        testTimeout.setTimeout(timeout);
+        testTimeout.addToken("1 hours");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -155,22 +146,12 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        final TestCaseTimeout testTimeout = test.newTimeout(0);
+        final LocalSetting<TestCase> testTimeout = test.newTimeout(0);
 
-        final RobotToken timeout = new RobotToken();
-        timeout.setText("1 hours");
-        testTimeout.setTimeout(timeout);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTimeout.addCommentPart(cmTok1);
-        testTimeout.addCommentPart(cmTok2);
-        testTimeout.addCommentPart(cmTok3);
+        testTimeout.addToken("1 hours");
+        testTimeout.addCommentPart("cm1");
+        testTimeout.addCommentPart("cm2");
+        testTimeout.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -202,22 +183,12 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        final TestCaseTimeout testTimeout = test.newTimeout(0);
+        final LocalSetting<TestCase> testTimeout = test.newTimeout(0);
 
-        final RobotToken timeout = new RobotToken();
-        timeout.setText("1 hours");
-        testTimeout.setTimeout(timeout);
-
-        final RobotToken msg1 = new RobotToken();
-        msg1.setText("msg1");
-        final RobotToken msg2 = new RobotToken();
-        msg2.setText("msg2");
-        final RobotToken msg3 = new RobotToken();
-        msg3.setText("msg3");
-
-        testTimeout.addMessagePart(msg1);
-        testTimeout.addMessagePart(msg2);
-        testTimeout.addMessagePart(msg3);
+        testTimeout.addToken("1 hours");
+        testTimeout.addToken("msg1");
+        testTimeout.addToken("msg2");
+        testTimeout.addToken("msg3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -251,33 +222,16 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        final TestCaseTimeout testTimeout = test.newTimeout(0);
+        final LocalSetting<TestCase> testTimeout = test.newTimeout(0);
 
-        final RobotToken timeout = new RobotToken();
-        timeout.setText("1 hours");
-        testTimeout.setTimeout(timeout);
+        testTimeout.addToken("1 hours");
+        testTimeout.addToken("msg1");
+        testTimeout.addToken("msg2");
+        testTimeout.addToken("msg3");
 
-        final RobotToken msg1 = new RobotToken();
-        msg1.setText("msg1");
-        final RobotToken msg2 = new RobotToken();
-        msg2.setText("msg2");
-        final RobotToken msg3 = new RobotToken();
-        msg3.setText("msg3");
-
-        testTimeout.addMessagePart(msg1);
-        testTimeout.addMessagePart(msg2);
-        testTimeout.addMessagePart(msg3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTimeout.addCommentPart(cmTok1);
-        testTimeout.addCommentPart(cmTok2);
-        testTimeout.addCommentPart(cmTok3);
+        testTimeout.addCommentPart("cm1");
+        testTimeout.addCommentPart("cm2");
+        testTimeout.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

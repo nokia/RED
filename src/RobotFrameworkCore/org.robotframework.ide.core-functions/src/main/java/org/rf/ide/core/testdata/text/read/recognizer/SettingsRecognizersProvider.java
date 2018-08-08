@@ -24,6 +24,10 @@ import org.rf.ide.core.testdata.text.read.recognizer.settings.SuitePostcondition
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SuitePreconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SuiteSetupRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SuiteTeardownRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.TaskSetupRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.TaskTeardownRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.TaskTemplateRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.settings.TaskTimeoutRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.TestPostconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.TestPreconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.TestSetupRecognizer;
@@ -47,9 +51,13 @@ public class SettingsRecognizersProvider {
             new SuiteSetupRecognizer(), new SuiteTeardownRecognizer(),
             new SuitePreconditionRecognizer(), new SuitePostconditionRecognizer(),
             new ForceTagsRecognizer(), new DefaultTagsRecognizer(),
+            
             new TestSetupRecognizer(), new TestTeardownRecognizer(),
             new TestPreconditionRecognizer(), new TestPostconditionRecognizer(),
-            new TestTemplateRecognizer(), new TestTimeoutRecognizer());
+            new TestTemplateRecognizer(), new TestTimeoutRecognizer(),
+            
+            new TaskSetupRecognizer(), new TaskTeardownRecognizer(),
+            new TaskTemplateRecognizer(), new TaskTimeoutRecognizer());
 
 
     public List<ATokenRecognizer> getRecognizers(final RobotVersion robotVersion) {

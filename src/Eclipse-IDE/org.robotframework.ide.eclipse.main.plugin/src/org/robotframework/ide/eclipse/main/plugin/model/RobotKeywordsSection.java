@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
@@ -41,15 +41,17 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         return (List<RobotKeywordDefinition>) super.getChildren();
     }
 
-    public RobotKeywordDefinition createKeywordDefinition(final String name) {
-        return createKeywordDefinition(getChildren().size(), name);
+    @Override
+    public String getDefaultChildName() {
+        return "Keyword";
     }
 
-    public RobotKeywordDefinition createKeywordDefinition(final int index, final String name) {
+    @Override
+    public RobotKeywordDefinition createChild(final int index, final String name) {
         final RobotKeywordDefinition keywordDefinition;
 
         final KeywordTable keywordsTable = getLinkedElement();
-        if (index >= 0 && index < keywordsTable.getKeywords().size() && index < getChildren().size()) {
+        if (index >= 0 && index < getChildren().size()) {
             keywordDefinition = new RobotKeywordDefinition(this, keywordsTable.createUserKeyword(name, index));
             elements.add(index, keywordDefinition);
         } else {
@@ -59,11 +61,32 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         return keywordDefinition;
     }
 
-    List<RobotKeywordDefinition> getUserDefinedKeywords() {
-        final List<RobotKeywordDefinition> userKeywords = newArrayList();
-        for (final RobotElement child : getChildren()) {
-            userKeywords.add((RobotKeywordDefinition) child);
+    @Override
+    public void insertChild(final int index, final RobotFileInternalElement element) {
+        final RobotKeywordDefinition keyword = (RobotKeywordDefinition) element;
+        keyword.setParent(this);
+
+        final KeywordTable keywordsTable = getLinkedElement();
+        if (index >= 0 && index < elements.size()) {
+            getChildren().add(index, keyword);
+            keywordsTable.addKeyword(keyword.getLinkedElement(), index);
+        } else {
+            getChildren().add(keyword);
+            keywordsTable.addKeyword(keyword.getLinkedElement());
         }
-        return userKeywords;
+    }
+    
+    @Override
+    public void removeChildren(final List<? extends RobotFileInternalElement> elementsToRemove) {
+        getChildren().removeAll(elementsToRemove);
+
+        final KeywordTable linkedElement = getLinkedElement();
+        for (final RobotFileInternalElement elementToDelete : elementsToRemove) {
+            linkedElement.removeKeyword((UserKeyword) elementToDelete.getLinkedElement());
+        }
+    }
+
+    List<RobotKeywordDefinition> getUserDefinedKeywords() {
+        return getChildren().stream().map(RobotKeywordDefinition.class::cast).collect(toList());
     }
 }

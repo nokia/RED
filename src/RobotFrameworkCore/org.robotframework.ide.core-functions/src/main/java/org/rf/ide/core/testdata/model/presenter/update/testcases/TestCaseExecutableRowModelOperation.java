@@ -47,11 +47,7 @@ public class TestCaseExecutableRowModelOperation implements IExecutablesStepsHol
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<TestCase> executableRow = (RobotExecutableRow<TestCase>) modelElement;
-
-        testCase.addElement(executableRow, index);
-        return modelElement;
+        return testCase.addElement(index, modelElement);
     }
 
     @Override
@@ -76,11 +72,5 @@ public class TestCaseExecutableRowModelOperation implements IExecutablesStepsHol
         for (int i = 0; i < newArguments.size(); i++) {
             row.setArgument(i, newArguments.get(i));
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeElement((RobotExecutableRow<TestCase>) modelElement);
     }
 }

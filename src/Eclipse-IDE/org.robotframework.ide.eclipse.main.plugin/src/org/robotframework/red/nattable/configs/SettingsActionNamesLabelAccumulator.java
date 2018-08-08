@@ -13,7 +13,6 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.SpecialKeywords;
@@ -35,14 +34,20 @@ public class SettingsActionNamesLabelAccumulator implements IConfigLabelAccumula
     @SuppressWarnings("unchecked")
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         final RobotSetting setting = ((Entry<String, RobotSetting>) dataProvider.getRowObject(rowPosition)).getValue();
-        if (setting != null && setting.isKeywordBased()) {
+        if (setting == null) {
+            return;
+        }
+
+        if (setting.isTemplate() && columnPosition > 0) {
+            configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+
+        } else if (setting.isAnySetupOrTeardown()) {
+            // don't worry about variable here - this case would be served by
+            // SettingsVariablesLabelAccumulator
             if (columnPosition == 1) {
-                // don't worry about variable here - this case would be served by
-                // SettingsVariablesLabelAccumulator
                 configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
 
-            } else if (columnPosition > 1
-                    && setting.getLinkedElement().getModelType() != ModelType.SUITE_TEST_TEMPLATE) {
+            } else if (columnPosition > 1) {
                 final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();
                 final List<RobotToken> allTokens = new ArrayList<>();
                 allTokens.add(linkedSetting.getKeywordName());
@@ -59,9 +64,6 @@ public class SettingsActionNamesLabelAccumulator implements IConfigLabelAccumula
                         }
                     }
                 }
-            } else if (columnPosition > 1
-                    && setting.getLinkedElement().getModelType() == ModelType.SUITE_TEST_TEMPLATE) {
-                configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
             }
         }
     }

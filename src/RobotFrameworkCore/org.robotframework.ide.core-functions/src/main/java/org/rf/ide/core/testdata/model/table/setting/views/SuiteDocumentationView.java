@@ -45,24 +45,6 @@ public class SuiteDocumentationView extends SuiteDocumentation {
     }
 
     @Override
-    public void setDocumentationText(final int index, final String docText) {
-        final List<RobotToken> tokens = super.getDocumentationText();
-        if (tokens.size() <= index) {
-            joinIfNeeded();
-        }
-        super.setDocumentationText(index, docText);
-    }
-
-    @Override
-    public void setDocumentationText(final int index, final RobotToken docText) {
-        final List<RobotToken> tokens = super.getDocumentationText();
-        if (tokens.size() <= index) {
-            joinIfNeeded();
-        }
-        super.setDocumentationText(index, docText);
-    }
-
-    @Override
     public void addCommentPart(final RobotToken rt) {
         joinIfNeeded();
         super.addCommentPart(rt);

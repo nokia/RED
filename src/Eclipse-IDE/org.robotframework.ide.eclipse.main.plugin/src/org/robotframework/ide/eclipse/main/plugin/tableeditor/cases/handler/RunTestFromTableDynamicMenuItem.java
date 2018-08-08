@@ -12,22 +12,26 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.IServiceLocator;
-import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestDynamicMenuItem;
+import org.robotframework.red.viewers.Selections;
 
-public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
+public class RunTestFromTableDynamicMenuItem extends CompoundContributionItem {
 
     private static final String RUN_TEST_COMMAND_ID = "org.robotframework.red.runSelectedTestsFromTable";
 
@@ -42,6 +46,14 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
     public RunTestFromTableDynamicMenuItem(final String id) {
         this.id = id;
     }
+
+    protected String getModeName() {
+        return "Run";
+    }
+
+    protected ImageDescriptor getImageDescriptor() {
+        return RedImages.getExecuteRunImage();
+    }
     
     @Override
     protected IContributionItem[] getContributionItems() {
@@ -54,53 +66,52 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
         if (selection instanceof StructuredSelection && !selection.isEmpty()) {
             final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
-            final Set<RobotCase> firstCases = findFirstCases(structuredSelection);
-            if (firstCases.size() == 1) {
-                contributeBefore(contributedItems);
-                contributedItems.add(createCurrentCaseItem(activeWindow, firstCases.toArray(new RobotCase[1])[0]));
-            } else if (firstCases.size() > 1) {
-                contributeBefore(contributedItems);
-                contributedItems.add(createCurrentCaseItem(activeWindow, null));
+            final Set<RobotCodeHoldingElement<?>> firstCases = findFirstCases(structuredSelection);
+            if (!firstCases.isEmpty()) {
+                final RobotCodeHoldingElement<?> testCase = firstCases.stream().findFirst().get();
+
+                final String elemTypeLabel = isTask(testCase) ? "task" : "test";
+                final String label = firstCases.size() == 1 ? elemTypeLabel + ": '" + testCase.getName() + "'"
+                        : "selected " + elemTypeLabel + "s";
+                contributedItems.add(createCurrentCaseItem(activeWindow, label));
+
             }
         }
         return contributedItems.toArray(new IContributionItem[0]);
     }
 
-    private Set<RobotCase> findFirstCases(final IStructuredSelection selection) {
-        final Set<RobotCase> firstCases = new HashSet<RobotCase>();
-        for (final Object o : selection.toList()) {
-            RobotCase testCase = null;
-            if (o instanceof RobotKeywordCall) {
-                // workaround for possible RobotSettingsSection type, should be changed
-                final IRobotCodeHoldingElement parent = ((RobotKeywordCall) o).getParent();
-                if (parent instanceof RobotCase) {
-                    testCase = (RobotCase) parent;
-                }
-            } else if (o instanceof RobotCase) {
-                testCase = (RobotCase) o;
+    private Set<RobotCodeHoldingElement<?>> findFirstCases(final IStructuredSelection selection) {
+        final List<RobotElement> selected = Selections.getElements(selection, RobotElement.class);
+
+        final Set<RobotCodeHoldingElement<?>> firstCases = new HashSet<>();
+        for (final RobotElement element : selected) {
+            if (element instanceof RobotKeywordCall && element.getParent() instanceof RobotCodeHoldingElement<?>) {
+                firstCases.add((RobotCodeHoldingElement<?>) element.getParent());
+
+            } else if (element instanceof RobotCodeHoldingElement<?>) {
+                firstCases.add((RobotCodeHoldingElement<?>) element);
             }
-            if (testCase != null) {
-                firstCases.add(testCase);
-                if (firstCases.size() > 1) {
-                    // This method should never return set bigger than 2 elements
-                    break;
-                }
+            if (firstCases.size() > 1) {
+                // This method should never return set bigger than 2 elements
+                break;
             }
         }
         return firstCases;
     }
 
-    @Override
-    protected IContributionItem createCurrentCaseItem(final IServiceLocator serviceLocator, final RobotCase testCase) {
+    private boolean isTask(final RobotCodeHoldingElement<?> testCase) {
+        return testCase.getLinkedElement().getModelType() == ModelType.TASK;
+    }
+
+    private IContributionItem createCurrentCaseItem(final IServiceLocator serviceLocator, final String label) {
         final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(
                 serviceLocator, id, RUN_TEST_COMMAND_ID, SWT.PUSH);
-        contributionParameters.label = getModeName()
-                + (testCase == null ? " selected tests" : " test: '" + testCase.getName() + "'");
+        contributionParameters.label = getModeName() + " " + label;
         contributionParameters.icon = getImageDescriptor();
+
         final HashMap<String, String> parameters = new HashMap<>();
         parameters.put(RUN_TEST_COMMAND_MODE_PARAMETER, getModeName().toUpperCase());
         contributionParameters.parameters = parameters;
         return new CommandContributionItem(contributionParameters);
     }
-
 }

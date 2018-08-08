@@ -8,7 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,7 +20,6 @@ import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.content.IContentDescriber;
 import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -67,18 +67,20 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.TasksEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.ErrorDialogWithLinkToPreferences;
 import org.robotframework.red.swt.SwtThread;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 
 public class RobotFormEditor extends FormEditor {
 
@@ -178,6 +180,8 @@ public class RobotFormEditor extends FormEditor {
 
             if (provideSuiteModel().isSuiteFile()) {
                 addEditorPart(new CasesEditorPart(), "Test Cases");
+            } else if (provideSuiteModel().isRpaSuiteFile()) {
+                addEditorPart(new TasksEditorPart(), "Tasks");
             }
             addEditorPart(new KeywordsEditorPart(), "Keywords");
             addEditorPart(new SettingsEditorPart(), "Settings");
@@ -247,27 +251,22 @@ public class RobotFormEditor extends FormEditor {
     public void doSave(final IProgressMonitor monitor) {
         waitForPendingEditorJobs();
 
-        boolean shouldSave = true;
-        boolean shouldClose = false;
         final RobotSuiteFile currentModel = provideSuiteModel();
 
         if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
             updateSourceFromModel();
         }
 
-        final int description = determineContentDescription();
-        if (currentModel.isSuiteFile() && description == IContentDescriber.INVALID) {
-            shouldSave = MessageDialog.openConfirm(getSite().getShell(), "File content mismatch",
-                    "The file " + currentModel.getFile().getName() + " is a Suite file, but after "
-                            + "changes there is no Test Cases section. From now on this file will be recognized as "
-                            + "Resource file.\n\nClick OK to save and reopen editor or cancel saving");
-            shouldClose = true;
-        } else if (currentModel.isResourceFile() && description == IContentDescriber.VALID) {
-            shouldSave = MessageDialog.openConfirm(getSite().getShell(), "File content mismatch",
-                    "The file " + currentModel.getFile().getName() + " is a Resource file, but after "
-                            + "changes there is a Test Cases section defined. From now on this file will be recognized "
-                            + "as Suite file.\n\nClick OK to save and reopen editor or cancel saving");
-            shouldClose = true;
+        final String contentTypeId = ASuiteFileDescriber.getContentType(suiteModel.getFile().getName(),
+                getSourceEditor().getDocument().get());
+        final boolean contentTypeMismatchDetected =
+                currentModel.isSuiteFile() && !ASuiteFileDescriber.isSuiteFile(contentTypeId)
+                || currentModel.isRpaSuiteFile() && !ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)
+                || currentModel.isResourceFile() && !ASuiteFileDescriber.isResourceFile(contentTypeId);
+
+        boolean shouldSave = true;
+        if (contentTypeMismatchDetected) {
+            shouldSave = shouldMismatchedContentBeSavedPriorToClosing(currentModel, contentTypeId);
         }
         if (!shouldSave) {
             monitor.setCanceled(true);
@@ -281,24 +280,44 @@ public class RobotFormEditor extends FormEditor {
 
         saveLibDiscoveryTrigger.startLibrariesAutoDiscoveryIfRequired(currentModel);
 
-        if (shouldClose) {
+        if (contentTypeMismatchDetected) {
             reopenEditor();
         }
     }
 
-    private int determineContentDescription() {
-        try {
-            final StringReader reader = new StringReader(getSourceEditor().getDocument().get());
-            final String fileExt = suiteModel.getFileExtension();
+    private boolean shouldMismatchedContentBeSavedPriorToClosing(final RobotSuiteFile currentModel,
+            final String contentTypeId) {
 
-            final ASuiteFileDescriber desc = fileExt != null && fileExt.toLowerCase().equals("tsv")
-                    ? new TsvRobotSuiteFileDescriber() : new RobotSuiteFileDescriber();
+        final String title = "File content mismatch";
+        final String description = "The file " + currentModel.getFile().getName() + " is a %s file but after "
+                + "changes there is %s section defined. From now on this file will be recognized as a %s file."
+                + "\n\nClick OK to save and reopen editor or cancel saving";
 
-            return desc.describe(reader, null);
-        } catch (final IOException e) {
-            // nothing to do
+        if (currentModel.isSuiteFile() && ASuiteFileDescriber.isResourceFile(contentTypeId)) {
+            return MessageDialog.openConfirm(getSite().getShell(), title,
+                    String.format(description, "tests suite", "no Test Cases nor Tasks", "resource"));
+
+        } else if (currentModel.isSuiteFile() && ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)) {
+            return MessageDialog.openConfirm(getSite().getShell(), title,
+                    String.format(description, "tests suite", "a Tasks", "tasks suite"));
+
+        } else if (currentModel.isResourceFile() && ASuiteFileDescriber.isSuiteFile(contentTypeId)) {
+            return MessageDialog.openConfirm(getSite().getShell(), title,
+                    String.format(description, "resource", "a Test Cases", "tests suite"));
+
+        } else if (currentModel.isResourceFile() && ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)) {
+            return MessageDialog.openConfirm(getSite().getShell(), title,
+                    String.format(description, "resource", "a Tasks", "tasks suite"));
+
+        } else if (currentModel.isRpaSuiteFile() && ASuiteFileDescriber.isSuiteFile(contentTypeId)) {
+            return MessageDialog.openConfirm(getSite().getShell(), title,
+                    String.format(description, "tasks suite", "a Test Cases", "tests suite"));
+
+        } else if (currentModel.isRpaSuiteFile() && ASuiteFileDescriber.isResourceFile(contentTypeId)) {
+            return MessageDialog.openConfirm(getSite().getShell(), title,
+                    String.format(description, "tasks suite", "no Test Cases nor Tasks", "resource"));
         }
-        return IContentDescriber.INDETERMINATE;
+        return false;
     }
 
     private void waitForPendingEditorJobs() {
@@ -395,9 +414,11 @@ public class RobotFormEditor extends FormEditor {
             checkRuntimeEnvironment(suiteModel);
         } else {
             final IStorage storage = getEditorInput().getAdapter(IStorage.class);
-            try {
-                suiteModel = new RobotSuiteStreamFile(storage.getName(), storage.getContents(), storage.isReadOnly());
-            } catch (final CoreException e) {
+            try (InputStream stream = storage.getContents()) {
+                final String content = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
+                suiteModel = new RobotSuiteStreamFile(storage.getName(), content, storage.isReadOnly());
+
+            } catch (final CoreException | IOException e) {
                 throw new IllegalRobotEditorInputException("Unable to provide model for given input", e);
             }
         }

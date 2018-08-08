@@ -14,7 +14,7 @@ import java.util.function.Function;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
-import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -107,10 +107,10 @@ public class SuiteContext extends DefaultContext {
                 return new SetupTeardownContext(fileUri, 1, errorMsg, this);
             }
 
-            final List<? extends AKeywordBaseSetting<SettingTable>> setupTeardowns = keyword.isSetup()
+            final List<? extends ExecutableSetting> setupTeardowns = keyword.isSetup()
                     ? settingsTable.getSuiteSetups()
                     : settingsTable.getSuiteTeardowns();
-            final AKeywordBaseSetting<?> setting = setupTeardowns.isEmpty() ? null : setupTeardowns.get(0);
+            final ExecutableSetting setting = setupTeardowns.isEmpty() ? null : setupTeardowns.get(0);
 
             if (setting == null) {
                 final String msg = ErrorMessages

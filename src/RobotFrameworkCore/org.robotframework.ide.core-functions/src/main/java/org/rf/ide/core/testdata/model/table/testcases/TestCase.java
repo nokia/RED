@@ -6,27 +6,35 @@
 package org.rf.ide.core.testdata.model.table.testcases;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
+import org.rf.ide.core.testdata.model.IRegionCacheable;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.DataDrivenKeywordName;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
-import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
+import org.rf.ide.core.testdata.model.table.CommonCase;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestCase extends AModelElement<TestCaseTable> implements IExecutableStepsHolder<TestCase>, Serializable {
+import com.google.common.base.Strings;
+
+public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Serializable {
 
     private static final long serialVersionUID = -3132511868734109797L;
 
@@ -39,28 +47,42 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         fixForTheType(testName, RobotTokenType.TEST_CASE_NAME, true);
     }
 
-    public RobotToken getTestName() {
+    private RobotVersion getVersion() {
+        return getParent().getParent().getParent().getRobotVersion();
+    }
+
+    @Override
+    public RobotToken getName() {
         return testName;
     }
 
-    public void setTestName(final RobotToken testName) {
+    @Override
+    public void setName(final RobotToken testName) {
         fixForTheType(testName, RobotTokenType.TEST_CASE_NAME, true);
         this.testName = testName;
     }
 
     @Override
     public RobotToken getDeclaration() {
-        return getTestName();
+        return getName();
     }
 
-    public void addElement(final AModelElement<TestCase> element) {
-        element.setParent(this);
-        allElements.add(element);
+    public AModelElement<TestCase> addElement(final AModelElement<?> element) {
+        return addElement(allElements.size(), element);
     }
 
-    public void addElement(final AModelElement<TestCase> element, final int index) {
-        element.setParent(this);
-        allElements.add(index, element);
+    public AModelElement<TestCase> addElement(final int index, final AModelElement<?> element) {
+        @SuppressWarnings("unchecked")
+        final AModelElement<TestCase> elementCasted = (AModelElement<TestCase>) element;
+        elementCasted.setParent(this);
+        allElements.add(index, elementCasted);
+
+        if (element.getModelType() == ModelType.TEST_CASE_DOCUMENTATION) {
+            final IRegionCacheable<IDocumentationHolder> adapter = ((LocalSetting<TestCase>) elementCasted)
+                    .adaptTo(IDocumentationHolder.class);
+            getParent().getParent().getParent().getDocumentationCacher().register(adapter);
+        }
+        return elementCasted;
     }
 
     @Override
@@ -89,14 +111,14 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         allElements.clear();
     }
 
-    public TestCaseUnknownSettings newUnknownSettings(final int index) {
-        final RobotToken dec = RobotToken.create("[]",
+    public LocalSetting<TestCase> newUnknownSetting(final int index) {
+        return newUnknownSetting(index, "[]");
+    }
+
+    public LocalSetting<TestCase> newUnknownSetting(final int index, final String representation) {
+        final RobotToken dec = RobotToken.create(representation,
                 newArrayList(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION));
-
-        final TestCaseUnknownSettings unknown = new TestCaseUnknownSettings(dec);
-        addElement(unknown, index);
-
-        return unknown;
+        return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN, dec));
     }
 
     public List<AModelElement<TestCase>> getAllElements() {
@@ -110,158 +132,194 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     @Override
     public List<RobotExecutableRow<TestCase>> getExecutionContext() {
+        return executablesStream().collect(Collectors.toList());
+    }
+
+    public LocalSetting<TestCase> newDocumentation(final int index) {
+        final String representation = RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION
+                .getTheMostCorrectOneRepresentation(getVersion())
+                .getRepresentation();
+        return newDocumentation(index, representation);
+    }
+
+    public LocalSetting<TestCase> newDocumentation(final int index, final String representation) {
+        final RobotToken dec = RobotToken.create(representation, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
+        return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_DOCUMENTATION, dec));
+    }
+
+    public LocalSetting<TestCase> newTags(final int index) {
+        final String representation = RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION
+                .getTheMostCorrectOneRepresentation(getVersion())
+                .getRepresentation();
+        return newTags(index, representation);
+    }
+
+    public LocalSetting<TestCase> newTags(final int index, final String representation) {
+        final RobotToken dec = RobotToken.create(representation, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION);
+        return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_TAGS, dec));
+    }
+
+    public LocalSetting<TestCase> newSetup(final int index) {
+        final String representation = RobotTokenType.TEST_CASE_SETTING_SETUP
+                .getTheMostCorrectOneRepresentation(getVersion())
+                .getRepresentation();
+        return newSetup(index, representation);
+    }
+
+    public LocalSetting<TestCase> newSetup(final int index, final String representation) {
+        final RobotToken dec = RobotToken.create(representation);
+        return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_SETUP, dec));
+    }
+
+    public LocalSetting<TestCase> newTeardown(final int index) {
+        final String representation = RobotTokenType.TEST_CASE_SETTING_TEARDOWN
+                .getTheMostCorrectOneRepresentation(getVersion())
+                .getRepresentation();
+        return newTeardown(index, representation);
+    }
+
+    public LocalSetting<TestCase> newTeardown(final int index, final String representation) {
+        final RobotToken dec = RobotToken.create(representation, RobotTokenType.TEST_CASE_SETTING_TEARDOWN);
+        return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_TEARDOWN, dec));
+    }
+
+    public LocalSetting<TestCase> newTemplate(final int index) {
+        final String representation = RobotTokenType.TEST_CASE_SETTING_TEMPLATE
+                .getTheMostCorrectOneRepresentation(getVersion())
+                .getRepresentation();
+        return newTemplate(index, representation);
+    }
+
+    public LocalSetting<TestCase> newTemplate(final int index, final String representation) {
+        final RobotToken dec = RobotToken.create(representation, RobotTokenType.TEST_CASE_SETTING_TEMPLATE);
+        return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_TEMPLATE, dec));
+    }
+
+    public LocalSetting<TestCase> newTimeout(final int index) {
+        final String representation = RobotTokenType.TEST_CASE_SETTING_TIMEOUT
+                .getTheMostCorrectOneRepresentation(getVersion())
+                .getRepresentation();
+        return newTimeout(index, representation);
+    }
+
+    public LocalSetting<TestCase> newTimeout(final int index, final String representation) {
+        final RobotToken dec = RobotToken.create(representation, RobotTokenType.TEST_CASE_SETTING_TIMEOUT);
+        return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_TIMEOUT, dec));
+    }
+
+    private Stream<RobotExecutableRow<TestCase>> executablesStream() {
         return getElements().stream()
                 .filter(el -> el.getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW)
-                .map(el -> (RobotExecutableRow<TestCase>) el)
-                .collect(Collectors.toList());
+                .map(el -> (RobotExecutableRow<TestCase>) el);
     }
 
-    public TestDocumentation newDocumentation(final int index) {
-        final RobotToken dec = new RobotToken();
-        dec.setText(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
-                .getRepresentation());
-
-        fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
-
-        final TestDocumentation testDoc = new TestDocumentation(dec);
-        addDocumentation(index, testDoc);
-
-        return testDoc;
-    }
-
-    public void addDocumentation(final TestDocumentation doc) {
-        addDocumentation(allElements.size(), doc);
-    }
-
-    public void addDocumentation(final int index, final TestDocumentation doc) {
-        doc.setParent(this);
-        allElements.add(index, doc);
-        getParent().getParent().getParent().getDocumentationCacher().register(doc);
-    }
-
-    public TestCaseTags newTags(final int index) {
-        final RobotToken dec = new RobotToken();
-        dec.setText(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
-                .getRepresentation());
-
-        fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION);
-
-        final TestCaseTags testTags = new TestCaseTags(dec);
-        addElement(testTags, index);
-
-        return testTags;
-    }
-
-    public TestCaseSetup newSetup(final int index) {
-        final RobotToken dec = new RobotToken();
-        dec.setText(RobotTokenType.TEST_CASE_SETTING_SETUP
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
-                .getRepresentation());
-
-        fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_SETUP);
-
-        final TestCaseSetup testSetup = new TestCaseSetup(dec);
-        addElement(testSetup, index);
-
-        return testSetup;
-    }
-
-    public TestCaseTeardown newTeardown(final int index) {
-        final RobotToken dec = new RobotToken();
-        dec.setText(RobotTokenType.TEST_CASE_SETTING_TEARDOWN
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
-                .getRepresentation());
-
-        fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TEARDOWN);
-
-        final TestCaseTeardown testTeardown = new TestCaseTeardown(dec);
-        addElement(testTeardown, index);
-
-        return testTeardown;
-    }
-
-    public TestCaseTemplate newTemplate(final int index) {
-        final RobotToken dec = new RobotToken();
-        dec.setText(RobotTokenType.TEST_CASE_SETTING_TEMPLATE
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
-                .getRepresentation());
-
-        fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TEMPLATE);
-
-        final TestCaseTemplate testTemplate = new TestCaseTemplate(dec);
-        addElement(testTemplate, index);
-
-        return testTemplate;
-    }
-
-    public TestCaseTimeout newTimeout(final int index) {
-        final RobotToken dec = new RobotToken();
-        dec.setText(RobotTokenType.TEST_CASE_SETTING_TIMEOUT
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
-                .getRepresentation());
-
-        fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TIMEOUT);
-
-        final TestCaseTimeout testTimeout = new TestCaseTimeout(dec);
-        addElement(testTimeout, index);
-
-        return testTimeout;
-    }
-
-    public List<TestDocumentation> getDocumentation() {
+    private Stream<LocalSetting<TestCase>> documentationsStream() {
         return getElements().stream()
                 .filter(el -> el.getModelType() == ModelType.TEST_CASE_DOCUMENTATION)
-                .map(TestDocumentation.class::cast)
-                .collect(Collectors.toList());
+                .map(setting -> (LocalSetting<TestCase>) setting);
     }
 
-    public List<TestCaseTags> getTags() {
+    private Stream<LocalSetting<TestCase>> tagsStream() {
         return getElements().stream()
                 .filter(el -> el.getModelType() == ModelType.TEST_CASE_TAGS)
-                .map(TestCaseTags.class::cast)
-                .collect(Collectors.toList());
+                .map(setting -> (LocalSetting<TestCase>) setting);
     }
 
-    public List<TestCaseSetup> getSetups() {
+    private Stream<LocalSetting<TestCase>> setupsStream() {
         return getElements().stream()
                 .filter(el -> el.getModelType() == ModelType.TEST_CASE_SETUP)
-                .map(TestCaseSetup.class::cast)
-                .collect(Collectors.toList());
+                .map(setting -> (LocalSetting<TestCase>) setting);
     }
 
-    public List<TestCaseTeardown> getTeardowns() {
+    private Stream<LocalSetting<TestCase>> teardownsStream() {
         return getElements().stream()
                 .filter(el -> el.getModelType() == ModelType.TEST_CASE_TEARDOWN)
-                .map(TestCaseTeardown.class::cast)
-                .collect(Collectors.toList());
+                .map(setting -> (LocalSetting<TestCase>) setting);
     }
 
-    public List<TestCaseTemplate> getTemplates() {
+    private Stream<LocalSetting<TestCase>> templatesStream() {
         return getElements().stream()
                 .filter(el -> el.getModelType() == ModelType.TEST_CASE_TEMPLATE)
-                .map(TestCaseTemplate.class::cast)
-                .collect(Collectors.toList());
+                .map(setting -> (LocalSetting<TestCase>) setting);
     }
 
-    public List<TestCaseTimeout> getTimeouts() {
+    private Stream<LocalSetting<TestCase>> timeoutsStream() {
         return getElements().stream()
                 .filter(el -> el.getModelType() == ModelType.TEST_CASE_TIMEOUT)
-                .map(TestCaseTimeout.class::cast)
-                .collect(Collectors.toList());
+                .map(setting -> (LocalSetting<TestCase>) setting);
     }
 
-    public List<TestCaseUnknownSettings> getUnknownSettings() {
+    private Stream<LocalSetting<TestCase>> unknownSettingsStream() {
         return getElements().stream()
                 .filter(el -> el.getModelType() == ModelType.TEST_CASE_SETTING_UNKNOWN)
-                .map(TestCaseUnknownSettings.class::cast)
-                .collect(Collectors.toList());
+                .map(setting -> (LocalSetting<TestCase>) setting);
+    }
+
+    public List<LocalSetting<TestCase>> getDocumentation() {
+        return documentationsStream().collect(Collectors.toList());
+    }
+
+    public List<LocalSetting<TestCase>> getTags() {
+        return tagsStream().collect(Collectors.toList());
+    }
+
+    public List<LocalSetting<TestCase>> getSetups() {
+        return setupsStream().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<? extends ExecutableSetting> getSetupExecutables() {
+        return setupsStream().map(setup -> setup.adaptTo(ExecutableSetting.class)).collect(toList());
+    }
+
+    public List<LocalSetting<TestCase>> getTeardowns() {
+        return teardownsStream().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<? extends ExecutableSetting> getTeardownExecutables() {
+        return teardownsStream().map(teardown -> teardown.adaptTo(ExecutableSetting.class)).collect(toList());
+    }
+
+    public List<LocalSetting<TestCase>> getTemplates() {
+        return templatesStream().collect(Collectors.toList());
+    }
+
+    public List<LocalSetting<TestCase>> getTimeouts() {
+        return timeoutsStream().collect(Collectors.toList());
+    }
+
+    public List<LocalSetting<TestCase>> getUnknownSettings() {
+        return unknownSettingsStream().collect(Collectors.toList());
+    }
+
+    public LocalSetting<TestCase> getLastDocumentation() {
+        return documentationsStream().reduce((a, b) -> b).orElse(null);
+    }
+
+    public LocalSetting<TestCase> getLastSetup() {
+        return setupsStream().reduce((a, b) -> b).orElse(null);
+    }
+
+    public LocalSetting<TestCase> getLastTeardown() {
+        return teardownsStream().reduce((a, b) -> b).orElse(null);
+    }
+
+    public LocalSetting<TestCase> getLastTags() {
+        return tagsStream().reduce((a, b) -> b).orElse(null);
+    }
+
+    public LocalSetting<TestCase> getLastTemplate() {
+        return templatesStream().reduce((a, b) -> b).orElse(null);
+    }
+
+    public LocalSetting<TestCase> getLastTimeout() {
+        return timeoutsStream().reduce((a, b) -> b).orElse(null);
     }
 
     @Override
     public boolean isPresent() {
-        return (getTestName() != null);
+        return getName() != null;
     }
 
     @Override
@@ -271,15 +329,15 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     @Override
     public FilePosition getBeginPosition() {
-        return getTestName().getFilePosition();
+        return getName().getFilePosition();
     }
 
     @Override
     public List<RobotToken> getElementTokens() {
         final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
-            if (getTestName() != null) {
-                tokens.add(getTestName());
+            if (getName() != null) {
+                tokens.add(getName());
             }
 
             for (final AModelElement<TestCase> elem : allElements) {
@@ -290,58 +348,34 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public boolean isDataDrivenTestCase() {
-        return (getTemplateKeywordName() != null);
-    }
-
-    public RobotToken getTemplateKeywordLocation() {
-        RobotToken token = new RobotToken();
-
-        final String templateKeyword = getRobotViewAboutTestTemplate();
-        if (templateKeyword == null) {
-            final SettingTable settingTable = getParent().getParent().getSettingTable();
-            if (settingTable.isPresent()) {
-                for (final TestTemplate tt : settingTable.getTestTemplates()) {
-                    if (tt.getKeywordName() != null) {
-                        token = tt.getKeywordName();
-                        break;
-                    }
-                }
-            }
-        } else {
-            for (final TestCaseTemplate tct : getTemplates()) {
-                if (tct.getKeywordName() != null) {
-                    token = tct.getKeywordName();
-                    break;
-                }
-            }
-        }
-
-        return token;
+        return getTemplateKeywordName() != null;
     }
 
     public String getTemplateKeywordName() {
-        String keywordName = getRobotViewAboutTestTemplate();
+        final String keywordName = getLocalTestTemplateInUse();
+
         if (keywordName == null) {
             final SettingTable settingTable = getParent().getParent().getSettingTable();
-            if (settingTable.isPresent()) {
-                keywordName = settingTable.getRobotViewAboutTestTemplate();
-                if (keywordName != null && keywordName.isEmpty()) {
-                    keywordName = null;
-                }
-            }
-        } else if (keywordName.isEmpty()) {
-            keywordName = null;
-        }
+            return settingTable.isPresent() ? Strings.emptyToNull(settingTable.getTestTemplateInUse()) : null;
 
-        if (keywordName != null && keywordName.equalsIgnoreCase("none")) {
-            keywordName = null;
-        }
+        } else if (keywordName.isEmpty() || keywordName.equalsIgnoreCase("none")) {
+            return null;
 
-        return keywordName;
+        } else {
+            return keywordName;
+        }
     }
 
-    public String getRobotViewAboutTestTemplate() {
-        return DataDrivenKeywordName.createRepresentation(getTemplates());
+    private String getLocalTestTemplateInUse() {
+        final List<LocalSetting<TestCase>> templates = getTemplates();
+        if (templates.size() == 1) {
+            final LocalSetting<TestCase> template = templates.get(0);
+            return template.getTokensWithoutDeclaration().stream()
+                    .filter(t -> t != null)
+                    .map(RobotToken::getText)
+                    .collect(joining(" "));
+        }
+        return null;
     }
 
     @Override
@@ -363,11 +397,6 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     @Override
     public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("This operation is not allowed inside TestCase.");
-    }
-
-    @Override
-    public RobotToken getName() {
-        return getTestName();
     }
 
     @Override

@@ -5,17 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.RobotTimeFormat;
@@ -72,8 +70,8 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportUnknownSettings() {
-        final List<TestCaseUnknownSettings> unknownSettings = testCase.getUnknownSettings();
-        for (final TestCaseUnknownSettings unknownSetting : unknownSettings) {
+        final List<LocalSetting<TestCase>> unknownSettings = testCase.getUnknownSettings();
+        for (final LocalSetting<TestCase> unknownSetting : unknownSettings) {
             final RobotToken token = unknownSetting.getDeclaration();
             final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.UNKNOWN_TEST_CASE_SETTING)
                     .formatMessageWith(token.getText());
@@ -87,21 +85,21 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
 
     private void reportTagsProblems() {
         testCase.getTags().stream()
-            .filter(tag -> tag.getTags().isEmpty())
+            .filter(tag -> !tag.tokensOf(RobotTokenType.TEST_CASE_SETTING_TAGS).findFirst().isPresent())
             .forEach(this::reportEmptySetting);
     }
 
     private void reportTimeoutsProblems() {
         testCase.getTimeouts().stream()
-                .filter(timeout -> timeout.getTimeout() == null)
+                .filter(timeout -> timeout.getToken(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE) == null)
                 .forEach(this::reportEmptySetting);
 
         reportInvalidTimeoutSyntax(testCase.getTimeouts());
     }
 
-    private void reportInvalidTimeoutSyntax(final List<TestCaseTimeout> timeouts) {
-        for (final TestCaseTimeout testTimeout : timeouts) {
-            final RobotToken timeoutToken = testTimeout.getTimeout();
+    private void reportInvalidTimeoutSyntax(final List<LocalSetting<TestCase>> timeouts) {
+        for (final LocalSetting<TestCase> testTimeout : timeouts) {
+            final RobotToken timeoutToken = testTimeout.getToken(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE);
             if (timeoutToken != null) {
                 final String timeout = timeoutToken.getText();
                 if (!timeoutToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
@@ -116,22 +114,25 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
 
     private void reportDocumentationsProblems() {
         testCase.getDocumentation().stream().findFirst()
-                .filter(doc -> doc.getDocumentationText().isEmpty())
+                .filter(doc -> doc.getToken(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT) == null)
                 .ifPresent(this::reportEmptySetting);
     }
 
     private void reportTemplateProblems() {
         testCase.getTemplates().stream()
-                .filter(template -> template.getKeywordName() == null)
+                .filter(template -> template.getToken(RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME) == null)
                 .forEach(this::reportEmptySetting);
 
         reportTemplateWrittenInMultipleCells(testCase.getTemplates());
         reportTemplateKeywordProblems(testCase.getTemplates());
     }
 
-    private void reportTemplateWrittenInMultipleCells(final List<TestCaseTemplate> templates) {
-        for (final TestCaseTemplate template : templates) {
-            if (!template.getUnexpectedTrashArguments().isEmpty()) {
+    private void reportTemplateWrittenInMultipleCells(final List<LocalSetting<TestCase>> templates) {
+        for (final LocalSetting<TestCase> template : templates) {
+            final boolean hasUnwantedArgs = template
+                    .getToken(RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT) != null;
+
+            if (hasUnwantedArgs) {
                 final RobotToken settingToken = template.getDeclaration();
                 final RobotProblem problem = RobotProblem
                         .causedBy(GeneralSettingsProblem.TEMPLATE_KEYWORD_NAME_IN_MULTIPLE_CELLS);
@@ -140,31 +141,31 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
         }
     }
 
-    private void reportTemplateKeywordProblems(final List<TestCaseTemplate> templates) {
-        for (final TestCaseTemplate template : templates) {
-            final RobotToken keywordToken = template.getKeywordName();
-            if (keywordToken != null) {
-                final List<String> keywordParts = newArrayList(keywordToken.getText());
-                template.getUnexpectedTrashArguments().stream().map(RobotToken::getText).forEach(keywordParts::add);
+    private void reportTemplateKeywordProblems(final List<LocalSetting<TestCase>> templates) {
+        for (final LocalSetting<TestCase> template : templates) {
+            final List<RobotToken> keywordNameParts = template.getTokensWithoutDeclaration();
+            if (!keywordNameParts.isEmpty()) {
+                final RobotToken firstPartOfName = keywordNameParts.get(0);
 
-                final String keywordName = String.join(" ", keywordParts);
-                if (keywordName.toLowerCase().equals("none")) {
+                final String keywordName = keywordNameParts.stream().map(RobotToken::getText).collect(joining(" "));
+                if (keywordName.isEmpty() || keywordName.toLowerCase().equals("none")) {
                     continue;
                 }
-                new KeywordCallInTemplateValidator(validationContext, keywordName, keywordToken, reporter).validate();
+                new KeywordCallInTemplateValidator(validationContext, keywordName, firstPartOfName, reporter)
+                        .validate();
             }
         }
     }
 
     private void reportSetupProblems() {
         testCase.getSetups().stream()
-                .filter(setup -> setup.getKeywordName() == null)
+                .filter(setup -> setup.getToken(RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME) == null)
                 .forEach(this::reportEmptySetting);
     }
 
     private void reportTeardownProblems() {
         testCase.getTeardowns().stream()
-                .filter(teardown -> teardown.getKeywordName() == null)
+                .filter(teardown -> teardown.getToken(RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME) == null)
                 .forEach(this::reportEmptySetting);
     }
 
@@ -178,11 +179,13 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
     private void reportUnknownVariablesInNonExecutables() {
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
 
-        for (final TestCaseTimeout testTimeout : testCase.getTimeouts()) {
-            unknownVarsValidator.reportUnknownVars(testTimeout.getTimeout());
+        for (final LocalSetting<TestCase> testTimeout : testCase.getTimeouts()) {
+            unknownVarsValidator
+                    .reportUnknownVars(testTimeout.getToken(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE));
         }
-        for (final TestCaseTags tag : testCase.getTags()) {
-            unknownVarsValidator.reportUnknownVars(tag.getTags());
+        for (final LocalSetting<TestCase> tag : testCase.getTags()) {
+            unknownVarsValidator
+                    .reportUnknownVars(tag.tokensOf(RobotTokenType.TEST_CASE_SETTING_TAGS).collect(toList()));
         }
     }
 }

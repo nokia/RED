@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Nokia Solutions and Networks
+ * Copyright 2018 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -38,5 +38,15 @@ public class TestSetup extends AKeywordBaseSetting<SettingTable> {
     @Override
     protected RobotTokenType getDeclarationType() {
         return RobotTokenType.SETTING_TEST_SETUP_DECLARATION;
+    }
+
+    @Override
+    public boolean isSetup() {
+        return true;
+    }
+
+    @Override
+    public boolean isTeardown() {
+        return false;
     }
 }

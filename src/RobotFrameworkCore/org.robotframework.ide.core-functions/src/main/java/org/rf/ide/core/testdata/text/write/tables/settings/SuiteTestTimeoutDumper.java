@@ -10,15 +10,15 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
+import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDumper;
 
-public class SuiteTestTimeoutDumper extends ANotExecutableTableElementDumper {
+public class SuiteTestTimeoutDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
     public SuiteTestTimeoutDumper(final DumperHelper aDumpHelper) {
         super(aDumpHelper, ModelType.SUITE_TEST_TIMEOUT);
@@ -26,11 +26,11 @@ public class SuiteTestTimeoutDumper extends ANotExecutableTableElementDumper {
 
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
-            AModelElement<? extends ARobotSectionTable> currentElement) {
-        TestTimeout testTimeout = (TestTimeout) currentElement;
+            final AModelElement<SettingTable> currentElement) {
+        final TestTimeout testTimeout = (TestTimeout) currentElement;
 
-        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
-        List<RobotToken> keys = new ArrayList<>();
+        final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        final List<RobotToken> keys = new ArrayList<>();
         if (testTimeout.getTimeout() != null) {
             keys.add(testTimeout.getTimeout());
         }

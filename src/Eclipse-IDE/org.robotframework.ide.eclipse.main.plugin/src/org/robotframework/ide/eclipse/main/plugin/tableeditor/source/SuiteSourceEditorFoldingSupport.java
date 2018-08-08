@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -34,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -43,13 +44,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.red.swt.StyledTextWrapper;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 
 class SuiteSourceEditorFoldingSupport {
 
@@ -100,10 +102,13 @@ class SuiteSourceEditorFoldingSupport {
             positions.addAll(calculateSectionsFoldingPositions(model));
         }
         if (foldableElements.contains(FoldableElements.CASES)) {
-            positions.addAll(calculateTestCasesFoldingPositions(model));
+            positions.addAll(calculateSectionChildrenPositions(model, RobotCasesSection.class));
+        }
+        if (foldableElements.contains(FoldableElements.TASKS)) {
+            positions.addAll(calculateSectionChildrenPositions(model, RobotTasksSection.class));
         }
         if (foldableElements.contains(FoldableElements.KEYWORDS)) {
-            positions.addAll(calculateKeywordsFoldingPositions(model));
+            positions.addAll(calculateSectionChildrenPositions(model, RobotKeywordsSection.class));
         }
         if (foldableElements.contains(FoldableElements.DOCUMENTATION)) {
             positions.addAll(calculateDocumentationFoldingPositions(model));
@@ -167,26 +172,21 @@ class SuiteSourceEditorFoldingSupport {
         return previous;
     }
 
-    private Collection<Position> calculateTestCasesFoldingPositions(final RobotSuiteFile model) {
-        final Optional<RobotCasesSection> casesSection = model.findSection(RobotCasesSection.class);
-        if (casesSection.isPresent()) {
-            return Lists.transform(casesSection.get().getChildren(), toPositions());
-        }
-        return new HashSet<>();
-    }
-
-    private Collection<Position> calculateKeywordsFoldingPositions(final RobotSuiteFile model) {
-        final Optional<RobotKeywordsSection> keywordSection = model.findSection(RobotKeywordsSection.class);
-        if (keywordSection.isPresent()) {
-            return Lists.transform(keywordSection.get().getChildren(), toPositions());
-        }
-        return new HashSet<>();
+    private Collection<Position> calculateSectionChildrenPositions(final RobotSuiteFile model,
+            final Class<? extends RobotSuiteFileSection> sectionClass) {
+        return model.findSection(sectionClass)
+                .map(Stream::of)
+                .orElseGet(Stream::empty)
+                .flatMap(s -> s.getChildren().stream())
+                .map(RobotFileInternalElement::getPosition)
+                .collect(toList());
     }
 
     private Collection<Position> calculateDocumentationFoldingPositions(final RobotSuiteFile model) {
         final Collection<Position> positions = new HashSet<>();
         positions.addAll(calculateSuiteDocumentationFoldingPositions(model));
         positions.addAll(calculateCasesDocumentationFoldingPositions(model));
+        positions.addAll(calculateTasksDocumentationFoldingPositions(model));
         positions.addAll(calculateKeywordsDocumentationFoldingPositions(model));
         return positions;
     }
@@ -219,6 +219,21 @@ class SuiteSourceEditorFoldingSupport {
         return positions;
     }
 
+    private Collection<Position> calculateTasksDocumentationFoldingPositions(final RobotSuiteFile model) {
+        final Collection<Position> positions = new HashSet<>();
+        final Optional<RobotTasksSection> tasksSection = model.findSection(RobotTasksSection.class);
+        if (tasksSection.isPresent()) {
+            for (final RobotTask task : tasksSection.get().getChildren()) {
+                for (final RobotKeywordCall call : task.getChildren()) {
+                    if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isDocumentation()) {
+                        positions.add(call.getPosition());
+                    }
+                }
+            }
+        }
+        return positions;
+    }
+
     private Collection<Position> calculateKeywordsDocumentationFoldingPositions(final RobotSuiteFile model) {
         final Collection<Position> positions = new HashSet<>();
         final Optional<RobotKeywordsSection> keywordsSection = model.findSection(RobotKeywordsSection.class);
@@ -235,13 +250,7 @@ class SuiteSourceEditorFoldingSupport {
     }
 
     private static Comparator<Position> positionsComparator() {
-        return new Comparator<Position>() {
-
-            @Override
-            public int compare(final Position p1, final Position p2) {
-                return Integer.compare(p1.getOffset(), p2.getOffset());
-            }
-        };
+        return (p1, p2) -> Integer.compare(p1.getOffset(), p2.getOffset());
     }
 
     private static Predicate<Position> onlyPositionsSpanning(final IDocument document, final int linesToSpan) {
@@ -261,34 +270,19 @@ class SuiteSourceEditorFoldingSupport {
         };
     }
 
-    private static Function<RobotCodeHoldingElement<?>, Position> toPositions() {
-        return new Function<RobotCodeHoldingElement<?>, Position>() {
-
-            @Override
-            public Position apply(final RobotCodeHoldingElement<?> element) {
-                return element.getPosition();
-            }
-        };
-    }
-
     private static Function<Position, Position> nextLineShiftedPosition(final IDocument document) {
-        return new Function<Position, Position>() {
-
-            @Override
-            public Position apply(final Position position) {
-                try {
-                    final int line = document.getLineOfOffset(position.getOffset() + position.getLength());
-                    final int nextLine = line + 1;
-                    if (nextLine >= document.getNumberOfLines()) {
-                        return new Position(position.getOffset(),
-                                Math.max(0, document.getLength() - position.getOffset()));
-                    } else {
-                        final int nextLineOffset = document.getLineInformation(nextLine).getOffset();
-                        return new Position(position.getOffset(), nextLineOffset - position.getOffset());
-                    }
-                } catch (final BadLocationException e) {
-                    return position;
+        return position -> {
+            try {
+                final int line = document.getLineOfOffset(position.getOffset() + position.getLength());
+                final int nextLine = line + 1;
+                if (nextLine >= document.getNumberOfLines()) {
+                    return new Position(position.getOffset(), Math.max(0, document.getLength() - position.getOffset()));
+                } else {
+                    final int nextLineOffset = document.getLineInformation(nextLine).getOffset();
+                    return new Position(position.getOffset(), nextLineOffset - position.getOffset());
                 }
+            } catch (final BadLocationException e) {
+                return position;
             }
         };
     }

@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken.TokenState;
 
-public enum CasesAdderState implements TokenState {
+enum CasesAdderState implements TokenState {
     CASE("case"),
     CALL("call");
 

@@ -19,7 +19,7 @@ public class CreateFreshSettingCommand extends EditorCommand {
 
     private final RobotSettingsSection settingsSection;
 
-    private final String keywordName;
+    private final String settingName;
 
     private final List<String> args;
 
@@ -27,22 +27,22 @@ public class CreateFreshSettingCommand extends EditorCommand {
 
     private RobotSetting newSetting;
 
-    public CreateFreshSettingCommand(final RobotSettingsSection settingsSection, final String keywordName,
+    public CreateFreshSettingCommand(final RobotSettingsSection settingsSection, final String settingName,
             final List<String> args) {
-        this(settingsSection, keywordName, args, "");
+        this(settingsSection, settingName, args, "");
     }
 
-    public CreateFreshSettingCommand(final RobotSettingsSection settingsSection, final String keywordName,
+    public CreateFreshSettingCommand(final RobotSettingsSection settingsSection, final String settingName,
             final List<String> args, final String comment) {
         this.settingsSection = settingsSection;
-        this.keywordName = keywordName;
+        this.settingName = settingName;
         this.args = args;
         this.comment = comment;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        newSetting = settingsSection.createSetting(keywordName, comment, args.toArray(new String[0]));
+        newSetting = settingsSection.createSetting(settingName, comment, args.toArray(new String[0]));
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
                 .to(newSetting.getGroup())

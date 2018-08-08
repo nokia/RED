@@ -299,7 +299,7 @@ public class AssistProposalsTest {
     @Test
     public void verifySettingProposalProperties() {
         final RedSettingProposal proposal = AssistProposals.createSettingProposal("Documentation",
-                SettingTarget.GENERAL, ProposalMatch.EMPTY);
+                SettingTarget.GENERAL_TESTS, ProposalMatch.EMPTY);
         assertThat(proposal.getContent()).isEqualTo("Documentation");
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotSettingImage());

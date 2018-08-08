@@ -13,11 +13,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -69,16 +65,15 @@ public class SelectionsPropertyTester extends PropertyTester {
         return false;
     }
 
-    private static boolean isKeywordCallButNotDocumentation(IStructuredSelection selection) {
+    private static boolean isKeywordCallButNotDocumentation(final IStructuredSelection selection) {
         final Object selected = selection.getFirstElement();
         if (selected == null || !(selected instanceof RobotKeywordCall)) {
             return false;
         }
-        final AModelElement<?> element = ((RobotKeywordCall) selected).getLinkedElement();
-        return !(element instanceof TestDocumentation) && !(element instanceof KeywordDocumentation);
+        return !(selected instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) selected).isDocumentation());
     }
 
-    private static boolean isMetadataSelected(IStructuredSelection selection) {
+    private static boolean isMetadataSelected(final IStructuredSelection selection) {
         final Object selected = selection.getFirstElement();
         if (selected == null || !(selected instanceof RobotSetting)) {
             return false;
@@ -126,24 +121,19 @@ public class SelectionsPropertyTester extends PropertyTester {
 
     public static boolean allElementsAreFromSameProject(final IStructuredSelection selection) {
         final List<IResource> resources = Selections.getAdaptableElements(selection, IResource.class);
-        final List<RobotCasesSection> sections = Selections.getElements(selection, RobotCasesSection.class);
-        final List<RobotCase> cases = Selections.getElements(selection, RobotCase.class);
-        if (sections.isEmpty() && cases.isEmpty() && resources.isEmpty()) {
+        final List<RobotFileInternalElement> elements = Selections.getElements(selection,
+                RobotFileInternalElement.class);
+        if (elements.isEmpty() && resources.isEmpty()) {
             return false;
         }
-        final Set<IProject> projects = new HashSet<IProject>();
+        final Set<IProject> projects = new HashSet<>();
         for (final IResource resource : resources) {
             if (projects.add(resource.getProject()) && projects.size() > 1) {
                 return false;
             }
         }
-        for (final RobotCasesSection section : sections) {
-            if (projects.add(section.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
-                return false;
-            }
-        }
-        for (final RobotCase robotCase : cases) {
-            if (projects.add(robotCase.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
+        for (final RobotFileInternalElement element : elements) {
+            if (projects.add(element.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
                 return false;
             }
         }

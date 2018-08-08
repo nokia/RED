@@ -67,9 +67,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshHolderCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
@@ -85,10 +84,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersCo
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor.TableCommandsCollector;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTableEditConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableEditableRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableSortingConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsMatchesCollection.KeywordsFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableValuesChangingCommandsCollector;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
@@ -128,7 +130,7 @@ import org.robotframework.services.event.Events;
 import com.google.common.base.Predicates;
 
 @SuppressWarnings("restriction")
-public class KeywordsEditorFormFragment implements ISectionFormFragment {
+class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     private IEventBroker eventBroker;
@@ -196,7 +198,10 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         final RedNattableLayersFactory factory = new RedNattableLayersFactory();
 
         // data providers
-        dataProvider = new KeywordsDataProvider(commandsStack, getSection());
+        final TableCommandsCollector commandsCollector = new CodeTableValuesChangingCommandsCollector();
+        final KeywordsColumnsPropertyAccessor propertyAccessor = new KeywordsColumnsPropertyAccessor(commandsStack,
+                commandsCollector);
+        dataProvider = new KeywordsDataProvider(propertyAccessor, getSection());
 
         final IDataProvider columnHeaderDataProvider = new KeywordsColumnHeaderDataProvider();
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
@@ -255,7 +260,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         }
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
                 CodeTableEditableRule.createEditableRule(fileModel), wrapCellContent));
-        gridLayer.addConfiguration(new KeywordsTableEditConfiguration(fileModel, dataProvider, wrapCellContent));
+        gridLayer.addConfiguration(new CodeElementsTableEditConfiguration(fileModel, dataProvider,
+                SettingTarget.KEYWORD, wrapCellContent));
 
         table = theme.configureScrollBars(parent, bodyViewportLayer,
                 tableParent -> createTable(tableParent, theme, factory, gridLayer, bodyDataLayer, configRegistry));
@@ -383,7 +389,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 return keyword.getChildren().get(keyword.getChildren().size() - 1);
             } else {
                 final RobotKeywordsSection section = dataProvider.getInput();
-                commandsStack.execute(new CreateFreshKeywordDefinitionCommand(section));
+                commandsStack.execute(new CreateFreshHolderCommand(section));
                 return section.getChildren().get(section.getChildren().size() - 1);
             }
         };
@@ -406,7 +412,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             + "/" + RobotKeywordsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         if (matches.getCollectors().contains(this)) {
             this.matches = matches;
-            dataProvider.setFilter(new KeywordsFilter(matches));
+            dataProvider.setFilter(new CodeElementsFilter(matches));
             table.refresh();
         }
     }
@@ -425,8 +431,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenKeywordDefinitionIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED) final Event event) {
+    private void whenKeywordDefinitionIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_ADDED) final Event event) {
 
         final RobotKeywordsSection section = Events.get(event, IEventBroker.DATA, RobotKeywordsSection.class);
         if (section != null && section.getSuiteFile() == fileModel) {
@@ -445,7 +450,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenKeywordDefinitionIsRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED) final RobotSuiteFileSection section) {
+            @UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_REMOVED) final RobotKeywordsSection section) {
         if (section.getSuiteFile() == fileModel) {
             selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
                 if (section.getChildren().isEmpty()) {
@@ -464,7 +469,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenKeywordDefinitionIsMoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED) final RobotSuiteFileSection section) {
+            @UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_MOVED) final RobotKeywordsSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
             selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
@@ -585,7 +590,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenKeywordDetailIsChanged(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_CHANGE_ALL) final RobotKeywordDefinition definition) {
+            @UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_NAME_CHANGED) final RobotKeywordDefinition definition) {
         if (definition.getSuiteFile() == fileModel) {
             table.refresh();
             setDirty();

@@ -35,7 +35,7 @@ public class CreationOfThreeTestCaseExecutablesWithOneStepTest extends ACreation
                 name += (index + 1);
             }
 
-            ((TestCase) units.get(index).getHolder()).getTestName().setText(name);
+            ((TestCase) units.get(index).getHolder()).getName().setText(name);
         }
 
         return units;
@@ -47,7 +47,7 @@ public class CreationOfThreeTestCaseExecutablesWithOneStepTest extends ACreation
         for (int index = 1; index < 3; index++) {
             String name = "TestCase";
             name += (index + 1);
-            ((TestCase) units.get(index).getHolder()).getTestName().setText(name);
+            ((TestCase) units.get(index).getHolder()).getName().setText(name);
         }
 
         return units;

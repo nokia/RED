@@ -29,6 +29,7 @@ public class WorkspaceFileUri implements OpenableUri {
     static final String SUITE_PARAM = "suite";
     static final String KEYWORD_PARAM = "keyword";
     static final String TEST_PARAM = "test";
+    static final String TASK_PARAM = "task";
 
     public static boolean isFileUri(final URI uri) {
         return uri.getScheme().equals(SCHEME) && uri.getQuery() == null;
@@ -82,6 +83,18 @@ public class WorkspaceFileUri implements OpenableUri {
 
     private static URI getFileUri(final IFile file) {
         return RedWorkspace.tryToGetLocalUri(file);
+    }
+
+    public static URI createShowTaskSourceUri(final IFile file, final String taskName) throws URISyntaxException {
+        final Map<String, String> values = ImmutableMap.of(SHOW_SRC_PARAM, Boolean.toString(true), TASK_PARAM,
+                taskName);
+        return createUri(file.getLocationURI(), values);
+    }
+
+    public static URI createShowTaskDocUri(final IFile file, final String testName) throws URISyntaxException {
+        final Map<String, String> values = ImmutableMap.of(SHOW_DOC_PARAM, Boolean.toString(true), TASK_PARAM,
+                testName);
+        return createUri(file.getLocationURI(), values);
     }
 
     private static URI createUri(final URI uri, final Map<String, String> values) throws URISyntaxException {

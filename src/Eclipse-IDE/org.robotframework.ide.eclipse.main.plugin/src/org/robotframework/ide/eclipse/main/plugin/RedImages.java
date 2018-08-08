@@ -218,6 +218,22 @@ public class RedImages {
         return getImageUri("resources", "case_templated.png");
     }
 
+    public static ImageDescriptor getRpaTaskImage() {
+        return RedPlugin.getImageDescriptor("resources/task.png");
+    }
+
+    public static Optional<URI> getRpaTaskImageUri() {
+        return getImageUri("resources", "task.png");
+    }
+
+    public static ImageDescriptor getTemplatedRpaTaskImage() {
+        return RedPlugin.getImageDescriptor("resources/task_templated.png");
+    }
+
+    public static Optional<URI> getTemplatedRpaTaskImageUri() {
+        return getImageUri("resources", "task_templated.png");
+    }
+
     public static ImageDescriptor getTestCaseSettingImage() {
         return RedPlugin.getImageDescriptor("resources/gear_small.png");
     }
@@ -578,12 +594,12 @@ public class RedImages {
             return RedPlugin.getImageDescriptor("resources/decorator_folder.png");
         }
 
-        public static ImageDescriptor getResourceDecorator() {
-            return RedPlugin.getImageDescriptor("resources/decorator_resource_file.png");
+        public static ImageDescriptor getTestsSuiteDecorator() {
+            return RedPlugin.getImageDescriptor("resources/decorator_test_suite.png");
         }
 
-        public static ImageDescriptor getInitFileDecorator() {
-            return RedPlugin.getImageDescriptor("resources/decorator_init_file.png");
+        public static ImageDescriptor getTasksSuiteDecorator() {
+            return RedPlugin.getImageDescriptor("resources/decorator_task_suite.png");
         }
     }
 }

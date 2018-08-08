@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +30,12 @@ import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfig
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationFinder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.propertytester.SelectionsPropertyTester;
 import org.robotframework.red.viewers.Selections;
 
@@ -57,6 +63,7 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
                 final List<RobotCase> selectedTestCases = Selections.getElements(selection, RobotCase.class);
                 final Map<IResource, List<String>> resourcesToTestCases = groupTestCasesByResource(selectedTestCases);
+
                 if (!resourcesToTestCases.isEmpty()) {
                     final ILaunchConfigurationWorkingCopy config = RobotLaunchConfigurationFinder
                             .getLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
@@ -65,40 +72,58 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
                     robotconfig.updateTestCases(resourcesToTestCases);
 
                     config.launch(mode.launchMgrName, monitor);
-                } else {
-                    final List<RobotCasesSection> selectedTestSuites = Selections.getElements(selection,
-                            RobotCasesSection.class);
-                    final List<IResource> resources = findResourcesForSections(selectedTestSuites);
-                    if (!resources.isEmpty()) {
-                        RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(resources)
-                                .launch(mode.launchMgrName, monitor);
-                    }
+                    return Status.OK_STATUS;
                 }
 
+                final List<RobotTask> selectedTasks = Selections.getElements(selection, RobotTask.class);
+                final Map<IResource, List<String>> resourcesToTasks = groupTestCasesByResource(selectedTasks);
+                if (!resourcesToTasks.isEmpty()) {
+                    final ILaunchConfigurationWorkingCopy config = RobotLaunchConfigurationFinder
+                            .getLaunchConfigurationForSelectedTestCases(resourcesToTasks);
+
+                    final RobotLaunchConfiguration robotconfig = new RobotLaunchConfiguration(config);
+                    robotconfig.updateTestCases(resourcesToTasks);
+
+                    config.launch(mode.launchMgrName, monitor);
+                    return Status.OK_STATUS;
+                }
+
+                final List<RobotCasesSection> selectedTestSuites = Selections.getElements(selection,
+                        RobotCasesSection.class);
+                final List<IResource> resources1 = findResourcesForSections(selectedTestSuites);
+                if (!resources1.isEmpty()) {
+                    RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(resources1)
+                            .launch(mode.launchMgrName, monitor);
+                    return Status.OK_STATUS;
+                }
+
+                final List<RobotTasksSection> selectedTaskSuites = Selections.getElements(selection,
+                        RobotTasksSection.class);
+                final List<IResource> resources2 = findResourcesForSections(selectedTaskSuites);
+                if (!resources2.isEmpty()) {
+                    RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(resources2)
+                            .launch(mode.launchMgrName, monitor);
+                    return Status.OK_STATUS;
+                }
                 return Status.OK_STATUS;
             }
 
-            private Map<IResource, List<String>> groupTestCasesByResource(final List<RobotCase> robotCases) {
-                final Map<IResource, List<String>> resourcesMapping = new HashMap<>();
-                for (final RobotCase robotCase : robotCases) {
-                    final IResource suiteFile = robotCase.getSuiteFile().getFile();
-                    if (!resourcesMapping.containsKey(suiteFile)) {
-                        resourcesMapping.put(suiteFile, new ArrayList<String>());
-                    }
-                    resourcesMapping.get(suiteFile).add(robotCase.getName());
-                }
-                return resourcesMapping;
+            private Map<IResource, List<String>> groupTestCasesByResource(
+                    final List<? extends RobotCodeHoldingElement<?>> robotCases) {
+
+                return robotCases.stream()
+                        .collect(groupingBy(testCase -> testCase.getSuiteFile().getFile(),
+                                mapping(RobotCodeHoldingElement::getName, toList())));
             }
 
-            private List<IResource> findResourcesForSections(final List<RobotCasesSection> robotCasesSections) {
-                final List<IResource> resources = newArrayList();
-                for (final RobotCasesSection section : robotCasesSections) {
-                    final IResource suiteFile = section.getSuiteFile().getFile();
-                    if (!resources.contains(suiteFile)) {
-                        resources.add(suiteFile);
-                    }
-                }
-                return resources;
+            private List<IResource> findResourcesForSections(
+                    final List<? extends RobotSuiteFileSection> robotCasesSections) {
+
+                return robotCasesSections.stream()
+                        .map(RobotFileInternalElement::getSuiteFile)
+                        .map(RobotSuiteFile::getFile)
+                        .distinct()
+                        .collect(toList());
             }
         };
         job.setUser(false);
@@ -111,7 +136,10 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
             final boolean robotCaseAbsent = Selections.getElements(selection, RobotCase.class).isEmpty();
             final boolean robotCasesSectionAbsent = Selections.getElements(selection, RobotCasesSection.class)
                     .isEmpty();
-            setEnabled(!robotCaseAbsent || !robotCasesSectionAbsent);
+            final boolean robotTaskAbsent = Selections.getElements(selection, RobotTask.class).isEmpty();
+            final boolean robotTasksSectionAbsent = Selections.getElements(selection, RobotTasksSection.class)
+                    .isEmpty();
+            setEnabled(!robotCaseAbsent || !robotCasesSectionAbsent || !robotTaskAbsent || !robotTasksSectionAbsent);
         } else {
             setEnabled(false);
         }

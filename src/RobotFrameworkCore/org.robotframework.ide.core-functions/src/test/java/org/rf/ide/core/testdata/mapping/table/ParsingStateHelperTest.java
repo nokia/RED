@@ -29,7 +29,7 @@ public class ParsingStateHelperTest {
     public static class IsTableInsideStateTest {
 
         private static final List<ParsingState> TABLE_INSIDE_STATES = asList(ParsingState.SETTING_TABLE_INSIDE,
-                ParsingState.TEST_CASE_TABLE_INSIDE, ParsingState.KEYWORD_TABLE_INSIDE,
+                ParsingState.TEST_CASE_TABLE_INSIDE, ParsingState.TASKS_TABLE_INSIDE, ParsingState.KEYWORD_TABLE_INSIDE,
                 ParsingState.VARIABLE_TABLE_INSIDE);
 
         @Test
@@ -50,19 +50,19 @@ public class ParsingStateHelperTest {
 
         private static final List<ParsingState> TABLE_HEADER_STATES = asList(ParsingState.SETTING_TABLE_HEADER,
                 ParsingState.VARIABLE_TABLE_HEADER, ParsingState.TEST_CASE_TABLE_HEADER,
-                ParsingState.KEYWORD_TABLE_HEADER);
+                ParsingState.TASKS_TABLE_HEADER, ParsingState.KEYWORD_TABLE_HEADER);
 
         @Test
         public void allTableHeaderStatesAreRecognized() {
             final List<ParsingState> states = TABLE_HEADER_STATES;
-            assertThat(states).allSatisfy(state -> assertThat(helper.isTableHeader(state)).isTrue());
+            assertThat(states).allSatisfy(state -> assertThat(helper.isTableHeaderState(state)).isTrue());
         }
 
         @Test
         public void allNotTableHeaderStatesAreRecognized() {
             final EnumSet<ParsingState> states = EnumSet.allOf(ParsingState.class);
             states.removeAll(TABLE_HEADER_STATES);
-            assertThat(states).allSatisfy(state -> assertThat(helper.isTableHeader(state)).isFalse());
+            assertThat(states).allSatisfy(state -> assertThat(helper.isTableHeaderState(state)).isFalse());
         }
     }
 
@@ -90,7 +90,7 @@ public class ParsingStateHelperTest {
 
         private static final List<RobotTokenType> TABLE_HEADER_TYPES = asList(RobotTokenType.KEYWORDS_TABLE_HEADER,
                 RobotTokenType.SETTINGS_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
-                RobotTokenType.VARIABLES_TABLE_HEADER);
+                RobotTokenType.TASKS_TABLE_HEADER, RobotTokenType.VARIABLES_TABLE_HEADER);
 
         @Test
         public void unknownStateIsReturned_whenTokenDoesNotContainTableHeaderTypes() {
@@ -111,7 +111,8 @@ public class ParsingStateHelperTest {
                     .map(helper::getState)
                     .collect(toList());
             assertThat(states).containsExactly(ParsingState.KEYWORD_TABLE_HEADER, ParsingState.SETTING_TABLE_HEADER,
-                    ParsingState.TEST_CASE_TABLE_HEADER, ParsingState.VARIABLE_TABLE_HEADER);
+                    ParsingState.TEST_CASE_TABLE_HEADER, ParsingState.TASKS_TABLE_HEADER,
+                    ParsingState.VARIABLE_TABLE_HEADER);
         }
     }
 

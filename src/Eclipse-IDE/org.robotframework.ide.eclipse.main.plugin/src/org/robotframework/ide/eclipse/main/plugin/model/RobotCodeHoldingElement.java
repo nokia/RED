@@ -10,10 +10,11 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -23,13 +24,15 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.collect.Iterables;
 
-public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
+public abstract class RobotCodeHoldingElement<T extends AModelElement<? extends ARobotSectionTable> & IExecutableStepsHolder<?>>
         implements IRobotCodeHoldingElement, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -100,15 +103,20 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         }
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void removeChild(final RobotKeywordCall child) {
         getChildren().remove(child);
-        getModelUpdater().remove(getLinkedElement(), child.getLinkedElement());
+        getLinkedElement().removeElement((AModelElement) child.getLinkedElement());
     }
 
     public abstract void moveChildDown(final RobotKeywordCall keywordCall);
 
     public abstract void moveChildUp(final RobotKeywordCall keywordCall);
+
+    public Optional<String> getTemplateInUse() {
+        return Optional.empty();
+    }
 
     protected abstract ModelType getExecutableRowModelType();
 
@@ -209,20 +217,23 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         return Iterables.any(calls, instanceOf(RobotDefinitionSetting.class));
     }
 
-    public Optional<RobotDefinitionSetting> findSetting(final ModelType... modelTypes) {
-        final List<RobotDefinitionSetting> settings = findSettings(modelTypes);
-        return settings.isEmpty() ? Optional.empty() : Optional.of(settings.get(0));
+    public Optional<RobotDefinitionSetting> findSetting(final Predicate<RobotDefinitionSetting> settingPredicate) {
+        return findSettings(settingPredicate).findFirst();
     }
 
-    protected final List<RobotDefinitionSetting> findSettings(final ModelType... modelTypes) {
+    public Optional<RobotDefinitionSetting> findSetting(final ModelType... modelTypes) {
+        return findSettings(modelTypes).findFirst();
+    }
+
+    private Stream<RobotDefinitionSetting> findSettings(final Predicate<RobotDefinitionSetting> settingPredicate) {
+        return getChildren().stream()
+                .filter(RobotDefinitionSetting.class::isInstance)
+                .map(RobotDefinitionSetting.class::cast)
+                .filter(settingPredicate);
+    }
+
+    protected final Stream<RobotDefinitionSetting> findSettings(final ModelType... modelTypes) {
         final Set<ModelType> typesToFind = newHashSet(modelTypes);
-        final List<RobotDefinitionSetting> matchingSettings = new ArrayList<>();
-        for (final RobotKeywordCall call : getChildren()) {
-            if (call instanceof RobotDefinitionSetting
-                    && typesToFind.contains(call.getLinkedElement().getModelType())) {
-                matchingSettings.add((RobotDefinitionSetting) call);
-            }
-        }
-        return matchingSettings;
+        return findSettings(setting -> typesToFind.contains(setting.getLinkedElement().getModelType()));
     }
 }

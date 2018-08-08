@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.read;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,10 +23,6 @@ import java.util.Stack;
 import org.rf.ide.core.testdata.IRobotFileParser;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler.LineContinueType;
-import org.rf.ide.core.testdata.mapping.keywords.KeywordExecutableRowActionMapper;
-import org.rf.ide.core.testdata.mapping.keywords.KeywordExecutableRowArgumentMapper;
-import org.rf.ide.core.testdata.mapping.setting.UnknownSettingArgumentMapper;
-import org.rf.ide.core.testdata.mapping.setting.UnknownSettingMapper;
 import org.rf.ide.core.testdata.mapping.setting.imports.LibraryAliasFixer;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
@@ -34,14 +32,12 @@ import org.rf.ide.core.testdata.mapping.table.MetadataOldSyntaxUtility;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.mapping.table.PrettyAlignSpaceUtility;
 import org.rf.ide.core.testdata.mapping.table.SettingsMapperProvider;
+import org.rf.ide.core.testdata.mapping.table.TaskMapperProvider;
 import org.rf.ide.core.testdata.mapping.table.TestCaseMapperProvider;
+import org.rf.ide.core.testdata.mapping.table.UnknownTableElementsMapper;
 import org.rf.ide.core.testdata.mapping.table.UserKeywordMapperProvider;
 import org.rf.ide.core.testdata.mapping.table.VariablesDeclarationMapperProvider;
-import org.rf.ide.core.testdata.mapping.testcases.TestCaseExecutableRowActionMapper;
-import org.rf.ide.core.testdata.mapping.testcases.TestCaseExecutableRowArgumentMapper;
 import org.rf.ide.core.testdata.mapping.variables.CommonVariableHelper;
-import org.rf.ide.core.testdata.mapping.variables.UnknownVariableMapper;
-import org.rf.ide.core.testdata.mapping.variables.UnknownVariableValueMapper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -58,6 +54,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.SettingsRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.TableHeadersRecognizersProvider;
+import org.rf.ide.core.testdata.text.read.recognizer.TaskRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.TestCaseRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.UserKeywordRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.VariablesDeclarationRecognizersProvider;
@@ -107,20 +104,11 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         this.positionResolvers = new ElementPositionResolver();
         this.postFixerActions = new PostProcessingFixActions();
 
-        unknownTableElementsMapper.add(new UnknownSettingMapper());
-        unknownTableElementsMapper.add(new UnknownSettingArgumentMapper());
-        unknownTableElementsMapper.add(new UnknownVariableMapper());
-        unknownTableElementsMapper.add(new UnknownVariableValueMapper());
-        unknownTableElementsMapper.add(new TestCaseExecutableRowActionMapper());
-        unknownTableElementsMapper.add(new TestCaseExecutableRowArgumentMapper());
-        unknownTableElementsMapper.add(new KeywordExecutableRowActionMapper());
-        unknownTableElementsMapper.add(new KeywordExecutableRowArgumentMapper());
-
     }
 
     @Override
     public void parse(final RobotFileOutput parsingOutput, final InputStream inputStream, final File robotFile) {
-        initializeRecognizersAndMappers(parsingOutput.getRobotVersion());
+        initalizeRecognizersAndMappers(parsingOutput.getRobotVersion());
 
         boolean wasProcessingError = false;
         try {
@@ -145,7 +133,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     @Override
     public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
-        initializeRecognizersAndMappers(parsingOutput.getRobotVersion());
+        initalizeRecognizersAndMappers(parsingOutput.getRobotVersion());
 
         boolean wasProcessingError = false;
         try {
@@ -174,21 +162,26 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         parsingOutput.setProcessedFile(robotFile);
     }
 
-    private void initializeRecognizersAndMappers(final RobotVersion robotVersion) {
+    private void initalizeRecognizersAndMappers(final RobotVersion robotVersion) {
         libraryFixer = new LibraryAliasFixer(robotVersion, utility, parsingStateHelper);
-
-        mappers.clear();
-        mappers.addAll(new SettingsMapperProvider().getMappers(robotVersion));
-        mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());
-        mappers.addAll(new TestCaseMapperProvider().getMappers(robotVersion));
-        mappers.addAll(new UserKeywordMapperProvider().getMappers(robotVersion));
 
         recognizers.clear();
         recognizers.addAll(new TableHeadersRecognizersProvider().getRecognizers(robotVersion));
         recognizers.addAll(new SettingsRecognizersProvider().getRecognizers(robotVersion));
         recognizers.addAll(new VariablesDeclarationRecognizersProvider().getRecognizers());
         recognizers.addAll(new TestCaseRecognizersProvider().getRecognizers(robotVersion));
+        recognizers.addAll(new TaskRecognizersProvider().getRecognizers(robotVersion));
         recognizers.addAll(new UserKeywordRecognizersProvider().getRecognizers(robotVersion));
+
+        mappers.clear();
+        mappers.addAll(new SettingsMapperProvider().getMappers(robotVersion));
+        mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());
+        mappers.addAll(new TestCaseMapperProvider().getMappers(robotVersion));
+        mappers.addAll(new TaskMapperProvider().getMappers(robotVersion));
+        mappers.addAll(new UserKeywordMapperProvider().getMappers(robotVersion));
+
+        unknownTableElementsMapper.clear();
+        unknownTableElementsMapper.addAll(new UnknownTableElementsMapper().getMappers(robotVersion));
     }
 
     private RobotFileOutput parse(final RobotFileOutput parsingOutput, final File robotFile, final Reader reader) {
@@ -229,8 +222,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 if (isPrettyAlignLineOnly(currentLineText)) {
 
                     rt = processEmptyLine(line, processingState, parsingOutput,
-                            new FilePosition(lineNumber, lastColumnProcessed, currentOffset), currentLineText,
-                            robotFile.getName(), isNewLine);
+                            new FilePosition(lineNumber, lastColumnProcessed, currentOffset), currentLineText);
                     rt.setStartOffset(currentOffset);
                     line.addLineElement(rt);
 
@@ -253,7 +245,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
                                 rt = processLineElement(line, processingState, parsingOutput,
                                         new FilePosition(lineNumber, lastColumnProcessed, currentOffset), rawText,
-                                        robotFile.getName(), isNewLine);
+                                        isNewLine);
 
                                 rt.setStartOffset(currentOffset);
                                 currentOffset += rt.getText().length();
@@ -273,6 +265,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                             // last element in line
                             if (utility.isNewExecutableSection(separator, line)) {
                                 processingState.remove(ParsingState.TEST_CASE_DECLARATION);
+                                processingState.remove(ParsingState.TASK_DECLARATION);
                                 processingState.remove(ParsingState.KEYWORD_DECLARATION);
                             }
 
@@ -280,7 +273,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
                             rt = processLineElement(line, processingState, parsingOutput,
                                     new FilePosition(lineNumber, lastColumnProcessed, currentOffset), rawText,
-                                    robotFile.getName(), isNewLine);
+                                    isNewLine);
                             rt.setStartOffset(currentOffset);
                             currentOffset += rt.getText().length();
                             line.addLineElement(rt);
@@ -402,7 +395,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         }
     }
 
-    public boolean isPrettyAlignLineOnly(final String currentLineText) {
+    private boolean isPrettyAlignLineOnly(final String currentLineText) {
         return RobotEmptyRow.isEmpty(currentLineText);
     }
 
@@ -429,13 +422,11 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         return newOffset;
     }
 
-    @VisibleForTesting
-    protected RobotToken processLineElement(final RobotLine currentLine, final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final FilePosition fp, final String text, final String fileName,
-            final boolean isNewLine) {
+    private RobotToken processLineElement(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final FilePosition fp, final String text, final boolean isNewLine) {
+
         final List<RobotToken> robotTokens = recognize(fp, text);
-        RobotToken robotToken = utility.computeCorrectRobotToken(currentLine, processingState, robotFileOutput, fp,
-                text, isNewLine, robotTokens, fileName);
+        RobotToken robotToken = utility.computeCorrectRobotToken(processingState, fp, text, robotTokens);
 
         final LineContinueType lineContinueType = previousLineHandler.computeLineContinue(processingState, isNewLine,
                 robotFileOutput.getFileModel(), currentLine, robotToken);
@@ -479,7 +470,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             boolean useMapper = true;
             final RobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
-                if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, fileModel, currentLine,
+                if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, currentLine,
                         robotToken) && isCorrectTableHeader(robotToken)) {
                     if (wasRecognizedCorrectly) {
                         robotToken.getTypes().remove(RobotTokenType.UNKNOWN);
@@ -492,6 +483,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                             table = fileModel.getVariableTable();
                         } else if (newState == ParsingState.TEST_CASE_TABLE_HEADER) {
                             table = fileModel.getTestCaseTable();
+                        } else if (newState == ParsingState.TASKS_TABLE_HEADER) {
+                            table = fileModel.getTasksTable();
                         } else if (newState == ParsingState.KEYWORD_TABLE_HEADER) {
                             table = fileModel.getKeywordTable();
                         }
@@ -510,8 +503,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             }
 
             if (useMapper && utility.isUserTableHeader(robotToken)) {
-                if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, fileModel, currentLine,
-                        robotToken)) {
+                if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, currentLine, robotToken)) {
                     // FIXME: add warning about user trash table
                     robotToken.getTypes().add(0, RobotTokenType.USER_OWN_TABLE_HEADER);
                     robotToken.getTypes().remove(RobotTokenType.UNKNOWN);
@@ -522,8 +514,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 }
             }
 
-            robotToken = alignUtility.applyPrettyAlignTokenIfIsValid(currentLine, processingState, robotFileOutput, fp,
-                    text, fileName, robotToken);
+            robotToken = alignUtility.applyPrettyAlignTokenIfIsValid(processingState, text, robotToken);
 
             useMapper = useMapper && !robotToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE);
 
@@ -538,10 +529,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         return robotToken;
     }
 
-    @VisibleForTesting
-    protected RobotToken processEmptyLine(final RobotLine currentLine, final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final FilePosition fp, final String text, final String fileName,
-            final boolean isNewLine) {
+    private RobotToken processEmptyLine(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final FilePosition fp, final String text) {
 
         RobotToken robotToken = new RobotToken();
         robotToken.setFilePosition(fp);
@@ -556,22 +545,24 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
     }
 
     private boolean isCorrectTableHeader(final RobotToken robotToken) {
-        boolean result = false;
+        final List<RobotTokenType> tableHeadersTypes = newArrayList(RobotTokenType.SETTINGS_TABLE_HEADER,
+                RobotTokenType.VARIABLES_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
+                RobotTokenType.TASKS_TABLE_HEADER, RobotTokenType.KEYWORDS_TABLE_HEADER);
 
         final String raw = robotToken.getText().replaceAll("\\s+|[*]", "");
-        for (final IRobotTokenType type : robotToken.getTypes()) {
-            if (utility.isTableHeader(type)) {
-                for (final String r : type.getRepresentation()) {
+        final List<IRobotTokenType> types = robotToken.getTypes();
+        for (final IRobotTokenType type : types) {
+            if (tableHeadersTypes.contains(type)) {
+                final List<String> representations = type.getRepresentation();
+                for (final String r : representations) {
                     if (r.replaceAll("\\s+", "").equalsIgnoreCase(raw)) {
-                        result = true;
-                        break;
+                        return true;
                     }
                 }
                 break;
             }
         }
-
-        return result;
+        return false;
 
     }
 
@@ -586,8 +577,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         }
 
         // check for unknown setting
-        int size = matchedMappers.size();
-        if (size == 0) {
+        if (matchedMappers.size() == 0) {
             for (final IParsingMapper mapper : unknownTableElementsMapper) {
                 if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine, robotToken, text, processingState)) {
                     matchedMappers.add(mapper);
@@ -595,18 +585,15 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             }
         }
 
-        size = matchedMappers.size();
-
-        if (size == 1) {
+        if (matchedMappers.size() == 1) {
             return matchedMappers.get(0).map(currentLine, processingState, robotFileOutput, robotToken, fp, text);
         }
-
         return robotToken;
     }
 
-    @VisibleForTesting
-    protected List<RobotToken> recognize(final FilePosition fp, final String text) {
+    private List<RobotToken> recognize(final FilePosition fp, final String text) {
         final List<RobotToken> possibleRobotTokens = new ArrayList<>();
+
         final StringBuilder sb = new StringBuilder(text);
         for (final ATokenRecognizer rec : recognizers) {
             if (rec.hasNext(sb, fp.getLine(), fp.getColumn())) {

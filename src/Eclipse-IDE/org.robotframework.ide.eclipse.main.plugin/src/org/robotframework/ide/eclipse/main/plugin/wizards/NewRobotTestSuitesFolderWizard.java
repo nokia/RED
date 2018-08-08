@@ -26,17 +26,17 @@ public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
     public void init(final IWorkbench workbench, final IStructuredSelection currentSelection) {
         super.init(workbench, currentSelection);
         setNeedsProgressMonitor(true);
-        setWindowTitle("New Robot Test Suites folder");
+        setWindowTitle("New Robot suites folder");
     }
 
     @Override
     public void addPages() {
         super.addPages();
 
-        mainPage = new WizardNewRobotFolderMainPage("New Robot Suites Folder", getSelection(), "robot", "txt", "tsv");
+        mainPage = new WizardNewRobotFolderMainPage("New Robot suites Folder", getSelection(), "robot", "txt", "tsv");
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Suites Folder");
-        mainPage.setDescription("Create new Robot test suites folder");
+        mainPage.setDescription("Create new Robot suites folder");
 
         this.addPage(mainPage);
     }

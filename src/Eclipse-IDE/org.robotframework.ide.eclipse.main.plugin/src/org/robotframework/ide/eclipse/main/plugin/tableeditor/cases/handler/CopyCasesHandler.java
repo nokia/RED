@@ -10,7 +10,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CopyCasesHandler.E4CopyCasesHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.E4CopyCodeHoldersHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
@@ -28,12 +27,8 @@ public class CopyCasesHandler extends DIParameterizedHandler<E4CopyCasesHandler>
         @Execute
         public boolean copyCases(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedClipboard clipboard) {
-            return copyCodeHolders(selection, clipboard);
-        }
 
-        @Override
-        protected Class<? extends RobotCodeHoldingElement<?>> getCodeHolderClass() {
-            return RobotCase.class;
+            return copyCodeHolders(selection, clipboard, RobotCase.class);
         }
     }
 }

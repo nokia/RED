@@ -30,6 +30,7 @@ public class FoldingPreferencePage extends RedFieldEditorPreferencePage {
 
         addField(new BooleanFieldEditor(RedPreferences.FOLDABLE_SECTIONS, "Sections (tables)", buttonsParent));
         addField(new BooleanFieldEditor(RedPreferences.FOLDABLE_CASES, "Test cases", buttonsParent));
+        addField(new BooleanFieldEditor(RedPreferences.FOLDABLE_TASKS, "Tasks", buttonsParent));
         addField(new BooleanFieldEditor(RedPreferences.FOLDABLE_KEYWORDS, "Keywords", buttonsParent));
         addField(new BooleanFieldEditor(RedPreferences.FOLDABLE_DOCUMENTATION,
                 "Documentations settings (of suites, keywords, cases)", buttonsParent));

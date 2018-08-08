@@ -74,7 +74,7 @@ public class ImportsInCodeAssistProcessorTest {
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION);
     }
 
     @Test

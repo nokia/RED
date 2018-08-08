@@ -5,16 +5,19 @@
  */
 package org.rf.ide.core.testdata.model.table;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.IDataDrivenSetting;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.model.presenter.DataDrivenKeywordName;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
@@ -25,6 +28,10 @@ import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TaskSetup;
+import org.rf.ide.core.testdata.model.table.setting.TaskTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TaskTemplate;
+import org.rf.ide.core.testdata.model.table.setting.TaskTimeout;
 import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
@@ -67,6 +74,14 @@ public class SettingTable extends ARobotSectionTable {
 
     private final List<TestTimeout> testTimeouts = new ArrayList<>();
 
+    private final List<TaskSetup> taskSetups = new ArrayList<>();
+
+    private final List<TaskTeardown> taskTeardowns = new ArrayList<>();
+
+    private final List<TaskTemplate> taskTemplates = new ArrayList<>();
+
+    private final List<TaskTimeout> taskTimeouts = new ArrayList<>();
+
     private final List<UnknownSetting> unknownSettings = new ArrayList<>();
 
     public SettingTable(final RobotFile parent) {
@@ -106,7 +121,7 @@ public class SettingTable extends ARobotSectionTable {
     public LibraryImport newLibraryImport(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_LIBRARY_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final LibraryImport libImp = new LibraryImport(dec);
         addImported(libImp, index);
@@ -121,7 +136,7 @@ public class SettingTable extends ARobotSectionTable {
     public ResourceImport newResourceImport(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_RESOURCE_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final ResourceImport resImp = new ResourceImport(dec);
         addImported(resImp, index);
@@ -136,7 +151,7 @@ public class SettingTable extends ARobotSectionTable {
     public VariablesImport newVariablesImport(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_VARIABLES_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final VariablesImport varImp = new VariablesImport(dec);
         addImported(varImp, index);
@@ -158,12 +173,26 @@ public class SettingTable extends ARobotSectionTable {
         imports.remove(imported);
     }
 
-    public boolean moveUpImported(final AImported imported) {
-        return MoveElementHelper.moveUp(imports, imported);
+    @Override
+    public boolean moveUpElement(final AModelElement<? extends ARobotSectionTable> element) {
+        if (metadatas.contains(element)) {
+            return MoveElementHelper.moveUp(metadatas, (Metadata) element);
+
+        } else if (imports.contains(element)) {
+            return MoveElementHelper.moveUp(imports, (AImported) element);
+        }
+        return false;
     }
 
-    public boolean moveDownImported(final AImported imported) {
-        return MoveElementHelper.moveDown(imports, imported);
+    @Override
+    public boolean moveDownElement(final AModelElement<? extends ARobotSectionTable> element) {
+        if (metadatas.contains(element)) {
+            return MoveElementHelper.moveDown(metadatas, (Metadata) element);
+
+        } else if (imports.contains(element)) {
+            return MoveElementHelper.moveDown(imports, (AImported) element);
+        }
+        return false;
     }
 
     public Optional<SuiteDocumentation> documentation() {
@@ -177,7 +206,7 @@ public class SettingTable extends ARobotSectionTable {
     public SuiteDocumentation newSuiteDocumentation() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_DOCUMENTATION_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final SuiteDocumentation suiteDoc = new SuiteDocumentation(dec);
         addDocumentation(suiteDoc);
@@ -209,7 +238,7 @@ public class SettingTable extends ARobotSectionTable {
     public Metadata newMetadata(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_METADATA_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final Metadata metadata = new Metadata(dec);
         addMetadata(metadata, index);
@@ -231,16 +260,8 @@ public class SettingTable extends ARobotSectionTable {
         metadatas.remove(metadata);
     }
 
-    public boolean moveUpMetadata(final Metadata metadata) {
-        return MoveElementHelper.moveUp(metadatas, metadata);
-    }
-
-    public boolean moveDownMetadata(final Metadata metadata) {
-        return MoveElementHelper.moveDown(metadatas, metadata);
-    }
-
     public List<SuiteSetup> getSuiteSetupsViews() {
-        final RobotVersion version = getParent().getParent().getRobotVersion();
+        final RobotVersion version = getVersion();
         return MultipleSettingsViewsCreator.createView(version, this, suiteSetups, SuiteSetupView::new);
     }
 
@@ -251,7 +272,7 @@ public class SettingTable extends ARobotSectionTable {
     public SuiteSetup newSuiteSetup() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final SuiteSetup suiteSetup = new SuiteSetup(dec);
         addSuiteSetup(suiteSetup);
@@ -269,7 +290,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public List<SuiteTeardown> getSuiteTeardownsViews() {
-        final RobotVersion version = getParent().getParent().getRobotVersion();
+        final RobotVersion version = getVersion();
         return MultipleSettingsViewsCreator.createView(version, this, suiteTeardowns, SuiteTeardownView::new);
     }
 
@@ -280,7 +301,7 @@ public class SettingTable extends ARobotSectionTable {
     public SuiteTeardown newSuiteTeardown() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final SuiteTeardown suiteTeardown = new SuiteTeardown(dec);
         addSuiteTeardown(suiteTeardown);
@@ -300,7 +321,7 @@ public class SettingTable extends ARobotSectionTable {
     public ForceTags newForceTag() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final ForceTags tags = new ForceTags(dec);
         addForceTags(tags);
@@ -309,7 +330,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public List<ForceTags> getForceTagsViews() {
-        final RobotVersion version = getParent().getParent().getRobotVersion();
+        final RobotVersion version = getVersion();
         return MultipleSettingsViewsCreator.createView(version, this, forceTags, ForceTagsView::new);
     }
 
@@ -327,7 +348,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public List<DefaultTags> getDefaultTagsViews() {
-        final RobotVersion version = getParent().getParent().getRobotVersion();
+        final RobotVersion version = getVersion();
         return MultipleSettingsViewsCreator.createView(version, this, defaultTags, DefaultTagsView::new);
     }
 
@@ -338,7 +359,7 @@ public class SettingTable extends ARobotSectionTable {
     public DefaultTags newDefaultTag() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final DefaultTags tags = new DefaultTags(dec);
         addDefaultTags(tags);
@@ -356,7 +377,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public List<TestSetup> getTestSetupsViews() {
-        final RobotVersion version = getParent().getParent().getRobotVersion();
+        final RobotVersion version = getVersion();
         return MultipleSettingsViewsCreator.createView(version, this, testSetups, TestSetupView::new);
     }
 
@@ -367,7 +388,7 @@ public class SettingTable extends ARobotSectionTable {
     public TestSetup newTestSetup() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_TEST_SETUP_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final TestSetup testSetup = new TestSetup(dec);
         addTestSetup(testSetup);
@@ -384,8 +405,31 @@ public class SettingTable extends ARobotSectionTable {
         testSetups.clear();
     }
 
+    public List<TaskSetup> getTaskSetups() {
+        return Collections.unmodifiableList(taskSetups);
+    }
+
+    public TaskSetup newTaskSetup() {
+        final RobotToken dec = RobotToken
+                .create(RobotTokenType.SETTING_TASK_SETUP_DECLARATION.getTheMostCorrectOneRepresentation(getVersion())
+                        .getRepresentation());
+
+        final TaskSetup taskSetup = new TaskSetup(dec);
+        addTaskSetup(taskSetup);
+        return taskSetup;
+    }
+
+    public void addTaskSetup(final TaskSetup taskSetup) {
+        taskSetup.setParent(this);
+        taskSetups.add(taskSetup);
+    }
+
+    public void removeTaskSetup() {
+        taskSetups.clear();
+    }
+
     public List<TestTeardown> getTestTeardownsViews() {
-        final RobotVersion version = getParent().getParent().getRobotVersion();
+        final RobotVersion version = getVersion();
         return MultipleSettingsViewsCreator.createView(version, this, testTeardowns, TestTeardownView::new);
     }
 
@@ -396,7 +440,7 @@ public class SettingTable extends ARobotSectionTable {
     public TestTeardown newTestTeardown() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final TestTeardown testTeardown = new TestTeardown(dec);
         addTestTeardown(testTeardown);
@@ -413,8 +457,31 @@ public class SettingTable extends ARobotSectionTable {
         testTeardowns.clear();
     }
 
+    public List<TaskTeardown> getTaskTeardowns() {
+        return Collections.unmodifiableList(taskTeardowns);
+    }
+
+    public TaskTeardown newTaskTeardown() {
+        final RobotToken dec = RobotToken.create(
+                RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION.getTheMostCorrectOneRepresentation(getVersion())
+                        .getRepresentation());
+
+        final TaskTeardown testTeardown = new TaskTeardown(dec);
+        addTaskTeardown(testTeardown);
+        return testTeardown;
+    }
+
+    public void addTaskTeardown(final TaskTeardown taskTeardown) {
+        taskTeardown.setParent(this);
+        taskTeardowns.add(taskTeardown);
+    }
+
+    public void removeTaskTeardown() {
+        taskTeardowns.clear();
+    }
+
     public List<TestTemplate> getTestTemplatesViews() {
-        final RobotVersion version = getParent().getParent().getRobotVersion();
+        final RobotVersion version = getVersion();
         return MultipleSettingsViewsCreator.createView(version, this, testTemplates, TestTemplateView::new);
     }
 
@@ -422,30 +489,30 @@ public class SettingTable extends ARobotSectionTable {
         return Collections.unmodifiableList(testTemplates);
     }
 
-    public String getRobotViewAboutTestTemplate() {
-        String templateName = null;
-        boolean useGenerator = true;
-        final RobotVersion robotVersion = getParent().getParent().getRobotVersion();
-        if (robotVersion != null && robotVersion.isNewerThan(new RobotVersion(2, 9))) {
-            if (isDuplicatedTemplatesDeclaration()) {
-                useGenerator = false;
-            }
-        }
+    public String getTestTemplateInUse() {
+        final RobotVersion robotVersion = getVersion();
+        if (robotVersion.isOlderThan(new RobotVersion(3, 0))) {
+            return testTemplates.stream()
+                    .flatMap(SettingTable::tokensOf)
+                    .filter(t -> t != null)
+                    .map(RobotToken::getText)
+                    .collect(joining(" "));
 
-        if (useGenerator) {
-            templateName = DataDrivenKeywordName.createRepresentation(testTemplates);
+        } else if (testTemplates.size() == 1) {
+                final TestTemplate template = testTemplates.get(0);
+                return tokensOf(template).filter(t -> t != null).map(RobotToken::getText).collect(joining(" "));
         }
-        return templateName;
+        return null;
     }
 
-    private boolean isDuplicatedTemplatesDeclaration() {
-        return testTemplates.size() != 1;
+    private static Stream<RobotToken> tokensOf(final IDataDrivenSetting template) {
+        return Stream.concat(Stream.of(template.getKeywordName()), template.getUnexpectedTrashArguments().stream());
     }
 
     public TestTemplate newTestTemplate() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final TestTemplate testTemplate = new TestTemplate(dec);
         addTestTemplate(testTemplate);
@@ -462,8 +529,42 @@ public class SettingTable extends ARobotSectionTable {
         testTemplates.clear();
     }
 
+    public List<TaskTemplate> getTaskTemplates() {
+        return Collections.unmodifiableList(taskTemplates);
+    }
+
+    public String getTaskTemplateInUse() {
+        if (taskTemplates.size() == 1) {
+            final TaskTemplate template = taskTemplates.get(0);
+            return Stream.concat(Stream.of(template.getKeywordName()), template.getUnexpectedTrashArguments().stream())
+                    .filter(t -> t != null)
+                    .map(RobotToken::getText)
+                    .collect(joining(" "));
+        }
+        return null;
+    }
+
+    public TaskTemplate newTaskTemplate() {
+        final RobotToken dec = RobotToken.create(
+                RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION.getTheMostCorrectOneRepresentation(getVersion())
+                        .getRepresentation());
+
+        final TaskTemplate taskTemplate = new TaskTemplate(dec);
+        addTaskTemplate(taskTemplate);
+        return taskTemplate;
+    }
+
+    public void addTaskTemplate(final TaskTemplate taskTemplate) {
+        taskTemplate.setParent(this);
+        taskTemplates.add(taskTemplate);
+    }
+
+    public void removeTaskTemplate() {
+        taskTemplates.clear();
+    }
+
     public List<TestTimeout> getTestTimeoutsViews() {
-        final RobotVersion version = getParent().getParent().getRobotVersion();
+        final RobotVersion version = getVersion();
         return MultipleSettingsViewsCreator.createView(version, this, testTimeouts, TestTimeoutView::new);
     }
 
@@ -474,7 +575,7 @@ public class SettingTable extends ARobotSectionTable {
     public TestTimeout newTestTimeout() {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION
-                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+                .getTheMostCorrectOneRepresentation(getVersion()).getRepresentation());
 
         final TestTimeout testTimeout = new TestTimeout(dec);
         addTestTimeout(testTimeout);
@@ -491,6 +592,29 @@ public class SettingTable extends ARobotSectionTable {
         testTimeouts.clear();
     }
 
+    public List<TaskTimeout> getTaskTimeouts() {
+        return Collections.unmodifiableList(taskTimeouts);
+    }
+
+    public TaskTimeout newTaskTimeout() {
+        final RobotToken dec = RobotToken
+                .create(RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION.getTheMostCorrectOneRepresentation(getVersion())
+                        .getRepresentation());
+
+        final TaskTimeout taskTimeout = new TaskTimeout(dec);
+        addTaskTimeout(taskTimeout);
+        return taskTimeout;
+    }
+
+    public void addTaskTimeout(final TaskTimeout taskTimeout) {
+        taskTimeout.setParent(this);
+        taskTimeouts.add(taskTimeout);
+    }
+
+    public void removeTaskTimeout() {
+        taskTimeouts.clear();
+    }
+
     public List<UnknownSetting> getUnknownSettings() {
         return Collections.unmodifiableList(unknownSettings);
     }
@@ -498,5 +622,9 @@ public class SettingTable extends ARobotSectionTable {
     public void addUnknownSetting(final UnknownSetting unknownSetting) {
         unknownSetting.setParent(this);
         unknownSettings.add(unknownSetting);
+    }
+
+    private RobotVersion getVersion() {
+        return getParent().getParent().getRobotVersion();
     }
 }

@@ -13,9 +13,8 @@ import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -31,31 +30,29 @@ public class KeywordTimeoutValueMapper implements IParsingMapper {
 
         if (utility.getCurrentState(processingState) == ParsingState.KEYWORD_SETTING_TIMEOUT) {
             final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
-            final List<KeywordTimeout> timeouts = keywords.get(keywords.size() - 1).getTimeouts();
-            return !hasValueAlready(timeouts);
+            final List<LocalSetting<UserKeyword>> timeouts = keywords.get(keywords.size() - 1).getTimeouts();
+            return !hasTimeoutAlready(timeouts);
         }
         return false;
     }
 
-    private boolean hasValueAlready(final List<KeywordTimeout> keywordTimeouts) {
-        return !keywordTimeouts.isEmpty() && keywordTimeouts.get(keywordTimeouts.size() - 1).getTimeout() != null;
+    static boolean hasTimeoutAlready(final List<LocalSetting<UserKeyword>> timeouts) {
+        return !timeouts.isEmpty()
+                && timeouts.get(timeouts.size() - 1).getToken(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE) != null;
     }
 
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
 
-        final List<IRobotTokenType> types = rt.getTypes();
-        types.remove(RobotTokenType.UNKNOWN);
-        types.add(0, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE);
         rt.setText(text);
 
         final KeywordTable keywordTable = robotFileOutput.getFileModel().getKeywordTable();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
         final UserKeyword keyword = keywords.get(keywords.size() - 1);
-        final List<KeywordTimeout> timeouts = keyword.getTimeouts();
+        final List<LocalSetting<UserKeyword>> timeouts = keyword.getTimeouts();
         if (!timeouts.isEmpty()) {
-            timeouts.get(timeouts.size() - 1).setTimeout(rt);
+            timeouts.get(timeouts.size() - 1).addToken(rt);
         }
 
         processingState.push(ParsingState.KEYWORD_SETTING_TIMEOUT_VALUE);

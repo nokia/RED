@@ -14,12 +14,11 @@ import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 
-public interface ISectionElementDumper {
+public interface ISectionElementDumper<T extends ARobotSectionTable> {
 
-    boolean isServedType(final AModelElement<? extends ARobotSectionTable> element);
+    boolean isServedType(final AModelElement<T> element);
 
     void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
-            final TableHeader<? extends ARobotSectionTable> th,
-            final List<AModelElement<ARobotSectionTable>> sortedSettings,
-            final AModelElement<ARobotSectionTable> currentElement, final List<RobotLine> lines);
+            final TableHeader<T> th, final List<? extends AModelElement<T>> sortedElements,
+            final AModelElement<T> currentElement, final List<RobotLine> lines);
 }

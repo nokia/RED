@@ -20,15 +20,15 @@ import org.rf.ide.core.testdata.text.write.EmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 
-public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
+public abstract class ANotExecutableTableDumper<T extends ARobotSectionTable> implements ISectionTableDumper<T> {
 
     private final DumperHelper aDumpHelper;
 
-    private final List<ISectionElementDumper> dumpers;
+    private final List<ISectionElementDumper<T>> dumpers;
 
     private final boolean shouldDumpHashCommentAfterHeader;
 
-    public ANotExecutableTableDumper(final DumperHelper aDumpHelper, final List<ISectionElementDumper> dumpers,
+    public ANotExecutableTableDumper(final DumperHelper aDumpHelper, final List<ISectionElementDumper<T>> dumpers,
             final boolean shouldDumpHashCommentAfterHeader) {
         this.aDumpHelper = aDumpHelper;
         this.dumpers = dumpers;
@@ -45,8 +45,8 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
 
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
-            final TableHeader<? extends ARobotSectionTable> th, final List<AModelElement<ARobotSectionTable>> sorted,
-            final List<RobotLine> lines) {
+            final TableHeader<T> th, final List<? extends AModelElement<T>> sorted, final List<RobotLine> lines) {
+
         getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
 
         if (this.shouldDumpHashCommentAfterHeader) {
@@ -57,21 +57,17 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
             final List<Section> settingSections = SectionType.filterByType(sections, sectionWithHeaderPos,
                     getSectionType());
             final int lastIndexToDump = getDumperHelper().getLastSortedToDump(model, settingSections,
-                    new ArrayList<AModelElement<ARobotSectionTable>>(sorted));
+                    new ArrayList<>(sorted));
 
             for (int settingIndex = 0; settingIndex <= lastIndexToDump; settingIndex++) {
                 addLineSeparatorIfIsRequired(model, lines);
 
-                final AModelElement<ARobotSectionTable> setting = sorted.get(settingIndex);
+                final AModelElement<T> setting = sorted.get(settingIndex);
 
-                ISectionElementDumper elemDumper = null;
-                for (final ISectionElementDumper dumper : dumpers) {
-                    if (dumper.isServedType(setting)) {
-                        elemDumper = dumper;
-                        break;
-                    }
-                }
-
+                final ISectionElementDumper<T> elemDumper = dumpers.stream()
+                        .filter(dumper -> dumper.isServedType(setting))
+                        .findFirst()
+                        .orElse(null);
                 elemDumper.dump(model, settingSections, sectionWithHeaderPos, th, sorted, setting, lines);
 
                 if (settingIndex < lastIndexToDump) {
@@ -92,6 +88,8 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
             }
         }
     }
+
+    protected abstract SectionType getSectionType();
 
     private void addLineSeparatorIfIsRequired(final RobotFile model, final List<RobotLine> lines) {
         if (!lines.isEmpty()) {

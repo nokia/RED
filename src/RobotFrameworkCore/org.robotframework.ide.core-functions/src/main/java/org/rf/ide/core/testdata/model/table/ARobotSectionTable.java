@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.IChildElement;
 import org.rf.ide.core.testdata.model.IOptional;
 import org.rf.ide.core.testdata.model.RobotFile;
 
 public abstract class ARobotSectionTable implements IOptional, IChildElement<RobotFile> {
 
-    private RobotFile parent;
+    private final RobotFile parent;
 
     private final List<TableHeader<? extends ARobotSectionTable>> headers = new ArrayList<>();
 
@@ -42,4 +43,8 @@ public abstract class ARobotSectionTable implements IOptional, IChildElement<Rob
     public boolean isPresent() {
         return !headers.isEmpty();
     }
+
+    public abstract boolean moveUpElement(AModelElement<? extends ARobotSectionTable> element);
+
+    public abstract boolean moveDownElement(AModelElement<? extends ARobotSectionTable> element);
 }

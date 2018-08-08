@@ -21,7 +21,7 @@ public class RedSectionProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Keywords ***",
-                "*** Settings ***", "*** Test Cases ***", "*** Variables ***");
+                "*** Settings ***", "*** Tasks ***", "*** Test Cases ***", "*** Variables ***");
     }
 
     @Test
@@ -36,7 +36,7 @@ public class RedSectionProposalsTest {
                 reverseComparator(AssistProposals.sortedByLabels()));
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Variables ***",
-                "*** Test Cases ***", "*** Settings ***", "*** Keywords ***");
+                "*** Test Cases ***", "*** Tasks ***", "*** Settings ***", "*** Keywords ***");
     }
 
     @Test

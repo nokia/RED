@@ -11,24 +11,24 @@ import java.util.List;
 import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.TaskTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
+import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
-
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author wypych
@@ -46,12 +46,26 @@ public class DocumentationLineContinueMissingFixer implements IPostProcessFixAct
 
         final KeywordTable keywordTable = model.getKeywordTable();
         if (keywordTable.isPresent()) {
-            keywordsDocumentationApplyContinueTokens(fileContent, keywordTable);
+            for (final UserKeyword keyword : keywordTable.getKeywords()) {
+                applyContinueTokens(fileContent, keyword.getDocumentation(),
+                        RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT);
+            }
         }
 
         final TestCaseTable testCaseTable = model.getTestCaseTable();
         if (testCaseTable.isPresent()) {
-            testsDocumentationApplyContinueTokens(fileContent, testCaseTable);
+            for (final TestCase testCase : testCaseTable.getTestCases()) {
+                applyContinueTokens(fileContent, testCase.getDocumentation(),
+                        RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT);
+            }
+        }
+
+        final TaskTable tasksTable = model.getTasksTable();
+        if (tasksTable.isPresent()) {
+            for (final Task task : tasksTable.getTasks()) {
+                applyContinueTokens(fileContent, task.getDocumentation(),
+                        RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT);
+            }
         }
     }
 
@@ -70,44 +84,20 @@ public class DocumentationLineContinueMissingFixer implements IPostProcessFixAct
         }
     }
 
-    private void keywordsDocumentationApplyContinueTokens(final List<RobotLine> fileContent,
-            final KeywordTable keywordTable) {
-        final List<UserKeyword> keywords = keywordTable.getKeywords();
-        for (final UserKeyword keyword : keywords) {
-            final List<KeywordDocumentation> documentation = keyword.getDocumentation();
-            for (final KeywordDocumentation keywordDocumentation : documentation) {
-                final RobotToken declaration = keywordDocumentation.getDeclaration();
-                keywordDocumentation.clearDocumentation();
-                final List<RobotToken> docTokens = tokensBelongs(fileContent, declaration,
-                        RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT, RobotTokenType.PRETTY_ALIGN_SPACE,
-                        RobotTokenType.PREVIOUS_LINE_CONTINUE);
-                for (final RobotToken textDoc : docTokens) {
-                    documentation.get(0).addDocumentationText(textDoc);
-                }
+    private void applyContinueTokens(final List<RobotLine> fileContent, final List<? extends LocalSetting<?>> docs,
+            final RobotTokenType docTextType) {
+        for (final LocalSetting<?> documentation : docs) {
+            final RobotToken declaration = documentation.getDeclaration();
+            documentation.adaptTo(IDocumentationHolder.class).clearDocumentation();
+            final List<RobotToken> docTokens = tokensBelongs(fileContent, declaration, docTextType,
+                    RobotTokenType.PRETTY_ALIGN_SPACE, RobotTokenType.PREVIOUS_LINE_CONTINUE);
+            for (final RobotToken textDoc : docTokens) {
+                docs.get(0).addToken(textDoc);
             }
         }
     }
 
-    private void testsDocumentationApplyContinueTokens(final List<RobotLine> fileContent,
-            final TestCaseTable testCaseTable) {
-        final List<TestCase> testCases = testCaseTable.getTestCases();
-        for (final TestCase testCase : testCases) {
-            final List<TestDocumentation> documentation = testCase.getDocumentation();
-            for (final TestDocumentation testDocumentation : documentation) {
-                final RobotToken declaration = testDocumentation.getDeclaration();
-                testDocumentation.clearDocumentation();
-                final List<RobotToken> docTokens = tokensBelongs(fileContent, declaration,
-                        RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT, RobotTokenType.PRETTY_ALIGN_SPACE,
-                        RobotTokenType.PREVIOUS_LINE_CONTINUE);
-                for (final RobotToken textDoc : docTokens) {
-                    documentation.get(0).addDocumentationText(textDoc);
-                }
-            }
-        }
-    }
-
-    @VisibleForTesting
-    protected List<RobotToken> tokensBelongs(final List<RobotLine> fileContent, final RobotToken declaration,
+    private List<RobotToken> tokensBelongs(final List<RobotLine> fileContent, final RobotToken declaration,
             final IRobotTokenType... acceptable) {
         final FilePosition declarationPosition = declaration.getFilePosition();
 

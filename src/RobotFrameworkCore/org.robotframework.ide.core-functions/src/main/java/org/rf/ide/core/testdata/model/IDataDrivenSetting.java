@@ -12,15 +12,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public interface IDataDrivenSetting {
 
-    RobotToken getDeclaration();
-
-
     RobotToken getKeywordName();
 
-
     List<RobotToken> getUnexpectedTrashArguments();
-
-
-    List<RobotToken> getComment();
-
 }

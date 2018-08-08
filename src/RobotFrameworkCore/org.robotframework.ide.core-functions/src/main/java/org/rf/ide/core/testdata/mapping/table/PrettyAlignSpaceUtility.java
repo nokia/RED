@@ -10,8 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
@@ -116,9 +114,8 @@ public class PrettyAlignSpaceUtility {
         }
     }
 
-    public RobotToken applyPrettyAlignTokenIfIsValid(final RobotLine currentLine,
-            final Stack<ParsingState> processingState, final RobotFileOutput robotFileOutput, final FilePosition fp,
-            final String text, final String fileName, final RobotToken robotToken) {
+    public RobotToken applyPrettyAlignTokenIfIsValid(final Stack<ParsingState> processingState, final String text,
+            final RobotToken robotToken) {
         if (isOnlySpaces(text)) {
             boolean isPrettyAlign = false;
 

@@ -200,5 +200,15 @@ public class AKeywordBaseSettingTest {
         public ModelType getModelType() {
             return null;
         }
+
+        @Override
+        public boolean isSetup() {
+            return true;
+        }
+
+        @Override
+        public boolean isTeardown() {
+            return false;
+        }
     }
 }

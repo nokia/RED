@@ -59,7 +59,7 @@ class TestCaseValidator implements ModelUnitValidator {
     }
 
     private void reportEmptyCase() {
-        final RobotToken caseName = testCase.getTestName();
+        final RobotToken caseName = testCase.getName();
 
         if (!hasAnythingToExecute(testCase)) {
             final String name = caseName.getText();

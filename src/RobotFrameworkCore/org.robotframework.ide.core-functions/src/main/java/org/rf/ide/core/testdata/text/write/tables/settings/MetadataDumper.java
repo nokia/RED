@@ -10,15 +10,15 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
+import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDumper;
 
-public class MetadataDumper extends ANotExecutableTableElementDumper {
+public class MetadataDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
     public MetadataDumper(final DumperHelper aDumpHelper) {
         super(aDumpHelper, ModelType.METADATA_SETTING);
@@ -26,11 +26,11 @@ public class MetadataDumper extends ANotExecutableTableElementDumper {
 
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
-            AModelElement<? extends ARobotSectionTable> currentElement) {
-        Metadata metadata = (Metadata) currentElement;
+            final AModelElement<SettingTable> currentElement) {
+        final Metadata metadata = (Metadata) currentElement;
 
-        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
-        List<RobotToken> keys = new ArrayList<>();
+        final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        final List<RobotToken> keys = new ArrayList<>();
         if (metadata.getKey() != null) {
             keys.add(metadata.getKey());
         }

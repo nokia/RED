@@ -41,6 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotResourceFileValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotRpaSuiteFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotSuiteFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
@@ -356,6 +357,8 @@ public class RobotArtifactsValidator {
 
             if (ASuiteFileDescriber.isSuiteFile(file)) {
                 return Optional.of(new RobotSuiteFileValidator(context, file, reporter));
+            } else if (ASuiteFileDescriber.isRpaSuiteFile(file)) {
+                return Optional.of(new RobotRpaSuiteFileValidator(context, file, reporter));
             } else if (ASuiteFileDescriber.isResourceFile(file)) {
                 return Optional.of(new RobotResourceFileValidator(context, file, reporter));
             } else if (ASuiteFileDescriber.isInitializationFile(file)) {

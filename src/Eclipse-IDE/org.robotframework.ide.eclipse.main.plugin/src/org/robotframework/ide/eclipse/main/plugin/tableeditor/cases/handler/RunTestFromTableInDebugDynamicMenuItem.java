@@ -5,9 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
-import java.util.List;
-
-import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -15,11 +12,6 @@ public class RunTestFromTableInDebugDynamicMenuItem extends RunTestFromTableDyna
 
     public RunTestFromTableInDebugDynamicMenuItem() {
         super("org.robotframework.red.menu.dynamic.table.debug");
-    }
-
-    @Override
-    protected void contributeBefore(final List<IContributionItem> contributedItems) {
-        // nothing to contribute
     }
 
     @Override

@@ -25,7 +25,7 @@ public class CreationOfTestCaseExecutableOneStepTest extends ACreationOfExecutio
     @Override
     public IExecutableStepsHolder getExecutableWithName() {
         final TestCase execUnit = createModelWithOneTestCaseInside();
-        execUnit.getTestName().setText("TestCase");
+        execUnit.getName().setText("TestCase");
 
         return execUnit;
     }

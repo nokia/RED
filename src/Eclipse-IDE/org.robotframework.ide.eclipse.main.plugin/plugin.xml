@@ -44,14 +44,14 @@
             finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
             icon="resources/new_robot_suite.png"
             id="org.robotframework.ide.eclipse.wizards.newRobotSuite"
-            name="Robot Test Suites folder">
+            name="Robot suites folder">
       </wizard>
       <wizard
             category="org.robotframework.ide.eclipse.wizards.category"
             class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotResourceWizard"
             finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
             hasPages="true"
-            icon="resources/new_robot_res_file.png"
+            icon="resources/new_robot_file.png"
             id="org.robotframework.ide.eclipse.wizards.newRobotResource"
             name="Robot Resource file">
       </wizard>
@@ -60,9 +60,18 @@
             class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTestSuiteWizard"
             finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
             hasPages="true"
-            icon="resources/new_robot_file.png"
+            icon="resources/new_robot_test_file.png"
             id="org.robotframework.ide.eclipse.wizards.newRobotCase"
             name="Robot Test Suite">
+      </wizard>
+      <wizard
+            category="org.robotframework.ide.eclipse.wizards.category"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotTaskSuiteWizard"
+            finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
+            hasPages="true"
+            icon="resources/new_robot_task_file.png"
+            id="org.robotframework.ide.eclipse.wizards.newRobotTask"
+            name="Robot Task Suite">
       </wizard>
       <wizard
             category="org.robotframework.ide.eclipse.wizards.category"
@@ -97,10 +106,11 @@
             file-extensions="robot,tsv,txt,resource"
             id="org.robotframework.red.robotfile"
             name="Robot file"
-            priority="high">
+            priority="normal">
       </content-type>
       <content-type
             base-type="org.robotframework.red.robotfile"
+            describer="org.robotframework.ide.eclipse.main.plugin.project.RobotInitFileDescriber"
             file-names="__init__.robot,__init__.tsv,__init__.txt"
             id="org.robotframework.red.robotsuiteinitfile"
             name="Robot suite initialization file"
@@ -116,12 +126,28 @@
       </content-type>
       <content-type
             base-type="org.robotframework.red.robotfile"
-            describer="org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescriber"
+            describer="org.robotframework.ide.eclipse.main.plugin.project.TsvSuiteFileDescriber"
             file-extensions="tsv"
             id="org.robotframework.red.robotsuitefile_tsv"
-            name="Robot suite file"
+            name="Robot tsv suite file"
             priority="high">
-      </content-type>      
+      </content-type>
+      <content-type
+            base-type="org.robotframework.red.robotfile"
+            describer="org.robotframework.ide.eclipse.main.plugin.project.RobotRpaSuiteFileDescriber"
+            file-extensions="robot,txt"
+            id="org.robotframework.red.rpa.robotsuitefile_robot"
+            name="Robot RPA suite file"
+            priority="high">
+      </content-type>
+      <content-type
+            base-type="org.robotframework.red.robotfile"
+            describer="org.robotframework.ide.eclipse.main.plugin.project.TsvRpaSuiteFileDescriber"
+            file-extensions="tsv"
+            id="org.robotframework.red.rpa.robotsuitefile_tsv"
+            name="Robot RPA tsv suite file"
+            priority="high">
+      </content-type>
    </extension>
    <extension
          id="robotNature"
@@ -146,7 +172,13 @@
       </content-type>
       <content-type
             id="org.robotframework.red.robotsuitefile_tsv">
-      </content-type>      
+      </content-type>
+      <content-type
+            id="org.robotframework.red.rpa.robotsuitefile_robot">
+      </content-type>
+      <content-type
+            id="org.robotframework.red.rpa.robotsuitefile_tsv">
+      </content-type>     
       <content-type
             id="org.robotframework.red.robotsuiteinitfile">
       </content-type>
@@ -188,7 +220,7 @@
           location="TOP_RIGHT"
           state="true">
        <description>
-          This decorator adds icon to Robot resource files and suite initialization files
+          This decorator adds icon to Test suite files and Task suite files
        </description>
        <enablement>
           <objectClass
@@ -275,6 +307,9 @@
              id="org.robotframework.ide.eclipse.wizards.newRobotCase">
        </newWizardShortcut>
        <newWizardShortcut
+             id="org.robotframework.ide.eclipse.wizards.newRobotTask">
+       </newWizardShortcut>
+       <newWizardShortcut
              id="org.robotframework.ide.eclipse.wizards.newRobotPython">
        </newWizardShortcut>
        <actionSet
@@ -323,6 +358,12 @@
            </contentTypeBinding>
            <contentTypeBinding
                  contentTypeId="org.robotframework.red.robotsuitefile_tsv">
+           </contentTypeBinding>    
+           <contentTypeBinding
+                 contentTypeId="org.robotframework.red.rpa.robotsuitefile_robot">
+           </contentTypeBinding>
+           <contentTypeBinding
+                 contentTypeId="org.robotframework.red.rpa.robotsuitefile_tsv">
            </contentTypeBinding>           
            <contentTypeBinding
                  contentTypeId="org.robotframework.red.robotsuiteinitfile">
@@ -465,6 +506,14 @@
                                         property="org.eclipse.core.resources.contentTypeId"
                                         value="org.robotframework.red.robotsuitefile_tsv">
                                   </test>
+                                  <test
+                                        property="org.eclipse.core.resources.contentTypeId"
+                                        value="org.robotframework.red.rpa.robotsuitefile_robot">
+                                  </test>
+                                  <test
+                                        property="org.eclipse.core.resources.contentTypeId"
+                                        value="org.robotframework.red.rpa.robotsuitefile_tsv">
+                                  </test>
                                </or>
                             </and>
                          </or>
@@ -533,6 +582,14 @@
                                <test
                                      property="org.eclipse.core.resources.contentTypeId"
                                      value="org.robotframework.red.robotsuitefile_tsv">
+                               </test>
+                               <test
+                                     property="org.eclipse.core.resources.contentTypeId"
+                                     value="org.robotframework.red.rpa.robotsuitefile_robot">
+                               </test>
+                               <test
+                                     property="org.eclipse.core.resources.contentTypeId"
+                                     value="org.robotframework.red.rpa.robotsuitefile_tsv">
                                </test>
                             </or>
                          </and>
@@ -779,6 +836,43 @@
     <commonWizard
           type="new"
           wizardId="org.robotframework.ide.eclipse.wizards.newRobotCase">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="org.eclipse.ui.perspectives.RobotPerspective">
+             </equals>
+          </with>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false">
+                <adapt
+                      type="org.eclipse.core.resources.IResource">
+                   <or>
+                      <and>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                         <test
+                               property="org.eclipse.core.resources.open"
+                               value="open">
+                         </test>
+                      </and>
+                      <not>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                      </not>
+                   </or>
+                </adapt>
+             </iterate>
+          </with>
+       </enablement>
+    </commonWizard>
+    <commonWizard
+          type="new"
+          wizardId="org.robotframework.ide.eclipse.wizards.newRobotTask">
        <enablement>
           <with
                 variable="activeWorkbenchWindow.activePerspective">
@@ -1082,6 +1176,12 @@
           description="Context for Test Cases section editor page"
           id="org.robotframework.ide.eclipse.tableeditor.cases.context"
           name="Test Cases Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
+    </context>
+    <context
+          description="Context for Tasks section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.tasks.context"
+          name="Tasks Editor Context"
           parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
     </context>
     <context
@@ -2150,6 +2250,160 @@
     </handler>
  </extension>
  <extension
+       name="Code parts common handlers"
+       point="org.eclipse.ui.handlers">
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.MoveCodeHolderUpHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementUp">
+       <activeWhen>
+          <or>
+            <reference
+                definitionId="org.robotframework.casesPartIsActiveAndEditable">
+            </reference>
+            <reference
+                  definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+            </reference>
+            <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+            </reference>
+          </or>
+       </activeWhen>
+       <enabledWhen>
+          <and>
+            <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+            </reference>
+           <with
+                 variable="selection">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+              </iterate>
+           </with>
+          </and>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.MoveCodeHolderDownHandler"
+          commandId="org.robotframework.ide.eclipse.moveElementDown">
+       <activeWhen>
+          <or>
+            <reference
+                definitionId="org.robotframework.casesPartIsActiveAndEditable">
+            </reference>
+            <reference
+                  definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+            </reference>
+            <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+            </reference>
+          </or>
+       </activeWhen>
+       <enabledWhen>
+          <and>
+            <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+            </reference>
+           <with
+                 variable="selection">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+              </iterate>
+           </with>
+          </and>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertNewLineHandler"
+          commandId="org.robotframework.ide.eclipse.insertNewLine">
+       <activeWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.casesPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+             </reference>
+          </or>
+       </activeWhen>
+       <enabledWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.exactlyOneElementIsSelected">
+             </reference>
+             <with
+                   variable="selection">
+                <or>
+                   <count
+                         value="0">
+                   </count>
+                   <and>
+                      <count
+                            value="1">
+                      </count>
+                      <iterate
+                            ifEmpty="false"
+                            operator="and">
+                         <instanceof
+                               value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
+                         </instanceof>
+                      </iterate>
+                   </and>
+                </or>
+             </with>
+          </or>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteInCodeHoldersTableHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.casesPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+             </reference>
+          </or>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.selectionContainAtLeastOneRobotElement">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCodeHoldersHandler"
+          commandId="org.robotframework.ide.eclipse.deleteRow">
+       <activeWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.casesPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
+             </reference>
+          </or>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.selectedElementsHaveSameType">
+          </reference>
+       </enabledWhen>
+    </handler>
+ </extension>
+ <extension
        name="Test Cases part handlers"
        point="org.eclipse.ui.handlers">
     <handler
@@ -2186,88 +2440,6 @@
                </or>
             </with>
           </or>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertNewLineHandler"
-          commandId="org.robotframework.ide.eclipse.insertNewLine">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.casesPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <or>
-            <reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
-            </reference>
-            <with
-                  variable="selection">
-               <or>
-                  <count
-                        value="0">
-                  </count>
-                  <and>
-                     <count
-                           value="1">
-                     </count>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <instanceof
-                              value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
-                        </instanceof>
-                     </iterate>
-                  </and>
-               </or>
-            </with>
-          </or>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseUpHandler"
-          commandId="org.robotframework.ide.eclipse.moveElementUp">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.casesPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <and>
-          	<reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
-          	</reference>
-           <with
-                 variable="selection">
-              <iterate
-                    ifEmpty="false"
-                    operator="and">
-              </iterate>
-           </with>
-          </and>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseDownHandler"
-          commandId="org.robotframework.ide.eclipse.moveElementDown">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.casesPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <and>
-          	<reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
-          	</reference>
-           <with
-                 variable="selection">
-              <iterate
-                    ifEmpty="false"
-                    operator="and">
-              </iterate>
-           </with>
-          </and>
        </enabledWhen>
     </handler>
     <handler
@@ -2310,23 +2482,6 @@
           <reference
                 definitionId="org.robotframework.canPasteToCasesSectionEditorTable">
           </reference>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCasesHandler"
-          commandId="org.robotframework.ide.eclipse.deleteRow">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.casesPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <with
-                variable="selection">
-             <count
-                   value="+">
-             </count>
-          </with>
        </enabledWhen>
     </handler>
     <handler
@@ -2375,17 +2530,116 @@
                 <reference
                       definitionId="org.robotframework.canPasteToCasesSectionEditorTable">
                 </reference>
+                <reference
+                      definitionId="org.robotframework.canPasteToTasksSectionEditorTable">
+                </reference>
              </or>
           </with>
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteInCasesTableHandler"
-          commandId="org.eclipse.ui.edit.delete">
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunSelectedTestsHandler"
+          commandId="org.robotframework.red.runSelectedTestsFromTable">
        <activeWhen>
-         <reference
-               definitionId="org.robotframework.casesPartIsActiveAndEditable">
-         </reference>
+          <or>
+             <reference
+                   definitionId="org.robotframework.casesPartIsActiveAndEditable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+             </reference>
+          </or>
+       </activeWhen>
+    </handler>
+ </extension>
+ <extension
+       name="Tasks part handlers"
+       point="org.eclipse.ui.handlers">
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.handler.InsertNewTaskHandler"
+          commandId="org.robotframework.ide.eclipse.insertNew">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <or>
+             <reference
+                   definitionId="org.robotframework.exactlyOneElementIsSelected">
+             </reference>
+             <with
+                   variable="selection">
+                <or>
+                   <count
+                         value="0">
+                   </count>
+                   <and>
+                      <count
+                            value="1">
+                      </count>
+                      <iterate
+                            ifEmpty="false"
+                            operator="and">
+                         <instanceof
+                               value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
+                         </instanceof>
+                      </iterate>
+                   </and>
+                </or>
+             </with>
+          </or>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.handler.CutTasksHandler"
+          commandId="org.robotframework.ide.eclipse.cutRow">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.selectedElementsHaveSameType">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.handler.CopyTasksHandler"
+          commandId="org.robotframework.ide.eclipse.copyRow">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.tasksPartIsActive">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.selectedElementsHaveSameType">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.handler.PasteTasksHandler"
+          commandId="org.robotframework.ide.eclipse.pasteRow">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.canPasteToTasksSectionEditorTable">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.handler.CutInTasksTableHandler"
+          commandId="org.eclipse.ui.edit.cut">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+          </reference>
        </activeWhen>
        <enabledWhen>
           <reference
@@ -2394,13 +2648,43 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunSelectedTestsHandler"
-          commandId="org.robotframework.red.runSelectedTestsFromTable">
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.handler.CopyInTasksTableHandler"
+          commandId="org.eclipse.ui.edit.copy">
        <activeWhen>
           <reference
-                definitionId="org.robotframework.casesPartIsActiveAndEditable">
+                definitionId="org.robotframework.tasksPartIsActive">
           </reference>
        </activeWhen>
+       <enabledWhen>
+          <reference
+                definitionId="org.robotframework.selectionContainAtLeastOneRobotElement">
+          </reference>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.handler.PasteInTasksTableHandler"
+          commandId="org.eclipse.ui.edit.paste">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.tasksPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="activeEditor">
+             <or>
+                <reference
+                      definitionId="org.robotframework.canPasteToKeywordSectionEditorTable">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.canPasteToCasesSectionEditorTable">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.canPasteToTasksSectionEditorTable">
+                </reference>
+             </or>
+          </with>
+       </enabledWhen>
     </handler>
  </extension>
  <extension
@@ -2443,88 +2727,6 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertNewLineHandler"
-          commandId="org.robotframework.ide.eclipse.insertNewLine">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <or>
-            <reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
-            </reference>
-            <with
-                  variable="selection">
-               <or>
-                  <count
-                        value="0">
-                  </count>
-                  <and>
-                     <count
-                           value="1">
-                     </count>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <instanceof
-                              value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
-                        </instanceof>
-                     </iterate>
-                  </and>
-               </or>
-            </with>
-          </or>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.MoveKeywordsUpHandler"
-          commandId="org.robotframework.ide.eclipse.moveElementUp">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <and>
-          	<reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
-          	</reference>
-           <with
-                 variable="selection">
-              <iterate
-                    ifEmpty="false"
-                    operator="and">
-              </iterate>
-           </with>
-          </and>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.MoveKeywordsDownHandler"
-          commandId="org.robotframework.ide.eclipse.moveElementDown">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <and>
-          	<reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
-          	</reference>
-           <with
-                 variable="selection">
-              <iterate
-                    ifEmpty="false"
-                    operator="and">
-              </iterate>
-           </with>
-          </and>
-       </enabledWhen>
-    </handler>
-    <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutKeywordsHandler"
           commandId="org.robotframework.ide.eclipse.cutRow">
        <activeWhen>
@@ -2563,20 +2765,6 @@
        <enabledWhen>
           <reference
                 definitionId="org.robotframework.canPasteToKeywordSectionEditorTable">
-          </reference>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteKeywordsHandler"
-          commandId="org.robotframework.ide.eclipse.deleteRow">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.selectedElementsHaveSameType">
           </reference>
        </enabledWhen>
     </handler>
@@ -2626,22 +2814,11 @@
                 <reference
                       definitionId="org.robotframework.canPasteToCasesSectionEditorTable">
                 </reference>
+                <reference
+                      definitionId="org.robotframework.canPasteToTasksSectionEditorTable">
+                </reference>
              </or>
           </with>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteInKeywordTableHandler"
-          commandId="org.eclipse.ui.edit.delete">
-       <activeWhen>
-         <reference
-               definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
-         </reference>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.selectionContainAtLeastOneRobotElement">
-          </reference>
        </enabledWhen>
     </handler>
  </extension>
@@ -3313,7 +3490,13 @@
                               value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
                         </instanceof>
                         <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotTask">
+                        </instanceof>
+                        <instanceof
                               value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
+                        </instanceof>
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection">
                         </instanceof>
                      </or>
                   </iterate>
@@ -4019,6 +4202,214 @@
                </with>
             </visibleWhen>
 		</dynamic>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.editor.page.tasks.contextMenu?before=additions">
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNew"
+             icon="resources/add.png"
+             label="Add new task"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNewLine"
+             icon="resources/add.png"
+             label="Add new line"
+             style="push">
+       </command>
+       <separator
+             name="navigation"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInSource"
+             icon="resources/source.png"
+             label="Show in source"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInDocView"
+             icon="resources/book.png"
+             label="Show documentation"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="activeEditor">
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                </instanceof>
+             </with>
+          </visibleWhen>
+       </command>
+       <separator
+             name="globals"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.eclipse.ui.edit.cut"
+             label="Cut"
+             style="push">
+       </command>
+       <command
+             commandId="org.eclipse.ui.edit.copy"
+             label="Copy"
+             style="push">
+       </command>
+       <command
+             commandId="org.eclipse.ui.edit.paste"
+             label="Paste"
+             style="push">
+       </command>
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+       <separator
+             name="table"
+             visible="true">
+       </separator>
+       <menu
+             label="Table">
+          <command
+                commandId="org.robotframework.ide.eclipse.insertCell"
+                label="Insert cell"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.insertCellToRight"
+                label="Insert cell to the right"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.deleteCell"
+                label="Delete cell"
+                style="push">
+          </command>
+          <separator
+                name="table.state"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.expandAll"
+                icon="resources/expandall.png"
+                label="Expand All"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.collapseAll"
+                icon="resources/collapseall.png"
+                label="Collapse All"
+                style="push">
+          </command>
+       </menu>
+       <menu
+             label="Row">
+          <command
+                commandId="org.robotframework.ide.eclipse.moveElementUp"
+                label="Move up"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.moveElementDown"
+                label="Move down"
+                style="push">
+          </command>
+          <separator
+                name="row.edit"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.cutRow"
+                label="Cut row"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.copyRow"
+                label="Copy row"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.pasteRow"
+                label="Paste row"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.deleteRow"
+                label="Delete row"
+                style="push">
+          </command>
+          <separator
+                name="row.additions"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.selectWholeRow"
+                label="Select whole row(s)"
+                style="push">
+          </command>
+       </menu>
+       <separator
+             name="actions"
+             visible="true">
+       </separator>
+       <command
+             commandId="org.robotframework.red.toggleCommentInTable"
+             label="Toggle Comment"
+             style="push">
+       </command>
+       <menu
+             label="References">
+          <command
+                commandId="org.robotframework.ide.eclipse.findElementUsages"
+                label="Workspace"
+                style="push">
+             <parameter
+                   name="org.robotframework.ide.eclipse.findElementUsages.place"
+                   value="workspace">
+             </parameter>
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.findElementUsages"
+                label="Project"
+                style="push">
+             <parameter
+                   name="org.robotframework.ide.eclipse.findElementUsages.place"
+                   value="project">
+             </parameter>
+          </command>
+       </menu>
+       <dynamic
+             class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunTestFromTableDynamicMenuItem"
+             id="org.robotframework.red.menu.dynamic.table.run">
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="activeEditor">
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                </instanceof>
+             </with>
+          </visibleWhen>
+       </dynamic>
+       <dynamic
+             class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunTestFromTableInDebugDynamicMenuItem"
+             id="org.robotframework.red.menu.dynamic.table.debug">
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="activeEditor">
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                </instanceof>
+             </with>
+          </visibleWhen>
+       </dynamic>
     </menuContribution>
     <menuContribution
           allPopups="false"
@@ -4888,7 +5279,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RobotEditorPropertyTester"
           id="org.robotframework.robotEditorPropertyTester"
           namespace="org.robotframework"
-          properties="editorModelIsEditable,activeSectionEditorHasSection,thereIsTextInClipboard,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard,thereAreCasesElementsInClipboard,thereAreVariablesInClipboard,thereAreGeneralSettingsInClipboard,thereAreMetadataSettingsInClipboard,thereAreImportSettingsInClipboard"
+          properties="editorModelIsEditable,activeSectionEditorHasSection,thereIsTextInClipboard,thereAreKeywordDefinitionElementsInClipboard,thereAreKeywordCallElementsInClipboard,thereAreCasesElementsInClipboard,thereAreTasksElementsInClipboard,thereAreVariablesInClipboard,thereAreGeneralSettingsInClipboard,thereAreMetadataSettingsInClipboard,thereAreImportSettingsInClipboard"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
     <propertyTester
@@ -5046,6 +5437,63 @@
 	                </iterate>
 	             </not>
 	          </and>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.editorModelIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.tasksPartIsActive">
+       <with
+             variable="activeContexts">
+          <and>
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.tableeditor.tasks.context">
+                </equals>
+             </iterate>
+             <not>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <equals
+                         value="org.robotframework.ide.eclipse.details.context">
+                   </equals>
+                </iterate>
+             </not>
+          </and>
+       </with>
+    </definition>
+    <definition
+          id="org.robotframework.tasksPartIsActiveAndEditable">
+       <and>
+          <with
+                variable="activeContexts">
+              <and>
+                 <iterate
+                       ifEmpty="false"
+                       operator="or">
+                    <equals
+                          value="org.robotframework.ide.eclipse.tableeditor.tasks.context">
+                    </equals>
+                 </iterate>
+                 <not>
+                    <iterate
+                          ifEmpty="false"
+                          operator="or">
+                       <equals
+                             value="org.robotframework.ide.eclipse.details.context">
+                       </equals>
+                    </iterate>
+                 </not>
+              </and>
           </with>
           <with
                 variable="activeEditor">
@@ -5374,6 +5822,40 @@
           <or>
              <test
                    property="org.robotframework.thereAreCasesElementsInClipboard"
+                   value="true">
+             </test>
+             <and>
+                <test
+                      property="org.robotframework.thereAreKeywordCallElementsInClipboard"
+                      value="true">
+                </test>
+                <with
+                      variable="selection">
+                   <count
+                         value="+">
+                   </count>
+                </with>
+             </and>
+             <and>
+                <test
+                      property="org.robotframework.thereIsTextInClipboard"
+                      value="true">
+                </test>
+                <test
+                      property="org.robotframework.table.cell.numberOfSelectedCellEquals"
+                      value="1">
+                </test>
+             </and>
+          </or>
+       </with>
+    </definition>
+    <definition
+          id="org.robotframework.canPasteToTasksSectionEditorTable">
+       <with
+             variable="activeEditor">
+          <or>
+             <test
+                   property="org.robotframework.thereAreTasksElementsInClipboard"
                    value="true">
              </test>
              <and>
@@ -6310,7 +6792,13 @@
                                  value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
                            </instanceof>
                            <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.model.RobotTask">
+                           </instanceof>
+                           <instanceof
                                  value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
+                           </instanceof>
+                           <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection">
                            </instanceof>
                         </or>
                      </iterate>

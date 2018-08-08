@@ -12,11 +12,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -36,14 +36,14 @@ public class MoveVariableDownCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
-                "dict", "invalid}");
+        assertThat(transform(varSection.getChildren(), RobotElement::getName)).containsExactly("scalar",
+                "scalar_as_list", "list", "dict", "invalid}");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
-                "dict", "invalid}");
+        assertThat(transform(varSection.getChildren(), RobotElement::getName)).containsExactly("scalar",
+                "scalar_as_list", "list", "dict", "invalid}");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -59,14 +59,14 @@ public class MoveVariableDownCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar_as_list", "scalar", "list",
-                "dict", "invalid}");
+        assertThat(transform(varSection.getChildren(), RobotElement::getName)).containsExactly("scalar_as_list",
+                "scalar", "list", "dict", "invalid}");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
-                "dict", "invalid}");
+        assertThat(transform(varSection.getChildren(), RobotElement::getName)).containsExactly("scalar",
+                "scalar_as_list", "list", "dict", "invalid}");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_VARIABLE_MOVED, varSection);
         verifyNoMoreInteractions(eventBroker);
@@ -83,14 +83,14 @@ public class MoveVariableDownCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "dict",
-                "list", "invalid}");
+        assertThat(transform(varSection.getChildren(), RobotElement::getName)).containsExactly("scalar",
+                "scalar_as_list", "dict", "list", "invalid}");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
-                "dict", "invalid}");
+        assertThat(transform(varSection.getChildren(), RobotElement::getName)).containsExactly("scalar",
+                "scalar_as_list", "list", "dict", "invalid}");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_VARIABLE_MOVED, varSection);
         verifyNoMoreInteractions(eventBroker);

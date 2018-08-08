@@ -88,6 +88,7 @@ public class VariablesAssistProcessorTest {
         assertThat(processor.getApplicableContentTypes()).containsOnly(
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+                SuiteSourcePartitionScanner.TASKS_SECTION,
                 SuiteSourcePartitionScanner.SETTINGS_SECTION,
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }

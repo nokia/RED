@@ -581,7 +581,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
 
         // tooltips support
-        new GeneralSettingsTableContentTooltip(table.get(), markersContainer, dataProvider);
+        new GeneralSettingsTableContentTooltip(table.get(), markersContainer, dataProvider, fileModel.isRpaSuiteFile());
     }
 
     private NatTable createTable(final Composite parent, final TableTheme theme,
@@ -1029,9 +1029,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private static class GeneralSettingsTableContentTooltip extends RedNatTableContentTooltip {
 
+        private final SettingTarget target;
+
         public GeneralSettingsTableContentTooltip(final NatTable natTable,
-                final SuiteFileMarkersContainer markersContainer, final IRowDataProvider<?> dataProvider) {
+                final SuiteFileMarkersContainer markersContainer, final IRowDataProvider<?> dataProvider,
+                final boolean isRpaSuite) {
             super(natTable, markersContainer, dataProvider);
+            this.target = isRpaSuite ? SettingTarget.GENERAL_TASKS : SettingTarget.GENERAL_TESTS;
         }
 
         @Override
@@ -1039,13 +1043,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             final String text = super.getText(event);
 
             final int col = natTable.getColumnPositionByX(event.x);
-            if (col == 1 && text != null && RedSettingProposals.isSetting(SettingTarget.GENERAL, text)) {
+            if (col == 1 && text != null && RedSettingProposals.isSetting(target, text)) {
                 final int row = natTable.getRowPositionByY(event.y);
                 final ILayerCell cell = natTable.getCellByPosition(col + 1, row);
                 final String keyword = cell != null && cell.getDataValue() != null
                         && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue()
                                 : "given in first argument";
-                return RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, text, keyword);
+                return RedSettingProposals.getSettingDescription(target, text, keyword);
             }
             return text;
         }

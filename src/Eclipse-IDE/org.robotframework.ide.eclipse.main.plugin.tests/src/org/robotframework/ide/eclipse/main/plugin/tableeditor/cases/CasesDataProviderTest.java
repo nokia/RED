@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -23,7 +24,8 @@ public class CasesDataProviderTest {
     @Rule
     public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
-    private final CasesDataProvider dataProvider = new CasesDataProvider(null, null);
+    private final CasesDataProvider dataProvider = new CasesDataProvider(
+            new CodeElementsColumnsPropertyAccessor(null, null), null);
 
     @Test
     public void columnsAreCountedCorrectly_whenTestCasesSectionIsEmpty() throws Exception {

@@ -20,8 +20,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
-import com.google.common.annotations.VisibleForTesting;
-
 
 public class TableHeaderColumnMapper implements IParsingMapper {
 
@@ -61,43 +59,31 @@ public class TableHeaderColumnMapper implements IParsingMapper {
         return rt;
     }
 
-
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState currentState = stateHelper
-                .getCurrentState(processingState);
-        if (!processingState.isEmpty()
-                && !stateHelper.isTableInsideStateInHierarchy(currentState)
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+        final ParsingState currentState = stateHelper.getCurrentState(processingState);
+        if (!processingState.isEmpty() && !stateHelper.isTableInsideStateInHierarchy(currentState)
                 && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                 && isNotExistLineContinueAfterHeader(currentLine)) {
             final ParsingState state = processingState.peek();
-            result = (stateHelper.isTableHeader(state) || state == ParsingState.TABLE_HEADER_COLUMN);
+            return stateHelper.isTableHeaderState(state) || state == ParsingState.TABLE_HEADER_COLUMN;
         }
-
-        return result;
+        return false;
     }
 
-
-    @VisibleForTesting
-    protected boolean isNotExistLineContinueAfterHeader(
-            final RobotLine currentLine) {
-        boolean result = true;
+    private boolean isNotExistLineContinueAfterHeader(final RobotLine currentLine) {
         final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         for (int i = 0; i < lineElements.size() || i == 2; i++) {
             final IRobotLineElement element = lineElements.get(i);
             final List<IRobotTokenType> types = element.getTypes();
             if (types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
-                result = false;
-                break;
-            } else if (!(types.contains(SeparatorType.PIPE) || types
-                    .contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE))) {
+                return false;
+            } else if (!(types.contains(SeparatorType.PIPE)
+                    || types.contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE))) {
                 break;
             }
         }
-
-        return result;
+        return true;
     }
 }

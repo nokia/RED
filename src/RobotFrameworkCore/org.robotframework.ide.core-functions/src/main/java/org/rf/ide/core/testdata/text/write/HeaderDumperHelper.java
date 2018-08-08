@@ -186,17 +186,21 @@ public class HeaderDumperHelper {
     }
 
     public RobotTokenType convertHeader(final ModelType modelType) {
-        RobotTokenType type = RobotTokenType.UNKNOWN;
         if (modelType == ModelType.SETTINGS_TABLE_HEADER) {
-            type = RobotTokenType.SETTINGS_TABLE_HEADER;
-        } else if (modelType == ModelType.VARIABLES_TABLE_HEADER) {
-            type = RobotTokenType.VARIABLES_TABLE_HEADER;
-        } else if (modelType == ModelType.TEST_CASE_TABLE_HEADER) {
-            type = RobotTokenType.TEST_CASES_TABLE_HEADER;
-        } else if (modelType == ModelType.KEYWORDS_TABLE_HEADER) {
-            type = RobotTokenType.KEYWORDS_TABLE_HEADER;
-        }
+            return RobotTokenType.SETTINGS_TABLE_HEADER;
 
-        return type;
+        } else if (modelType == ModelType.VARIABLES_TABLE_HEADER) {
+            return RobotTokenType.VARIABLES_TABLE_HEADER;
+
+        } else if (modelType == ModelType.TEST_CASE_TABLE_HEADER) {
+            return RobotTokenType.TEST_CASES_TABLE_HEADER;
+
+        } else if (modelType == ModelType.TASKS_TABLE_HEADER) {
+            return RobotTokenType.TASKS_TABLE_HEADER;
+
+        } else if (modelType == ModelType.KEYWORDS_TABLE_HEADER) {
+            return RobotTokenType.KEYWORDS_TABLE_HEADER;
+        }
+        return RobotTokenType.UNKNOWN;
     }
 }

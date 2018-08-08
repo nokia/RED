@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -68,6 +69,14 @@ public class ConvertCallToComment extends EditorCommand {
                     ((TestCase) parentObject).replaceElement(
                             (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement(), tempLinked);
                     newLinked = tempLinked;
+
+                } else if (parentObject instanceof Task) {
+                    final RobotExecutableRow<Task> tempLinked = new RobotExecutableRow<>();
+                    tempLinked.getAction().setType(RobotTokenType.TASK_ACTION_NAME);
+                    ((Task) parentObject)
+                            .replaceElement((RobotExecutableRow<Task>) keywordCall.getLinkedElement(), tempLinked);
+                    newLinked = tempLinked;
+
                 } else if (parentObject instanceof UserKeyword) {
                     final RobotExecutableRow<UserKeyword> tempLinked = new RobotExecutableRow<>();
                     tempLinked.getAction().setType(RobotTokenType.KEYWORD_ACTION_NAME);

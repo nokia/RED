@@ -65,7 +65,7 @@ public class CreationOfNewExecutionRowsInTestCase extends RobotFormatParameteriz
         final RobotExecutableRow<TestCase> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("Log_new"));
         executionRow.addArgument(RobotToken.create("arg_new"));
-        testCase.addElement(executionRow, 2);
+        testCase.addElement(2, executionRow);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);

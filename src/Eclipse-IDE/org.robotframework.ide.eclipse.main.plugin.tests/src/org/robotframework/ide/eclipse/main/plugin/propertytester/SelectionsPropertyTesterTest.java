@@ -14,10 +14,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -147,13 +145,13 @@ public class SelectionsPropertyTesterTest {
 
     @Test
     public void testIsKeywordCallButNotDocumentationProperty() {
-        final RobotKeywordCall call = new RobotKeywordCall(null, new KeywordArguments(new RobotToken()));
-        final AModelElement<?> testDocElement = new TestDocumentation(new RobotToken());
-        final AModelElement<?> keywordDocElement = new KeywordDocumentation(new RobotToken());
-        final RobotKeywordCall testDocumentation = new RobotKeywordCall(null, testDocElement);
-        final RobotKeywordCall keywordDocumentation = new RobotKeywordCall(null, keywordDocElement);
-        final IStructuredSelection selectionWithCall = new StructuredSelection(
-                new Object[] { call });
+        final RobotKeywordCall arguments = new RobotKeywordCall(null,
+                new LocalSetting<>(ModelType.USER_KEYWORD_ARGUMENTS, RobotToken.create("")));
+        final RobotKeywordCall testDocumentation = new RobotKeywordCall(null,
+                new LocalSetting<>(ModelType.TEST_CASE_DOCUMENTATION, RobotToken.create("")));
+        final RobotKeywordCall keywordDocumentation = new RobotKeywordCall(null,
+                new LocalSetting<>(ModelType.USER_KEYWORD_DOCUMENTATION, RobotToken.create("")));
+        final IStructuredSelection selectionWithCall = new StructuredSelection(new Object[] { arguments });
         final IStructuredSelection selectionWithTestDoc = new StructuredSelection(
                 new Object[] { testDocumentation });
         final IStructuredSelection selectionWithKeywordDoc = new StructuredSelection(

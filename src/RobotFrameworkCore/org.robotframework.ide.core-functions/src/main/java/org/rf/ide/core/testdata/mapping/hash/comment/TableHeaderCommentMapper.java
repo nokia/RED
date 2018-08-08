@@ -26,7 +26,7 @@ public class TableHeaderCommentMapper implements IHashCommentMapper {
 
     @Override
     public boolean isApplicable(final ParsingState state) {
-        return stateHelper.isTableHeader(state);
+        return stateHelper.isTableHeaderState(state);
     }
 
     @Override
@@ -41,14 +41,14 @@ public class TableHeaderCommentMapper implements IHashCommentMapper {
             table = fileModel.getKeywordTable();
         } else if (currentState == ParsingState.TEST_CASE_TABLE_HEADER) {
             table = fileModel.getTestCaseTable();
+        } else if (currentState == ParsingState.TASKS_TABLE_HEADER) {
+            table = fileModel.getTasksTable();
         }
 
         final List<TableHeader<? extends ARobotSectionTable>> headers = table.getHeaders();
         if (!headers.isEmpty()) {
             final TableHeader<?> header = headers.get(headers.size() - 1);
             header.addCommentPart(rt);
-        } else {
-            // FIXME: it is not possible
         }
     }
 }

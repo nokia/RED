@@ -34,7 +34,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
     }
 
     public void addDocumentationText(final String text) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(text);
 
         addDocumentationText(rt);
@@ -49,21 +49,6 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
     @Override
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
-    }
-
-    @Override
-    public void setDocumentationText(final int index, final String docText) {
-        updateOrCreateTokenInside(text, index, docText, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
-    }
-
-    @Override
-    public void setDocumentationText(final int index, final RobotToken docText) {
-        updateOrCreateTokenInside(text, index, docText, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
-    }
-
-    @Override
-    public void removeDocumentationPart(int index) {
-        this.text.remove(index);
     }
 
     @Override
@@ -83,20 +68,20 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
     }
 
     @Override
-    public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+    public void setComment(final String comment) {
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -138,7 +123,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("Please see " + DocumentationServiceHandler.class);
     }
 

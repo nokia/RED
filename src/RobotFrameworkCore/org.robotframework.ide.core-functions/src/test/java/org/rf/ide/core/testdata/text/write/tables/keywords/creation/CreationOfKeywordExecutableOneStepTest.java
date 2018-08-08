@@ -25,7 +25,7 @@ public class CreationOfKeywordExecutableOneStepTest extends ACreationOfExecution
     @Override
     public IExecutableStepsHolder getExecutableWithName() {
         final UserKeyword execUnit = createModelWithOneKeywordInside();
-        execUnit.getKeywordName().setText("UserKeyword");
+        execUnit.getName().setText("UserKeyword");
 
         return execUnit;
     }

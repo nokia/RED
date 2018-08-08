@@ -28,12 +28,12 @@ public class TxtRobotFileDumper extends ARobotFileDumper {
 
     @Override
     protected boolean isAcceptableForDefault(final Separator separator) {
-        return (separator.getTypes().contains(SeparatorType.PIPE)
-                || separator.getTypes().contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE));
+        return separator.getTypes().contains(SeparatorType.PIPE)
+                || separator.getTypes().contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
     }
 
     @Override
     protected boolean canBeSeparatorAddBeforeExecutableUnitName(final Separator separator) {
-        return (separator.getTypes().contains(SeparatorType.PIPE));
+        return separator.getTypes().contains(SeparatorType.PIPE);
     }
 }

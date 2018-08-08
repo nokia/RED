@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CopyInCasesTableHandler.E4CopyInCasesTableHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CutInCasesTableHandler.E4CutInCasesTableHandler;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteInCasesTableHandler.E4DeleteInCasesTableHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteInCodeHoldersTableHandler.E4DeleteInCodeHoldersTableHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -34,7 +34,7 @@ public class CutInCasesTableHandler extends DIParameterizedHandler<E4CutInCasesT
 
             final boolean copiedToClipboard = new E4CopyInCasesTableHandler().copyContent(editor, selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteInCasesTableHandler().delete(selection, editor, commandsStack);
+                new E4DeleteInCodeHoldersTableHandler().delete(selection, editor, commandsStack);
             }
         }
     }

@@ -20,8 +20,9 @@ import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.IServiceLocator;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
@@ -52,11 +53,11 @@ public class RunTestDynamicMenuItem extends CompoundContributionItem {
         final RobotFormEditor suiteEditor = (RobotFormEditor) activeWindow.getActivePage().getActiveEditor();
         final RobotSuiteFile suiteModel = suiteEditor.provideSuiteModel();
 
-        final RobotCase testCase = RunTestHandler.getTestCase(suiteModel, selection.getOffset());
+        final RobotCodeHoldingElement<?> theCase = RunTestHandler.getCase(suiteModel, selection.getOffset());
         final List<IContributionItem> contributedItems = new ArrayList<>();
-        if (testCase != null) {
+        if (theCase != null) {
             contributeBefore(contributedItems);
-            contributedItems.add(createCurrentCaseItem(activeWindow, testCase));
+            contributedItems.add(createCurrentCaseItem(activeWindow, theCase));
         }
         return contributedItems.toArray(new IContributionItem[0]);
     }
@@ -65,15 +66,21 @@ public class RunTestDynamicMenuItem extends CompoundContributionItem {
         contributedItems.add(new Separator());
     }
 
-    protected IContributionItem createCurrentCaseItem(final IServiceLocator serviceLocator, final RobotCase testCase) {
+    protected IContributionItem createCurrentCaseItem(final IServiceLocator serviceLocator,
+            final RobotCodeHoldingElement<?> theCase) {
         final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(
                 serviceLocator, id, RUN_TEST_COMMAND_ID, SWT.PUSH);
-        contributionParameters.label = getModeName() + " test: '" + testCase.getName() + "'";
+        final String elemTypeLabel = isTask(theCase) ? "task" : "test";
+        contributionParameters.label = getModeName() + " " + elemTypeLabel + ": '" + theCase.getName() + "'";
         contributionParameters.icon = getImageDescriptor();
         final HashMap<String, String> parameters = new HashMap<>();
         parameters.put(RUN_TEST_COMMAND_MODE_PARAMETER, getModeName().toUpperCase());
         contributionParameters.parameters = parameters;
         return new CommandContributionItem(contributionParameters);
+    }
+
+    private boolean isTask(final RobotCodeHoldingElement<?> testCase) {
+        return testCase.getLinkedElement().getModelType() == ModelType.TASK;
     }
 
     protected String getModeName() {

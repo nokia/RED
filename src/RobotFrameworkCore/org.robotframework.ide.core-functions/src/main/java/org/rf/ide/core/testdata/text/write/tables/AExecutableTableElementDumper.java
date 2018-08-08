@@ -35,7 +35,7 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
     private final ElementsUtility anElementHelper;
 
-    private final ModelType servedType;
+    protected final ModelType servedType;
 
     private final TableElementDumperHelper elemDumperHelper;
 

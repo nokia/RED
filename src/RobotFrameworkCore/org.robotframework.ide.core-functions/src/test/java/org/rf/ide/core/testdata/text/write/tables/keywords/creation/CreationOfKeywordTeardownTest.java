@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
@@ -75,18 +75,11 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTeardown keyTear = uk.newTeardown(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTear.addCommentPart(cmTok1);
-        keyTear.addCommentPart(cmTok2);
-        keyTear.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyTear = uk.newTeardown(0);
+        keyTear.addCommentPart("cm1");
+        keyTear.addCommentPart("cm2");
+        keyTear.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -116,11 +109,9 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTeardown keyTear = uk.newTeardown(0);
 
-        final RobotToken keywordName = new RobotToken();
-        keywordName.setText("execKey");
-        keyTear.setKeywordName(keywordName);
+        final LocalSetting<UserKeyword> keyTear = uk.newTeardown(0);
+        keyTear.addToken("execKey");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -152,22 +143,12 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTeardown keyTear = uk.newTeardown(0);
 
-        final RobotToken keywordName = new RobotToken();
-        keywordName.setText("execKey");
-        keyTear.setKeywordName(keywordName);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTear.addCommentPart(cmTok1);
-        keyTear.addCommentPart(cmTok2);
-        keyTear.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyTear = uk.newTeardown(0);
+        keyTear.addToken("execKey");
+        keyTear.addCommentPart("cm1");
+        keyTear.addCommentPart("cm2");
+        keyTear.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -199,22 +180,12 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTeardown keyTear = uk.newTeardown(0);
 
-        final RobotToken keywordName = new RobotToken();
-        keywordName.setText("execKey");
-        keyTear.setKeywordName(keywordName);
-
-        final RobotToken arg1 = new RobotToken();
-        arg1.setText("arg1");
-        final RobotToken arg2 = new RobotToken();
-        arg2.setText("arg2");
-        final RobotToken arg3 = new RobotToken();
-        arg3.setText("arg3");
-
-        keyTear.addArgument(arg1);
-        keyTear.addArgument(arg2);
-        keyTear.addArgument(arg3);
+        final LocalSetting<UserKeyword> keyTear = uk.newTeardown(0);
+        keyTear.addToken("execKey");
+        keyTear.addToken("arg1");
+        keyTear.addToken("arg2");
+        keyTear.addToken("arg3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -246,33 +217,15 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTeardown keyTear = uk.newTeardown(0);
 
-        final RobotToken keywordName = new RobotToken();
-        keywordName.setText("execKey");
-        keyTear.setKeywordName(keywordName);
-
-        final RobotToken arg1 = new RobotToken();
-        arg1.setText("arg1");
-        final RobotToken arg2 = new RobotToken();
-        arg2.setText("arg2");
-        final RobotToken arg3 = new RobotToken();
-        arg3.setText("arg3");
-
-        keyTear.addArgument(arg1);
-        keyTear.addArgument(arg2);
-        keyTear.addArgument(arg3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTear.addCommentPart(cmTok1);
-        keyTear.addCommentPart(cmTok2);
-        keyTear.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyTear = uk.newTeardown(0);
+        keyTear.addToken("execKey");
+        keyTear.addToken("arg1");
+        keyTear.addToken("arg2");
+        keyTear.addToken("arg3");
+        keyTear.addCommentPart("cm1");
+        keyTear.addCommentPart("cm2");
+        keyTear.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

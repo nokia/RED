@@ -12,9 +12,8 @@ import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
-import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -30,30 +29,28 @@ public class TestCaseTemplateKeywordMapper implements IParsingMapper {
 
         if (stateHelper.getCurrentState(processingState) == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE) {
             final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
-            final List<TestCaseTemplate> templates = tests.get(tests.size() - 1).getTemplates();
+            final List<LocalSetting<TestCase>> templates = tests.get(tests.size() - 1).getTemplates();
             return !hasKeywordNameAlready(templates);
         }
         return false;
     }
 
-    private boolean hasKeywordNameAlready(final List<TestCaseTemplate> templates) {
-        return !templates.isEmpty() && templates.get(templates.size() - 1).getKeywordName() != null;
+    private boolean hasKeywordNameAlready(final List<LocalSetting<TestCase>> templates) {
+        return !templates.isEmpty() && templates.get(templates.size() - 1)
+                .getToken(RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME) != null;
     }
 
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
 
-        final List<IRobotTokenType> types = rt.getTypes();
-        types.remove(RobotTokenType.UNKNOWN);
-        types.add(0, RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME);
         rt.setText(text);
 
         final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
         final TestCase testCase = testCases.get(testCases.size() - 1);
-        final List<TestCaseTemplate> templates = testCase.getTemplates();
+        final List<LocalSetting<TestCase>> templates = testCase.getTemplates();
         if (!templates.isEmpty()) {
-            templates.get(templates.size() - 1).setKeywordName(rt);
+            templates.get(templates.size() - 1).addToken(rt);
         }
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE_KEYWORD);

@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
-import org.rf.ide.core.execution.debug.contexts.TestCaseContext;
+import org.rf.ide.core.execution.debug.contexts.CaseContext;
 
 public interface ElementsLocator {
 
@@ -30,7 +30,7 @@ public interface ElementsLocator {
     SuiteContext findContextForSuite(final String suiteName, final URI path, boolean isDirectory,
             final URI currentLocalSuitePath);
 
-    TestCaseContext findContextForTestCase(String testCaseName, URI currentSuitePath, Optional<String> template);
+    CaseContext findContextForCase(String testCaseName, URI currentSuitePath, Optional<String> template);
 
     KeywordContext findContextForKeyword(String libOrResourceName, String keywordName, URI currentSuitePath,
             Set<URI> loadedResources);

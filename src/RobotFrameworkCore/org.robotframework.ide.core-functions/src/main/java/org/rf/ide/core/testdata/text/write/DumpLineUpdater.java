@@ -132,6 +132,7 @@ public class DumpLineUpdater {
         for (final IRobotTokenType tt : types) {
             if (tt == RobotTokenType.VARIABLES_VARIABLE_VALUE || RobotTokenType.getTypesForSettingsTable().contains(tt)
                     || (RobotTokenType.getTypesForTestCasesTable().contains(tt) && tt != RobotTokenType.TEST_CASE_NAME)
+                    || (RobotTokenType.getTypesForTasksTable().contains(tt) && tt != RobotTokenType.TASK_NAME)
                     || (RobotTokenType.getTypesForKeywordsTable().contains(tt) && tt != RobotTokenType.KEYWORD_NAME)) {
                 result = true;
                 break;

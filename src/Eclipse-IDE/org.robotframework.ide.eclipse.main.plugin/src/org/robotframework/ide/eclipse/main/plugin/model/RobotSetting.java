@@ -31,6 +31,7 @@ import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.IRegionCacheable;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotExpressions;
+import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -64,6 +65,12 @@ public class RobotSetting extends RobotKeywordCall {
         return (RobotSettingsSection) super.getParent();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public AModelElement<SettingTable> getLinkedElement() {
+        return (AModelElement<SettingTable>) super.getLinkedElement();
+    }
+
     public SettingsGroup getGroup() {
         return group;
     }
@@ -94,6 +101,10 @@ public class RobotSetting extends RobotKeywordCall {
                         && type != RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION
                         && type != RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION
                         && type != RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION
+                        && type != RobotTokenType.SETTING_TASK_SETUP_DECLARATION
+                        && type != RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION
+                        && type != RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION
+                        && type != RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION
                         && type != RobotTokenType.SETTING_FORCE_TAGS_DECLARATION
                         && type != RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION
                         && type != RobotTokenType.SETTING_LIBRARY_ALIAS
@@ -107,11 +118,16 @@ public class RobotSetting extends RobotKeywordCall {
         return SettingsGroup.getImportsGroupsSet().contains(getGroup());
     }
 
-    public boolean isKeywordBased() {
+    public boolean isAnySetupOrTeardown() {
         final ModelType modelType = getLinkedElement().getModelType();
-        return modelType == ModelType.SUITE_TEARDOWN || modelType == ModelType.SUITE_TEST_TEARDOWN
-                || modelType == ModelType.SUITE_SETUP || modelType == ModelType.SUITE_TEST_SETUP
-                || modelType == ModelType.SUITE_TEST_TEMPLATE;
+        return modelType == ModelType.SUITE_SETUP || modelType == ModelType.SUITE_TEARDOWN
+                || modelType == ModelType.SUITE_TEST_SETUP || modelType == ModelType.SUITE_TEST_TEARDOWN
+                || modelType == ModelType.SUITE_TASK_SETUP || modelType == ModelType.SUITE_TASK_TEARDOWN;
+    }
+
+    public boolean isTemplate() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return modelType == ModelType.SUITE_TEST_TEMPLATE || modelType == ModelType.SUITE_TASK_TEMPLATE;
     }
 
     public boolean isDocumentation() {

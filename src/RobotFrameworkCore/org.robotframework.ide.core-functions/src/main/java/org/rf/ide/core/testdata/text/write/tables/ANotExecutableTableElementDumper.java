@@ -29,7 +29,8 @@ import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 
-public abstract class ANotExecutableTableElementDumper implements ISectionElementDumper {
+public abstract class ANotExecutableTableElementDumper<T extends ARobotSectionTable>
+        implements ISectionElementDumper<T> {
 
     private final DumperHelper aDumpHelper;
 
@@ -59,18 +60,17 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
     }
 
     @Override
-    public boolean isServedType(final AModelElement<? extends ARobotSectionTable> element) {
-        return (element.getModelType() == servedType);
+    public boolean isServedType(final AModelElement<T> element) {
+        return element.getModelType() == servedType;
     }
 
-    public abstract RobotElementsComparatorWithPositionChangedPresave getSorter(
-            final AModelElement<? extends ARobotSectionTable> currentElement);
+    public abstract RobotElementsComparatorWithPositionChangedPresave getSorter(final AModelElement<T> currentElement);
 
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
-            final TableHeader<? extends ARobotSectionTable> th,
-            final List<AModelElement<ARobotSectionTable>> sortedSettings,
-            final AModelElement<ARobotSectionTable> currentElement, final List<RobotLine> lines) {
+            final TableHeader<T> th, final List<? extends AModelElement<T>> sortedSettings,
+            final AModelElement<T> currentElement, final List<RobotLine> lines) {
+
         final RobotToken elemDeclaration = currentElement.getDeclaration();
         final FilePosition filePosition = elemDeclaration.getFilePosition();
         int fileOffset = -1;
@@ -112,7 +112,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
             if (tokens.isEmpty()) {
                 // dump EOL
                 wasDumped = getElementDumperHelper().dumpEOLAsItIs(getDumperHelper(), model, lastToken, lines);
-            } else if (canBeDumpedDirectly(lastToken, tokens)) {
+            } else if (canBeDumpedDirectly(tokens)) {
                 // dump line tokens
                 wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
             }
@@ -270,7 +270,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         }
     }
 
-    private boolean canBeDumpedDirectly(final IRobotLineElement lastToken, final List<RobotToken> tokens) {
+    private boolean canBeDumpedDirectly(final List<RobotToken> tokens) {
         return !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent()
                 && !getElementDumperHelper().isDirtyAnyDirtyInside(tokens);
     }
@@ -280,7 +280,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
                 && (!(lastToken instanceof Separator) || ((Separator) lastToken).getRaw().equals(lastToken.getText()));
     }
 
-    private List<RobotToken> prepareTokens(final AModelElement<ARobotSectionTable> currentElement) {
+    private List<RobotToken> prepareTokens(final AModelElement<T> currentElement) {
         final RobotElementsComparatorWithPositionChangedPresave sorter = getSorter(currentElement);
         final List<RobotToken> tokens = sorter.getTokensInElement();
 

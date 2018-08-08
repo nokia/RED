@@ -37,7 +37,7 @@ public class MoveVariableDownCommand extends EditorCommand {
         Collections.swap(children, index, index + 1);
 
         final VariableTable table = variablesSection.getLinkedElement();
-        table.moveDownVariable(variable.getLinkedElement());
+        table.moveDownElement(variable.getLinkedElement());
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_MOVED, variablesSection);
     }

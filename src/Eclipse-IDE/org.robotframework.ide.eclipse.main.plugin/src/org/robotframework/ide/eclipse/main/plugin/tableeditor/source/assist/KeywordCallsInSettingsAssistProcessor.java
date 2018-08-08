@@ -40,10 +40,13 @@ public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistPro
 
     static boolean isKeywordBasedSetting(final String lineContent) {
         return startsWithOptionalSpace(lineContent, "test template")
+                || startsWithOptionalSpace(lineContent, "task template")
                 || startsWithOptionalSpace(lineContent, "suite setup")
                 || startsWithOptionalSpace(lineContent, "suite teardown")
                 || startsWithOptionalSpace(lineContent, "test setup")
-                || startsWithOptionalSpace(lineContent, "test teardown");
+                || startsWithOptionalSpace(lineContent, "test teardown")
+                || startsWithOptionalSpace(lineContent, "task setup")
+                || startsWithOptionalSpace(lineContent, "task teardown");
     }
 
     private static boolean startsWithOptionalSpace(final String string, final String potentialPrefix) {
@@ -53,7 +56,8 @@ public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistPro
 
     @Override
     protected List<String> getArguments(final AssistProposal proposal, final String lineContent) {
-        if (startsWithOptionalSpace(lineContent, "test template")) {
+        if (startsWithOptionalSpace(lineContent, "test template")
+                || startsWithOptionalSpace(lineContent, "task template")) {
             return new ArrayList<>();
         } else {
             return super.getArguments(proposal, lineContent);

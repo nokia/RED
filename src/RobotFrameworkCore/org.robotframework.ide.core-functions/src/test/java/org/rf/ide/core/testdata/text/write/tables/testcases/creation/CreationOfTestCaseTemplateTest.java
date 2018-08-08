@@ -8,9 +8,9 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
@@ -76,18 +76,11 @@ public class CreationOfTestCaseTemplateTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTemplate testTemplate = test.newTemplate(0);
+        final LocalSetting<TestCase> testTemplate = test.newTemplate(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTemplate.addCommentPart(cmTok1);
-        testTemplate.addCommentPart(cmTok2);
-        testTemplate.addCommentPart(cmTok3);
+        testTemplate.addCommentPart("cm1");
+        testTemplate.addCommentPart("cm2");
+        testTemplate.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -119,12 +112,9 @@ public class CreationOfTestCaseTemplateTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTemplate testTemplate = test.newTemplate(0);
+        final LocalSetting<TestCase> testTemplate = test.newTemplate(0);
 
-        final RobotToken keyword = new RobotToken();
-        keyword.setText("execKey");
-
-        testTemplate.setKeywordName(keyword);
+        testTemplate.addToken("execKey");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -156,23 +146,12 @@ public class CreationOfTestCaseTemplateTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTemplate testTemplate = test.newTemplate(0);
 
-        final RobotToken keyword = new RobotToken();
-        keyword.setText("execKey");
-
-        testTemplate.setKeywordName(keyword);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTemplate.addCommentPart(cmTok1);
-        testTemplate.addCommentPart(cmTok2);
-        testTemplate.addCommentPart(cmTok3);
+        final LocalSetting<TestCase> testTemplate = test.newTemplate(0);
+        testTemplate.addToken("execKey");
+        testTemplate.addCommentPart("cm1");
+        testTemplate.addCommentPart("cm2");
+        testTemplate.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -204,23 +183,12 @@ public class CreationOfTestCaseTemplateTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTemplate testTemplate = test.newTemplate(0);
 
-        final RobotToken keyword = new RobotToken();
-        keyword.setText("execKey");
-
-        testTemplate.setKeywordName(keyword);
-
-        final RobotToken argU1 = new RobotToken();
-        argU1.setText("argU1");
-        final RobotToken argU2 = new RobotToken();
-        argU2.setText("argU2");
-        final RobotToken argU3 = new RobotToken();
-        argU3.setText("argU3");
-
-        testTemplate.addUnexpectedTrashArgument(argU1);
-        testTemplate.addUnexpectedTrashArgument(argU2);
-        testTemplate.addUnexpectedTrashArgument(argU3);
+        final LocalSetting<TestCase> testTemplate = test.newTemplate(0);
+        testTemplate.addToken("execKey");
+        testTemplate.addToken("argU1");
+        testTemplate.addToken("argU2");
+        testTemplate.addToken("argU3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -254,34 +222,16 @@ public class CreationOfTestCaseTemplateTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTemplate testTemplate = test.newTemplate(0);
 
-        final RobotToken keyword = new RobotToken();
-        keyword.setText("execKey");
+        final LocalSetting<TestCase> testTemplate = test.newTemplate(0);
+        testTemplate.addToken("execKey");
+        testTemplate.addToken("argU1");
+        testTemplate.addToken("argU2");
+        testTemplate.addToken("argU3");
 
-        testTemplate.setKeywordName(keyword);
-
-        final RobotToken argU1 = new RobotToken();
-        argU1.setText("argU1");
-        final RobotToken argU2 = new RobotToken();
-        argU2.setText("argU2");
-        final RobotToken argU3 = new RobotToken();
-        argU3.setText("argU3");
-
-        testTemplate.addUnexpectedTrashArgument(argU1);
-        testTemplate.addUnexpectedTrashArgument(argU2);
-        testTemplate.addUnexpectedTrashArgument(argU3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTemplate.addCommentPart(cmTok1);
-        testTemplate.addCommentPart(cmTok2);
-        testTemplate.addCommentPart(cmTok3);
+        testTemplate.addCommentPart("cm1");
+        testTemplate.addCommentPart("cm2");
+        testTemplate.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

@@ -73,8 +73,8 @@ class KeywordTableValidator implements ModelUnitValidator {
         for (final UserKeyword kw1 : keywords) {
             for (final UserKeyword kw2 : keywords) {
                 if (kw1 != kw2) {
-                    final String kw1Name = QualifiedKeywordName.unifyDefinition(kw1.getKeywordName().getText());
-                    final String kw2Name = QualifiedKeywordName.unifyDefinition(kw2.getKeywordName().getText());
+                    final String kw1Name = QualifiedKeywordName.unifyDefinition(kw1.getName().getText());
+                    final String kw2Name = QualifiedKeywordName.unifyDefinition(kw2.getName().getText());
 
                     if (kw1Name.equals(kw2Name)) {
                         duplicatedNames.add(kw1Name);
@@ -84,7 +84,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         }
 
         for (final UserKeyword keyword : keywords) {
-            final RobotToken keywordName = keyword.getKeywordName();
+            final RobotToken keywordName = keyword.getName();
             final String name = keywordName.getText();
 
             if (duplicatedNames.contains(QualifiedKeywordName.unifyDefinition(name.toLowerCase()))) {

@@ -11,8 +11,6 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.setting.AImported;
-import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -41,11 +39,7 @@ public class MoveSettingUpCommand extends EditorCommand {
 
         final ARobotSectionTable linkedElement = section.getLinkedElement();
         if (linkedElement != null && linkedElement instanceof SettingTable) {
-            if (setting.getGroup() == SettingsGroup.METADATA) {
-                ((SettingTable) linkedElement).moveUpMetadata((Metadata) setting.getLinkedElement());
-            } else {
-                ((SettingTable) linkedElement).moveUpImported((AImported) setting.getLinkedElement());
-            }
+            linkedElement.moveUpElement(setting.getLinkedElement());
         }
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(setting.getGroup())

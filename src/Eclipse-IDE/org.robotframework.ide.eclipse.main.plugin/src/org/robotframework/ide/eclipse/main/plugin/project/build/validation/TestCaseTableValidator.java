@@ -60,8 +60,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
         for (final TestCase case1 : cases) {
             for (final TestCase case2 : cases) {
                 if (case1 != case2) {
-                    final String case1Name = case1.getTestName().getText();
-                    final String case2Name = case2.getTestName().getText();
+                    final String case1Name = case1.getName().getText();
+                    final String case2Name = case2.getName().getText();
 
                     if (case1Name.equalsIgnoreCase(case2Name)) {
                         duplicatedNames.add(case1Name.toLowerCase());
@@ -71,7 +71,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
         }
 
         for (final TestCase testCase : cases) {
-            final RobotToken caseName = testCase.getTestName();
+            final RobotToken caseName = testCase.getName();
             final String name = caseName.getText();
 
             if (duplicatedNames.contains(name.toLowerCase())) {

@@ -45,13 +45,9 @@ public class KeywordExecutableRowModelOperation implements IExecutablesStepsHold
     }
 
     @Override
-    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+    public AModelElement<UserKeyword> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<UserKeyword> executableRow = (RobotExecutableRow<UserKeyword>) modelElement;
-        
-        userKeyword.addElement(executableRow, index);
-        return modelElement;
+        return userKeyword.addElement(index, modelElement);
     }
 
     @Override
@@ -76,11 +72,5 @@ public class KeywordExecutableRowModelOperation implements IExecutablesStepsHold
         for (int i = 0; i < newArguments.size(); i++) {
             row.setArgument(i, newArguments.get(i));
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

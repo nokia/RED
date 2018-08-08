@@ -13,8 +13,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
@@ -38,7 +40,7 @@ public class UserKeywordRemoveElementsTest {
     public void forDocumentation_whichExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordDocumentation doc = keyword.newDocumentation(0);
+        final LocalSetting<UserKeyword> doc = keyword.newDocumentation(0);
 
         // execute
         final boolean state = keyword.removeElement(doc);
@@ -53,7 +55,8 @@ public class UserKeywordRemoveElementsTest {
     public void forDocumentation_whichNotExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordDocumentation doc = new KeywordDocumentation(new RobotToken());
+        final LocalSetting<UserKeyword> doc = new LocalSetting<>(ModelType.USER_KEYWORD_DOCUMENTATION,
+                RobotToken.create(""));
 
         // execute
         final boolean state = keyword.removeElement(doc);
@@ -68,7 +71,7 @@ public class UserKeywordRemoveElementsTest {
     public void forTags_whichExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordTags tags = keyword.newTags(0);
+        final LocalSetting<UserKeyword> tags = keyword.newTags(0);
 
         // execute
         final boolean state = keyword.removeElement(tags);
@@ -83,7 +86,7 @@ public class UserKeywordRemoveElementsTest {
     public void forTags_whichNotExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordTags tags = new KeywordTags(new RobotToken());
+        final LocalSetting<UserKeyword> tags = new LocalSetting<>(ModelType.USER_KEYWORD_TAGS, RobotToken.create(""));
 
         // execute
         final boolean state = keyword.removeElement(tags);
@@ -98,7 +101,7 @@ public class UserKeywordRemoveElementsTest {
     public void forArguments_whichExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordArguments args = keyword.newArguments(0);
+        final LocalSetting<UserKeyword> args = keyword.newArguments(0);
 
         // execute
         final boolean state = keyword.removeElement(args);
@@ -113,7 +116,8 @@ public class UserKeywordRemoveElementsTest {
     public void forArguments_whichNotExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordArguments args = new KeywordArguments(new RobotToken());
+        final LocalSetting<UserKeyword> args = new LocalSetting<>(ModelType.USER_KEYWORD_ARGUMENTS,
+                RobotToken.create(""));
 
         // execute
         final boolean state = keyword.removeElement(args);
@@ -128,7 +132,7 @@ public class UserKeywordRemoveElementsTest {
     public void forReturns_whichExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordReturn returns = keyword.newReturn(0);
+        final LocalSetting<UserKeyword> returns = keyword.newReturn(0);
 
         // execute
         final boolean state = keyword.removeElement(returns);
@@ -143,7 +147,8 @@ public class UserKeywordRemoveElementsTest {
     public void forReturns_whichNotExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordReturn returns = new KeywordReturn(new RobotToken());
+        final LocalSetting<UserKeyword> returns = new LocalSetting<>(ModelType.USER_KEYWORD_RETURN,
+                RobotToken.create(""));
 
         // execute
         final boolean state = keyword.removeElement(returns);
@@ -158,7 +163,7 @@ public class UserKeywordRemoveElementsTest {
     public void forTeardowns_whichExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordTeardown teardowns = keyword.newTeardown(0);
+        final LocalSetting<UserKeyword> teardowns = keyword.newTeardown(0);
 
         // execute
         final boolean state = keyword.removeElement(teardowns);
@@ -173,7 +178,8 @@ public class UserKeywordRemoveElementsTest {
     public void forTeardowns_whichNotExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordTeardown teardowns = new KeywordTeardown(new RobotToken());
+        final LocalSetting<UserKeyword> teardowns = new LocalSetting<>(ModelType.USER_KEYWORD_TEARDOWN,
+                RobotToken.create(""));
 
         // execute
         final boolean state = keyword.removeElement(teardowns);
@@ -188,7 +194,7 @@ public class UserKeywordRemoveElementsTest {
     public void forTimeouts_whichExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordTimeout timeouts = keyword.newTimeout(0);
+        final LocalSetting<UserKeyword> timeouts = keyword.newTimeout(0);
 
         // execute
         final boolean state = keyword.removeElement(timeouts);
@@ -203,7 +209,8 @@ public class UserKeywordRemoveElementsTest {
     public void forTimeouts_whichNotExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordTimeout timeouts = new KeywordTimeout(new RobotToken());
+        final LocalSetting<UserKeyword> timeouts = new LocalSetting<>(ModelType.USER_KEYWORD_TIMEOUT,
+                RobotToken.create(""));
 
         // execute
         final boolean state = keyword.removeElement(timeouts);
@@ -218,7 +225,8 @@ public class UserKeywordRemoveElementsTest {
     public void forUnknownSettings_whichExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordUnknownSettings unknownSetting = new KeywordUnknownSettings(new RobotToken());
+        final LocalSetting<UserKeyword> unknownSetting = new LocalSetting<>(ModelType.USER_KEYWORD_SETTING_UNKNOWN,
+                RobotToken.create(""));
         keyword.addElement(unknownSetting);
 
         // execute
@@ -234,7 +242,8 @@ public class UserKeywordRemoveElementsTest {
     public void forUnknownSettings_whichNotExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final KeywordUnknownSettings unknownSetting = new KeywordUnknownSettings(new RobotToken());
+        final LocalSetting<UserKeyword> unknownSetting = new LocalSetting<>(ModelType.USER_KEYWORD_SETTING_UNKNOWN,
+                RobotToken.create(""));
 
         // execute
         final boolean state = keyword.removeElement(unknownSetting);
@@ -249,7 +258,7 @@ public class UserKeywordRemoveElementsTest {
     public void forExecutableRow_whichExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<UserKeyword>();
+        final RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<>();
         keyword.addElement(executionRow);
 
         // execute
@@ -265,7 +274,7 @@ public class UserKeywordRemoveElementsTest {
     public void forExecutableRow_whichNotExists() {
         // prepare
         final List<AModelElement<UserKeyword>> elementsWhichShouldRemain = new ArrayList<>(keyword.getElements());
-        final RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<UserKeyword>();
+        final RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<>();
 
         // execute
         final boolean state = keyword.removeElement(executionRow);
@@ -283,6 +292,6 @@ public class UserKeywordRemoveElementsTest {
         uk.newReturn(3);
         uk.newTeardown(4);
         uk.newTimeout(5);
-        uk.addElement(new KeywordUnknownSettings(new RobotToken()));
+        uk.addElement(new LocalSetting<>(ModelType.USER_KEYWORD_SETTING_UNKNOWN, new RobotToken()));
     }
 }

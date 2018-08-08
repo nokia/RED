@@ -213,7 +213,7 @@ class SectionPartitionRule implements IPredicateRule {
     private static final Pattern VARIABLES_NORMAL = Pattern.compile(NORMAL_SECTION_START + "("
             + insensitiveWithSpace("Variables") + "|" + insensitiveWithSpace("Variable") + ")" + NORMAL_SECTION_END);
     private static final Pattern VARIABLES_PIPES = Pattern.compile(PIPED_SECTION_START + "("
-            + insensitiveWithSpace("Variables") + "|" + insensitiveWithSpace("Variable") + ")" + PIPED_SECTION_END);
+            + insensitiveWithSpaces("Variables") + "|" + insensitiveWithSpaces("Variable") + ")" + PIPED_SECTION_END);
 
     private static final Pattern KEYWORDS_NORMAL = Pattern.compile(NORMAL_SECTION_START + "("
             + insensitiveWithSpace("User") + "[\\s]?)?" + "(" + insensitiveWithSpace("Keywords") + "|"
@@ -229,6 +229,11 @@ class SectionPartitionRule implements IPredicateRule {
             .compile(PIPED_SECTION_START + insensitiveWithSpaces("Test") + "[\\s]*" + "("
                     + insensitiveWithSpaces("Cases") + "|" + insensitiveWithSpaces("Case") + ")" + PIPED_SECTION_END);
 
+    private static final Pattern TASKS_NORMAL = Pattern.compile(NORMAL_SECTION_START + "("
+            + insensitiveWithSpace("Tasks") + "|" + insensitiveWithSpace("Task") + ")" + NORMAL_SECTION_END);
+    private static final Pattern TASKS_PIPES = Pattern.compile(PIPED_SECTION_START + "("
+            + insensitiveWithSpaces("Tasks") + "|" + insensitiveWithSpaces("Task") + ")" + PIPED_SECTION_END);
+
     private static String insensitiveWithSpaces(final String text) {
         return ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside(text);
     }
@@ -239,6 +244,7 @@ class SectionPartitionRule implements IPredicateRule {
 
     static enum Section {
         TEST_CASES(TEST_CASE_NORMAL, TEST_CASE_PIPES),
+        TASKS(TASKS_NORMAL, TASKS_PIPES),
         KEYWORDS(KEYWORDS_NORMAL, KEYWORDS_PIPES),
         SETTINGS(SETTINGS_NORMAL, SETTINGS_PIPES),
         VARIABLES(VARIABLES_NORMAL, VARIABLES_PIPES);

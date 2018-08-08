@@ -24,12 +24,17 @@ public class ExecutableLineChecker {
     private static Set<RobotTokenType> executableTypes = newHashSet(
             RobotTokenType.KEYWORD_ACTION_NAME,
             RobotTokenType.TEST_CASE_ACTION_NAME,
+            RobotTokenType.TASK_ACTION_NAME,
             RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME,
             RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME,
             RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME,
             RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME,
+            RobotTokenType.SETTING_TASK_SETUP_KEYWORD_NAME,
+            RobotTokenType.SETTING_TASK_TEARDOWN_KEYWORD_NAME,
             RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME,
-            RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME);
+            RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME,
+            RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME,
+            RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME);
 
     public static boolean isExecutableLine(final RobotFile file, final int lineNumber) {
         final int zeroBasedLineNumber = lineNumber - 1;

@@ -12,9 +12,8 @@ import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -30,29 +29,28 @@ public class TestCaseTimeoutValueMapper implements IParsingMapper {
 
         if (utility.getCurrentState(processingState) == ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT) {
             final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
-            final List<TestCaseTimeout> timeouts = tests.get(tests.size() - 1).getTimeouts();
-            return !hasValueAlready(timeouts);
+            final List<LocalSetting<TestCase>> timeouts = tests.get(tests.size() - 1).getTimeouts();
+            return !hasTimeoutAlready(timeouts);
         }
         return false;
     }
 
-    private boolean hasValueAlready(final List<TestCaseTimeout> testCaseTimeouts) {
-        return !testCaseTimeouts.isEmpty() && testCaseTimeouts.get(testCaseTimeouts.size() - 1).getTimeout() != null;
+    static boolean hasTimeoutAlready(final List<LocalSetting<TestCase>> timeouts) {
+        return !timeouts.isEmpty()
+                && timeouts.get(timeouts.size() - 1).getToken(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE) != null;
     }
 
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
 
-        rt.getTypes().add(0, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE);
         rt.setText(text);
 
-        final TestCaseTable testCaseTable = robotFileOutput.getFileModel().getTestCaseTable();
-        final List<TestCase> testCases = testCaseTable.getTestCases();
+        final List<TestCase> testCases = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
         final TestCase testCase = testCases.get(testCases.size() - 1);
-        final List<TestCaseTimeout> timeouts = testCase.getTimeouts();
+        final List<LocalSetting<TestCase>> timeouts = testCase.getTimeouts();
         if (!timeouts.isEmpty()) {
-            timeouts.get(timeouts.size() - 1).setTimeout(rt);
+            timeouts.get(timeouts.size() - 1).addToken(rt);
         }
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEST_TIMEOUT_VALUE);

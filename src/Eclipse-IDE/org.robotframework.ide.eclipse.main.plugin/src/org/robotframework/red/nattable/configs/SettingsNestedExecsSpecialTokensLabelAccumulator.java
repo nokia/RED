@@ -13,7 +13,6 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.SpecialKeywords;
@@ -51,8 +50,7 @@ public class SettingsNestedExecsSpecialTokensLabelAccumulator implements IConfig
     private List<RobotToken> getTokensBefore(final int columnPosition, final int rowPosition) {
         @SuppressWarnings("unchecked")
         final RobotSetting setting = ((Entry<String, RobotSetting>) dataProvider.getRowObject(rowPosition)).getValue();
-        if (setting != null && setting.isKeywordBased()
-                && setting.getLinkedElement().getModelType() != ModelType.SUITE_TEST_TEMPLATE) {
+        if (setting != null && setting.isAnySetupOrTeardown()) {
             final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();
 
             final List<RobotToken> tokens = new ArrayList<>();

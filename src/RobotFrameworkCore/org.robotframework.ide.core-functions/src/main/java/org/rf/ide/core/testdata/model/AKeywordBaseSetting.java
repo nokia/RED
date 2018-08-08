@@ -15,7 +15,8 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements ICommentHolder, Serializable {
+public abstract class AKeywordBaseSetting<T> extends AModelElement<T>
+        implements ExecutableSetting, ICommentHolder, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,6 +45,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         return declaration;
     }
 
+    @Override
     public RobotToken getKeywordName() {
         return keywordName;
     }
@@ -56,6 +58,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         this.keywordName = updateOrCreate(this.keywordName, keywordName, getKeywordNameType());
     }
 
+    @Override
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
@@ -141,6 +144,8 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         return tokens;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public RobotExecutableRow<T> asExecutableRow() {
         final RobotExecutableRow<T> execRow = new RobotExecutableRow<>();
         execRow.setParent(getParent());
