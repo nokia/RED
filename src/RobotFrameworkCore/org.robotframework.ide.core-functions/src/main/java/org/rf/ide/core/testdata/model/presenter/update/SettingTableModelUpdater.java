@@ -21,6 +21,10 @@ import org.rf.ide.core.testdata.model.presenter.update.settings.MetadataModelOpe
 import org.rf.ide.core.testdata.model.presenter.update.settings.ResourceImportModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.settings.SuiteSetupModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.settings.SuiteTeardownModelOperation;
+import org.rf.ide.core.testdata.model.presenter.update.settings.TaskSetupModelOperation;
+import org.rf.ide.core.testdata.model.presenter.update.settings.TaskTeardownModelOperation;
+import org.rf.ide.core.testdata.model.presenter.update.settings.TaskTemplateModelOperation;
+import org.rf.ide.core.testdata.model.presenter.update.settings.TaskTimeoutModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.settings.TestSetupModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.settings.TestTeardownModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.settings.TestTemplateModelOperation;
@@ -36,9 +40,10 @@ public class SettingTableModelUpdater {
     private static final List<ISettingTableElementOperation> ELEMENT_OPERATIONS = newArrayList(
             new SuiteSetupModelOperation(), new SuiteTeardownModelOperation(), new TestSetupModelOperation(),
             new TestTeardownModelOperation(), new TestTemplateModelOperation(), new TestTimeoutModelOperation(),
-            new ForceTagsModelOperation(), new DefaultTagsModelOperation(), new DocumentationModelOperation(),
-            new LibraryImportModelOperation(), new ResourceImportModelOperation(), new VariablesImportModelOperation(),
-            new MetadataModelOperation());
+            new TaskSetupModelOperation(), new TaskTeardownModelOperation(), new TaskTemplateModelOperation(),
+            new TaskTimeoutModelOperation(), new ForceTagsModelOperation(), new DefaultTagsModelOperation(),
+            new DocumentationModelOperation(), new LibraryImportModelOperation(), new ResourceImportModelOperation(),
+            new VariablesImportModelOperation(), new MetadataModelOperation());
 
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
 

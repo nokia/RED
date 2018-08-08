@@ -77,10 +77,10 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
         if (state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.KEYWORD_DECLARATION) {
             if (!RobotEmptyRow.isEmpty(text) || !currentLine.getLineElements().isEmpty()) {
                 if (posResolver.isCorrectPosition(PositionExpected.KEYWORD_EXEC_ROW_ACTION_NAME,
-                        robotFileOutput.getFileModel(), currentLine, rt)) {
+                        currentLine, rt)) {
                     result = true;
                 } else if (posResolver.isCorrectPosition(PositionExpected.USER_KEYWORD_NAME,
-                        robotFileOutput.getFileModel(), currentLine, rt)) {
+                        currentLine, rt)) {
                     if (text.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0))) {
                         if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                             rt.getTypes().add(RobotTokenType.START_HASH_COMMENT);

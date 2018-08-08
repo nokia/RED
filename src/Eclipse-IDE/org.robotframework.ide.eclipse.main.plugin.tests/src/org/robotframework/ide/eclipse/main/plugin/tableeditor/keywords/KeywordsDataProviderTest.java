@@ -23,7 +23,8 @@ public class KeywordsDataProviderTest {
     @Rule
     public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
-    private final KeywordsDataProvider dataProvider = new KeywordsDataProvider(null, null);
+    private final KeywordsDataProvider dataProvider = new KeywordsDataProvider(
+            new KeywordsColumnsPropertyAccessor(null, null), null);
 
     @Test
     public void columnsAreCountedCorrectly_whenKeywordsSectionIsEmpty() throws Exception {

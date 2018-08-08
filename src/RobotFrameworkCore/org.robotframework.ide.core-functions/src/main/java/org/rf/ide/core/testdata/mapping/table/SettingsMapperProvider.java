@@ -40,6 +40,18 @@ import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownKeywordArgume
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownKeywordMapper;
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownKeywordMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskSetupKeywordArgumentMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskSetupKeywordMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskSetupMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTeardownKeywordArgumentMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTeardownKeywordMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTeardownMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTemplateKeywordMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTemplateMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTemplateTrashDataMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTimeoutMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTimeoutMessageMapper;
+import org.rf.ide.core.testdata.mapping.setting.task.TaskTimeoutValueMapper;
 import org.rf.ide.core.testdata.mapping.setting.test.TestSetupKeywordArgumentMapper;
 import org.rf.ide.core.testdata.mapping.setting.test.TestSetupKeywordArgumentMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.test.TestSetupKeywordMapper;
@@ -98,7 +110,15 @@ public class SettingsMapperProvider {
 
             new TestTemplateMapper(), new TestTemplateKeywordMapper(), new TestTemplateTrashDataMapper(),
 
-            new TestTimeoutMapper(), new TestTimeoutValueMapper(), new TestTimeoutMessageMapper());
+            new TestTimeoutMapper(), new TestTimeoutValueMapper(), new TestTimeoutMessageMapper(),
+
+            new TaskSetupMapper(), new TaskSetupKeywordMapper(), new TaskSetupKeywordArgumentMapper(),
+
+            new TaskTeardownMapper(), new TaskTeardownKeywordMapper(), new TaskTeardownKeywordArgumentMapper(),
+
+            new TaskTemplateMapper(), new TaskTemplateKeywordMapper(), new TaskTemplateTrashDataMapper(),
+
+            new TaskTimeoutMapper(), new TaskTimeoutValueMapper(), new TaskTimeoutMessageMapper());
 
 
     public List<IParsingMapper> getMappers(final RobotVersion robotVersion) {

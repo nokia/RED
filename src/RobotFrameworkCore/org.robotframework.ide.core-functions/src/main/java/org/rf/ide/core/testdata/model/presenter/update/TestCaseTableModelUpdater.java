@@ -8,30 +8,21 @@ package org.rf.ide.core.testdata.model.presenter.update;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
+import org.rf.ide.core.testdata.model.presenter.update.testcases.EmptyLineToTestEmptyLineMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.testcases.ExecRowToTestExecRowMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.testcases.LocalSettingToTestSettingMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseDocumentationModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseEmptyLineModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseExecutableRowModelOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseSetupModelOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTagsModelOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTeardownModelOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTemplateModelOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTimeoutModelOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseUnkownModelOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordArgumentsMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordDocumentationMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordEmptyLineMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordExecutableRowMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordReturnMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTagsMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTeardownMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTimeoutMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordUnknownSettingMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseSettingModelOperation;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -42,15 +33,15 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
 
     private static final List<IExecutablesStepsHolderElementOperation<TestCase>> ELEMENT_OPERATIONS = newArrayList(
             new TestCaseEmptyLineModelOperation(), new TestCaseExecutableRowModelOperation(),
-            new TestCaseDocumentationModelOperation(),
-            new TestCaseSetupModelOperation(), new TestCaseTagsModelOperation(), new TestCaseTeardownModelOperation(),
-            new TestCaseTemplateModelOperation(), new TestCaseTimeoutModelOperation(),
-            new TestCaseUnkownModelOperation(), new UserKeywordEmptyLineMorphOperation(),
-            new UserKeywordExecutableRowMorphOperation(),
-            new UserKeywordTagsMorphOperation(), new UserKeywordDocumentationMorphOperation(),
-            new UserKeywordTeardownMorphOperation(), new UserKeywordTimeoutMorphOperation(),
-            new UserKeywordArgumentsMorphOperation(), new UserKeywordReturnMorphOperation(),
-            new UserKeywordUnknownSettingMorphOperation());
+            new TestCaseDocumentationModelOperation(), new TestCaseSettingModelOperation(ModelType.TEST_CASE_SETUP),
+            new TestCaseSettingModelOperation(ModelType.TEST_CASE_TAGS),
+            new TestCaseSettingModelOperation(ModelType.TEST_CASE_TEARDOWN),
+            new TestCaseSettingModelOperation(ModelType.TEST_CASE_TEMPLATE),
+            new TestCaseSettingModelOperation(ModelType.TEST_CASE_TIMEOUT),
+            new TestCaseSettingModelOperation(ModelType.TEST_CASE_SETTING_UNKNOWN),
+
+            new ExecRowToTestExecRowMorphOperation(), new EmptyLineToTestEmptyLineMorphOperation(),
+            new LocalSettingToTestSettingMorphOperation());
 
     @Override
     public AModelElement<TestCase> createEmptyLine(final TestCase testCase, final int index, final String name) {
@@ -60,19 +51,25 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             throw new IllegalArgumentException("Unable to create empty line. Operation handler is missing");
         }
         final AModelElement<TestCase> row = operationHandler.create(testCase, index, name, null, null);
-        testCase.addElement(row, index);
+        testCase.addElement(index, row);
         return row;
     }
 
     @Override
     public AModelElement<TestCase> createSetting(final TestCase testCase, final int index, final String settingName,
             final String comment, final List<String> args) {
-        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(settingName);
-        if (operationHandler == null || testCase == null) {
+
+        if (testCase == null) {
+            throw new IllegalArgumentException(
+                    "Unable to create " + settingName + " setting. There is no test case given");
+        }
+        final BiFunction<Integer, String, LocalSetting<TestCase>> creator = getSettingCreateOperation(testCase,
+                settingName);
+        if (creator == null) {
             throw new IllegalArgumentException(
                     "Unable to create " + settingName + " setting. Operation handler is missing");
         }
-        return operationHandler.create(testCase, index, settingName, args, comment);
+        return new TestCaseSettingModelOperation(null).create(creator, index, settingName, args, comment);
     }
 
     @Override
@@ -85,7 +82,7 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
                     "Unable to create " + action + " executable row. Operation handler is missing");
         }
         final AModelElement<TestCase> row = operationHandler.create(testCase, index, action, args, comment);
-        testCase.addElement(row, index);
+        testCase.addElement(index, row);
         return row;
     }
 
@@ -117,17 +114,6 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
     }
 
     @Override
-    public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
-                modelElement.getModelType());
-        if (operationHandler == null) {
-            throw new IllegalArgumentException("Unable to remove " + modelElement + " from "
-                    + testCase.getName().getText() + " test case. Operation handler is missing");
-        }
-        operationHandler.remove(testCase, modelElement);
-    }
-
-    @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         // morph operations enables inserting settings taken from keywords elements
         final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
@@ -139,6 +125,20 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
         return operationHandler.insert(testCase, index, modelElement);
     }
 
+    private BiFunction<Integer, String, LocalSetting<TestCase>> getSettingCreateOperation(final TestCase testCase,
+            final String settingName) {
+        final RobotTokenType type = RobotTokenType.findTypeOfDeclarationForTestCaseSettingTable(settingName);
+        switch (type) {
+            case TEST_CASE_SETTING_SETUP: return testCase::newSetup;
+            case TEST_CASE_SETTING_TEARDOWN: return testCase::newTeardown;
+            case TEST_CASE_SETTING_DOCUMENTATION: return testCase::newDocumentation;
+            case TEST_CASE_SETTING_TAGS_DECLARATION: return testCase::newTags;
+            case TEST_CASE_SETTING_TIMEOUT: return testCase::newTimeout;
+            case TEST_CASE_SETTING_TEMPLATE: return testCase::newTemplate;
+            default: return testCase::newUnknownSetting;
+        }
+    }
+
     @VisibleForTesting
     IExecutablesStepsHolderElementOperation<TestCase> getOperationHandler(final ModelType elementModelType) {
         for (final IExecutablesStepsHolderElementOperation<TestCase> operation : ELEMENT_OPERATIONS) {
@@ -147,12 +147,6 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             }
         }
         return null;
-    }
-
-    private IExecutablesStepsHolderElementOperation<TestCase> getOperationHandler(final String settingName) {
-        final RobotTokenType type = RobotTokenType.findTypeOfDeclarationForTestCaseSettingTable(settingName);
-        return getOperationHandler(
-                type == RobotTokenType.UNKNOWN ? RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION : type);
     }
 
     @VisibleForTesting

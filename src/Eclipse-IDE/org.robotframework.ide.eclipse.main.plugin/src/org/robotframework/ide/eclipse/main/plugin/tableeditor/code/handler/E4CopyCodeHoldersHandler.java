@@ -14,12 +14,13 @@ import org.robotframework.red.viewers.Selections;
 
 public abstract class E4CopyCodeHoldersHandler {
 
-    protected final boolean copyCodeHolders(final IStructuredSelection selection, final RedClipboard clipboard) {
+    protected final boolean copyCodeHolders(final IStructuredSelection selection, final RedClipboard clipboard,
+            final Class<? extends RobotCodeHoldingElement<?>> holderClass) {
 
-        final RobotCodeHoldingElement<?>[] codeHolders = Selections.getElementsArray(selection, getCodeHolderClass());
+        final RobotCodeHoldingElement<?>[] codeHolders = Selections.getElementsArray(selection, holderClass);
         final RobotKeywordCall[] calls = Selections.getElementsArray(selection, RobotKeywordCall.class);
         if (codeHolders.length > 0) {
-            final Object data = ArraysSerializerDeserializer.copy(getCodeHolderClass(), codeHolders);
+            final Object data = ArraysSerializerDeserializer.copy(holderClass, codeHolders);
             clipboard.insertContent(data);
             return true;
 
@@ -30,6 +31,4 @@ public abstract class E4CopyCodeHoldersHandler {
         }
         return false;
     }
-
-    protected abstract Class<? extends RobotCodeHoldingElement<?>> getCodeHolderClass();
 }

@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.red.junit.ShellProvider;
@@ -72,7 +73,8 @@ public class ExecutionViewTest {
         final ExecutionStatusStore store1 = new ExecutionStatusStore();
         store1.open();
         launch1.getExecutionData(ExecutionStatusStore.class, () -> store1);
-        store1.suiteStarted("suite", new URI("file:///suite"), 2, new ArrayList<>(), newArrayList("t1", "t2"));
+        store1.suiteStarted("suite", new URI("file:///suite"), ExecutionMode.TESTS, 2, new ArrayList<>(),
+                newArrayList("t1", "t2"));
         store1.testStarted();
         store1.elementEnded(1000, Status.PASS, "");
         store1.testStarted();
@@ -84,7 +86,8 @@ public class ExecutionViewTest {
         final ExecutionStatusStore store2 = new ExecutionStatusStore();
         store2.open();
         launch2.getExecutionData(ExecutionStatusStore.class, () -> store2);
-        store2.suiteStarted("suite2", new URI("file:///suite2"), 2, new ArrayList<>(), newArrayList("tx", "ty"));
+        store2.suiteStarted("suite2", new URI("file:///suite2"), ExecutionMode.TESTS, 2, new ArrayList<>(),
+                newArrayList("tx", "ty"));
         store2.testStarted();
         store2.elementEnded(1000, Status.PASS, "");
         store2.testStarted();

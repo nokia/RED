@@ -14,7 +14,6 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
@@ -29,7 +28,7 @@ import org.rf.ide.core.testdata.text.write.EmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 
-public abstract class AExecutableTableDumper implements ISectionTableDumper {
+public abstract class AExecutableTableDumper<T extends ARobotSectionTable> implements ISectionTableDumper<T> {
 
     private final DumperHelper aDumpHelper;
 
@@ -58,7 +57,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
     @SuppressWarnings("unchecked")
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
-            final TableHeader<? extends ARobotSectionTable> th, final List<AModelElement<ARobotSectionTable>> sorted,
+            final TableHeader<T> th, final List<? extends AModelElement<T>> sorted,
             final List<RobotLine> lines) {
         getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
 
@@ -73,7 +72,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
             for (int execUnitIndex = 0; execUnitIndex <= lastIndexToDump; execUnitIndex++) {
                 addLineSeparatorIfIsRequired(model, lines);
 
-                final AModelElement<ARobotSectionTable> execUnit = sorted.get(execUnitIndex);
+                final AModelElement<T> execUnit = sorted.get(execUnitIndex);
                 if (execUnitIndex > 0) {
                     getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(sorted.get(execUnitIndex - 1),
                             execUnit, model, lines);
@@ -125,7 +124,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                 if (sortedUnits.isEmpty()) {
                     last = null;
                 }
-                getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit, execUnitIndex == lastIndexToDump);
+                getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit);
             }
 
             if (last != null) {
@@ -141,6 +140,8 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
             }
         }
     }
+
+    protected abstract SectionType getSectionType();
 
     private void addLineSeparatorIfIsRequiredAfterExecElement(final RobotFile model, final List<RobotLine> lines,
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execHolder,
@@ -244,25 +245,5 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
         }
 
         return shouldSeparateLine;
-    }
-
-    public abstract List<AModelElement<? extends IExecutableStepsHolder<?>>> getSortedUnits(
-            final IExecutableStepsHolder<?> execHolder);
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void revertExecutableRowToCorrectPlace(
-            final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedUnits,
-            final IExecutableStepsHolder<?> execHolder) {
-        if (execHolder.getExecutionContext().isEmpty()) {
-            return;
-        }
-        final int size = sortedUnits.size();
-        int indexInExec = 0;
-        for (int i = 0; i < size; i++) {
-            final AModelElement<? extends IExecutableStepsHolder<?>> elem = sortedUnits.get(i);
-            if (elem instanceof RobotExecutableRow) {
-                sortedUnits.set(i, (RobotExecutableRow) execHolder.getExecutionContext().get(indexInExec++));
-            }
-        }
     }
 }

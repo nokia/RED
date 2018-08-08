@@ -23,6 +23,7 @@ public class RobotEditorPropertyTester extends PropertyTester {
     @VisibleForTesting static final String THERE_ARE_METADATA_SETTINGS_IN_CLIPBOARD = "thereAreMetadataSettingsInClipboard";
     @VisibleForTesting static final String THERE_ARE_GENERAL_SETTINGS_IN_CLIPBOARD = "thereAreGeneralSettingsInClipboard";
     @VisibleForTesting static final String THERE_ARE_CASES_ELEMENTS_IN_CLIPBOARD = "thereAreCasesElementsInClipboard";
+    @VisibleForTesting static final String THERE_ARE_TASKS_ELEMENTS_IN_CLIPBOARD = "thereAreTasksElementsInClipboard";
     @VisibleForTesting static final String THERE_ARE_KEYWORD_CALL_ELEMENTS_IN_CLIPBOARD = "thereAreKeywordCallElementsInClipboard";
     @VisibleForTesting static final String THERE_ARE_KEYWORD_DEFINITION_ELEMENTS_IN_CLIPBOARD = "thereAreKeywordDefinitionElementsInClipboard";
     @VisibleForTesting static final String ACTIVE_SECTION_EDITOR_HAS_SECTION = "activeSectionEditorHasSection";
@@ -57,6 +58,9 @@ public class RobotEditorPropertyTester extends PropertyTester {
 
         } else if (THERE_ARE_CASES_ELEMENTS_IN_CLIPBOARD.equals(property)) {
             return editor.getClipboard().hasCases() == expected;
+
+        } else if (THERE_ARE_TASKS_ELEMENTS_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasTasks() == expected;
 
         } else if (THERE_ARE_KEYWORD_CALL_ELEMENTS_IN_CLIPBOARD.equals(property)) {
             return editor.getClipboard().hasKeywordCalls() == expected;

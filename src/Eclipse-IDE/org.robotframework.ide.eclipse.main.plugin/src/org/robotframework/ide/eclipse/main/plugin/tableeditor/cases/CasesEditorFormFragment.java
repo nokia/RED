@@ -66,9 +66,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshHolderCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
@@ -84,10 +83,15 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersCo
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor.TableCommandsCollector;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTableEditConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableEditableRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableSortingConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableValuesChangingCommandsCollector;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
@@ -127,7 +131,7 @@ import org.robotframework.services.event.Events;
 import com.google.common.base.Predicates;
 
 @SuppressWarnings("restriction")
-public class CasesEditorFormFragment implements ISectionFormFragment {
+class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     private IEventBroker eventBroker;
@@ -195,7 +199,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         final RedNattableLayersFactory factory = new RedNattableLayersFactory();
 
         // data providers
-        dataProvider = new CasesDataProvider(commandsStack, getSection());
+        final TableCommandsCollector commandsCollector = new CodeTableValuesChangingCommandsCollector();
+        final CodeElementsColumnsPropertyAccessor propertyAccessor = new CodeElementsColumnsPropertyAccessor(
+                commandsStack, commandsCollector);
+        dataProvider = new CasesDataProvider(propertyAccessor, getSection());
 
         final IDataProvider columnHeaderDataProvider = new CasesColumnHeaderDataProvider();
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
@@ -254,7 +261,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         }
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
                 CodeTableEditableRule.createEditableRule(fileModel), wrapCellContent));
-        gridLayer.addConfiguration(new CasesTableEditConfiguration(fileModel, dataProvider, wrapCellContent));
+        gridLayer.addConfiguration(new CodeElementsTableEditConfiguration(fileModel, dataProvider,
+                SettingTarget.TEST_CASE, wrapCellContent));
 
         table = theme.configureScrollBars(parent, bodyViewportLayer,
                 tableParent -> createTable(tableParent, theme, factory, gridLayer, bodyDataLayer, configRegistry));
@@ -382,7 +390,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 return testCase.getChildren().get(testCase.getChildren().size() - 1);
             } else {
                 final RobotCasesSection section = dataProvider.getInput();
-                commandsStack.execute(new CreateFreshCaseCommand(section));
+                commandsStack.execute(new CreateFreshHolderCommand(section));
                 return section.getChildren().get(section.getChildren().size() - 1);
             }
         };
@@ -390,7 +398,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
-        final CasesMatchesCollection casesMatches = new CasesMatchesCollection();
+        final CodeElementsMatchesCollection casesMatches = new CodeElementsMatchesCollection();
         casesMatches.collect(dataProvider.getInput(), filter);
         return casesMatches;
     }
@@ -405,7 +413,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             + "/Test_Cases") final HeaderFilterMatchesCollection matches) {
         if (matches.getCollectors().contains(this)) {
             this.matches = matches;
-            dataProvider.setFilter(new CasesFilter(matches));
+            dataProvider.setFilter(new CodeElementsFilter(matches));
             table.refresh();
         }
     }
@@ -424,7 +432,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenCaseIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final Event event) {
+    private void whenCaseIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_ADDED) final Event event) {
         final RobotCasesSection section = Events.get(event, IEventBroker.DATA, RobotCasesSection.class);
 
         if (section != null && section.getSuiteFile() == fileModel) {
@@ -443,7 +451,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenCaseIsRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_CASE_REMOVED) final RobotSuiteFileSection section) {
+            @UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_REMOVED) final RobotCasesSection section) {
         if (section.getSuiteFile() == fileModel) {
             selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(), coordinate -> {
                 if (section.getChildren().isEmpty()) {
@@ -461,7 +469,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenCaseIsMoved(@UIEventTopic(RobotModelEvents.ROBOT_CASE_MOVED) final RobotSuiteFileSection section) {
+    private void whenCaseIsMoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_MOVED) final RobotCasesSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
             selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
@@ -562,7 +571,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenCaseDetailIsChanged(
-            @UIEventTopic(RobotModelEvents.ROBOT_CASE_DETAIL_CHANGE_ALL) final RobotCase testCase) {
+            @UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_NAME_CHANGED) final RobotCase testCase) {
         if (testCase.getSuiteFile() == fileModel) {
             table.update();
             table.refresh();

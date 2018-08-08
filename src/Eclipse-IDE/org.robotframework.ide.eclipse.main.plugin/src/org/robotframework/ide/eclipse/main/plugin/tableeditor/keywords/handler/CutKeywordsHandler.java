@@ -10,10 +10,10 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCodeHoldersHandler.E4DeleteHoldersHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyKeywordsHandler.E4CopyKeywordsHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutKeywordsHandler.E4CutKeywordsHandler;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteKeywordsHandler.E4DeleteKeywordsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -31,7 +31,7 @@ public class CutKeywordsHandler extends DIParameterizedHandler<E4CutKeywordsHand
 
             final boolean copiedToClipboard = new E4CopyKeywordsHandler().copyKeywords(selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteKeywordsHandler().deleteKeywords(commandsStack, selection);
+                new E4DeleteHoldersHandler().deleteHoldersAndCalls(commandsStack, selection);
             }
         }
     }

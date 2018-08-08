@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
@@ -45,7 +46,11 @@ public class RobotResourceFileValidator extends RobotFileValidator {
         super.validate(fileModel, validationContext);
 
         final Optional<RobotSettingsSection> settingsSection = fileModel.findSection(RobotSettingsSection.class);
-        final Optional<RobotCasesSection> unsupportedSection = fileModel.findSection(RobotCasesSection.class);
+        Optional<? extends RobotSuiteFileSection> unsupportedSection = fileModel
+                .findSection(RobotCasesSection.class);
+        if (!unsupportedSection.isPresent()) {
+            unsupportedSection = fileModel.findSection(RobotTasksSection.class);
+        }
 
         validateIfThereIsUnsupportedTable(unsupportedSection);
         validateIfThereAreNoForbiddenSettings(settingsSection);

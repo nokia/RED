@@ -21,4 +21,6 @@ public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobot
     T getHolder();
 
     RobotToken getName();
+
+    void setName(RobotToken name);
 }

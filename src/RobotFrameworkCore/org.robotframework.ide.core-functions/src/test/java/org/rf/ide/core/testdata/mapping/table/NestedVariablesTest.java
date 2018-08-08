@@ -13,11 +13,8 @@ import java.util.Stack;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
-import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -46,12 +43,10 @@ public class NestedVariablesTest {
 
     private void testNestedVariableOfTypeAndSymbol(final RobotTokenType type, final String symbol) {
         // prepare
-        final RobotLine line = new RobotLine(1, null);
         final Stack<ParsingState> processingState = new Stack<>();
         processingState.push(ParsingState.KEYWORD_TABLE_INSIDE);
         processingState.push(ParsingState.KEYWORD_DECLARATION);
         processingState.push(ParsingState.KEYWORD_INSIDE_ACTION);
-        final RobotFileOutput rfo = new RobotFileOutput(new RobotVersion(3, 0));
         final FilePosition fp = new FilePosition(10, 10, -1);
         final FilePosition fpInside = new FilePosition(10, 12, -1);
 
@@ -69,11 +64,9 @@ public class NestedVariablesTest {
         final List<IRobotTokenType> wantedResults = new ArrayList<>();
         wantedResults.add(type);
         wantedResults.add(RobotTokenType.VARIABLE_USAGE);
-        final String fileName = "fake.robot";
 
         // execute
-        final RobotToken result = elementsUtility.computeCorrectRobotToken(line, processingState, rfo, fp, text, false,
-                robotTokens, fileName);
+        final RobotToken result = elementsUtility.computeCorrectRobotToken(processingState, fp, text, robotTokens);
 
         // verify
         assertThat(result.getText()).isEqualTo(text);

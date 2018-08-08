@@ -6,7 +6,6 @@
 package org.rf.ide.core.testdata.text.write;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +24,9 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.SettingTableElementsComparator;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.TableHeaderComparator;
+import org.rf.ide.core.testdata.model.table.TaskTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -37,9 +35,9 @@ import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
-import org.rf.ide.core.testdata.text.write.tables.ISectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.KeywordsSectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.SettingsSectionTableDumper;
+import org.rf.ide.core.testdata.text.write.tables.TasksSectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.TestCasesSectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.VariablesSectionTableDumper;
 
@@ -47,17 +45,12 @@ import com.google.common.annotations.VisibleForTesting;
 
 public abstract class ARobotFileDumper implements IRobotFileDumper {
 
-    private final List<ISectionTableDumper> tableDumpers;
-
-    private final DumperHelper aDumpHelper;
+    private final DumperHelper dumpHelper;
 
     private DumpContext dumpContext;
 
     public ARobotFileDumper() {
-        this.aDumpHelper = new DumperHelper(this);
-        this.tableDumpers = new ArrayList<>(
-                Arrays.asList(new SettingsSectionTableDumper(aDumpHelper), new VariablesSectionTableDumper(aDumpHelper),
-                        new TestCasesSectionTableDumper(aDumpHelper), new KeywordsSectionTableDumper(aDumpHelper)));
+        this.dumpHelper = new DumperHelper(this);
     }
 
     @Override
@@ -69,7 +62,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     private DumpedResult newLines(final RobotFile model, final DumpedResultBuilder builder) {
         final List<RobotLine> lines = new ArrayList<>(0);
         builder.producedLines(lines);
-        this.aDumpHelper.setTokenDumpListener(builder);
+        this.dumpHelper.setTokenDumpListener(builder);
 
         final SectionBuilder sectionBuilder = new SectionBuilder();
         final List<Section> sections = sectionBuilder.build(model);
@@ -79,56 +72,70 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         final SettingTable settingTable = model.getSettingTable();
         final List<AModelElement<SettingTable>> sortedSettings = sortSettings(settingTable);
         final VariableTable variableTable = model.getVariableTable();
-        final List<AModelElement<VariableTable>> sortedVariables = sortVariables(variableTable);
+        final List<AModelElement<VariableTable>> variables = new ArrayList<>(variableTable.getVariables());
 
         final TestCaseTable testCaseTable = model.getTestCaseTable();
-        final List<AModelElement<TestCaseTable>> sortedTestCases = getTestCases(testCaseTable);
+        final List<AModelElement<TestCaseTable>> testCases = new ArrayList<>(testCaseTable.getTestCases());
+        final TaskTable taskTable = model.getTasksTable();
+        final List<AModelElement<TaskTable>> tasks = new ArrayList<>(taskTable.getTasks());
         final KeywordTable keywordTable = model.getKeywordTable();
-        final List<AModelElement<KeywordTable>> sortedKeywords = getKeywords(keywordTable);
+        final List<AModelElement<KeywordTable>> keywords = new ArrayList<>(keywordTable.getKeywords());
 
         final List<TableHeader<? extends ARobotSectionTable>> headers = new ArrayList<>(0);
         headers.addAll(settingTable.getHeaders());
         headers.addAll(variableTable.getHeaders());
         headers.addAll(testCaseTable.getHeaders());
+        headers.addAll(taskTable.getHeaders());
         headers.addAll(keywordTable.getHeaders());
         Collections.sort(headers, new TableHeaderComparator<>());
 
         for (final TableHeader<? extends ARobotSectionTable> th : headers) {
-            List<AModelElement<ARobotSectionTable>> sorted = null;
             final int sectionWithHeader = getSectionWithHeader(sections, th);
 
-            ISectionTableDumper dumperToUse = null;
-            for (final ISectionTableDumper dumper : tableDumpers) {
-                if (dumper.isServedType(th)) {
-                    dumperToUse = dumper;
-                    break;
-                }
-            }
-
             if (th.getModelType() == ModelType.SETTINGS_TABLE_HEADER) {
-                sorted = copySettings(sortedSettings);
-            } else if (th.getModelType() == ModelType.VARIABLES_TABLE_HEADER) {
-                sorted = copyVariables(sortedVariables);
-            } else if (th.getModelType() == ModelType.KEYWORDS_TABLE_HEADER) {
-                sorted = copyKeywords(sortedKeywords);
-            } else if (th.getModelType() == ModelType.TEST_CASE_TABLE_HEADER) {
-                sorted = copyTestCases(sortedTestCases);
-            }
-
-            dumperToUse.dump(model, sections, sectionWithHeader, th, sorted, lines);
-
-            if (th.getModelType() == ModelType.SETTINGS_TABLE_HEADER) {
+                final List<AModelElement<SettingTable>> copy = new ArrayList<>(sortedSettings);
+                @SuppressWarnings("unchecked")
+                final TableHeader<SettingTable> header = (TableHeader<SettingTable>) th;
+                final SettingsSectionTableDumper dumper = new SettingsSectionTableDumper(dumpHelper);
+                dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
                 sortedSettings.clear();
-                sortedSettings.addAll(copyUpSettings(sorted));
+                sortedSettings.addAll(copy);
+
             } else if (th.getModelType() == ModelType.VARIABLES_TABLE_HEADER) {
-                sortedVariables.clear();
-                sortedVariables.addAll(copyUpVariables(sorted));
+                final List<AModelElement<VariableTable>> copy = copyVariables(variables);
+                @SuppressWarnings("unchecked")
+                final TableHeader<VariableTable> header = (TableHeader<VariableTable>) th;
+                final VariablesSectionTableDumper dumper = new VariablesSectionTableDumper(dumpHelper);
+                dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
+                variables.clear();
+                variables.addAll(copy);
+
             } else if (th.getModelType() == ModelType.KEYWORDS_TABLE_HEADER) {
-                sortedKeywords.clear();
-                sortedKeywords.addAll(copyUpKeywords(sorted));
+                final List<AModelElement<KeywordTable>> copy = new ArrayList<>(keywords);
+                @SuppressWarnings("unchecked")
+                final TableHeader<KeywordTable> header = (TableHeader<KeywordTable>) th;
+                final KeywordsSectionTableDumper dumper = new KeywordsSectionTableDumper(dumpHelper);
+                dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
+                keywords.clear();
+                keywords.addAll(copy);
+
             } else if (th.getModelType() == ModelType.TEST_CASE_TABLE_HEADER) {
-                sortedTestCases.clear();
-                sortedTestCases.addAll(copyUpTestCases(sorted));
+                final List<AModelElement<TestCaseTable>> copy = new ArrayList<>(testCases);
+                @SuppressWarnings("unchecked")
+                final TableHeader<TestCaseTable> header = (TableHeader<TestCaseTable>) th;
+                final TestCasesSectionTableDumper dumper = new TestCasesSectionTableDumper(dumpHelper);
+                dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
+                testCases.clear();
+                testCases.addAll(copy);
+
+            } else if (th.getModelType() == ModelType.TASKS_TABLE_HEADER) {
+                final List<AModelElement<TaskTable>> copy = new ArrayList<>(tasks);
+                @SuppressWarnings("unchecked")
+                final TableHeader<TaskTable> header = (TableHeader<TaskTable>) th;
+                final TasksSectionTableDumper dumper = new TasksSectionTableDumper(dumpHelper);
+                dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
+                tasks.clear();
+                tasks.addAll(copy);
             }
 
             if (sectionWithHeader > -1) {
@@ -139,29 +146,14 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         final List<Section> userSections = filterUserTableHeadersOnly(sections);
         dumpUntilRobotHeaderSection(model, userSections, 0, lines);
 
-        aDumpHelper.addEOFinCaseIsMissing(model, lines);
+        dumpHelper.addEOFinCaseIsMissing(model, lines);
 
         return builder.build();
     }
 
-    @SuppressWarnings("unchecked")
-    private List<AModelElement<ARobotSectionTable>> copySettings(final List<AModelElement<SettingTable>> elems) {
-        final List<AModelElement<ARobotSectionTable>> copied = new ArrayList<>();
-        for (final AModelElement<?> stE : elems) {
-            copied.add(((AModelElement<ARobotSectionTable>) stE));
-        }
-
-        return copied;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<AModelElement<ARobotSectionTable>> copyVariables(final List<AModelElement<VariableTable>> elems) {
-        final List<AModelElement<ARobotSectionTable>> copied = new ArrayList<>();
-        for (final AModelElement<?> stE : elems) {
-            fixVariableDeclarationToName((AVariable) stE);
-            copied.add(((AModelElement<ARobotSectionTable>) stE));
-        }
-
+    private List<AModelElement<VariableTable>> copyVariables(final List<AModelElement<VariableTable>> elems) {
+        final List<AModelElement<VariableTable>> copied = new ArrayList<>(elems);
+        copied.forEach(elem -> fixVariableDeclarationToName((AVariable) elem));
         return copied;
     }
 
@@ -173,93 +165,11 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
             if (!varName.startsWith(correctBeginOfVariable)) {
                 varDeclaration = correctBeginOfVariable + varName;
             }
-
             if (!varDeclaration.endsWith("}")) {
                 varDeclaration += "}";
             }
-
             var.getDeclaration().setText(varDeclaration);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<AModelElement<ARobotSectionTable>> copyTestCases(final List<AModelElement<TestCaseTable>> elems) {
-        final List<AModelElement<ARobotSectionTable>> copied = new ArrayList<>();
-        for (final AModelElement<?> stE : elems) {
-            copied.add(((AModelElement<ARobotSectionTable>) stE));
-        }
-
-        return copied;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<AModelElement<ARobotSectionTable>> copyKeywords(final List<AModelElement<KeywordTable>> elems) {
-        final List<AModelElement<ARobotSectionTable>> copied = new ArrayList<>();
-        for (final AModelElement<?> stE : elems) {
-            copied.add(((AModelElement<ARobotSectionTable>) stE));
-        }
-
-        return copied;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<AModelElement<SettingTable>> copyUpSettings(final List<AModelElement<ARobotSectionTable>> elems) {
-        final List<AModelElement<SettingTable>> copied = new ArrayList<>();
-        for (final AModelElement<?> stE : elems) {
-            copied.add(((AModelElement<SettingTable>) stE));
-        }
-
-        return copied;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<AModelElement<VariableTable>> copyUpVariables(final List<AModelElement<ARobotSectionTable>> elems) {
-        final List<AModelElement<VariableTable>> copied = new ArrayList<>();
-        for (final AModelElement<?> stE : elems) {
-            copied.add(((AModelElement<VariableTable>) stE));
-        }
-
-        return copied;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<AModelElement<TestCaseTable>> copyUpTestCases(final List<AModelElement<ARobotSectionTable>> elems) {
-        final List<AModelElement<TestCaseTable>> copied = new ArrayList<>();
-        for (final AModelElement<?> stE : elems) {
-            copied.add(((AModelElement<TestCaseTable>) stE));
-        }
-
-        return copied;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<AModelElement<KeywordTable>> copyUpKeywords(final List<AModelElement<ARobotSectionTable>> elems) {
-        final List<AModelElement<KeywordTable>> copied = new ArrayList<>();
-        for (final AModelElement<?> stE : elems) {
-            copied.add(((AModelElement<KeywordTable>) stE));
-        }
-
-        return copied;
-    }
-
-    private List<AModelElement<KeywordTable>> getKeywords(final KeywordTable keywordTable) {
-        final List<AModelElement<KeywordTable>> list = new ArrayList<>();
-
-        for (final UserKeyword uk : keywordTable.getKeywords()) {
-            list.add(uk);
-        }
-
-        return list;
-    }
-
-    private List<AModelElement<TestCaseTable>> getTestCases(final TestCaseTable testCaseTable) {
-        final List<AModelElement<TestCaseTable>> list = new ArrayList<>();
-
-        for (final TestCase tc : testCaseTable.getTestCases()) {
-            list.add(tc);
-        }
-
-        return list;
     }
 
     private List<AModelElement<SettingTable>> sortSettings(final SettingTable settingTable) {
@@ -287,7 +197,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @VisibleForTesting
-    protected void repositionElementsBaseOnList(final List<AModelElement<SettingTable>> src,
+    void repositionElementsBaseOnList(final List<AModelElement<SettingTable>> src,
             final List<? extends AModelElement<SettingTable>> correctors) {
         if (correctors.size() >= 2) {
             int hitCorrectors = 0;
@@ -329,18 +239,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @VisibleForTesting
-    protected boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src,
+    boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src,
             final AModelElement<SettingTable> m, final int currentIndex) {
         return (currentIndex + 1 < src.size() && m == src.get(currentIndex + 1));
-    }
-
-    private List<AModelElement<VariableTable>> sortVariables(final VariableTable variableTable) {
-        final List<AModelElement<VariableTable>> list = new ArrayList<>();
-        for (final AVariable var : variableTable.getVariables()) {
-            list.add(var);
-        }
-
-        return list;
     }
 
     private List<Section> filterUserTableHeadersOnly(final List<Section> sections) {
@@ -388,7 +289,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                     continue;
                 } else if (elemPos.isSamePlace(start) || elemPos.isSamePlace(end)
                         || (elemPos.isAfter(start) && elemPos.isBefore(end))) {
-                    aDumpHelper.getDumpLineUpdater().updateLine(model, outLines, elem);
+                    dumpHelper.getDumpLineUpdater().updateLine(model, outLines, elem);
                 } else {
                     meetEnd = true;
                     break;
@@ -402,7 +303,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                 final FilePosition endOfLineFP = endOfLine.getFilePosition();
                 if (endOfLineFP.isSamePlace(start) || endOfLineFP.isSamePlace(end)
                         || (endOfLineFP.isAfter(start) && endOfLineFP.isBefore(end))) {
-                    aDumpHelper.getDumpLineUpdater().updateLine(model, outLines, endOfLine);
+                    dumpHelper.getDumpLineUpdater().updateLine(model, outLines, endOfLine);
                 }
             }
         }

@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -30,13 +31,21 @@ public class SetDocumentationSettingCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final IDocumentationHolder docHolder = (IDocumentationHolder) docSetting.getLinkedElement();
-        oldDoc = DocumentationServiceHandler.toEditConsolidated(docHolder);
+        oldDoc = DocumentationServiceHandler.toEditConsolidated(getHolder());
 
         if (!Objects.equals(value, oldDoc)) {
-            DocumentationServiceHandler.update(docHolder, value);
+            DocumentationServiceHandler.update(getHolder(), value);
 
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, docSetting);
+        }
+    }
+
+    private IDocumentationHolder getHolder() {
+        if (docSetting.getLinkedElement() instanceof IDocumentationHolder) {
+            return (IDocumentationHolder) docSetting.getLinkedElement();
+        } else {
+            final LocalSetting<?> setting = (LocalSetting<?>) docSetting.getLinkedElement();
+            return setting.adaptTo(IDocumentationHolder.class);
         }
     }
 

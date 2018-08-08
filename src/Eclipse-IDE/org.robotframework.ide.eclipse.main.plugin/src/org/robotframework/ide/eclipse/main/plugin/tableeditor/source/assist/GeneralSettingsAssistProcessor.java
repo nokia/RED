@@ -63,7 +63,9 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
 
         final String contentSuffix = atTheEndOfLine ? assist.getSeparatorToFollow() : "";
 
-        final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(SettingTarget.GENERAL)
+        final SettingTarget target = assist.getModel().isRpaSuiteFile() ? SettingTarget.GENERAL_TASKS
+                : SettingTarget.GENERAL_TESTS;
+        final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(target)
                 .getSettingsProposals(userContent);
 
         final List<ICompletionProposal> proposals = newArrayList();
@@ -78,7 +80,8 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
     }
 
     private boolean shouldActivate(final String settingName) {
-        return newArrayList("library", "resource", "variables", "test setup", "test teardown", "suite setup",
-                "suite teardown", "test template").contains(settingName.toLowerCase());
+        return newArrayList("library", "resource", "variables", "test setup", "test teardown", "task setup",
+                "task teardown", "suite setup", "suite teardown", "test template", "task template")
+                        .contains(settingName.toLowerCase());
     }
 }

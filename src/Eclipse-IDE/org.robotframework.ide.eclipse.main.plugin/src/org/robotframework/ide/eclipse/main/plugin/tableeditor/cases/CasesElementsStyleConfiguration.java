@@ -30,7 +30,7 @@ import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.nattable.painter.InactiveCellPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
-class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
+public class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
 
     private final TableTheme theme;
 
@@ -38,7 +38,8 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
 
     private final boolean wrapCellContent;
 
-    CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable, final boolean wrapCellContent) {
+    public CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable,
+            final boolean wrapCellContent) {
         this.theme = theme;
         this.isEditable = isEditable;
         this.wrapCellContent = wrapCellContent;

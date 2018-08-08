@@ -59,7 +59,7 @@ public class CodeReservedWordsAssistProcessorTest {
         final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
                 createAssistant(projectProvider.getFile("suite.robot")));
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION);
     }
 
     @Test

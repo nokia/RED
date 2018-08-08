@@ -16,7 +16,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -48,6 +47,7 @@ import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
@@ -82,19 +82,25 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public RobotSuiteFileSection createRobotSection(final String name) {
+        final RobotTokenType headerType = RobotTokenType.findTypeOfDeclarationForTableHeader(name);
+        getLinkedElement().includeTableSection(headerType);
+
         final RobotSuiteFileSection section;
-        if (name.equals(RobotVariablesSection.SECTION_NAME)) {
-            getLinkedElement().includeVariableTableSection();
+        if (headerType == RobotTokenType.VARIABLES_TABLE_HEADER) {
             section = new RobotVariablesSection(this, getLinkedElement().getVariableTable());
-        } else if (name.equals(RobotSettingsSection.SECTION_NAME)) {
-            getLinkedElement().includeSettingTableSection();
+
+        } else if (headerType == RobotTokenType.SETTINGS_TABLE_HEADER) {
             section = new RobotSettingsSection(this, getLinkedElement().getSettingTable());
-        } else if (name.equals(RobotCasesSection.SECTION_NAME)) {
-            getLinkedElement().includeTestCaseTableSection();
+
+        } else if (headerType == RobotTokenType.TEST_CASES_TABLE_HEADER) {
             section = new RobotCasesSection(this, getLinkedElement().getTestCaseTable());
-        } else if (name.equals(RobotKeywordsSection.SECTION_NAME)) {
-            getLinkedElement().includeKeywordTableSection();
+
+        } else if (headerType == RobotTokenType.TASKS_TABLE_HEADER) {
+            section = new RobotTasksSection(this, getLinkedElement().getTasksTable());
+
+        } else if (headerType == RobotTokenType.KEYWORDS_TABLE_HEADER) {
             section = new RobotKeywordsSection(this, getLinkedElement().getKeywordTable());
+
         } else {
             throw new IllegalStateException("Unrecognized section '" + name + "' cannot be created");
         }
@@ -162,6 +168,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             section.link();
             sections.add(section);
         }
+        if (model.getTasksTable().isPresent()) {
+            final RobotTasksSection section = new RobotTasksSection(this, model.getTasksTable());
+            section.link();
+            sections.add(section);
+        }
         if (model.getSettingTable().isPresent()) {
             final RobotSettingsSection section = new RobotSettingsSection(this, model.getSettingTable());
             section.link();
@@ -172,13 +183,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             section.link();
             sections.add(section);
         }
-        Collections.sort(sections, new Comparator<RobotSuiteFileSection>() {
-
-            @Override
-            public int compare(final RobotSuiteFileSection section1, final RobotSuiteFileSection section2) {
-                return Integer.compare(section1.getHeaderLine(), section2.getHeaderLine());
-            }
-        });
+        Collections.sort(sections,
+                (section1, section2) -> Integer.compare(section1.getHeaderLine(), section2.getHeaderLine()));
     }
 
     protected RobotFileOutput parseModel(final ParsingStrategy parsingStrategy) {
@@ -251,23 +257,23 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     public boolean isTsvFile() {
         final String fileExt = getFileExtension();
-        if (fileExt != null && fileExt.toLowerCase().equals("tsv")) {
-            return true;
-        }
-        return ASuiteFileDescriber.SUITE_FILE_TSV_CONTENT_ID.equals(getContentTypeId());
+        return fileExt != null && fileExt.toLowerCase().equals("tsv");
     }
 
     public boolean isSuiteFile() {
-        final String ctId = getContentTypeId();
-        return ctId != null && ctId.startsWith(ASuiteFileDescriber.SUITE_FILE_CONTENT_ID);
+        return ASuiteFileDescriber.isSuiteFile(getContentTypeId());
+    }
+
+    public boolean isRpaSuiteFile() {
+        return ASuiteFileDescriber.isRpaSuiteFile(getContentTypeId());
     }
 
     public boolean isResourceFile() {
-        return ASuiteFileDescriber.RESOURCE_FILE_CONTENT_ID.equals(getContentTypeId());
+        return ASuiteFileDescriber.isResourceFile(getContentTypeId());
     }
 
     public boolean isInitializationFile() {
-        return ASuiteFileDescriber.INIT_FILE_CONTENT_ID.equals(getContentTypeId());
+        return ASuiteFileDescriber.isInitializationFile(getContentTypeId());
     }
 
     protected String getContentTypeId() {
@@ -383,8 +389,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return (RobotProject) current;
     }
 
-    public RobotVersion getRobotVersion() {
-        return getProject().getRobotVersion();
+    public RobotVersion getRobotParserComplianceVersion() {
+        return getProject().getRobotParserComplianceVersion();
     }
 
     public RobotRuntimeEnvironment getRuntimeEnvironment() {
@@ -464,22 +470,27 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     public List<RobotKeywordDefinition> getUserDefinedKeywords() {
         return findSection(RobotKeywordsSection.class).map(RobotKeywordsSection::getUserDefinedKeywords)
-                .orElseGet(() -> new ArrayList<>());
+                .orElseGet(ArrayList::new);
     }
 
     public List<RobotCase> getTestCases() {
         return findSection(RobotCasesSection.class).map(RobotCasesSection::getTestCases)
-                .orElseGet(() -> new ArrayList<>());
+                .orElseGet(ArrayList::new);
+    }
+
+    public List<RobotTask> getTasks() {
+        return findSection(RobotTasksSection.class).map(RobotTasksSection::getTasks)
+                .orElseGet(ArrayList::new);
     }
 
     public List<String> getResourcesPaths() {
         return findSection(RobotSettingsSection.class).map(RobotSettingsSection::getResourcesPaths)
-                .orElseGet(() -> new ArrayList<>());
+                .orElseGet(ArrayList::new);
     }
 
     public List<String> getVariablesPaths() {
         return findSection(RobotSettingsSection.class).map(RobotSettingsSection::getVariablesPaths)
-                .orElseGet(() -> new ArrayList<>());
+                .orElseGet(ArrayList::new);
     }
 
     public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
 import java.io.ObjectStreamException;
 import java.util.ArrayList;
@@ -20,17 +21,17 @@ import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -99,7 +100,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
 
     public String getDocumentation() {
         return findSetting(ModelType.USER_KEYWORD_DOCUMENTATION).map(RobotKeywordCall::getLinkedElement)
-                .map(KeywordDocumentation.class::cast)
+                .map(setting -> (LocalSetting<?>) setting)
+                .map(setting -> setting.adaptTo(IDocumentationHolder.class))
                 .map(DocumentationServiceHandler::toShowConsolidated)
                 .orElse("<not documented>");
     }
@@ -114,20 +116,20 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     }
 
     public ArgumentsDescriptor createArgumentsDescriptor() {
-        final List<RobotDefinitionSetting> argSettings = findSettings(ModelType.USER_KEYWORD_ARGUMENTS);
+        final List<RobotDefinitionSetting> argSettings = findSettings(ModelType.USER_KEYWORD_ARGUMENTS)
+                .collect(toList());
         return ArgumentsDescriptor.createDescriptor(getArguments(argSettings.size() == 1 ? argSettings.get(0) : null));
     }
 
     private List<String> getArguments(final RobotDefinitionSetting argumentsSetting) {
         // embedded arguments are not provided for descriptor or documentation
-        final List<String> args = new ArrayList<>();
         if (argumentsSetting != null) {
-            final KeywordArguments arguments = (KeywordArguments) argumentsSetting.getLinkedElement();
-            for (final RobotToken token : arguments.getArguments()) {
-                args.add(toPythonicNotation(token));
-            }
+            return ((LocalSetting<?>) argumentsSetting.getLinkedElement())
+                    .tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT)
+                    .map(this::toPythonicNotation)
+                    .collect(toList());
         }
-        return args;
+        return new ArrayList<>();
     }
 
     private String toPythonicNotation(final RobotToken token) {

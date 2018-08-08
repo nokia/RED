@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -20,11 +21,12 @@ import org.rf.ide.core.testdata.importer.AVariableImported;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
@@ -150,11 +152,11 @@ public class VariableDefinitionLocator {
         if (parent instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) parent;
             final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
-            final AModelElement<?> linkedElement = argumentsSetting == null ? null
-                    : argumentsSetting.getLinkedElement();
-            if (linkedElement instanceof KeywordArguments) {
-                final KeywordArguments args = (KeywordArguments) linkedElement;
-                for (final RobotToken token : args.getArguments()) {
+            if (argumentsSetting != null && argumentsSetting.isArguments()) {
+                final LocalSetting<?> args = (LocalSetting<?>) argumentsSetting.getLinkedElement();
+                final List<RobotToken> argTokens = args.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT)
+                        .collect(toList());
+                for (final RobotToken token : argTokens) {
                     final ContinueDecision shouldContinue = detector.localVariableDetected(argumentsSetting, token);
                     if (shouldContinue == ContinueDecision.STOP) {
                         return ContinueDecision.STOP;

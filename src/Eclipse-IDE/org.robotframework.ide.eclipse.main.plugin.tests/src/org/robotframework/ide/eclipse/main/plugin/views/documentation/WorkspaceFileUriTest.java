@@ -133,6 +133,24 @@ public class WorkspaceFileUriTest {
     }
 
     @Test
+    public void docOfTaskUriIsCreatedFromFileLocation_withAdditionalTaskNameArgument() throws Exception {
+        final IFile file = projectProvider.getFile("file.txt");
+        final URI uri = WorkspaceFileUri.createShowTaskDocUri(file, "t");
+
+        assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
+        assertThat(uri.getQuery()).isEqualTo("show_doc=true&task=t");
+    }
+
+    @Test
+    public void sourceOfTaskUriIsCreatedFromFileLocation_withAdditionalTaskNameArgument() throws Exception {
+        final IFile file = projectProvider.getFile("file.txt");
+        final URI uri = WorkspaceFileUri.createShowTaskSourceUri(file, "t");
+
+        assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
+        assertThat(uri.getQuery()).isEqualTo("show_source=true&task=t");
+    }
+
+    @Test
     public void whenWorkspaceFileUriIsBeingOpen_theFileWillBeSearchedAndPassedToConsumerWithQueryArguments_1() {
         final IFile file = projectProvider.getFile("file.txt");
 

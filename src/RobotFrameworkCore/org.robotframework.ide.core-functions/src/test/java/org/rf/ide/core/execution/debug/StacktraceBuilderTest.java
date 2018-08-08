@@ -27,6 +27,7 @@ import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
 import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.rf.ide.core.execution.agent.event.Variable;
@@ -36,9 +37,9 @@ import org.rf.ide.core.execution.agent.event.VersionsEvent;
 import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesFixer;
 import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesForRf29Fixer;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
+import org.rf.ide.core.execution.debug.contexts.CaseContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
-import org.rf.ide.core.execution.debug.contexts.TestCaseContext;
 
 public class StacktraceBuilderTest {
 
@@ -77,8 +78,8 @@ public class StacktraceBuilderTest {
                 new ResourceImportEvent(URI.create("file:///res1.robot"), URI.create("file:///suite.robot")));
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///res2.robot"), URI.create("file:///suite.robot")));
-        builder.handleSuiteStarted(new SuiteStartedEvent("Suite", URI.create("file:///suite.robot"), false, 2,
-                newArrayList(), newArrayList("t1", "t2")));
+        builder.handleSuiteStarted(new SuiteStartedEvent("Suite", URI.create("file:///suite.robot"), false,
+                ExecutionMode.TESTS, 2, newArrayList(), newArrayList("t1", "t2")));
 
         assertThat(stack.size()).isEqualTo(1);
         final StackFrame frame = stack.peekCurrentFrame().get();
@@ -110,14 +111,14 @@ public class StacktraceBuilderTest {
                 new ResourceImportEvent(URI.create("file:///res1.robot"), URI.create("file:///suite")));
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///res2.robot"), URI.create("file:///suite")));
-        builder.handleSuiteStarted(new SuiteStartedEvent("Suite", URI.create("file:///suite"), true, 2,
-                newArrayList("Inner"), newArrayList()));
+        builder.handleSuiteStarted(new SuiteStartedEvent("Suite", URI.create("file:///suite"), true,
+                ExecutionMode.TESTS, 2, newArrayList("Inner"), newArrayList()));
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///inner_res1.robot"), URI.create("file:///inner.robot")));
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///inner_res2.robot"), URI.create("file:///inner.robot")));
-        builder.handleSuiteStarted(new SuiteStartedEvent("Inner", URI.create("file:///inner.robot"), false, 2,
-                newArrayList(), newArrayList("t1", "t2")));
+        builder.handleSuiteStarted(new SuiteStartedEvent("Inner", URI.create("file:///inner.robot"), false,
+                ExecutionMode.TESTS, 2, newArrayList(), newArrayList("t1", "t2")));
 
         assertThat(stack.size()).isEqualTo(2);
         final StackFrame frame = stack.peekCurrentFrame().get();
@@ -135,10 +136,10 @@ public class StacktraceBuilderTest {
 
     @Test
     public void frameForTestIsCreated_whenTestStarts() {
-        final TestCaseContext context = mock(TestCaseContext.class);
+        final CaseContext context = mock(CaseContext.class);
 
         final ElementsLocator locator = mock(ElementsLocator.class);
-        when(locator.findContextForTestCase("test", null, Optional.empty())).thenReturn(context);
+        when(locator.findContextForCase("test", null, Optional.empty())).thenReturn(context);
         
         final Stacktrace stack = new Stacktrace();
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, mock(StackFrameContext.class)));
@@ -162,7 +163,7 @@ public class StacktraceBuilderTest {
     public void currentFrameSwitchesContext_whenKeywordIsAboutToStart() {
         final RobotBreakpointSupplier breakpointsSupplier = breakpointsSupplier();
         
-        final TestCaseContext newContext = mock(TestCaseContext.class);
+        final CaseContext newContext = mock(CaseContext.class);
         final StackFrameContext oldContext = mock(StackFrameContext.class);
         when(oldContext.moveTo(new RunningKeyword("lib", "kw", KeywordCallType.NORMAL_CALL), breakpointsSupplier))
                 .thenReturn(newContext);

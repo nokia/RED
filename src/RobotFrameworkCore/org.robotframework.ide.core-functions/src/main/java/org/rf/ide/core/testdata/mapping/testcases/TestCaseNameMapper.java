@@ -53,8 +53,7 @@ public class TestCaseNameMapper implements IParsingMapper {
             final RobotLine currentLine, final RobotToken rt, final String text,
             final Stack<ParsingState> processingState) {
         boolean result = false;
-        if (positionResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME,
-                robotFileOutput.getFileModel(), currentLine, rt)) {
+        if (positionResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME, currentLine, rt)) {
             if (processingState.contains(ParsingState.TEST_CASE_TABLE_INSIDE)) {
                 boolean wasUpdated = false;
                 final String testCaseName = rt.getText().toString();

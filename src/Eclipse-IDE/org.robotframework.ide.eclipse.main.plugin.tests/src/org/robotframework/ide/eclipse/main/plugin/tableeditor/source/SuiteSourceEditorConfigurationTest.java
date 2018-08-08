@@ -25,6 +25,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.N
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsTemplateRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskNameRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
@@ -39,13 +41,19 @@ public class SuiteSourceEditorConfigurationTest {
 
         final Map<String, ISyntaxColouringRule[]> coloringRules = config.createColoringRules();
 
-        assertThat(coloringRules).hasSize(5)
+        assertThat(coloringRules).hasSize(6)
                 .hasEntrySatisfying(IDocument.DEFAULT_CONTENT_TYPE,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, CommentRule.class,
                                 MatchEverythingRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, CaseNameRule.class,
                                 TestCaseSettingsRule.class, SettingsTemplateRule.class,
+                                ExecutableCallInSettingsRule.class, ExecutableCallRule.class,
+                                NestedExecsSpecialTokensRule.class, CommentRule.class, VariableUsageRule.class,
+                                InTokenRule.class))
+                .hasEntrySatisfying(SuiteSourcePartitionScanner.TASKS_SECTION,
+                        rules -> haveExactTypes(rules, SectionHeaderRule.class, TaskNameRule.class,
+                                TaskSettingsRule.class, SettingsTemplateRule.class,
                                 ExecutableCallInSettingsRule.class, ExecutableCallRule.class,
                                 NestedExecsSpecialTokensRule.class, CommentRule.class, VariableUsageRule.class,
                                 InTokenRule.class))

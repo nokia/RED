@@ -8,15 +8,12 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-public class SetKeywordCallArgumentCommand extends EditorCommand {
+public abstract class SetKeywordCallArgumentCommand extends EditorCommand {
 
     protected final RobotKeywordCall keywordCall;
     protected final int index;
@@ -102,28 +99,12 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     }
 
     private boolean isFirstArgumentInKeywordBasedSetting(final boolean isSetting) {
-        if (isSetting && ((RobotDefinitionSetting) keywordCall).isKeywordBased()) {
+        if (isSetting && (((RobotDefinitionSetting) keywordCall).isExecutableSetting()
+                || ((RobotDefinitionSetting) keywordCall).isTemplate())) {
             return index == 0;
         }
         return false;
     }
 
-    protected void updateModelElement(final List<String> arguments) {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-        final IExecutablesTableModelUpdater<?> updater = parent.getModelUpdater();
-
-        final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
-        if (value != null) {
-            for (int i = arguments.size() - 1; i >= 0; i--) {
-                updater.updateArgument(linkedElement, i, arguments.get(i));
-            }
-        } else {
-            updater.updateArgument(linkedElement, index, value);
-        }
-    }
-
-    @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetKeywordCallArgumentCommand(keywordCall, index, previousValue, shouldReplaceValue));
-    }
+    protected abstract void updateModelElement(final List<String> arguments);
 }

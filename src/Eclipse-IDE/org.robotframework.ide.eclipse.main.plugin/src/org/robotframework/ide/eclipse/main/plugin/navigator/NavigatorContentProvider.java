@@ -19,12 +19,11 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -110,7 +109,7 @@ public class NavigatorContentProvider extends TreeContentProvider {
 
     @Override
     public boolean hasChildren(final Object element) {
-        if (element instanceof RobotCase || element instanceof RobotKeywordDefinition) {
+        if (element instanceof RobotCodeHoldingElement<?>) {
             return false;
         }
         if (element instanceof RobotElement) {
@@ -163,18 +162,10 @@ public class NavigatorContentProvider extends TreeContentProvider {
 
     @Inject
     @Optional
-    private void whenCaseNameChanges(@UIEventTopic(RobotModelEvents.ROBOT_CASE_NAME_CHANGE) final RobotCase testCase) {
+    private void whenHolderNameChanges(
+            @UIEventTopic(RobotModelEvents.ROBOT_ELEMENT_NAME_CHANGED) final RobotCodeHoldingElement<?> holder) {
         if (viewer != null) {
-            viewer.refresh(testCase.getParent());
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenKeywordDefinitionNameChanges(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_NAME_CHANGE) final RobotKeywordDefinition keywordDef) {
-        if (viewer != null) {
-            viewer.update(keywordDef, null);
+            viewer.refresh(holder.getParent());
         }
     }
 

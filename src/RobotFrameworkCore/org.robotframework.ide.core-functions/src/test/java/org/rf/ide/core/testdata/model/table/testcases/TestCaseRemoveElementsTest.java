@@ -13,8 +13,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
@@ -38,7 +40,7 @@ public class TestCaseRemoveElementsTest {
     public void forDocumentation_whichExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestDocumentation doc = testCase.newDocumentation(0);
+        final LocalSetting<TestCase> doc = testCase.newDocumentation(0);
 
         // execute
         final boolean state = testCase.removeElement(doc);
@@ -53,7 +55,7 @@ public class TestCaseRemoveElementsTest {
     public void forDocumentation_whichNotExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestDocumentation doc = new TestDocumentation(new RobotToken());
+        final LocalSetting<TestCase> doc = new LocalSetting<>(ModelType.TEST_CASE_DOCUMENTATION, new RobotToken());
 
         // execute
         final boolean state = testCase.removeElement(doc);
@@ -68,7 +70,7 @@ public class TestCaseRemoveElementsTest {
     public void forTags_whichExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseTags tags = testCase.newTags(0);
+        final LocalSetting<TestCase> tags = testCase.newTags(0);
 
         // execute
         final boolean state = testCase.removeElement(tags);
@@ -83,7 +85,7 @@ public class TestCaseRemoveElementsTest {
     public void forTags_whichNotExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseTags tags = new TestCaseTags(new RobotToken());
+        final LocalSetting<TestCase> tags = new LocalSetting<>(ModelType.TEST_CASE_TAGS, new RobotToken());
 
         // execute
         final boolean state = testCase.removeElement(tags);
@@ -98,7 +100,7 @@ public class TestCaseRemoveElementsTest {
     public void forSetups_whichExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseSetup setups = testCase.newSetup(0);
+        final LocalSetting<TestCase> setups = testCase.newSetup(0);
 
         // execute
         final boolean state = testCase.removeElement(setups);
@@ -113,7 +115,7 @@ public class TestCaseRemoveElementsTest {
     public void forSetups_whichNotExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseSetup setups = new TestCaseSetup(new RobotToken());
+        final LocalSetting<TestCase> setups = new LocalSetting<>(ModelType.TEST_CASE_SETUP, new RobotToken());
 
         // execute
         final boolean state = testCase.removeElement(setups);
@@ -128,7 +130,7 @@ public class TestCaseRemoveElementsTest {
     public void forTeardowns_whichExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseTeardown teardowns = testCase.newTeardown(0);
+        final LocalSetting<TestCase> teardowns = testCase.newTeardown(0);
 
         // execute
         final boolean state = testCase.removeElement(teardowns);
@@ -143,7 +145,7 @@ public class TestCaseRemoveElementsTest {
     public void forTeardowns_whichNotExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseTeardown teardowns = new TestCaseTeardown(new RobotToken());
+        final LocalSetting<TestCase> teardowns = new LocalSetting<>(ModelType.TEST_CASE_TEARDOWN, new RobotToken());
 
         // execute
         final boolean state = testCase.removeElement(teardowns);
@@ -158,7 +160,7 @@ public class TestCaseRemoveElementsTest {
     public void forTemplates_whichExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseTemplate templates = testCase.newTemplate(0);
+        final LocalSetting<TestCase> templates = testCase.newTemplate(0);
 
         // execute
         final boolean state = testCase.removeElement(templates);
@@ -173,7 +175,8 @@ public class TestCaseRemoveElementsTest {
     public void forTemplates_whichNotExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseTemplate templates = new TestCaseTemplate(new RobotToken());
+        final LocalSetting<TestCase> templates = new LocalSetting<>(ModelType.TEST_CASE_TEMPLATE,
+                new RobotToken());
 
         // execute
         final boolean state = testCase.removeElement(templates);
@@ -188,7 +191,7 @@ public class TestCaseRemoveElementsTest {
     public void forTimeouts_whichExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseTimeout timeouts = testCase.newTimeout(0);
+        final LocalSetting<TestCase> timeouts = testCase.newTimeout(0);
 
         // execute
         final boolean state = testCase.removeElement(timeouts);
@@ -203,7 +206,7 @@ public class TestCaseRemoveElementsTest {
     public void forTimeouts_whichNotExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseTimeout timeouts = new TestCaseTimeout(new RobotToken());
+        final LocalSetting<TestCase> timeouts = new LocalSetting<>(ModelType.TEST_CASE_TIMEOUT, new RobotToken());
 
         // execute
         final boolean state = testCase.removeElement(timeouts);
@@ -218,7 +221,8 @@ public class TestCaseRemoveElementsTest {
     public void forUnknownSetting_whichExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseUnknownSettings unknownSetting = new TestCaseUnknownSettings(new RobotToken());
+        final LocalSetting<TestCase> unknownSetting = new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN,
+                RobotToken.create(""));
         testCase.addElement(unknownSetting);
 
         // execute
@@ -234,7 +238,8 @@ public class TestCaseRemoveElementsTest {
     public void forUnknownSetting_whichNotExists() {
         // prepare
         final List<AModelElement<TestCase>> elementsWhichShouldRemain = new ArrayList<>(testCase.getElements());
-        final TestCaseUnknownSettings unknownSetting = new TestCaseUnknownSettings(new RobotToken());
+        final LocalSetting<TestCase> unknownSetting = new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN,
+                RobotToken.create(""));
 
         // execute
         final boolean state = testCase.removeElement(unknownSetting);
@@ -283,6 +288,6 @@ public class TestCaseRemoveElementsTest {
         testCase.newTeardown(3);
         testCase.newTemplate(4);
         testCase.newTimeout(5);
-        testCase.addElement(new TestCaseUnknownSettings(new RobotToken()));
+        testCase.addElement(new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN, RobotToken.create("")));
     }
 }

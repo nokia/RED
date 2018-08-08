@@ -271,9 +271,10 @@ public class SuiteSourceEditor extends TextEditor {
                     viewer.invalidateTextPresentation();
                 });
 
-            } else if (newHashSet(RedPreferences.FOLDABLE_CASES, RedPreferences.FOLDABLE_KEYWORDS,
-                    RedPreferences.FOLDABLE_SECTIONS, RedPreferences.FOLDABLE_DOCUMENTATION,
-                    RedPreferences.FOLDING_LINE_LIMIT).contains(event.getKey())) {
+            } else if (newHashSet(RedPreferences.FOLDABLE_CASES, RedPreferences.FOLDABLE_TASKS,
+                    RedPreferences.FOLDABLE_KEYWORDS, RedPreferences.FOLDABLE_SECTIONS,
+                    RedPreferences.FOLDABLE_DOCUMENTATION, RedPreferences.FOLDING_LINE_LIMIT)
+                            .contains(event.getKey())) {
 
                 foldingSupport.updateFoldingStructure(fileModel, getDocument());
             }

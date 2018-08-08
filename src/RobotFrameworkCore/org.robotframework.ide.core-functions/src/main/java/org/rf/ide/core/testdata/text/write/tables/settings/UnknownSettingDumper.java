@@ -7,14 +7,14 @@ package org.rf.ide.core.testdata.text.write.tables.settings;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
+import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.UnknownSetting;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDumper;
 
-public class UnknownSettingDumper extends ANotExecutableTableElementDumper {
+public class UnknownSettingDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
     public UnknownSettingDumper(final DumperHelper aDumpHelper) {
         super(aDumpHelper, ModelType.SETTINGS_UNKNOWN);
@@ -22,10 +22,10 @@ public class UnknownSettingDumper extends ANotExecutableTableElementDumper {
 
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
-            final AModelElement<? extends ARobotSectionTable> currentElement) {
-        UnknownSetting unknown = (UnknownSetting) currentElement;
+            final AModelElement<SettingTable> currentElement) {
+        final UnknownSetting unknown = (UnknownSetting) currentElement;
 
-        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_UNKNOWN, 1, unknown.getTrashs());
 
         return sorter;

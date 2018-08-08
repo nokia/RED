@@ -272,8 +272,17 @@ class TestRunnerAgent:
         attrs_copy = copy.copy(attrs)
         del attrs_copy['doc']
         attrs_copy['is_dir'] = os.path.isdir(attrs['source'])
+        attrs_copy['is_rpa'] = self._is_rpa_mode()
         
         self._send_to_server(AgentEventMessage.START_SUITE, name, attrs_copy)
+        
+    def _is_rpa_mode(self):
+        try:
+            # this is not API and could be sensitive for future
+            # code changes
+            return self._built_in._context.output._settings['RPA']
+        except:
+            return False
 
     def end_suite(self, name, attrs):
         attrs_copy = copy.copy(attrs)

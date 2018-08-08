@@ -150,6 +150,14 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
         return null;
     }
 
+    public abstract String getDefaultChildName();
+
+    public abstract RobotFileInternalElement createChild(final int index, final String name);
+
+    public abstract void insertChild(int index, RobotFileInternalElement element);
+
+    public abstract void removeChildren(List<? extends RobotFileInternalElement> elementsToRemove);
+
     @Override
     public RobotSuiteFile getSuiteFile() {
         return (RobotSuiteFile) this.getParent();

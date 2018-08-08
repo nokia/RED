@@ -11,9 +11,11 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.TaskTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.exec.ExecutableUnitsFixer;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 /**
@@ -49,6 +51,7 @@ public class FixerForForContinueForItemIssue implements IPostProcessFixAction {
     public void applyFix(final RobotFileOutput parsingOutput) {
         final RobotFile fileModel = parsingOutput.getFileModel();
         final TestCaseTable testCaseTable = fileModel.getTestCaseTable();
+        final TaskTable tasksTable = fileModel.getTasksTable();
         final KeywordTable keywordTable = fileModel.getKeywordTable();
 
         if (testCaseTable.isPresent()) {
@@ -57,6 +60,17 @@ public class FixerForForContinueForItemIssue implements IPostProcessFixAction {
                 final List<AModelElement<TestCase>> fixed = execUnitFixer.applyFix(execUnit);
                 execUnit.removeAllElements();
                 for (final AModelElement<TestCase> el : fixed) {
+                    execUnit.addElement(el);
+                }
+            }
+        }
+
+        if (tasksTable.isPresent()) {
+            final List<Task> tasks = tasksTable.getTasks();
+            for (final Task execUnit : tasks) {
+                final List<AModelElement<Task>> fixed = execUnitFixer.applyFix(execUnit);
+                execUnit.removeAllElements();
+                for (final AModelElement<Task> el : fixed) {
                     execUnit.addElement(el);
                 }
             }

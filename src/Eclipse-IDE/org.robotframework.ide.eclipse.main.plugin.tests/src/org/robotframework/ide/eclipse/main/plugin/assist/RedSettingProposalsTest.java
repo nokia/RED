@@ -19,13 +19,13 @@ public class RedSettingProposalsTest {
 
     @Test
     public void isSettingTest() {
-        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL, "documentation")).isTrue();
-        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL, "metadata")).isTrue();
-        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL, "library")).isTrue();
+        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "documentation")).isTrue();
+        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "metadata")).isTrue();
+        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "library")).isTrue();
 
-        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL, "[documentation]")).isFalse();
-        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL, "[arguments]")).isFalse();
-        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL, "xyz")).isFalse();
+        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "[documentation]")).isFalse();
+        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "[arguments]")).isFalse();
+        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "xyz")).isFalse();
 
         assertThat(RedSettingProposals.isSetting(SettingTarget.KEYWORD, "[documentation]")).isTrue();
         assertThat(RedSettingProposals.isSetting(SettingTarget.KEYWORD, "[arguments]")).isTrue();
@@ -46,11 +46,11 @@ public class RedSettingProposalsTest {
 
     @Test
     public void settingDescriptionTest() {
-        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "documentation", ""))
+        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL_TESTS, "documentation", ""))
                 .isEqualTo("Documentation of current suite");
-        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "metadata", ""))
+        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL_TESTS, "metadata", ""))
                 .isEqualTo("Metadata current suite hold");
-        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL, "library", ""))
+        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL_TESTS, "library", ""))
                 .isEqualTo("Imports library given by its name or path");
 
         assertThat(RedSettingProposals.getSettingDescription(SettingTarget.KEYWORD, "[documentation]", ""))
@@ -66,7 +66,7 @@ public class RedSettingProposalsTest {
 
     @Test
     public void allGeneralSettingsProposalsAreProvided_whenInputIsEmpty() {
-        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Default Tags", "Documentation",
@@ -76,14 +76,14 @@ public class RedSettingProposalsTest {
 
     @Test
     public void noGeneralSettingsProposalsAreProvided_whenNothingMatchesToGivenInput() {
-        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("Xyz");
         assertThat(proposals).isEmpty();
     }
 
     @Test
     public void generalSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
-        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("Te", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("Te")));
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Suite Teardown", "Suite Setup",
@@ -92,7 +92,7 @@ public class RedSettingProposalsTest {
 
     @Test
     public void onlyGeneralSettingsProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
-        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("es");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Resource", "Test Setup",
@@ -101,7 +101,7 @@ public class RedSettingProposalsTest {
 
     @Test
     public void onlyGeneralSettingsProposalsContainingInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed() {
-        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("me");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Metadata", "Documentation",
@@ -110,7 +110,7 @@ public class RedSettingProposalsTest {
 
     @Test
     public void onlyGeneralSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
-        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL,
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS,
                 prefixesMatcher()).getSettingsProposals("D");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Default Tags", "Documentation");

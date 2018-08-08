@@ -30,7 +30,7 @@ import org.rf.ide.core.execution.debug.contexts.ForLoopContext;
 import org.rf.ide.core.execution.debug.contexts.ForLoopIterationContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
-import org.rf.ide.core.execution.debug.contexts.TestCaseContext;
+import org.rf.ide.core.execution.debug.contexts.CaseContext;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
@@ -88,7 +88,7 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final Optional<String> template = event.getTemplate();
 
         final URI path = stacktrace.getContextPath().orElse(null);
-        final TestCaseContext context = locator.findContextForTestCase(testName, path, template);
+        final CaseContext context = locator.findContextForCase(testName, path, template);
         stacktrace.push(new StackFrame(testName, FrameCategory.TEST, stacktrace.size(), context));
     }
 

@@ -9,7 +9,6 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.E4CopyCodeHoldersHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
@@ -28,12 +27,8 @@ public class CopyKeywordsHandler extends DIParameterizedHandler<E4CopyKeywordsHa
         @Execute
         public boolean copyKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedClipboard clipboard) {
-            return copyCodeHolders(selection, clipboard);
-        }
 
-        @Override
-        protected Class<? extends RobotCodeHoldingElement<?>> getCodeHolderClass() {
-            return RobotKeywordDefinition.class;
+            return copyCodeHolders(selection, clipboard, RobotKeywordDefinition.class);
         }
     }
 }

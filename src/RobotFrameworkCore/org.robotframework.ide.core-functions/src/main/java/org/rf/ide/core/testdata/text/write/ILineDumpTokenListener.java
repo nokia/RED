@@ -10,6 +10,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 /**
  * @author wypych
  */
+@FunctionalInterface
 public interface ILineDumpTokenListener {
 
     void tokenDumped(final RobotToken oldToken, final RobotToken newToken);

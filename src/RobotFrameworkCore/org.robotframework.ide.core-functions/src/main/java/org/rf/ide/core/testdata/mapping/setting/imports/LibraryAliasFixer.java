@@ -48,7 +48,7 @@ public class LibraryAliasFixer {
         if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
             final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
 
-            applyFixes(robotFileOutput, lib, null, processingState);
+            applyFixes(lib, null, processingState);
         } else if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
             final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
 
@@ -97,8 +97,8 @@ public class LibraryAliasFixer {
         }
     }
 
-    public void applyFixes(final RobotFileOutput robotFileOutput, final LibraryImport lib,
-            final RobotToken additionalToken, final Stack<ParsingState> processingState) {
+    public void applyFixes(final LibraryImport lib, final RobotToken additionalToken,
+            final Stack<ParsingState> processingState) {
         final LibraryAlias alias = lib.getAlias();
         if (additionalToken == null) {
             // end of line

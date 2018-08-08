@@ -33,7 +33,7 @@ public enum TestCasesProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_TEST_CASE;
+            return ProblemCategory.DUPLICATED_TEST_OR_TASK;
         }
 
         @Override

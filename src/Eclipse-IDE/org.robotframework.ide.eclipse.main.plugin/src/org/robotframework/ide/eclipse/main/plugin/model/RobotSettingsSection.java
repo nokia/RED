@@ -9,9 +9,9 @@ import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,16 +23,12 @@ import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
-import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
-import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
-import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
-import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
-import org.rf.ide.core.testdata.model.table.setting.TestSetup;
-import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TaskTemplate;
+import org.rf.ide.core.testdata.model.table.setting.TaskTimeout;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
@@ -80,18 +76,17 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         for (final TestTemplate templateSetting : settingsTable.getTestTemplatesViews()) {
             elements.add(new RobotSetting(this, templateSetting));
         }
+        for (final TaskTemplate templateSetting : settingsTable.getTaskTemplates()) {
+            elements.add(new RobotSetting(this, templateSetting));
+        }
         for (final TestTimeout timeoutSetting : settingsTable.getTestTimeoutsViews()) {
             elements.add(new RobotSetting(this, timeoutSetting));
         }
-        Collections.sort(elements, new Comparator<RobotFileInternalElement>() {
-
-            @Override
-            public int compare(final RobotFileInternalElement o1, final RobotFileInternalElement o2) {
-                final RobotSetting s1 = (RobotSetting) o1;
-                final RobotSetting s2 = (RobotSetting) o2;
-                return Integer.compare(s1.getDefinitionPosition().getOffset(), s2.getDefinitionPosition().getOffset());
-            }
-        });
+        for (final TaskTimeout timeoutSetting : settingsTable.getTaskTimeouts()) {
+            elements.add(new RobotSetting(this, timeoutSetting));
+        }
+        Collections.sort(elements, (o1, o2) -> Integer.compare(o1.getDefinitionPosition().getOffset(),
+                o2.getDefinitionPosition().getOffset()));
     }
 
     @Override
@@ -105,6 +100,16 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return (List<RobotKeywordCall>) super.getChildren();
     }
 
+    @Override
+    public String getDefaultChildName() {
+        return "Setting";
+    }
+
+    @Override
+    public RobotFileInternalElement createChild(final int index, final String name) {
+        return createSetting(name, "");
+    }
+
     public RobotSetting createSetting(final String name, final String comment, final String... args) {
         final List<String> settingArgs = newArrayList(args);
 
@@ -115,6 +120,16 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         elements.add(setting);
 
         return setting;
+    }
+
+    @Override
+    public void insertChild(final int index, final RobotFileInternalElement element) {
+        throw new IllegalStateException("Not implemented for settings section");
+    }
+
+    @Override
+    public void removeChildren(final List<? extends RobotFileInternalElement> elementsToRemove) {
+        throw new IllegalStateException("Not implemented for settings section");
     }
 
     public RobotSetting insertSetting(final RobotKeywordCall call, final int allSettingsElementsIndex) {
@@ -225,34 +240,24 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     }
 
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {
-        final List<AKeywordBaseSetting<?>> elements = newArrayList();
-        final List<SuiteSetup> suiteSetups = settingTable.getSuiteSetupsViews();
-        if (!suiteSetups.isEmpty()) {
-            elements.add(suiteSetups.get(0));
-        }
-        final List<SuiteTeardown> suiteTeardowns = settingTable.getSuiteTeardownsViews();
-        if (!suiteTeardowns.isEmpty()) {
-            elements.add(suiteTeardowns.get(0));
-        }
-        final List<TestSetup> testSetups = settingTable.getTestSetupsViews();
-        if (!testSetups.isEmpty()) {
-            elements.add(testSetups.get(0));
-        }
-        final List<TestTeardown> testTeardowns = settingTable.getTestTeardownsViews();
-        if (!testTeardowns.isEmpty()) {
-            elements.add(testTeardowns.get(0));
-        }
+        final List<AKeywordBaseSetting<?>> elements = new ArrayList<>();
+
+        settingTable.getSuiteSetupsViews().stream().findFirst().ifPresent(elements::add);
+        settingTable.getSuiteTeardownsViews().stream().findFirst().ifPresent(elements::add);
+        settingTable.getTestSetupsViews().stream().findFirst().ifPresent(elements::add);
+        settingTable.getTaskSetups().stream().findFirst().ifPresent(elements::add);
+        settingTable.getTestTeardownsViews().stream().findFirst().ifPresent(elements::add);
+        settingTable.getTaskTeardowns().stream().findFirst().ifPresent(elements::add);
+
         return elements;
     }
 
     private static List<? extends ATags<?>> getTagsSettings(final SettingTable settingTable) {
-        final List<ATags<?>> elements = newArrayList();
-        for (final ForceTags forceTags : settingTable.getForceTagsViews()) {
-            elements.add(forceTags);
-        }
-        for (final DefaultTags defaultTags : settingTable.getDefaultTagsViews()) {
-            elements.add(defaultTags);
-        }
+        final List<ATags<?>> elements = new ArrayList<>();
+
+        settingTable.getForceTagsViews().forEach(elements::add);
+        settingTable.getDefaultTagsViews().forEach(elements::add);
+
         return elements;
     }
 

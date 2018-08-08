@@ -93,7 +93,7 @@ public class KeywordCallsAssistProcessorTest {
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+                SuiteSourcePartitionScanner.TASKS_SECTION, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
     }
 
     @Test

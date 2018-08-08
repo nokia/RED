@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -27,14 +28,9 @@ public class KeywordTable extends ARobotSectionTable {
     }
 
     public UserKeyword createUserKeyword(final String keywordName, final int position) {
-        RobotToken keyName = new RobotToken();
-        keyName.setText(keywordName);
-
-        UserKeyword uk = new UserKeyword(keyName);
-
-        addKeyword(uk, position);
-
-        return uk;
+        final UserKeyword keyword = new UserKeyword(RobotToken.create(keywordName));
+        addKeyword(keyword, position);
+        return keyword;
     }
 
     public void addKeyword(final UserKeyword keyword) {
@@ -50,12 +46,14 @@ public class KeywordTable extends ARobotSectionTable {
         userKeywords.remove(keyword);
     }
 
-    public boolean moveUpKeyword(final UserKeyword keyword) {
-        return MoveElementHelper.moveUp(userKeywords, keyword);
+    @Override
+    public boolean moveUpElement(final AModelElement<? extends ARobotSectionTable> element) {
+        return MoveElementHelper.moveUp(userKeywords, (UserKeyword) element);
     }
 
-    public boolean moveDownKeyword(final UserKeyword keyword) {
-        return MoveElementHelper.moveDown(userKeywords, keyword);
+    @Override
+    public boolean moveDownElement(final AModelElement<? extends ARobotSectionTable> element) {
+        return MoveElementHelper.moveDown(userKeywords, (UserKeyword) element);
     }
 
     public List<UserKeyword> getKeywords() {

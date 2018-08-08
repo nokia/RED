@@ -20,6 +20,7 @@ import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.OutputFileEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -68,10 +69,11 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///suite.robot"), false, 2,
-                new ArrayList<>(), new ArrayList<>()));
+        tracker.handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///suite.robot"), false,
+                ExecutionMode.TESTS, 2, new ArrayList<>(), new ArrayList<>()));
 
-        verify(store).suiteStarted("suite", new URI("file:///suite.robot"), 2, new ArrayList<>(), new ArrayList<>());
+        verify(store).suiteStarted("suite", new URI("file:///suite.robot"), ExecutionMode.TESTS, 2, new ArrayList<>(),
+                new ArrayList<>());
         verifyNoMoreInteractions(store);
     }
 

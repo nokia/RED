@@ -39,4 +39,14 @@ public class SuiteTeardown extends AKeywordBaseSetting<SettingTable> {
     protected RobotTokenType getDeclarationType() {
         return RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION;
     }
+
+    @Override
+    public boolean isSetup() {
+        return false;
+    }
+
+    @Override
+    public boolean isTeardown() {
+        return true;
+    }
 }

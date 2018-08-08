@@ -49,7 +49,7 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
         } else {
             final List<AVariable> variables = variableTable.getVariables();
             final IVariableHolder var = variables.get(variables.size() - 1);
-            if (isInTheSameLine(rt, var) || resolver.buildPositionDescription(fileModel, currentLine, rt)
+            if (isInTheSameLine(rt, var) || resolver.buildPositionDescription(currentLine, rt)
                     .isContinuePreviousLineTheFirstToken(TableType.VARIABLES)) {
                 var.addCommentPart(rt);
             } else {

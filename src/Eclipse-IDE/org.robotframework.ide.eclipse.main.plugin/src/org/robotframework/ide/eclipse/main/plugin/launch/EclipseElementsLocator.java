@@ -26,24 +26,24 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.execution.debug.ElementsLocator;
+import org.rf.ide.core.execution.debug.contexts.CaseContext;
 import org.rf.ide.core.execution.debug.contexts.ErrorMessages;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordFromLibraryContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordOfUserContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordUnknownContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
-import org.rf.ide.core.execution.debug.contexts.TestCaseContext;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
+import org.rf.ide.core.testdata.model.table.CommonCase;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotContainer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -51,11 +51,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities.AccessibleKeywordsCollector;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.CasesDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -230,18 +230,18 @@ public class EclipseElementsLocator implements ElementsLocator {
     }
 
     @Override
-    public TestCaseContext findContextForTestCase(final String testCaseName, final URI currentSuitePath,
+    public CaseContext findContextForCase(final String testCaseName, final URI currentSuitePath,
             final Optional<String> template) {
         final Optional<IFile> suiteFile = Optional.ofNullable(currentSuitePath)
                 .map(uri -> (IFile) workspace.forUri(uri));
 
         if (!suiteFile.isPresent()) {
             final String errorMsg = String.format(ErrorMessages.testNotFound_missingSuite, testCaseName);
-            return new TestCaseContext(errorMsg);
+            return new CaseContext(errorMsg);
         }
 
-        final List<RobotCase> matchingCases = new ArrayList<>();
-        new TestCasesDefinitionLocator(suiteFile.get()).locateTestCaseDefinition((s, testCase) -> {
+        final List<RobotCodeHoldingElement<?>> matchingCases = new ArrayList<>();
+        new CasesDefinitionLocator(suiteFile.get()).locateCaseDefinition((s, testCase) -> {
             if (testCase.getName().equalsIgnoreCase(testCaseName)) {
                 matchingCases.add(testCase);
             }
@@ -254,29 +254,29 @@ public class EclipseElementsLocator implements ElementsLocator {
             final String errorMsg = String.format(ErrorMessages.testNotFound_noMatch, testCaseName);
             final RobotSuiteFile suiteModel = model.createSuiteFile(suiteFile.get());
             final int line = findLineForCaseTableHeader(suiteModel);
-            return new TestCaseContext(models, locationUri, line, errorMsg);
+            return new CaseContext(models, locationUri, line, errorMsg);
 
         } else if (matchingCases.size() == 1) {
-            final RobotCase foundCase = matchingCases.get(0);
-            final TestCase testCase = foundCase.getLinkedElement();
+            final RobotCodeHoldingElement<?> foundCase = matchingCases.get(0);
+            final CommonCase<?, ?> testCase = (CommonCase<?, ?>) foundCase.getLinkedElement();
 
             final Optional<String> templateInUse = foundCase.getTemplateInUse();
 
             if (template.equals(templateInUse)) {
-                return new TestCaseContext(testCase, locationUri, models, template.orElse(null));
+                return new CaseContext(testCase, locationUri, models, template.orElse(null));
             } else {
                 final String errorMsg = String.format(ErrorMessages.testNotFound_templatesMismatch, testCaseName,
                         template.map(t -> "'" + t + "'").orElse("no"),
                         templateInUse.map(t -> "'" + t + "'").orElse("no"));
-                return new TestCaseContext(testCase, locationUri, models, template.orElse(null), errorMsg);
+                return new CaseContext(testCase, locationUri, models, template.orElse(null), errorMsg);
             }
 
         } else {
-            final RobotCase foundCase = matchingCases.get(0);
-            final TestCase testCase = foundCase.getLinkedElement();
+            final RobotCodeHoldingElement<?> foundCase = matchingCases.get(0);
+            final CommonCase<?, ?> testCase = (CommonCase<?, ?>) foundCase.getLinkedElement();
 
             final String errorMsg = String.format(ErrorMessages.testNotFound_tooManyMatches, testCaseName);
-            return new TestCaseContext(testCase, locationUri, models, template.orElse(null), errorMsg);
+            return new CaseContext(testCase, locationUri, models, template.orElse(null), errorMsg);
         }
     }
 

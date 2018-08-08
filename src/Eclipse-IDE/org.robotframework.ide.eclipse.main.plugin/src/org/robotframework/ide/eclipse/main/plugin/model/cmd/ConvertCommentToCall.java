@@ -10,6 +10,7 @@ import java.util.List;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -51,6 +52,15 @@ public class ConvertCommentToCall extends EditorCommand {
                 typeToUse = RobotTokenType.TEST_CASE_ACTION_ARGUMENT;
                 firstToken.setType(RobotTokenType.TEST_CASE_ACTION_NAME);
                 newLinked = tempLinked;
+
+            } else if (parentObject instanceof Task) {
+                final RobotExecutableRow<Task> tempLinked = new RobotExecutableRow<>();
+                ((Task) parentObject).replaceElement((RobotExecutableRow<Task>) commentCall.getLinkedElement(),
+                        tempLinked);
+                typeToUse = RobotTokenType.TASK_ACTION_ARGUMENT;
+                firstToken.setType(RobotTokenType.TASK_ACTION_NAME);
+                newLinked = tempLinked;
+
             } else if (parentObject instanceof UserKeyword) {
                 final RobotExecutableRow<UserKeyword> tempLinked = new RobotExecutableRow<>();
                 ((UserKeyword) parentObject)

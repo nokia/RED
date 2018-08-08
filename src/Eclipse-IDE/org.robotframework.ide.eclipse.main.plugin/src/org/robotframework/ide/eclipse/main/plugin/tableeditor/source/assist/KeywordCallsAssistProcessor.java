@@ -52,7 +52,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<String> getApplicableContentTypes() {
-        return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+        return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION,
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION);
     }
 

@@ -15,28 +15,23 @@ public abstract class ExecutablesStepsHolderMorphOperation<T extends IExecutable
         implements IExecutablesStepsHolderElementOperation<T> {
 
     @Override
-    public boolean isApplicable(final IRobotTokenType elementType) {
+    public final boolean isApplicable(final IRobotTokenType elementType) {
         return false;
     }
 
     @Override
-    public AModelElement<T> create(final T executablesHolder, final int index, final String action,
+    public final AModelElement<T> create(final T executablesHolder, final int index, final String action,
             final List<String> args, final String comment) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void update(final AModelElement<?> modelElement, final int index, final String value) {
+    public final void update(final AModelElement<?> modelElement, final int index, final String value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void remove(final T executablesHolder, final AModelElement<?> modelElement) {
+    public final void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         throw new UnsupportedOperationException();
     }
 }

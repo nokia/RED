@@ -7,11 +7,12 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
@@ -37,9 +38,10 @@ public class CreationOfTestCaseDocumentationTest extends RobotFormatParameterize
         testCaseName.setText("TestCase");
         final TestCase testCase = new TestCase(testCaseName);
         testCaseTable.addTest(testCase);
-        final TestDocumentation testDoc = testCase.newDocumentation(0);
+        final LocalSetting<TestCase> testDoc = testCase.newDocumentation(0);
 
-        DocumentationServiceHandler.update(testDoc, "doc me" + "\n" + "textZero" + "\n" + "textTwo");
+        DocumentationServiceHandler.update(testDoc.adaptTo(IDocumentationHolder.class),
+                "doc me" + "\n" + "textZero" + "\n" + "textTwo");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -103,18 +105,11 @@ public class CreationOfTestCaseDocumentationTest extends RobotFormatParameterize
         testCaseName.setText(userTestCaseName);
         final TestCase test = new TestCase(testCaseName);
         testCaseTable.addTest(test);
-        final TestDocumentation testDoc = test.newDocumentation(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testDoc.addCommentPart(cmTok1);
-        testDoc.addCommentPart(cmTok2);
-        testDoc.addCommentPart(cmTok3);
+        final LocalSetting<TestCase> testDoc = test.newDocumentation(0);
+        testDoc.addCommentPart("cm1");
+        testDoc.addCommentPart("cm2");
+        testDoc.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -146,17 +141,12 @@ public class CreationOfTestCaseDocumentationTest extends RobotFormatParameterize
         testCaseName.setText(userTestCaseName);
         final TestCase test = new TestCase(testCaseName);
         testCaseTable.addTest(test);
-        final TestDocumentation testDoc = test.newDocumentation(0);
-        final RobotToken wr1 = new RobotToken();
-        wr1.setText("w1");
-        final RobotToken wr2 = new RobotToken();
-        wr2.setText("w2");
-        final RobotToken wr3 = new RobotToken();
-        wr3.setText("w3");
 
-        testDoc.addDocumentationText(wr1);
-        testDoc.addDocumentationText(wr2);
-        testDoc.addDocumentationText(wr3);
+        final LocalSetting<TestCase> testDoc = test.newDocumentation(0);
+        testDoc.addToken("w1");
+        testDoc.addToken("w2");
+        testDoc.addToken("w3");
+
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
@@ -187,28 +177,14 @@ public class CreationOfTestCaseDocumentationTest extends RobotFormatParameterize
         testCaseName.setText(userTestCaseName);
         final TestCase test = new TestCase(testCaseName);
         testCaseTable.addTest(test);
-        final TestDocumentation testDoc = test.newDocumentation(0);
-        final RobotToken wr1 = new RobotToken();
-        wr1.setText("w1");
-        final RobotToken wr2 = new RobotToken();
-        wr2.setText("w2");
-        final RobotToken wr3 = new RobotToken();
-        wr3.setText("w3");
 
-        testDoc.addDocumentationText(wr1);
-        testDoc.addDocumentationText(wr2);
-        testDoc.addDocumentationText(wr3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testDoc.addCommentPart(cmTok1);
-        testDoc.addCommentPart(cmTok2);
-        testDoc.addCommentPart(cmTok3);
+        final LocalSetting<TestCase> testDoc = test.newDocumentation(0);
+        testDoc.addToken("w1");
+        testDoc.addToken("w2");
+        testDoc.addToken("w3");
+        testDoc.addCommentPart("cm1");
+        testDoc.addCommentPart("cm2");
+        testDoc.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

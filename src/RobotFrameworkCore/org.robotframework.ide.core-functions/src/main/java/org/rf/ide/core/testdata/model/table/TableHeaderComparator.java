@@ -22,22 +22,20 @@ public class TableHeaderComparator<T extends AModelElement<?>> implements Compar
         POSITION.put(ModelType.SETTINGS_TABLE_HEADER, startPosition);
         POSITION.put(ModelType.VARIABLES_TABLE_HEADER, ++startPosition);
         POSITION.put(ModelType.TEST_CASE_TABLE_HEADER, ++startPosition);
+        POSITION.put(ModelType.TASKS_TABLE_HEADER, ++startPosition);
         POSITION.put(ModelType.KEYWORDS_TABLE_HEADER, ++startPosition);
     }
 
     @Override
-    public int compare(T modelElement1, T modelElement2) {
-        int result = ECompareResult.EQUAL_TO.getValue();
-        FilePosition filePos1 = modelElement1.getBeginPosition();
-        FilePosition filePos2 = modelElement2.getBeginPosition();
+    public int compare(final T modelElement1, final T modelElement2) {
+        final FilePosition filePos1 = modelElement1.getBeginPosition();
+        final FilePosition filePos2 = modelElement2.getBeginPosition();
 
         if (filePos1.isNotSet() || filePos2.isNotSet()) {
-            result = Integer.compare(POSITION.get(modelElement1.getModelType()),
+            return Integer.compare(POSITION.get(modelElement1.getModelType()),
                     POSITION.get(modelElement2.getModelType()));
         } else {
-            result = filePos1.compare(filePos2);
+            return filePos1.compare(filePos2);
         }
-
-        return result;
     }
 }

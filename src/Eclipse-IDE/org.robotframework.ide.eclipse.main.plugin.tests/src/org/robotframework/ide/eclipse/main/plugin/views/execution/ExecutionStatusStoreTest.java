@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 public class ExecutionStatusStoreTest {
@@ -38,7 +39,8 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.open();
 
-        store.suiteStarted("suite", new URI("file:///suite"), 42, newArrayList("s1", "s2"), new ArrayList<>());
+        store.suiteStarted("suite", new URI("file:///suite"), ExecutionMode.TESTS, 42, newArrayList("s1", "s2"),
+                new ArrayList<>());
 
         assertThat(store.getTotalTests()).isEqualTo(42);
 
@@ -60,7 +62,8 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.open();
 
-        store.suiteStarted("suite", new URI("file:///suite"), 42, newArrayList("s1", "s2"), new ArrayList<>());
+        store.suiteStarted("suite", new URI("file:///suite"), ExecutionMode.TESTS, 42, newArrayList("s1", "s2"),
+                new ArrayList<>());
         assertThat(store.checkDirtyAndReset()).isTrue();
         assertThat(store.checkDirtyAndReset()).isFalse();
     }
@@ -76,7 +79,8 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
         store.setCurrent(current);
 
-        store.suiteStarted("another", new URI("file:///another"), 30, new ArrayList<>(), newArrayList("t1", "t2"));
+        store.suiteStarted("another", new URI("file:///another"), ExecutionMode.TESTS, 30, new ArrayList<>(),
+                newArrayList("t1", "t2"));
 
         assertThat(store.getTotalTests()).isEqualTo(0);
         assertThat(store.getExecutionTree()).isSameAs(root);
@@ -104,7 +108,8 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
         store.setCurrent(current);
 
-        store.suiteStarted("another", new URI("file:///another"), 30, new ArrayList<>(), newArrayList("t1", "t2"));
+        store.suiteStarted("another", new URI("file:///another"), ExecutionMode.TESTS, 30, new ArrayList<>(),
+                newArrayList("t1", "t2"));
         assertThat(store.checkDirtyAndReset()).isTrue();
         assertThat(store.checkDirtyAndReset()).isFalse();
     }

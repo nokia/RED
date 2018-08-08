@@ -34,7 +34,7 @@ public class TestCaseFinder {
 
             final RobotLine lineToModify = findRobotLineInModel(fileModel, testCase,
                     currentLine);
-            lineToModify.addLineElementAt(0, testCase.getTestName());
+            lineToModify.addLineElementAt(0, testCase.getName());
         } else {
             testCase = lastHeaderTestCases.get(lastHeaderTestCases.size() - 1);
         }
@@ -96,7 +96,7 @@ public class TestCaseFinder {
             final int numberOfTestCases = testCasesAvail.size();
             for (int i = 0; i < numberOfTestCases; i++) {
                 final TestCase test = testCasesAvail.get(i);
-                if (test.getTestName().getLineNumber() > tableHeaderLineNumber) {
+                if (test.getName().getLineNumber() > tableHeaderLineNumber) {
                     testCases.add(test);
                 }
             }

@@ -30,7 +30,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -187,7 +187,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
     private List<RobotToken> getTokensFor(final RobotFileInternalElement element) {
         final AModelElement<?> modelElement = (AModelElement<?>) element.getLinkedElement();
 
-        if (modelElement.getModelType() == ModelType.TEST_CASE) {
+        if (modelElement.getModelType() == ModelType.TEST_CASE || modelElement.getModelType() == ModelType.TASK) {
             return newArrayList(modelElement.getDeclaration());
         } else if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
             // for keywords we are displaying arguments in the same line as keyword name,
@@ -196,7 +196,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
 
             final List<RobotToken> tokens = new ArrayList<>();
             tokens.add(modelElement.getDeclaration());
-            for (final KeywordArguments arguments : keyword.getArguments()) {
+            for (final LocalSetting<UserKeyword> arguments : keyword.getArguments()) {
                 tokens.addAll(arguments.getElementTokens());
             }
             return tokens;

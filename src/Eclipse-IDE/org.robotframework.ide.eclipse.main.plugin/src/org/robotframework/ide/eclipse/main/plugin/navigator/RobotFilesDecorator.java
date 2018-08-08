@@ -37,10 +37,11 @@ public class RobotFilesDecorator implements ILightweightLabelDecorator {
 
     @Override
     public void decorate(final Object element, final IDecoration decoration) {
-        if (element instanceof IFile && ASuiteFileDescriber.isResourceFile((IFile) element)) {
-            decoration.addOverlay(RedImages.Decorators.getResourceDecorator());
-        } else if (element instanceof IFile && ASuiteFileDescriber.isInitializationFile((IFile) element)) {
-            decoration.addOverlay(RedImages.Decorators.getInitFileDecorator());
+        if (element instanceof IFile && ASuiteFileDescriber.isSuiteFile((IFile) element)) {
+            decoration.addOverlay(RedImages.Decorators.getTestsSuiteDecorator());
+
+        } else if (element instanceof IFile && ASuiteFileDescriber.isRpaSuiteFile((IFile) element)) {
+            decoration.addOverlay(RedImages.Decorators.getTasksSuiteDecorator());
         }
     }
 

@@ -9,7 +9,6 @@ import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.children;
-import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCaseConditions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCallConditions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -56,7 +56,7 @@ public class PasteCasesHandlerTest {
 
         assertThat(emptyModel.getSections()).hasSize(1);
         final RobotCasesSection section = emptyModel.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());
     }
@@ -71,7 +71,7 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "existing case 2", "existing case 3",
                 "case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());
@@ -88,7 +88,7 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "existing case 2", "existing case 3",
                 "case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());
@@ -107,7 +107,8 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly("existing case 1", "case 1", "case 2",
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing case 1", "case 1",
+                "case 2",
                 "case 3", "existing case 2", "existing case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());
     }
@@ -126,7 +127,7 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "case 1", "case 2",
                 "case 3", "existing case 2", "existing case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());
@@ -145,7 +146,7 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "case 1", "case 2",
                 "case 3", "existing case 2", "existing case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());
@@ -174,7 +175,7 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "existing case 2", "existing case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());
     }
@@ -191,7 +192,7 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "existing case 2", "existing case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());
     }
@@ -209,22 +210,22 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "existing case 2", "existing case 3");
         
         final RobotCase fstCase = section.getChildren().get(0);
         assertThat(fstCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(fstCase.getChildren(), toNames())).containsExactly("a", "b");
+        assertThat(transform(fstCase.getChildren(), RobotElement::getName)).containsExactly("a", "b");
         assertThat(fstCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
         
         final RobotCase sndCase = section.getChildren().get(1);
         assertThat(sndCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(sndCase.getChildren(), toNames())).containsExactly("c", "d", "call1", "call2");
+        assertThat(transform(sndCase.getChildren(), RobotElement::getName)).containsExactly("c", "d", "call1", "call2");
         assertThat(sndCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotCase trdCase = section.getChildren().get(2);
         assertThat(trdCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(trdCase.getChildren(), toNames())).containsExactly("e", "f");
+        assertThat(transform(trdCase.getChildren(), RobotElement::getName)).containsExactly("e", "f");
         assertThat(trdCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
     }
 
@@ -242,22 +243,22 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "existing case 2", "existing case 3");
         
         final RobotCase fstCase = section.getChildren().get(0);
         assertThat(fstCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(fstCase.getChildren(), toNames())).containsExactly("a", "b");
+        assertThat(transform(fstCase.getChildren(), RobotElement::getName)).containsExactly("a", "b");
         assertThat(fstCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
         
         final RobotCase sndCase = section.getChildren().get(1);
         assertThat(sndCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(sndCase.getChildren(), toNames())).containsExactly("c", "call1", "call2", "d");
+        assertThat(transform(sndCase.getChildren(), RobotElement::getName)).containsExactly("c", "call1", "call2", "d");
         assertThat(sndCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotCase trdCase = section.getChildren().get(2);
         assertThat(trdCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(trdCase.getChildren(), toNames())).containsExactly("e", "f");
+        assertThat(transform(trdCase.getChildren(), RobotElement::getName)).containsExactly("e", "f");
         assertThat(trdCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
     }
 
@@ -274,22 +275,22 @@ public class PasteCasesHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "existing case 2", "existing case 3");
         
         final RobotCase fstCase = section.getChildren().get(0);
         assertThat(fstCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(fstCase.getChildren(), toNames())).containsExactly("a", "b");
+        assertThat(transform(fstCase.getChildren(), RobotElement::getName)).containsExactly("a", "b");
         assertThat(fstCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
         
         final RobotCase sndCase = section.getChildren().get(1);
         assertThat(sndCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(sndCase.getChildren(), toNames())).containsExactly("c", "d", "call1", "call2");
+        assertThat(transform(sndCase.getChildren(), RobotElement::getName)).containsExactly("c", "d", "call1", "call2");
         assertThat(sndCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotCase trdCase = section.getChildren().get(2);
         assertThat(trdCase).has(RobotCaseConditions.properlySetParent());
-        assertThat(transform(trdCase.getChildren(), toNames())).containsExactly("e", "f");
+        assertThat(transform(trdCase.getChildren(), RobotElement::getName)).containsExactly("e", "f");
         assertThat(trdCase.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
     }
 
@@ -304,7 +305,7 @@ public class PasteCasesHandlerTest {
         
         assertThat(model.getSections()).hasSize(1);
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        assertThat(transform(section.getChildren(), toNames())).containsExactly(
+        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly(
                 "existing case 1", "existing case 2", "existing case 3",
                 "case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotCaseConditions.properlySetParent());

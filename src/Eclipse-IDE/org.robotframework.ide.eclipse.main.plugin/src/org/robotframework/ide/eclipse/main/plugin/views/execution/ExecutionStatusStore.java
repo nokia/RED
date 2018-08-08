@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.eclipse.ui.services.IDisposable;
 import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -32,6 +33,8 @@ public class ExecutionStatusStore implements IDisposable {
     private int totalTests;
 
     private URI outputFile;
+
+    private ExecutionMode mode;
 
     public ExecutionTreeNode getExecutionTree() {
         return root;
@@ -97,12 +100,17 @@ public class ExecutionStatusStore implements IDisposable {
         return isDisposed;
     }
 
-    protected void suiteStarted(final String suiteName, final URI suiteFilePath, final int totalTests,
-            final List<String> childSuites, final List<String> childTests) {
+    ExecutionMode getMode() {
+        return mode;
+    }
+
+    protected void suiteStarted(final String suiteName, final URI suiteFilePath, final ExecutionMode executionMode,
+            final int totalTests, final List<String> childSuites, final List<String> childTests) {
         Preconditions.checkArgument(isOpen);
 
         if (root == null) {
             this.totalTests = totalTests;
+            this.mode = executionMode;
             root = new ExecutionTreeNode(null, ElementKind.SUITE, suiteName);
             current = root;
         }

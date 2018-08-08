@@ -39,4 +39,14 @@ public class TestTeardown extends AKeywordBaseSetting<SettingTable> {
     protected RobotTokenType getDeclarationType() {
         return RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION;
     }
+
+    @Override
+    public boolean isSetup() {
+        return false;
+    }
+
+    @Override
+    public boolean isTeardown() {
+        return true;
+    }
 }

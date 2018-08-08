@@ -21,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 
@@ -88,6 +89,15 @@ public class RedClipboard {
     public RobotCase[] getCases() {
         final Object probablyCases = clipboard.getContents(CasesTransfer.getInstance());
         return probablyCases instanceof RobotCase[] ? (RobotCase[]) probablyCases : null;
+    }
+
+    public boolean hasTasks() {
+        return isValid() && clipboardContainSupportedData(TasksTransfer.getInstance());
+    }
+
+    public RobotTask[] getTasks() {
+        final Object probablyTasks = clipboard.getContents(TasksTransfer.getInstance());
+        return probablyTasks instanceof RobotTask[] ? (RobotTask[]) probablyTasks : null;
     }
 
     public boolean hasKeywordCalls() {

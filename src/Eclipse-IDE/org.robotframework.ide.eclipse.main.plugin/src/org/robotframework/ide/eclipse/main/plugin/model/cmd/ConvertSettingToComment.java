@@ -10,13 +10,17 @@ import java.util.stream.Collectors;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.services.event.RedEventBroker;
 
@@ -49,9 +53,7 @@ public class ConvertSettingToComment extends EditorCommand {
         }
 
         final RobotExecutableRow<?> newLinked = new RobotExecutableRow<>();
-        newLinked.getAction().setType(settingCall.getParent() instanceof RobotCase
-                ? RobotTokenType.TEST_CASE_ACTION_NAME
-                : RobotTokenType.KEYWORD_ACTION_NAME);
+        newLinked.getAction().setType(getActionType());
 
         final RobotToken first = tokens.get(0);
         first.setType(RobotTokenType.START_HASH_COMMENT);
@@ -76,6 +78,18 @@ public class ConvertSettingToComment extends EditorCommand {
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(commentCall).send(
                 RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, parent);
+    }
+
+    private IRobotTokenType getActionType() {
+        final IRobotCodeHoldingElement parent = settingCall.getParent();
+        if (parent instanceof RobotCase) {
+            return RobotTokenType.TEST_CASE_ACTION_NAME;
+        } else if (parent instanceof RobotTask) {
+            return RobotTokenType.TASK_ACTION_NAME;
+        } else if (parent instanceof RobotKeywordDefinition) {
+            return RobotTokenType.KEYWORD_ACTION_NAME;
+        }
+        throw new IllegalStateException("Unrecognized code holder type");
     }
 
     @Override

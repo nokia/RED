@@ -10,11 +10,9 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshSectionCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.InsertKeywordDefinitionsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.E4PasteCodeHoldersHandler;
@@ -45,27 +43,13 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
         }
 
         @Override
-        protected void createTargetSectionIfRequired(final RobotSuiteFile fileModel,
-                final RobotEditorCommandsStack commandsStack) {
-            if (fileModel.findSection(RobotKeywordsSection.class).isPresent()) {
-                return;
-            }
-            commandsStack.execute(new CreateFreshSectionCommand(fileModel, RobotKeywordsSection.SECTION_NAME));
+        protected String getSectionName() {
+            return RobotKeywordsSection.SECTION_NAME;
         }
 
         @Override
-        protected void insertHoldersAtSectionEnd(final RobotSuiteFile fileModel,
-                final RobotCodeHoldingElement<?>[] holders, final RobotEditorCommandsStack commandsStack) {
-            final RobotKeywordsSection section = fileModel.findSection(RobotKeywordsSection.class).get();
-            commandsStack.execute(new InsertKeywordDefinitionsCommand(section, (RobotKeywordDefinition[]) holders));
-        }
-
-        @Override
-        protected void insertHoldersAt(final RobotSuiteFile fileModel, final int index,
-                final RobotCodeHoldingElement<?>[] holders, final RobotEditorCommandsStack commandsStack) {
-            final RobotKeywordsSection section = fileModel.findSection(RobotKeywordsSection.class).get();
-            commandsStack
-                    .execute(new InsertKeywordDefinitionsCommand(section, index, (RobotKeywordDefinition[]) holders));
+        protected Class<? extends RobotSuiteFileSection> getSectionClass() {
+            return RobotKeywordsSection.class;
         }
     }
 }

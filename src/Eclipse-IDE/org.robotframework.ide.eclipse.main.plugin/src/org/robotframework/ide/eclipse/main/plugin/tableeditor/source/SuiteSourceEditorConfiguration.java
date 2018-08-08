@@ -84,6 +84,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.R
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsTemplateRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskNameRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
@@ -148,6 +150,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         strategies.add(new SuiteSourceInsertLineContinuationStrategy(isTsv));
         if (contentType.equals(SuiteSourcePartitionScanner.KEYWORDS_SECTION)
                 || contentType.equals(SuiteSourcePartitionScanner.TEST_CASES_SECTION)
+                || contentType.equals(SuiteSourcePartitionScanner.TASKS_SECTION)
                 || contentType.equals(IDocument.DEFAULT_CONTENT_TYPE)) {
             strategies.add(new SuiteSourceIndentLineAfterDefinitionStrategy(isTsv));
         }
@@ -213,7 +216,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         createSettingsAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
         createVariablesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
         createKeywordsAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
-        createTestCasesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
+        createTestCasesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor,
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        createTestCasesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor,
+                SuiteSourcePartitionScanner.TASKS_SECTION);
         createDefaultAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
     }
 
@@ -271,7 +277,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createTestCasesAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
-            final AssistantCallbacks assistantAccessor) {
+            final AssistantCallbacks assistantAccessor, final String contentType) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
 
@@ -292,7 +298,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         cycledProcessor.addProcessor(keywordCallsAssistProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
 
-        contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        contentAssistant.setContentAssistProcessor(cycledProcessor, contentType);
         contentAssistant.addCompletionListener(cycledProcessor);
     }
 
@@ -432,6 +438,13 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new InTokenRule(special) };
 
+        final ISyntaxColouringRule[] tasksRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
+                new TaskNameRule(definition), new TaskSettingsRule(setting), new SettingsTemplateRule(call),
+                ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin, quote, variable),
+                ExecutableCallRule.forExecutableInTask(call, gherkin, quote, variable),
+                new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new InTokenRule(special) };
+
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
                 ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, quote, variable),
@@ -453,6 +466,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final Map<String, ISyntaxColouringRule[]> rules = new HashMap<>();
         rules.put(IDocument.DEFAULT_CONTENT_TYPE, defaultRules);
         rules.put(SuiteSourcePartitionScanner.TEST_CASES_SECTION, testCasesRules);
+        rules.put(SuiteSourcePartitionScanner.TASKS_SECTION, tasksRules);
         rules.put(SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules);
         rules.put(SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules);
         rules.put(SuiteSourcePartitionScanner.VARIABLES_SECTION, variablesRules);

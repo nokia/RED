@@ -10,15 +10,15 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
+import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDumper;
 
-public class ResourceImportDumper extends ANotExecutableTableElementDumper {
+public class ResourceImportDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
     public ResourceImportDumper(final DumperHelper aDumpHelper) {
         super(aDumpHelper, ModelType.RESOURCE_IMPORT_SETTING);
@@ -26,15 +26,15 @@ public class ResourceImportDumper extends ANotExecutableTableElementDumper {
 
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
-            final AModelElement<? extends ARobotSectionTable> currentElement) {
-        ResourceImport resource = (ResourceImport) currentElement;
+            final AModelElement<SettingTable> currentElement) {
+        final ResourceImport resource = (ResourceImport) currentElement;
 
-        List<RobotToken> resourcePaths = new ArrayList<>(0);
+        final List<RobotToken> resourcePaths = new ArrayList<>(0);
         if (resource.getPathOrName() != null) {
             resourcePaths.add(resource.getPathOrName());
         }
 
-        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_RESOURCE_FILE_NAME, 1, resourcePaths);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT, 2,
                 resource.getUnexpectedTrashArguments());

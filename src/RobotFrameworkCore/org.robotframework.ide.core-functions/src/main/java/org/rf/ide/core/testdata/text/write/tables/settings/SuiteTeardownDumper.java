@@ -10,15 +10,15 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
+import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDumper;
 
-public class SuiteTeardownDumper extends ANotExecutableTableElementDumper {
+public class SuiteTeardownDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
     public SuiteTeardownDumper(final DumperHelper aDumpHelper) {
         super(aDumpHelper, ModelType.SUITE_TEARDOWN);
@@ -26,10 +26,10 @@ public class SuiteTeardownDumper extends ANotExecutableTableElementDumper {
 
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
-            AModelElement<? extends ARobotSectionTable> currentElement) {
-        SuiteTeardown suiteTeardown = (SuiteTeardown) currentElement;
+            final AModelElement<SettingTable> currentElement) {
+        final SuiteTeardown suiteTeardown = (SuiteTeardown) currentElement;
 
-        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         final List<RobotToken> keys = new ArrayList<>();
         if (suiteTeardown.getKeywordName() != null) {
             keys.add(suiteTeardown.getKeywordName());

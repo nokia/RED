@@ -13,15 +13,9 @@ import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
-import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 
-public interface ISectionTableDumper {
-
-    boolean isServedType(final TableHeader<? extends ARobotSectionTable> header);
-
-    SectionType getSectionType();
+public interface ISectionTableDumper<T extends ARobotSectionTable> {
 
     void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
-            final TableHeader<? extends ARobotSectionTable> th, final List<AModelElement<ARobotSectionTable>> sorted,
-            final List<RobotLine> lines);
+            final TableHeader<T> th, final List<? extends AModelElement<T>> sorted, final List<RobotLine> lines);
 }

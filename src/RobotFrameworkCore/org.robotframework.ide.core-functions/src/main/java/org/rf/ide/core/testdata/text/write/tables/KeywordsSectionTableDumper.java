@@ -8,70 +8,31 @@ package org.rf.ide.core.testdata.text.write.tables;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
-import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
-import org.rf.ide.core.testdata.model.table.TableHeader;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordArgumentsDumper;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordDocumentationDumper;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordEmptyLineDumper;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordExecutionRowDumper;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordReturnDumper;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordTagsDumper;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordTeardownDumper;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordTimeoutDumper;
-import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordUnknownSettingDumper;
 
-public class KeywordsSectionTableDumper extends AExecutableTableDumper {
+public class KeywordsSectionTableDumper extends AExecutableTableDumper<KeywordTable> {
 
-    private final static ModelType MY_TYPE = ModelType.KEYWORDS_TABLE_HEADER;
-
-    public KeywordsSectionTableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, getDumpers(aDumpHelper));
+    public KeywordsSectionTableDumper(final DumperHelper helper) {
+        super(helper, getDumpers(helper));
     }
 
-    private static List<IExecutableSectionElementDumper> getDumpers(final DumperHelper aDumpHelper) {
+    private static List<IExecutableSectionElementDumper> getDumpers(final DumperHelper helper) {
         final List<IExecutableSectionElementDumper> dumpers = new ArrayList<>();
 
-        dumpers.add(new KeywordDocumentationDumper(aDumpHelper));
-        dumpers.add(new KeywordTagsDumper(aDumpHelper));
-        dumpers.add(new KeywordArgumentsDumper(aDumpHelper));
-        dumpers.add(new KeywordReturnDumper(aDumpHelper));
-        dumpers.add(new KeywordTeardownDumper(aDumpHelper));
-        dumpers.add(new KeywordTimeoutDumper(aDumpHelper));
-        dumpers.add(new KeywordUnknownSettingDumper(aDumpHelper));
-        dumpers.add(new KeywordExecutionRowDumper(aDumpHelper));
-        dumpers.add(new KeywordEmptyLineDumper(aDumpHelper));
-
+        for (final ModelType settingType : LocalSetting.KEYWORD_SETTING_TYPES) {
+            dumpers.add(new LocalSettingDumper(helper, settingType));
+        }
+        dumpers.add(new ExecutableHolderExecutionRowDumper(helper, ModelType.USER_KEYWORD_EXECUTABLE_ROW));
+        dumpers.add(new ExecutableHolderEmptyLineDumper(helper, ModelType.USER_KEYWORD_EMPTY_LINE));
         return dumpers;
-    }
-
-    @Override
-    public boolean isServedType(final TableHeader<? extends ARobotSectionTable> header) {
-        return (header.getModelType() == MY_TYPE);
     }
 
     @Override
     public SectionType getSectionType() {
         return SectionType.KEYWORDS;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<AModelElement<? extends IExecutableStepsHolder<?>>> getSortedUnits(
-            final IExecutableStepsHolder<?> execHolder) {
-        final List<AModelElement<? extends IExecutableStepsHolder<?>>> sorted = new ArrayList<>(0);
-
-        for (final AModelElement<?> el : execHolder.getElements()) {
-            sorted.add((AModelElement<UserKeyword>) el);
-        }
-
-        revertExecutableRowToCorrectPlace(sorted, execHolder);
-
-        return sorted;
     }
 }

@@ -31,7 +31,7 @@ public class ExecutionStatusTracker extends RobotDefaultAgentEventListener {
     @Override
     public void handleSuiteStarted(final SuiteStartedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.suiteStarted(event.getName(), event.getPath(), event.getNumberOfTests(),
+                store -> store.suiteStarted(event.getName(), event.getPath(), event.getMode(), event.getNumberOfTests(),
                         event.getChildrenSuites(), event.getChildrenTests()));
     }
 

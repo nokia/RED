@@ -60,9 +60,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     @Override
     public String getName() {
-        final ModelType modelType = linkedElement.getModelType();
-        if ((modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW)
-                && linkedElement.getClass() == RobotExecutableRow.class) {
+        if (isExecutable() && linkedElement.getClass() == RobotExecutableRow.class) {
             @SuppressWarnings("unchecked")
             final RobotExecutableRowView view = RobotExecutableRowView
                     .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
@@ -79,8 +77,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     public String getLabel() {
-        final ModelType modelType = linkedElement.getModelType();
-        if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+        if (isExecutable()) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
             return row.buildLineDescription().getAction().getToken().getText();
         } else {
@@ -114,7 +111,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     public boolean isExecutable() {
         final ModelType type = linkedElement.getModelType();
-        return type == ModelType.TEST_CASE_EXECUTABLE_ROW || type == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+        return type == ModelType.TEST_CASE_EXECUTABLE_ROW || type == ModelType.TASK_EXECUTABLE_ROW
+                || type == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
     }
 
     @Override
@@ -129,7 +127,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
                 final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
                 return !types.contains(RobotTokenType.START_HASH_COMMENT)
                         && !types.contains(RobotTokenType.COMMENT_CONTINUE)
-                        && type != RobotTokenType.KEYWORD_ACTION_NAME && type != RobotTokenType.TEST_CASE_ACTION_NAME;
+                        && type != RobotTokenType.KEYWORD_ACTION_NAME && type != RobotTokenType.TEST_CASE_ACTION_NAME
+                        && type != RobotTokenType.TASK_ACTION_NAME;
             });
 
             if (isExecutable()) {

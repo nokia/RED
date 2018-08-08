@@ -29,9 +29,8 @@ public class MetadataMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         final List<IRobotTokenType> types = rt.getTypes();
-        return containsOnlyMetadata(types)
-                && positionResolver.isCorrectPosition(PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION,
-                        robotFileOutput.getFileModel(), currentLine, rt)
+        return containsOnlyMetadata(types) && positionResolver
+                .isCorrectPosition(PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION, currentLine, rt)
                 && isIncludedInSettingTable(processingState);
     }
 

@@ -8,9 +8,7 @@ package org.rf.ide.core.testdata.text.write.tables;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
-import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 import org.rf.ide.core.testdata.text.write.tables.settings.DefaultTagsDumper;
@@ -28,16 +26,14 @@ import org.rf.ide.core.testdata.text.write.tables.settings.TestTeardownDumper;
 import org.rf.ide.core.testdata.text.write.tables.settings.UnknownSettingDumper;
 import org.rf.ide.core.testdata.text.write.tables.settings.VariablesImportDumper;
 
-public class SettingsSectionTableDumper extends ANotExecutableTableDumper {
-
-    private final static ModelType MY_TYPE = ModelType.SETTINGS_TABLE_HEADER;
+public class SettingsSectionTableDumper extends ANotExecutableTableDumper<SettingTable> {
 
     public SettingsSectionTableDumper(final DumperHelper aDumpHelper) {
         super(aDumpHelper, getDumpers(aDumpHelper), true);
     }
 
-    private static List<ISectionElementDumper> getDumpers(final DumperHelper aDumpHelper) {
-        final List<ISectionElementDumper> dumpers = new ArrayList<ISectionElementDumper>();
+    private static List<ISectionElementDumper<SettingTable>> getDumpers(final DumperHelper aDumpHelper) {
+        final List<ISectionElementDumper<SettingTable>> dumpers = new ArrayList<>();
         dumpers.add(new SuiteDocumentationDumper(aDumpHelper));
         dumpers.add(new SuiteSetupDumper(aDumpHelper));
         dumpers.add(new SuiteTeardownDumper(aDumpHelper));
@@ -54,11 +50,6 @@ public class SettingsSectionTableDumper extends ANotExecutableTableDumper {
         dumpers.add(new UnknownSettingDumper(aDumpHelper));
 
         return dumpers;
-    }
-
-    @Override
-    public boolean isServedType(final TableHeader<? extends ARobotSectionTable> header) {
-        return (header.getModelType() == MY_TYPE);
     }
 
     @Override

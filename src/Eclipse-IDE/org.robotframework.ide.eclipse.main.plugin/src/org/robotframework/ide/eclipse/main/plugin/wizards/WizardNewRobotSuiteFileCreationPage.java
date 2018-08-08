@@ -17,8 +17,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 class WizardNewRobotSuiteFileCreationPage extends WizardNewRobotFileCreationPage {
 
-    WizardNewRobotSuiteFileCreationPage(final String pageName, final IStructuredSelection selection) {
+    private final String initialContent;
+
+    WizardNewRobotSuiteFileCreationPage(final String pageName, final IStructuredSelection selection,
+            final String initialContent) {
         super(pageName, selection);
+        this.initialContent = initialContent;
     }
 
     @Override
@@ -42,6 +46,6 @@ class WizardNewRobotSuiteFileCreationPage extends WizardNewRobotFileCreationPage
 
     @Override
     protected InputStream getInitialContents() {
-        return new ByteArrayInputStream("*** Test Cases ***".getBytes(StandardCharsets.UTF_8));
+        return new ByteArrayInputStream(initialContent.getBytes(StandardCharsets.UTF_8));
     }
 }

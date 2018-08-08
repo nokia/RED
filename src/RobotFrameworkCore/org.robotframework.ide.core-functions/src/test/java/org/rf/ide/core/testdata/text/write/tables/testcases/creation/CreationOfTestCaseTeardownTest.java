@@ -8,9 +8,9 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
@@ -74,18 +74,11 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTeardown.addCommentPart(cmTok1);
-        testTeardown.addCommentPart(cmTok2);
-        testTeardown.addCommentPart(cmTok3);
+        final LocalSetting<TestCase> testTeardown = test.newTeardown(0);
+        testTeardown.addCommentPart("cm1");
+        testTeardown.addCommentPart("cm2");
+        testTeardown.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -114,11 +107,9 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        final RobotToken keywordName = new RobotToken();
-        keywordName.setText("execKey");
-        testTeardown.setKeywordName(keywordName);
+        final LocalSetting<TestCase> testTeardown = test.newTeardown(0);
+        testTeardown.addToken("execKey");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -150,22 +141,12 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        final RobotToken keywordName = new RobotToken();
-        keywordName.setText("execKey");
-        testTeardown.setKeywordName(keywordName);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTeardown.addCommentPart(cmTok1);
-        testTeardown.addCommentPart(cmTok2);
-        testTeardown.addCommentPart(cmTok3);
+        final LocalSetting<TestCase> testTeardown = test.newTeardown(0);
+        testTeardown.addToken("execKey");
+        testTeardown.addCommentPart("cm1");
+        testTeardown.addCommentPart("cm2");
+        testTeardown.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -197,22 +178,12 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        final RobotToken keywordName = new RobotToken();
-        keywordName.setText("execKey");
-        testTeardown.setKeywordName(keywordName);
-
-        final RobotToken arg1 = new RobotToken();
-        arg1.setText("arg1");
-        final RobotToken arg2 = new RobotToken();
-        arg2.setText("arg2");
-        final RobotToken arg3 = new RobotToken();
-        arg3.setText("arg3");
-
-        testTeardown.addArgument(arg1);
-        testTeardown.addArgument(arg2);
-        testTeardown.addArgument(arg3);
+        final LocalSetting<TestCase> testTeardown = test.newTeardown(0);
+        testTeardown.addToken("execKey");
+        testTeardown.addToken("arg1");
+        testTeardown.addToken("arg2");
+        testTeardown.addToken("arg3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -244,33 +215,15 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        final RobotToken keywordName = new RobotToken();
-        keywordName.setText("execKey");
-        testTeardown.setKeywordName(keywordName);
-
-        final RobotToken arg1 = new RobotToken();
-        arg1.setText("arg1");
-        final RobotToken arg2 = new RobotToken();
-        arg2.setText("arg2");
-        final RobotToken arg3 = new RobotToken();
-        arg3.setText("arg3");
-
-        testTeardown.addArgument(arg1);
-        testTeardown.addArgument(arg2);
-        testTeardown.addArgument(arg3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTeardown.addCommentPart(cmTok1);
-        testTeardown.addCommentPart(cmTok2);
-        testTeardown.addCommentPart(cmTok3);
+        final LocalSetting<TestCase> testTeardown = test.newTeardown(0);
+        testTeardown.addToken("execKey");
+        testTeardown.addToken("arg1");
+        testTeardown.addToken("arg2");
+        testTeardown.addToken("arg3");
+        testTeardown.addCommentPart("cm1");
+        testTeardown.addCommentPart("cm2");
+        testTeardown.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

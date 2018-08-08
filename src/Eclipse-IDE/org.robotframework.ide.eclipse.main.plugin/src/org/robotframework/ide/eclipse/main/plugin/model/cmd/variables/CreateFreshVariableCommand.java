@@ -18,7 +18,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshVariableCommand extends EditorCommand {
 
-    private static final String DEFAULT_NAME = "var";
     private final RobotVariablesSection variablesSection;
     private final int index;
     private RobotVariable newVariable;
@@ -38,13 +37,10 @@ public class CreateFreshVariableCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final String name = NamesGenerator.generateUniqueName(variablesSection, DEFAULT_NAME, false);
+        final String defaultName = variablesSection.getDefaultChildName();
+        final String name = NamesGenerator.generateUniqueName(variablesSection, defaultName, false);
 
-        if (index == -1) {
-            newVariable = variablesSection.createVariable(variableType, name);
-        } else {
-            newVariable = variablesSection.createVariable(index, variableType, name);
-        }
+        newVariable = variablesSection.createVariable(index, variableType, name);
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_ADDED, variablesSection);
     }

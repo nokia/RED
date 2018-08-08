@@ -8,9 +8,9 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
@@ -73,7 +73,7 @@ public class CreationOfTestCaseTagsTest extends RobotFormatParameterizedTest {
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTags testTags = test.newTags(0);
+        final LocalSetting<TestCase> testTags = test.newTags(0);
 
         final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
@@ -114,17 +114,11 @@ public class CreationOfTestCaseTagsTest extends RobotFormatParameterizedTest {
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTags testTags = test.newTags(0);
+        final LocalSetting<TestCase> testTags = test.newTags(0);
 
-        final RobotToken tagOne = new RobotToken();
-        tagOne.setText("tag1");
-        final RobotToken tagTwo = new RobotToken();
-        tagTwo.setText("tag2");
-        final RobotToken tagThree = new RobotToken();
-        tagThree.setText("tag3");
-        testTags.addTag(tagOne);
-        testTags.addTag(tagTwo);
-        testTags.addTag(tagThree);
+        testTags.addToken("tag1");
+        testTags.addToken("tag2");
+        testTags.addToken("tag3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -155,28 +149,15 @@ public class CreationOfTestCaseTagsTest extends RobotFormatParameterizedTest {
         testName.setText(userTestName);
         final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        final TestCaseTags testTags = test.newTags(0);
+        final LocalSetting<TestCase> testTags = test.newTags(0);
 
-        final RobotToken tagOne = new RobotToken();
-        tagOne.setText("tag1");
-        final RobotToken tagTwo = new RobotToken();
-        tagTwo.setText("tag2");
-        final RobotToken tagThree = new RobotToken();
-        tagThree.setText("tag3");
-        testTags.addTag(tagOne);
-        testTags.addTag(tagTwo);
-        testTags.addTag(tagThree);
+        testTags.addToken("tag1");
+        testTags.addToken("tag2");
+        testTags.addToken("tag3");
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        testTags.addCommentPart(cmTok1);
-        testTags.addCommentPart(cmTok2);
-        testTags.addCommentPart(cmTok3);
+        testTags.addCommentPart("cm1");
+        testTags.addCommentPart("cm2");
+        testTags.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

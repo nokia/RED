@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
@@ -41,6 +42,8 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Lib
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.LibrarySpecificationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput.SuiteFileOnSettingInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TaskInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TaskInput.TaskOnSettingInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput.TestCaseOnSettingInput;
 
@@ -160,10 +163,16 @@ public class Documentations {
         } else if (element instanceof RobotCase) {
             return Optional.of(new TestCaseInput((RobotCase) element));
 
+        } else if (element instanceof RobotTask) {
+            return Optional.of(new TaskInput((RobotTask) element));
+
         } else if (element instanceof RobotDefinitionSetting) {
             final RobotDefinitionSetting setting = (RobotDefinitionSetting) element;
             if (setting.isDocumentation() && setting.getParent() instanceof RobotCase) {
                 return Optional.of(new TestCaseOnSettingInput(setting));
+
+            } else if (setting.isDocumentation() && setting.getParent() instanceof RobotTask) {
+                return Optional.of(new TaskOnSettingInput(setting));
 
             } else if (setting.isDocumentation() && setting.getParent() instanceof RobotKeywordDefinition) {
                 return Optional.of(new KeywordDefinitionOnSettingInput(setting));

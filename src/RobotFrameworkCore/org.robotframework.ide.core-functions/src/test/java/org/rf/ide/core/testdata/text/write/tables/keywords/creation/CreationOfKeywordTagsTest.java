@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
@@ -74,18 +74,11 @@ public class CreationOfKeywordTagsTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTags keyTags = uk.newTags(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTags.addCommentPart(cmTok1);
-        keyTags.addCommentPart(cmTok2);
-        keyTags.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyTags = uk.newTags(0);
+        keyTags.addCommentPart("cm1");
+        keyTags.addCommentPart("cm2");
+        keyTags.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -115,17 +108,11 @@ public class CreationOfKeywordTagsTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTags keyTags = uk.newTags(0);
 
-        final RobotToken tagOne = new RobotToken();
-        tagOne.setText("tag1");
-        final RobotToken tagTwo = new RobotToken();
-        tagTwo.setText("tag2");
-        final RobotToken tagThree = new RobotToken();
-        tagThree.setText("tag3");
-        keyTags.addTag(tagOne);
-        keyTags.addTag(tagTwo);
-        keyTags.addTag(tagThree);
+        final LocalSetting<UserKeyword> keyTags = uk.newTags(0);
+        keyTags.addToken("tag1");
+        keyTags.addToken("tag2");
+        keyTags.addToken("tag3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -157,28 +144,14 @@ public class CreationOfKeywordTagsTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordTags keyTags = uk.newTags(0);
 
-        final RobotToken tagOne = new RobotToken();
-        tagOne.setText("tag1");
-        final RobotToken tagTwo = new RobotToken();
-        tagTwo.setText("tag2");
-        final RobotToken tagThree = new RobotToken();
-        tagThree.setText("tag3");
-        keyTags.addTag(tagOne);
-        keyTags.addTag(tagTwo);
-        keyTags.addTag(tagThree);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTags.addCommentPart(cmTok1);
-        keyTags.addCommentPart(cmTok2);
-        keyTags.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyTags = uk.newTags(0);
+        keyTags.addToken("tag1");
+        keyTags.addToken("tag2");
+        keyTags.addToken("tag3");
+        keyTags.addCommentPart("cm1");
+        keyTags.addCommentPart("cm2");
+        keyTags.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

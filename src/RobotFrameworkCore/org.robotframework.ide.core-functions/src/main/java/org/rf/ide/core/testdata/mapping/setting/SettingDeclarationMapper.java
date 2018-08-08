@@ -51,9 +51,9 @@ public abstract class SettingDeclarationMapper implements IParsingMapper {
     public final boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         final List<IRobotTokenType> types = rt.getTypes();
-        return types.size() == 1 && types.get(0) == declarationType
-                && positionResolver.isCorrectPosition(PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION,
-                        robotFileOutput.getFileModel(), currentLine, rt)
+        return types.size() == 1
+                && types.get(0) == declarationType && positionResolver
+                        .isCorrectPosition(PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION, currentLine, rt)
                 && isIncludedInSettingTable(processingState);
     }
 

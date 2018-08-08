@@ -85,9 +85,7 @@ public class DumperHelper {
     }
 
     public void notifyTokenDumpListener(final RobotToken oldToken, final RobotToken newToken) {
-        if (this.dumpTokenListeners.isPresent()) {
-            this.dumpTokenListeners.get().tokenDumped(oldToken, newToken);
-        }
+        dumpTokenListeners.ifPresent(listener -> listener.tokenDumped(oldToken, newToken));
     }
 
     public void addEOFinCaseIsMissing(final RobotFile model, final List<RobotLine> lines) {
@@ -152,8 +150,8 @@ public class DumperHelper {
         return eol;
     }
 
-    public int getLastSortedToDump(final RobotFile model, final List<Section> sections,
-            final List<AModelElement<ARobotSectionTable>> sortedElements) {
+    public <T extends ARobotSectionTable> int getLastSortedToDump(final RobotFile model, final List<Section> sections,
+            final List<AModelElement<T>> sortedElements) {
         final int size = sortedElements.size();
         int index = size - 1;
         int nextFound = 0;
@@ -177,7 +175,7 @@ public class DumperHelper {
             }
 
             for (int elemIndex = 0; elemIndex < size; elemIndex++) {
-                final AModelElement<ARobotSectionTable> e = sortedElements.get(elemIndex);
+                final AModelElement<T> e = sortedElements.get(elemIndex);
                 final FilePosition pos = e.getBeginPosition();
 
                 if (pos.isNotSet() || pos.getOffset() == FilePosition.NOT_SET) {

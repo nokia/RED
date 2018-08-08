@@ -42,6 +42,7 @@ import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
 import org.rf.ide.core.execution.agent.event.ShouldContinueEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.rf.ide.core.execution.agent.event.Variable;
@@ -273,8 +274,8 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///a/b/suite.robot"), false, 7,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+        verify(listener).handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///a/b/suite.robot"), false,
+                ExecutionMode.TESTS, 7, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }

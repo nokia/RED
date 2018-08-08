@@ -11,8 +11,7 @@ import java.util.List;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
-import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
-import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.SpecialKeywords;
@@ -52,17 +51,16 @@ public class NestedExecsSpecialTokensLabelAccumulator implements IConfigLabelAcc
         final Object rowObject = dataProvider.getRowObject(rowPosition);
         if (rowObject instanceof RobotKeywordCall && ((RobotKeywordCall) rowObject).isExecutable()) {
             final RobotKeywordCall call = (RobotKeywordCall) rowObject;
-            
+
             final List<RobotToken> tokens = new ArrayList<>();
             call.getAction().ifPresent(tokens::add);
             tokens.addAll(
                     call.getArgumentTokens().subList(0, Math.min(call.getArgumentTokens().size(), columnPosition)));
             return tokens;
 
-        } else if (rowObject instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) rowObject).isKeywordBased()
-                && ((RobotDefinitionSetting) rowObject).getLinkedElement()
-                        .getModelType() != ModelType.TEST_CASE_TEMPLATE) {
-            final AKeywordBaseSetting<?> setting = (AKeywordBaseSetting<?>) ((RobotDefinitionSetting) rowObject).getLinkedElement();
+        } else if (rowObject instanceof RobotDefinitionSetting
+                && ((RobotDefinitionSetting) rowObject).isExecutableSetting()) {
+            final ExecutableSetting setting = ((RobotDefinitionSetting) rowObject).getExecutableSetting();
 
             final List<RobotToken> tokens = new ArrayList<>();
             tokens.add(setting.getKeywordName());

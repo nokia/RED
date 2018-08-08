@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -33,12 +34,13 @@ import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.swt.widgets.Control;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -108,7 +110,7 @@ class TagsProposalsSupport {
 
         private Collection<String> extractTagProposals() {
             final Multimap<IPath, SourcedTag> groupedTags = groupTagsBySuites();
-            return groupedTags.values().stream().map(sourcedTag -> sourcedTag.tag).collect(Collectors.toList());
+            return groupedTags.values().stream().map(sourcedTag -> sourcedTag.tag).collect(toList());
         }
 
         private Multimap<IPath, SourcedTag> groupTagsBySuites() {
@@ -120,11 +122,13 @@ class TagsProposalsSupport {
 
                         @Override
                         public boolean visit(final IResource resource) throws CoreException {
+                            // only suites files contains tags
                             if (resource.getType() == IResource.FILE
-                                    && ASuiteFileDescriber.isSuiteFile((IFile) resource)) { // only suites files contains tags
+                                    && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                                            || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
                                 final RobotSuiteFile suiteModel = RedPlugin.getModelManager()
                                         .createSuiteFile((IFile) resource);
-                                if (suiteModel != null) {
+                                if (suiteModel != null && (suiteModel.isSuiteFile() || suiteModel.isRpaSuiteFile())) {
                                     final IPath groupingPath = suiteModel.getFile().getFullPath();
 
                                     if (!allTagsCache.containsKey(groupingPath)) {
@@ -190,33 +194,26 @@ class TagsProposalsSupport {
         }
 
         private Collection<SourcedTag> extractTagsFromCases(final RobotSuiteFile suiteModel) {
-            final Collection<RobotCase> cases = collectCases(suiteModel);
-            final Collection<SourcedTag> tags = new ArrayList<>();
-            for (final RobotCase testCase : cases) {
-                tags.addAll(extractTagProposalsFromTestCase(testCase));
-            }
-            return tags;
+            return collectCases(suiteModel).flatMap(this::extractTagProposalsFromCase).collect(toList());
         }
 
-        private Collection<RobotCase> collectCases(final RobotSuiteFile suiteModel) {
-            final Optional<RobotCasesSection> testCasesSection = suiteModel.findSection(RobotCasesSection.class);
-            if (!testCasesSection.isPresent()) {
-                return new ArrayList<>();
-            }
-            return newArrayList(testCasesSection.get().getChildren());
+        private Stream<RobotCodeHoldingElement<?>> collectCases(final RobotSuiteFile suiteModel) {
+            return Stream
+                    .of(suiteModel.findSection(RobotCasesSection.class),
+                            suiteModel.findSection(RobotTasksSection.class))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .flatMap(section -> section.getChildren().stream())
+                    .map(RobotCodeHoldingElement.class::cast);
         }
 
-        private Collection<SourcedTag> extractTagProposalsFromTestCase(final RobotCase testCases) {
-            final List<RobotDefinitionSetting> tagsSettings = testCases.getTagsSetting();
-            final List<SourcedTag> tags = new ArrayList<>();
-            for (final RobotDefinitionSetting tagsSetting : tagsSettings) {
-                if (tagsSetting.getArguments() != null) {
-                    for (final String tag : tagsSetting.getArguments()) {
-                        tags.add(new SourcedTag(testCases.getName().toLowerCase(), tag));
-                    }
-                }
-            }
-            return tags;
+        private Stream<SourcedTag> extractTagProposalsFromCase(final RobotCodeHoldingElement<?> theCase) {
+            return theCase.findSetting(RobotDefinitionSetting::isTags)
+                    .filter(setting -> setting.getArguments() != null)
+                    .map(Stream::of)
+                    .orElseGet(Stream::empty)
+                    .flatMap(setting -> setting.getArguments().stream())
+                    .map(tag -> new SourcedTag(theCase.getName().toLowerCase(), tag));
         }
     }
 

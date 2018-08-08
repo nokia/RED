@@ -7,9 +7,9 @@ package org.rf.ide.core.testdata.model.presenter.update;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -26,24 +26,11 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -132,12 +119,6 @@ public class KeywordTableModelUpdaterTest {
             } catch (final UnsupportedOperationException e) {
                 // we expected that
             }
-            try {
-                handler.remove(keyword, element);
-                fail("Expected exception");
-            } catch (final UnsupportedOperationException e) {
-                // we expected that
-            }
         }
         verifyZeroInteractions(keyword, element);
     }
@@ -172,222 +153,136 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.setArguments(executable, newArgs);
 
         checkSetting(executable.getArguments(), newArgs, executable.getComment(), newComment);
-
-        checkRemoveMethod(modelElement);
     }
 
     @Test
     public void testArgumentsCRUD() {
-        final String keywordSettingName = "[Arguments]";
-        final List<String> settingArgs = newArrayList("arg1", "arg2");
-        final String comment = "comment";
-
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
-                settingArgs);
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Arguments]", "comment",
+                newArrayList("arg1", "arg2"));
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_ARGUMENTS);
-        final KeywordArguments setting = (KeywordArguments) modelElement;
+        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
-        checkSetting(setting.getArguments(), settingArgs, setting.getComment(), comment);
+        assertThat(cellsOf(setting)).containsExactly("[Arguments]", "arg1", "arg2", "#comment");
 
-        final String newArg3 = "arg3";
-        settingArgs.set(1, newArg3);
-        final String newArg4 = "arg4";
-        settingArgs.add(newArg4);
-        final String newComment = "new comment";
+        modelUpdater.updateArgument(setting, 1, "arg3");
+        modelUpdater.updateArgument(setting, 2, "arg4");
+        modelUpdater.updateComment(setting, "new comment");
 
-        modelUpdater.updateArgument(setting, 1, newArg3);
-        modelUpdater.updateArgument(setting, 2, newArg4);
-        modelUpdater.updateComment(setting, newComment);
-
-        checkSetting(setting.getArguments(), settingArgs, setting.getComment(), newComment);
+        assertThat(cellsOf(setting)).containsExactly("[Arguments]", "arg1", "arg3", "arg4", "#new comment");
 
         final List<String> newArgs = newArrayList("1", "2", "3");
         modelUpdater.setArguments(setting, newArgs);
 
-        checkSetting(setting.getArguments(), newArgs, setting.getComment(), newComment);
-
-        checkRemoveMethod(modelElement);
+        assertThat(cellsOf(setting)).containsExactly("[Arguments]", "1", "2", "3", "#new comment");
     }
 
     @Test
     public void testDocumentationCRUD() {
-        final String keywordSettingName = "[Documentation]";
-        final List<String> settingArgs = newArrayList("arg1", "arg2");
-        final String comment = "comment";
-
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
-                settingArgs);
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Documentation]", "comment",
+                newArrayList("arg1", "arg2"));
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION);
-        final KeywordDocumentation setting = (KeywordDocumentation) modelElement;
+        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
-        checkSetting(setting.getDocumentationText(), settingArgs, setting.getComment(), comment);
+        assertThat(cellsOf(setting)).containsExactly("[Documentation]", "arg1", "arg2", "#comment");
 
-        settingArgs.clear();
-        final String newArg3 = "arg3";
-        settingArgs.add(newArg3);
-        final String newComment = "new comment";
+        modelUpdater.updateArgument(setting, 0, "arg3");
+        modelUpdater.updateComment(setting, "new comment");
 
-        modelUpdater.updateArgument(setting, 0, newArg3);
-        modelUpdater.updateComment(setting, newComment);
-
-        checkSetting(setting.getDocumentationText(), newArrayList(newArg3), setting.getComment(), newComment);
+        assertThat(cellsOf(setting)).containsExactly("[Documentation]", "arg3", "#new comment");
 
         modelUpdater.setArguments(setting, newArrayList("1", "2", "3"));
 
-        checkSetting(setting.getDocumentationText(), newArrayList("1"), setting.getComment(), newComment);
-
-        checkRemoveMethod(modelElement);
+        assertThat(cellsOf(setting)).containsExactly("[Documentation]", "1", "#new comment");
     }
 
     @Test
     public void testTagsCRUD() {
-        final String keywordSettingName = "[Tags]";
-        final List<String> settingArgs = newArrayList("arg1", "arg2");
-        final String comment = "comment";
-
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
-                settingArgs);
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Tags]", "comment",
+                newArrayList("arg1", "arg2"));
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TAGS);
-        final KeywordTags setting = (KeywordTags) modelElement;
+        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
-        checkSetting(setting.getTags(), settingArgs, setting.getComment(), comment);
+        assertThat(cellsOf(setting)).containsExactly("[Tags]", "arg1", "arg2", "#comment");
 
-        final String newArg3 = "arg3";
-        settingArgs.set(1, newArg3);
-        final String newArg4 = "arg4";
-        settingArgs.add(newArg4);
-        final String newComment = "new comment";
+        modelUpdater.updateArgument(setting, 1, "arg3");
+        modelUpdater.updateArgument(setting, 2, "arg4");
+        modelUpdater.updateComment(setting, "new comment");
 
-        modelUpdater.updateArgument(setting, 1, newArg3);
-        modelUpdater.updateArgument(setting, 2, newArg4);
-        modelUpdater.updateComment(setting, newComment);
+        assertThat(cellsOf(setting)).containsExactly("[Tags]", "arg1", "arg3", "arg4", "#new comment");
 
-        checkSetting(setting.getTags(), settingArgs, setting.getComment(), newComment);
+        modelUpdater.setArguments(setting, newArrayList("1", "2", "3"));
 
-        final List<String> newArgs = newArrayList("1", "2", "3");
-        modelUpdater.setArguments(setting, newArgs);
-
-        checkSetting(setting.getTags(), newArgs, setting.getComment(), newComment);
-
-        checkRemoveMethod(modelElement);
+        assertThat(cellsOf(setting)).containsExactly("[Tags]", "1", "2", "3", "#new comment");
     }
 
     @Test
     public void testTimeoutCRUD() {
-        final String keywordSettingName = "[Timeout]";
-        final String timeout = "2 seconds";
-        final List<String> settingArgs = newArrayList("arg1", "arg2");
-        final List<String> args = newArrayList(timeout);
-        args.addAll(settingArgs);
-        final String comment = "comment";
-
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
-                args);
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Timeout]", "comment",
+                newArrayList("2 seconds", "arg1", "arg2"));
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TIMEOUT);
-        final KeywordTimeout setting = (KeywordTimeout) modelElement;
+        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
-        checkSetting(setting.getTimeout(), timeout, setting.getMessage(), settingArgs, setting.getComment(), comment);
+        assertThat(cellsOf(setting)).containsExactly("[Timeout]", "2 seconds", "arg1", "arg2", "#comment");
 
-        final String newTimeout = "3 seconds";
-        final String newArg3 = "arg3";
-        settingArgs.set(1, newArg3);
-        final String newArg4 = "arg4";
-        settingArgs.add(newArg4);
-        final String newComment = "new comment";
+        modelUpdater.updateArgument(setting, 0, "3 seconds");
+        modelUpdater.updateArgument(setting, 2, "arg3");
+        modelUpdater.updateArgument(setting, 3, "arg4");
+        modelUpdater.updateComment(setting, "new comment");
 
-        modelUpdater.updateArgument(setting, 0, newTimeout);
-        modelUpdater.updateArgument(setting, 2, newArg3);
-        modelUpdater.updateArgument(setting, 3, newArg4);
-        modelUpdater.updateComment(setting, newComment);
-
-        checkSetting(setting.getTimeout(), newTimeout, setting.getMessage(), settingArgs, setting.getComment(),
-                newComment);
+        assertThat(cellsOf(setting)).containsExactly("[Timeout]", "3 seconds", "arg1", "arg3", "arg4", "#new comment");
 
         modelUpdater.setArguments(setting, newArrayList("1", "2", "3"));
 
-        checkSetting(setting.getTimeout(), "1", setting.getMessage(), newArrayList("2", "3"), setting.getComment(),
-                newComment);
-
-        checkRemoveMethod(modelElement);
+        assertThat(cellsOf(setting)).containsExactly("[Timeout]", "1", "2", "3", "#new comment");
     }
 
     @Test
     public void testTeardownCRUD() {
-        final String keywordSettingName = "[Teardown]";
-        final String teardown = "teardown";
-        final List<String> settingArgs = newArrayList("arg1", "arg2");
-        final List<String> args = newArrayList(teardown);
-        args.addAll(settingArgs);
-        final String comment = "comment";
+        final List<String> args = newArrayList("teardown", "arg1", "arg2");
 
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Teardown]", "comment",
                 args);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TEARDOWN);
-        final KeywordTeardown setting = (KeywordTeardown) modelElement;
+        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
-        checkSetting(setting.getKeywordName(), teardown, setting.getArguments(), settingArgs, setting.getComment(),
-                comment);
+        assertThat(cellsOf(setting)).containsExactly("[Teardown]", "teardown", "arg1", "arg2", "#comment");
 
-        final String newTeardown = "teardown2";
-        final String newArg3 = "arg3";
-        settingArgs.set(1, newArg3);
-        final String newArg4 = "arg4";
-        settingArgs.add(newArg4);
-        final String newComment = "new comment";
+        modelUpdater.updateArgument(setting, 0, "teardown2");
+        modelUpdater.updateArgument(setting, 2, "arg3");
+        modelUpdater.updateArgument(setting, 3, "arg4");
+        modelUpdater.updateComment(setting, "new comment");
 
-        modelUpdater.updateArgument(setting, 0, newTeardown);
-        modelUpdater.updateArgument(setting, 2, newArg3);
-        modelUpdater.updateArgument(setting, 3, newArg4);
-        modelUpdater.updateComment(setting, newComment);
-
-        checkSetting(setting.getKeywordName(), newTeardown, setting.getArguments(), settingArgs, setting.getComment(),
-                newComment);
+        assertThat(cellsOf(setting)).containsExactly("[Teardown]", "teardown2", "arg1", "arg3", "arg4", "#new comment");
 
         modelUpdater.setArguments(setting, newArrayList("1", "2", "3"));
 
-        checkSetting(setting.getKeywordName(), "1", setting.getArguments(), newArrayList("2", "3"),
-                setting.getComment(), newComment);
-
-        checkRemoveMethod(modelElement);
+        assertThat(cellsOf(setting)).containsExactly("[Teardown]", "1", "2", "3", "#new comment");
     }
 
     @Test
     public void testReturnCRUD() {
-        final String keywordSettingName = "[Return]";
-        final List<String> settingArgs = newArrayList("arg1", "arg2");
-        final String comment = "comment";
-
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
-                settingArgs);
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Return]", "comment",
+                newArrayList("arg1", "arg2"));
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_RETURN);
-        final KeywordReturn setting = (KeywordReturn) modelElement;
+        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
-        checkSetting(setting.getReturnValues(), settingArgs, setting.getComment(), comment);
+        assertThat(cellsOf(setting)).containsExactly("[Return]", "arg1", "arg2", "#comment");
 
-        final String newArg3 = "arg3";
-        settingArgs.set(1, newArg3);
-        final String newArg4 = "arg4";
-        settingArgs.add(newArg4);
-        final String newComment = "new comment";
+        modelUpdater.updateArgument(setting, 1, "arg3");
+        modelUpdater.updateArgument(setting, 2, "arg4");
+        modelUpdater.updateComment(setting, "new comment");
 
-        modelUpdater.updateArgument(setting, 1, newArg3);
-        modelUpdater.updateArgument(setting, 2, newArg4);
-        modelUpdater.updateComment(setting, newComment);
+        assertThat(cellsOf(setting)).containsExactly("[Return]", "arg1", "arg3", "arg4", "#new comment");
 
-        checkSetting(setting.getReturnValues(), settingArgs, setting.getComment(), newComment);
+        modelUpdater.setArguments(setting, newArrayList("1", "2", "3"));
 
-        final List<String> newArgs = newArrayList("1", "2", "3");
-        modelUpdater.setArguments(setting, newArgs);
-
-        checkSetting(setting.getReturnValues(), newArgs, setting.getComment(), newComment);
-
-        checkRemoveMethod(modelElement);
+        assertThat(cellsOf(setting)).containsExactly("[Return]", "1", "2", "3", "#new comment");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -409,43 +304,31 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testUnknownCRUD() {
-        final List<String> settingArgs = newArrayList("arg1", "arg2");
-        final String comment = "comment";
-        final String keywordSettingName = "[Unknown]";
-
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
-                settingArgs);
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Unknown]", "comment",
+                newArrayList("arg1", "arg2"));
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN);
-        final KeywordUnknownSettings setting = (KeywordUnknownSettings) modelElement;
+        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
-        checkSetting(setting.getArguments(), settingArgs, setting.getComment(), comment);
+        assertThat(cellsOf(setting)).containsExactly("[Unknown]", "arg1", "arg2", "#comment");
 
-        final String newArg3 = "arg3";
-        settingArgs.set(1, newArg3);
-        final String newArg4 = "arg4";
-        settingArgs.add(newArg4);
-        final String newComment = "new comment";
+        modelUpdater.updateArgument(setting, 1, "arg3");
+        modelUpdater.updateArgument(setting, 2, "arg4");
+        modelUpdater.updateComment(setting, "new comment");
 
-        modelUpdater.updateArgument(setting, 1, newArg3);
-        modelUpdater.updateArgument(setting, 2, newArg4);
-        modelUpdater.updateComment(setting, newComment);
-
-        checkSetting(setting.getArguments(), settingArgs, setting.getComment(), newComment);
-
-        checkRemoveMethod(modelElement);
+        assertThat(cellsOf(setting)).containsExactly("[Unknown]", "arg1", "arg3", "arg4", "#new comment");
     }
 
     @Test
     public void testUpdateParent() {
         final RobotToken declaration = new RobotToken();
 
-        final KeywordArguments args = new KeywordArguments(declaration);
-        final KeywordDocumentation doc = new KeywordDocumentation(declaration);
-        final KeywordTags tags = new KeywordTags(declaration);
-        final KeywordTimeout timeout = new KeywordTimeout(declaration);
-        final KeywordTeardown teardown = new KeywordTeardown(declaration);
-        final KeywordReturn returnValue = new KeywordReturn(declaration);
+        final LocalSetting<UserKeyword> args = new LocalSetting<>(ModelType.USER_KEYWORD_ARGUMENTS, declaration);
+        final LocalSetting<UserKeyword> doc = new LocalSetting<>(ModelType.USER_KEYWORD_DOCUMENTATION, declaration);
+        final LocalSetting<UserKeyword> tags = new LocalSetting<>(ModelType.USER_KEYWORD_TAGS, declaration);
+        final LocalSetting<UserKeyword> timeout = new LocalSetting<>(ModelType.USER_KEYWORD_TIMEOUT, declaration);
+        final LocalSetting<UserKeyword> teardown = new LocalSetting<>(ModelType.USER_KEYWORD_TEARDOWN, declaration);
+        final LocalSetting<UserKeyword> returnValue = new LocalSetting<>(ModelType.USER_KEYWORD_RETURN, declaration);
 
         modelUpdater.insert(userKeyword, 0, args);
         modelUpdater.insert(userKeyword, 0, doc);
@@ -491,7 +374,7 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseSetupSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
-        final TestCaseSetup setupSetting = (TestCaseSetup) new TestCaseTableModelUpdater()
+        final LocalSetting<TestCase> setupSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
                 .createSetting(createCase(), 0, "[Setup]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
@@ -500,7 +383,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, setupSetting);
 
         assertThat(keyword.getUnknownSettings()).hasSize(1);
-        final KeywordUnknownSettings setting = keyword.getUnknownSettings().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getUnknownSettings().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_SETTING_UNKNOWN);
@@ -515,7 +398,7 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseTemplateSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
-        final TestCaseTemplate templateSetting = (TestCaseTemplate) new TestCaseTableModelUpdater()
+        final LocalSetting<TestCase> templateSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
                 .createSetting(createCase(), 0, "[Template]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
@@ -524,7 +407,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, templateSetting);
 
         assertThat(keyword.getUnknownSettings()).hasSize(1);
-        final KeywordUnknownSettings setting = keyword.getUnknownSettings().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getUnknownSettings().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_SETTING_UNKNOWN);
@@ -539,7 +422,7 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
-        final TestCaseTags tagsSettingSetting = (TestCaseTags) new TestCaseTableModelUpdater()
+        final LocalSetting<TestCase> tagsSettingSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
                 .createSetting(createCase(), 0, "[Tags]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
@@ -548,7 +431,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, tagsSettingSetting);
 
         assertThat(keyword.getTags()).hasSize(1);
-        final KeywordTags setting = keyword.getTags().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getTags().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TAGS);
@@ -563,7 +446,7 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseTeardownSettingIsProperlyMorphedIntoTeardownSetting_whenInserted() {
-        final TestCaseTeardown teardownSetting = (TestCaseTeardown) new TestCaseTableModelUpdater()
+        final LocalSetting<TestCase> teardownSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
                 .createSetting(createCase(), 0, "[Teardown]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
@@ -572,7 +455,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, teardownSetting);
 
         assertThat(keyword.getTeardowns()).hasSize(1);
-        final KeywordTeardown setting = keyword.getTeardowns().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getTeardowns().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TEARDOWN);
@@ -587,7 +470,7 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseTimeoutSettingIsProperlyMorphedIntoTimeoutSetting_whenInserted() {
-        final TestCaseTimeout timeoutSetting = (TestCaseTimeout) new TestCaseTableModelUpdater()
+        final LocalSetting<TestCase> timeoutSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
                 .createSetting(createCase(), 0, "[Timeout]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
@@ -596,7 +479,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, timeoutSetting);
 
         assertThat(keyword.getTimeouts()).hasSize(1);
-        final KeywordTimeout setting = keyword.getTimeouts().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getTimeouts().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TIMEOUT);
@@ -611,7 +494,7 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseDocumentationSettingIsProperlyMorphedIntoDocumentationSetting_whenInserted() {
-        final TestDocumentation docSetting = (TestDocumentation) new TestCaseTableModelUpdater()
+        final LocalSetting<TestCase> docSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
                 .createSetting(createCase(), 0, "[Documentation]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
@@ -620,7 +503,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, docSetting);
 
         assertThat(keyword.getDocumentation()).hasSize(1);
-        final KeywordDocumentation setting = keyword.getDocumentation().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getDocumentation().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_DOCUMENTATION);
@@ -635,10 +518,11 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseUnknownSetupSettingIsProperlyMorphedIntoArgumentsSetting_whenInserted() {
-        final TestCaseUnknownSettings tcSetting = new TestCaseUnknownSettings(RobotToken.create("[Arguments]"));
-        tcSetting.addArgument(RobotToken.create("a"));
-        tcSetting.addArgument(RobotToken.create("b"));
-        tcSetting.addArgument(RobotToken.create("c"));
+        final LocalSetting<TestCase> tcSetting = new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN,
+                RobotToken.create("[Arguments]"));
+        tcSetting.addToken("a");
+        tcSetting.addToken("b");
+        tcSetting.addToken("c");
         tcSetting.setComment("comment");
 
         final UserKeyword keyword = createKeyword();
@@ -647,7 +531,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, tcSetting);
 
         assertThat(keyword.getArguments()).hasSize(1);
-        final KeywordArguments setting = keyword.getArguments().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getArguments().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_ARGUMENTS);
@@ -662,10 +546,11 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseUnknownTemplateSettingIsProperlyMorphedIntoReturnSetting_whenInserted() {
-        final TestCaseUnknownSettings tcSetting = new TestCaseUnknownSettings(RobotToken.create("[Return]"));
-        tcSetting.addArgument(RobotToken.create("a"));
-        tcSetting.addArgument(RobotToken.create("b"));
-        tcSetting.addArgument(RobotToken.create("c"));
+        final LocalSetting<TestCase> tcSetting = new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN,
+                RobotToken.create("[Return]"));
+        tcSetting.addToken("a");
+        tcSetting.addToken("b");
+        tcSetting.addToken("c");
         tcSetting.setComment("comment");
 
         final UserKeyword keyword = createKeyword();
@@ -674,7 +559,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, tcSetting);
 
         assertThat(keyword.getReturns()).hasSize(1);
-        final KeywordReturn setting = keyword.getReturns().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getReturns().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_RETURN);
@@ -689,10 +574,11 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testCaseUnknownTemplateSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
-        final TestCaseUnknownSettings tcSetting = new TestCaseUnknownSettings(RobotToken.create("[something]"));
-        tcSetting.addArgument(RobotToken.create("a"));
-        tcSetting.addArgument(RobotToken.create("b"));
-        tcSetting.addArgument(RobotToken.create("c"));
+        final LocalSetting<TestCase> tcSetting = new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN,
+                RobotToken.create("[something]"));
+        tcSetting.addToken("a");
+        tcSetting.addToken("b");
+        tcSetting.addToken("c");
         tcSetting.setComment("comment");
 
         final UserKeyword keyword = createKeyword();
@@ -701,7 +587,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(keyword, 0, tcSetting);
 
         assertThat(keyword.getUnknownSettings()).hasSize(1);
-        final KeywordUnknownSettings setting = keyword.getUnknownSettings().get(0);
+        final LocalSetting<UserKeyword> setting = keyword.getUnknownSettings().get(0);
 
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_SETTING_UNKNOWN);
@@ -714,12 +600,8 @@ public class KeywordTableModelUpdaterTest {
                 RobotTokenType.START_HASH_COMMENT);
     }
 
-    private void checkSetting(final RobotToken actualKeywordName, final String expectedKeywordName,
-            final List<RobotToken> actualArguments, final List<String> expectedArguments,
-            final List<RobotToken> actualComments, final String expectedComment) {
-        assertTrue(actualKeywordName.getText().equals(expectedKeywordName));
-        checkSettingArguments(actualArguments, expectedArguments);
-        checkSettingComment(actualComments, expectedComment);
+    private static List<String> cellsOf(final LocalSetting<?> setting) {
+        return setting.getElementTokens().stream().map(RobotToken::getText).collect(toList());
     }
 
     private void checkSetting(final List<RobotToken> actualArguments, final List<String> expectedArguments,
@@ -737,12 +619,6 @@ public class KeywordTableModelUpdaterTest {
         for (int i = 0; i < actualArguments.size(); i++) {
             assertTrue(actualArguments.get(i).getText().equals(expectedArguments.get(i)));
         }
-    }
-
-    private void checkRemoveMethod(final AModelElement<?> modelElement) {
-        assertFalse(userKeyword.getElements().isEmpty());
-        modelUpdater.remove(userKeyword, modelElement);
-        assertTrue(userKeyword.getElements().isEmpty());
     }
 
     private static TestCase createCase() {

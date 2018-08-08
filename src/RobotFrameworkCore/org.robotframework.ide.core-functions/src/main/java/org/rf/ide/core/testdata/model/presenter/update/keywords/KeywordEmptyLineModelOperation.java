@@ -36,12 +36,9 @@ public class KeywordEmptyLineModelOperation implements IExecutablesStepsHolderEl
     }
 
     @Override
-    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+    public AModelElement<UserKeyword> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        @SuppressWarnings("unchecked")
-        final RobotEmptyRow<UserKeyword> emptyLine = (RobotEmptyRow<UserKeyword>) modelElement;
-        userKeyword.addElement(emptyLine, index);
-        return modelElement;
+        return userKeyword.addElement(index, modelElement);
     }
 
     @Override
@@ -52,11 +49,5 @@ public class KeywordEmptyLineModelOperation implements IExecutablesStepsHolderEl
     @Override
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         // Do nothing
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }
