@@ -33,8 +33,8 @@ public class SectionsAssistProcessorTest {
     public void sectionsProcessorIsValidOnlyForVariablesSection() {
         final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant((RobotSuiteFile) null));
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
-                SuiteSourcePartitionScanner.KEYWORDS_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
-                SuiteSourcePartitionScanner.VARIABLES_SECTION);
+                SuiteSourcePartitionScanner.TASKS_SECTION, SuiteSourcePartitionScanner.KEYWORDS_SECTION,
+                SuiteSourcePartitionScanner.SETTINGS_SECTION, SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
     @Test
@@ -70,13 +70,14 @@ public class SectionsAssistProcessorTest {
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 19);
 
-        assertThat(proposals).hasSize(4)
-            .haveExactly(4, proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
+        assertThat(proposals).hasSize(5)
+                .haveExactly(5, proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Test Cases ***", "*** Keywords ***", ""),
                 new Document("*** Test Cases ***", "*** Test Cases ***", ""),
+                new Document("*** Test Cases ***", "*** Tasks ***", ""),
                 new Document("*** Test Cases ***", "*** Variables ***", ""),
                 new Document("*** Test Cases ***", "*** Settings ***", ""));
     }
@@ -94,13 +95,15 @@ public class SectionsAssistProcessorTest {
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 0);
 
-        assertThat(proposals).hasSize(4).haveExactly(4,
+        assertThat(proposals).hasSize(5)
+                .haveExactly(5,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Keywords ***", ""),
                 new Document("*** Test Cases ***", ""),
+                new Document("*** Tasks ***", ""),
                 new Document("*** Variables ***", ""),
                 new Document("*** Settings ***", ""));
     }

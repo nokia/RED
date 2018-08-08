@@ -20,7 +20,7 @@ public class RedSettingProposalTest {
 
     @Test
     public void testGeneralSettingProposalWithEmptyMatch() {
-        final RedSettingProposal proposal = new RedSettingProposal("Documentation", SettingTarget.GENERAL,
+        final RedSettingProposal proposal = new RedSettingProposal("Documentation", SettingTarget.GENERAL_TESTS,
                 ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("Documentation");
@@ -65,7 +65,7 @@ public class RedSettingProposalTest {
 
     @Test
     public void testProposalWithNonEmptyMatch() {
-        final RedSettingProposal proposal = new RedSettingProposal("Documentation", SettingTarget.GENERAL,
+        final RedSettingProposal proposal = new RedSettingProposal("Documentation", SettingTarget.GENERAL_TESTS,
                 new ProposalMatch(Range.closedOpen(1, 3), Range.closedOpen(4, 7)));
 
         assertThat(proposal.getContent()).isEqualTo("Documentation");

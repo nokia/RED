@@ -35,7 +35,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
     @Test
     public void labelIsNotAdded_forNonKeywordBasedSetting() {
         final RobotSetting setting = mock(RobotSetting.class);
-        when(setting.isKeywordBased()).thenReturn(false);
+        when(setting.isAnySetupOrTeardown()).thenReturn(false);
         final Entry<String, RobotSetting> entry = entry("Setting", setting);
 
         assertThat(labelsAt(entry, 0)).isEmpty();
@@ -46,7 +46,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
     @Test
     public void labelIsNotAdded_forFirstColumnOfKeywordBasedSetting() {
         final RobotSetting setting = mock(RobotSetting.class);
-        when(setting.isKeywordBased()).thenReturn(true);
+        when(setting.isAnySetupOrTeardown()).thenReturn(true);
         final Entry<String, RobotSetting> entry = entry("Setting", setting);
 
         assertThat(labelsAt(entry, 0)).isEmpty();
@@ -55,7 +55,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
     @Test
     public void labelIsAdded_forSecondColumnOfKeywordBasedSetting() {
         final RobotSetting setting = mock(RobotSetting.class);
-        when(setting.isKeywordBased()).thenReturn(true);
+        when(setting.isAnySetupOrTeardown()).thenReturn(true);
         final Entry<String, RobotSetting> entry = entry("Setting", setting);
 
         assertThat(labelsAt(entry, 1)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);

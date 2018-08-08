@@ -26,12 +26,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.SourceOpeningSupport;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordDefinitionInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordSpecificationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.LibrarySpecificationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TaskInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -166,6 +168,9 @@ public class DocumentationsLinksSupport {
         } else if (params.containsKey(WorkspaceFileUri.TEST_PARAM)) {
             input = element.map(e -> new TestCaseInput((RobotCase) e));
 
+        } else if (params.containsKey(WorkspaceFileUri.TASK_PARAM)) {
+            input = element.map(e -> new TaskInput((RobotTask) e));
+
         } else {
             input = Optional.empty();
         }
@@ -192,11 +197,19 @@ public class DocumentationsLinksSupport {
                     .flatMap(Collection::stream)
                     .filter(kw -> kw.getName().equals(params.get(WorkspaceFileUri.KEYWORD_PARAM)))
                     .findFirst();
+
         } else if (params.containsKey(WorkspaceFileUri.TEST_PARAM)) {
             return fileModel.map(RobotSuiteFile::getTestCases)
                     .flatMap(Collection::stream)
                     .filter(test -> test.getName().equals(params.get(WorkspaceFileUri.TEST_PARAM)))
                     .findFirst();
+
+        } else if (params.containsKey(WorkspaceFileUri.TASK_PARAM)) {
+            return fileModel.map(RobotSuiteFile::getTasks)
+                    .flatMap(Collection::stream)
+                    .filter(task -> task.getName().equals(params.get(WorkspaceFileUri.TASK_PARAM)))
+                    .findFirst();
+
         } else {
             return Optional.empty();
         }

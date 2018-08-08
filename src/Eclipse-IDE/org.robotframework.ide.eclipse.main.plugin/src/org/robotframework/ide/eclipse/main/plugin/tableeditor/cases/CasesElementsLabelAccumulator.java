@@ -9,6 +9,7 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
@@ -38,9 +39,9 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
                 configLabels.addLabel(CASE_SETTING_CONFIG_LABEL);
             } else if (rowObject instanceof RobotKeywordCall) {
                 configLabels.addLabel(CASE_CALL_CONFIG_LABEL);
-            } else if (rowObject instanceof RobotCase) {
-                final RobotCase testCase = (RobotCase) rowObject;
-                if (testCase.getTemplateInUse().isPresent()) {
+            } else if (rowObject instanceof RobotCodeHoldingElement<?>) {
+                final RobotCodeHoldingElement<?> holder = (RobotCodeHoldingElement<?>) rowObject;
+                if (holder.getTemplateInUse().isPresent()) {
                     configLabels.addLabel(CASE_WITH_TEMPLATE_CONFIG_LABEL);
                 } else {
                     configLabels.addLabel(CASE_CONFIG_LABEL);

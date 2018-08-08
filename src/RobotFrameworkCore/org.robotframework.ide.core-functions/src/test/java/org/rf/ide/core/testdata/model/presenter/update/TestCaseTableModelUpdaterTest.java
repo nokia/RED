@@ -21,24 +21,11 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -131,23 +118,6 @@ public class TestCaseTableModelUpdaterTest {
     }
 
     @Test
-    public void handlersForKeywordCannotRemoveAnything() {
-        final TestCase testCase = mock(TestCase.class);
-        final AModelElement<?> element = mock(AModelElement.class);
-        for (final ModelType kwModelType : keywordModelTypes) {
-            final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
-
-            try {
-                handler.remove(testCase, element);
-                fail("Expected exception");
-            } catch (final UnsupportedOperationException e) {
-                // we expected that
-            }
-        }
-        verifyZeroInteractions(testCase, element);
-    }
-
-    @Test
     public void executableRowOpreationsTest() {
         final TestCase testCase = createCase();
 
@@ -187,11 +157,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "1", "2", "3",
                 "#new comment");
 
-        updater.remove(testCase, addedRow);
-        assertThat(testCase.getExecutionContext()).isEmpty();
-
         updater.insert(testCase, 0, addedRow);
-        assertThat(testCase.getExecutionContext()).hasSize(1);
+        assertThat(testCase.getExecutionContext()).hasSize(2);
         assertThat(addedRow).isSameAs(testCase.getExecutionContext().get(0));
     }
 
@@ -219,11 +186,11 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getSetups()).isEmpty();
 
-        final TestCaseSetup setting = (TestCaseSetup) updater.createSetting(testCase, 0, "[Setup]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Setup]",
+                "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getSetups()).hasSize(1);
-        final TestCaseSetup addedSetting = testCase.getSetups().get(0);
+        final LocalSetting<TestCase> addedSetting = testCase.getSetups().get(0);
 
         assertThat(addedSetting).isSameAs(setting);
         assertThat(addedSetting.getParent()).isSameAs(testCase);
@@ -256,11 +223,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "1", "2", "3",
                 "#new comment");
 
-        updater.remove(testCase, addedSetting);
-        assertThat(testCase.getSetups()).isEmpty();
-
         updater.insert(testCase, 0, addedSetting);
-        assertThat(testCase.getSetups()).hasSize(1);
+        assertThat(testCase.getSetups()).hasSize(2);
         assertThat(addedSetting).isSameAs(testCase.getSetups().get(0));
     }
 
@@ -270,11 +234,11 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTags()).isEmpty();
 
-        final TestCaseTags setting = (TestCaseTags) updater.createSetting(testCase, 0, "[Tags]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Tags]",
+                "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getTags()).hasSize(1);
-        final TestCaseTags addedSetting = testCase.getTags().get(0);
+        final LocalSetting<TestCase> addedSetting = testCase.getTags().get(0);
 
         assertThat(addedSetting).isSameAs(setting);
         assertThat(addedSetting.getParent()).isSameAs(testCase);
@@ -307,11 +271,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "1", "2", "3",
                 "#new comment");
 
-        updater.remove(testCase, addedSetting);
-        assertThat(testCase.getTags()).isEmpty();
-
         updater.insert(testCase, 0, addedSetting);
-        assertThat(testCase.getTags()).hasSize(1);
+        assertThat(testCase.getTags()).hasSize(2);
         assertThat(addedSetting).isSameAs(testCase.getTags().get(0));
     }
 
@@ -321,11 +282,11 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTimeouts()).isEmpty();
 
-        final TestCaseTimeout setting = (TestCaseTimeout) updater.createSetting(testCase, 0, "[Timeout]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Timeout]",
+                "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getTimeouts()).hasSize(1);
-        final TestCaseTimeout addedSetting = testCase.getTimeouts().get(0);
+        final LocalSetting<TestCase> addedSetting = testCase.getTimeouts().get(0);
 
         assertThat(addedSetting).isSameAs(setting);
         assertThat(addedSetting.getParent()).isSameAs(testCase);
@@ -358,11 +319,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "1", "2", "3",
                 "#new comment");
 
-        updater.remove(testCase, addedSetting);
-        assertThat(testCase.getTags()).isEmpty();
-
         updater.insert(testCase, 0, addedSetting);
-        assertThat(testCase.getTimeouts()).hasSize(1);
+        assertThat(testCase.getTimeouts()).hasSize(2);
         assertThat(addedSetting).isSameAs(testCase.getTimeouts().get(0));
     }
 
@@ -372,11 +330,11 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final TestCaseTeardown setting = (TestCaseTeardown) updater.createSetting(testCase, 0, "[Teardown]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Teardown]",
+                "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getTeardowns()).hasSize(1);
-        final TestCaseTeardown addedSetting = testCase.getTeardowns().get(0);
+        final LocalSetting<TestCase> addedSetting = testCase.getTeardowns().get(0);
 
         assertThat(addedSetting).isSameAs(setting);
         assertThat(addedSetting.getParent()).isSameAs(testCase);
@@ -409,11 +367,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "1", "2", "3",
                 "#new comment");
 
-        updater.remove(testCase, addedSetting);
-        assertThat(testCase.getTeardowns()).isEmpty();
-
         updater.insert(testCase, 0, addedSetting);
-        assertThat(testCase.getTeardowns()).hasSize(1);
+        assertThat(testCase.getTeardowns()).hasSize(2);
         assertThat(addedSetting).isSameAs(testCase.getTeardowns().get(0));
     }
 
@@ -423,11 +378,11 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final TestCaseTemplate setting = (TestCaseTemplate) updater.createSetting(testCase, 0, "[Template]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Template]",
+                "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getTemplates()).hasSize(1);
-        final TestCaseTemplate addedSetting = testCase.getTemplates().get(0);
+        final LocalSetting<TestCase> addedSetting = testCase.getTemplates().get(0);
 
         assertThat(addedSetting).isSameAs(setting);
         assertThat(addedSetting.getParent()).isSameAs(testCase);
@@ -460,11 +415,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "1", "2", "3",
                 "#new comment");
 
-        updater.remove(testCase, addedSetting);
-        assertThat(testCase.getTemplates()).isEmpty();
-
         updater.insert(testCase, 0, addedSetting);
-        assertThat(testCase.getTemplates()).hasSize(1);
+        assertThat(testCase.getTemplates()).hasSize(2);
         assertThat(addedSetting).isSameAs(testCase.getTemplates().get(0));
     }
 
@@ -474,12 +426,11 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final TestCaseUnknownSettings setting = (TestCaseUnknownSettings) updater.createSetting(testCase, 0,
-                "[unknown]",
+        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[unknown]",
                 "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getUnknownSettings()).hasSize(1);
-        final TestCaseUnknownSettings addedSetting = testCase.getUnknownSettings().get(0);
+        final LocalSetting<TestCase> addedSetting = testCase.getUnknownSettings().get(0);
 
         assertThat(addedSetting).isSameAs(setting);
         assertThat(addedSetting.getParent()).isSameAs(testCase);
@@ -512,11 +463,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "1", "2", "3",
                 "#new comment");
 
-        updater.remove(testCase, addedSetting);
-        assertThat(testCase.getUnknownSettings()).isEmpty();
-
         updater.insert(testCase, 0, addedSetting);
-        assertThat(testCase.getUnknownSettings()).hasSize(1);
+        assertThat(testCase.getUnknownSettings()).hasSize(2);
         assertThat(addedSetting).isSameAs(testCase.getUnknownSettings().get(0));
     }
 
@@ -526,11 +474,11 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getDocumentation()).isEmpty();
 
-        final TestDocumentation setting = (TestDocumentation) updater.createSetting(testCase, 0, "[Documentation]",
-                "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0,
+                "[Documentation]", "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getDocumentation()).hasSize(1);
-        final TestDocumentation addedSetting = testCase.getDocumentation().get(0);
+        final LocalSetting<TestCase> addedSetting = testCase.getDocumentation().get(0);
 
         assertThat(addedSetting).isSameAs(setting);
         assertThat(addedSetting.getParent()).isSameAs(testCase);
@@ -563,11 +511,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "1",
                 "#new comment");
 
-        updater.remove(testCase, addedSetting);
-        assertThat(testCase.getDocumentation()).isEmpty();
-
         updater.insert(testCase, 0, addedSetting);
-        assertThat(testCase.getDocumentation()).hasSize(1);
+        assertThat(testCase.getDocumentation()).hasSize(2);
         assertThat(addedSetting).isSameAs(testCase.getDocumentation().get(0));
     }
 
@@ -601,7 +546,7 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordArgumentsSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
-        final KeywordArguments keywordSetting = (KeywordArguments) new KeywordTableModelUpdater()
+        final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
                 .createSetting(createKeyword(), 0, "[Arguments]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
@@ -610,7 +555,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getUnknownSettings()).hasSize(1);
-        final TestCaseUnknownSettings setting = testCase.getUnknownSettings().get(0);
+        final LocalSetting<TestCase> setting = testCase.getUnknownSettings().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETTING_UNKNOWN);
@@ -625,7 +570,7 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordReturnSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
-        final KeywordReturn keywordSetting = (KeywordReturn) new KeywordTableModelUpdater()
+        final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
                 .createSetting(createKeyword(), 0, "[Return]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
@@ -634,7 +579,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getUnknownSettings()).hasSize(1);
-        final TestCaseUnknownSettings setting = testCase.getUnknownSettings().get(0);
+        final LocalSetting<TestCase> setting = testCase.getUnknownSettings().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETTING_UNKNOWN);
@@ -649,8 +594,8 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
-        final KeywordTags keywordSetting = (KeywordTags) new KeywordTableModelUpdater().createSetting(createKeyword(),
-                0, "[Tags]", "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
+                .createSetting(createKeyword(), 0, "[Tags]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -658,7 +603,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getTags()).hasSize(1);
-        final TestCaseTags setting = testCase.getTags().get(0);
+        final LocalSetting<TestCase> setting = testCase.getTags().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_TAGS);
@@ -673,7 +618,7 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordTeardownSettingIsProperlyMorphedIntoTeardownSetting_whenInserted() {
-        final KeywordTeardown keywordSetting = (KeywordTeardown) new KeywordTableModelUpdater()
+        final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
                 .createSetting(createKeyword(), 0, "[Teardown]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
@@ -682,7 +627,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getTeardowns()).hasSize(1);
-        final TestCaseTeardown setting = testCase.getTeardowns().get(0);
+        final LocalSetting<TestCase> setting = testCase.getTeardowns().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_TEARDOWN);
@@ -697,7 +642,7 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordTimeoutSettingIsProperlyMorphedIntoTimeoutSetting_whenInserted() {
-        final KeywordTimeout keywordSetting = (KeywordTimeout) new KeywordTableModelUpdater()
+        final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
                 .createSetting(createKeyword(), 0, "[Timeout]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
@@ -706,7 +651,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getTimeouts()).hasSize(1);
-        final TestCaseTimeout setting = testCase.getTimeouts().get(0);
+        final LocalSetting<TestCase> setting = testCase.getTimeouts().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_TIMEOUT);
@@ -721,7 +666,7 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordDocumentationSettingIsProperlyMorphedIntoDocumentationSetting_whenInserted() {
-        final KeywordDocumentation keywordSetting = (KeywordDocumentation) new KeywordTableModelUpdater()
+        final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
                 .createSetting(createKeyword(), 0, "[Documentation]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
@@ -730,7 +675,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getDocumentation()).hasSize(1);
-        final TestDocumentation setting = testCase.getDocumentation().get(0);
+        final LocalSetting<TestCase> setting = testCase.getDocumentation().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_DOCUMENTATION);
@@ -746,10 +691,11 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordUnknownSetupSettingIsProperlyMorphedIntoSetupSetting_whenInserted() {
-        final KeywordUnknownSettings keywordSetting = new KeywordUnknownSettings(RobotToken.create("[Setup]"));
-        keywordSetting.addArgument(RobotToken.create("a"));
-        keywordSetting.addArgument(RobotToken.create("b"));
-        keywordSetting.addArgument(RobotToken.create("c"));
+        final LocalSetting<UserKeyword> keywordSetting = new LocalSetting<>(ModelType.USER_KEYWORD_SETTING_UNKNOWN,
+                RobotToken.create("[Setup]"));
+        keywordSetting.addToken("a");
+        keywordSetting.addToken("b");
+        keywordSetting.addToken("c");
         keywordSetting.setComment("comment");
 
         final TestCase testCase = createCase();
@@ -758,7 +704,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getSetups()).hasSize(1);
-        final TestCaseSetup setting = testCase.getSetups().get(0);
+        final LocalSetting<TestCase> setting = testCase.getSetups().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETUP);
@@ -773,10 +719,11 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordUnknownTemplateSettingIsProperlyMorphedIntoTemplateSetting_whenInserted() {
-        final KeywordUnknownSettings keywordSetting = new KeywordUnknownSettings(RobotToken.create("[Template]"));
-        keywordSetting.addArgument(RobotToken.create("a"));
-        keywordSetting.addArgument(RobotToken.create("b"));
-        keywordSetting.addArgument(RobotToken.create("c"));
+        final LocalSetting<UserKeyword> keywordSetting = new LocalSetting<>(ModelType.USER_KEYWORD_SETTING_UNKNOWN,
+                RobotToken.create("[Template]"));
+        keywordSetting.addToken("a");
+        keywordSetting.addToken("b");
+        keywordSetting.addToken("c");
         keywordSetting.setComment("comment");
 
         final TestCase testCase = createCase();
@@ -785,7 +732,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getTemplates()).hasSize(1);
-        final TestCaseTemplate setting = testCase.getTemplates().get(0);
+        final LocalSetting<TestCase> setting = testCase.getTemplates().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_TEMPLATE);
@@ -800,10 +747,11 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordUnknownTemplateSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
-        final KeywordUnknownSettings keywordSetting = new KeywordUnknownSettings(RobotToken.create("[something]"));
-        keywordSetting.addArgument(RobotToken.create("a"));
-        keywordSetting.addArgument(RobotToken.create("b"));
-        keywordSetting.addArgument(RobotToken.create("c"));
+        final LocalSetting<UserKeyword> keywordSetting = new LocalSetting<>(ModelType.USER_KEYWORD_SETTING_UNKNOWN,
+                RobotToken.create("[something]"));
+        keywordSetting.addToken("a");
+        keywordSetting.addToken("b");
+        keywordSetting.addToken("c");
         keywordSetting.setComment("comment");
 
         final TestCase testCase = createCase();
@@ -812,7 +760,7 @@ public class TestCaseTableModelUpdaterTest {
         updater.insert(testCase, 0, keywordSetting);
 
         assertThat(testCase.getUnknownSettings()).hasSize(1);
-        final TestCaseUnknownSettings setting = testCase.getUnknownSettings().get(0);
+        final LocalSetting<TestCase> setting = testCase.getUnknownSettings().get(0);
 
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETTING_UNKNOWN);

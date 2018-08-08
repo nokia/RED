@@ -5,25 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
-import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.validation.ProblemPosition;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
-
-import com.google.common.collect.Range;
 
 public class RobotSuiteFileValidator extends RobotFileValidator {
 
@@ -39,7 +31,7 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
 
         super.validate(fileModel, validationContext);
 
-        validateFileName(fileModel);
+        validateIfThereAreNoForbiddenSections(fileModel);
     }
 
     private void reportVersionSpecificProblems(final RobotSuiteFile fileModel,
@@ -49,30 +41,13 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
         versionDependentValidators.getTestSuiteFileValidators(fileModel).forEach(ModelUnitValidator::validate);
     }
 
-    private void validateFileName(final RobotSuiteFile fileModel) {
-        if (RobotFile.INIT_NAMES.stream().anyMatch(file.getName()::equalsIgnoreCase)) {
-            final ProblemPosition position = getTestCaseTableHeaderPosition(
-                    fileModel.findSection(RobotCasesSection.class));
-            reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.SUITE_FILE_IS_NAMED_INIT), file, position);
-        }
+    private void validateIfThereAreNoForbiddenSections(final RobotSuiteFile fileModel) {
+        fileModel.findSection(RobotTasksSection.class)
+                .map(RobotTasksSection::getLinkedElement)
+                .map(ARobotSectionTable::getHeaders)
+                .map(headers -> headers.get(0))
+                .map(TableHeader::getDeclaration)
+                .ifPresent(headerToken -> reporter.handleProblem(
+                        RobotProblem.causedBy(SuiteFileProblem.SUITE_FILE_CONTAINS_TASKS), file, headerToken));
     }
-
-    private ProblemPosition getTestCaseTableHeaderPosition(final Optional<RobotCasesSection> section) {
-        // TODO : this can be done using some nice API on parser side
-        if (!section.isPresent()) {
-            return new ProblemPosition(1);
-        }
-        final TestCaseTable table = section.get().getLinkedElement();
-        final List<TableHeader<? extends ARobotSectionTable>> headers = table.getHeaders();
-        if (!headers.isEmpty()) {
-            final TableHeader<? extends ARobotSectionTable> header = headers.get(0);
-            final int line = header.getBeginPosition().getLine();
-            final int beginOffset = header.getBeginPosition().getOffset();
-            final int endOffset = header.getEndPosition().getOffset();
-
-            return new ProblemPosition(line, Range.closed(beginOffset, endOffset));
-        }
-        return new ProblemPosition(1);
-    }
-
 }

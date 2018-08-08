@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.text.read.recognizer;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotVersion;
@@ -39,11 +40,7 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.SETTINGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Setting").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Settings").build(),
-            VersionAvailabilityInfoBuilder.create()
-                    .addRepresentation("Metadata")
-                    .deprecatedFrom("3.0")
-                    .removedFrom("3.1")
-                    .build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata").deprecatedFrom("3.0").build()),
     /**
      */
     VARIABLES_TABLE_HEADER(
@@ -56,22 +53,18 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.TEST_CASES,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Case").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Cases").build()),
+    TASKS_TABLE_HEADER(
+            TableType.TASKS,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Tasks").build()),
     /**
      */
     KEYWORDS_TABLE_HEADER(
             TableType.KEYWORDS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Keyword").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Keywords").build(),
-            VersionAvailabilityInfoBuilder.create()
-                    .addRepresentation("User Keyword")
-                    .deprecatedFrom("3.0")
-                    .removedFrom("3.1")
-                    .build(),
-            VersionAvailabilityInfoBuilder.create()
-                    .addRepresentation("User Keywords")
-                    .deprecatedFrom("3.0")
-                    .removedFrom("3.1")
-                    .build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keyword").deprecatedFrom("3.0").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keywords").build()),
     /**
      */
     TABLE_HEADER_COLUMN(TableType.NOT_STRICTLY_BELONGS),
@@ -169,16 +162,10 @@ public enum RobotTokenType implements IRobotTokenType {
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata:").build(),
-            VersionAvailabilityInfoBuilder.create()
-                    .deprecatedFrom("2.9")
-                    .removedFrom("3.0")
-                    .addRepresentation("Meta")
-                    .build(),
-            VersionAvailabilityInfoBuilder.create()
-                    .deprecatedFrom("2.9")
-                    .removedFrom("3.0")
-                    .addRepresentation("Meta:")
-                    .build()),
+            VersionAvailabilityInfoBuilder.create().deprecatedFrom("2.9").removedFrom("3.0")
+                .addRepresentation("Meta").build(),
+            VersionAvailabilityInfoBuilder.create().deprecatedFrom("2.9").removedFrom("3.0")
+                .addRepresentation("Meta:").build()),
     /**
      */
     SETTING_METADATA_KEY(TableType.SETTINGS),
@@ -269,12 +256,15 @@ public enum RobotTokenType implements IRobotTokenType {
                     .removedFrom("3.1")
                     .build()),
     /**
+     * 
      */
     SETTING_TEST_SETUP_KEYWORD_NAME(TableType.SETTINGS),
     /**
+     * 
      */
     SETTING_TEST_SETUP_KEYWORD_ARGUMENT(TableType.SETTINGS),
     /**
+     * 
      */
     SETTING_TEST_TEARDOWN_DECLARATION(
             TableType.SETTINGS,
@@ -323,6 +313,36 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     SETTING_TEST_TIMEOUT_MESSAGE(TableType.SETTINGS),
+
+    SETTING_TASK_SETUP_DECLARATION(
+            TableType.SETTINGS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task Setup").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task Setup:").build()),
+    SETTING_TASK_SETUP_KEYWORD_NAME(TableType.SETTINGS),
+    SETTING_TASK_SETUP_KEYWORD_ARGUMENT(TableType.SETTINGS),
+    SETTING_TASK_TEARDOWN_DECLARATION(
+            TableType.SETTINGS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task Teardown").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task Teardown:").build()),
+    SETTING_TASK_TEARDOWN_KEYWORD_NAME(TableType.SETTINGS),
+    SETTING_TASK_TEARDOWN_KEYWORD_ARGUMENT(TableType.SETTINGS),
+    SETTING_TASK_TEMPLATE_DECLARATION(
+            TableType.SETTINGS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task Template").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task Template:").build()),
+    SETTING_TASK_TEMPLATE_KEYWORD_NAME(TableType.SETTINGS),
+    SETTING_TASK_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT(TableType.SETTINGS),
+    SETTING_TASK_TIMEOUT_DECLARATION(
+            TableType.SETTINGS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task Timeout").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task Timeout:").build()),
+    SETTING_TASK_TIMEOUT_VALUE(TableType.SETTINGS),
+    SETTING_TASK_TIMEOUT_MESSAGE(TableType.SETTINGS),
+
     /**
      */
     VARIABLES_WRONG_DEFINED(TableType.VARIABLES, true),
@@ -463,6 +483,53 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     TEST_CASE_EMPTY_LINE(TableType.TEST_CASES),
+
+
+    TASK_EMPTY_CELL(
+            TableType.NOT_STRICTLY_BELONGS,
+            VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
+    TASK_SETTING_UNKNOWN_DECLARATION(TableType.TASKS, true),
+    TASK_SETTING_UNKNOWN_ARGUMENTS(TableType.TASKS),
+    TASK_SETTING_DOCUMENTATION(
+            TableType.TASKS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("[Documentation]").build()),
+    TASK_SETTING_DOCUMENTATION_TEXT(TableType.TASKS),
+    TASK_SETTING_TAGS_DECLARATION(
+            TableType.TASKS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("[Tags]").build()),
+    TASK_SETTING_TAGS(TableType.TASKS),
+    TASK_SETTING_SETUP(
+            TableType.TASKS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("[Setup]").build()),
+    TASK_SETTING_SETUP_KEYWORD_NAME(TableType.TASKS),
+    TASK_SETTING_SETUP_KEYWORD_ARGUMENT(TableType.TASKS),
+    TASK_SETTING_TEARDOWN(
+            TableType.TASKS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("[Teardown]").build()),
+    TASK_SETTING_TEARDOWN_KEYWORD_NAME(TableType.TASKS),
+    TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT(TableType.TASKS),
+    TASK_SETTING_TEMPLATE(
+            TableType.TASKS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("[Template]").build()),
+    TASK_SETTING_TEMPLATE_KEYWORD_NAME(TableType.TASKS),
+    TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT(TableType.TASKS),
+    TASK_SETTING_TIMEOUT(
+            TableType.TASKS,
+            true,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("[Timeout]").build()),
+    TASK_SETTING_TIMEOUT_VALUE(TableType.TASKS),
+    TASK_SETTING_TIMEOUT_MESSAGE(TableType.TASKS),
+    TASK_NAME(TableType.TASKS),
+    TASK_ACTION_NAME(TableType.TASKS),
+    TASK_ACTION_ARGUMENT(TableType.TASKS),
+    TASK_EMPTY_LINE(TableType.TASKS),
+
+
     /**
      */
     KEYWORD_EMPTY_CELL(
@@ -517,6 +584,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_RETURN_VALUE(TableType.KEYWORDS),
     /**
+     * 
      */
     KEYWORD_SETTING_TEARDOWN(
             TableType.KEYWORDS,
@@ -533,6 +601,7 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT(TableType.KEYWORDS),
+
     /**
      */
     KEYWORD_SETTING_TIMEOUT(
@@ -575,10 +644,8 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     FOR_CONTINUE_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()),
-    /**
-     */
-    FOR_CONTINUE_ARTIFICIAL_TOKEN(TableType.NOT_STRICTLY_BELONGS);
+            VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()), FOR_CONTINUE_ARTIFICIAL_TOKEN(
+                    TableType.NOT_STRICTLY_BELONGS);
 
     private final List<String> text = new ArrayList<>(0);
 
@@ -621,16 +688,12 @@ public enum RobotTokenType implements IRobotTokenType {
     }
 
     private enum TableType {
-        NOT_STRICTLY_BELONGS,
-        SETTINGS,
-        VARIABLES,
-        TEST_CASES,
-        KEYWORDS;
+        NOT_STRICTLY_BELONGS, SETTINGS, VARIABLES, TEST_CASES, TASKS, KEYWORDS;
     }
 
     public static boolean isTableHeader(final IRobotTokenType type) {
         return (type == SETTINGS_TABLE_HEADER || type == VARIABLES_TABLE_HEADER || type == TEST_CASES_TABLE_HEADER
-                || type == KEYWORDS_TABLE_HEADER || type == USER_OWN_TABLE_HEADER);
+                || type == TASKS_TABLE_HEADER || type == KEYWORDS_TABLE_HEADER || type == USER_OWN_TABLE_HEADER);
     }
 
     public static List<RobotTokenType> getTypesForSettingsTable() {
@@ -643,6 +706,10 @@ public enum RobotTokenType implements IRobotTokenType {
 
     public static List<RobotTokenType> getTypesForTestCasesTable() {
         return getTypes(TableType.TEST_CASES);
+    }
+
+    public static List<RobotTokenType> getTypesForTasksTable() {
+        return getTypes(TableType.TASKS);
     }
 
     public static List<RobotTokenType> getTypesForKeywordsTable() {
@@ -665,8 +732,29 @@ public enum RobotTokenType implements IRobotTokenType {
         return findTypeOfDeclaration(getTypesForTestCasesTable(), textSettingDeclaration);
     }
 
+    public static RobotTokenType findTypeOfDeclarationForTaskSettingTable(final String textSettingDeclaration) {
+        return findTypeOfDeclaration(getTypesForTasksTable(), textSettingDeclaration);
+    }
+
     public static RobotTokenType findTypeOfDeclarationForSettingTable(final String textSettingDeclaration) {
         return findTypeOfDeclaration(getTypesForSettingsTable(), textSettingDeclaration);
+    }
+
+    public static RobotTokenType findTypeOfDeclarationForTableHeader(final String headerName) {
+        final EnumSet<RobotTokenType> headerTypes = EnumSet.of(RobotTokenType.USER_OWN_TABLE_HEADER,
+                RobotTokenType.SETTINGS_TABLE_HEADER, RobotTokenType.VARIABLES_TABLE_HEADER,
+                RobotTokenType.KEYWORDS_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
+                RobotTokenType.TASKS_TABLE_HEADER);
+
+        for (final RobotTokenType headerType : headerTypes) {
+            for (final String representation : headerType.getRepresentation()) {
+                if (representation.equalsIgnoreCase(headerName.trim())) {
+                    return headerType;
+                }
+            }
+        }
+        return RobotTokenType.UNKNOWN;
+
     }
 
     private static RobotTokenType findTypeOfDeclaration(final List<RobotTokenType> availableTypes,
@@ -681,7 +769,6 @@ public enum RobotTokenType implements IRobotTokenType {
                 }
             }
         }
-
         return RobotTokenType.UNKNOWN;
     }
 
@@ -692,12 +779,14 @@ public enum RobotTokenType implements IRobotTokenType {
 
     @Override
     public VersionAvailabilityInfo findVersionAvailabilityInfo(final String text) {
+        VersionAvailabilityInfo vaiResult = null;
         for (final VersionAvailabilityInfo vInfo : representation) {
             if (vInfo.getRepresentation().equalsIgnoreCase(text)) {
-                return vInfo;
+                vaiResult = vInfo;
+                break;
             }
         }
-        return null;
+        return vaiResult;
     }
 
     public VersionAvailabilityInfo getTheMostCorrectOneRepresentation(final RobotVersion robotVersionInstalled) {

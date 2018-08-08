@@ -12,10 +12,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteInCodeHoldersTableHandler.E4DeleteInCodeHoldersTableHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyInKeywordTableHandler.E4CopyInKeywordTableHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutInKeywordTableHandler.E4CutInKeywordTableHandler;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteInKeywordTableHandler.E4DeleteInKeywordTableHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -34,7 +34,7 @@ public class CutInKeywordTableHandler extends DIParameterizedHandler<E4CutInKeyw
 
             final boolean copiedToClipboard = new E4CopyInKeywordTableHandler().copyContent(editor, selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteInKeywordTableHandler().delete(selection, editor, commandsStack);
+                new E4DeleteInCodeHoldersTableHandler().delete(selection, editor, commandsStack);
             }
         }
     }

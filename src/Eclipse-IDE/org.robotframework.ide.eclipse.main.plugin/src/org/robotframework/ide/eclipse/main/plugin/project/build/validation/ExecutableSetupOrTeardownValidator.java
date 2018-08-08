@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
@@ -26,11 +26,11 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
     private final Set<String> additionalVariables;
     private final ValidationReportingStrategy reporter;
 
-    private final AKeywordBaseSetting<?> setupOrTeardown;
+    private final ExecutableSetting setupOrTeardown;
 
 
     ExecutableSetupOrTeardownValidator(final FileValidationContext validationContext,
-            final Set<String> additionalVariables, final AKeywordBaseSetting<?> setupOrTeardown,
+            final Set<String> additionalVariables, final ExecutableSetting setupOrTeardown,
             final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.additionalVariables = additionalVariables;

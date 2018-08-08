@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.read.recognizer;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +40,10 @@ public class RobotToken implements IRobotLineElement, Serializable {
 
     public static RobotToken create(final String text) {
         return create(text, new ArrayList<>());
+    }
+
+    public static RobotToken create(final String text, final IRobotTokenType... types) {
+        return create(text, newArrayList(types));
     }
 
     public static RobotToken create(final String text, final Collection<? extends IRobotTokenType> types) {

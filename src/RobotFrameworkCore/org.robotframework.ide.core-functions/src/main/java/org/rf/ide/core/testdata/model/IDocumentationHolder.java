@@ -15,13 +15,7 @@ public interface IDocumentationHolder extends IRegionCacheable<IDocumentationHol
 
     List<RobotToken> getDocumentationText();
 
-    void setDocumentationText(final int index, final String docText);
-
-    void setDocumentationText(final int index, final RobotToken docText);
-
     void addDocumentationText(final RobotToken cmPart);
-
-    void removeDocumentationPart(final int index);
 
     void clearDocumentation();
 }

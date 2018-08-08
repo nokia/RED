@@ -173,18 +173,19 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         return toReturn;
     }
 
-    protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType) {
+    protected RobotToken fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType) {
         final List<IRobotTokenType> types = token.getTypes();
         if (!types.contains(expectedMainType)) {
             types.add(0, expectedMainType);
         }
+        return token;
     }
 
-    protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType,
+    protected RobotToken fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType,
             final boolean shouldNullCheck) {
         if (shouldNullCheck && token == null) {
-            return;
+            return token;
         }
-        fixForTheType(token, expectedMainType);
+        return fixForTheType(token, expectedMainType);
     }
 }

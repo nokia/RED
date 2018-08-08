@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
@@ -41,23 +41,52 @@ public class RobotCasesSection extends RobotSuiteFileSection {
         return (List<RobotCase>) super.getChildren();
     }
 
-    public RobotCase createTestCase(final String name) {
-        return createTestCase(getChildren().size(), name);
+    @Override
+    public String getDefaultChildName() {
+        return "case";
     }
 
-    public RobotCase createTestCase(final int index, final String name) {
+    @Override
+    public RobotCase createChild(final int index, final String name) {
+        final RobotCase testCase;
+
         final TestCaseTable casesTable = getLinkedElement();
-        final TestCase userTestCase = casesTable.createTestCase(name);
-        final RobotCase testCase = new RobotCase(this, userTestCase);
-        elements.add(index, testCase);
+        if (index >= 0 && index < elements.size()) {
+            testCase = new RobotCase(this, casesTable.createTestCase(name, index));
+            elements.add(index, testCase);
+        } else {
+            testCase = new RobotCase(this, casesTable.createTestCase(name));
+            elements.add(testCase);
+        }
         return testCase;
     }
 
-    List<RobotCase> getTestCases() {
-        final List<RobotCase> testCases = newArrayList();
-        for (final RobotElement child : getChildren()) {
-            testCases.add((RobotCase) child);
+    @Override
+    public void insertChild(final int index, final RobotFileInternalElement element) {
+        final RobotCase testCase = (RobotCase) element;
+        testCase.setParent(this);
+
+        final TestCaseTable casesTable = getLinkedElement();
+        if (index >= 0 && index < elements.size()) {
+            getChildren().add(index, testCase);
+            casesTable.addTest(testCase.getLinkedElement(), index);
+        } else {
+            getChildren().add(testCase);
+            casesTable.addTest(testCase.getLinkedElement());
         }
-        return testCases;
+    }
+
+    @Override
+    public void removeChildren(final List<? extends RobotFileInternalElement> elementsToRemove) {
+        getChildren().removeAll(elementsToRemove);
+
+        final TestCaseTable linkedElement = getLinkedElement();
+        for (final RobotFileInternalElement elementToRemove : elementsToRemove) {
+            linkedElement.removeTest((TestCase) elementToRemove.getLinkedElement());
+        }
+    }
+
+    List<RobotCase> getTestCases() {
+        return getChildren().stream().map(RobotCase.class::cast).collect(toList());
     }
 }

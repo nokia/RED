@@ -5,13 +5,14 @@
  */
 package org.rf.ide.core.testdata.mapping.table;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler;
-import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -36,75 +37,46 @@ import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import org.rf.ide.core.testdata.text.read.separators.StrictTsvTabulatorSeparator;
 
-@SuppressWarnings("PMD.GodClass")
 public class ElementsUtility {
 
-    private final ParsingStateHelper parsingStateHelper;
+    private final ParsingStateHelper parsingStateHelper = new ParsingStateHelper();
 
-    private final VariableExtractor varExtractor;
-
-    public ElementsUtility() {
-        this.parsingStateHelper = new ParsingStateHelper();
-        this.varExtractor = new VariableExtractor();
-    }
+    private final VariableExtractor varExtractor = new VariableExtractor();
 
     public List<RobotToken> filter(final List<RobotToken> toks, final IRobotTokenType type) {
-        final List<RobotToken> filtered = new ArrayList<>(0);
-
-        for (final RobotToken token : toks) {
-            if (token.getTypes().contains(type)) {
-                filtered.add(token);
-            }
-        }
-
-        return filtered;
+        return toks.stream().filter(token -> token.getTypes().contains(type)).collect(toList());
     }
 
     public boolean isNewExecutableSection(final ALineSeparator separator, final RobotLine line) {
-        boolean result = false;
         if (separator.getProducedType() == SeparatorType.PIPE) {
             final List<IRobotLineElement> lineElements = line.getLineElements();
-            if (lineElements.size() == 1) {
-                result = lineElements.get(0).getTypes().contains(SeparatorType.PIPE);
-            }
+            return lineElements.size() == 1 && lineElements.get(0).getTypes().contains(SeparatorType.PIPE);
         } else {
-            result = line.getLineElements().isEmpty();
+            return line.getLineElements().isEmpty();
         }
-        return result;
     }
 
     public LibraryImport findNearestLibraryImport(final RobotFileOutput robotFileOutput) {
         final AImported imported = getNearestImport(robotFileOutput);
-        LibraryImport lib;
-        if (imported instanceof LibraryImport) {
-            lib = (LibraryImport) imported;
-        } else {
-            lib = null;
-
-            // FIXME: sth wrong - declaration of library not inside setting
-            // and was not catch by previous library declaration logic
-        }
-        return lib;
+        return imported instanceof LibraryImport ? (LibraryImport) imported : null;
     }
 
-    public RobotToken computeCorrectRobotToken(final RobotLine currentLine, final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final FilePosition fp, final String text, final boolean isNewLine,
-            final List<RobotToken> robotTokens, final String fileName) {
-        final ParsingState state = parsingStateHelper.getCurrentState(processingState);
+    public RobotToken computeCorrectRobotToken(final Stack<ParsingState> processingState, final FilePosition fp,
+            final String text, final List<RobotToken> robotTokens) {
 
+        final ParsingState state = parsingStateHelper.getCurrentState(processingState);
         RobotToken correct = null;
 
-        final List<VariableDeclaration> correctVariables = varExtractor.extract(FilePosition.createNotSet(), text)
+        final List<VariableDeclaration> correctVariables = varExtractor
+                .extract(FilePosition.createNotSet(), text, "fake")
                 .getCorrectVariables();
 
         if (robotTokens.size() > 1) {
             final List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(robotTokens, fp);
             final TableType currentTable = state.getTable();
             if (tokensExactlyOnPosition.size() != 1 || currentTable == TableType.KEYWORD
-                    || currentTable == TableType.TEST_CASE) {
-                final List<RobotToken> headersPossible = robotTokens.stream()
-                        .filter(this::isTableHeader)
-                        .collect(Collectors.toList());
+                    || currentTable == TableType.TEST_CASE || currentTable == TableType.TASKS) {
+                final List<RobotToken> headersPossible = findHeadersPossible(robotTokens);
                 if (!headersPossible.isEmpty()) {
                     if (headersPossible.size() == 1) {
                         correct = headersPossible.get(0);
@@ -125,12 +97,15 @@ public class ElementsUtility {
                     }
 
                     final TableType tableType = state.getTable();
-                    if (correct == null && (tableType == TableType.KEYWORD || tableType == TableType.TEST_CASE)) {
+                    if (correct == null && (tableType == TableType.KEYWORD || tableType == TableType.TEST_CASE
+                            || tableType == TableType.TASKS)) {
                         final ParsingState expected;
                         if (tableType == TableType.KEYWORD) {
                             expected = ParsingState.KEYWORD_DECLARATION;
-                        } else {
+                        } else if (tableType == TableType.TEST_CASE) {
                             expected = ParsingState.TEST_CASE_DECLARATION;
+                        } else {
+                            expected = ParsingState.TASK_DECLARATION;
                         }
                         if (meetsState(state, expected) && tokensExactlyOnPosition.size() == 1) {
                             final RobotToken exactlyOne = tokensExactlyOnPosition.get(0);
@@ -163,7 +138,7 @@ public class ElementsUtility {
                     if (correct == null) {
                         if (ParsingState.getSettingsStates().contains(state) || currentTable == TableType.VARIABLES
                                 || currentTable == TableType.KEYWORD || currentTable == TableType.TEST_CASE
-                                || state == ParsingState.COMMENT) {
+                                || currentTable == TableType.TASKS || state == ParsingState.COMMENT) {
                             final RobotToken newRobotToken = new RobotToken();
                             newRobotToken.setLineNumber(fp.getLine());
                             newRobotToken.setStartColumn(fp.getColumn());
@@ -326,7 +301,7 @@ public class ElementsUtility {
         return tokens;
     }
 
-    private RobotToken findCommentToken(final List<RobotToken> robotTokens, final String text) {
+    public RobotToken findCommentToken(final List<RobotToken> robotTokens, final String text) {
         RobotToken comment = null;
         for (final RobotToken rt : robotTokens) {
             final List<IRobotTokenType> types = rt.getTypes();
@@ -339,6 +314,53 @@ public class ElementsUtility {
         }
 
         return comment;
+    }
+
+    public List<RobotToken> findHeadersPossible(final List<RobotToken> tokens) {
+        final List<RobotToken> found = new ArrayList<>();
+        for (final RobotToken t : tokens) {
+            if (isTableHeader(t)) {
+                found.add(t);
+            }
+        }
+
+        return found;
+    }
+
+    public boolean isComment(final RobotLine line) {
+        boolean result = false;
+        for (final IRobotLineElement elem : line.getLineElements()) {
+            final List<IRobotTokenType> types = elem.getTypes();
+            if (types.isEmpty()) {
+                result = false;
+                break;
+            } else {
+                final IRobotTokenType tokenType = types.get(0);
+                if (tokenType == SeparatorType.PIPE || tokenType == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
+                    continue;
+                } else if (tokenType == RobotTokenType.START_HASH_COMMENT) {
+                    result = true;
+                    break;
+                } else {
+                    result = false;
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public boolean isTableSection(final RobotLine line) {
+        boolean result = false;
+        for (final IRobotLineElement elem : line.getLineElements()) {
+            if (isTableHeader(elem)) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
     }
 
     public AImported getNearestImport(final RobotFileOutput robotFileOutput) {
@@ -363,6 +385,8 @@ public class ElementsUtility {
             tableKnownHeaders = fileModel.getVariableTable().getHeaders();
         } else if (tableHeaderState == ParsingState.TEST_CASE_TABLE_HEADER) {
             tableKnownHeaders = fileModel.getTestCaseTable().getHeaders();
+        } else if (tableHeaderState == ParsingState.TASKS_TABLE_HEADER) {
+            tableKnownHeaders = fileModel.getTasksTable().getHeaders();
         } else if (tableHeaderState == ParsingState.KEYWORD_TABLE_HEADER) {
             tableKnownHeaders = fileModel.getKeywordTable().getHeaders();
         } else {
@@ -373,24 +397,52 @@ public class ElementsUtility {
     }
 
     public boolean isTableHeader(final IRobotTokenType type) {
-        return type == RobotTokenType.SETTINGS_TABLE_HEADER || type == RobotTokenType.VARIABLES_TABLE_HEADER
-                || type == RobotTokenType.TEST_CASES_TABLE_HEADER || type == RobotTokenType.KEYWORDS_TABLE_HEADER;
+        return (type == RobotTokenType.SETTINGS_TABLE_HEADER || type == RobotTokenType.VARIABLES_TABLE_HEADER
+                || type == RobotTokenType.TEST_CASES_TABLE_HEADER || type == RobotTokenType.TASKS_TABLE_HEADER
+                || type == RobotTokenType.KEYWORDS_TABLE_HEADER);
     }
 
     public boolean isTableHeader(final RobotToken t) {
-        return t.getTypes().stream().anyMatch(this::isTableHeader) && t.getText().trim().startsWith("*");
+        boolean result = false;
+        final List<IRobotTokenType> declaredTypes = t.getTypes();
+        for (final IRobotTokenType type : declaredTypes) {
+            if (isTableHeader(type)) {
+                result = true;
+                break;
+            }
+        }
+
+        if (!t.getText().trim().startsWith("*")) {
+            result = false;
+        }
+
+        return result;
+    }
+
+    public boolean isTableHeader(final IRobotLineElement elem) {
+        boolean result = false;
+        if (elem instanceof RobotToken) {
+            result = isTableHeader((RobotToken) elem);
+        }
+
+        return result;
     }
 
     public boolean isUserTableHeader(final RobotToken t) {
+        boolean result = false;
         final String text = t.getText();
-        return text != null && text.length() > 1 && text.trim().startsWith("*");
+        if (text != null && text.length() > 1) {
+            result = text.trim().startsWith("*");
+        }
+
+        return result;
     }
 
-    public boolean checkIfFirstHasKeywordNameAlready(final List<? extends AKeywordBaseSetting<?>> keywordBased) {
+    public boolean checkIfFirstHasKeywordNameAlready(final List<? extends ExecutableSetting> keywordBased) {
         return !keywordBased.isEmpty() && keywordBased.get(0).getKeywordName() != null;
     }
 
-    public boolean checkIfLastHasKeywordNameAlready(final List<? extends AKeywordBaseSetting<?>> keywordBased) {
+    public boolean checkIfLastHasKeywordNameAlready(final List<? extends ExecutableSetting> keywordBased) {
         return !keywordBased.isEmpty() && keywordBased.get(keywordBased.size() - 1).getKeywordName() != null;
     }
 
@@ -419,7 +471,7 @@ public class ElementsUtility {
         } else if (separator.getProducedType() == SeparatorType.PIPE
                 || separator instanceof StrictTsvTabulatorSeparator) {
             final LineTokenInfo lineTokenInfo = LineTokenInfo.build(splittedLine);
-            if (!lineTokenInfo.getPositionsOfLineContinue().isEmpty()
+            if (!lineTokenInfo.getPositionsOfLineContinoue().isEmpty()
                     || !lineTokenInfo.getPositionsOfNotEmptyElements().isEmpty()) {
                 // Logic: Grant valid to process empty elements in case:
                 // SETTINGS or VARIABLES: always read empty the exclusion is
@@ -429,9 +481,9 @@ public class ElementsUtility {
                 // line continue in any case only first element is omitted
                 // GRANT LOGIC main: always process start from beginning until
                 // last not empty element
-                final boolean isContinue = lineTokenInfo.isLineContinueTheFirst();
+                final boolean isContinoue = lineTokenInfo.isLineContinueTheFirst();
                 if (tableType == TableType.SETTINGS || tableType == TableType.VARIABLES) {
-                    if (isContinue) {
+                    if (isContinoue) {
                         final RobotFile model = parsingOutput.getFileModel();
                         final PreviousLineHandler prevLineHandler = new PreviousLineHandler();
                         if (prevLineHandler.isSomethingToContinue(model)) {
@@ -444,32 +496,35 @@ public class ElementsUtility {
                     }
 
                     result = result && lineTokenInfo.getDataEndIndex() >= separator.getCurrentElementIndex();
-                } else if (tableType == TableType.TEST_CASE || tableType == TableType.KEYWORD) {
+                } else if (tableType == TableType.TEST_CASE || tableType == TableType.TASKS
+                        || tableType == TableType.KEYWORD) {
                     if (line.getLineElements().size() >= 2 || (line.getLineElements().size() == 1
                             && separator instanceof StrictTsvTabulatorSeparator)) {
-                        if (isContinue) {
+                        if (isContinoue) {
                             result = lineTokenInfo.getDataStartIndex() <= separator.getCurrentElementIndex();
                         } else {
-                            if (state == ParsingState.TEST_CASE_DECLARATION
+                            if (state == ParsingState.TEST_CASE_DECLARATION || state == ParsingState.TASK_DECLARATION
                                     || state == ParsingState.KEYWORD_DECLARATION) {
                                 /**
                                  * <pre>
                                  *  *** Test Cases ***
                                  *  | x | | ... | Log | ... |
-                                 *
+                                 * 
                                  *  is not inline:
-                                 *
+                                 * 
                                  * ** Test Cases ***
                                  * | | x | | ... | Log | ... |
                                  * </pre>
                                  */
                                 if (shouldTreatAsInlineContinue(lineTokenInfo)) {
-                                    result = separator.getCurrentElementIndex() > lineTokenInfo.getPositionsOfLineContinue().get(0)
+                                    result = separator.getCurrentElementIndex() > lineTokenInfo
+                                            .getPositionsOfLineContinoue().get(0)
                                             || separator.getCurrentElementIndex() < lineTokenInfo.getDataStartIndex();
                                 } else {
                                     result = true;
                                 }
                             } else if (state == ParsingState.TEST_CASE_INSIDE_ACTION
+                                    || state == ParsingState.TASK_INSIDE_ACTION
                                     || state == ParsingState.KEYWORD_INSIDE_ACTION) {
                                 final ForDescriptorInfo forInfo = ForDescriptorInfo.build(splittedLine);
                                 if (forInfo.getForStartIndex() > -1) {
@@ -517,15 +572,15 @@ public class ElementsUtility {
     private boolean shouldTreatAsInlineContinue(final LineTokenInfo lineTokenInfo) {
         boolean result = false;
 
-        if (!lineTokenInfo.getPositionsOfLineContinue().isEmpty()
+        if (!lineTokenInfo.getPositionsOfLineContinoue().isEmpty()
                 && !lineTokenInfo.getPositionsOfNotEmptyElements().isEmpty()) {
             final int theFirstToken = lineTokenInfo.getPositionsOfNotEmptyElements().get(0);
-            final int theFirstContinue = lineTokenInfo.getPositionsOfLineContinue().get(0);
+            final int theFirstContinoue = lineTokenInfo.getPositionsOfLineContinoue().get(0);
             if (lineTokenInfo.getPositionsOfNotEmptyElements().size() > 1) {
                 final int theSecondToken = lineTokenInfo.getPositionsOfNotEmptyElements().get(1);
-                result = theFirstToken < theFirstContinue && theFirstContinue < theSecondToken;
+                result = theFirstToken < theFirstContinoue && theFirstContinoue < theSecondToken;
             } else {
-                result = theFirstToken < theFirstContinue;
+                result = theFirstToken < theFirstContinoue;
             }
         }
 
@@ -533,17 +588,18 @@ public class ElementsUtility {
     }
 
     public ARobotSectionTable getTable(final RobotFile robotModel, final TableType type) {
-        ARobotSectionTable table = null;
+        final ARobotSectionTable table = null;
         if (type == TableType.SETTINGS) {
-            table = robotModel.getSettingTable();
+            return robotModel.getSettingTable();
         } else if (type == TableType.VARIABLES) {
-            table = robotModel.getVariableTable();
+            return robotModel.getVariableTable();
         } else if (type == TableType.KEYWORD) {
-            table = robotModel.getKeywordTable();
+            return robotModel.getKeywordTable();
         } else if (type == TableType.TEST_CASE) {
-            table = robotModel.getTestCaseTable();
+            return robotModel.getTestCaseTable();
+        } else if (type == TableType.TASKS) {
+            return robotModel.getTasksTable();
         }
-
         return table;
     }
 
@@ -551,9 +607,9 @@ public class ElementsUtility {
 
         private final List<Integer> positionsOfNotEmptyElements = new ArrayList<>();
 
-        private final List<Integer> positionsOfLineContinue = new ArrayList<>();
+        private final List<Integer> positionsOfLineContinoue = new ArrayList<>();
 
-        private boolean isLineContinue;
+        private boolean isLineContinoue;
 
         private int dataStartIndex = -1;
 
@@ -568,9 +624,9 @@ public class ElementsUtility {
                     final RobotToken token = (RobotToken) elem;
                     final String tokenText = token.getText();
                     if (RobotTokenType.PREVIOUS_LINE_CONTINUE.getRepresentation().get(0).equals(tokenText)) {
-                        lti.positionsOfLineContinue.add(elemIndex);
+                        lti.positionsOfLineContinoue.add(elemIndex);
                         if (lti.positionsOfNotEmptyElements.isEmpty()) {
-                            lti.isLineContinue = true;
+                            lti.isLineContinoue = true;
                         }
 
                         if (lti.dataStartIndex == -1) {
@@ -595,12 +651,12 @@ public class ElementsUtility {
             return positionsOfNotEmptyElements;
         }
 
-        public List<Integer> getPositionsOfLineContinue() {
-            return positionsOfLineContinue;
+        public List<Integer> getPositionsOfLineContinoue() {
+            return positionsOfLineContinoue;
         }
 
         public boolean isLineContinueTheFirst() {
-            return isLineContinue;
+            return isLineContinoue;
         }
 
         public int getDataStartIndex() {

@@ -45,13 +45,14 @@ public class FoldingPreferencePageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(5);
+        assertThat(editors).hasSize(6);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
         assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.FOLDABLE_SECTIONS, RedPreferences.FOLDABLE_CASES,
-                        RedPreferences.FOLDABLE_KEYWORDS, RedPreferences.FOLDABLE_DOCUMENTATION));
+                        RedPreferences.FOLDABLE_TASKS, RedPreferences.FOLDABLE_KEYWORDS,
+                        RedPreferences.FOLDABLE_DOCUMENTATION));
         assertThat(namesGroupedByType).hasEntrySatisfying(IntegerFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.FOLDING_LINE_LIMIT));
     }

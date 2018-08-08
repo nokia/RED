@@ -20,18 +20,32 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixe
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ConvertToRobotFileFormat;
 
 public enum SuiteFileProblem implements IProblemCause {
-    SUITE_FILE_IS_NAMED_INIT {
+    INIT_FILE_CONTAINS_TESTS_OR_TASKS {
 
         @Override
         public String getProblemDescription() {
-            return "Suite initialization file shouldn't contain Test Cases section";
+            return "Suite initialization file shouldn't contain Test Cases nor Tasks section";
+        }
+    },
+    SUITE_FILE_CONTAINS_TASKS {
+
+        @Override
+        public String getProblemDescription() {
+            return "Tests suite shouldn't contain 'Tasks' section";
+        }
+    },
+    RPA_SUITE_FILE_CONTAINS_TESTS {
+
+        @Override
+        public String getProblemDescription() {
+            return "Tasks suite shouldn't contain 'Test Cases' section";
         }
     },
     UNRECOGNIZED_TABLE_HEADER {
 
         @Override
         public String getProblemDescription() {
-            return "Unrecognized table header: '%s'";
+            return "Unrecognized table header: '%s'%s";
         }
 
         @Override

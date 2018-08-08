@@ -49,7 +49,8 @@ class RobotSuiteFileCollector {
 
             if (resource.getType() == IResource.FILE) {
                 final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
-                if (suiteFile.isSuiteFile() || suiteFile.isResourceFile() || suiteFile.isInitializationFile()) {
+                if (suiteFile.isSuiteFile() || suiteFile.isRpaSuiteFile() || suiteFile.isResourceFile()
+                        || suiteFile.isInitializationFile()) {
                     files.add(suiteFile);
                 }
             } else if (resource.getType() == IResource.FOLDER || resource.getType() == IResource.PROJECT) {

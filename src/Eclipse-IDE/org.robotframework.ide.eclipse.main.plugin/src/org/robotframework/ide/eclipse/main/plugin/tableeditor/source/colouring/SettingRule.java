@@ -20,6 +20,8 @@ public class SettingRule extends TokenTypeBasedRule {
             RobotTokenType.SETTING_FORCE_TAGS_DECLARATION, RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION,
             RobotTokenType.SETTING_TEST_SETUP_DECLARATION, RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION,
             RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION, RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION,
+            RobotTokenType.SETTING_TASK_SETUP_DECLARATION, RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION,
+            RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION, RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION,
             RobotTokenType.SETTING_UNKNOWN);
 
     public SettingRule(final IToken textToken) {

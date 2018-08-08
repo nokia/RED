@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
@@ -78,18 +78,11 @@ public class CreationOfKeywordArgumentsTest extends RobotFormatParameterizedTest
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordArguments newArguments = uk.newArguments(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        newArguments.addCommentPart(cmTok1);
-        newArguments.addCommentPart(cmTok2);
-        newArguments.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> newArguments = uk.newArguments(0);
+        newArguments.addCommentPart("cm1");
+        newArguments.addCommentPart("cm2");
+        newArguments.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -121,18 +114,11 @@ public class CreationOfKeywordArgumentsTest extends RobotFormatParameterizedTest
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordArguments newArguments = uk.newArguments(0);
 
-        final RobotToken argTok1 = new RobotToken();
-        argTok1.setText("${arg1}");
-        final RobotToken argTok2 = new RobotToken();
-        argTok2.setText("${arg2}");
-        final RobotToken argTok3 = new RobotToken();
-        argTok3.setText("${arg3}");
-
-        newArguments.addArgument(argTok1);
-        newArguments.addArgument(argTok2);
-        newArguments.addArgument(argTok3);
+        final LocalSetting<UserKeyword> newArguments = uk.newArguments(0);
+        newArguments.addToken("${arg1}");
+        newArguments.addToken("${arg2}");
+        newArguments.addToken("${arg3}");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -164,29 +150,14 @@ public class CreationOfKeywordArgumentsTest extends RobotFormatParameterizedTest
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordArguments newArguments = uk.newArguments(0);
 
-        final RobotToken argTok1 = new RobotToken();
-        argTok1.setText("${arg1}");
-        final RobotToken argTok2 = new RobotToken();
-        argTok2.setText("${arg2}");
-        final RobotToken argTok3 = new RobotToken();
-        argTok3.setText("${arg3}");
-
-        newArguments.addArgument(argTok1);
-        newArguments.addArgument(argTok2);
-        newArguments.addArgument(argTok3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        newArguments.addCommentPart(cmTok1);
-        newArguments.addCommentPart(cmTok2);
-        newArguments.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> newArguments = uk.newArguments(0);
+        newArguments.addToken("${arg1}");
+        newArguments.addToken("${arg2}");
+        newArguments.addToken("${arg3}");
+        newArguments.addCommentPart("cm1");
+        newArguments.addCommentPart("cm2");
+        newArguments.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

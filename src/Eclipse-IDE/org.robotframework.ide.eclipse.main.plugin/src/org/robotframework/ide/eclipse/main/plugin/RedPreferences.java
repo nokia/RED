@@ -58,6 +58,7 @@ public class RedPreferences {
 
     public static final String FOLDABLE_SECTIONS = "foldableSections";
     public static final String FOLDABLE_CASES = "foldableCases";
+    public static final String FOLDABLE_TASKS = "foldableTasks";
     public static final String FOLDABLE_KEYWORDS = "foldableKeywords";
     public static final String FOLDABLE_DOCUMENTATION = "foldableDocumentation";
     public static final String FOLDING_LINE_LIMIT = "foldingLineLimit";
@@ -208,6 +209,9 @@ public class RedPreferences {
         }
         if (store.getBoolean(FOLDABLE_CASES)) {
             elements.add(FoldableElements.CASES);
+        }
+        if (store.getBoolean(FOLDABLE_TASKS)) {
+            elements.add(FoldableElements.TASKS);
         }
         if (store.getBoolean(FOLDABLE_KEYWORDS)) {
             elements.add(FoldableElements.KEYWORDS);
@@ -450,6 +454,7 @@ public class RedPreferences {
         SECTIONS,
         KEYWORDS,
         CASES,
+        TASKS,
         DOCUMENTATION
     }
 

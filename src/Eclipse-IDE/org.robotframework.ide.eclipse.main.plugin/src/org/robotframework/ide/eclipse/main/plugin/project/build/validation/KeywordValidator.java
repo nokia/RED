@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,14 +19,15 @@ import java.util.stream.Stream;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -65,7 +68,7 @@ class KeywordValidator implements ModelUnitValidator {
     }
 
     private void reportVariableAsKeywordName() {
-        final RobotToken keywordName = keyword.getKeywordName();
+        final RobotToken keywordName = keyword.getName();
         final String name = keywordName.getText();
 
         if (VARIABLES_ONLY_PATTERN.matcher(name).matches()) {
@@ -78,7 +81,7 @@ class KeywordValidator implements ModelUnitValidator {
     }
 
     private void reportKeywordNameWithDots() {
-        final RobotToken keywordName = keyword.getKeywordName();
+        final RobotToken keywordName = keyword.getName();
         final String name = keywordName.getText();
         if (name.contains(".")) {
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_WITH_DOTS)
@@ -89,7 +92,7 @@ class KeywordValidator implements ModelUnitValidator {
     }
 
     private void reportMaskingKeyword() {
-        final RobotToken keywordName = keyword.getKeywordName();
+        final RobotToken keywordName = keyword.getName();
         final String name = keywordName.getText();
         final ListMultimap<KeywordScope, KeywordEntity> possibleKeywords = validationContext.getPossibleKeywords(name,
                 true);
@@ -106,7 +109,7 @@ class KeywordValidator implements ModelUnitValidator {
     }
 
     private void reportEmptyKeyword() {
-        final RobotToken keywordName = keyword.getKeywordName();
+        final RobotToken keywordName = keyword.getName();
         final String name = keywordName.getText();
         if (isReturnEmpty(keyword) && !hasAnythingToExecute(keyword)) {
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD).formatMessageWith(name);
@@ -120,16 +123,13 @@ class KeywordValidator implements ModelUnitValidator {
     }
 
     private boolean isReturnEmpty(final UserKeyword keyword) {
-        if (!keyword.getReturns().isEmpty()) {
-            final KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
-            final List<RobotToken> returnValues = keywordReturn.getReturnValues();
-            for (final RobotToken rtValue : returnValues) {
-                if (!rtValue.getText().trim().isEmpty()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return !keyword.getReturns()
+                .stream()
+                .reduce((a, b) -> b)
+                .map(Stream::of)
+                .orElseGet(Stream::empty)
+                .flatMap(ret -> ret.tokensOf(RobotTokenType.KEYWORD_SETTING_RETURN_VALUE))
+                .anyMatch(token -> !token.getText().trim().isEmpty());
     }
 
     private void validateSettings() {
@@ -160,8 +160,9 @@ class KeywordValidator implements ModelUnitValidator {
         // also validate variables in [Return] after all executables were checked (that's why this
         // is done here not in KeywordSettingsValidator)
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
-        for (final KeywordReturn kwReturn : keyword.getReturns()) {
-            unknownVarsValidator.reportUnknownVars(additionalVariables, kwReturn.getReturnValues());
+        for (final LocalSetting<UserKeyword> kwReturn : keyword.getReturns()) {
+            unknownVarsValidator.reportUnknownVars(additionalVariables,
+                    kwReturn.tokensOf(RobotTokenType.KEYWORD_SETTING_RETURN_VALUE).collect(toList()));
         }
     }
 
@@ -171,7 +172,7 @@ class KeywordValidator implements ModelUnitValidator {
 
         final Set<String> arguments = new HashSet<>();
         // first add arguments embedded in name
-        Stream.of(keyword.getKeywordName())
+        Stream.of(keyword.getName())
                 .map(nameToken -> VariableNamesSupport.extractUnifiedVariables(nameToken, extractor, fileName))
                 .map(Multimap::keySet)
                 .flatMap(Set::stream)
@@ -181,8 +182,7 @@ class KeywordValidator implements ModelUnitValidator {
         // second add arguments from [Arguments] setting
         keyword.getArguments()
                 .stream()
-                .map(arg -> arg.getArguments())
-                .flatMap(List::stream)
+                .flatMap(arg -> arg.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT))
                 .map(argToken -> VariableNamesSupport.extractUnifiedVariables(argToken, extractor, fileName))
                 .map(Multimap::keySet)
                 .flatMap(Set::stream)

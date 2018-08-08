@@ -18,18 +18,21 @@ public class SuiteSourcePartitionScanner extends RuleBasedPartitionScanner {
 
     public final static String TEST_CASES_SECTION = "__test_cases_section";
 
+    public final static String TASKS_SECTION = "__tasks_section";
+
     public final static String KEYWORDS_SECTION = "__keywords_section";
 
     public final static String SETTINGS_SECTION = "__settings_section";
 
     public final static String VARIABLES_SECTION = "__variables_section";
 
-    public static final String[] LEGAL_CONTENT_TYPES = { TEST_CASES_SECTION, KEYWORDS_SECTION, SETTINGS_SECTION,
-            VARIABLES_SECTION };
+    public static final String[] LEGAL_CONTENT_TYPES = { TEST_CASES_SECTION, TASKS_SECTION, KEYWORDS_SECTION,
+            SETTINGS_SECTION, VARIABLES_SECTION };
 
     public SuiteSourcePartitionScanner(final boolean isTsv) {
         final List<SectionPartitionRule> rules = newArrayList(
                 new SectionPartitionRule(Section.TEST_CASES, new Token(TEST_CASES_SECTION), isTsv),
+                new SectionPartitionRule(Section.TASKS, new Token(TASKS_SECTION), isTsv),
                 new SectionPartitionRule(Section.KEYWORDS, new Token(KEYWORDS_SECTION), isTsv),
                 new SectionPartitionRule(Section.SETTINGS, new Token(SETTINGS_SECTION), isTsv),
                 new SectionPartitionRule(Section.VARIABLES, new Token(VARIABLES_SECTION), isTsv));

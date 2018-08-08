@@ -31,22 +31,33 @@ public class NestedExecsSpecialTokensRule implements ISyntaxColouringRule {
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
                 RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT,
                 RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
+                RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.TASK_ACTION_ARGUMENT,
+                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT,
+                RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
                 RobotTokenType.KEYWORD_ACTION_NAME,
                 RobotTokenType.KEYWORD_ACTION_ARGUMENT,
                 RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
                 RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_ARGUMENT,
                 RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT,
                 RobotTokenType.SETTING_TEST_SETUP_KEYWORD_ARGUMENT,
-                RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT);
+                RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT,
+                RobotTokenType.SETTING_TASK_SETUP_KEYWORD_ARGUMENT,
+                RobotTokenType.SETTING_TASK_TEARDOWN_KEYWORD_ARGUMENT);
         this.readStoppingTypes = EnumSet.of(RobotTokenType.TEST_CASE_NAME,
                 RobotTokenType.TEST_CASE_SETTING_SETUP,
                 RobotTokenType.TEST_CASE_SETTING_TEARDOWN,
+                RobotTokenType.TASK_NAME,
+                RobotTokenType.TASK_SETTING_SETUP,
+                RobotTokenType.TASK_SETTING_TEARDOWN,
                 RobotTokenType.KEYWORD_NAME,
                 RobotTokenType.KEYWORD_SETTING_TEARDOWN,
                 RobotTokenType.SETTING_SUITE_SETUP_DECLARATION,
                 RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION,
                 RobotTokenType.SETTING_TEST_SETUP_DECLARATION,
-                RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION);
+                RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION,
+                RobotTokenType.SETTING_TASK_SETUP_DECLARATION,
+                RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION);
     }
 
     @Override

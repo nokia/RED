@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -23,12 +24,12 @@ public class TestCaseTable extends ARobotSectionTable {
     }
 
     public TestCase createTestCase(final String testName) {
-        final RobotToken testCaseName = new RobotToken();
-        testCaseName.setText(testName);
+        return createTestCase(testName, testCases.size());
+    }
 
-        final TestCase test = new TestCase(testCaseName);
-        addTest(test);
-
+    public TestCase createTestCase(final String testName, final int position) {
+        final TestCase test = new TestCase(RobotToken.create(testName));
+        addTest(test, position);
         return test;
     }
 
@@ -46,12 +47,14 @@ public class TestCaseTable extends ARobotSectionTable {
         testCases.remove(testCase);
     }
 
-    public boolean moveUpTest(final TestCase testCase) {
-        return MoveElementHelper.moveUp(testCases, testCase);
+    @Override
+    public boolean moveUpElement(final AModelElement<? extends ARobotSectionTable> element) {
+        return MoveElementHelper.moveUp(testCases, (TestCase) element);
     }
 
-    public boolean moveDownTest(final TestCase testCase) {
-        return MoveElementHelper.moveDown(testCases, testCase);
+    @Override
+    public boolean moveDownElement(final AModelElement<? extends ARobotSectionTable> element) {
+        return MoveElementHelper.moveDown(testCases, (TestCase) element);
     }
 
     public List<TestCase> getTestCases() {

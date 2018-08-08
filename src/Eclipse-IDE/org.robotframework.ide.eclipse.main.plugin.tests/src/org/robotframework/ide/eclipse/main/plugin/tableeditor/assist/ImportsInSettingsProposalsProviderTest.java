@@ -155,7 +155,7 @@ public class ImportsInSettingsProposalsProviderTest {
         final ImportsInSettingsProposalsProvider provider = new ImportsInSettingsProposalsProvider(suiteFile,
                 dataProvider);
 
-        for (int row = 0; row < settings.size(); row++) {
+        for (int row = 0; row < settings.size() - 1; row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
             final RedContentProposal[] proposals = provider.getProposals(text.getText(), 1, context);
             assertThat(proposals).hasSize(1);
@@ -170,7 +170,7 @@ public class ImportsInSettingsProposalsProviderTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         for (int i = 0; i < settings.size(); i++) {
             final Map<String, Object> map = new HashMap<>();
-            map.put(settings.get(0).getName(), new Object());
+            map.put(settings.get(i).getName(), settings.get(i));
             final Entry<String, Object> entry = map.entrySet().iterator().next();
 
             when(dataProvider.getRowObject(i)).thenReturn(entry);

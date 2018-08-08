@@ -113,6 +113,8 @@ public class TableHeader<T> extends AModelElement<T> implements ICommentHolder {
                 type = ModelType.VARIABLES_TABLE_HEADER;
             } else if (tokenType == RobotTokenType.TEST_CASES_TABLE_HEADER) {
                 type = ModelType.TEST_CASE_TABLE_HEADER;
+            } else if (tokenType == RobotTokenType.TASKS_TABLE_HEADER) {
+                type = ModelType.TASKS_TABLE_HEADER;
             } else if (tokenType == RobotTokenType.KEYWORDS_TABLE_HEADER) {
                 type = ModelType.KEYWORDS_TABLE_HEADER;
             }

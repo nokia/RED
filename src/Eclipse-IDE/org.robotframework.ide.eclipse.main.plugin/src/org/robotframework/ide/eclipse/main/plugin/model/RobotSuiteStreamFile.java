@@ -6,36 +6,30 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
-import org.eclipse.core.runtime.content.IContentDescriber;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescriber;
 
 public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     private final String name;
 
-    private final InputStream input;
+    private final String content;
 
     private final boolean readOnly;
 
     private RobotVersion version;
 
-    public RobotSuiteStreamFile(final String name, final InputStream input, final boolean readOnly) {
+    public RobotSuiteStreamFile(final String name, final String content, final boolean readOnly) {
         super(null, null);
         this.name = name;
-        this.input = input;
+        this.content = content;
         this.readOnly = readOnly;
     }
 
@@ -44,35 +38,14 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         return name.contains(".") ? name.substring(name.lastIndexOf('.') + 1) : null;
     }
 
+
     @Override
     protected String getContentTypeId() {
         final String id = super.getContentTypeId();
         if (id != null) {
             return id;
         }
-        contentTypeId = null;
-        if (input != null) {
-            if (RobotFile.INIT_NAMES.stream().anyMatch(name::equalsIgnoreCase)) {
-                contentTypeId = ASuiteFileDescriber.INIT_FILE_CONTENT_ID;
-                return contentTypeId;
-            }
-
-            int validationResult;
-            try {
-                final String fileExt = getFileExtension();
-                final ASuiteFileDescriber desc = fileExt.toLowerCase().equals("tsv") ? new TsvRobotSuiteFileDescriber()
-                        : new RobotSuiteFileDescriber();
-
-                validationResult = desc.describe(input, null);
-                if (validationResult == IContentDescriber.VALID) {
-                    contentTypeId = ASuiteFileDescriber.SUITE_FILE_CONTENT_ID;
-                } else {
-                    contentTypeId = ASuiteFileDescriber.RESOURCE_FILE_CONTENT_ID;
-                }
-            } catch (final IOException e) {
-                // null will be returned
-            }
-        }
+        contentTypeId = ASuiteFileDescriber.getContentType(name, content);
         return contentTypeId;
     }
 
@@ -82,7 +55,7 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     }
 
     @Override
-    public RobotVersion getRobotVersion() {
+    public RobotVersion getRobotParserComplianceVersion() {
         if (version != null) {
             return version;
         }
@@ -94,8 +67,8 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     protected ParsingStrategy createReparsingStrategy(final String newContent) {
         return () -> {
             final RobotRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
-            final RobotParser parser = RobotParser.create(new RobotProjectHolder(env), getRobotVersion(),
-                    (PathsProvider) null);
+            final RobotParser parser = RobotParser.create(new RobotProjectHolder(env),
+                    getRobotParserComplianceVersion(), (PathsProvider) null);
             return parser.parseEditorContent(newContent, new File(name));
         };
     }

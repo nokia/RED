@@ -22,6 +22,7 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
@@ -31,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Key
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordSpecificationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.LibrarySpecificationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TaskInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -49,10 +51,18 @@ public class DocumentationsLinksSupportTest {
                 "*** Test Cases ***",
                 "case",
                 "  [Documentation]  doc");
+        projectProvider.createFile("task_with_doc.robot",
+                "*** Tasks ***",
+                "task",
+                "  [Documentation]  doc");
         projectProvider.createFile("keyword_with_doc.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Documentation]  doc");
+
+        RedPlugin.getModelManager()
+                .createProject(projectProvider.getProject())
+                .setRobotParserComplianceVersion(new RobotVersion(3, 1));
     }
     
     @Test
@@ -193,6 +203,23 @@ public class DocumentationsLinksSupportTest {
     }
 
     @Test
+    public void displayerIsAskedToDisplayDocumentationOfTask_whenMovingToExistingFileTaskDoc() {
+        final IFile file = projectProvider.getFile("task_with_doc.robot");
+
+        final IWorkbenchBrowserSupport browserSupport = mock(IWorkbenchBrowserSupport.class);
+        final DocumentationDisplayer displayer = mock(DocumentationDisplayer.class);
+        final Runnable outsideDisplayerCallback = mock(Runnable.class);
+
+        final DocumentationsLinksSupport support = createSupport(browserSupport, displayer, outsideDisplayerCallback);
+        final boolean isHandled = support
+                .changeLocationTo(URI.create(file.getLocationURI() + "?show_doc=true&task=task"));
+
+        assertThat(isHandled).isTrue();
+        verifyZeroInteractions(browserSupport, outsideDisplayerCallback);
+        verify(displayer).displayDocumentation(any(TaskInput.class));
+    }
+
+    @Test
     public void displayerIsAskedToDisplayDocumentationOfKeyword_whenMovingToExistingFileKeywordDoc() {
         final IFile file = projectProvider.getFile("keyword_with_doc.robot");
 
@@ -232,6 +259,19 @@ public class DocumentationsLinksSupportTest {
         assertThatExceptionOfType(UnableToOpenUriException.class)
                 .isThrownBy(() -> support
                         .changeLocationTo(URI.create("file:///location/to/missing/file.robot?show_doc=true&test=case")))
+                .withMessage("Unable to find given element");
+    }
+
+    @Test
+    public void exceptionIsThrown_whenTryingToOpenDocumentationOfTask_butTheFileIsMissing() {
+        final IWorkbenchBrowserSupport browserSupport = mock(IWorkbenchBrowserSupport.class);
+        final DocumentationDisplayer displayer = mock(DocumentationDisplayer.class);
+        final Runnable outsideDisplayerCallback = mock(Runnable.class);
+
+        final DocumentationsLinksSupport support = createSupport(browserSupport, displayer, outsideDisplayerCallback);
+        assertThatExceptionOfType(UnableToOpenUriException.class)
+                .isThrownBy(() -> support
+                        .changeLocationTo(URI.create("file:///location/to/missing/file.robot?show_doc=true&task=t")))
                 .withMessage("Unable to find given element");
     }
 

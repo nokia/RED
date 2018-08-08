@@ -17,8 +17,9 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -50,7 +51,8 @@ public class ConvertSettingToCallTest {
                 .build();
         final RobotCase testCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
         final RobotDefinitionSetting setting = testCase.findSetting(ModelType.TEST_CASE_TEARDOWN).get();
-        final TestCaseTeardown oldLinked = (TestCaseTeardown) setting.getLinkedElement();
+        @SuppressWarnings("unchecked")
+        final LocalSetting<TestCase> oldLinked = (LocalSetting<TestCase>) setting.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -82,7 +84,8 @@ public class ConvertSettingToCallTest {
                 .build();
         final RobotKeywordDefinition keyword = model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
         final RobotDefinitionSetting keywordCall = (RobotDefinitionSetting) keyword.getChildren().get(0);
-        final KeywordTeardown oldLinked = (KeywordTeardown) keywordCall.getLinkedElement();
+        @SuppressWarnings("unchecked")
+        final LocalSetting<UserKeyword> oldLinked = (LocalSetting<UserKeyword>) keywordCall.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)

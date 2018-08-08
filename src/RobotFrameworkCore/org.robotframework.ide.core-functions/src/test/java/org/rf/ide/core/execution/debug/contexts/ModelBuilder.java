@@ -7,24 +7,24 @@ package org.rf.ide.core.execution.debug.contexts;
 
 import java.io.File;
 
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
 import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class ModelBuilder {
 
@@ -335,12 +335,13 @@ public class ModelBuilder {
 
         @Override
         public TestCaseBuildingStep withTestSetup(final String keyword, final String... arguments) {
-            final TestCaseSetup setup = new TestCaseSetup(RobotToken.create("[Setup]"));
+            final LocalSetting<TestCase> setup = new LocalSetting<>(ModelType.TEST_CASE_SETUP,
+                    RobotToken.create("[Setup]"));
             if (keyword != null) {
-                setup.setKeywordName(keyword);
+                setup.addToken(keyword);
             }
             for (final String arg : arguments) {
-                setup.addArgument(arg);
+                setup.addToken(arg);
             }
             test.addElement(setup);
             return this;
@@ -348,12 +349,13 @@ public class ModelBuilder {
 
         @Override
         public TestCaseBuildingStep withTestTeardown(final String keyword, final String... arguments) {
-            final TestCaseTeardown teardown = new TestCaseTeardown(RobotToken.create("[Teardown]"));
+            final LocalSetting<TestCase> teardown = new LocalSetting<>(ModelType.TEST_CASE_TEARDOWN,
+                    RobotToken.create("[Teardown]"));
             if (keyword != null) {
-                teardown.setKeywordName(keyword);
+                teardown.addToken(keyword);
             }
             for (final String arg : arguments) {
-                teardown.addArgument(arg);
+                teardown.addToken(arg);
             }
             test.addElement(teardown);
             return this;
@@ -438,10 +440,11 @@ public class ModelBuilder {
         final RobotFileOutput rfo = new RobotFileOutput(RobotVersion.from("3.0.0"));
         rfo.setProcessedFile(new File(filename));
         final RobotFile robotFile = rfo.getFileModel();
-        robotFile.excludeKeywordTableSection();
-        robotFile.excludeTestCaseTableSection();
-        robotFile.excludeSettingTableSection();
-        robotFile.excludeVariableTableSection();
+        robotFile.excludeTable(RobotTokenType.KEYWORDS_TABLE_HEADER);
+        robotFile.excludeTable(RobotTokenType.TEST_CASES_TABLE_HEADER);
+        robotFile.excludeTable(RobotTokenType.TASKS_TABLE_HEADER);
+        robotFile.excludeTable(RobotTokenType.SETTINGS_TABLE_HEADER);
+        robotFile.excludeTable(RobotTokenType.VARIABLES_TABLE_HEADER);
         
         return new TableBuilder(robotFile);
     }
@@ -459,12 +462,13 @@ public class ModelBuilder {
 
         @Override
         public UserKeywordBuildingStep withKeywordTeardown(final String keyword, final String... arguments) {
-            final KeywordTeardown teardown = new KeywordTeardown(RobotToken.create("[Teardown]"));
+            final LocalSetting<UserKeyword> teardown = new LocalSetting<>(ModelType.USER_KEYWORD_TEARDOWN,
+                    RobotToken.create("[Teardown]"));
             if (keyword != null) {
-                teardown.setKeywordName(keyword);
+                teardown.addToken(keyword);
             }
             for (final String arg : arguments) {
-                teardown.addArgument(arg);
+                teardown.addToken(arg);
             }
             this.keyword.addElement(teardown);
             return this;

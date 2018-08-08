@@ -6,12 +6,12 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
-
 
 public class RobotVariablesSection extends RobotSuiteFileSection {
 
@@ -40,24 +40,53 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
         return (List<RobotVariable>) super.getChildren();
     }
 
-    public RobotVariable createVariable(final VariableType variableType, final String name) {
-        return createVariable(getChildren().size(), variableType, name);
+    @Override
+    public String getDefaultChildName() {
+        return "var";
+    }
+
+    @Override
+    public RobotFileInternalElement createChild(final int index, final String name) {
+        VariableType actualType = VariableType.INVALID;
+        for (final VariableType type : EnumSet.complementOf(EnumSet.of(VariableType.INVALID))) {
+            if (name.startsWith(type.getIdentificator())) {
+                actualType = type;
+                break;
+            }
+        }
+        String actualName = actualType == VariableType.INVALID ? name : name.substring(1);
+        actualName = actualName.startsWith("{") ? actualName.substring(1) : actualName;
+        actualName = actualName.endsWith("}") ? actualName.substring(0, actualName.length() - 1) : actualName;
+
+        return createVariable(index, actualType, actualName);
+    }
+
+    @Override
+    public void insertChild(final int index, final RobotFileInternalElement element) {
+        throw new IllegalStateException("Not implemented for variables section");
+    }
+
+    @Override
+    public void removeChildren(final List<? extends RobotFileInternalElement> elementsToRemove) {
+        throw new IllegalStateException("Not implemented for variables section");
     }
 
     public RobotVariable createVariable(final int index, final VariableType variableType, final String name) {
+        final int actualIndex = 0 <= index && index < elements.size() ? index : elements.size();
+
         AVariable var;
         if (variableType == VariableType.SCALAR) {
-            var = getLinkedElement().createScalarVariable(index, name, new ArrayList<>());
+            var = getLinkedElement().createScalarVariable(actualIndex, name, new ArrayList<>());
         } else if (variableType == VariableType.LIST) {
-            var = getLinkedElement().createListVariable(index, name, new ArrayList<>());
+            var = getLinkedElement().createListVariable(actualIndex, name, new ArrayList<>());
         } else if (variableType == VariableType.DICTIONARY) {
-            var = getLinkedElement().createDictionaryVariable(index, name, new ArrayList<>());
+            var = getLinkedElement().createDictionaryVariable(actualIndex, name, new ArrayList<>());
         } else {
             throw new IllegalArgumentException("Unable to create variable of type " + variableType.name());
         }
 
         final RobotVariable robotVariable = new RobotVariable(this, var);
-        elements.add(index, robotVariable);
+        elements.add(actualIndex, robotVariable);
         return robotVariable;
     }
 

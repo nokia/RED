@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
+import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -19,7 +19,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDumper;
 
-public class DictionaryVariableDumper extends ANotExecutableTableElementDumper {
+public class DictionaryVariableDumper extends ANotExecutableTableElementDumper<VariableTable> {
 
     public DictionaryVariableDumper(final DumperHelper aDumpHelper) {
         super(aDumpHelper, ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE);
@@ -27,7 +27,7 @@ public class DictionaryVariableDumper extends ANotExecutableTableElementDumper {
 
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
-            final AModelElement<? extends ARobotSectionTable> currentElement) {
+            final AModelElement<VariableTable> currentElement) {
         final DictionaryVariable var = (DictionaryVariable) currentElement;
 
         final List<RobotToken> itemsAsValue = new ArrayList<>(0);

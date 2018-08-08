@@ -36,7 +36,7 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<String> getApplicableContentTypes() {
-        return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+        return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION,
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION);
     }
 
@@ -70,6 +70,8 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
         final String contentType = getVirtualContentType(document, offset);
         if (SuiteSourcePartitionScanner.TEST_CASES_SECTION.equals(contentType)) {
             return SettingTarget.TEST_CASE;
+        } else if (SuiteSourcePartitionScanner.TASKS_SECTION.equals(contentType)) {
+            return SettingTarget.TASK;
         } else if (SuiteSourcePartitionScanner.KEYWORDS_SECTION.equals(contentType)) {
             return SettingTarget.KEYWORD;
         }

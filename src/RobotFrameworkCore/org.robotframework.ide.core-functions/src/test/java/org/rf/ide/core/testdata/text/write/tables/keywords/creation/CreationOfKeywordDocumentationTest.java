@@ -7,10 +7,11 @@ package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
@@ -37,9 +38,10 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         keyName.setText("User Keyword");
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordDocumentation keyDoc = uk.newDocumentation(0);
+        final LocalSetting<UserKeyword> keyDoc = uk.newDocumentation(0);
 
-        DocumentationServiceHandler.update(keyDoc, "doc me" + "\n" + "textZero" + "\n" + "textTwo");
+        DocumentationServiceHandler.update(keyDoc.adaptTo(IDocumentationHolder.class),
+                "doc me" + "\n" + "textZero" + "\n" + "textTwo");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -103,18 +105,11 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordDocumentation keyDoc = uk.newDocumentation(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyDoc.addCommentPart(cmTok1);
-        keyDoc.addCommentPart(cmTok2);
-        keyDoc.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyDoc = uk.newDocumentation(0);
+        keyDoc.addCommentPart("cm1");
+        keyDoc.addCommentPart("cm2");
+        keyDoc.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -146,17 +141,12 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordDocumentation keyDoc = uk.newDocumentation(0);
-        final RobotToken wr1 = new RobotToken();
-        wr1.setText("w1");
-        final RobotToken wr2 = new RobotToken();
-        wr2.setText("w2");
-        final RobotToken wr3 = new RobotToken();
-        wr3.setText("w3");
 
-        keyDoc.addDocumentationText(wr1);
-        keyDoc.addDocumentationText(wr2);
-        keyDoc.addDocumentationText(wr3);
+        final LocalSetting<UserKeyword> keyDoc = uk.newDocumentation(0);
+        keyDoc.addToken("w1");
+        keyDoc.addToken("w2");
+        keyDoc.addToken("w3");
+
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
@@ -187,28 +177,14 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordDocumentation keyDoc = uk.newDocumentation(0);
-        final RobotToken wr1 = new RobotToken();
-        wr1.setText("w1");
-        final RobotToken wr2 = new RobotToken();
-        wr2.setText("w2");
-        final RobotToken wr3 = new RobotToken();
-        wr3.setText("w3");
 
-        keyDoc.addDocumentationText(wr1);
-        keyDoc.addDocumentationText(wr2);
-        keyDoc.addDocumentationText(wr3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyDoc.addCommentPart(cmTok1);
-        keyDoc.addCommentPart(cmTok2);
-        keyDoc.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyDoc = uk.newDocumentation(0);
+        keyDoc.addToken("w1");
+        keyDoc.addToken("w2");
+        keyDoc.addToken("w3");
+        keyDoc.addCommentPart("cm1");
+        keyDoc.addCommentPart("cm2");
+        keyDoc.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

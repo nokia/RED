@@ -33,6 +33,13 @@ public class ExecutableCallRule extends VariableUsageRule {
                 elem -> elem.getTypes().contains(RobotTokenType.TEST_CASE_NAME));
     }
 
+    public static ISyntaxColouringRule forExecutableInTask(final IToken textToken, final IToken gherkinToken,
+            final IToken quoteToken, final IToken embeddedVariablesToken) {
+        return new ExecutableCallRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
+                EnumSet.of(RobotTokenType.TASK_ACTION_NAME, RobotTokenType.TASK_ACTION_ARGUMENT),
+                elem -> elem.getTypes().contains(RobotTokenType.TASK_NAME));
+    }
+
     public static ExecutableCallRule forExecutableInKeyword(final IToken textToken, final IToken gherkinToken,
             final IToken quoteToken, final IToken embeddedVariablesToken) {
         return new ExecutableCallRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
@@ -201,7 +208,8 @@ public class ExecutableCallRule extends VariableUsageRule {
                 return types.contains(RobotTokenType.START_HASH_COMMENT)
                         || types.contains(RobotTokenType.COMMENT_CONTINUE)
                         || types.contains(RobotTokenType.KEYWORD_EMPTY_CELL)
-                        || types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL);
+                        || types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL)
+                        || types.contains(RobotTokenType.TASK_EMPTY_CELL);
             }
         }
         return false;

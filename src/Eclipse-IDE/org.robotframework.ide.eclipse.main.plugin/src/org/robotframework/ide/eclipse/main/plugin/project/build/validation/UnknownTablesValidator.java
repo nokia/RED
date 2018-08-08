@@ -13,10 +13,11 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.header.TasksTableHeaderRecognizer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 
 /**
@@ -55,8 +56,14 @@ class UnknownTablesValidator implements ModelUnitValidator {
     }
 
     private void reportUnrecognizedTableHeader(final RobotToken token) {
+        final boolean isFutureTaskTable = TasksTableHeaderRecognizer.EXPECTED.matcher(token.getText()).matches();
+        final String additionalMsg = isFutureTaskTable
+                ? ". The tasks table is introduced in Robot Framework 3.1. "
+                        + "Please verify if your project uses at least that version."
+                : "";
+
         final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER)
-                .formatMessageWith(token.getText());
+                .formatMessageWith(token.getText(), additionalMsg);
         reporter.handleProblem(problem, fileModel.getFile(), token);
     }
 }

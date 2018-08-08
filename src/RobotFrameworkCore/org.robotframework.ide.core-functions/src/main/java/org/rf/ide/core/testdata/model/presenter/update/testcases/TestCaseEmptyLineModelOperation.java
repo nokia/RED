@@ -37,11 +37,7 @@ public class TestCaseEmptyLineModelOperation implements IExecutablesStepsHolderE
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        @SuppressWarnings("unchecked")
-        final RobotEmptyRow<TestCase> emptyLine = (RobotEmptyRow<TestCase>) modelElement;
-
-        testCase.addElement(emptyLine, index);
-        return modelElement;
+        return testCase.addElement(index, modelElement);
     }
 
     @Override
@@ -52,11 +48,5 @@ public class TestCaseEmptyLineModelOperation implements IExecutablesStepsHolderE
     @Override
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         // Do nothing
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeElement((RobotEmptyRow<TestCase>) modelElement);
     }
 }

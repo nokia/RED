@@ -40,6 +40,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.services.IEvaluationService;
 import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
@@ -228,11 +229,15 @@ public class ExecutionView {
         if (executionViewer.getTree().isDisposed()) {
             return;
         }
+        resetControls();
+    }
 
+    private void resetControls() {
         executionViewer.setInput(null);
         messageText.setText("");
 
-        testsCounterLabel.setText("Tests: 0/0");
+        final String mode = testsCounterLabel.getText().substring(0, testsCounterLabel.getText().indexOf(':'));
+        testsCounterLabel.setText(mode + ": 0/0");
         passCounterLabel.setText("Passed: 0");
         failCounterLabel.setText("Failed: 0");
 
@@ -246,8 +251,8 @@ public class ExecutionView {
             return;
         }
 
-        setProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(), elementsStore.getFailedTests(),
-                elementsStore.getTotalTests());
+        setProgress(elementsStore.getMode(), elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
+                elementsStore.getFailedTests(), elementsStore.getTotalTests());
 
         executionViewer.getTree().setRedraw(false);
         try {
@@ -295,21 +300,12 @@ public class ExecutionView {
     }
 
     public void clearView() {
-        executionViewer.setInput(null);
-        messageText.setText("");
-
         final ExecutionViewContentProvider provider = (ExecutionViewContentProvider) executionViewer
                 .getContentProvider();
         provider.setFailedFilter(false);
         ShowFailedOnlyHandler.setCommandState(false);
 
-        testsCounterLabel.setText("Tests: 0/0");
-        passCounterLabel.setText("Passed: 0");
-        failCounterLabel.setText("Failed: 0");
-
-        progressBar.reset();
-
-        executionViewer.refresh();
+        resetControls();
         
         evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED);
     }
@@ -324,9 +320,10 @@ public class ExecutionView {
         }
     }
 
-    private void setProgress(final int currentTest, final int passedSoFar, final int failedSoFar,
-            final int totalTests) {
-        testsCounterLabel.setText(String.format("Tests: %d/%d", currentTest, totalTests));
+    private void setProgress(final ExecutionMode executionMode, final int currentTest, final int passedSoFar,
+            final int failedSoFar, final int totalTests) {
+        final String casesLabel = executionMode == ExecutionMode.TASKS ? "Tasks" : "Tests";
+        testsCounterLabel.setText(String.format(casesLabel + ": %d/%d", currentTest, totalTests));
         passCounterLabel.setText("Passed: " + passedSoFar);
         failCounterLabel.setText("Failed: " + failedSoFar);
 

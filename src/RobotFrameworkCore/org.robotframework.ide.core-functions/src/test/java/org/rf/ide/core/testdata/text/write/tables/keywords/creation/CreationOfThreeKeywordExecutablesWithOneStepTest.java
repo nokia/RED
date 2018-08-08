@@ -35,7 +35,7 @@ public class CreationOfThreeKeywordExecutablesWithOneStepTest extends ACreationO
                 name += (index + 1);
             }
 
-            ((UserKeyword) units.get(index).getHolder()).getKeywordName().setText(name);
+            ((UserKeyword) units.get(index).getHolder()).getName().setText(name);
         }
 
         return units;
@@ -47,7 +47,7 @@ public class CreationOfThreeKeywordExecutablesWithOneStepTest extends ACreationO
         for (int index = 1; index < 3; index++) {
             String name = "UserKeyword";
             name += (index + 1);
-            ((UserKeyword) units.get(index).getHolder()).getKeywordName().setText(name);
+            ((UserKeyword) units.get(index).getHolder()).getName().setText(name);
         }
 
         return units;

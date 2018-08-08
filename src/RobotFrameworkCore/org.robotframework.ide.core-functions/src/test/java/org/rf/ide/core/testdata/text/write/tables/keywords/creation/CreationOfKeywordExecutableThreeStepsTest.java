@@ -25,7 +25,7 @@ public class CreationOfKeywordExecutableThreeStepsTest extends ACreationOfThreeE
     @Override
     public IExecutableStepsHolder getExecutableWithName() {
         final UserKeyword execUnit = createModelWithOneKeywordInside();
-        execUnit.getKeywordName().setText("UserKeyword");
+        execUnit.getName().setText("UserKeyword");
 
         return execUnit;
     }

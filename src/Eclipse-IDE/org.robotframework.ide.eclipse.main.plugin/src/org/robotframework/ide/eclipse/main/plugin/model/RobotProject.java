@@ -70,6 +70,8 @@ public class RobotProject extends RobotContainer {
 
     private RobotProjectConfig configuration;
 
+    private RobotVersion parserComplianceVersion;
+
     private Map<LibraryDescriptor, LibrarySpecification> stdLibsSpecs;
 
     private Map<LibraryDescriptor, LibrarySpecification> refLibsSpecs;
@@ -94,7 +96,7 @@ public class RobotProject extends RobotContainer {
     }
 
     public RobotParser getRobotParser() {
-        return RobotParser.create(getRobotProjectHolder(), getRobotVersion(), createPathsProvider());
+        return RobotParser.create(getRobotProjectHolder(), getRobotParserComplianceVersion(), createPathsProvider());
     }
 
     public IProject getProject() {
@@ -105,7 +107,14 @@ public class RobotProject extends RobotContainer {
         return LibspecsFolder.get(getProject());
     }
 
-    public RobotVersion getRobotVersion() {
+    public void setRobotParserComplianceVersion(final RobotVersion version) {
+        this.parserComplianceVersion = version;
+    }
+
+    public RobotVersion getRobotParserComplianceVersion() {
+        if (parserComplianceVersion != null) {
+            return parserComplianceVersion;
+        }
         readProjectConfigurationIfNeeded();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
         return env == null ? RobotVersion.UNKNOWN : RobotVersion.from(env.getVersion());

@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write;
 
+import static java.util.stream.Collectors.maxBy;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -46,14 +48,14 @@ public class NotModelRelatedHashCommentedLineDumper {
                 final List<RobotLine> oldContent = model.getFileContent();
                 final int lastLineToDump = findLastHashLine(oldContent, startLine, lastTokenInLines);
                 if (lastLineToDump > -1) {
-                    dumpCommentHashes(model, lines, startLine, oldContent, lastLineToDump, lastTokenInLines);
+                    dumpCommentHashes(model, lines, startLine, oldContent, lastLineToDump);
                 }
             }
         }
     }
 
     private void dumpCommentHashes(final RobotFile model, final List<RobotLine> lines, final int startLine,
-            final List<RobotLine> oldContent, final int lastLineToDump, final RobotToken lastTokenInLines) {
+            final List<RobotLine> oldContent, final int lastLineToDump) {
         for (int lineIndex = startLine; lineIndex < lastLineToDump; lineIndex++) {
             final RobotLine robotLine = oldContent.get(lineIndex);
             dumpHashLine(model, lines, robotLine);
@@ -71,18 +73,9 @@ public class NotModelRelatedHashCommentedLineDumper {
     }
 
     private <T> Optional<RobotToken> tokenWithMaxLineNumber(final AModelElement<T> elem) {
-        Optional<RobotToken> max = Optional.empty();
-        for (final RobotToken t : elem.getElementTokens()) {
-            if (max.isPresent()) {
-                if (max.get().getFilePosition().getLine() < t.getLineNumber()) {
-                    max = Optional.of(t);
-                }
-            } else {
-                max = Optional.of(t);
-            }
-        }
-
-        return max;
+        return elem.getElementTokens()
+                .stream()
+                .collect(maxBy((t1, t2) -> Integer.compare(t1.getLineNumber(), t2.getLineNumber())));
     }
 
     private int findLastHashLine(final List<RobotLine> lines, final int startLine, final RobotToken lastTokenInLines) {

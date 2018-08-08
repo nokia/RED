@@ -12,7 +12,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CopyCasesHandler.E4CopyCasesHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CutCasesHandler.E4CutCasesHandler;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCasesHandler.E4DeleteCasesHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCodeHoldersHandler.E4DeleteHoldersHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -26,12 +26,12 @@ public class CutCasesHandler extends DIParameterizedHandler<E4CutCasesHandler> {
     public static class E4CutCasesHandler {
 
         @Execute
-        public void cutKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void cutCases(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedClipboard clipboard, final RobotEditorCommandsStack commandsStack) {
             
             final boolean copiedToClipboard = new E4CopyCasesHandler().copyCases(selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteCasesHandler().deleteCasesAndCalls(commandsStack, selection);
+                new E4DeleteHoldersHandler().deleteHoldersAndCalls(commandsStack, selection);
             }
         }
     }

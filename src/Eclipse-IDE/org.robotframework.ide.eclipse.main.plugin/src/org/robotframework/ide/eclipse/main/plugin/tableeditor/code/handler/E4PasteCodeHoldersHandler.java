@@ -11,6 +11,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshSectionCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertHoldersCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordCallsCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -69,14 +72,29 @@ public abstract class E4PasteCodeHoldersHandler {
         }
     }
 
-    protected abstract void createTargetSectionIfRequired(RobotSuiteFile fileModel,
-            RobotEditorCommandsStack commandsStack);
+    private void createTargetSectionIfRequired(final RobotSuiteFile fileModel,
+            final RobotEditorCommandsStack commandsStack) {
+        if (fileModel.findSection(getSectionClass()).isPresent()) {
+            return;
+        }
+        commandsStack.execute(new CreateFreshSectionCommand(fileModel, getSectionName()));
+    }
 
-    protected abstract void insertHoldersAtSectionEnd(final RobotSuiteFile fileModel,
-            final RobotCodeHoldingElement<?>[] holders, final RobotEditorCommandsStack commandsStack);
+    protected abstract Class<? extends RobotSuiteFileSection> getSectionClass();
 
-    protected abstract void insertHoldersAt(final RobotSuiteFile fileModel, final int index,
-            final RobotCodeHoldingElement<?>[] holders, final RobotEditorCommandsStack commandsStack);
+    protected abstract String getSectionName();
+
+    private void insertHoldersAtSectionEnd(final RobotSuiteFile fileModel, final RobotCodeHoldingElement<?>[] holders,
+            final RobotEditorCommandsStack commandsStack) {
+        final RobotSuiteFileSection section = fileModel.findSection(getSectionClass()).get();
+        commandsStack.execute(new InsertHoldersCommand(section, holders));
+    }
+
+    private void insertHoldersAt(final RobotSuiteFile fileModel, final int index,
+            final RobotCodeHoldingElement<?>[] holders, final RobotEditorCommandsStack commandsStack) {
+        final RobotSuiteFileSection section = fileModel.findSection(getSectionClass()).get();
+        commandsStack.execute(new InsertHoldersCommand(section, index, holders));
+    }
 
     private void insertCalls(final IStructuredSelection selection, final RobotKeywordCall[] calls,
             final RobotEditorCommandsStack commandsStack) {

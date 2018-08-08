@@ -9,6 +9,9 @@ import java.util.Set;
 
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
@@ -23,6 +26,15 @@ interface ExecutableValidator extends ModelUnitValidator {
         if (modelElement instanceof AKeywordBaseSetting<?>) {
             return new ExecutableSetupOrTeardownValidator(validationContext, additionalVariables,
                     (AKeywordBaseSetting<?>) modelElement, reporter);
+
+        } else if (modelElement instanceof LocalSetting<?> && 
+                (modelElement.getModelType() == ModelType.TASK_SETUP
+                || modelElement.getModelType() == ModelType.TASK_TEARDOWN
+                || modelElement.getModelType() == ModelType.TEST_CASE_SETUP
+                || modelElement.getModelType() == ModelType.TEST_CASE_TEARDOWN)
+                || modelElement.getModelType() == ModelType.USER_KEYWORD_TEARDOWN) {
+            return new ExecutableSetupOrTeardownValidator(validationContext, additionalVariables,
+                    ((LocalSetting<?>) modelElement).adaptTo(ExecutableSetting.class), reporter);
 
         } else if (modelElement instanceof RobotExecutableRow<?>) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;

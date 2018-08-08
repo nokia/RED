@@ -56,7 +56,7 @@ public class ScalarVariableMapper implements IParsingMapper {
         final List<IRobotTokenType> types = rt.getTypes();
         if (types.size() == 1 && types.get(0) == RobotTokenType.VARIABLES_SCALAR_DECLARATION) {
             if (positionResolver.isCorrectPosition(PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE,
-                    robotFileOutput.getFileModel(), currentLine, rt)) {
+                    currentLine, rt)) {
                 if (varHelper.isIncludedInVariableTable(currentLine, processingState)) {
                     if (varHelper.matchesBracketsConditionsForCorrectVariable(text)) {
                         result = true;

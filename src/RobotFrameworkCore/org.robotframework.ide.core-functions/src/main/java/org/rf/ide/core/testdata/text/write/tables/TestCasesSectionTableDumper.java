@@ -8,69 +8,31 @@ package org.rf.ide.core.testdata.text.write.tables;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
-import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
-import org.rf.ide.core.testdata.model.table.TableHeader;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseDocumentationDumper;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseEmptyLineDumper;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseExecutionRowDumper;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseSetupDumper;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseTagsDumper;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseTeardownDumper;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseTemplateDumper;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseTimeoutDumper;
-import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseUnknownSettingDumper;
 
-public class TestCasesSectionTableDumper extends AExecutableTableDumper {
+public class TestCasesSectionTableDumper extends AExecutableTableDumper<TestCaseTable> {
 
-    private final static ModelType MY_TYPE = ModelType.TEST_CASE_TABLE_HEADER;
-
-    public TestCasesSectionTableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, getDumpers(aDumpHelper));
+    public TestCasesSectionTableDumper(final DumperHelper helper) {
+        super(helper, getDumpers(helper));
     }
 
-    private static List<IExecutableSectionElementDumper> getDumpers(final DumperHelper aDumpHelper) {
+    private static List<IExecutableSectionElementDumper> getDumpers(final DumperHelper helper) {
         final List<IExecutableSectionElementDumper> dumpers = new ArrayList<>();
 
-        dumpers.add(new TestCaseDocumentationDumper(aDumpHelper));
-        dumpers.add(new TestCaseTagsDumper(aDumpHelper));
-        dumpers.add(new TestCaseSetupDumper(aDumpHelper));
-        dumpers.add(new TestCaseTeardownDumper(aDumpHelper));
-        dumpers.add(new TestCaseTemplateDumper(aDumpHelper));
-        dumpers.add(new TestCaseTimeoutDumper(aDumpHelper));
-        dumpers.add(new TestCaseUnknownSettingDumper(aDumpHelper));
-        dumpers.add(new TestCaseExecutionRowDumper(aDumpHelper));
-        dumpers.add(new TestCaseEmptyLineDumper(aDumpHelper));
-
+        for (final ModelType settingType : LocalSetting.TEST_SETTING_TYPES) {
+            dumpers.add(new LocalSettingDumper(helper, settingType));
+        }
+        dumpers.add(new ExecutableHolderExecutionRowDumper(helper, ModelType.TEST_CASE_EXECUTABLE_ROW));
+        dumpers.add(new ExecutableHolderEmptyLineDumper(helper, ModelType.TEST_CASE_EMPTY_LINE));
         return dumpers;
-    }
-
-    @Override
-    public boolean isServedType(final TableHeader<? extends ARobotSectionTable> header) {
-        return (header.getModelType() == MY_TYPE);
     }
 
     @Override
     public SectionType getSectionType() {
         return SectionType.TEST_CASES;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<AModelElement<? extends IExecutableStepsHolder<?>>> getSortedUnits(
-            final IExecutableStepsHolder<?> execHolder) {
-        final List<AModelElement<? extends IExecutableStepsHolder<?>>> sorted = new ArrayList<>(0);
-
-        for (final AModelElement<?> el : execHolder.getElements()) {
-            sorted.add((AModelElement<TestCase>) el);
-        }
-
-        revertExecutableRowToCorrectPlace(sorted, execHolder);
-        return sorted;
     }
 }

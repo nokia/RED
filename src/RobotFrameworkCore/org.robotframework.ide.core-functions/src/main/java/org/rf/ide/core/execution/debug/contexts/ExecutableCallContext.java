@@ -13,12 +13,12 @@ import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
 import org.rf.ide.core.execution.debug.RobotLineBreakpoint;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
@@ -111,7 +111,8 @@ public class ExecutableCallContext extends DefaultContext {
     private StackFrameContext moveToKeywordTeardown(final UserKeyword keyword, final RunningKeyword runningKeyword,
             final RobotBreakpointSupplier breakpointSupplier) {
 
-        final KeywordTeardown teardownSetting = keyword.getTeardowns().isEmpty() ? null : keyword.getTeardowns().get(0);
+        final ExecutableSetting teardownSetting = keyword.getTeardownExecutables().isEmpty() ? null
+                : keyword.getTeardownExecutables().get(0);
         if (teardownSetting != null) {
             return CommonContextsTransitions.moveToLocallyDefinedSetupOrTeardown(locationUri, teardownSetting, false,
                     runningKeyword, this, breakpointSupplier);

@@ -11,12 +11,11 @@ import java.util.List;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
-import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
-import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.CommonCase;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.base.Preconditions;
@@ -29,11 +28,8 @@ class CommonContextsTransitions {
         Preconditions.checkArgument(keyword.isSetup() || keyword.isTeardown());
 
         final boolean isSetup = keyword.isSetup();
-        final ModelType generalSettingType = isSetup ? ModelType.SUITE_TEST_SETUP
-                : ModelType.SUITE_TEST_TEARDOWN;
-
-        final StackFrameContext newContext = moveToSuiteDefinedSetupOrTeardown(models, generalSettingType,
-                keyword, previousContext, breakpointSupplier);
+        final StackFrameContext newContext = moveToSuiteDefinedSetupOrTeardown(models, isSetup, keyword,
+                previousContext, breakpointSupplier);
 
         if (newContext != null) {
             return newContext;
@@ -45,7 +41,7 @@ class CommonContextsTransitions {
         }
     }
 
-    static StackFrameContext moveToTestSetupOrTeardown(final TestCase testCase, final List<RobotFile> models,
+    static StackFrameContext moveToTestSetupOrTeardown(final CommonCase<?, ?> theCase, final List<RobotFile> models,
             final RunningKeyword keyword, final StackFrameContext previousContext,
             final RobotBreakpointSupplier breakpointSupplier) {
 
@@ -54,17 +50,16 @@ class CommonContextsTransitions {
         final boolean isSetup = keyword.isSetup();
         final URI fileUri = models.get(0).getParent().getProcessedFile().toURI();
 
-        final List<? extends AKeywordBaseSetting<TestCase>> settings = isSetup ? testCase.getSetups()
-                : testCase.getTeardowns();
-        final AKeywordBaseSetting<?> setting = settings.isEmpty() ? null : settings.get(0);
+        final List<? extends ExecutableSetting> settings = isSetup ? theCase.getSetupExecutables()
+                : theCase.getTeardownExecutables();
+        final ExecutableSetting setting = settings.isEmpty() ? null : settings.get(0);
         
         if (setting != null) {
             return moveToLocallyDefinedSetupOrTeardown(fileUri, setting, true, keyword, previousContext,
                     breakpointSupplier);
 
         } else {
-            final ModelType generalSettingType = isSetup ? ModelType.SUITE_TEST_SETUP : ModelType.SUITE_TEST_TEARDOWN;
-            final StackFrameContext newContext = moveToSuiteDefinedSetupOrTeardown(models, generalSettingType, keyword,
+            final StackFrameContext newContext = moveToSuiteDefinedSetupOrTeardown(models, isSetup, keyword,
                     previousContext, breakpointSupplier);
 
             if (newContext != null) {
@@ -72,25 +67,23 @@ class CommonContextsTransitions {
             } else {
                 final String msg = ErrorMessages.errorOfLocalPrePostKwNotFound(isSetup);
                 final String errorMsg = String.format(msg, keyword.asCall());
-                return new SetupTeardownContext(fileUri, testCase.getDeclaration().getLineNumber(), errorMsg,
+                return new SetupTeardownContext(fileUri, theCase.getDeclaration().getLineNumber(), errorMsg,
                         previousContext);
             }
         }
     }
 
     static StackFrameContext moveToLocallyDefinedSetupOrTeardown(final URI fileUri,
-            final AKeywordBaseSetting<?> setting, final boolean isTest, final RunningKeyword keyword,
+            final ExecutableSetting setting, final boolean isTest, final RunningKeyword keyword,
             final StackFrameContext previousContext, final RobotBreakpointSupplier breakpointSupplier) {
 
         final RobotToken keywordToken = setting.getKeywordName();
 
-        final ModelType modelType = setting.getModelType();
-        final boolean isTeardown = modelType == ModelType.TEST_CASE_TEARDOWN
-                || modelType == ModelType.USER_KEYWORD_TEARDOWN;
+        final boolean isSetup = setting.isSetup();
 
         if (keywordToken == null || keywordToken.getText().isEmpty()) {
             final String msg = ErrorMessages
-                    .errorOfLocalPrePostKwNotFoundBecauseOfMissingSetting(!isTeardown, isTest);
+                    .errorOfLocalPrePostKwNotFoundBecauseOfMissingSetting(isSetup, isTest);
             final String errorMessage = String.format(msg, keyword.asCall());
             return new SetupTeardownContext(fileUri, setting.getDeclaration().getLineNumber(), errorMessage,
                     previousContext);
@@ -100,7 +93,7 @@ class CommonContextsTransitions {
 
         } else {
             final String msg = ErrorMessages
-                    .errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(!isTeardown, isTest);
+                    .errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(isSetup, isTest);
             final String errorMessage = String.format(msg, keyword.asCall(), keywordToken.getText());
             return new SetupTeardownContext(fileUri, keywordToken.getLineNumber(), errorMessage,
                     previousContext);
@@ -108,7 +101,7 @@ class CommonContextsTransitions {
     }
 
     private static StackFrameContext moveToSuiteDefinedSetupOrTeardown(final List<RobotFile> models,
-            final ModelType settingType, final RunningKeyword keyword, final StackFrameContext previousContext,
+            final boolean isSetup, final RunningKeyword keyword, final StackFrameContext previousContext,
             final RobotBreakpointSupplier breakpointSupplier) {
 
         for (final RobotFile fileModel : models) {
@@ -117,19 +110,17 @@ class CommonContextsTransitions {
                 continue;
             }
 
-            final List<? extends AKeywordBaseSetting<SettingTable>> settings = settingType == ModelType.SUITE_TEST_SETUP
-                    ? settingsTable.getTestSetups()
+            final List<? extends ExecutableSetting> settings = isSetup ? settingsTable.getTestSetups()
                     : settingsTable.getTestTeardowns();
 
-            final AKeywordBaseSetting<?> setting = settings.isEmpty() ? null : settings.get(0);
-
+            final ExecutableSetting setting = settings.isEmpty() ? null : settings.get(0);
             if (setting != null) {
                 final RobotToken keywordToken = setting.getKeywordName();
                 final URI fileUri = fileModel.getParent().getProcessedFile().toURI();
 
                 if (keywordToken == null || keywordToken.getText().isEmpty()) {
-                    final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfMissingSetting(
-                            settingType == ModelType.SUITE_TEST_SETUP, true);
+                    final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfMissingSetting(isSetup,
+                            true);
                     final String errorMsg = String.format(msg, keyword.asCall());
                     return new SetupTeardownContext(fileUri, setting.getDeclaration().getLineNumber(), errorMsg,
                             previousContext);
@@ -139,8 +130,7 @@ class CommonContextsTransitions {
                             breakpointSupplier);
 
                 } else {
-                    final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(
-                            settingType == ModelType.SUITE_TEST_SETUP, true);
+                    final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(isSetup, true);
                     final String errorMsg = String.format(msg, keyword.asCall(), keywordToken.getText());
                     return new SetupTeardownContext(fileUri, keywordToken.getLineNumber(), errorMsg, previousContext);
                 }

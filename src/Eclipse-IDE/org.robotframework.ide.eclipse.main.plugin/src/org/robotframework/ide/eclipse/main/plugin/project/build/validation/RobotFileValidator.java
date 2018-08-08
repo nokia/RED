@@ -18,6 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -67,6 +68,8 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
 
         new UnknownTablesValidator(fileModel, reporter).validate(null);
         new TestCaseTableValidator(validationContext, fileModel.findSection(RobotCasesSection.class), reporter)
+                .validate(null);
+        new TaskTableValidator(validationContext, fileModel.findSection(RobotTasksSection.class), reporter)
                 .validate(null);
         new GeneralSettingsTableValidator(validationContext, fileModel.findSection(RobotSettingsSection.class),
                 reporter).validate(null);

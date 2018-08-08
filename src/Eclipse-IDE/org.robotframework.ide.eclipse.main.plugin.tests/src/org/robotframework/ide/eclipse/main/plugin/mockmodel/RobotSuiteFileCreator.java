@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.mockmodel;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,8 +61,7 @@ public class RobotSuiteFileCreator {
 
     private RobotSuiteFile buildModel(final String filename, final boolean readOnly) {
         final String content = getContent();
-        final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
-        final RobotSuiteStreamFile model = new RobotSuiteStreamFile(filename, stream, readOnly);
+        final RobotSuiteStreamFile model = new RobotSuiteStreamFile(filename, content, readOnly);
         if (version != null) {
             model.setRobotVersion(version);
         }

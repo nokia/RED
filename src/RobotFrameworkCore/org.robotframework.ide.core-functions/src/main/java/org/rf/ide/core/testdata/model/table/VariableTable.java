@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -143,12 +144,14 @@ public class VariableTable extends ARobotSectionTable {
         variables.remove(variable);
     }
 
-    public boolean moveUpVariable(final AVariable variable) {
-        return MoveElementHelper.moveUp(variables, variable);
+    @Override
+    public boolean moveUpElement(final AModelElement<? extends ARobotSectionTable> element) {
+        return MoveElementHelper.moveUp(variables, (AVariable) element);
     }
 
-    public boolean moveDownVariable(final AVariable variable) {
-        return MoveElementHelper.moveDown(variables, variable);
+    @Override
+    public boolean moveDownElement(final AModelElement<? extends ARobotSectionTable> element) {
+        return MoveElementHelper.moveDown(variables, (AVariable) element);
     }
 
     public boolean isEmpty() {

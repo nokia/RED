@@ -33,7 +33,7 @@ public class KeywordFinder {
             keywordTable.addKeyword(keyword);
 
             final RobotLine lineToModification = findRobotLineInModel(fileModel, keyword, currentLine);
-            lineToModification.addLineElementAt(0, keyword.getKeywordName());
+            lineToModification.addLineElementAt(0, keyword.getName());
         } else {
             keyword = lastHeaderKeyword.get(lastHeaderKeyword.size() - 1);
         }
@@ -96,7 +96,7 @@ public class KeywordFinder {
             final int numberOfTestCases = keywordsAvail.size();
             for (int i = numberOfTestCases - 1; i >= 0; i--) {
                 final UserKeyword keyword = keywordsAvail.get(i);
-                if (keyword.getKeywordName().getLineNumber() > tableHeaderLineNumber) {
+                if (keyword.getName().getLineNumber() > tableHeaderLineNumber) {
                     keywords.add(keyword);
                 }
             }

@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -23,7 +24,8 @@ import com.google.common.annotations.VisibleForTesting;
 public class RedSectionProposals {
 
     private static final List<String> SECTION_NAMES = newArrayList(RobotKeywordsSection.SECTION_NAME,
-            RobotCasesSection.SECTION_NAME, RobotSettingsSection.SECTION_NAME, RobotVariablesSection.SECTION_NAME);
+            RobotCasesSection.SECTION_NAME, RobotTasksSection.SECTION_NAME, RobotSettingsSection.SECTION_NAME,
+            RobotVariablesSection.SECTION_NAME);
 
     private final ProposalMatcher matcher;
 

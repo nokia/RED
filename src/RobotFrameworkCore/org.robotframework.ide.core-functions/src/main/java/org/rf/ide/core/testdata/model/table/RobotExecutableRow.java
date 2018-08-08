@@ -19,6 +19,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ExecutableRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -40,6 +41,12 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         this.action = new RobotToken();
     }
 
+    @Override
+    public void setParent(final T parent) {
+        super.setParent(parent);
+        fixMissingTypes();
+    }
+
     public RobotToken getAction() {
         fixMissingTypes();
         return action;
@@ -56,21 +63,27 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     private IRobotTokenType getActionType() {
-        IRobotTokenType actType = null;
-        if (getParent() != null) {
-            final Class<? extends Object> parentClass = getParent().getClass();
-            if (parentClass == TestCase.class) {
-                actType = RobotTokenType.TEST_CASE_ACTION_NAME;
-            } else if (parentClass == UserKeyword.class) {
-                actType = RobotTokenType.KEYWORD_ACTION_NAME;
-            }
+        final T parent = getParent();
+        if (parent != null && parent.getClass() == TestCase.class) {
+            return RobotTokenType.TEST_CASE_ACTION_NAME;
+        } else if (parent != null && parent.getClass() == Task.class) {
+            return RobotTokenType.TASK_ACTION_NAME;
+        } else if (parent != null && parent.getClass() == UserKeyword.class) {
+            return RobotTokenType.KEYWORD_ACTION_NAME;
         }
+        return RobotTokenType.UNKNOWN;
+    }
 
-        if (actType == null) {
-            actType = RobotTokenType.UNKNOWN;
+    private IRobotTokenType getArgumentType() {
+        final T parent = getParent();
+        if (parent != null && parent.getClass() == TestCase.class) {
+            return RobotTokenType.TEST_CASE_ACTION_ARGUMENT;
+        } else if (parent != null && parent.getClass() == Task.class) {
+            return RobotTokenType.TASK_ACTION_ARGUMENT;
+        } else if (parent != null && parent.getClass() == UserKeyword.class) {
+            return RobotTokenType.KEYWORD_ACTION_ARGUMENT;
         }
-
-        return actType;
+        return RobotTokenType.UNKNOWN;
     }
 
     public List<RobotToken> getArguments() {
@@ -112,20 +125,6 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     public void removeArgument(final int index) {
         arguments.remove(index);
-    }
-
-    private IRobotTokenType getArgumentType() {
-        IRobotTokenType argType = null;
-        if (getParent() != null) {
-            final Class<? extends Object> parentClass = getParent().getClass();
-            if (parentClass == TestCase.class) {
-                argType = RobotTokenType.TEST_CASE_ACTION_ARGUMENT;
-            } else if (parentClass == UserKeyword.class) {
-                argType = RobotTokenType.KEYWORD_ACTION_ARGUMENT;
-            }
-        }
-
-        return argType;
     }
 
     @Override
@@ -179,6 +178,8 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         final List<IRobotTokenType> types = getAction().getTypes();
         if (types.contains(RobotTokenType.TEST_CASE_ACTION_NAME)) {
             type = ModelType.TEST_CASE_EXECUTABLE_ROW;
+        } else if (types.contains(RobotTokenType.TASK_ACTION_NAME)) {
+            type = ModelType.TASK_EXECUTABLE_ROW;
         } else if (types.contains(RobotTokenType.KEYWORD_ACTION_NAME)) {
             type = ModelType.USER_KEYWORD_EXECUTABLE_ROW;
         }
@@ -189,6 +190,8 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
                 final AModelElement<?> parentModel = (AModelElement<?>) parent;
                 if (parentModel.getModelType() == ModelType.TEST_CASE) {
                     type = ModelType.TEST_CASE_EXECUTABLE_ROW;
+                } else if (parentModel.getModelType() == ModelType.TASK) {
+                    type = ModelType.TASK_EXECUTABLE_ROW;
                 } else if (parentModel.getModelType() == ModelType.USER_KEYWORD) {
                     type = ModelType.USER_KEYWORD_EXECUTABLE_ROW;
                 }
@@ -291,7 +294,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     @Override
-    public void insertValueAt(final String value, int position) {
+    public void insertValueAt(final String value, final int position) {
         final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position == 0) { // new action

@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -15,6 +17,8 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionServi
 public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
 
     private final RobotTestsLaunch testsLaunchContext;
+
+    private ExecutionMode mode;
 
     public ExecutionMessagesTracker(final RobotTestsLaunch testsLaunchContext) {
         this.testsLaunchContext = testsLaunchContext;
@@ -33,15 +37,22 @@ public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
     }
 
     @Override
+    public void handleSuiteStarted(final SuiteStartedEvent event) {
+        this.mode = event.getMode();
+    }
+
+    @Override
     public void handleTestStarted(final TestStartedEvent event) {
+        final String caseLabel = this.mode == ExecutionMode.TASKS ? "task" : "test";
         testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
-                store -> store.append("Starting test: " + event.getLongName() + '\n'));
+                store -> store.append("Starting " + caseLabel + ": " + event.getLongName() + '\n'));
     }
 
     @Override
     public void handleTestEnded(final TestEndedEvent event) {
+        final String caseLabel = this.mode == ExecutionMode.TASKS ? "task" : "test";
         testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
-                store -> store.append("Ending test: " + event.getLongName() + "\n\n"));
+                store -> store.append("Ending " + caseLabel + ": " + event.getLongName() + "\n\n"));
     }
 
     @Override

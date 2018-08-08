@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.toCollection;
 import java.io.ObjectStreamException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,12 +17,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -76,10 +76,6 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
                 : RedImages.getTestCaseImage();
     }
 
-    public List<RobotDefinitionSetting> getTagsSetting() {
-        return findSettings(ModelType.TEST_CASE_TAGS);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void removeUnitSettings(final RobotKeywordCall call) {
@@ -88,7 +84,8 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
     public String getDocumentation() {
         return findSetting(ModelType.TEST_CASE_DOCUMENTATION).map(RobotKeywordCall::getLinkedElement)
-                .map(TestDocumentation.class::cast)
+                .map(setting -> (LocalSetting<?>) setting)
+                .map(setting -> setting.adaptTo(IDocumentationHolder.class))
                 .map(DocumentationServiceHandler::toShowConsolidated)
                 .orElse("<not documented>");
     }
@@ -102,6 +99,7 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
         return new Documentation(DocFormat.ROBOT, getDocumentation(), keywords);
     }
     
+    @Override
     public Optional<String> getTemplateInUse() {
         return Optional.ofNullable(getLinkedElement().getTemplateKeywordName());
     }

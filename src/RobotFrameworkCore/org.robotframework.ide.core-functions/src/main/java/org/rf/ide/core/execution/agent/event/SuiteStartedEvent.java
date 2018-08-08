@@ -24,14 +24,21 @@ public final class SuiteStartedEvent {
         final List<?> childSuites = (List<?>) attributes.get("suites");
         final List<?> childTests = (List<?>) attributes.get("tests");
         final Integer totalTests = (Integer) attributes.get("totaltests");
+        ExecutionMode mode;
+        if (attributes.get("is_rpa") instanceof Boolean) {
+            final boolean isRpa = ((Boolean) attributes.get("is_rpa")).booleanValue();
+            mode = isRpa ? ExecutionMode.TASKS : ExecutionMode.TESTS;
+        } else {
+            mode = ExecutionMode.TESTS;
+        }
 
         if (isDir == null || childSuites == null || childTests == null || totalTests == null) {
             throw new IllegalArgumentException("Suite started event should have directory/file flag, children "
                     + "suites and tests as well as number of total tests");
         }
 
-        return new SuiteStartedEvent(name, suiteFilePath, isDir, totalTests, Events.ensureListOfStrings(childSuites),
-                Events.ensureListOfStrings(childTests));
+        return new SuiteStartedEvent(name, suiteFilePath, isDir, mode, totalTests,
+                Events.ensureListOfStrings(childSuites), Events.ensureListOfStrings(childTests));
     }
 
 
@@ -41,17 +48,21 @@ public final class SuiteStartedEvent {
 
     private final boolean isDir;
 
+    private final ExecutionMode mode;
+
     private final int totalTests;
 
     private final List<String> childSuites;
 
     private final List<String> childTests;
 
-    public SuiteStartedEvent(final String name, final URI suiteFilePath, final boolean isDir, final int totalTests,
-            final List<String> childSuites, final List<String> childTests) {
+
+    public SuiteStartedEvent(final String name, final URI suiteFilePath, final boolean isDir, final ExecutionMode mode,
+            final int totalTests, final List<String> childSuites, final List<String> childTests) {
         this.name = name;
         this.suiteFilePath = suiteFilePath;
         this.isDir = isDir;
+        this.mode = mode;
         this.totalTests = totalTests;
         this.childSuites = childSuites;
         this.childTests = childTests;
@@ -67,6 +78,10 @@ public final class SuiteStartedEvent {
 
     public boolean isDirectory() {
         return isDir;
+    }
+
+    public ExecutionMode getMode() {
+        return mode;
     }
 
     public int getNumberOfTests() {
@@ -86,7 +101,7 @@ public final class SuiteStartedEvent {
         if (obj != null && obj.getClass() == SuiteStartedEvent.class) {
             final SuiteStartedEvent that = (SuiteStartedEvent) obj;
             return this.name.equals(that.name) && this.suiteFilePath.equals(that.suiteFilePath)
-                    && this.isDir == that.isDir && this.totalTests == that.totalTests
+                    && this.isDir == that.isDir && this.mode == that.mode && this.totalTests == that.totalTests
                     && this.childSuites.equals(that.childSuites) && this.childTests.equals(that.childTests);
         }
         return false;
@@ -94,6 +109,10 @@ public final class SuiteStartedEvent {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, suiteFilePath, isDir, totalTests, childSuites, childTests);
+        return Objects.hash(name, suiteFilePath, isDir, mode, totalTests, childSuites, childTests);
+    }
+
+    public static enum ExecutionMode {
+        TESTS, TASKS
     }
 }

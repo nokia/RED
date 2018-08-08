@@ -40,7 +40,7 @@ public class DumpedResultBuilder implements ILineDumpTokenListener {
 
     @Override
     public void tokenDumped(final RobotToken oldToken, final RobotToken newToken) {
-        this.addMapNewToOld(oldToken, newToken);
+        addMapNewToOld(oldToken, newToken);
     }
 
     public static class DumpedResult {

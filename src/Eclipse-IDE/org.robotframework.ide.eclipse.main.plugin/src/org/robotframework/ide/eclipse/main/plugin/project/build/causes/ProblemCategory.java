@@ -111,10 +111,10 @@ public enum ProblemCategory {
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Duplicated variable name",
             "Occurs when variable name is duplicated and one variable value overrides another."),
-    DUPLICATED_TEST_CASE(
+    DUPLICATED_TEST_OR_TASK(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
-            "Duplicated test case name",
-            "Occurs when test case name is duplicated and both test cases can be run."),
+            "Duplicated test case/task name",
+            "Occurs when test case/task name is duplicated and both can be run."),
     MASKED_KEYWORD(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Masked keyword name",
@@ -123,7 +123,7 @@ public enum ProblemCategory {
     EMPTY_SETTINGS(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Empty settings definition",
-            "Occurs when suite, test case or keyword setting is defined with empty content."),
+            "Occurs when suite, test case, task or keyword setting is defined with empty content."),
     UNRECOGNIZED_HEADER(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Unrecognized header type",
@@ -265,7 +265,7 @@ public enum ProblemCategory {
 
     public static Map<ProblemCategoryType, List<ProblemCategory>> getNonValidationCategories() {
         return Stream.of(ProblemCategory.values())
-                .filter(((Predicate<ProblemCategory>) ProblemCategory::isValidationCategory).negate())
+                .filter(((Predicate<ProblemCategory>)ProblemCategory::isValidationCategory).negate())
                 .collect(Collectors.groupingBy(category -> category.type, TreeMap::new, Collectors.toList()));
     }
 

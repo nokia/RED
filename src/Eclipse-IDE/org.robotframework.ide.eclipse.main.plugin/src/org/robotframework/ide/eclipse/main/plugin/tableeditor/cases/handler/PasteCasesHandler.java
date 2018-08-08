@@ -9,12 +9,10 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshSectionCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.InsertCasesCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.PasteCasesHandler.E4PasteCasesHandler;
@@ -45,26 +43,13 @@ public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandle
         }
 
         @Override
-        protected void createTargetSectionIfRequired(final RobotSuiteFile fileModel,
-                final RobotEditorCommandsStack commandsStack) {
-            if (fileModel.findSection(RobotCasesSection.class).isPresent()) {
-                return;
-            }
-            commandsStack.execute(new CreateFreshSectionCommand(fileModel, RobotCasesSection.SECTION_NAME));
+        protected Class<? extends RobotSuiteFileSection> getSectionClass() {
+            return RobotCasesSection.class;
         }
 
         @Override
-        protected void insertHoldersAtSectionEnd(final RobotSuiteFile fileModel,
-                final RobotCodeHoldingElement<?>[] holders, final RobotEditorCommandsStack commandsStack) {
-            final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class).get();
-            commandsStack.execute(new InsertCasesCommand(section, (RobotCase[]) holders));
-        }
-
-        @Override
-        protected void insertHoldersAt(final RobotSuiteFile fileModel, final int index,
-                final RobotCodeHoldingElement<?>[] holders, final RobotEditorCommandsStack commandsStack) {
-            final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class).get();
-            commandsStack.execute(new InsertCasesCommand(section, index, (RobotCase[]) holders));
+        protected String getSectionName() {
+            return RobotCasesSection.SECTION_NAME;
         }
     }
 }

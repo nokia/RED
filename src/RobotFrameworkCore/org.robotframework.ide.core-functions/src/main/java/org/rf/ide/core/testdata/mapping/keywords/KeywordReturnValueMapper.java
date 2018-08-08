@@ -13,13 +13,11 @@ import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordReturnValueMapper implements IParsingMapper {
 
@@ -37,17 +35,14 @@ public class KeywordReturnValueMapper implements IParsingMapper {
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
 
-        final List<IRobotTokenType> types = rt.getTypes();
-        types.remove(RobotTokenType.UNKNOWN);
-        types.add(0, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE);
         rt.setText(text);
 
         final KeywordTable keywordTable = robotFileOutput.getFileModel().getKeywordTable();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
         final UserKeyword keyword = keywords.get(keywords.size() - 1);
-        final List<KeywordReturn> returns = keyword.getReturns();
-        final KeywordReturn keywordReturn = returns.get(returns.size() - 1);
-        keywordReturn.addReturnValue(rt);
+        final List<LocalSetting<UserKeyword>> returns = keyword.getReturns();
+        final LocalSetting<UserKeyword> keywordReturn = returns.get(returns.size() - 1);
+        keywordReturn.addToken(rt);
 
         processingState.push(ParsingState.KEYWORD_SETTING_RETURN_VALUE);
         return rt;

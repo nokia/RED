@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,12 +19,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
@@ -89,8 +87,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportUnknownSettings() {
-        final List<KeywordUnknownSettings> unknownSettings = keyword.getUnknownSettings();
-        for (final KeywordUnknownSettings unknownSetting : unknownSettings) {
+        final List<LocalSetting<UserKeyword>> unknownSettings = keyword.getUnknownSettings();
+        for (final LocalSetting<UserKeyword> unknownSetting : unknownSettings) {
             final RobotToken token = unknownSetting.getDeclaration();
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD_SETTING)
                     .formatMessageWith(token.getText());
@@ -102,24 +100,28 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportReturnProblems() {
-        keyword.getReturns().stream().filter(ret -> ret.getReturnValues().isEmpty()).forEach(this::reportEmptySetting);
+        keyword.getReturns().stream()
+                .filter(ret -> ret.getToken(RobotTokenType.KEYWORD_SETTING_RETURN_VALUE) == null)
+                .forEach(this::reportEmptySetting);
     }
 
     private void reportTagsProblems() {
-        keyword.getTags().stream().filter(tag -> tag.getTags().isEmpty()).forEach(this::reportEmptySetting);
+        keyword.getTags().stream()
+                .filter(tag -> tag.getToken(RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME) == null)
+                .forEach(this::reportEmptySetting);
     }
 
     private void reportTimeoutsProblems() {
         keyword.getTimeouts().stream()
-                .filter(timeout -> timeout.getTimeout() == null)
+                .filter(tag -> tag.getToken(RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE) == null)
                 .forEach(this::reportEmptySetting);
 
         reportInvalidTimeoutSyntax(keyword.getTimeouts());
     }
 
-    private void reportInvalidTimeoutSyntax(final List<KeywordTimeout> timeouts) {
-        for (final KeywordTimeout kwTimeout : timeouts) {
-            final RobotToken timeoutToken = kwTimeout.getTimeout();
+    private void reportInvalidTimeoutSyntax(final List<LocalSetting<UserKeyword>> timeouts) {
+        for (final LocalSetting<UserKeyword> kwTimeout : timeouts) {
+            final RobotToken timeoutToken = kwTimeout.getToken(RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE);
             if (timeoutToken != null) {
                 final String timeout = timeoutToken.getText();
                 if (!timeoutToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
@@ -134,13 +136,13 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
     private void reportDocumentationsProblems() {
         keyword.getDocumentation().stream().findFirst()
-                .filter(doc -> doc.getDocumentationText().isEmpty())
+                .filter(doc -> doc.getToken(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT) == null)
                 .ifPresent(this::reportEmptySetting);
     }
 
     private void reportTeardownProblems() {
         keyword.getTeardowns().stream()
-                .filter(teardown -> teardown.getKeywordName() == null)
+                .filter(teardown -> teardown.getToken(RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME) == null)
                 .forEach(this::reportEmptySetting);
     }
 
@@ -154,11 +156,12 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     private void reportUnknownVariablesInNonExecutables() {
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
 
-        for (final KeywordTimeout kwTimeout : keyword.getTimeouts()) {
-            unknownVarsValidator.reportUnknownVars(kwTimeout.getTimeout());
+        for (final LocalSetting<UserKeyword> kwTimeout : keyword.getTimeouts()) {
+            unknownVarsValidator.reportUnknownVars(kwTimeout.getToken(RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE));
         }
-        for (final KeywordTags tag : keyword.getTags()) {
-            unknownVarsValidator.reportUnknownVars(tag.getTags());
+        for (final LocalSetting<UserKeyword> tag : keyword.getTags()) {
+            unknownVarsValidator
+                    .reportUnknownVars(tag.tokensOf(RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME).collect(toList()));
         }
         // KeywordReturn are validated in KeywordValidator, since it requires variables created by executables
     }
@@ -167,7 +170,10 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         final IFile file = validationContext.getFile();
         final String fileName = file.getName();
 
-        keyword.getArguments().stream().filter(args -> args.getArguments().isEmpty()).forEach(this::reportEmptySetting);
+        keyword.getArguments()
+                .stream()
+                .filter(args -> args.getToken(RobotTokenType.KEYWORD_SETTING_ARGUMENT) == null)
+                .forEach(this::reportEmptySetting);
 
         if (!keyword.getArguments().isEmpty() && hasEmbeddedArguments(fileName, keyword)) {
             reporter.handleProblem(
@@ -185,19 +191,18 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private boolean reportArgumentsSyntaxProblems() {
-        boolean shouldContinue = true;
-        for (final KeywordArguments argSetting : keyword.getArguments()) {
-            for (final RobotToken argToken : argSetting.getArguments()) {
-                final boolean isCorrect = hasValidArgumentSyntax(argToken);
-                if (!isCorrect) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX)
-                            .formatMessageWith(argToken.getText());
-                    reporter.handleProblem(problem, validationContext.getFile(), argToken);
-                }
-                shouldContinue &= isCorrect;
-            }
+        final AtomicBoolean shouldContinue = new AtomicBoolean(true);
+        for (final LocalSetting<UserKeyword> argSetting : keyword.getArguments()) {
+            argSetting.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT)
+                    .filter(token -> !hasValidArgumentSyntax(token))
+                    .forEach(argToken -> {
+                        shouldContinue.set(false);
+                        final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX)
+                                .formatMessageWith(argToken.getText());
+                        reporter.handleProblem(problem, validationContext.getFile(), argToken);
+                    });
         }
-        return shouldContinue;
+        return shouldContinue.get();
     }
 
     private boolean hasValidArgumentSyntax(final RobotToken argToken) {
@@ -233,13 +238,13 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
         // first add arguments embedded in name, then from [Arguments] setting
         final Multimap<String, RobotToken> embeddedArguments = VariableNamesSupport
-                .extractUnifiedVariables(keyword.getKeywordName(), extractor, fileName);
+                .extractUnifiedVariables(keyword.getName(), extractor, fileName);
         for (final String argName : embeddedArguments.keySet()) {
             arguments.putAll(EmbeddedKeywordNamesSupport.removeRegex(argName), embeddedArguments.get(argName));
         }
-        for (final KeywordArguments argument : keyword.getArguments()) {
-            for (final RobotToken token : argument.getArguments()) {
-
+        for (final LocalSetting<UserKeyword> argument : keyword.getArguments()) {
+            for (final RobotToken token : argument.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT)
+                    .collect(toList())) {
                 final boolean hasDefault = token.getText().contains("=");
                 if (hasDefault) {
                     final List<String> splitted = Splitter.on('=').limit(2).splitToList(token.getText());
@@ -261,19 +266,23 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     private boolean hasEmbeddedArguments(final String fileName, final UserKeyword keyword) {
         final VariableExtractor variableExtractor = new VariableExtractor();
         final List<VariableDeclaration> extractedVariables = variableExtractor
-                .extract(keyword.getKeywordName(), fileName).getCorrectVariables();
+                .extract(keyword.getName(), fileName)
+                .getCorrectVariables();
         return !extractedVariables.isEmpty();
     }
 
     private void reportArgumentsOrderProblems() {
-        final List<KeywordArguments> arguments = keyword.getArguments();
+        final List<LocalSetting<UserKeyword>> arguments = keyword.getArguments();
         if (arguments == null || arguments.isEmpty()) {
             return;
         }
         boolean wasVararg = false;
         boolean wasKwarg = false;
         boolean wasDefault = false;
-        for (final RobotToken argumentToken : arguments.get(arguments.size() - 1).getArguments()) {
+        final List<RobotToken> tokens = arguments.get(arguments.size() - 1)
+                .tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT)
+                .collect(toList());
+        for (final RobotToken argumentToken : tokens) {
             final boolean isDefault = isDefaultArgument(argumentToken);
             final boolean isVararg = argumentToken.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION);
             final boolean isKwarg = argumentToken.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
@@ -300,10 +309,12 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportArgumentsDefaultValuesUnknownVariables() {
-        for (final KeywordArguments argSetting : keyword.getArguments()) {
+        for (final LocalSetting<UserKeyword> argSetting : keyword.getArguments()) {
             final Set<String> additionalKnownVariables = new HashSet<>();
 
-            for (final RobotToken argToken : argSetting.getArguments()) {
+            final List<RobotToken> tokens = argSetting.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT)
+                    .collect(toList());
+            for (final RobotToken argToken : tokens) {
                 final boolean hasDefault = argToken.getText().contains("=");
                 if (hasDefault) {
                     final List<String> splitted = Splitter.on('=').limit(2).splitToList(argToken.getText());

@@ -31,7 +31,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
     }
 
     @Override
-    public void setParent(T parent) {
+    public void setParent(final T parent) {
         super.setParent(parent);
         fixMissingType();
     }
@@ -85,6 +85,8 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
         final List<IRobotTokenType> types = empty.getTypes();
         if (types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL)) {
             return ModelType.TEST_CASE_EMPTY_LINE;
+        } else if (types.contains(RobotTokenType.TASK_EMPTY_CELL)) {
+            return ModelType.TASK_EMPTY_LINE;
         } else if (types.contains(RobotTokenType.KEYWORD_EMPTY_CELL)) {
             return ModelType.USER_KEYWORD_EMPTY_LINE;
         }
@@ -113,7 +115,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
     }
 
     @Override
-    public void insertValueAt(String value, int position) {
+    public void insertValueAt(final String value, final int position) {
         // do nothing
     }
 
@@ -129,6 +131,8 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
         final AModelElement<?> parent = (AModelElement<?>) getParent();
         if (parent != null && parent.getModelType() == ModelType.TEST_CASE) {
             return RobotTokenType.TEST_CASE_EMPTY_CELL;
+        } else if (parent != null && parent.getModelType() == ModelType.TASK) {
+            return RobotTokenType.TASK_EMPTY_CELL;
         } else if (parent != null && parent.getModelType() == ModelType.USER_KEYWORD) {
             return RobotTokenType.KEYWORD_EMPTY_CELL;
         }

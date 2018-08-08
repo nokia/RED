@@ -135,6 +135,7 @@ public class ExecutableUnitsFixer {
                             final RobotToken actionToBeArgument = execLine.getAction().copy();
                             actionToBeArgument.getTypes().remove(RobotTokenType.KEYWORD_ACTION_NAME);
                             actionToBeArgument.getTypes().remove(RobotTokenType.TEST_CASE_ACTION_NAME);
+                            actionToBeArgument.getTypes().remove(RobotTokenType.TASK_ACTION_NAME);
                             actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                             actionToBeArgument.setText("\\");
                             execLine.addArgument(0, actionToBeArgument);
@@ -148,6 +149,7 @@ public class ExecutableUnitsFixer {
                     final RobotToken actionToBeArgument = execLine.getAction().copy();
                     actionToBeArgument.getTypes().remove(RobotTokenType.KEYWORD_ACTION_NAME);
                     actionToBeArgument.getTypes().remove(RobotTokenType.TEST_CASE_ACTION_NAME);
+                    actionToBeArgument.getTypes().remove(RobotTokenType.TASK_ACTION_NAME);
                     actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                     execLine.addArgument(0, actionToBeArgument);
                     execLine.getAction().setText("\\");
@@ -321,7 +323,7 @@ public class ExecutableUnitsFixer {
             if (p instanceof RobotExecutableRow) {
                 descs.add(((RobotExecutableRow<T>) p).buildLineDescription());
             } else {
-                descs.add(new SettingDescriptor<T>(p));
+                descs.add(new SettingDescriptor<>(p));
             }
         }
 

@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Iterables.transform;
+import static java.util.stream.Collectors.joining;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsPrefixedFirst;
 
 import java.util.ArrayList;
@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.ImmutableTable.Builder;
@@ -42,6 +41,19 @@ public class RedSettingProposals {
         builder.put(SettingTarget.TEST_CASE, "[teardown]",
                 "The keyword %s is executed after every other keyword inside the definition");
 
+        builder.put(SettingTarget.TASK, "[tags]",
+                "These tags are set to this task and they possibly override Default Tags");
+        builder.put(SettingTarget.TASK, "[documentation]", "Documentation of current task");
+        builder.put(SettingTarget.TASK, "[setup]",
+                "The keyword %s is executed before other keywords inside the definition");
+        builder.put(SettingTarget.TASK, "[template]", "The keyword %s is used as a template");
+        builder.put(SettingTarget.TASK, "[timeout]",
+                "Specifies maximum time this task is allowed to execute before being aborted.\n"
+                        + "This setting overrides Task Timeout setting set on suite level\n"
+                        + "Numerical values are interpreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+        builder.put(SettingTarget.TASK, "[teardown]",
+                "The keyword %s is executed after every other keyword inside the definition");
+
         builder.put(SettingTarget.KEYWORD, "[tags]",
                 "These tags are set to this keyword and are not affected by Default Tags or Force Tags setting");
         builder.put(SettingTarget.KEYWORD, "[documentation]",
@@ -57,20 +69,50 @@ public class RedSettingProposals {
         builder.put(SettingTarget.KEYWORD, "[return]",
                 "Specify the return value for this keyword. Multiple values can be used.");
 
-        builder.put(SettingTarget.GENERAL, "library", "Imports library given by its name or path");
-        builder.put(SettingTarget.GENERAL, "resource", "Imports resource file to be used in current suite");
-        builder.put(SettingTarget.GENERAL, "variables", "Imports variables file to be used in current suite");
-        builder.put(SettingTarget.GENERAL, "documentation", "Documentation of current suite");
-        builder.put(SettingTarget.GENERAL, "metadata", "Metadata current suite hold");
-        builder.put(SettingTarget.GENERAL, "suite setup", "The keyword %s is executed before executing any of the test cases or lower level suites");
-        builder.put(SettingTarget.GENERAL, "suite teardown", "The keyword %s is executed after all test cases and lower level suites have been executed");
-        builder.put(SettingTarget.GENERAL, "force tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
-        builder.put(SettingTarget.GENERAL, "default tags", "Sets tags to all tests cases in this suite, unless test case specifies own tags");
-        builder.put(SettingTarget.GENERAL, "test setup", "The keyword %s is executed before every test cases in this suite unless test cases override it");
-        builder.put(SettingTarget.GENERAL, "test teardown", "The keyword %s is executed after every test cases in this suite unless test cases override it");
-        builder.put(SettingTarget.GENERAL, "test template", "The keyword %s is used as default template keyword in this suite");
-        builder.put(SettingTarget.GENERAL, "test timeout",
+        builder.put(SettingTarget.GENERAL_TESTS, "library", "Imports library given by its name or path");
+        builder.put(SettingTarget.GENERAL_TESTS, "resource", "Imports resource file to be used in current suite");
+        builder.put(SettingTarget.GENERAL_TESTS, "variables", "Imports variables file to be used in current suite");
+        builder.put(SettingTarget.GENERAL_TESTS, "documentation", "Documentation of current suite");
+        builder.put(SettingTarget.GENERAL_TESTS, "metadata", "Metadata current suite hold");
+        builder.put(SettingTarget.GENERAL_TESTS, "suite setup",
+                "The keyword %s is executed before executing any of the test cases or lower level suites");
+        builder.put(SettingTarget.GENERAL_TESTS, "suite teardown",
+                "The keyword %s is executed after all test cases and lower level suites have been executed");
+        builder.put(SettingTarget.GENERAL_TESTS, "force tags",
+                "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
+        builder.put(SettingTarget.GENERAL_TESTS, "default tags",
+                "Sets tags to all tests cases in this suite, unless test case specifies own tags");
+        builder.put(SettingTarget.GENERAL_TESTS, "test setup",
+                "The keyword %s is executed before every test cases in this suite unless test cases override it");
+        builder.put(SettingTarget.GENERAL_TESTS, "test teardown",
+                "The keyword %s is executed after every test cases in this suite unless test cases override it");
+        builder.put(SettingTarget.GENERAL_TESTS, "test template",
+                "The keyword %s is used as default template keyword in this suite");
+        builder.put(SettingTarget.GENERAL_TESTS, "test timeout",
                 "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
+                        + "Numerical values are interpreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+
+        builder.put(SettingTarget.GENERAL_TASKS, "library", "Imports library given by its name or path");
+        builder.put(SettingTarget.GENERAL_TASKS, "resource", "Imports resource file to be used in current suite");
+        builder.put(SettingTarget.GENERAL_TASKS, "variables", "Imports variables file to be used in current suite");
+        builder.put(SettingTarget.GENERAL_TASKS, "documentation", "Documentation of current suite");
+        builder.put(SettingTarget.GENERAL_TASKS, "metadata", "Metadata current suite hold");
+        builder.put(SettingTarget.GENERAL_TASKS, "suite setup",
+                "The keyword %s is executed before executing any of the tasks or lower level suites");
+        builder.put(SettingTarget.GENERAL_TASKS, "suite teardown",
+                "The keyword %s is executed after all tasks and lower level suites have been executed");
+        builder.put(SettingTarget.GENERAL_TASKS, "force tags",
+                "Sets tags to all tasks in this suite. Inherited tags are not shown here.");
+        builder.put(SettingTarget.GENERAL_TASKS, "default tags",
+                "Sets tags to all tasks in this suite, unless task specifies own tags");
+        builder.put(SettingTarget.GENERAL_TASKS, "task setup",
+                "The keyword %s is executed before every task in this suite unless task override it");
+        builder.put(SettingTarget.GENERAL_TASKS, "task teardown",
+                "The keyword %s is executed after every task in this suite unless task override it");
+        builder.put(SettingTarget.GENERAL_TASKS, "task template",
+                "The keyword %s is used as default template keyword in this suite");
+        builder.put(SettingTarget.GENERAL_TASKS, "task timeout",
+                "Specifies default timeout for each task in this suite, which can be overridden by task settings.\n"
                         + "Numerical values are interpreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
         DESCRIBED_SETTINGS = builder.build();
     }
@@ -121,11 +163,15 @@ public class RedSettingProposals {
 
     private String toCanonicalName(final String settingName) {
         switch (target) {
-            case GENERAL:
-                final Iterable<String> upperCased = transform(Splitter.on(' ').split(settingName),
-                        elem -> CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, elem));
-                return Joiner.on(' ').join(upperCased);
+            case GENERAL_TESTS:
+            case GENERAL_TASKS:
+                return Splitter.on(' ')
+                        .splitToList(settingName)
+                        .stream()
+                        .map(elem -> CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, elem))
+                        .collect(joining(" "));
             case TEST_CASE:
+            case TASK:
             case KEYWORD:
                 final char firstLetter = settingName.charAt(1);
                 return settingName.replaceAll("\\[" + firstLetter, "[" + Character.toUpperCase(firstLetter));
@@ -136,7 +182,9 @@ public class RedSettingProposals {
 
     public enum SettingTarget {
         TEST_CASE,
+        TASK,
         KEYWORD,
-        GENERAL
+        GENERAL_TESTS,
+        GENERAL_TASKS
     }
 }

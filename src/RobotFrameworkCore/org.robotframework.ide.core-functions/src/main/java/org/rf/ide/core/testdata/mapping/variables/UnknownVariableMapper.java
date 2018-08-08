@@ -61,7 +61,7 @@ public class UnknownVariableMapper implements IParsingMapper {
         if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {
             if (text != null) {
                 result = positionResolver.isCorrectPosition(PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE,
-                        robotFileOutput.getFileModel(), currentLine, rt);
+                        currentLine, rt);
             }
         }
 

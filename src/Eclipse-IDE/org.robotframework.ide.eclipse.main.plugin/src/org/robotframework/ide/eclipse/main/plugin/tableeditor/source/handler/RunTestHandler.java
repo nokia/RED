@@ -16,9 +16,11 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunSelectedTestCasesAction;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunSelectedTestCasesAction.Mode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -45,7 +47,7 @@ public class RunTestHandler extends DIParameterizedHandler<E4RunTestHandler> {
 
             final SourceViewer viewer = editor.getSourceEditor().getViewer();
             final ITextSelection selection = (ITextSelection) viewer.getSelection();
-            final RobotCase testCase = getTestCase(suiteModel, selection.getOffset());
+            final RobotCodeHoldingElement<?> testCase = getCase(suiteModel, selection.getOffset());
 
             if (testCase != null) {
                 RunSelectedTestCasesAction.runSelectedTestCases(new StructuredSelection(Arrays.asList(testCase)),
@@ -54,14 +56,16 @@ public class RunTestHandler extends DIParameterizedHandler<E4RunTestHandler> {
         }
     }
 
-    static RobotCase getTestCase(final RobotSuiteFile suiteModel, final int caretOffset) {
+    static RobotCodeHoldingElement<?> getCase(final RobotSuiteFile suiteModel, final int caretOffset) {
         final Optional<? extends RobotElement> element = suiteModel.findElement(caretOffset);
         if (element.isPresent()) {
             final RobotElement elem = element.get();
-            if (elem instanceof RobotCase) {
-                return (RobotCase) elem;
-            } else if (elem instanceof RobotKeywordCall && elem.getParent() instanceof RobotCase) {
-                return (RobotCase) elem.getParent();
+            if (elem instanceof RobotCase || elem instanceof RobotTask) {
+                return (RobotCodeHoldingElement<?>) elem;
+
+            } else if (elem instanceof RobotKeywordCall
+                    && (elem.getParent() instanceof RobotCase || elem.getParent() instanceof RobotTask)) {
+                return (RobotCodeHoldingElement<?>) elem.getParent();
             }
         }
         return null;

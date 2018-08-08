@@ -38,7 +38,7 @@ public class UpdateOfSettingsMetadataTest extends RobotFormatParameterizedTest {
 
         // action
         final List<Metadata> metadatas = settingTable.getMetadatas();
-        settingTable.moveUpMetadata(metadatas.get(metadatas.size() - 1));
+        settingTable.moveUpElement(metadatas.get(metadatas.size() - 1));
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);

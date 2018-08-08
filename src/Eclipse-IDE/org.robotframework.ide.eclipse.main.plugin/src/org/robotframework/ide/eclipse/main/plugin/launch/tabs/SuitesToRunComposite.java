@@ -51,10 +51,11 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.Selections;
@@ -159,8 +160,8 @@ class SuitesToRunComposite extends Composite {
                 final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(),
                         new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
                 dialog.setAllowMultiple(true);
-                dialog.setTitle("Select test suite");
-                dialog.setMessage("Select the test suite to execute:");
+                dialog.setTitle("Select suite");
+                dialog.setMessage("Select suite to execute:");
                 dialog.addFilter(new ViewerFilter() {
 
                     @Override
@@ -177,8 +178,9 @@ class SuitesToRunComposite extends Composite {
                             continue;
                         }
                         final SuiteLaunchElement suite = new SuiteLaunchElement(chosenResource);
-                        for (final RobotCase test : getCases(chosenResource)) {
-                            final TestCaseLaunchElement child = new TestCaseLaunchElement(suite, test.getName(), false,
+                        for (final RobotCodeHoldingElement<?> theCase : getCases(chosenResource)) {
+                            final TestCaseLaunchElement child = new TestCaseLaunchElement(suite, theCase.getName(),
+                                    false,
                                     false);
                             suite.addChild(child);
                         }
@@ -320,8 +322,8 @@ class SuitesToRunComposite extends Composite {
 
         final List<String> allCases = newArrayList(entry.getValue());
 
-        for (final RobotCase testCase : getCases(resource)) {
-            final String name = testCase.getName();
+        for (final RobotCodeHoldingElement<?> theCase : getCases(resource)) {
+            final String name = theCase.getName();
             suite.addChild(new TestCaseLaunchElement(suite, name,
                     entry.getValue().isEmpty() || entry.getValue().contains(name.toLowerCase()), false));
             allCases.remove(name.toLowerCase());
@@ -332,14 +334,22 @@ class SuitesToRunComposite extends Composite {
         return suite;
     }
 
-    private static List<RobotCase> getCases(final IResource resource) {
-        final List<RobotCase> cases = new ArrayList<>();
+    private static List<RobotCodeHoldingElement<?>> getCases(final IResource resource) {
+        final List<RobotCodeHoldingElement<?>> cases = new ArrayList<>();
 
         if (resource.exists() && resource.getType() == IResource.FILE) {
             final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
-            final Optional<RobotCasesSection> section = suiteModel.findSection(RobotCasesSection.class);
-            if (section.isPresent()) {
-                cases.addAll(section.get().getChildren());
+            if (suiteModel.isSuiteFile()) {
+                final Optional<RobotCasesSection> section = suiteModel.findSection(RobotCasesSection.class);
+                if (section.isPresent()) {
+                    cases.addAll(section.get().getChildren());
+                }
+
+            } else if (suiteModel.isRpaSuiteFile()) {
+                final Optional<RobotTasksSection> section = suiteModel.findSection(RobotTasksSection.class);
+                if (section.isPresent()) {
+                    cases.addAll(section.get().getChildren());
+                }
             }
         }
         return cases;

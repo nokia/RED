@@ -32,6 +32,21 @@ public class ExecutableCallInSettingsRule extends ExecutableCallRule {
                         || elem.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME));
     }
 
+    public static ExecutableCallRule forExecutableInTaskSetupOrTeardown(final IToken textToken,
+            final IToken gherkinToken, final IToken quoteToken, final IToken embeddedVariablesToken) {
+        return new ExecutableCallInSettingsRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
+                EnumSet.of(RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME,
+                        RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT,
+                        RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME,
+                        RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT),
+
+                elem -> elem.getTypes().contains(RobotTokenType.TASK_SETTING_SETUP)
+                        || elem.getTypes().contains(RobotTokenType.TASK_SETTING_TEARDOWN),
+
+                elem -> elem.getTypes().contains(RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME)
+                        || elem.getTypes().contains(RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME));
+    }
+
     public static ExecutableCallRule forExecutableInKeywordTeardown(final IToken textToken, final IToken gherkinToken,
             final IToken quoteToken, final IToken embeddedVariablesToken) {
         return new ExecutableCallInSettingsRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
@@ -53,17 +68,25 @@ public class ExecutableCallInSettingsRule extends ExecutableCallRule {
                         RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME,
                         RobotTokenType.SETTING_TEST_SETUP_KEYWORD_ARGUMENT,
                         RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME,
-                        RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT),
+                        RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT,
+                        RobotTokenType.SETTING_TASK_SETUP_KEYWORD_NAME,
+                        RobotTokenType.SETTING_TASK_SETUP_KEYWORD_ARGUMENT,
+                        RobotTokenType.SETTING_TASK_TEARDOWN_KEYWORD_NAME,
+                        RobotTokenType.SETTING_TASK_TEARDOWN_KEYWORD_ARGUMENT),
 
                 elem -> elem.getTypes().contains(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION)
                         || elem.getTypes().contains(RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION)
                         || elem.getTypes().contains(RobotTokenType.SETTING_TEST_SETUP_DECLARATION)
-                        || elem.getTypes().contains(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION),
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION)
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TASK_SETUP_DECLARATION)
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION),
 
                 elem -> elem.getTypes().contains(RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME)
                         || elem.getTypes().contains(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME)
                         || elem.getTypes().contains(RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME)
-                        || elem.getTypes().contains(RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME));
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME)
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TASK_SETUP_KEYWORD_NAME)
+                        || elem.getTypes().contains(RobotTokenType.SETTING_TASK_TEARDOWN_KEYWORD_NAME));
     }
 
     private final Predicate<IRobotLineElement> isKeywordName;

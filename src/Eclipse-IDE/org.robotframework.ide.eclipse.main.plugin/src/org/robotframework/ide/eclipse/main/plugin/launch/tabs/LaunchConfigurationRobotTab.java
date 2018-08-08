@@ -211,7 +211,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
 
     private void createSuitesGroup(final Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
-        group.setText("Test Suite(s)");
+        group.setText("Suite(s)");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
         GridLayoutFactory.fillDefaults().applyTo(group);
 

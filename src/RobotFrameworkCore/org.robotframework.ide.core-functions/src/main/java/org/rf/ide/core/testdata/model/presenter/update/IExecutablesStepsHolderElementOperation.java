@@ -25,6 +25,4 @@ public interface IExecutablesStepsHolderElementOperation<T extends IExecutableSt
     void update(final AModelElement<?> modelElement, final int index, final String value);
 
     void update(final AModelElement<?> modelElement, final List<String> newArguments);
-
-    void remove(T executablesHolder, AModelElement<?> modelElement);
 }

@@ -85,6 +85,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.putInt(RedPreferences.FOLDING_LINE_LIMIT, 2);
         preferences.putBoolean(RedPreferences.FOLDABLE_SECTIONS, true);
         preferences.putBoolean(RedPreferences.FOLDABLE_CASES, true);
+        preferences.putBoolean(RedPreferences.FOLDABLE_TASKS, true);
         preferences.putBoolean(RedPreferences.FOLDABLE_KEYWORDS, true);
         preferences.putBoolean(RedPreferences.FOLDABLE_DOCUMENTATION, true);
     }

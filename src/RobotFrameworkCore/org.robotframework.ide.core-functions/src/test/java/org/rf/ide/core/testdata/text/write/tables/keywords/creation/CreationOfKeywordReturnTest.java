@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
@@ -74,18 +74,11 @@ public class CreationOfKeywordReturnTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordReturn keyReturn = uk.newReturn(0);
 
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyReturn.addCommentPart(cmTok1);
-        keyReturn.addCommentPart(cmTok2);
-        keyReturn.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyReturn = uk.newReturn(0);
+        keyReturn.addCommentPart("cm1");
+        keyReturn.addCommentPart("cm2");
+        keyReturn.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -115,18 +108,11 @@ public class CreationOfKeywordReturnTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordReturn keyReturn = uk.newReturn(0);
 
-        final RobotToken rTok1 = new RobotToken();
-        rTok1.setText("${r1}");
-        final RobotToken rTok2 = new RobotToken();
-        rTok2.setText("${r2}");
-        final RobotToken rTok3 = new RobotToken();
-        rTok3.setText("${r3}");
-
-        keyReturn.addReturnValue(rTok1);
-        keyReturn.addReturnValue(rTok2);
-        keyReturn.addReturnValue(rTok3);
+        final LocalSetting<UserKeyword> keyReturn = uk.newReturn(0);
+        keyReturn.addToken("${r1}");
+        keyReturn.addToken("${r2}");
+        keyReturn.addToken("${r3}");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -158,29 +144,14 @@ public class CreationOfKeywordReturnTest extends RobotFormatParameterizedTest {
         keyName.setText(userKeywordName);
         final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        final KeywordReturn keyReturn = uk.newReturn(0);
 
-        final RobotToken rTok1 = new RobotToken();
-        rTok1.setText("${r1}");
-        final RobotToken rTok2 = new RobotToken();
-        rTok2.setText("${r2}");
-        final RobotToken rTok3 = new RobotToken();
-        rTok3.setText("${r3}");
-
-        keyReturn.addReturnValue(rTok1);
-        keyReturn.addReturnValue(rTok2);
-        keyReturn.addReturnValue(rTok3);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyReturn.addCommentPart(cmTok1);
-        keyReturn.addCommentPart(cmTok2);
-        keyReturn.addCommentPart(cmTok3);
+        final LocalSetting<UserKeyword> keyReturn = uk.newReturn(0);
+        keyReturn.addToken("${r1}");
+        keyReturn.addToken("${r2}");
+        keyReturn.addToken("${r3}");
+        keyReturn.addCommentPart("cm1");
+        keyReturn.addCommentPart("cm2");
+        keyReturn.addCommentPart("cm3");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);

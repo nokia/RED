@@ -14,14 +14,14 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 class ModelTokenTestHelper {
 
     public static RobotToken createToken(final String text) {
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setText(text);
 
         return tok;
     }
 
     public static List<String> getText(final AKeywordBaseSetting<?> elem) {
-        List<String> text = new ArrayList<>();
+        final List<String> text = new ArrayList<>();
 
         if (elem.getKeywordName() != null) {
             text.add(elem.getKeywordName().getText());
@@ -33,8 +33,8 @@ class ModelTokenTestHelper {
         return text;
     }
 
-    public static List<String> getText(List<RobotToken> tokens) {
-        List<String> text = new ArrayList<>();
+    public static List<String> getText(final List<RobotToken> tokens) {
+        final List<String> text = new ArrayList<>();
         for (final RobotToken tok : tokens) {
             text.add(tok.getText());
         }

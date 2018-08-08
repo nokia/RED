@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
@@ -56,6 +57,11 @@ public class SectionBuilder {
                     currentSectionType = SectionType.TEST_CASES;
                     section = new Section(currentSectionType, lineElements.get(0).getFilePosition());
                     sections.add(section);
+                } else if (elem.getTypes().contains(RobotTokenType.TASKS_TABLE_HEADER)
+                        && isCorrectTableHeader(line, elemIndex)) {
+                    currentSectionType = SectionType.TASKS;
+                    section = new Section(currentSectionType, lineElements.get(0).getFilePosition());
+                    sections.add(section);
                 } else if (elem.getTypes().contains(RobotTokenType.KEYWORDS_TABLE_HEADER)
                         && isCorrectTableHeader(line, elemIndex)) {
                     currentSectionType = SectionType.KEYWORDS;
@@ -97,6 +103,38 @@ public class SectionBuilder {
                         currentSectionType = SectionType.TEST_CASE_SETTING;
                         FilePosition startPos;
                         if (doNotContainsType(line, elem, RobotTokenType.TEST_CASE_NAME)) {
+                            startPos = lineElements.get(0).getFilePosition();
+                        } else {
+                            startPos = elem.getFilePosition();
+                        }
+                        section = new Section(currentSectionType, startPos);
+                        final List<Section> subSections = sections.get(sections.size() - 1).getSubSections();
+                        subSections.get(subSections.size() - 1).addSubSection(section);
+                    }
+                } else if (currentSectionType == SectionType.TASKS || currentSectionType == SectionType.TASK
+                        || currentSectionType == SectionType.TASK_SETTING
+                        || currentSectionType == SectionType.TASK_ROW) {
+                    if (isTaskDeclaration(line, elemIndex)) {
+                        currentSectionType = SectionType.TASK;
+                        section = new Section(currentSectionType, lineElements.get(0).getFilePosition());
+                        sections.get(sections.size() - 1).addSubSection(section);
+                    } else if (isTaskRowDeclaration(line, elemIndex)) {
+                        currentSectionType = SectionType.TASK_ROW;
+                        FilePosition startPos;
+                        if (doNotContainsType(line, elem, RobotTokenType.TASK_NAME)) {
+                            startPos = lineElements.get(0).getFilePosition();
+                        } else {
+                            startPos = elem.getFilePosition();
+                        }
+                        section = new Section(currentSectionType, startPos);
+                        final List<Section> subSections = sections.get(sections.size() - 1).getSubSections();
+                        if (!subSections.isEmpty()) {
+                            subSections.get(subSections.size() - 1).addSubSection(section);
+                        }
+                    } else if (isSettingTaskDeclaration(line, elemIndex)) {
+                        currentSectionType = SectionType.TASK_SETTING;
+                        FilePosition startPos;
+                        if (doNotContainsType(line, elem, RobotTokenType.TASK_NAME)) {
                             startPos = lineElements.get(0).getFilePosition();
                         } else {
                             startPos = elem.getFilePosition();
@@ -239,6 +277,12 @@ public class SectionBuilder {
         return result && isCorrectTestCaseExecRowDeclaration(line, elementIndex);
     }
 
+    private boolean isTaskRowDeclaration(final RobotLine line, final int elementIndex) {
+        final IRobotLineElement elem = line.getLineElements().get(elementIndex);
+        return elem instanceof RobotToken && elem.getTypes().contains(RobotTokenType.TASK_ACTION_NAME)
+                && isCorrectTaskExecRowDeclaration(line, elementIndex);
+    }
+
     private boolean isSettingTestCaseDeclaration(final RobotLine line, final int elementIndex) {
         boolean result = false;
         final IRobotLineElement elem = line.getLineElements().get(elementIndex);
@@ -257,6 +301,22 @@ public class SectionBuilder {
         return result;
     }
 
+    private boolean isSettingTaskDeclaration(final RobotLine line, final int elementIndex) {
+        final IRobotLineElement elem = line.getLineElements().get(elementIndex);
+        if (elem instanceof RobotToken) {
+            final List<IRobotTokenType> types = elem.getTypes();
+            for (final IRobotTokenType tokenType : types) {
+                if (tokenType instanceof RobotTokenType) {
+                    final RobotTokenType type = (RobotTokenType) tokenType;
+                    if (type.isSettingDeclaration() && RobotTokenType.getTypesForTasksTable().contains(type)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private boolean isTestCaseDeclaration(final RobotLine line, final int elementIndex) {
         boolean result = false;
         final IRobotLineElement elem = line.getLineElements().get(elementIndex);
@@ -266,6 +326,12 @@ public class SectionBuilder {
         }
 
         return result && isCorrectTestCaseDeclaration(line, elementIndex);
+    }
+
+    private boolean isTaskDeclaration(final RobotLine line, final int elementIndex) {
+        final IRobotLineElement elem = line.getLineElements().get(elementIndex);
+        return elem instanceof RobotToken && elem.getTypes().contains(RobotTokenType.TASK_NAME)
+                && isCorrectTaskDeclaration(line, elementIndex);
     }
 
     private boolean isVariableDeclaration(final RobotFile model, final RobotLine line, final int elementIndex) {
@@ -278,7 +344,7 @@ public class SectionBuilder {
                     final RobotTokenType type = (RobotTokenType) tokenType;
                     if ((type.isSettingDeclaration() && RobotTokenType.getTypesForVariablesTable().contains(type))
                             || (type == RobotTokenType.START_HASH_COMMENT
-                                    && isUnknownVariableStart(model, line, elem))) {
+                                    && isUnknownVariableStart(model, elem))) {
                         result = true;
                         break;
                     }
@@ -288,7 +354,7 @@ public class SectionBuilder {
         return result && isCorrectVariableDeclaration(line, elementIndex);
     }
 
-    private boolean isUnknownVariableStart(final RobotFile model, final RobotLine line, final IRobotLineElement elem) {
+    private boolean isUnknownVariableStart(final RobotFile model, final IRobotLineElement elem) {
         boolean result = false;
         final FilePosition filePosition = elem.getFilePosition();
         if (!filePosition.isNotSet()) {
@@ -334,8 +400,16 @@ public class SectionBuilder {
         return isCorrectPlace(line, elementIndex, PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME);
     }
 
+    private boolean isCorrectTaskExecRowDeclaration(final RobotLine line, final int elementIndex) {
+        return isCorrectPlace(line, elementIndex, PositionExpected.TASK_EXEC_ROW_ACTION_NAME);
+    }
+
     private boolean isCorrectTestCaseDeclaration(final RobotLine line, final int elementIndex) {
         return isCorrectPlace(line, elementIndex, PositionExpected.TEST_CASE_NAME);
+    }
+
+    private boolean isCorrectTaskDeclaration(final RobotLine line, final int elementIndex) {
+        return isCorrectPlace(line, elementIndex, PositionExpected.TASK_NAME);
     }
 
     private boolean isCorrectVariableDeclaration(final RobotLine line, final int elementIndex) {
@@ -358,7 +432,7 @@ public class SectionBuilder {
             lineFake.setSeparatorType(line.getSeparatorForLine().get());
         }
         lineFake.setLineElements(line.getLineElements().subList(0, elementIndex));
-        if (posResolver.isCorrectPosition(posExpected, line.getParent(), lineFake,
+        if (posResolver.isCorrectPosition(posExpected, lineFake,
                 (RobotToken) line.getLineElements().get(elementIndex))) {
             result = true;
         }
@@ -426,6 +500,10 @@ public class SectionBuilder {
         TEST_CASE_ROW,
         TEST_CASE(TEST_CASE_SETTING, TEST_CASE_ROW),
         TEST_CASES(TEST_CASE),
+        TASK_SETTING,
+        TASK_ROW,
+        TASK(TASK_SETTING, TASK_ROW),
+        TASKS(TASK),
         KEYWORD_SETTING,
         KEYWORD_ROW,
         KEYWORD(KEYWORD_SETTING, KEYWORD_ROW),
@@ -438,15 +516,7 @@ public class SectionBuilder {
         }
 
         public boolean containsSubSectionType(final SectionType subSectionType) {
-            boolean result = false;
-            for (final SectionType st : subSections) {
-                if (st == subSectionType) {
-                    result = true;
-                    break;
-                }
-            }
-
-            return result;
+            return Stream.of(subSections).anyMatch(s -> s == subSectionType);
         }
 
         public static List<Section> filterByType(final List<Section> sections, final int sectionWithHeaderPos,
