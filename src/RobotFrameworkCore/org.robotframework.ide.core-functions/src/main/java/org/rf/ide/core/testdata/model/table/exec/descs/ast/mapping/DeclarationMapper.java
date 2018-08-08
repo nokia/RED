@@ -266,16 +266,13 @@ public class DeclarationMapper {
 
     private boolean seemsToBeCorrectRobotVariable(final FilePosition currentPosition, final MappingResult mappingResult,
             final VariableDeclaration variableDec) {
-        boolean result = false;
         if (!variableDec.isEscaped()) {
             final TextPosition typeId = variableDec.getTypeIdentificator();
             if (typeId != null) {
                 final String idText = typeId.getText();
-                if (idText != null && !idText.isEmpty()) {
+                if (idText != null && !idText.isEmpty() && variableDec.getEnd() != null) {
                     if (idText.length() == 1) {
-                        if (variableDec.getEnd() != null) {
-                            result = true;
-                        }
+                        return true;
                     } else {
                         final BuildMessage warnMessage = BuildMessage.createWarnMessage(
                                 "Incorrect variable id with space between " + idText.charAt(0) + " and '{'.",
@@ -291,8 +288,7 @@ public class DeclarationMapper {
                 }
             }
         }
-
-        return result;
+        return false;
     }
 
     private boolean seemsToBeCorrectRobotVariableIndex(List<IElementDeclaration> mappedElements,
