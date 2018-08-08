@@ -10,9 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.junit.After;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -221,14 +219,9 @@ public class ATokenRecognizerTest {
         assertThat(rec.getPattern()).isEqualTo(p);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
-    }
-
     private static class DummyTokenRecognizer extends ATokenRecognizer {
 
-        public DummyTokenRecognizer(Pattern p, RobotTokenType type) {
+        public DummyTokenRecognizer(final Pattern p, final RobotTokenType type) {
             super(p, type);
         }
 

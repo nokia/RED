@@ -18,25 +18,21 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class MetaRecognizerTest {
 
+    private final MetaRecognizer recognizer = new MetaRecognizer();
+
     @Test
     public void patternTest() {
-        final MetaRecognizer recognizer = new MetaRecognizer();
-
         assertThat(recognizer.getPattern().pattern())
                 .isEqualTo("[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Meta") + ":)");
     }
 
     @Test
     public void producedTypeTest() {
-        final MetaRecognizer recognizer = new MetaRecognizer();
-
         assertThat(recognizer.getProducedType()).isEqualTo(RobotTokenType.SETTING_METADATA_DECLARATION);
     }
 
     @Test
     public void metaColonWord_allCombinations() {
-        final MetaRecognizer recognizer = new MetaRecognizer();
-
         final List<String> combinations = new CombinationGenerator().combinations("Meta:");
         for (final String comb : combinations) {
             final StringBuilder textOfHeader = new StringBuilder(comb);
@@ -52,9 +48,7 @@ public class MetaRecognizerTest {
     }
 
     @Test
-    public void twoSpacesAndMetaColonThanWord() {
-        final MetaRecognizer recognizer = new MetaRecognizer();
-
+    public void twoSpacesAndMetaColonThenWord() {
         final StringBuilder text = new StringBuilder(" Meta:");
         final StringBuilder d = new StringBuilder(" ").append(text);
 
@@ -68,9 +62,7 @@ public class MetaRecognizerTest {
     }
 
     @Test
-    public void singleSpaceAndMetaColonThanWord() {
-        final MetaRecognizer recognizer = new MetaRecognizer();
-
+    public void singleSpaceAndMetaColonThenWord() {
         final StringBuilder text = new StringBuilder(" Meta:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -84,9 +76,7 @@ public class MetaRecognizerTest {
     }
 
     @Test
-    public void singleMetaColonThanLetterCWord() {
-        final MetaRecognizer recognizer = new MetaRecognizer();
-
+    public void singleMetaColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Meta:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -101,8 +91,6 @@ public class MetaRecognizerTest {
 
     @Test
     public void singleMetaColonWord() {
-        final MetaRecognizer recognizer = new MetaRecognizer();
-
         final StringBuilder text = new StringBuilder("Meta:");
 
         assertThat(recognizer.hasNext(text, 1, 0)).isTrue();

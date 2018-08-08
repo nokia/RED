@@ -37,7 +37,7 @@ public class TestSetupRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestSetupColonThanWord() {
+    public void test_twoSpacesAndTestSetupColonThenWord() {
         final StringBuilder text = new StringBuilder(" Test Setup:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -50,7 +50,7 @@ public class TestSetupRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestSetupColonThanWord() {
+    public void test_singleSpaceAndTestSetupColonThenWord() {
         final StringBuilder text = new StringBuilder(" Test Setup:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -64,7 +64,7 @@ public class TestSetupRecognizerTest {
     }
 
     @Test
-    public void test_singleTestSetupColonThanLetterCWord() {
+    public void test_singleTestSetupColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Test Setup:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -108,7 +108,7 @@ public class TestSetupRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestSetupThanWord() {
+    public void test_twoSpacesAndTestSetupThenWord() {
         final StringBuilder text = new StringBuilder(" Test Setup");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -121,7 +121,7 @@ public class TestSetupRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestSetupThanWord() {
+    public void test_singleSpaceAndTestSetupThenWord() {
         final StringBuilder text = new StringBuilder(" Test Setup");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -135,7 +135,7 @@ public class TestSetupRecognizerTest {
     }
 
     @Test
-    public void test_singleTestSetupThanLetterCWord() {
+    public void test_singleTestSetupThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Test Setup");
         final StringBuilder d = new StringBuilder(text).append("C");
 

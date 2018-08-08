@@ -9,21 +9,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class MetadataRecognizerTest {
 
-    @ForClean
-    private ATokenRecognizer rec;
+    private final MetadataRecognizer rec = new MetadataRecognizer();
 
     @Test
     public void test_metadataColonWord_allCombinations() {
@@ -43,7 +37,7 @@ public class MetadataRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndMetadataColonThanWord() {
+    public void test_twoSpacesAndMetadataColonThenWord() {
         final StringBuilder text = new StringBuilder(" Metadata:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -56,7 +50,7 @@ public class MetadataRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndMetadataColonThanWord() {
+    public void test_singleSpaceAndMetadataColonThenWord() {
         final StringBuilder text = new StringBuilder(" Metadata:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -70,7 +64,7 @@ public class MetadataRecognizerTest {
     }
 
     @Test
-    public void test_singleMetadataColonThanLetterCWord() {
+    public void test_singleMetadataColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Metadata:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -114,7 +108,7 @@ public class MetadataRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndMetadataThanWord() {
+    public void test_twoSpacesAndMetadataThenWord() {
         final StringBuilder text = new StringBuilder(" Metadata");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -127,7 +121,7 @@ public class MetadataRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndMetadataThanWord() {
+    public void test_singleSpaceAndMetadataThenWord() {
         final StringBuilder text = new StringBuilder(" Metadata");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -141,7 +135,7 @@ public class MetadataRecognizerTest {
     }
 
     @Test
-    public void test_singleMetadataThanLetterCWord() {
+    public void test_singleMetadataThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Metadata");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -176,15 +170,5 @@ public class MetadataRecognizerTest {
     @Test
     public void test_getProducedType() {
         assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_METADATA_DECLARATION);
-    }
-
-    @Before
-    public void setUp() {
-        rec = new MetadataRecognizer();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

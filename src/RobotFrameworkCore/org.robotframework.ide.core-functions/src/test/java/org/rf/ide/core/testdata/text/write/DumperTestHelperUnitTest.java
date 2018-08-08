@@ -7,27 +7,18 @@ package org.rf.ide.core.testdata.text.write;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
 
 public class DumperTestHelperUnitTest {
 
-    @ForClean
     private DumperTestHelper helper;
 
     @Before
     public void setUp() {
         this.helper = new DumperTestHelper();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 
     @Test
