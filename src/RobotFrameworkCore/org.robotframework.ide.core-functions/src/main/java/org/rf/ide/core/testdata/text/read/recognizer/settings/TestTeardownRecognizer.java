@@ -13,15 +13,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestTeardownRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern.compile("[ ]?(("
+    public static final Pattern EXPECTED = Pattern.compile("[ ]?"
             + createUpperLowerCaseWord("Test") + "[\\s]+"
-            + createUpperLowerCaseWord("Teardown") + "[\\s]*:" + "|"
-            + createUpperLowerCaseWord("Test") + "[\\s]+"
-            + createUpperLowerCaseWord("Teardown") + ")|("
-            + createUpperLowerCaseWord("Test") + "[\\s]+"
-            + createUpperLowerCaseWord("Postcondition") + "[\\s]*:" + "|"
-            + createUpperLowerCaseWord("Test") + "[\\s]+"
-            + createUpperLowerCaseWord("Postcondition") + "))");
+            + createUpperLowerCaseWord("Teardown") + "([\\s]*:)?");
 
 
     public TestTeardownRecognizer() {

@@ -6,12 +6,23 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseDocumentRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCasePostconditionRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCasePreconditionRecognizer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 
 /**
@@ -44,16 +55,11 @@ public enum TestCasesProblem implements IProblemCause {
             return "Test case '%s' contains no keywords to execute";
         }
     },
-    DOCUMENT_SYNONYM {
+    DEPRECATED_CASE_SETTING_NAME {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Test Case setting '%s' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current.";
+            return ProblemCategory.DEPRECATED_API;
         }
 
         @Override
@@ -62,52 +68,14 @@ public enum TestCasesProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("[Documentation]"));
-        }
-    },
-    PRECONDITION_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
         public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Setup syntax instead of current.";
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
+            return "Test case setting name '%s' is deprecated. Use '%s' instead";
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("[Setup]"));
-        }
-    },
-    POSTCONDITION_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Teardown syntax instead of current.";
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("[Teardown]"));
+            final String targetName = marker.getAttribute(AdditionalMarkerAttributes.VALUE, "");
+            return newArrayList(new ChangeToFixer(targetName));
         }
     },
     UNKNOWN_TEST_CASE_SETTING {
@@ -115,6 +83,37 @@ public enum TestCasesProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Unknown test case's setting definition '%s'";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+            final RobotVersion robotVersion = Optional
+                    .ofNullable(marker.getAttribute(AdditionalMarkerAttributes.ROBOT_VERSION, null))
+                    .map(RobotVersion::from)
+                    .orElse(new RobotVersion(3, 1));
+
+            final Map<Pattern, String> oldSettingName = new HashMap<>();
+            oldSettingName.put(TestCaseDocumentRecognizer.EXPECTED,
+                    RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+            oldSettingName.put(TestCasePreconditionRecognizer.EXPECTED,
+                    RobotTokenType.TEST_CASE_SETTING_SETUP.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+            oldSettingName.put(TestCasePostconditionRecognizer.EXPECTED,
+                    RobotTokenType.TEST_CASE_SETTING_TEARDOWN.getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+
+            return oldSettingName.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey().matcher(name).matches())
+                    .map(entry -> new ChangeToFixer(entry.getValue()))
+                    .collect(toList());
         }
     },
     EMPTY_CASE_SETTING {

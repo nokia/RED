@@ -5,18 +5,20 @@
  */
 package org.rf.ide.core.testdata.text.read.recognizer.keywords;
 
-import org.rf.ide.core.testdata.text.read.recognizer.AExecutableElementSettingsRecognizer;
+import java.util.regex.Pattern;
+
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
-public class KeywordDocumentationRecognizer extends
-        AExecutableElementSettingsRecognizer {
+public class KeywordDocumentationRecognizer extends ATokenRecognizer {
+
+    public static final Pattern EXPECTED = Pattern
+            .compile("[ ]?((\\[\\s*" + createUpperLowerCaseWord("Documentation") + "\\s*\\]))");
 
     public KeywordDocumentationRecognizer() {
-        super(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
+        super(EXPECTED, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
     }
-
 
     @Override
     public ATokenRecognizer newInstance() {

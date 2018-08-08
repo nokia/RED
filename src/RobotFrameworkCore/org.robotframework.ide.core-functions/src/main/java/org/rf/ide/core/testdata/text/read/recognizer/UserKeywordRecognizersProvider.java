@@ -11,7 +11,9 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordArgumentsRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordPostconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordReturnRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordTeardownRecognizer;
@@ -24,10 +26,12 @@ public class UserKeywordRecognizersProvider {
     static {
         recognized.add(new KeywordsTableHeaderRecognizer());
         recognized.add(new KeywordDocumentationRecognizer());
+        recognized.add(new KeywordDocumentRecognizer());
         recognized.add(new KeywordTagsRecognizer());
         recognized.add(new KeywordArgumentsRecognizer());
         recognized.add(new KeywordReturnRecognizer());
         recognized.add(new KeywordTeardownRecognizer());
+        recognized.add(new KeywordPostconditionRecognizer());
         recognized.add(new KeywordTimeoutRecognizer());
     }
 

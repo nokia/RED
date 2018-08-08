@@ -10,12 +10,15 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseDocumentRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseDocumentationRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCasePostconditionRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCasePreconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseSetupRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseTeardownRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseTemplateRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseTimeoutRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestDocumentationRecognizer;
 
 
 public class TestCaseRecognizersProvider {
@@ -23,10 +26,13 @@ public class TestCaseRecognizersProvider {
     private static volatile List<ATokenRecognizer> recognized = new ArrayList<>();
     static {
         recognized.add(new TestCasesTableHeaderRecognizer());
-        recognized.add(new TestDocumentationRecognizer());
+        recognized.add(new TestCaseDocumentationRecognizer());
+        recognized.add(new TestCaseDocumentRecognizer());
         recognized.add(new TestCaseTagsRecognizer());
         recognized.add(new TestCaseSetupRecognizer());
+        recognized.add(new TestCasePreconditionRecognizer());
         recognized.add(new TestCaseTeardownRecognizer());
+        recognized.add(new TestCasePostconditionRecognizer());
         recognized.add(new TestCaseTemplateRecognizer());
         recognized.add(new TestCaseTimeoutRecognizer());
     }

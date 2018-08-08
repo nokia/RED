@@ -30,17 +30,18 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.RobotTimeFormat;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
@@ -80,7 +81,6 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         reportTeardownProblems();
         reportArgumentsProblems();
 
-        reportOutdatedSettingsSynonyms();
         reportUnknownVariablesInNonExecutables();
     }
 
@@ -95,7 +95,10 @@ class KeywordSettingsValidator implements ModelUnitValidator {
             final RobotToken token = unknownSetting.getDeclaration();
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD_SETTING)
                     .formatMessageWith(token.getText());
-            reporter.handleProblem(problem, validationContext.getFile(), token);
+            final String robotVersion = validationContext.getVersion().asString();
+            reporter.handleProblem(problem, validationContext.getFile(), token,
+                    ImmutableMap.of(AdditionalMarkerAttributes.NAME, token.getText(),
+                            AdditionalMarkerAttributes.ROBOT_VERSION, robotVersion));
         }
     }
 
@@ -147,25 +150,6 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD_SETTING)
                 .formatMessageWith(defToken.getText());
         reporter.handleProblem(problem, validationContext.getFile(), defToken);
-    }
-
-    private void reportOutdatedSettingsSynonyms() {
-        reportOutdatedSettings(keyword.getDocumentation(), KeywordsProblem.DOCUMENT_SYNONYM, "documentation");
-        reportOutdatedSettings(keyword.getTeardowns(), KeywordsProblem.POSTCONDITION_SYNONYM, "teardown");
-    }
-
-    private void reportOutdatedSettings(final List<? extends AModelElement<?>> settings, final IProblemCause cause,
-            final String correctRepresentation) {
-        for (final AModelElement<?> setting : settings) {
-            final RobotToken declarationToken = setting.getDeclaration();
-            final String text = declarationToken.getText();
-            final String canonicalText = text.replaceAll("\\s", "").toLowerCase();
-            final String canonicalCorrectRepresentation = correctRepresentation.replaceAll("\\s", "").toLowerCase();
-            if (!canonicalText.contains(canonicalCorrectRepresentation)) {
-                reporter.handleProblem(RobotProblem.causedBy(cause).formatMessageWith(text),
-                        validationContext.getFile(), declarationToken);
-            }
-        }
     }
 
     private void reportUnknownVariablesInNonExecutables() {
