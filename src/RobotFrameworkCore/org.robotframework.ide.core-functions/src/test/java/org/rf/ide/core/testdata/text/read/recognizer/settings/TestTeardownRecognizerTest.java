@@ -37,7 +37,7 @@ public class TestTeardownRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestTeardownColonThanWord() {
+    public void test_twoSpacesAndTestTeardownColonThenWord() {
         final StringBuilder text = new StringBuilder(" Test Teardown:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -50,7 +50,7 @@ public class TestTeardownRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestTeardownColonThanWord() {
+    public void test_singleSpaceAndTestTeardownColonThenWord() {
         final StringBuilder text = new StringBuilder(" Test Teardown:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -64,7 +64,7 @@ public class TestTeardownRecognizerTest {
     }
 
     @Test
-    public void test_singleTestTeardownColonThanLetterCWord() {
+    public void test_singleTestTeardownColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Test Teardown:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -108,7 +108,7 @@ public class TestTeardownRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndTestTeardownThanWord() {
+    public void test_twoSpacesAndTestTeardownThenWord() {
         final StringBuilder text = new StringBuilder(" Test Teardown");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -121,7 +121,7 @@ public class TestTeardownRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndTestTeardownThanWord() {
+    public void test_singleSpaceAndTestTeardownThenWord() {
         final StringBuilder text = new StringBuilder(" Test Teardown");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -135,7 +135,7 @@ public class TestTeardownRecognizerTest {
     }
 
     @Test
-    public void test_singleTestTeardownThanLetterCWord() {
+    public void test_singleTestTeardownThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Test Teardown");
         final StringBuilder d = new StringBuilder(text).append("C");
 

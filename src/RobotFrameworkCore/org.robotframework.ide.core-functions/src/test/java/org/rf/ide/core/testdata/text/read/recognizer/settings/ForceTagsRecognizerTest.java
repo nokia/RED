@@ -9,31 +9,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class ForceTagsRecognizerTest {
 
-    @ForClean
-    private ATokenRecognizer rec;
+    private final ATokenRecognizer rec = new ForceTagsRecognizer();
 
     @Test
     public void test_forceTagsColonWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("Force Tags:");
+        final List<String> combinations = new CombinationGenerator().combinations("Force Tags:");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -43,11 +37,11 @@ public class ForceTagsRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndForceTagsColonThanWord() {
-        StringBuilder text = new StringBuilder(" Force Tags:");
-        StringBuilder d = new StringBuilder(" ").append(text);
+    public void test_twoSpacesAndForceTagsColonThenWord() {
+        final StringBuilder text = new StringBuilder(" Force Tags:");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
@@ -56,12 +50,12 @@ public class ForceTagsRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndForceTagsColonThanWord() {
-        StringBuilder text = new StringBuilder(" Force Tags:");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleSpaceAndForceTagsColonThenWord() {
+        final StringBuilder text = new StringBuilder(" Force Tags:");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -70,12 +64,12 @@ public class ForceTagsRecognizerTest {
     }
 
     @Test
-    public void test_singleForceTagsColonThanLetterCWord() {
-        StringBuilder text = new StringBuilder("Force Tags:");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleForceTagsColonThenLetterCWord() {
+        final StringBuilder text = new StringBuilder("Force Tags:");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -85,10 +79,10 @@ public class ForceTagsRecognizerTest {
 
     @Test
     public void test_singleForceTagsColonWord() {
-        StringBuilder text = new StringBuilder("Force Tags:");
+        final StringBuilder text = new StringBuilder("Force Tags:");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -98,13 +92,13 @@ public class ForceTagsRecognizerTest {
 
     @Test
     public void test_forceTagsWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("Force Tags");
+        final List<String> combinations = new CombinationGenerator().combinations("Force Tags");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -114,11 +108,11 @@ public class ForceTagsRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndForceTagsThanWord() {
-        StringBuilder text = new StringBuilder(" Force Tags");
-        StringBuilder d = new StringBuilder(" ").append(text);
+    public void test_twoSpacesAndForceTagsThenWord() {
+        final StringBuilder text = new StringBuilder(" Force Tags");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
@@ -127,12 +121,12 @@ public class ForceTagsRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndForceTagsThanWord() {
-        StringBuilder text = new StringBuilder(" Force Tags");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleSpaceAndForceTagsThenWord() {
+        final StringBuilder text = new StringBuilder(" Force Tags");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -141,12 +135,12 @@ public class ForceTagsRecognizerTest {
     }
 
     @Test
-    public void test_singleForceTagsThanLetterCWord() {
-        StringBuilder text = new StringBuilder("Force Tags");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleForceTagsThenLetterCWord() {
+        final StringBuilder text = new StringBuilder("Force Tags");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -156,10 +150,10 @@ public class ForceTagsRecognizerTest {
 
     @Test
     public void test_singleForceTagsWord() {
-        StringBuilder text = new StringBuilder("Force Tags");
+        final StringBuilder text = new StringBuilder("Force Tags");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -179,15 +173,5 @@ public class ForceTagsRecognizerTest {
     @Test
     public void test_getProducedType() {
         assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION);
-    }
-
-    @Before
-    public void setUp() {
-        rec = new ForceTagsRecognizer();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

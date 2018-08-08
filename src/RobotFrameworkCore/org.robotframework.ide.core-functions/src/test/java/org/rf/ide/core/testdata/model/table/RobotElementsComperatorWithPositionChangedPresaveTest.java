@@ -13,11 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -27,8 +24,12 @@ import com.google.common.collect.Multimap;
 
 public class RobotElementsComperatorWithPositionChangedPresaveTest {
 
-    @ForClean
     private RobotElementsComparatorWithPositionChangedPresave robotElemsCmp;
+
+    @Before
+    public void setUp() {
+        robotElemsCmp = new RobotElementsComparatorWithPositionChangedPresave();
+    }
 
     @Test
     public void test_getTokensInElement_forOneTypeOfElements() {
@@ -248,9 +249,9 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
         final RobotToken tok2 = new RobotToken();
         tok2.setType(RobotTokenType.COMMENT_CONTINUE);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 1,
-                new ArrayList<RobotToken>(Arrays.asList(tok1)));
+                new ArrayList<>(Arrays.asList(tok1)));
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
-                new ArrayList<RobotToken>(Arrays.asList(tok2)));
+                new ArrayList<>(Arrays.asList(tok2)));
 
         // execute
         final int compareResult = robotElemsCmp.compare(tok1, tok2);
@@ -270,7 +271,7 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
         final RobotToken tok2 = new RobotToken();
         tok2.setType(RobotTokenType.START_HASH_COMMENT);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 1,
-                new ArrayList<RobotToken>(Arrays.asList(tok1, tok2)));
+                new ArrayList<>(Arrays.asList(tok1, tok2)));
 
         // execute
         final int compareResult = robotElemsCmp.compare(tok1, tok2);
@@ -299,9 +300,9 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
         tok3.setType(RobotTokenType.COMMENT_CONTINUE);
 
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 1,
-                new ArrayList<RobotToken>(Arrays.asList(tok1)));
+                new ArrayList<>(Arrays.asList(tok1)));
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
-                new ArrayList<RobotToken>(Arrays.asList(tok3, tok2)));
+                new ArrayList<>(Arrays.asList(tok3, tok2)));
 
         // execute
         final int compareResult = robotElemsCmp.compare(tok3, tok2);
@@ -311,15 +312,5 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
         // verify
         assertThat(compareResult).isEqualTo(ECompareResult.LESS_THAN.getValue());
         assertThat(toks).containsExactly(tok1, tok3, tok2);
-    }
-
-    @Before
-    public void setUp() {
-        this.robotElemsCmp = new RobotElementsComparatorWithPositionChangedPresave();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }

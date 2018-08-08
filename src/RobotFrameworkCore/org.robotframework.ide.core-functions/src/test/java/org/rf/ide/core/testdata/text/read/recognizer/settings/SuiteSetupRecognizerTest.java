@@ -37,7 +37,7 @@ public class SuiteSetupRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndSuiteSetupColonThanWord() {
+    public void test_twoSpacesAndSuiteSetupColonThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Setup:");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -50,7 +50,7 @@ public class SuiteSetupRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndSuiteSetupColonThanWord() {
+    public void test_singleSpaceAndSuiteSetupColonThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Setup:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -64,7 +64,7 @@ public class SuiteSetupRecognizerTest {
     }
 
     @Test
-    public void test_singleSuiteSetupColonThanLetterCWord() {
+    public void test_singleSuiteSetupColonThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Suite Setup:");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -108,7 +108,7 @@ public class SuiteSetupRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndSuiteSetupThanWord() {
+    public void test_twoSpacesAndSuiteSetupThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Setup");
         final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
@@ -121,7 +121,7 @@ public class SuiteSetupRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndSuiteSetupThanWord() {
+    public void test_singleSpaceAndSuiteSetupThenWord() {
         final StringBuilder text = new StringBuilder(" Suite Setup");
         final StringBuilder d = new StringBuilder(text).append("C");
 
@@ -135,7 +135,7 @@ public class SuiteSetupRecognizerTest {
     }
 
     @Test
-    public void test_singleSuiteSetupThanLetterCWord() {
+    public void test_singleSuiteSetupThenLetterCWord() {
         final StringBuilder text = new StringBuilder("Suite Setup");
         final StringBuilder d = new StringBuilder(text).append("C");
 

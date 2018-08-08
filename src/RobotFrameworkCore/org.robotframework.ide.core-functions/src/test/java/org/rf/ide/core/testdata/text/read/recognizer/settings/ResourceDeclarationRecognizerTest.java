@@ -9,31 +9,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner;
-import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class ResourceDeclarationRecognizerTest {
 
-    @ForClean
-    private ATokenRecognizer rec;
+    private final ResourceDeclarationRecognizer rec = new ResourceDeclarationRecognizer();
 
     @Test
     public void test_resourceColonWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("Resource:");
+        final List<String> combinations = new CombinationGenerator().combinations("Resource:");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -43,11 +37,11 @@ public class ResourceDeclarationRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndResourceColonThanWord() {
-        StringBuilder text = new StringBuilder(" Resource:");
-        StringBuilder d = new StringBuilder(" ").append(text);
+    public void test_twoSpacesAndResourceColonThenWord() {
+        final StringBuilder text = new StringBuilder(" Resource:");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
@@ -56,12 +50,12 @@ public class ResourceDeclarationRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndResourceColonThanWord() {
-        StringBuilder text = new StringBuilder(" Resource:");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleSpaceAndResourceColonThenWord() {
+        final StringBuilder text = new StringBuilder(" Resource:");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -70,12 +64,12 @@ public class ResourceDeclarationRecognizerTest {
     }
 
     @Test
-    public void test_singleResourceColonThanLetterCWord() {
-        StringBuilder text = new StringBuilder("Resource:");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleResourceColonThenLetterCWord() {
+        final StringBuilder text = new StringBuilder("Resource:");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -85,10 +79,10 @@ public class ResourceDeclarationRecognizerTest {
 
     @Test
     public void test_singleResourceColonWord() {
-        StringBuilder text = new StringBuilder("Resource:");
+        final StringBuilder text = new StringBuilder("Resource:");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -98,13 +92,13 @@ public class ResourceDeclarationRecognizerTest {
 
     @Test
     public void test_resourceWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("Resource");
+        final List<String> combinations = new CombinationGenerator().combinations("Resource");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -114,11 +108,11 @@ public class ResourceDeclarationRecognizerTest {
     }
 
     @Test
-    public void test_twoSpacesAndResourceThanWord() {
-        StringBuilder text = new StringBuilder(" Resource");
-        StringBuilder d = new StringBuilder(" ").append(text);
+    public void test_twoSpacesAndResourceThenWord() {
+        final StringBuilder text = new StringBuilder(" Resource");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
@@ -127,12 +121,12 @@ public class ResourceDeclarationRecognizerTest {
     }
 
     @Test
-    public void test_singleSpaceAndResourceThanWord() {
-        StringBuilder text = new StringBuilder(" Resource");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleSpaceAndResourceThenWord() {
+        final StringBuilder text = new StringBuilder(" Resource");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -141,12 +135,12 @@ public class ResourceDeclarationRecognizerTest {
     }
 
     @Test
-    public void test_singleResourceThanLetterCWord() {
-        StringBuilder text = new StringBuilder("Resource");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleResourceThenLetterCWord() {
+        final StringBuilder text = new StringBuilder("Resource");
+        final StringBuilder d = new StringBuilder(text).append("C");
 
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -156,10 +150,10 @@ public class ResourceDeclarationRecognizerTest {
 
     @Test
     public void test_singleResourceWord() {
-        StringBuilder text = new StringBuilder("Resource");
+        final StringBuilder text = new StringBuilder("Resource");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -177,15 +171,5 @@ public class ResourceDeclarationRecognizerTest {
     @Test
     public void test_getProducedType() {
         assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_RESOURCE_DECLARATION);
-    }
-
-    @Before
-    public void setUp() {
-        rec = new ResourceDeclarationRecognizer();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ClassFieldCleaner.init(this);
     }
 }
