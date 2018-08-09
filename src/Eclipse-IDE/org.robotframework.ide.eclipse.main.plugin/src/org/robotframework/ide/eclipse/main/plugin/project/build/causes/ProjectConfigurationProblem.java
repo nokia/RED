@@ -30,7 +30,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "FATAL: project configuration file " + RobotProjectConfig.FILENAME + " does not exist";
+            return "FATAL: Project configuration file '" + RobotProjectConfig.FILENAME + "' does not exist";
         }
 
         @Override
@@ -42,7 +42,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "FATAL: unable to read configuration file. %s Fix this problem in order to properly build project";
+            return "FATAL: Unable to read configuration file. %s Fix this problem to build project.";
         }
 
         @Override
@@ -54,7 +54,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "FATAL: %s Python environment is not defined in preferences. Fix this problem to build project";
+            return "FATAL: Python installation '%s' is not defined in preferences. Fix this problem to build project.";
         }
 
         @Override
@@ -66,7 +66,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "FATAL: %s is not a Python installation directory. Fix this problem to build project";
+            return "FATAL: The location '%s' does not seem to be a valid Python directory. Fix this problem to build project.";
         }
 
         @Override
@@ -78,12 +78,24 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "FATAL: Python installation %s has no Robot installed. Fix this problem to build project";
+            return "FATAL: Python installation '%s' does not seem to have Robot Framework installed. Fix this problem to build project.";
         }
 
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.MISSING_ROBOT_ENVIRONMENT;
+        }
+    },
+    ENVIRONMENT_DEPRECATED_PYTHON {
+
+        @Override
+        public String getProblemDescription() {
+            return "Python installation '%s' has deprecated version (%s). RED or Robot Framework may be not compatible with it.";
+        }
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_PYTHON_ENVIRONMENT;
         }
     };
 
