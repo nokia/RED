@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.rf.ide.core.executor.PythonVersion;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
@@ -22,6 +23,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy.ReportingInterruptedException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public class RobotArtifactsBuilder {
 
@@ -120,7 +123,8 @@ public class RobotArtifactsBuilder {
         }
     }
 
-    private RobotRuntimeEnvironment provideRuntimeEnvironment(final RobotProject robotProject,
+    @VisibleForTesting
+    RobotRuntimeEnvironment provideRuntimeEnvironment(final RobotProject robotProject,
             final RobotProjectConfig configuration, final ValidationReportingStrategy reporter) {
 
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
@@ -136,6 +140,12 @@ public class RobotArtifactsBuilder {
         } else if (!runtimeEnvironment.hasRobotInstalled()) {
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_HAS_NO_ROBOT)
                     .formatMessageWith(runtimeEnvironment.getFile());
+            reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
+        } else if (!runtimeEnvironment.isCompatibleRobotInstallation()) {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_PYTHON)
+                    .formatMessageWith(runtimeEnvironment.getFile(),
+                            PythonVersion.from(runtimeEnvironment.getVersion()).asString());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
         }
         return runtimeEnvironment;

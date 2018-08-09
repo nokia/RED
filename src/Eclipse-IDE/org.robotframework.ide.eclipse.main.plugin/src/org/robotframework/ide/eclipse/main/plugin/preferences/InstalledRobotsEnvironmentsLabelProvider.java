@@ -14,6 +14,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.rf.ide.core.executor.PythonVersion;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.FontsManager;
@@ -35,7 +36,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
         final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
             return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_RED);
-        } else if (!env.hasRobotInstalled()) {
+        } else if (!env.hasRobotInstalled() || !env.isCompatibleRobotInstallation()) {
             return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW);
         }
         return null;
@@ -52,16 +53,20 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
     @Override
     public String getToolTipText(final Object element) {
         final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
+        final String dirPath = env.getFile().getAbsolutePath();
         if (!env.isValidPythonInstallation()) {
-            return "The location '" + env.getFile().getAbsolutePath()
-                    + "' does not seem to be a valid python directory.";
+            return String.format("The location '%s' does not seem to be a valid Python directory", dirPath);
         }
-        final String execPath = env.getFile().getAbsolutePath() + File.separator
-                + env.getInterpreter().executableName();
+        final String execPath = dirPath + File.separator + env.getInterpreter().executableName();
         if (!env.hasRobotInstalled()) {
-            return "Python installation '" + execPath + "' does not seem to have robot framework installed.";
+            return String.format("Python installation '%s' does not seem to have Robot Framework installed", execPath);
         }
-        return "Python installation '" + execPath + "' has " + env.getVersion() + ".";
+        if (!env.isCompatibleRobotInstallation()) {
+            return String.format(
+                    "Python installation '%s' has deprecated version (%s). RED or Robot Framework may be not compatible with it.",
+                    execPath, PythonVersion.from(env.getVersion()).asString());
+        }
+        return String.format("Python installation '%s' has %s", execPath, env.getVersion());
     }
 
     @Override
@@ -69,7 +74,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
         final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
             return ImagesManager.getImage(RedImages.getTooltipProhibitedImage());
-        } else if (!env.hasRobotInstalled()) {
+        } else if (!env.hasRobotInstalled() || !env.isCompatibleRobotInstallation()) {
             return ImagesManager.getImage(RedImages.getTooltipWarnImage());
         }
         return ImagesManager.getImage(RedImages.getTooltipImage());

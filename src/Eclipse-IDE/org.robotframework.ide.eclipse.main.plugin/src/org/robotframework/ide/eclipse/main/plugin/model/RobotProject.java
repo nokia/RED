@@ -111,7 +111,7 @@ public class RobotProject extends RobotContainer {
     public String getVersion() {
         readProjectConfigurationIfNeeded();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
-        return env == null ? "???" : env.getVersion();
+        return env == null ? null : env.getVersion();
     }
 
     public synchronized boolean hasStandardLibraries() {

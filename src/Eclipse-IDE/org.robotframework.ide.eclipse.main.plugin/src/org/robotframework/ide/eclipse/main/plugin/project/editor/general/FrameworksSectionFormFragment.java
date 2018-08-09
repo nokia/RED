@@ -294,7 +294,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         activeText.append(RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(env.getFile().getAbsolutePath()))
                 .toOSString());
         activeText.append("</a>");
-        activeText.append(" " + (env.getVersion() == null ? "&lt;unknown&gt;" : env.getVersion()));
+        activeText.append(" " + java.util.Optional.ofNullable(env.getVersion()).orElse("???"));
         if (isUsingPrefs) {
             activeText.append(" (<a href=\"" + PREFERENCES_LINK + "\">from Preferences</a>)");
         }
