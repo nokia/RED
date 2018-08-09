@@ -266,8 +266,16 @@ public class ElementsUtility {
             }
         }
 
-        boolean hasAnyProposalVariableInside = false;
+        if (hasAnyVariableProposalInside(robotTokens, correctVariables)
+                && state != ParsingState.VARIABLE_TABLE_INSIDE) {
+            correct.getTypes().add(RobotTokenType.VARIABLE_USAGE);
+        }
 
+        return correct;
+    }
+
+    private static boolean hasAnyVariableProposalInside(final List<RobotToken> robotTokens,
+            final List<VariableDeclaration> correctVariables) {
         for (final RobotToken rt : robotTokens) {
             final List<IRobotTokenType> types = rt.getTypes();
             for (final IRobotTokenType type : types) {
@@ -280,19 +288,13 @@ public class ElementsUtility {
                         final VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
                         if (typeByTokenType.getIdentificator()
                                 .equals(correctVariables.get(0).getTypeIdentificator().getText())) {
-                            hasAnyProposalVariableInside = true;
-                            break;
+                            return true;
                         }
                     }
                 }
             }
         }
-
-        if (hasAnyProposalVariableInside && state != ParsingState.VARIABLE_TABLE_INSIDE) {
-            correct.getTypes().add(RobotTokenType.VARIABLE_USAGE);
-        }
-
-        return correct;
+        return false;
     }
 
     private boolean meetsState(final ParsingState state, final ParsingState expected) {
