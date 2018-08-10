@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/29/18 10:50 AM
+Save-Time: 8/10/18 3:33 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -123,7 +123,10 @@ with [get-editor "Script.robot" | get-text-viewer] {
     key-type Enter
     type-text "here_is_class"
     key-type "M1+s"
-    wait 500
+}
+
+wait-for-errors -amount 1 -times 4 -delay 500
+with [get-editor "Script.robot" | get-text-viewer] {   
     set-caret-pos 6 19
     get-menu "Quick Fix" | click
     wait 500
