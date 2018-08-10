@@ -313,6 +313,10 @@ public class RobotRuntimeEnvironment {
         return isValidPythonInstallation() && version != null;
     }
 
+    public boolean isCompatibleRobotInstallation() {
+        return hasRobotInstalled() && !PythonVersion.from(version).isDeprecated();
+    }
+
     public String getVersion() {
         return version;
     }

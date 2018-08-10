@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -233,18 +232,13 @@ public class LibrariesBuilder {
             final String fileName = LibraryDescriptor.ofStandardLibrary(stdLib).generateLibspecFileName();
 
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-            if (!fileExist(xmlSpecFile)
-                    || !hasSameVersion(new File(xmlSpecFile.getLocationURI()), environment.getVersion())) {
+            if (!fileExist(xmlSpecFile) || !hasSameVersion(xmlSpecFile, environment.getVersion())) {
                 // we always want to regenerate standard libraries when RF version have changed
                 // or libdoc does not exist
                 generators.add(new StandardLibraryLibdocGenerator(stdLib, xmlSpecFile, LibdocFormat.XML));
             }
         }
         return generators;
-    }
-
-    private static boolean hasSameVersion(final File file, final String version) {
-        return version.startsWith(String.format("Robot Framework %s (", LibrarySpecification.getVersion(file)));
     }
 
     private List<ILibdocGenerator> getStandardRemoteLibrariesToRecreate(final RobotProjectConfig configuration,
@@ -318,6 +312,11 @@ public class LibrariesBuilder {
 
     private static boolean fileExist(final IFile file) {
         return file.exists() && file.getLocation().toFile().exists();
+    }
+
+    private static boolean hasSameVersion(final IFile file, final String version) {
+        final String fileVersion = LibrarySpecification.getVersion(file.getLocation().toFile());
+        return version.startsWith(String.format("Robot Framework %s (", fileVersion));
     }
 
     private static String toAbsolute(final String path) {

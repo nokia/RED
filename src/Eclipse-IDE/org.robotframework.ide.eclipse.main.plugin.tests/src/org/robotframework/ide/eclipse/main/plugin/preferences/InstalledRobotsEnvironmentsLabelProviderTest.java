@@ -68,9 +68,20 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
     }
 
     @Test
+    public void testGettingForeground_forDeprecatedPythonInstallationWithRobotInstalled() throws Exception {
+        when(environment.isValidPythonInstallation()).thenReturn(true);
+        when(environment.hasRobotInstalled()).thenReturn(true);
+        when(environment.isCompatibleRobotInstallation()).thenReturn(false);
+        final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(createViewer());
+        assertThat(labelProvider.getForeground(environment))
+                .isEqualTo(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW));
+    }
+
+    @Test
     public void testGettingForeground_forValidPythonInstallationWithRobotInstalled() throws Exception {
         when(environment.isValidPythonInstallation()).thenReturn(true);
         when(environment.hasRobotInstalled()).thenReturn(true);
+        when(environment.isCompatibleRobotInstallation()).thenReturn(true);
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(createViewer());
         assertThat(labelProvider.getForeground(environment)).isNull();
     }
@@ -99,7 +110,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
         when(environment.isValidPythonInstallation()).thenReturn(false);
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipText(environment)).isEqualTo("The location '"
-                + pythonInstallation.getAbsolutePath() + "' does not seem to be a valid python directory.");
+                + pythonInstallation.getAbsolutePath() + "' does not seem to be a valid Python directory");
     }
 
     @Test
@@ -112,7 +123,22 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipText(environment))
                 .isEqualTo("Python installation '" + pythonInstallation.getAbsolutePath() + File.separator
-                        + SuiteExecutor.Python.executableName() + "' does not seem to have robot framework installed.");
+                        + SuiteExecutor.Python.executableName() + "' does not seem to have Robot Framework installed");
+    }
+
+    @Test
+    public void testGettingToolTipText_forDeprecatedPythonInstallationWithRobotInstalled() throws Exception {
+        final File pythonInstallation = new File("py_installation");
+        when(environment.getFile()).thenReturn(pythonInstallation);
+        when(environment.isValidPythonInstallation()).thenReturn(true);
+        when(environment.hasRobotInstalled()).thenReturn(true);
+        when(environment.isCompatibleRobotInstallation()).thenReturn(false);
+        when(environment.getInterpreter()).thenReturn(SuiteExecutor.Python);
+        when(environment.getVersion()).thenReturn("Robot Framework 3.0.2 (Python 3.6.5 on win32)");
+        final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
+        assertThat(labelProvider.getToolTipText(environment)).isEqualTo("Python installation '"
+                + pythonInstallation.getAbsolutePath() + File.separator + SuiteExecutor.Python.executableName()
+                + "' has deprecated version (3.6.5). RED or Robot Framework may be not compatible with it.");
     }
 
     @Test
@@ -121,12 +147,13 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
         when(environment.getFile()).thenReturn(pythonInstallation);
         when(environment.isValidPythonInstallation()).thenReturn(true);
         when(environment.hasRobotInstalled()).thenReturn(true);
+        when(environment.isCompatibleRobotInstallation()).thenReturn(true);
         when(environment.getInterpreter()).thenReturn(SuiteExecutor.Python);
-        when(environment.getVersion()).thenReturn("Robot.Version.123");
+        when(environment.getVersion()).thenReturn("Robot Framework 3.0.2 (Python 3.6.5 on win32)");
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
-        assertThat(labelProvider.getToolTipText(environment))
-                .isEqualTo("Python installation '" + pythonInstallation.getAbsolutePath() + File.separator
-                        + SuiteExecutor.Python.executableName() + "' has Robot.Version.123.");
+        assertThat(labelProvider.getToolTipText(environment)).isEqualTo("Python installation '"
+                + pythonInstallation.getAbsolutePath() + File.separator + SuiteExecutor.Python.executableName()
+                + "' has Robot Framework 3.0.2 (Python 3.6.5 on win32)");
     }
 
     @Test
@@ -147,9 +174,20 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
     }
 
     @Test
+    public void testGettingToolTipImage_forDeprecatedPythonInstallationWithRobotInstalled() throws Exception {
+        when(environment.isValidPythonInstallation()).thenReturn(true);
+        when(environment.hasRobotInstalled()).thenReturn(true);
+        when(environment.isCompatibleRobotInstallation()).thenReturn(false);
+        final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
+        assertThat(labelProvider.getToolTipImage(environment))
+                .isSameAs(ImagesManager.getImage(RedImages.getTooltipWarnImage()));
+    }
+
+    @Test
     public void testGettingToolTipImage_forValidPythonInstallationWithRobotInstalled() throws Exception {
         when(environment.isValidPythonInstallation()).thenReturn(true);
         when(environment.hasRobotInstalled()).thenReturn(true);
+        when(environment.isCompatibleRobotInstallation()).thenReturn(true);
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipImage(environment))
                 .isSameAs(ImagesManager.getImage(RedImages.getTooltipImage()));
@@ -164,9 +202,9 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingName_forPythonInstallationWithKnownVersion() throws Exception {
-        when(environment.getVersion()).thenReturn("Robot.Version.123");
+        when(environment.getVersion()).thenReturn("Robot Framework 3.0.2 (Python 3.6.5 on win32)");
         final InstalledRobotsNamesLabelProvider labelProvider = new InstalledRobotsNamesLabelProvider(null);
-        assertThat(labelProvider.getText(environment)).isEqualTo("Robot.Version.123");
+        assertThat(labelProvider.getText(environment)).isEqualTo("Robot Framework 3.0.2 (Python 3.6.5 on win32)");
     }
 
     @Test
