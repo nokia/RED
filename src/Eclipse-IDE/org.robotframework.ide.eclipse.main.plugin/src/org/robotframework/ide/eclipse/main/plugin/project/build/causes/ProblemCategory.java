@@ -53,10 +53,21 @@ public enum ProblemCategory {
             return new Severity[] { Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
         }
     },
+    DEPRECATED_PYTHON_ENVIRONMENT(
+            ProblemCategoryType.PROJECT_CONFIGURATION,
+            "Deprecated Python environment",
+            "Occurs when deprecated Python version is defined.\n"
+                    + "RED or Robot Framework may not be compatible with it.") {
+
+        @Override
+        public Severity getDefaultSeverity() {
+            return Severity.WARNING;
+        }
+    },
     LIBRARY_SPECIFICATION_FILE(
             ProblemCategoryType.PROJECT_CONFIGURATION,
             "Library documentation file cannot be generated",
-            "Occurs when for some reason Robot framework is unable to generate library specification file, probably "
+            "Occurs when for some reason Robot Framework is unable to generate library specification file, probably "
                     + "due to missing library dependencies or errors in library source code.\n") {
 
         @Override
