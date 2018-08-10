@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PG3S0DE7EeWbDptfbJdvqQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/5/17 12:31 PM
+Save-Time: 8/10/18 3:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -32,11 +32,11 @@ get-view Problems | get-tree  | select "Errors .*" | double-click
 
 with [get-view Problems | get-tree] {
     get-item "Errors \\(1 item\\)" | get-property caption | equals "Errors (1 item)" | verify-true
-    get-item "Errors \\(1 item\\)/FATAL: project configuration file red.xml does not exist" | get-property caption 
-        | equals "FATAL: project configuration file red.xml does not exist" | verify-true
+    get-item "Errors \\(1 item\\)/FATAL: Project configuration file 'red.xml' does not exist"  | get-property caption 
+        | equals "FATAL: Project configuration file 'red.xml' does not exist" | verify-true
 }
 //check how fix window looks like
-get-view Problems | get-tree | select "Errors (1 item)/FATAL: project configuration file red.xml does not exist" 
+get-view Problems | get-tree | select "Errors \\(1 item\\)/FATAL: Project configuration file 'red.xml' does not exist" 
     | get-menu "Quick Fix" | click
 with [get-window "Quick Fix"] {
     get-table | get-item "Create configuration file" | get-property caption | equals "Create configuration file" 
