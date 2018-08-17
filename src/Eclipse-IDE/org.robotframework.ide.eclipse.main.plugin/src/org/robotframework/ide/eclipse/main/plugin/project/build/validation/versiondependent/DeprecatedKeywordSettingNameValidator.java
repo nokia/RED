@@ -48,16 +48,15 @@ class DeprecatedKeywordSettingNameValidator extends VersionDependentModelUnitVal
     public void validate(final IProgressMonitor monitor) throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
 
-        reportOutdatedSettings(keyword.getDocumentation(),
+        reportOutdated(keyword.getDocumentation(),
                 RobotTokenType.KEYWORD_SETTING_DOCUMENTATION.getTheMostCorrectOneRepresentation(version)
                         .getRepresentation());
-        reportOutdatedSettings(keyword.getTeardowns(),
+        reportOutdated(keyword.getTeardowns(),
                 RobotTokenType.KEYWORD_SETTING_TEARDOWN.getTheMostCorrectOneRepresentation(version)
                         .getRepresentation());
     }
 
-    private void reportOutdatedSettings(final List<? extends AModelElement<?>> settings,
-            final String correctRepresentation) {
+    private void reportOutdated(final List<? extends AModelElement<?>> settings, final String correctRepresentation) {
         for (final AModelElement<?> setting : settings) {
             final RobotToken declarationToken = setting.getDeclaration();
             final String text = declarationToken.getText();

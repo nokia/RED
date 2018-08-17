@@ -196,7 +196,7 @@ public class KeywordCallArgumentsValidatorTest {
                         problem(ORDER_PROBLEM, 47, 50, "Positional argument cannot be used after named arguments. "
                                         + "Although this argument looks like named one, it isn't because there is no "
                                         + "'b' argument in the keyword definition"));
-                
+
                 softly.assertThat(problemsOf(call("a=1", "b=2", "x=3")).against(threeArgs)).extracting(ALL).containsOnly(
                         problem(ORDER_PROBLEM, 53, 56, "Positional argument cannot be used after named arguments. "
                                         + "Although this argument looks like named one, it isn't because there is no "
@@ -962,7 +962,7 @@ public class KeywordCallArgumentsValidatorTest {
                                     + "Although this argument looks like named one, it isn't because there is no "
                                     + "'b' argument in the keyword definition"));
 
-                
+
                 softly.assertThat(problemsOf(call("x=1", "a=2", "3")).against(threeArgs)).extracting(ALL).containsOnly(
                         problem(ORDER_PROBLEM, 53, 54, "Positional argument cannot be used after named arguments"));
                 softly.assertThat(problemsOf(call("a=1", "b=2", "c=3")).against(threeArgs)).extracting(ALL).containsOnly(
@@ -1509,7 +1509,7 @@ public class KeywordCallArgumentsValidatorTest {
                         problem(COLLECTION_WARNING, 47, 51, "List argument '@{l}' has to contain from 0 to 1 item"));
                 softly.assertThat(problemsOf(call("@{l}", "2")).against(twoArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to be empty"));
-                
+
                 softly.assertThat(problemsOf(call("@{l}")).against(threeArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to contain from 0 to 2 items"));
                 softly.assertThat(problemsOf(call("@{l}", "@{l}")).against(threeArgs)).extracting(ALL).containsOnly(
@@ -1968,7 +1968,7 @@ public class KeywordCallArgumentsValidatorTest {
                         problem(COLLECTION_WARNING, 44, 48, "Dictionary argument '&{d}' cannot have key: (a)"));
                 softly.assertThat(problemsOf(call("&{d}", "b=2")).against(threeArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to contain at least 1 mapping. Required key: (a)"));
-                
+
                 softly.assertThat(problemsOf(call("&{d}")).against(fiveArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to contain at least 2 mappings. Required keys: (a, b)"));
                 softly.assertThat(problemsOf(call("&{d}", "&{d}")).against(fiveArgs)).extracting(ALL).containsOnly(
@@ -2150,7 +2150,7 @@ public class KeywordCallArgumentsValidatorTest {
                         problem(COLLECTION_WARNING, 44, 48, "Dictionary argument '&{d}' cannot have key: (a)"));
                 softly.assertThat(problemsOf(call("&{d}", "b=2")).against(threeArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to contain at least 1 mapping. Required key: (a)"));
-                
+
                 softly.assertThat(problemsOf(call("&{d}")).against(fiveArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to contain at least 3 mappings. Required keys: (a, b, c)"));
                 softly.assertThat(problemsOf(call("&{d}", "&{d}")).against(fiveArgs)).extracting(ALL).containsOnly(
@@ -2279,7 +2279,7 @@ public class KeywordCallArgumentsValidatorTest {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("1", "&{d}")).against(threeArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 44, 48, "Dictionary argument '&{d}' cannot have key: (a)"));
-                
+
                 softly.assertThat(problemsOf(call("1", "&{d}")).against(fiveArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 44, 48, "Dictionary argument '&{d}' cannot have key: (a)"));
                 softly.assertThat(problemsOf(call("1", "2", "3", "4", "5", "&{d}")).against(fiveArgs)).extracting(ALL).containsOnly(
@@ -2329,7 +2329,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
 
         @Test
-        public void overridenNamedArgumentsAreReported() {
+        public void overriddenNamedArgumentsAreReported() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call("a=1", "a=2")).against(fourArgs)).extracting(ALL).containsOnly(
                         problem(OVERRIDDEN_ARG_PROBLEM, 39, 42,
@@ -2455,7 +2455,7 @@ public class KeywordCallArgumentsValidatorTest {
                         problem(COLLECTION_WARNING, 44, 48, "Dictionary argument '&{d}' cannot have key: (a)"));
                 softly.assertThat(problemsOf(call("&{d}", "b=2")).against(fourArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to contain at least 1 mapping. Required key: (a)"));
-                
+
                 softly.assertThat(problemsOf(call("&{d}")).against(sixArgs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to contain at least 2 mappings. Required keys: (a, b)"));
                 softly.assertThat(problemsOf(call("&{d}", "&{d}")).against(sixArgs)).extracting(ALL).containsOnly(
