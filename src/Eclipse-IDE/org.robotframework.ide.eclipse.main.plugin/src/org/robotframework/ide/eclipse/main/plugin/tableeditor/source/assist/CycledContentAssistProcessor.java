@@ -129,7 +129,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     @Override
     public void applied(final ICompletionProposal proposal) {
         // this method is called also for processors from which the proposal was not chosen
-        // hence canReopenAssistantProgramatically is holding information which proccessor
+        // hence canReopenAssistantProgramatically is holding information which processor
         // is able to open proposals after accepting
         if (!canReopenAssistantProgramatically) {
             return;

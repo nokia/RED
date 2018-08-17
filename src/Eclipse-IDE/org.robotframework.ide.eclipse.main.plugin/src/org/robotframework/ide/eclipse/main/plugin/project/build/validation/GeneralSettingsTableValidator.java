@@ -19,9 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
@@ -67,7 +65,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         this.validationContext = validationContext;
         this.settingsSection = settingSection;
         this.reporter = reporter;
-        this.versionDependentValidators = new VersionDependentValidators();
+        this.versionDependentValidators = new VersionDependentValidators(validationContext, reporter);
     }
 
     @Override
@@ -103,21 +101,24 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private void reportVersionSpecificProblems(final SettingTable table, final IProgressMonitor monitor)
             throws CoreException {
-        final Iterable<VersionDependentModelUnitValidator> validators = versionDependentValidators
-                .getGeneralSettingsValidators(validationContext, table, reporter);
+        final List<VersionDependentModelUnitValidator> validators = versionDependentValidators
+                .getGeneralSettingsValidators(table)
+                .collect(toList());
         for (final ModelUnitValidator validator : validators) {
             validator.validate(monitor);
         }
     }
 
     private void reportOutdatedTableName(final SettingTable table) {
-        for (final TableHeader<? extends ARobotSectionTable> th : table.getHeaders()) {
-            final RobotToken declaration = th.getDeclaration();
-            final String tableName = declaration.getText();
-            final String tableNameWithoutWhiteSpaces = tableName.toLowerCase().replaceAll("\\s", "");
-            if (tableNameWithoutWhiteSpaces.contains("metadata")) {
-                reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.METADATA_TABLE_HEADER_SYNONYM)
-                        .formatMessageWith(tableName), validationContext.getFile(), declaration);
+        for (final AModelElement<?> th : table.getHeaders()) {
+            final RobotToken declarationToken = th.getDeclaration();
+            final String text = declarationToken.getText();
+
+            final String canonicalText = text.replaceAll("\\s", "").toLowerCase();
+            if (canonicalText.contains("metadata")) {
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.METADATA_TABLE_HEADER_SYNONYM)
+                        .formatMessageWith(text);
+                reporter.handleProblem(problem, validationContext.getFile(), declarationToken);
             }
         }
     }

@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -22,10 +22,10 @@ public class VersionDependentValidatorsTest {
 
     @Test
     public void properValidatorsAreReturnedForVersionsUnder28() {
-        final VersionDependentValidators validators = new VersionDependentValidators();
+        final VersionDependentValidators validators = new VersionDependentValidators(prepareContext("2.7.7"), null);
 
-        final List<? extends ModelUnitValidator> applicableValidators = newArrayList(
-                validators.getVariableValidators(prepareContext("2.7.7"), null, null));
+        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null)
+                .collect(toList());
         assertThat(applicableValidators.size()).isEqualTo(2);
         assertThat(applicableValidators.get(0)).isInstanceOf(DictionaryExistenceValidator.class);
         assertThat(applicableValidators.get(1)).isInstanceOf(ScalarAsListInOlderRobotValidator.class);
@@ -33,10 +33,10 @@ public class VersionDependentValidatorsTest {
 
     @Test
     public void properValidatorsAreReturnedForVersions28() {
-        final VersionDependentValidators validators = new VersionDependentValidators();
+        final VersionDependentValidators validators = new VersionDependentValidators(prepareContext("2.8.0"), null);
 
-        final List<? extends ModelUnitValidator> applicableValidators = newArrayList(
-                validators.getVariableValidators(prepareContext("2.8.0"), null, null));
+        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null)
+                .collect(toList());
         assertThat(applicableValidators.size()).isEqualTo(2);
         assertThat(applicableValidators.get(0)).isInstanceOf(DictionaryExistenceValidator.class);
         assertThat(applicableValidators.get(1)).isInstanceOf(ScalarAsListValidator.class);
@@ -44,10 +44,10 @@ public class VersionDependentValidatorsTest {
 
     @Test
     public void properValidatorsAreReturnedForVersions29() {
-        final VersionDependentValidators validators = new VersionDependentValidators();
+        final VersionDependentValidators validators = new VersionDependentValidators(prepareContext("2.9"), null);
 
-        final List<? extends ModelUnitValidator> applicableValidators = newArrayList(
-                validators.getVariableValidators(prepareContext("2.9"), null, null));
+        final List<? extends ModelUnitValidator> applicableValidators = validators.getVariableValidators(null)
+                .collect(toList());
         assertThat(applicableValidators).isEmpty();
     }
 

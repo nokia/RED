@@ -36,7 +36,7 @@ public class ForDescriptorInfo {
                         tryToFindFor(info, elementIndex, token);
                     } else if (separatorsNumbers > 2) {
                         final String text = token.getText().toString();
-                        final boolean shouldBreak = tryToFindPreviousLineContinoue(info, elementIndex, text);
+                        final boolean shouldBreak = tryToFindPreviousLineContinue(info, elementIndex, text);
 
                         if (shouldBreak) {
                             break;
@@ -47,7 +47,7 @@ public class ForDescriptorInfo {
                         tryToFindFor(info, elementIndex, token);
                     } else if (separatorsNumbers > 1) {
                         final String text = token.getText().toString();
-                        final boolean shouldBreak = tryToFindPreviousLineContinoue(info, elementIndex, text);
+                        final boolean shouldBreak = tryToFindPreviousLineContinue(info, elementIndex, text);
 
                         if (shouldBreak) {
                             break;
@@ -96,7 +96,7 @@ public class ForDescriptorInfo {
         return isInToken;
     }
 
-    private static boolean tryToFindPreviousLineContinoue(final ForDescriptorInfo info, final int elementIndex,
+    private static boolean tryToFindPreviousLineContinue(final ForDescriptorInfo info, final int elementIndex,
             final String text) {
         boolean shouldBreak = false;
         if (text != null) {

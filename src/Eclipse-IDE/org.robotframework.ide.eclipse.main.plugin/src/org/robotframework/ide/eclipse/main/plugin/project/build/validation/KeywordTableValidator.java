@@ -14,9 +14,8 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -59,14 +58,16 @@ class KeywordTableValidator implements ModelUnitValidator {
         validateKeywords(keywords);
     }
 
-    private void reportOutdatedTableName(final KeywordTable keywordTable) {
-        for (final TableHeader<? extends ARobotSectionTable> th : keywordTable.getHeaders()) {
-            final RobotToken declaration = th.getDeclaration();
-            final String text = declaration.getText();
-            final String textWithoutWhiteSpaces = text.toLowerCase().replaceAll("\\s", "");
-            if (textWithoutWhiteSpaces.toLowerCase().contains("userkeyword")) {
-                reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONYM)
-                        .formatMessageWith(text), validationContext.getFile(), declaration);
+    private void reportOutdatedTableName(final KeywordTable table) {
+        for (final AModelElement<?> th : table.getHeaders()) {
+            final RobotToken declarationToken = th.getDeclaration();
+            final String text = declarationToken.getText();
+
+            final String canonicalText = text.replaceAll("\\s", "").toLowerCase();
+            if (canonicalText.contains("userkeyword")) {
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONYM)
+                        .formatMessageWith(text);
+                reporter.handleProblem(problem, validationContext.getFile(), declarationToken);
             }
         }
     }

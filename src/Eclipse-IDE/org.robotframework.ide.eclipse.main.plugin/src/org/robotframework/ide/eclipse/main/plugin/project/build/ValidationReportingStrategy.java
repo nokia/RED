@@ -37,7 +37,7 @@ public class ValidationReportingStrategy {
     }
 
     public void handleProblem(final RobotProblem problem, final IFile file, final int line) throws ReportingInterruptedException {
-        handleProblem(problem, file, new ProblemPosition(line), new HashMap<String, Object>());
+        handleProblem(problem, file, new ProblemPosition(line), new HashMap<>());
     }
 
     public void handleProblem(final RobotProblem problem, final IFile file, final int line,
@@ -48,7 +48,7 @@ public class ValidationReportingStrategy {
     public void handleProblem(final RobotProblem problem, final IFile file, final RobotToken token) {
         final ProblemPosition position = new ProblemPosition(token.getLineNumber(),
                 Range.closed(token.getStartOffset(), token.getStartOffset() + token.getText().length()));
-        handleProblem(problem, file, position, new HashMap<String, Object>());
+        handleProblem(problem, file, position, new HashMap<>());
     }
 
     public void handleProblem(final RobotProblem problem, final IFile file, final RobotToken token,
@@ -59,7 +59,7 @@ public class ValidationReportingStrategy {
     }
 
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition) {
-        handleProblem(problem, file, filePosition, new HashMap<String, Object>());
+        handleProblem(problem, file, filePosition, new HashMap<>());
     }
 
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
