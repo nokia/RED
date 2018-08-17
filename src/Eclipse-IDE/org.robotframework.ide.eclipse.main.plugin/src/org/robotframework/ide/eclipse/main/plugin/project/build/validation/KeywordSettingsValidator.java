@@ -66,7 +66,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         this.validationContext = validationContext;
         this.keyword = keyword;
         this.reporter = reporter;
-        this.versionDependentValidators = new VersionDependentValidators();
+        this.versionDependentValidators = new VersionDependentValidators(validationContext, reporter);
     }
 
     @Override
@@ -85,8 +85,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportVersionSpecificProblems() {
-        versionDependentValidators.getKeywordSettingsValidators(validationContext, keyword, reporter)
-                .forEach(ModelUnitValidator::validate);
+        versionDependentValidators.getKeywordSettingsValidators(keyword).forEach(ModelUnitValidator::validate);
     }
 
     private void reportUnknownSettings() {

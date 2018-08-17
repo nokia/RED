@@ -103,7 +103,7 @@ public class ExecutableCallContextTest {
 
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), executables, 2,
                 URI.create("file:///file.robot"), 42, mock(RobotBreakpointSupplier.class));
-        
+
         assertThat(context.isOnLastExecutable()).isTrue();
     }
 
@@ -124,7 +124,7 @@ public class ExecutableCallContextTest {
 
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), executables, 1,
                 URI.create("file:///file.robot"), 42, mock(RobotBreakpointSupplier.class));
-        
+
         assertThat(context.isOnLastExecutable()).isFalse();
     }
 
@@ -145,7 +145,7 @@ public class ExecutableCallContextTest {
         final RobotBreakpointSupplier bpSupplier = mock(RobotBreakpointSupplier.class);
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), executables, 0,
                 URI.create("file:///file.robot"), 42, bpSupplier);
-        
+
         assertThatExceptionOfType(IllegalDebugContextStateException.class)
                 .isThrownBy(() -> context.moveTo(new RunningKeyword("lib", "kw", KeywordCallType.SETUP), bpSupplier))
                 .withMessage(
@@ -170,7 +170,7 @@ public class ExecutableCallContextTest {
         final RobotBreakpointSupplier bpSupplier = mock(RobotBreakpointSupplier.class);
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), executables, 0,
                 URI.create("file:///file.robot"), 42, bpSupplier);
-        
+
         assertThatExceptionOfType(IllegalDebugContextStateException.class)
                 .isThrownBy(() -> context.moveTo(new RunningKeyword("lib", "kw", KeywordCallType.SETUP), bpSupplier))
                 .withMessage(
@@ -191,11 +191,11 @@ public class ExecutableCallContextTest {
                 .get(0)
                 .getExecutionContext();
         final List<ExecutableWithDescriptor> executables = ExecutablesCompiler.compileExecutables(rows, null);
-        
+
         final RobotBreakpointSupplier bpSupplier = mock(RobotBreakpointSupplier.class);
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), executables, 1,
                 URI.create("file:///file.robot"), 42, bpSupplier);
-        
+
         final StackFrameContext newContext = context
                 .moveTo(new RunningKeyword("lib", "kw", KeywordCallType.NORMAL_CALL), bpSupplier);
 
@@ -217,11 +217,11 @@ public class ExecutableCallContextTest {
                 .get(0)
                 .getExecutionContext();
         final List<ExecutableWithDescriptor> executables = ExecutablesCompiler.compileExecutables(rows, null);
-        
+
         final RobotBreakpointSupplier bpSupplier = mock(RobotBreakpointSupplier.class);
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), executables, 1,
                 URI.create("file:///file.robot"), 42, bpSupplier);
-        
+
         final StackFrameContext newContext = context
                 .moveTo(new RunningKeyword("lib", "kw", KeywordCallType.NORMAL_CALL), bpSupplier);
 
@@ -231,7 +231,7 @@ public class ExecutableCallContextTest {
     }
 
     @Test
-    public void erreneousExecutableContextIsReturned_whenMovingToForLoopButDifferentLoopIsFoundInsideTestCase() {
+    public void erroneousExecutableContextIsReturned_whenMovingToForLoopButDifferentLoopIsFoundInsideTestCase() {
         final RobotFile model = ModelBuilder.modelForFile()
                 .withTestCasesTable()
                     .withTestCase("test")
@@ -259,7 +259,7 @@ public class ExecutableCallContextTest {
     }
 
     @Test
-    public void erreneousExecutableContextIsReturned_whenMovingToForLoopButDifferentLoopIsFoundInsideUserKeyword() {
+    public void erroneousExecutableContextIsReturned_whenMovingToForLoopButDifferentLoopIsFoundInsideUserKeyword() {
         final RobotFile model = ModelBuilder.modelForFile()
                 .withKeywordsTable()
                     .withUserKeyword("keyword")
@@ -356,14 +356,14 @@ public class ExecutableCallContextTest {
                 .get(0)
                 .getExecutionContext();
         final List<ExecutableWithDescriptor> executables = ExecutablesCompiler.compileExecutables(rows, null);
-        
+
         final RobotBreakpointSupplier bpSupplier = mock(RobotBreakpointSupplier.class);
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), executables, 0,
                 URI.create("file:///file.robot"), 42, bpSupplier);
 
         final StackFrameContext newContext = context
                 .moveTo(new RunningKeyword(null, "${y} IN [ 1 | 2 | 3 | 4 ]", KeywordCallType.FOR), bpSupplier);
-        
+
         assertThat(newContext.isErroneous()).isTrue();
         assertThat(newContext.getAssociatedPath()).contains(URI.create("file:///file.robot"));
         assertThat(newContext.getErrorMessage())
@@ -384,14 +384,14 @@ public class ExecutableCallContextTest {
                 .get(0)
                 .getExecutionContext();
         final List<ExecutableWithDescriptor> executables = ExecutablesCompiler.compileExecutables(rows, null);
-        
+
         final RobotBreakpointSupplier bpSupplier = mock(RobotBreakpointSupplier.class);
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), executables, 0,
                 URI.create("file:///file.robot"), 42, bpSupplier);
 
         final StackFrameContext newContext = context
                 .moveTo(new RunningKeyword(null, "${y} IN [ 1 | 2 | 3 | 4 ]", KeywordCallType.FOR), bpSupplier);
-        
+
         assertThat(newContext.isErroneous()).isTrue();
         assertThat(newContext.getAssociatedPath()).contains(URI.create("file:///file.robot"));
         assertThat(newContext.getErrorMessage())
@@ -721,7 +721,7 @@ public class ExecutableCallContextTest {
                 + "Keyword Teardown setting was found but seem to call non-matching keyword 'non-matching'\n");
         assertThat(newContext.previousContext()).isSameAs(context);
     }
-    
+
     @Test
     public void erroneousTeardownContextIsReturned_whenMovingToTestTeardownButItsNotDefinedLocallyOrInSettingsTable() {
         final RobotFile model = ModelBuilder.modelForFile()
@@ -748,7 +748,7 @@ public class ExecutableCallContextTest {
         assertThat(newContext.getErrorMessage()).contains("Unable to find Test Teardown call of 'lib.kw' keyword\n");
         assertThat(newContext.previousContext()).isSameAs(context);
     }
-    
+
     @Test
     public void erroneousTeardownContextIsReturned_whenMovingToKeywordTeardownButItsNotDefinedLocallyOrInSettingsTable() {
         final RobotFile model = ModelBuilder.modelForFile()
@@ -995,7 +995,7 @@ public class ExecutableCallContextTest {
     }
 
     @Test
-    public void erroneousTeardownContextIsReturned_whenMovingToTestTeardownAndMatchingCallIsOverridenWithNonMatchingInFileUnder() {
+    public void erroneousTeardownContextIsReturned_whenMovingToTestTeardownAndMatchingCallIsOverriddenWithNonMatchingInFileUnder() {
         final RobotFile parentModel = ModelBuilder.modelForFile()
                 .withSettingsTable()
                     .withTestTeardown("kw", "1")
@@ -1019,7 +1019,7 @@ public class ExecutableCallContextTest {
 
         final StackFrameContext newContext = context
                 .moveTo(new RunningKeyword("lib", "kw", KeywordCallType.TEARDOWN), bpSupplier);
-        
+
         assertThat(newContext.isErroneous()).isTrue();
         assertThat(newContext.getErrorMessage()).contains("Unable to find Test Teardown call of 'lib.kw' keyword\n"
                 + "Test Teardown setting was found but seem to call non-matching keyword 'non-matching'\n");

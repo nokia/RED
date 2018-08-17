@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
@@ -51,18 +52,18 @@ class VariablesTableValidator implements ModelUnitValidator {
     private static final Pattern VARIABLE_WITHOUT_NAME_PATTERN = Pattern.compile("^[$&@]\\{\\}=?$");
 
     VariablesTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotVariablesSection> variablesSection,
-            final ValidationReportingStrategy reportingStrategy) {
-        this(validationContext, variablesSection, reportingStrategy, new VersionDependentValidators());
+            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reporter) {
+        this(validationContext, variablesSection, reporter,
+                new VersionDependentValidators(validationContext, reporter));
     }
 
     @VisibleForTesting
     VariablesTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reportingStrategy,
+            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reporter,
             final VersionDependentValidators versionDependentValidators) {
         this.validationContext = validationContext;
         this.variablesSection = variablesSection;
-        this.reporter = reportingStrategy;
+        this.reporter = reporter;
         this.versionDependentValidators = versionDependentValidators;
     }
 
@@ -87,8 +88,9 @@ class VariablesTableValidator implements ModelUnitValidator {
     private void reportVersionSpecificProblems(final VariableTable variableTable, final IProgressMonitor monitor)
             throws CoreException {
         for (final IVariableHolder variable : variableTable.getVariables()) {
-            final Iterable<VersionDependentModelUnitValidator> validators = versionDependentValidators
-                    .getVariableValidators(validationContext, variable, reporter);
+            final List<VersionDependentModelUnitValidator> validators = versionDependentValidators
+                    .getVariableValidators(variable)
+                    .collect(toList());
             for (final ModelUnitValidator validator : validators) {
                 validator.validate(monitor);
             }
