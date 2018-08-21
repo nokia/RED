@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordArgumentsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentationRecognizer;
@@ -22,24 +21,23 @@ import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordTimeoutReco
 
 public class UserKeywordRecognizersProvider {
 
-    private static volatile List<ATokenRecognizer> recognized = new ArrayList<>();
+    private static final List<ATokenRecognizer> RECOGNIZERS = new ArrayList<>();
     static {
-        recognized.add(new KeywordsTableHeaderRecognizer());
-        recognized.add(new KeywordDocumentationRecognizer());
-        recognized.add(new KeywordDocumentRecognizer());
-        recognized.add(new KeywordTagsRecognizer());
-        recognized.add(new KeywordArgumentsRecognizer());
-        recognized.add(new KeywordReturnRecognizer());
-        recognized.add(new KeywordTeardownRecognizer());
-        recognized.add(new KeywordPostconditionRecognizer());
-        recognized.add(new KeywordTimeoutRecognizer());
+        RECOGNIZERS.add(new KeywordDocumentationRecognizer());
+        RECOGNIZERS.add(new KeywordDocumentRecognizer());
+        RECOGNIZERS.add(new KeywordTagsRecognizer());
+        RECOGNIZERS.add(new KeywordArgumentsRecognizer());
+        RECOGNIZERS.add(new KeywordReturnRecognizer());
+        RECOGNIZERS.add(new KeywordTeardownRecognizer());
+        RECOGNIZERS.add(new KeywordPostconditionRecognizer());
+        RECOGNIZERS.add(new KeywordTimeoutRecognizer());
     }
 
 
     public List<ATokenRecognizer> getRecognizers(final RobotVersion robotVersion) {
         final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
-        synchronized (recognized) {
-            for (final ATokenRecognizer rec : recognized) {
+        synchronized (RECOGNIZERS) {
+            for (final ATokenRecognizer rec : RECOGNIZERS) {
                 if (rec.isApplicableFor(robotVersion)) {
                     recognizersProvided.add(rec.newInstance());
                 }

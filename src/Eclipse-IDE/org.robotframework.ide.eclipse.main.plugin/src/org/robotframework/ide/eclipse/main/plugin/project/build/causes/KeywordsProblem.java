@@ -262,28 +262,6 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(new ChangeToFixer(targetName));
         }
     },
-    USER_KEYWORD_TABLE_HEADER_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Table header '%s' is deprecated from Robot Framework 3.0. Use *** Keywords *** or *** Keyword *** syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("*** Keywords ***"));
-        }
-    },
     UNKNOWN_KEYWORD_SETTING {
 
         @Override
