@@ -14,8 +14,7 @@ public class SettingsTableHeaderRecognizer extends ATokenRecognizer {
 
     public static final Pattern EXPECTED = Pattern
             .compile("[ ]?([*][\\s]*)+[\\s]*(" + createUpperLowerCaseWordWithSpacesInside("Settings") + "|"
-                    + createUpperLowerCaseWordWithSpacesInside("Setting") + "|"
-                    + createUpperLowerCaseWordWithSpacesInside("Metadata") + ")([\\s]*[*])*");
+                    + createUpperLowerCaseWordWithSpacesInside("Setting") + ")([\\s]*[*])*");
 
     public SettingsTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.SETTINGS_TABLE_HEADER);

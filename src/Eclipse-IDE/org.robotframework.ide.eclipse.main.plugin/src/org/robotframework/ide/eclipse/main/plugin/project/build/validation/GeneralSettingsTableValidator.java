@@ -73,11 +73,11 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         if (!settingsSection.isPresent()) {
             return;
         }
-        final RobotSuiteFile suiteFile = settingsSection.get().getSuiteFile();
-        final SettingTable settingsTable = settingsSection.get().getLinkedElement();
+        final RobotSettingsSection robotSettingsSection = settingsSection.get();
+        final RobotSuiteFile suiteFile = robotSettingsSection.getSuiteFile();
+        final SettingTable settingsTable = robotSettingsSection.getLinkedElement();
 
         reportVersionSpecificProblems(settingsTable, monitor);
-        reportOutdatedTableName(settingsTable);
         reportUnknownSettings(settingsTable.getUnknownSettings());
 
         validateLibraries(suiteFile, settingsTable.getLibraryImports(), monitor);
@@ -102,24 +102,10 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     private void reportVersionSpecificProblems(final SettingTable table, final IProgressMonitor monitor)
             throws CoreException {
         final List<VersionDependentModelUnitValidator> validators = versionDependentValidators
-                .getGeneralSettingsValidators(table)
+                .getGeneralSettingsTableValidators(table)
                 .collect(toList());
         for (final ModelUnitValidator validator : validators) {
             validator.validate(monitor);
-        }
-    }
-
-    private void reportOutdatedTableName(final SettingTable table) {
-        for (final AModelElement<?> th : table.getHeaders()) {
-            final RobotToken declarationToken = th.getDeclaration();
-            final String text = declarationToken.getText();
-
-            final String canonicalText = text.replaceAll("\\s", "").toLowerCase();
-            if (canonicalText.contains("metadata")) {
-                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.METADATA_TABLE_HEADER_SYNONYM)
-                        .formatMessageWith(text);
-                reporter.handleProblem(problem, validationContext.getFile(), declarationToken);
-            }
         }
     }
 

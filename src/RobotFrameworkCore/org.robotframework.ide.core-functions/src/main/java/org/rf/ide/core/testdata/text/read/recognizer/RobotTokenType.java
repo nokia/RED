@@ -39,7 +39,11 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.SETTINGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Setting").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Settings").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata").deprecatedFrom("3.0").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("Metadata")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     VARIABLES_TABLE_HEADER(
@@ -58,8 +62,16 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.KEYWORDS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Keyword").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Keywords").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keyword").deprecatedFrom("3.0").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keywords").deprecatedFrom("3.0").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("User Keyword")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build(),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("User Keywords")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     TABLE_HEADER_COLUMN(TableType.NOT_STRICTLY_BELONGS),

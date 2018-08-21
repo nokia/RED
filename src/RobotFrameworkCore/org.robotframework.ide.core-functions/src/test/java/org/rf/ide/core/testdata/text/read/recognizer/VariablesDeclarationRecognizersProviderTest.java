@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.rf.ide.core.testdata.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.DictionaryVariableDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.EnvironmentVariableDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.ListVariableDeclarationRecognizer;
@@ -26,8 +25,7 @@ public class VariablesDeclarationRecognizersProviderTest {
     public void getRecognizers_providesProperVariableRecognizers() {
         final List<ATokenRecognizer> recognizers = new VariablesDeclarationRecognizersProvider().getRecognizers();
 
-        assertThat(recognizers).hasSize(5);
-        assertThat(recognizers).hasAtLeastOneElementOfType(VariablesTableHeaderRecognizer.class);
+        assertThat(recognizers).hasSize(4);
         assertThat(recognizers).hasAtLeastOneElementOfType(ScalarVariableDeclarationRecognizer.class);
         assertThat(recognizers).hasAtLeastOneElementOfType(ListVariableDeclarationRecognizer.class);
         assertThat(recognizers).hasAtLeastOneElementOfType(DictionaryVariableDeclarationRecognizer.class);

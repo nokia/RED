@@ -25,19 +25,6 @@ import com.google.common.collect.Range;
 public class KeywordTableValidatorTest {
 
     @Test
-    public void outdatedTableHeaderIsReported() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** User Keywords ***")
-                .appendLine("keyword 1")
-                .appendLine("  [Return]  42")
-                .build();
-
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
-        assertThat(problems).containsExactly(
-                new Problem(KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONYM,
-                        new ProblemPosition(1, Range.closed(0, 21))));
-    }
-
-    @Test
     public void keywordsAreReported_whenTheyAreDuplicated_1() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword 1")

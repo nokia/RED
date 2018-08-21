@@ -41,14 +41,14 @@ public class DocumentationServiceHandlerTest {
     }
 
     @Test
-    public void test_toShowConsolidated_threeLinesWithContinoue() throws Exception {
+    public void test_toShowConsolidated_threeLinesWithContinue() throws Exception {
         final String inFileName = DIR_PATH + "DocPresentationThreeLinesWithContinue.robot";
         final String expectedText = "text1 text2 text3" + "\n" + "text4 text5 text6" + "\n" + "text7 text8";
         assertThatViewIsTheSameAsItShouldBe(inFileName, expectedText);
     }
 
     @Test
-    public void test_toShowConsolidated_threeLinesWithContinoue_andWithDuplicatedDeclaration() throws Exception {
+    public void test_toShowConsolidated_threeLinesWithContinue_andWithDuplicatedDeclaration() throws Exception {
         final String inFileName = DIR_PATH + "DocPresentationMultipleLinesAndDuplicatedDeclaration.robot";
         final String expectedText = "text1 text2 text3" + "\n" + "text4 text5 text6" + "\n" + "text7 text8" + "\n"
                 + "... ..." + "\n" + "dd33";
@@ -71,7 +71,7 @@ public class DocumentationServiceHandlerTest {
     }
 
     @Test
-    public void test_readAndUpdateIntegration_threeLinesWithContinoue() throws Exception {
+    public void test_readAndUpdateIntegration_threeLinesWithContinue() throws Exception {
         final String inFileName = DIR_PATH + "DocPresentationThreeLinesWithContinue.robot";
         final String textToUpdate = "text1 text2 text3" + "\n" + "text4 text5 text6" + "\n" + "text7 text8a";
         final String textFromTokens = "text1 text2 text3" + "\n..." + "text4 text5 text6" + "\n..." + "text7 text8a";
