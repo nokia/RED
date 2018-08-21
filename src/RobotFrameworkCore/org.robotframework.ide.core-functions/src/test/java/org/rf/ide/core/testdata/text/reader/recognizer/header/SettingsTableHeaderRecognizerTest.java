@@ -21,11 +21,6 @@ public class SettingsTableHeaderRecognizerTest {
     private final SettingsTableHeaderRecognizer rec = new SettingsTableHeaderRecognizer();
 
     @Test
-    public void test_check_MetadataAllPossibilities_withAsterisks_atTheBeginAndEnd() {
-        assertAllCombinations("Metadata");
-    }
-
-    @Test
     public void test_check_SettingsAllPossibilities_withAsterisks_atTheBeginAndEnd() {
         assertAllCombinations("Settings");
     }
@@ -49,112 +44,6 @@ public class SettingsTableHeaderRecognizerTest {
             assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
-    }
-
-    @Test
-    public void test_check_Metadata_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
-        final String expectedToCut = " * Metadata *";
-        final StringBuilder text = new StringBuilder(expectedToCut).append(" T");
-
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(0);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
-        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
-    }
-
-    @Test
-    public void test_check_spaceLetterT_and_Metadata_withAsterisk_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder("T * Metadata ***");
-
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(1);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(" * Metadata ***");
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
-    }
-
-    @Test
-    public void test_check_spaceMetadata_withAsterisk_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder(" * Metadata ***");
-
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(0);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
-    }
-
-    @Test
-    public void test_check_Metadata_withAsterisk_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder("* Metadata ***");
-
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(0);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
-    }
-
-    @Test
-    public void test_check_Metadata_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
-        final String expectedToCut = " *** Metadata ***";
-        final StringBuilder text = new StringBuilder(expectedToCut).append(" T");
-
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(0);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(expectedToCut.length());
-        assertThat(token.getText().toString()).isEqualTo(expectedToCut);
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
-    }
-
-    @Test
-    public void test_check_spaceLetterT_and_Metadata_withAsterisks_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder("T *** Metadata ***");
-
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(1);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(" *** Metadata ***");
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
-    }
-
-    @Test
-    public void test_check_spaceMetadata_withAsterisks_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder(" *** Metadata ***");
-
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(0);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
-    }
-
-    @Test
-    public void test_check_Metadata_withAsterisks_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder("*** Metadata ***");
-
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(0);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(text.toString());
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
     @Test
@@ -373,8 +262,7 @@ public class SettingsTableHeaderRecognizerTest {
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
                 "[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Settings") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Setting") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Metadata") + ")([\\s]*[*])*");
+                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Setting") + ")([\\s]*[*])*");
     }
 
     @Test

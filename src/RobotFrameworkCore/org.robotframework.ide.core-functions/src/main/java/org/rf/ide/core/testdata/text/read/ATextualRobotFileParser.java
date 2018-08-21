@@ -5,8 +5,6 @@
  */
 package org.rf.ide.core.testdata.text.read;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,6 +57,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.SettingsRecognizersProvider;
+import org.rf.ide.core.testdata.text.read.recognizer.TableHeadersRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.TestCaseRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.UserKeywordRecognizersProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.VariablesDeclarationRecognizersProvider;
@@ -71,7 +70,7 @@ import com.google.common.annotations.VisibleForTesting;
 @SuppressWarnings("PMD.GodClass")
 public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
-    private final List<ATokenRecognizer> recognized = new ArrayList<>();
+    private final List<ATokenRecognizer> recognizers = new ArrayList<>();
 
     private final List<IParsingMapper> mappers = new ArrayList<>();
 
@@ -184,11 +183,12 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         mappers.addAll(new TestCaseMapperProvider().getMappers(robotVersion));
         mappers.addAll(new UserKeywordMapperProvider().getMappers(robotVersion));
 
-        recognized.clear();
-        recognized.addAll(new SettingsRecognizersProvider().getRecognizers(robotVersion));
-        recognized.addAll(new VariablesDeclarationRecognizersProvider().getRecognizers());
-        recognized.addAll(new TestCaseRecognizersProvider().getRecognizers(robotVersion));
-        recognized.addAll(new UserKeywordRecognizersProvider().getRecognizers(robotVersion));
+        recognizers.clear();
+        recognizers.addAll(new TableHeadersRecognizersProvider().getRecognizers(robotVersion));
+        recognizers.addAll(new SettingsRecognizersProvider().getRecognizers(robotVersion));
+        recognizers.addAll(new VariablesDeclarationRecognizersProvider().getRecognizers());
+        recognizers.addAll(new TestCaseRecognizersProvider().getRecognizers(robotVersion));
+        recognizers.addAll(new UserKeywordRecognizersProvider().getRecognizers(robotVersion));
     }
 
     private RobotFileOutput parse(final RobotFileOutput parsingOutput, final File robotFile, final Reader reader) {
@@ -558,16 +558,10 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
     private boolean isCorrectTableHeader(final RobotToken robotToken) {
         boolean result = false;
 
-        final List<RobotTokenType> tableHeadersTypes = newArrayList(RobotTokenType.SETTINGS_TABLE_HEADER,
-                RobotTokenType.VARIABLES_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
-                RobotTokenType.KEYWORDS_TABLE_HEADER);
-
         final String raw = robotToken.getText().replaceAll("\\s+|[*]", "");
-        final List<IRobotTokenType> types = robotToken.getTypes();
-        for (final IRobotTokenType type : types) {
-            if (tableHeadersTypes.contains(type)) {
-                final List<String> representations = type.getRepresentation();
-                for (final String r : representations) {
+        for (final IRobotTokenType type : robotToken.getTypes()) {
+            if (utility.isTableHeader(type)) {
+                for (final String r : type.getRepresentation()) {
                     if (r.replaceAll("\\s+", "").equalsIgnoreCase(raw)) {
                         result = true;
                         break;
@@ -614,7 +608,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
     protected List<RobotToken> recognize(final FilePosition fp, final String text) {
         final List<RobotToken> possibleRobotTokens = new ArrayList<>();
         final StringBuilder sb = new StringBuilder(text);
-        for (final ATokenRecognizer rec : recognized) {
+        for (final ATokenRecognizer rec : recognizers) {
             if (rec.hasNext(sb, fp.getLine(), fp.getColumn())) {
                 final RobotToken t = rec.next();
                 t.setStartColumn(t.getStartColumn() + fp.getColumn());

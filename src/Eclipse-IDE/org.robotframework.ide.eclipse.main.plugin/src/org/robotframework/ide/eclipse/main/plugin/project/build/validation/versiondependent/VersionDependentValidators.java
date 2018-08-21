@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -43,9 +44,11 @@ public class VersionDependentValidators {
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
-    public Stream<VersionDependentModelUnitValidator> getGeneralSettingsValidators(final SettingTable table) {
+    public Stream<VersionDependentModelUnitValidator> getGeneralSettingsTableValidators(final SettingTable table) {
         final IFile file = validationContext.getFile();
         final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
+                new DeprecatedGeneralSettingsTableHeaderValidator(file, table, reporter),
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestTemplates, reporter),
                 new SettingsDuplicationValidator<>(file, table::getTestTemplates, reporter, ". No template will be used"),
 
@@ -78,6 +81,14 @@ public class VersionDependentValidators {
                 new TimeoutMessageValidator<>(file, table::getTestTimeouts, TestTimeout::getMessageArguments, reporter),
                 new LibraryAliasNotInUpperCaseValidator(file, table, reporter),
                 new LibraryAliasNotInUpperCaseValidator31(file, table, reporter));
+
+        return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
+    }
+
+    public Stream<VersionDependentModelUnitValidator> getKeywordTableValidators(final KeywordTable table) {
+        final IFile file = validationContext.getFile();
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
+                new DeprecatedKeywordTableHeaderValidator(file, table, reporter));
 
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }

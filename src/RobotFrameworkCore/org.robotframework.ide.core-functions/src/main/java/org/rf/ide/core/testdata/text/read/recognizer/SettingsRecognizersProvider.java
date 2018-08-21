@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.DefaultTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ForceTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizer;
@@ -36,8 +35,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.settings.VariableDeclaratio
 
 public class SettingsRecognizersProvider {
 
-    private static final List<ATokenRecognizer> RECOGNIZED = Arrays.asList(
-            new SettingsTableHeaderRecognizer(),
+    private static final List<ATokenRecognizer> RECOGNIZERS = Arrays.asList(
             new HashCommentRecognizer(),
             new PreviousLineContinueRecognizer(),
             new LibraryDeclarationRecognizer(), new LibraryAliasRecognizerOld(), new LibraryAliasRecognizer(),
@@ -56,8 +54,8 @@ public class SettingsRecognizersProvider {
 
     public List<ATokenRecognizer> getRecognizers(final RobotVersion robotVersion) {
         final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
-        synchronized (RECOGNIZED) {
-            for (final ATokenRecognizer rec : RECOGNIZED) {
+        synchronized (RECOGNIZERS) {
+            for (final ATokenRecognizer rec : RECOGNIZERS) {
                 if (rec.isApplicableFor(robotVersion)) {
                     recognizersProvided.add(rec.newInstance());
                 }

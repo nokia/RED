@@ -22,14 +22,15 @@ public class FileRegionSplitterTest {
     @Test
     public void givenEmptyList_whenCallSplitter_thenShouldReturnUnsetFileRegion() {
         // given
-        List<RobotToken> tokens = new ArrayList<>(0);
+        final List<RobotToken> tokens = new ArrayList<>(0);
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
+        final List<FileRegion> splitContinuesRegions = new FileRegion.FileRegionSplitter()
+                .splitContinuousRegions(tokens);
 
         // then
-        assertThat(splitContinouesRegions).hasSize(1);
-        FileRegion fileRegion = splitContinouesRegions.get(0);
+        assertThat(splitContinuesRegions).hasSize(1);
+        final FileRegion fileRegion = splitContinuesRegions.get(0);
         assertThat(fileRegion.getStart().isSamePlace(FilePosition.createNotSet())).isTrue();
         assertThat(fileRegion.getEnd().isSamePlace(FilePosition.createNotSet())).isTrue();
     }
@@ -37,14 +38,15 @@ public class FileRegionSplitterTest {
     @Test
     public void givenListWithNotSetElement_whenCallSplitter_thenShouldReturnUnsetFileRegion() {
         // given
-        List<RobotToken> tokens = Arrays.asList(RobotToken.create(""));
+        final List<RobotToken> tokens = Arrays.asList(RobotToken.create(""));
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
+        final List<FileRegion> splitContinuesRegions = new FileRegion.FileRegionSplitter()
+                .splitContinuousRegions(tokens);
 
         // then
-        assertThat(splitContinouesRegions).hasSize(1);
-        FileRegion fileRegion = splitContinouesRegions.get(0);
+        assertThat(splitContinuesRegions).hasSize(1);
+        final FileRegion fileRegion = splitContinuesRegions.get(0);
         assertThat(fileRegion.getStart().isSamePlace(FilePosition.createNotSet())).isTrue();
         assertThat(fileRegion.getEnd().isSamePlace(FilePosition.createNotSet())).isTrue();
     }
@@ -56,14 +58,15 @@ public class FileRegionSplitterTest {
         token.setStartOffset(10);
         token.setLineNumber(11);
         token.setStartColumn(12);
-        List<RobotToken> tokens = Arrays.asList(token);
+        final List<RobotToken> tokens = Arrays.asList(token);
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
+        final List<FileRegion> splitContinuesRegions = new FileRegion.FileRegionSplitter()
+                .splitContinuousRegions(tokens);
 
         // then
-        assertThat(splitContinouesRegions).hasSize(1);
-        FileRegion fileRegion = splitContinouesRegions.get(0);
+        assertThat(splitContinuesRegions).hasSize(1);
+        final FileRegion fileRegion = splitContinuesRegions.get(0);
         assertThat(fileRegion.getStart().isSamePlace(token.getFilePosition())).isTrue();
         assertThat(fileRegion.getEnd()
                 .isSamePlace(new FilePosition(token.getLineNumber(), token.getEndColumn(), token.getEndOffset())))
@@ -88,14 +91,15 @@ public class FileRegionSplitterTest {
         tokenThree.setLineNumber(tokenTwo.getLineNumber());
         tokenThree.setStartColumn(tokenTwo.getEndColumn() + 1);
 
-        List<RobotToken> tokens = Arrays.asList(tokenThree, tokenTwo, tokenOne);
+        final List<RobotToken> tokens = Arrays.asList(tokenThree, tokenTwo, tokenOne);
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
+        final List<FileRegion> splitContinuesRegions = new FileRegion.FileRegionSplitter()
+                .splitContinuousRegions(tokens);
 
         // then
-        assertThat(splitContinouesRegions).hasSize(1);
-        FileRegion fileRegion = splitContinouesRegions.get(0);
+        assertThat(splitContinuesRegions).hasSize(1);
+        final FileRegion fileRegion = splitContinuesRegions.get(0);
         assertThat(fileRegion.getStart().isSamePlace(tokenOne.getFilePosition())).isTrue();
         assertThat(fileRegion.getEnd().isSamePlace(
                 new FilePosition(tokenThree.getLineNumber(), tokenThree.getEndColumn(), tokenThree.getEndOffset())))
@@ -120,19 +124,20 @@ public class FileRegionSplitterTest {
         tokenThree.setLineNumber(tokenTwo.getLineNumber() + 3);
         tokenThree.setStartColumn(tokenTwo.getEndColumn() + 1);
 
-        List<RobotToken> tokens = Arrays.asList(tokenThree, tokenTwo, tokenOne);
+        final List<RobotToken> tokens = Arrays.asList(tokenThree, tokenTwo, tokenOne);
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
+        final List<FileRegion> splitContinuesRegions = new FileRegion.FileRegionSplitter()
+                .splitContinuousRegions(tokens);
 
         // then
-        assertThat(splitContinouesRegions).hasSize(2);
-        FileRegion fileRegionOne = splitContinouesRegions.get(0);
+        assertThat(splitContinuesRegions).hasSize(2);
+        final FileRegion fileRegionOne = splitContinuesRegions.get(0);
         assertThat(fileRegionOne.getStart().isSamePlace(tokenOne.getFilePosition())).isTrue();
         assertThat(fileRegionOne.getEnd().isSamePlace(
                 new FilePosition(tokenTwo.getLineNumber(), tokenTwo.getEndColumn(), tokenTwo.getEndOffset()))).isTrue();
 
-        FileRegion fileRegionTwo = splitContinouesRegions.get(1);
+        final FileRegion fileRegionTwo = splitContinuesRegions.get(1);
         assertThat(fileRegionTwo.getStart().isSamePlace(tokenThree.getFilePosition())).isTrue();
         assertThat(fileRegionTwo.getEnd().isSamePlace(
                 new FilePosition(tokenThree.getLineNumber(), tokenThree.getEndColumn(), tokenThree.getEndOffset())))
