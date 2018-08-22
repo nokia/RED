@@ -13,8 +13,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class KeywordsTableHeaderRecognizer extends ATokenRecognizer {
 
     public static final Pattern EXPECTED = Pattern
-            .compile("[ ]?([*][\\s]*)+[\\s]*(" + createUpperLowerCaseWordWithSpacesInside("User") + "[\\s]+)?("
-                    + createUpperLowerCaseWordWithSpacesInside("Keywords") + "|"
+            .compile("[ ]?([*][\\s]*)+[\\s]*(" + createUpperLowerCaseWordWithSpacesInside("Keywords") + "|"
                     + createUpperLowerCaseWordWithSpacesInside("Keyword") + ")([\\s]*[*])*");
 
     public KeywordsTableHeaderRecognizer() {

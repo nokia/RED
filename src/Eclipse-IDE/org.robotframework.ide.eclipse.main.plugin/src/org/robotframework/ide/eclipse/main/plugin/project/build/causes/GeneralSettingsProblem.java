@@ -455,28 +455,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return newArrayList(new ChangeToFixer(targetName));
         }
     },
-    METADATA_TABLE_HEADER_SYNONYM {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.REMOVED_API;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Table header '%s' is deprecated from Robot Framework 3.0. Use *** Settings *** syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("*** Settings ***"));
-        }
-    },
     LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION {
 
         @Override

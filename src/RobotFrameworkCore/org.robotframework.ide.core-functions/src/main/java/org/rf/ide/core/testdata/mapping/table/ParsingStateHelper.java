@@ -51,16 +51,6 @@ public class ParsingStateHelper {
         return result;
     }
 
-    public ParsingState findNearestNotCommentState(final Stack<ParsingState> processingState) {
-        ParsingState state = ParsingState.UNKNOWN;
-        for (final ParsingState s : processingState) {
-            if (s != ParsingState.COMMENT) {
-                state = s;
-            }
-        }
-        return state;
-    }
-
     public void updateStatusesForNewLine(final Stack<ParsingState> processingState) {
 
         boolean clean = true;
@@ -129,50 +119,50 @@ public class ParsingStateHelper {
     }
 
     public boolean isTableHeader(final ParsingState state) {
-        boolean result = false;
-        if (state == ParsingState.SETTING_TABLE_HEADER || state == ParsingState.VARIABLE_TABLE_HEADER
-                || state == ParsingState.TEST_CASE_TABLE_HEADER || state == ParsingState.KEYWORD_TABLE_HEADER) {
-            result = true;
-        }
-
-        return result;
+        return state == ParsingState.SETTING_TABLE_HEADER || state == ParsingState.VARIABLE_TABLE_HEADER
+                || state == ParsingState.TEST_CASE_TABLE_HEADER || state == ParsingState.KEYWORD_TABLE_HEADER;
     }
 
     public ParsingState getCurrentStatus(final Stack<ParsingState> processingState) {
-        ParsingState state = ParsingState.UNKNOWN;
-
         if (!processingState.isEmpty()) {
-            state = processingState.peek();
+            return processingState.peek();
         }
 
-        return state;
+        return ParsingState.UNKNOWN;
     }
 
     public ParsingState getStatus(final RobotToken t) {
-        ParsingState status = ParsingState.UNKNOWN;
         final List<IRobotTokenType> types = t.getTypes();
         if (types.contains(RobotTokenType.SETTINGS_TABLE_HEADER)) {
-            status = ParsingState.SETTING_TABLE_HEADER;
+            return ParsingState.SETTING_TABLE_HEADER;
         } else if (types.contains(RobotTokenType.VARIABLES_TABLE_HEADER)) {
-            status = ParsingState.VARIABLE_TABLE_HEADER;
+            return ParsingState.VARIABLE_TABLE_HEADER;
         } else if (types.contains(RobotTokenType.TEST_CASES_TABLE_HEADER)) {
-            status = ParsingState.TEST_CASE_TABLE_HEADER;
+            return ParsingState.TEST_CASE_TABLE_HEADER;
         } else if (types.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
-            status = ParsingState.KEYWORD_TABLE_HEADER;
+            return ParsingState.KEYWORD_TABLE_HEADER;
         }
 
-        return status;
+        return ParsingState.UNKNOWN;
     }
 
     public ParsingState getNearestTableHeaderState(final Stack<ParsingState> processingState) {
-        ParsingState state = ParsingState.UNKNOWN;
         for (final ParsingState s : processingState) {
             if (isTableState(s)) {
-                state = s;
-                break;
+                return s;
             }
         }
 
-        return state;
+        return ParsingState.UNKNOWN;
+    }
+
+    public ParsingState getNearestNotCommentState(final Stack<ParsingState> processingState) {
+        for (final ParsingState s : processingState) {
+            if (s != ParsingState.COMMENT) {
+                return s;
+            }
+        }
+
+        return ParsingState.UNKNOWN;
     }
 }

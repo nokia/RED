@@ -39,7 +39,11 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.SETTINGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Setting").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Settings").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata").deprecatedFrom("3.0").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("Metadata")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     VARIABLES_TABLE_HEADER(
@@ -58,8 +62,16 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.KEYWORDS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Keyword").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Keywords").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keyword").deprecatedFrom("3.0").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keywords").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("User Keyword")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build(),
+            VersionAvailabilityInfoBuilder.create()
+                    .addRepresentation("User Keywords")
+                    .deprecatedFrom("3.0")
+                    .removedFrom("3.1")
+                    .build()),
     /**
      */
     TABLE_HEADER_COLUMN(TableType.NOT_STRICTLY_BELONGS),
@@ -157,10 +169,16 @@ public enum RobotTokenType implements IRobotTokenType {
             true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata:").build(),
-            VersionAvailabilityInfoBuilder.create().deprecatedFrom("2.9").removedFrom("3.0")
-                .addRepresentation("Meta").build(),
-            VersionAvailabilityInfoBuilder.create().deprecatedFrom("2.9").removedFrom("3.0")
-                .addRepresentation("Meta:").build()),
+            VersionAvailabilityInfoBuilder.create()
+                    .deprecatedFrom("2.9")
+                    .removedFrom("3.0")
+                    .addRepresentation("Meta")
+                    .build(),
+            VersionAvailabilityInfoBuilder.create()
+                    .deprecatedFrom("2.9")
+                    .removedFrom("3.0")
+                    .addRepresentation("Meta:")
+                    .build()),
     /**
      */
     SETTING_METADATA_KEY(TableType.SETTINGS),
@@ -251,15 +269,12 @@ public enum RobotTokenType implements IRobotTokenType {
                     .removedFrom("3.1")
                     .build()),
     /**
-     * 
      */
     SETTING_TEST_SETUP_KEYWORD_NAME(TableType.SETTINGS),
     /**
-     * 
      */
     SETTING_TEST_SETUP_KEYWORD_ARGUMENT(TableType.SETTINGS),
     /**
-     * 
      */
     SETTING_TEST_TEARDOWN_DECLARATION(
             TableType.SETTINGS,
@@ -502,7 +517,6 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_RETURN_VALUE(TableType.KEYWORDS),
     /**
-     * 
      */
     KEYWORD_SETTING_TEARDOWN(
             TableType.KEYWORDS,
@@ -519,7 +533,6 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT(TableType.KEYWORDS),
-
     /**
      */
     KEYWORD_SETTING_TIMEOUT(
@@ -562,8 +575,10 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     FOR_CONTINUE_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()), FOR_CONTINUE_ARTIFICIAL_TOKEN(
-                    TableType.NOT_STRICTLY_BELONGS);
+            VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()),
+    /**
+     */
+    FOR_CONTINUE_ARTIFICIAL_TOKEN(TableType.NOT_STRICTLY_BELONGS);
 
     private final List<String> text = new ArrayList<>(0);
 
@@ -606,7 +621,11 @@ public enum RobotTokenType implements IRobotTokenType {
     }
 
     private enum TableType {
-        NOT_STRICTLY_BELONGS, SETTINGS, VARIABLES, TEST_CASES, KEYWORDS;
+        NOT_STRICTLY_BELONGS,
+        SETTINGS,
+        VARIABLES,
+        TEST_CASES,
+        KEYWORDS;
     }
 
     public static boolean isTableHeader(final IRobotTokenType type) {
@@ -673,14 +692,12 @@ public enum RobotTokenType implements IRobotTokenType {
 
     @Override
     public VersionAvailabilityInfo findVersionAvailabilityInfo(final String text) {
-        VersionAvailabilityInfo vaiResult = null;
         for (final VersionAvailabilityInfo vInfo : representation) {
             if (vInfo.getRepresentation().equalsIgnoreCase(text)) {
-                vaiResult = vInfo;
-                break;
+                return vInfo;
             }
         }
-        return vaiResult;
+        return null;
     }
 
     public VersionAvailabilityInfo getTheMostCorrectOneRepresentation(final RobotVersion robotVersionInstalled) {
@@ -690,7 +707,7 @@ public enum RobotTokenType implements IRobotTokenType {
                 continue;
             }
             if ((vai.getAvailableFrom() == null || robotVersionInstalled.isNewerOrEqualTo(vai.getAvailableFrom()))
-                    && vai.getDepracatedFrom() == null && vai.getRemovedFrom() == null) {
+                    && vai.getDeprecatedFrom() == null && vai.getRemovedFrom() == null) {
                 vaiInCaseNoMatches = vai;
                 break;
             } else {
@@ -701,8 +718,8 @@ public enum RobotTokenType implements IRobotTokenType {
 
                 if (vai.getAvailableFrom() == null || robotVersionInstalled.isNewerOrEqualTo(vai.getAvailableFrom())) {
                     if (vai.getRemovedFrom() == null) {
-                        if (vaiInCaseNoMatches.getDepracatedFrom() != null
-                                && vai.getDepracatedFrom().isNewerThan(vaiInCaseNoMatches.getDepracatedFrom())) {
+                        if (vaiInCaseNoMatches.getDeprecatedFrom() != null
+                                && vai.getDeprecatedFrom().isNewerThan(vaiInCaseNoMatches.getDeprecatedFrom())) {
                             vaiInCaseNoMatches = vai;
                         }
                     } else {

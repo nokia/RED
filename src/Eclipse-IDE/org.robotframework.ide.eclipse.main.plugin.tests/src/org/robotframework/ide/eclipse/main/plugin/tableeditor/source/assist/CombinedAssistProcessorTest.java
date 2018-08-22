@@ -36,7 +36,7 @@ public class CombinedAssistProcessorTest {
     @Test
     public void combinedProcessorDoesNotCareIfShouldShowProposalsIsCalled() throws Exception {
         // the shouldShowProposals method is inherited, but it is never called, because
-        // computeProposals(ITextViewer, int) is overriden, so it simply return false
+        // computeProposals(ITextViewer, int) is overridden, so it simply return false
         final CombinedAssistProcessor processor = new CombinedAssistProcessor();
 
         final IDocument document = mock(IDocument.class);
@@ -48,7 +48,7 @@ public class CombinedAssistProcessorTest {
     @Test
     public void noProposalsAreProvidedUsingSpecializedComputeProposalsMethod() throws Exception {
         // the specialized computeProposals method is inherited, but it is never called, because
-        // computeProposals(ITextViewer, int) is overriden, so it simply return null
+        // computeProposals(ITextViewer, int) is overridden, so it simply return null
         final CombinedAssistProcessor processor = new CombinedAssistProcessor();
 
         final IDocument document = mock(IDocument.class);
