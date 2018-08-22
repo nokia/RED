@@ -148,13 +148,15 @@ class ExternalLibrariesImportCollector {
                             .create(RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/");
                     final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(remoteLibName,
                             uriAddress);
-                    if (!isInLibraryImports(strippedAddress, libraryImports)) {
+                    final boolean isUnknown = libraryImports.stream()
+                            .filter(lib -> lib.getName().startsWith("Remote"))
+                            .noneMatch(lib -> strippedAddress.equals(RemoteArgumentsResolver
+                                    .stripLastSlashAndProtocolIfNecessary(lib.getSource().toString())));
+                    if (isUnknown) {
                         libraryImports.add(libImport);
-                        libraryImporters.put(libImport, currentSuite);
                         knownLibraryNames.put(remoteLibName, libImport);
-                    } else {
-                        libraryImporters.put(libImport, currentSuite);
                     }
+                    libraryImporters.put(libImport, currentSuite);
                 } else {
                     libraryLocator.locateByName(currentSuite, name);
                 }
@@ -295,17 +297,6 @@ class ExternalLibrariesImportCollector {
                     .map(lib -> RobotDryRunLibraryImport.createKnown(lib.getName(), libraryFile.toURI()))
                     .collect(toList());
         }
-    }
-
-    private static boolean isInLibraryImports(final String strippedAddress,
-            final Set<RobotDryRunLibraryImport> libraryImports) {
-        for (final RobotDryRunLibraryImport libImport : libraryImports) {
-            if (strippedAddress.equals(
-                    RemoteArgumentsResolver.stripLastSlashAndProtocolIfNecessary(libImport.getSource().toString()))) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }
