@@ -152,7 +152,7 @@ class ArgumentsParser {
             @Override
             String getExplanation() {
                 return pad("-noReport") + "[OPTIONAL] switches of report generation. This overrides -report switch and "
-                        + "may be overriden by it";
+                        + "may be overridden by it";
             }
         };
 

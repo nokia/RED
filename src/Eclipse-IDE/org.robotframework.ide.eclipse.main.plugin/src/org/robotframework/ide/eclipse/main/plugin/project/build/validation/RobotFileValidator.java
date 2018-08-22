@@ -56,7 +56,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
     /**
      * This method does common validation for different file types (resources, inits, suites).
      * It should be overridden and called by subclasses
-     * 
+     *
      * @param fileModel
      * @param monitor
      * @param validationContext
@@ -64,7 +64,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
      */
     protected void validate(final RobotSuiteFile fileModel, final FileValidationContext validationContext)
             throws CoreException {
-        
+
         new UnknownTablesValidator(fileModel, reporter).validate(null);
         new TestCaseTableValidator(validationContext, fileModel.findSection(RobotCasesSection.class), reporter)
                 .validate(null);
@@ -79,7 +79,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
 
         new RobotTasksReporter(fileModel, reporter).reportTasks();
     }
-    
+
     private void checkRobotFileOutputStatus(final RobotSuiteFile fileModel) {
         final RobotFile linkedElement = fileModel.getLinkedElement();
         if (linkedElement == null) {
@@ -89,7 +89,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         if (robotFileOutput == null) {
             return;
         }
-        // make sure variable files are loaded as this proccess can report problems
+        // make sure variable files are loaded as this process can report problems
         fileModel.getVariablesFromLocalReferencedFiles();
 
         if (robotFileOutput.getStatus() == Status.FAILED) {

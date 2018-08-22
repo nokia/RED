@@ -49,7 +49,7 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
         this.validationContext = validationContext;
         this.testCase = testCase;
         this.reporter = reporter;
-        this.versionDependentValidators = new VersionDependentValidators();
+        this.versionDependentValidators = new VersionDependentValidators(validationContext, reporter);
     }
 
     @Override
@@ -68,8 +68,7 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportVersionSpecificProblems() {
-        versionDependentValidators.getTestCaseSettingsValidators(validationContext, testCase, reporter)
-                .forEach(ModelUnitValidator::validate);
+        versionDependentValidators.getTestCaseSettingsValidators(testCase).forEach(ModelUnitValidator::validate);
     }
 
     private void reportUnknownSettings() {

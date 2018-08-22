@@ -8,7 +8,6 @@ package org.rf.ide.core.testdata.text.read.recognizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.DictionaryVariableDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.EnvironmentVariableDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.variables.ListVariableDeclarationRecognizer;
@@ -16,19 +15,18 @@ import org.rf.ide.core.testdata.text.read.recognizer.variables.ScalarVariableDec
 
 public class VariablesDeclarationRecognizersProvider {
 
-    private static volatile List<ATokenRecognizer> recognized = new ArrayList<>();
+    private static final List<ATokenRecognizer> RECOGNIZERS = new ArrayList<>();
     static {
-        recognized.add(new VariablesTableHeaderRecognizer());
-        recognized.add(new ScalarVariableDeclarationRecognizer());
-        recognized.add(new ListVariableDeclarationRecognizer());
-        recognized.add(new DictionaryVariableDeclarationRecognizer());
-        recognized.add(new EnvironmentVariableDeclarationRecognizer());
+        RECOGNIZERS.add(new ScalarVariableDeclarationRecognizer());
+        RECOGNIZERS.add(new ListVariableDeclarationRecognizer());
+        RECOGNIZERS.add(new DictionaryVariableDeclarationRecognizer());
+        RECOGNIZERS.add(new EnvironmentVariableDeclarationRecognizer());
     }
 
     public List<ATokenRecognizer> getRecognizers() {
         final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
-        synchronized (recognized) {
-            for (final ATokenRecognizer rec : recognized) {
+        synchronized (RECOGNIZERS) {
+            for (final ATokenRecognizer rec : RECOGNIZERS) {
                 recognizersProvided.add(rec.newInstance());
             }
         }

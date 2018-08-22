@@ -5,50 +5,201 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
+import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
+@RunWith(Enclosed.class)
 public class VersionDependentValidatorsTest {
 
-    @Test
-    public void properValidatorsAreReturnedForVersionsUnder28() {
-        final VersionDependentValidators validators = new VersionDependentValidators();
+    public static class VariableValidatorsTest {
 
-        final List<? extends ModelUnitValidator> applicableValidators = newArrayList(
-                validators.getVariableValidators(prepareContext("2.7.7"), null, null));
-        assertThat(applicableValidators.size()).isEqualTo(2);
-        assertThat(applicableValidators.get(0)).isInstanceOf(DictionaryExistenceValidator.class);
-        assertThat(applicableValidators.get(1)).isInstanceOf(ScalarAsListInOlderRobotValidator.class);
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder28() {
+            assertThat(getVariableValidators("2.7.7")).hasSize(2)
+                    .hasOnlyElementsOfTypes(DictionaryExistenceValidator.class,
+                            ScalarAsListInOlderRobotValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion28() {
+            assertThat(getVariableValidators("2.8.0")).hasSize(2)
+                    .hasOnlyElementsOfTypes(DictionaryExistenceValidator.class, ScalarAsListValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion29() {
+            assertThat(getVariableValidators("2.9")).isEmpty();
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getVariableValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            return validators.getVariableValidators(mock(IVariableHolder.class));
+        }
+
     }
 
-    @Test
-    public void properValidatorsAreReturnedForVersions28() {
-        final VersionDependentValidators validators = new VersionDependentValidators();
+    public static class GeneralSettingsTableValidatorsTest {
 
-        final List<? extends ModelUnitValidator> applicableValidators = newArrayList(
-                validators.getVariableValidators(prepareContext("2.8.0"), null, null));
-        assertThat(applicableValidators.size()).isEqualTo(2);
-        assertThat(applicableValidators.get(0)).isInstanceOf(DictionaryExistenceValidator.class);
-        assertThat(applicableValidators.get(1)).isInstanceOf(ScalarAsListValidator.class);
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder28() {
+            assertThat(getGeneralSettingsTableValidators("2.7.7")).hasSize(9)
+                    .hasOnlyElementsOfTypes(SettingsDuplicationInOldRfValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion28() {
+            assertThat(getGeneralSettingsTableValidators("2.8.0")).hasSize(9)
+                    .hasOnlyElementsOfTypes(SettingsDuplicationInOldRfValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion29() {
+            assertThat(getGeneralSettingsTableValidators("2.9")).hasSize(10)
+                    .hasOnlyElementsOfTypes(SettingsDuplicationInOldRfValidator.class,
+                            MetadataKeyInColumnOfSettingValidatorUntilRF30.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion30() {
+            assertThat(getGeneralSettingsTableValidators("3.0.4")).hasSize(13)
+                    .hasOnlyElementsOfTypes(DeprecatedGeneralSettingsTableHeaderValidator.class,
+                            SettingsDuplicationValidator.class, DeprecatedGeneralSettingNameValidator.class,
+                            TimeoutMessageValidator.class, LibraryAliasNotInUpperCaseValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion31() {
+            assertThat(getGeneralSettingsTableValidators("3.1")).hasSize(11)
+                    .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class, TimeoutMessageValidator.class,
+                            LibraryAliasNotInUpperCaseValidator31.class);
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getGeneralSettingsTableValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            return validators.getGeneralSettingsTableValidators(mock(SettingTable.class));
+        }
+
     }
 
-    @Test
-    public void properValidatorsAreReturnedForVersions29() {
-        final VersionDependentValidators validators = new VersionDependentValidators();
+    public static class KeywordTableValidatorsTest {
 
-        final List<? extends ModelUnitValidator> applicableValidators = newArrayList(
-                validators.getVariableValidators(prepareContext("2.9"), null, null));
-        assertThat(applicableValidators).isEmpty();
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder30() {
+            assertThat(getKeywordTableValidators("2.9")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion30() {
+            assertThat(getKeywordTableValidators("3.0.4")).hasSize(1)
+                    .hasOnlyElementsOfTypes(DeprecatedKeywordTableHeaderValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion31() {
+            assertThat(getKeywordTableValidators("3.1")).isEmpty();
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getKeywordTableValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            return validators.getKeywordTableValidators(mock(KeywordTable.class));
+        }
+
+    }
+
+    public static class TestCaseSettingsValidatorsTest {
+
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder29() {
+            assertThat(getTestCaseSettingsValidators("2.8.0")).hasSize(1)
+                    .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion29() {
+            assertThat(getTestCaseSettingsValidators("2.9")).hasSize(1)
+                    .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion30() {
+            assertThat(getTestCaseSettingsValidators("3.0.4")).hasSize(8)
+                    .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class,
+                            DeprecatedTestCaseSettingNameValidator.class, TimeoutMessageValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion31() {
+            assertThat(getTestCaseSettingsValidators("3.1")).hasSize(7)
+                    .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class, TimeoutMessageValidator.class);
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getTestCaseSettingsValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            final TestCase testCase = mock(TestCase.class);
+            final TestCaseTable testCaseTable = mock(TestCaseTable.class);
+            final RobotFile robotFile = mock(RobotFile.class);
+            when(testCase.getParent()).thenReturn(testCaseTable);
+            when(testCaseTable.getParent()).thenReturn(robotFile);
+            return validators.getTestCaseSettingsValidators(testCase);
+        }
+
+    }
+
+    public static class KeywordSettingsValidatorsTest {
+
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder29() {
+            assertThat(getKeywordSettingsValidators("2.8.0")).hasSize(1)
+                    .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion29() {
+            assertThat(getKeywordSettingsValidators("2.9")).hasSize(1)
+                    .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion30() {
+            assertThat(getKeywordSettingsValidators("3.0.4")).hasSize(8)
+                    .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class,
+                            DeprecatedKeywordSettingNameValidator.class, TimeoutMessageValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion31() {
+            assertThat(getKeywordSettingsValidators("3.1")).hasSize(7)
+                    .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class, TimeoutMessageValidator.class);
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getKeywordSettingsValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            final UserKeyword userKeyword = mock(UserKeyword.class);
+            final KeywordTable keywordTable = mock(KeywordTable.class);
+            final RobotFile robotFile = mock(RobotFile.class);
+            when(userKeyword.getParent()).thenReturn(keywordTable);
+            when(keywordTable.getParent()).thenReturn(robotFile);
+            return validators.getKeywordSettingsValidators(userKeyword);
+        }
+
     }
 
     private static FileValidationContext prepareContext(final String version) {

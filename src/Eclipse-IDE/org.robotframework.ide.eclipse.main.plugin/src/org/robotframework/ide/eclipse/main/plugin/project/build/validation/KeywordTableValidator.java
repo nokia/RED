@@ -14,9 +14,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -26,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -37,11 +36,14 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private final FileValidationContext validationContext;
 
+    private final VersionDependentValidators versionDependentValidators;
+
     KeywordTableValidator(final FileValidationContext validationContext,
             final Optional<RobotKeywordsSection> keywordSection, final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.keywordSection = keywordSection;
         this.reporter = reporter;
+        this.versionDependentValidators = new VersionDependentValidators(validationContext, reporter);
     }
 
     @Override
@@ -53,22 +55,16 @@ class KeywordTableValidator implements ModelUnitValidator {
         final KeywordTable keywordTable = robotKeywordsSection.getLinkedElement();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
 
-        reportOutdatedTableName(keywordTable);
+        reportVersionSpecificProblems(keywordTable, monitor);
+
         reportDuplicatedKeywords(keywords);
 
         validateKeywords(keywords);
     }
 
-    private void reportOutdatedTableName(final KeywordTable keywordTable) {
-        for (final TableHeader<? extends ARobotSectionTable> th : keywordTable.getHeaders()) {
-            final RobotToken declaration = th.getDeclaration();
-            final String text = declaration.getText();
-            final String textWithoutWhiteSpaces = text.toLowerCase().replaceAll("\\s", "");
-            if (textWithoutWhiteSpaces.toLowerCase().contains("userkeyword")) {
-                reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONYM)
-                        .formatMessageWith(text), validationContext.getFile(), declaration);
-            }
-        }
+    private void reportVersionSpecificProblems(final KeywordTable table, final IProgressMonitor monitor)
+            throws CoreException {
+        versionDependentValidators.getKeywordTableValidators(table).forEach(ModelUnitValidator::validate);
     }
 
     private void reportDuplicatedKeywords(final List<UserKeyword> keywords) {

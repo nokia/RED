@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseDocumentRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseDocumentationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCasePostconditionRecognizer;
@@ -23,25 +22,24 @@ import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCaseTimeoutRe
 
 public class TestCaseRecognizersProvider {
 
-    private static volatile List<ATokenRecognizer> recognized = new ArrayList<>();
+    private static final List<ATokenRecognizer> RECOGNIZERS = new ArrayList<>();
     static {
-        recognized.add(new TestCasesTableHeaderRecognizer());
-        recognized.add(new TestCaseDocumentationRecognizer());
-        recognized.add(new TestCaseDocumentRecognizer());
-        recognized.add(new TestCaseTagsRecognizer());
-        recognized.add(new TestCaseSetupRecognizer());
-        recognized.add(new TestCasePreconditionRecognizer());
-        recognized.add(new TestCaseTeardownRecognizer());
-        recognized.add(new TestCasePostconditionRecognizer());
-        recognized.add(new TestCaseTemplateRecognizer());
-        recognized.add(new TestCaseTimeoutRecognizer());
+        RECOGNIZERS.add(new TestCaseDocumentationRecognizer());
+        RECOGNIZERS.add(new TestCaseDocumentRecognizer());
+        RECOGNIZERS.add(new TestCaseTagsRecognizer());
+        RECOGNIZERS.add(new TestCaseSetupRecognizer());
+        RECOGNIZERS.add(new TestCasePreconditionRecognizer());
+        RECOGNIZERS.add(new TestCaseTeardownRecognizer());
+        RECOGNIZERS.add(new TestCasePostconditionRecognizer());
+        RECOGNIZERS.add(new TestCaseTemplateRecognizer());
+        RECOGNIZERS.add(new TestCaseTimeoutRecognizer());
     }
 
 
     public List<ATokenRecognizer> getRecognizers(final RobotVersion robotVersion) {
         final List<ATokenRecognizer> recognizersProvided = new ArrayList<>();
-        synchronized (recognized) {
-            for (final ATokenRecognizer rec : recognized) {
+        synchronized (RECOGNIZERS) {
+            for (final ATokenRecognizer rec : RECOGNIZERS) {
                 if (rec.isApplicableFor(robotVersion)) {
                     recognizersProvided.add(rec.newInstance());
                 }

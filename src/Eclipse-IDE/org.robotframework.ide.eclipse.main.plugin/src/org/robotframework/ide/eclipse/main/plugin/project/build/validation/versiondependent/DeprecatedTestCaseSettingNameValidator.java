@@ -48,18 +48,17 @@ class DeprecatedTestCaseSettingNameValidator extends VersionDependentModelUnitVa
     public void validate(final IProgressMonitor monitor) throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
 
-        reportOutdatedSettings(testCase.getDocumentation(),
+        reportOutdated(testCase.getDocumentation(),
                 RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION.getTheMostCorrectOneRepresentation(version)
                         .getRepresentation());
-        reportOutdatedSettings(testCase.getSetups(),
+        reportOutdated(testCase.getSetups(),
                 RobotTokenType.TEST_CASE_SETTING_SETUP.getTheMostCorrectOneRepresentation(version).getRepresentation());
-        reportOutdatedSettings(testCase.getTeardowns(),
+        reportOutdated(testCase.getTeardowns(),
                 RobotTokenType.TEST_CASE_SETTING_TEARDOWN.getTheMostCorrectOneRepresentation(version)
                         .getRepresentation());
     }
 
-    private void reportOutdatedSettings(final List<? extends AModelElement<?>> settings,
-            final String correctRepresentation) {
+    private void reportOutdated(final List<? extends AModelElement<?>> settings, final String correctRepresentation) {
         for (final AModelElement<?> setting : settings) {
             final RobotToken declarationToken = setting.getDeclaration();
             final String text = declarationToken.getText();
