@@ -147,22 +147,13 @@ public class ParsingStateHelper {
     }
 
     public ParsingState getNearestTableHeaderState(final Stack<ParsingState> processingState) {
-        for (final ParsingState s : processingState) {
-            if (isTableState(s)) {
-                return s;
-            }
-        }
-
-        return ParsingState.UNKNOWN;
+        return processingState.stream().filter(this::isTableState).findFirst().orElse(ParsingState.UNKNOWN);
     }
 
     public ParsingState getNearestNotCommentState(final Stack<ParsingState> processingState) {
-        for (final ParsingState s : processingState) {
-            if (s != ParsingState.COMMENT) {
-                return s;
-            }
-        }
-
-        return ParsingState.UNKNOWN;
+        return processingState.stream()
+                .filter(s -> s != ParsingState.COMMENT)
+                .reduce((first, second) -> second)
+                .orElse(ParsingState.UNKNOWN);
     }
 }
