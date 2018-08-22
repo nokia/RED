@@ -780,6 +780,62 @@ public class ExternalLibrariesImportCollectorTest {
     }
 
     @Test
+    public void remoteLibraryImportIsCollectedOnce_forSeveralImports() throws Exception {
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  Remote  http://127.0.0.1:10000/  30",
+                "Library  Remote  http://127.0.0.1:10000/  30",
+                "Library  Remote  http://127.0.0.1:10000/  60",
+                "Library  Remote  http://127.0.0.1:10000/  90",
+                "*** Test Cases ***"));
+        final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
+        collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
+
+        final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:10000/", URI.create("http://127.0.0.1:10000/"));
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
+        assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport,
+                newArrayList(suite, suite, suite, suite));
+        assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
+    }
+
+    @Test
+    public void remoteLibraryImportIsCollected_togetherWithOtherImports() throws Exception {
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        projectProvider.configure(config);
+
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  Remote  http://127.0.0.1:10000/  30",
+                "Library  NameLib",
+                "Library  ./libs/PathLib.py",
+                "Library  UnknownLib",
+                "Library  unknown_lib.py",
+                "Library  Remote  http://127.0.0.1:10000/  60",
+                "*** Test Cases ***"));
+        final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
+        collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
+
+        final RobotDryRunLibraryImport libImport1 = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:10000/", URI.create("http://127.0.0.1:10000/"));
+        final RobotDryRunLibraryImport libImport2 = createImport(ADDED, "NameLib",
+                projectProvider.getFile("libs/NameLib.py"));
+        final RobotDryRunLibraryImport libImport3 = createImport(ADDED, "PathLib",
+                projectProvider.getFile("libs/PathLib.py"));
+        final RobotDryRunLibraryImport libImport4 = createImport(NOT_ADDED, "unknown_lib.py");
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2, libImport3, libImport4));
+        assertThat(collector.getLibraryImporters().asMap()).hasSize(4);
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite, suite));
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite));
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport3, newArrayList(suite));
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport4, newArrayList(suite));
+        assertThat(collector.getUnknownLibraryNames().asMap()).hasSize(1);
+        assertThat(collector.getUnknownLibraryNames().asMap()).containsEntry("UnknownLib", newArrayList(suite));
+    }
+
+    @Test
     public void singleLibraryNameIsCollected_whenUnknownLibraryIsImportedByName() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
                 "*** Settings ***",
