@@ -124,15 +124,15 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             new KeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
                     importArguments).validate(new NullProgressMonitor());
         } else {
-            if (!pathOrName.equals("Remote")) {
+            if (pathOrName.equals("Remote")) {
+                reportProblemOnRemoteLibraryArguments(pathOrName, pathOrNameToken, importArguments);
+            } else {
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
                         .formatMessageWith(pathOrName);
                 final Map<String, Object> additional = isPath
                         ? ImmutableMap.of(AdditionalMarkerAttributes.PATH, pathOrName)
                         : ImmutableMap.of(AdditionalMarkerAttributes.NAME, pathOrName);
                 reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
-            } else {
-                reportProblemOnRemoteLibraryArguments(pathOrName, pathOrNameToken, importArguments);
             }
         }
     }
@@ -140,55 +140,55 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     private void reportProblemOnRemoteLibraryArguments(final String name, final RobotToken nameToken,
             final List<RobotToken> arguments) {
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
-        final Optional<String> timeout = resolver.getTimeout();
+
         final Optional<String> address = resolver.getUri();
-        final RobotToken uriOrNameToken = resolver.getUriToken().orElse(nameToken);
         if (address.isPresent()) {
-            try {
-                reportProblemOnRemoteLocation(uriOrNameToken, address.get());
-            } catch (final IllegalArgumentException e) {
-                final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT)
-                        .formatMessageWith(e.getCause().getMessage());
-                reporter.handleProblem(problem, validationContext.getFile(), uriOrNameToken);
-            }
+            final RobotToken uriOrNameToken = resolver.getUriToken().orElse(nameToken);
+            reportProblemOnRemoteLocation(uriOrNameToken, address.get());
         } else {
             new KeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
                     resolver.getDescriptor(), arguments).validate(new NullProgressMonitor());
         }
-        if (timeout.isPresent()) {
+
+        final Optional<String> timeout = resolver.getTimeout();
+        if (timeout.isPresent() && !RobotTimeFormat.isValidRobotTimeArgument(timeout.get())) {
             final RobotToken timeoutToken = resolver.getTimeoutToken().get();
-            if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.get())) {
-                final RobotProblem problem = RobotProblem
-                        .causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
-                        .formatMessageWith(timeout.get());
-                reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
-            }
+            final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
+                    .formatMessageWith(timeout.get());
+            reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
         }
     }
 
     private void reportProblemOnRemoteLocation(final RobotToken markerToken, final String address) {
-        final String uriScheme = URI.create(address.toLowerCase()).getScheme();
-        if (uriScheme.equals("http") || uriScheme.equals("https")) {
-            if (isInRemoteLocations(address)) {
+        try {
+            final String uriScheme = URI.create(address.toLowerCase()).getScheme();
+            if (!uriScheme.equals("http") && !uriScheme.equals("https")) {
                 final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
-                        .formatMessageWith(address);
+                        .causedBy(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT)
+                        .formatMessageWith(uriScheme);
                 reporter.handleProblem(problem, validationContext.getFile(), markerToken);
-            } else {
-                final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML)
-                        .formatMessageWith(address);
-                final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
-                reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
+                return;
             }
-        } else {
+        } catch (final IllegalArgumentException e) {
             final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT)
-                    .formatMessageWith(uriScheme);
+                    .causedBy(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(e.getCause().getMessage());
             reporter.handleProblem(problem, validationContext.getFile(), markerToken);
+            return;
         }
 
+        if (isInRemoteLocations(address)) {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(address);
+            reporter.handleProblem(problem, validationContext.getFile(), markerToken);
+        } else {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML)
+                    .formatMessageWith(address);
+            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
+            reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
+        }
     }
 
     private boolean isInRemoteLocations(final String address) {
