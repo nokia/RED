@@ -1,14 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _zKaAYG-LEeas5uogJbgGYA
+Contexts: _zKaAYG-LEeas5uogJbgGYA,_hb89IDvxEeiDC73Fvf4wHA
 Element-Name: DocumentationViewInTestCase
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _72sQgG-KEeas5uogJbgGYA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/26/17 1:32 PM
-Tags: notTestable
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 8/23/18 3:22 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -21,14 +20,6 @@ RED-748 - After selecting from outline test with doc, doc is not shown in view
 Content-Type: text/ecl
 Entry-Name: .content
 
-
-
-proc "wait-for-view" [val text ""]{
-	try -times 8 -delay 500 -command{
-		get-view "Documentation View" | get-editbox | get-property text | equals $text | verify-true
-	}
-}
-
 get-view "Project Explorer" | get-tree | select "RobotProject/checking_doc.robot" | double-click
 get-editor "checking_doc.robot" | get-tab-folder | get-tab-item "Test Cases" | click
 
@@ -36,11 +27,33 @@ get-editor "checking_doc.robot" | get-tab-folder | get-tab-item "Test Cases" | c
 get-menu "Window/Show View/Documentation View" | click
 
 //check button if it is not on
-with [get-view "Documentation View" | get-button "Show Libdoc"] {
-    get-property caption | equals "" | verify-true
-    get-property selected | equals false | verify-true
-    get-property index | equals 2 | verify-true
+with [get-view "Documentation View"] {
+    get-button "Link with Selection" | get-property enablement | equals true | verify-true
+    get-button "Open Input" | get-property enablement | equals false | verify-true
+    get-button "Open attached documentation in a Browser" | get-property enablement | equals false | verify-true
 }
+
+
+//check if view is still empty
+get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test1" | click
+wait 200
+
+//got to tc name
+with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Down
+    key-type Up
+}
+check-documentation-view -kw_name ""  -project_name "" -library "" -is_empty true
+
+//go down to kw wit doc and args
+get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 8
+   check-documentation-view -kw_name ""  -project_name "" -library "" -is_empty true
+   
+   
+//--------------------------------------- link with editor -----------------------------------------------------
+    
+get-view "Documentation View" | get-button "Link with Selection" | click
+
 //select first TC
 get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test1" | click
 wait 200
@@ -51,10 +64,7 @@ with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases
     key-type Up
 }
 //check if doc is shown
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "checking_doc.robot\n\n"
-    + "Doc for TC: test 1" | verify-true
+check-documentation-view-for-tc  -tc_name "test1" -path "/RobotProject/checking_doc.robot"  -spec "Doc for TC: test 1"
     
     
 //got to [doc] section
@@ -62,34 +72,25 @@ with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases
     key-type Down
 }
 //check if doc is shown
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "checking_doc.robot\n\n"
-    + "Doc for TC: test 1" | verify-true   
+check-documentation-view-for-tc  -tc_name "test1" -path "/RobotProject/checking_doc.robot"  -spec "Doc for TC: test 1"
 
-//go down to kw that has not [doc] - doc is from TC still shown
+//go down to kw that has not [doc] 
 get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "checking_doc.robot\n\n"
-    + "Doc for TC: test 1" | verify-true
-  
-//go to KW in second test   - no doc shown 
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 4
-wait 2000  
-wait-for-view -text ""
 
-//check if built-in kw doc is not shown
+check-documentation-view-for-user-kw -kw_name "kw1_with_imported_kw" -path "/RobotProject/checking_doc.robot" -arguments "\[\]" -spec "&lt;not documented&gt;"
+  
+//go to KW in second test - doc shown 
+get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 4
+check-documentation-view-for-tc  -tc_name "test 2" -path "/RobotProject/checking_doc.robot"  -spec "&lt;not documented&gt;"
+
+//check if built-in kw doc is shown
 get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test 3" | click
 wait 200
 get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
-get-view "Documentation View" | get-editbox | get-property text | equals "" | verify-true
+check-documentation-view   -kw_name "Log"  -project_name "RobotProject" -library  "BuiltIn"
+	-arguments "\[message, level=INFO, html=False, console=False, repr=False\]" -spec "Logs the given message with the given level.*"
 
 
-//------------------------------------------------------------------------------------------------------------------
-//turn on button to show libdoc
-with [get-view "Documentation View"] {
-    click
-    get-button "Show Libdoc" | click
-}
 
 //go to last kw in 2. test case
 get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test 2/kw_from_res_with_no_doc" | click
@@ -101,77 +102,33 @@ with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases
 }
 
 //this kw from resource has no doc: kw_from_res_with_no_doc
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw_from_res_with_no_doc\n"
-    + "Source: User defined (/RobotProject/res.robot)\n"
-    + "Arguments: []\n\n"
-    + "<not documented>" | verify-true
+check-documentation-view-for-user-kw -kw_name "kw_from_res_with_no_doc" -path "/RobotProject/res.robot" -arguments "\[\]" -spec   "&lt;not documented&gt;" 
+
     
 //go up: kw_with_doc
 get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up
+check-documentation-view-for-user-kw -kw_name "kw_with_doc_and_arg" -path "/RobotProject/checking_doc.robot" 
+	-arguments "\[\*dict_1, \*\*list_2\]" -spec  "Second main kw" 
 
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw_with_doc_and_arg\n"
-    + "Source: User defined (/RobotProject/checking_doc.robot)\n"
-    + "Arguments: [*dict_1, **list_2]\n\n"
-    + "Second main kw" | verify-true
 
 // kw_from_res 
 get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw_from_res\n"
-    + "Source: User defined (/RobotProject/res.robot)\n"
-    + "Arguments: [a, v]\n\n"
-    + "this is doc from kw form res" | verify-true
-    
-//test 2    
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up
-get-view "Documentation View" | get-editbox | get-property text | equals "" | verify-true
+check-documentation-view-for-user-kw -kw_name "kw_from_res" -path "/RobotProject/res.robot" 
+	-arguments "\[a, v\]" -spec  "this is doc from kw form res" 
 
-//kw_with_no_doc
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up -times 3
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw_with_no_doc\n"
-    + "Source: User defined (/RobotProject/checking_doc.robot)\n"
-    + "Arguments: [d]\n\n"
-    + "<not documented>" | verify-true
+
     
 //  kw1_with_imported_kw  
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw1_with_imported_kw\n"
-    + "Source: User defined (/RobotProject/checking_doc.robot)\n"
-    + "Arguments: []\n\n"
-    + "<not documented>" | verify-true
-    
-//[doc] from test 1    
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "checking_doc.robot\n\n"
-    + "Doc for TC: test 1" | verify-true
-    
-//test 1    
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "checking_doc.robot\n\n"
-    + "Doc for TC: test 1" | verify-true
-
-
-//go to log KW    
-get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test 3/Log"
-with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-    key-type Up
-    key-type Down
-}
-
-get-view "Documentation View" | get-editbox | get-property text | contains "Name: Log\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [message, level=INFO, html=False, console=False, repr=False]\n\n"
-    + "Logs the given message with the given level.\n\n" | verify-true
-    
+get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up -times 5
+check-documentation-view-for-user-kw -kw_name "kw1_with_imported_kw" -path "/RobotProject/checking_doc.robot" 
+	-arguments "\[\]" -spec  "&lt;not documented&gt;" 
+	
 
 //kw_with_only_doc
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw_with_only_doc\n"
-    + "Source: User defined (/RobotProject/checking_doc.robot)\n"
-    + "Arguments: []\n\n"
-    + "I have only doc, no args" | verify-true     
-    
+get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 12
+check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/checking_doc.robot" 
+	-arguments "\[\]" -spec  "I have only doc, no args" 
+	    
     
 //==================================== keyword table ==========================================================================
 
@@ -185,104 +142,54 @@ with [get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywo
     key-type Down
 }
 //kw_from_res
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw_from_res\n"
-    + "Source: User defined (/RobotProject/res.robot)\n"
-    + "Arguments: [a, v]\n\n"
-    + "this is doc from kw form res" | verify-true
+check-documentation-view-for-user-kw -kw_name "kw_from_res" -path "/RobotProject/res.robot" 
+	-arguments "\[a, v\]" -spec  "this is doc from kw form res" 
 
 //Should contain    
 get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down -times 2
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: Should Contain\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [container, item, msg=None, values=True]\n\n"
-    + "Fails if ``container`` does not contain ``item`` one or more times.\n\n"
-    + "Works with strings, lists, and anything that supports Python's ``in``\n"
-    + "operator. See `Should Be Equal` for an explanation on how to override\n"
-    + "the default error message with ``msg`` and ``values``.\n\n"
-    + "Examples:\n"
-    + "| Should Contain | ${output}    | PASS  |\n"
-    + "| Should Contain | ${some list} | value |" | verify-true
-    
+
+check-documentation-view   -kw_name "Should Contain"  -project_name "RobotProject" -library  "BuiltIn"
+	-arguments "\[container, item, msg=None, values=True, ignore_case=False\]" -spec "Fails if <code>container</code> does not contain <code>item</code> one or more times.*"
+	    
 //[doc]    
 get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down -times 3
-get-view "Documentation View" | get-editbox | get-property text | equals "kw_with_doc_and_arg\n"
-    + "checking_doc.robot\n\n"
-    + "Second main kw" | verify-true
-    
-//kw name with no doc    
-get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down -times 3
-get-view "Documentation View" | get-editbox | get-property text | equals "kw_with_doc_and_arg\n"
-    + "checking_doc.robot\n\n"
-    + "Second main kw" | verify-true 
+check-documentation-view-for-user-kw -kw_name "kw_with_doc_and_arg" -path "/RobotProject/checking_doc.robot" 
+	-arguments "\[\*dict_1, \*\*list_2\]" -spec  "Second main kw" 
+	
+	
+////==================================== Show in Doc View from menu  ==========================================================================
+// back to test case
+get-editor "checking_doc.robot" | get-tab-folder | get-tab-item "Test Cases" | click
 
-//==================================== Show in Doc View ==========================================================================
-// Show in Doc - KW
-get-view "Documentation View" | click
-get-view "Message Log" | click
-get-editor "checking_doc.robot" | click
+//close view
 get-view "Documentation View" | close
 get-view "Message Log" | click
     
 
-// check Show in Doc for KW doc
-get-view Outline | get-tree | select "checking_doc.robot/Keywords/kw_with_doc_and_arg"
-get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Show in Doc View" 
-    | click
-get-view "Documentation View" | get-editbox | get-property text | equals "kw_with_doc_and_arg\n"
-    + "checking_doc.robot\n\n"
-    + "Second main kw" | verify-true
-get-view "Documentation View" | click
-get-view "Message Log" | click
-get-editor "checking_doc.robot" | click
+// check Show in Doc for kw wieth no doc
+get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test 2/kw_with_doc_and_arg"
+with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Down
+    get-menu -path "Show documentation" | click
+}
+check-documentation-view-for-user-kw -kw_name "kw_from_res_with_no_doc" -path "/RobotProject/res.robot" -arguments "\[\]" -spec   "&lt;not documented&gt;" 
+
+
+//----------- menu from KW table
+
+//turn off linking with editor
+get-view "Documentation View" | get-button "Link with Selection" | click
+get-view "Documentation View" | get-button "Link with Selection" | get-property selected | equals false | verify-true
 get-view "Documentation View" | close
-get-view "Message Log" | click
-// check Show in Doc for built in doc
-get-view Outline | get-tree | select "checking_doc.robot/Keywords/kw_with_doc_and_arg/Catenate" | double-click
-get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Show in Doc View" 
-    | click
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: Catenate\n"
-    + "Source: Library (BuiltIn)\n"
-    + "Arguments: [*items]\n\n"
-    + "Catenates the given items together and returns the resulted string.\n\n"
-    + "By default, items are catenated with spaces, but if the first item\n"
-    + "contains the string ``SEPARATOR=<sep>``, the separator ``<sep>`` is\n"
-    + "used instead. Items are converted into strings when necessary.\n\n"
-    + "Examples:\n"
-    + "| ${str1} = | Catenate | Hello         | world |       |\n"
-    + "| ${str2} = | Catenate | SEPARATOR=--- | Hello | world |\n"
-    + "| ${str3} = | Catenate | SEPARATOR=    | Hello | world |\n"
-    + "=>\n"
-    + "| ${str1} = 'Hello world'\n"
-    + "| ${str2} = 'Hello---world'\n"
-    + "| ${str3} = 'Helloworld'" | verify-true
 
+//open doc from KW table
+get-view Outline | get-tree | select "checking_doc.robot/Keywords/kw_with_only_doc"
+with [get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down
+    get-menu -path "Show documentation" | click
+}
 
-// Show in Doc View in TestCases
-
-get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test1"
-get-view "Documentation View" | click
-get-view "Message Log" | click
-get-editor "checking_doc.robot" | click
-get-view "Documentation View" | close
-get-view "Message Log" | click
-
-// check Show in Doc for TC libdoc
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu "Show in Doc View" 
-    | click
-get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
-    + "checking_doc.robot\n\n"
-    + "Doc for TC: test 1" | verify-true
-get-view "Documentation View" | click
-get-view "Message Log" | click
-get-view Outline | click
-get-view "Documentation View" | close
-get-view "Message Log" | click
-// check Show in Doc for child kw in TC
-get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test1/kw1_with_imported_kw"
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu "Show in Doc View" 
-    | click
-get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw1_with_imported_kw\n"
-    + "Source: User defined (/RobotProject/checking_doc.robot)\n"
-    + "Arguments: []\n\n"
-    + "<not documented>" | verify-true
+check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/checking_doc.robot" 
+	-arguments "\[\]" -spec  "I have only doc, no args" 
+	    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
