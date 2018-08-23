@@ -35,7 +35,7 @@ public class CommonVariableHelper {
     }
 
     public void extractVariableAssignmentPart(final RobotLine line, final Stack<ParsingState> state) {
-        if (stateHelper.getCurrentStatus(state) != ParsingState.KEYWORD_SETTING_ARGUMENTS_ARGUMENT_VALUE) {
+        if (stateHelper.getCurrentState(state) != ParsingState.KEYWORD_SETTING_ARGUMENTS_ARGUMENT_VALUE) {
             final List<IRobotLineElement> lineElements = line.getLineElements();
             final boolean wasNotVariableElement = false;
             for (int elementIndex = 0; elementIndex < lineElements.size(); elementIndex++) {

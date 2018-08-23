@@ -34,7 +34,7 @@ public class KeywordTagsTagNameMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        final ParsingState state = utility.getCurrentStatus(processingState);
+        final ParsingState state = utility.getCurrentState(processingState);
         return state == ParsingState.KEYWORD_SETTING_TAGS || state == ParsingState.KEYWORD_SETTING_TAGS_TAG_NAME;
     }
 

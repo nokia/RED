@@ -27,7 +27,7 @@ public class ForceTagsTagNameMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        final ParsingState state = utility.getCurrentStatus(processingState);
+        final ParsingState state = utility.getCurrentState(processingState);
         return state == ParsingState.SETTING_FORCE_TAGS || state == ParsingState.SETTING_FORCE_TAGS_TAG_NAME;
     }
 

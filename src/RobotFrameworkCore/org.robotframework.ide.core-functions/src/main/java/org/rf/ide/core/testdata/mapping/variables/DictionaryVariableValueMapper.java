@@ -142,7 +142,7 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
             final RobotLine currentLine, final RobotToken rt, final String text,
             final Stack<ParsingState> processingState) {
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentState(processingState);
         return (state == ParsingState.DICTIONARY_VARIABLE_DECLARATION
                 || state == ParsingState.DICTIONARY_VARIABLE_VALUE);
     }

@@ -28,14 +28,14 @@ public class PrettyAlignSpaceUtility {
     }
 
     public void fixOnlyPrettyAlignLinesInSettings(final RobotLine line, final Stack<ParsingState> processingState) {
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentState(processingState);
         if (state == ParsingState.SETTING_TABLE_INSIDE) {
             removeTokenWithoutTextFromSimpleTableLine(line);
         }
     }
 
     public void fixOnlyPrettyAlignLinesInVariables(final RobotLine line, final Stack<ParsingState> processingState) {
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentState(processingState);
         if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
             removeTokenWithoutTextFromSimpleTableLine(line);
         }
@@ -122,11 +122,10 @@ public class PrettyAlignSpaceUtility {
         if (isOnlySpaces(text)) {
             boolean isPrettyAlign = false;
 
-            final ParsingState currentStatus = stateHelper.getCurrentStatus(processingState);
-            if (currentStatus == ParsingState.KEYWORD_TABLE_INSIDE
-                    || currentStatus == ParsingState.TEST_CASE_TABLE_INSIDE
-                    || currentStatus == ParsingState.TEST_CASE_DECLARATION
-                    || currentStatus == ParsingState.KEYWORD_DECLARATION) {
+            final ParsingState currentState = stateHelper.getCurrentState(processingState);
+            if (currentState == ParsingState.KEYWORD_TABLE_INSIDE || currentState == ParsingState.TEST_CASE_TABLE_INSIDE
+                    || currentState == ParsingState.TEST_CASE_DECLARATION
+                    || currentState == ParsingState.KEYWORD_DECLARATION) {
                 isPrettyAlign = true;
             }
 
