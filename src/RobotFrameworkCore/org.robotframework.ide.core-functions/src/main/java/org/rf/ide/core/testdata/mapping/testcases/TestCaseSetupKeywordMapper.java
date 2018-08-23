@@ -31,7 +31,7 @@ public class TestCaseSetupKeywordMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (stateHelper.getCurrentStatus(processingState) == ParsingState.TEST_CASE_SETTING_SETUP) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.TEST_CASE_SETTING_SETUP) {
             final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
             final List<TestCaseSetup> setups = tests.get(tests.size() - 1).getSetups();
             return !utility.checkIfLastHasKeywordNameAlready(setups);

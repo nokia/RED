@@ -50,7 +50,7 @@ public class TestCaseEmptyLineMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentState(processingState);
         return state == ParsingState.TEST_CASE_DECLARATION
                 && RobotEmptyRow.isEmpty(text)
                 && currentLine.getLineElements().isEmpty();

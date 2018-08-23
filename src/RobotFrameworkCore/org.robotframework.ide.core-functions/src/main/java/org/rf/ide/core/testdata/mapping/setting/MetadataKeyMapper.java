@@ -26,7 +26,7 @@ public class MetadataKeyMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        return utility.getCurrentStatus(processingState) == ParsingState.SETTING_METADATA;
+        return utility.getCurrentState(processingState) == ParsingState.SETTING_METADATA;
     }
 
     @Override

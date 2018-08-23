@@ -36,7 +36,7 @@ public class SuiteTeardownKeywordMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (stateHelper.getCurrentStatus(processingState) == ParsingState.SETTING_SUITE_TEARDOWN) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.SETTING_SUITE_TEARDOWN) {
             final List<SuiteTeardown> suiteTeardowns = robotFileOutput.getFileModel()
                     .getSettingTable()
                     .getSuiteTeardowns();

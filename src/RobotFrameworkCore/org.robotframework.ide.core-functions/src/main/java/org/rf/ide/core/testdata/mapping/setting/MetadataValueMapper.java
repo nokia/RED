@@ -53,7 +53,7 @@ public class MetadataValueMapper implements IParsingMapper {
             final RobotLine currentLine, final RobotToken rt, final String text,
             final Stack<ParsingState> processingState) {
         boolean result = false;
-        final ParsingState state = utility.getCurrentStatus(processingState);
+        final ParsingState state = utility.getCurrentState(processingState);
         if (state == ParsingState.SETTING_METADATA_KEY
                 || state == ParsingState.SETTING_METADATA_VALUE) {
             result = true;

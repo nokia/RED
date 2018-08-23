@@ -53,7 +53,7 @@ public class UnknownVariableValueMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
             final RobotLine currentLine, final RobotToken rt, final String text,
             final Stack<ParsingState> processingState) {
-        final ParsingState currentState = utility.getCurrentStatus(processingState);
+        final ParsingState currentState = utility.getCurrentState(processingState);
 
         return (currentState == ParsingState.VARIABLE_UNKNOWN || currentState == ParsingState.VARIABLE_UNKNOWN_VALUE);
     }

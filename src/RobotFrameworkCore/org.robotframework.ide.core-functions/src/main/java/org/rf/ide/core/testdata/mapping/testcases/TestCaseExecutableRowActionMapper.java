@@ -74,7 +74,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine, final RobotToken rt,
             final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentState(processingState);
         if (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION) {
             if (!RobotEmptyRow.isEmpty(text) || !currentLine.getLineElements().isEmpty()) {
                 if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME,

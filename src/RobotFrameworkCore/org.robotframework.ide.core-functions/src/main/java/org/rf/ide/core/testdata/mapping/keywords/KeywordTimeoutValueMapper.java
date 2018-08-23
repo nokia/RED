@@ -29,7 +29,7 @@ public class KeywordTimeoutValueMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (utility.getCurrentStatus(processingState) == ParsingState.KEYWORD_SETTING_TIMEOUT) {
+        if (utility.getCurrentState(processingState) == ParsingState.KEYWORD_SETTING_TIMEOUT) {
             final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
             final List<KeywordTimeout> timeouts = keywords.get(keywords.size() - 1).getTimeouts();
             return !hasValueAlready(timeouts);

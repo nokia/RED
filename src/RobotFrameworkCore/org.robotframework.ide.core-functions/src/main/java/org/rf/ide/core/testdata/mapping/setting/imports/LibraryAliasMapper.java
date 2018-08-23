@@ -72,11 +72,10 @@ public class LibraryAliasMapper implements IParsingMapper {
             final Stack<ParsingState> processingState) {
         boolean result;
 
-        final ParsingState status = parsingStateHelper
-                .getCurrentStatus(processingState);
-        if (status == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
+        final ParsingState currentState = parsingStateHelper.getCurrentState(processingState);
+        if (currentState == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
             result = true;
-        } else if (status == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE) {
+        } else if (currentState == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS_VALUE) {
             final AImported imported = utility.getNearestImport(robotFileOutput);
             LibraryImport lib;
             if (imported instanceof LibraryImport) {

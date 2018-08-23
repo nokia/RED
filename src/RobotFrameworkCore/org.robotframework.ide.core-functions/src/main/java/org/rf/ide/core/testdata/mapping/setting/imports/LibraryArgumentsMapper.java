@@ -58,7 +58,7 @@ public class LibraryArgumentsMapper implements IParsingMapper {
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            final ParsingState currentState = stateHelper.getCurrentStatus(processingState);
+            final ParsingState currentState = stateHelper.getCurrentState(processingState);
             if (currentState == ParsingState.SETTING_LIBRARY_NAME_OR_PATH
                     || currentState == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
                 if (rt.getTypes().contains(RobotTokenType.SETTING_LIBRARY_ALIAS)) {

@@ -31,13 +31,14 @@ public class KeywordTeardownArgumentMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (stateHelper.getCurrentStatus(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN) {
             final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
             final List<KeywordTeardown> teardowns = keywords.get(keywords.size() - 1).getTeardowns();
             return utility.checkIfLastHasKeywordNameAlready(teardowns);
         }
-        return stateHelper.getCurrentStatus(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN_KEYWORD
-                || stateHelper.getCurrentStatus(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT;
+        return stateHelper.getCurrentState(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN_KEYWORD
+                || stateHelper
+                        .getCurrentState(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT;
     }
 
     @Override

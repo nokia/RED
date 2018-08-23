@@ -44,7 +44,7 @@ public class LibraryAliasFixer {
     }
 
     public void checkAndFixLine(final RobotFileOutput robotFileOutput, final Stack<ParsingState> processingState) {
-        final ParsingState state = parsingStateHelper.getNearestNotCommentState(processingState);
+        final ParsingState state = parsingStateHelper.getLastNotCommentState(processingState);
         if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
             final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
 

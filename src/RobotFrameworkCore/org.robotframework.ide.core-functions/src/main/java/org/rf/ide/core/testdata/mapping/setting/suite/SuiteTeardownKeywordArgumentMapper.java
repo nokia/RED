@@ -37,15 +37,15 @@ public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (stateHelper.getCurrentStatus(processingState) == ParsingState.SETTING_SUITE_TEARDOWN) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.SETTING_SUITE_TEARDOWN) {
             final List<SuiteTeardown> suiteTeardowns = robotFileOutput.getFileModel()
                     .getSettingTable()
                     .getSuiteTeardowns();
             return canBeMappedTo(suiteTeardowns);
         }
-        return stateHelper.getCurrentStatus(processingState) == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD
+        return stateHelper.getCurrentState(processingState) == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD
                 || stateHelper
-                        .getCurrentStatus(processingState) == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT;
+                        .getCurrentState(processingState) == ParsingState.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT;
     }
 
     protected boolean canBeMappedTo(final List<SuiteTeardown> suiteTeardowns) {
