@@ -44,12 +44,11 @@ public class TableHeaderColumnMapper implements IParsingMapper {
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TABLE_HEADER_COLUMN);
         rt.setText(text);
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentState(processingState);
         if (state != ParsingState.TABLE_HEADER_COLUMN) {
             processingState.push(ParsingState.TABLE_HEADER_COLUMN);
         }
-        final ParsingState tableHeaderState = stateHelper
-                .getNearestTableHeaderState(processingState);
+        final ParsingState tableHeaderState = stateHelper.getFirstTableHeaderState(processingState);
         final List<TableHeader<? extends ARobotSectionTable>> headersForTable = utility
                 .getKnownHeadersForTable(robotFileOutput, tableHeaderState);
         if (!headersForTable.isEmpty()) {
@@ -69,13 +68,13 @@ public class TableHeaderColumnMapper implements IParsingMapper {
             final Stack<ParsingState> processingState) {
         boolean result = false;
         final ParsingState currentState = stateHelper
-                .getCurrentStatus(processingState);
+                .getCurrentState(processingState);
         if (!processingState.isEmpty()
                 && !stateHelper.isTableInsideStateInHierarchy(currentState)
                 && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                 && isNotExistLineContinueAfterHeader(currentLine)) {
             final ParsingState state = processingState.peek();
-            result = (stateHelper.isTableState(state) || state == ParsingState.TABLE_HEADER_COLUMN);
+            result = (stateHelper.isTableHeader(state) || state == ParsingState.TABLE_HEADER_COLUMN);
         }
 
         return result;

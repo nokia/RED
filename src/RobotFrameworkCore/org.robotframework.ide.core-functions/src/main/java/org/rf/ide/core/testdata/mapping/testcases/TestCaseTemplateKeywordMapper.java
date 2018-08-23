@@ -28,7 +28,7 @@ public class TestCaseTemplateKeywordMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (stateHelper.getCurrentStatus(processingState) == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.TEST_CASE_SETTING_TEST_TEMPLATE) {
             final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
             final List<TestCaseTemplate> templates = tests.get(tests.size() - 1).getTemplates();
             return !hasKeywordNameAlready(templates);

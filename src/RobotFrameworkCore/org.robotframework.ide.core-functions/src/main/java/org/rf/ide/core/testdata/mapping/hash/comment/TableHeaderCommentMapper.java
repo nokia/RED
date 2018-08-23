@@ -26,7 +26,7 @@ public class TableHeaderCommentMapper implements IHashCommentMapper {
 
     @Override
     public boolean isApplicable(final ParsingState state) {
-        return stateHelper.isTableState(state);
+        return stateHelper.isTableHeader(state);
     }
 
     @Override

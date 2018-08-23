@@ -34,19 +34,19 @@ public class ListVariableValueMapper implements IParsingMapper {
 
 
     @Override
-    public RobotToken map(RobotLine currentLine,
-            Stack<ParsingState> processingState,
-            RobotFileOutput robotFileOutput, RobotToken rt, FilePosition fp,
-            String text) {
-        List<IRobotTokenType> types = rt.getTypes();
+    public RobotToken map(final RobotLine currentLine,
+            final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
+            final String text) {
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
-        VariableTable variableTable = robotFileOutput.getFileModel()
+        final VariableTable variableTable = robotFileOutput.getFileModel()
                 .getVariableTable();
-        List<AVariable> variables = variableTable.getVariables();
+        final List<AVariable> variables = variableTable.getVariables();
         if (!variables.isEmpty()) {
-            IVariableHolder var = variables.get(variables.size() - 1);
+            final IVariableHolder var = variables.get(variables.size() - 1);
             ((ListVariable) var).addItem(rt);
         } else {
             // FIXME: some error
@@ -58,10 +58,10 @@ public class ListVariableValueMapper implements IParsingMapper {
 
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput,
-            RobotLine currentLine, RobotToken rt, String text,
-            Stack<ParsingState> processingState) {
-        ParsingState state = utility.getCurrentStatus(processingState);
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
+            final RobotLine currentLine, final RobotToken rt, final String text,
+            final Stack<ParsingState> processingState) {
+        final ParsingState state = utility.getCurrentState(processingState);
         return (state == ParsingState.LIST_VARIABLE_DECLARATION || state == ParsingState.LIST_VARIABLE_VALUE);
     }
 }

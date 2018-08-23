@@ -31,7 +31,7 @@ public class TestCaseTeardownKeywordArgumentMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentState(processingState);
         if (state == ParsingState.TEST_CASE_SETTING_TEARDOWN) {
             final List<TestCase> tests = robotFileOutput.getFileModel().getTestCaseTable().getTestCases();
             final List<TestCaseTeardown> teardowns = tests.get(tests.size() - 1).getTeardowns();
