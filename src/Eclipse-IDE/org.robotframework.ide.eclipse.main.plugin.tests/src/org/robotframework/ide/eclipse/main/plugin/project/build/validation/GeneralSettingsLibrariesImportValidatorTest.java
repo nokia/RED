@@ -105,6 +105,14 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
+    public void markerIsReported_whenImportedLibraryNameContainsSpaces() {
+        validateLibraryImport("C o l l e c t i o n s");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                GeneralSettingsProblem.LIBRARY_NAME_WITH_SPACES, new ProblemPosition(2, Range.closed(26, 47))));
+    }
+
+    @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithoutArgumentsAndDefaultLocationIsNotInConfig() {
         validateLibraryImport("Remote");
 

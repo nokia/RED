@@ -98,7 +98,12 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     @Override
     protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
             throws CoreException {
-        if (name.equals("Remote")) {
+        if (name.contains(" ")) {
+            final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.LIBRARY_NAME_WITH_SPACES)
+                    .formatMessageWith(name, name.replaceAll("\\s", ""));
+            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
+            reporter.handleProblem(problem, validationContext.getFile(), nameToken, additional);
+        } else if (name.equals("Remote")) {
             final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
             final Optional<String> address = resolver.getUri();
             if (address.isPresent()) {

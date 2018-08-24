@@ -455,6 +455,24 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return newArrayList(new ChangeToFixer(targetName));
         }
     },
+    LIBRARY_NAME_WITH_SPACES {
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Extra spaces in library name '%s'. Remove spaces and use '%s' instead.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+            return newArrayList(new ChangeToFixer(name.replaceAll("\\s", "")));
+        }
+    },
     LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION {
 
         @Override
