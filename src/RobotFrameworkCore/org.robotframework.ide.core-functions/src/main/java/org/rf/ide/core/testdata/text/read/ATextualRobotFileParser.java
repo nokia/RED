@@ -451,7 +451,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         }
 
         if (processThisElement) {
-            ParsingState newStatus = parsingStateHelper.getStatus(robotToken);
+            ParsingState newState = parsingStateHelper.getState(robotToken);
             boolean wasRecognizedCorrectly = true;
             if (robotToken != null) {
                 if (!text.trim().equals(robotToken.getText().trim())) {
@@ -464,7 +464,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
                     newRobotToken.getTypes().addAll(robotToken.getTypes());
                     robotToken = newRobotToken;
-                    newStatus = ParsingState.UNKNOWN;
+                    newState = ParsingState.UNKNOWN;
                 }
             } else {
                 robotToken = new RobotToken();
@@ -473,7 +473,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 robotToken.setText(text);
                 robotToken.setType(RobotTokenType.UNKNOWN);
 
-                newStatus = ParsingState.UNKNOWN;
+                newState = ParsingState.UNKNOWN;
             }
 
             boolean useMapper = true;
@@ -486,19 +486,19 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                         @SuppressWarnings("rawtypes")
                         final TableHeader<?> header = new TableHeader(robotToken);
                         ARobotSectionTable table = null;
-                        if (newStatus == ParsingState.SETTING_TABLE_HEADER) {
+                        if (newState == ParsingState.SETTING_TABLE_HEADER) {
                             table = fileModel.getSettingTable();
-                        } else if (newStatus == ParsingState.VARIABLE_TABLE_HEADER) {
+                        } else if (newState == ParsingState.VARIABLE_TABLE_HEADER) {
                             table = fileModel.getVariableTable();
-                        } else if (newStatus == ParsingState.TEST_CASE_TABLE_HEADER) {
+                        } else if (newState == ParsingState.TEST_CASE_TABLE_HEADER) {
                             table = fileModel.getTestCaseTable();
-                        } else if (newStatus == ParsingState.KEYWORD_TABLE_HEADER) {
+                        } else if (newState == ParsingState.KEYWORD_TABLE_HEADER) {
                             table = fileModel.getKeywordTable();
                         }
 
                         table.addHeader(header);
                         processingState.clear();
-                        processingState.push(newStatus);
+                        processingState.push(newState);
 
                         useMapper = false;
                     } else {

@@ -64,8 +64,7 @@ public class ResourceTrashDataMapper implements IParsingMapper {
             final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            final ParsingState currentState = stateHelper
-                    .getCurrentStatus(processingState);
+            final ParsingState currentState = stateHelper.getCurrentState(processingState);
             if (currentState == ParsingState.SETTING_RESOURCE_IMPORT_PATH
                     || currentState == ParsingState.SETTING_RESOURCE_UNWANTED_ARGUMENTS) {
                 result = true;

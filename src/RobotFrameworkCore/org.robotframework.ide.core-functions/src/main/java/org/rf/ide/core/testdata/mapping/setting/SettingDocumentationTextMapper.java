@@ -54,7 +54,7 @@ public class SettingDocumentationTextMapper implements IParsingMapper {
             final RobotLine currentLine, final RobotToken rt, final String text,
             final Stack<ParsingState> processingState) {
         boolean result = false;
-        final ParsingState state = utility.getCurrentStatus(processingState);
+        final ParsingState state = utility.getCurrentState(processingState);
         if (state == ParsingState.SETTING_DOCUMENTATION
                 || state == ParsingState.SETTING_DOCUMENTATION_TEXT) {
             result = true;

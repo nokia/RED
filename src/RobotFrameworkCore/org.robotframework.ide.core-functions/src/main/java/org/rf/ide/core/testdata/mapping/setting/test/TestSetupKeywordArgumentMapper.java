@@ -36,7 +36,7 @@ public class TestSetupKeywordArgumentMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        final ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentState(processingState);
         if (state == ParsingState.SETTING_TEST_SETUP) {
             final List<TestSetup> testSetups = robotFileOutput.getFileModel().getSettingTable().getTestSetups();
             return canBeMappedTo(testSetups);

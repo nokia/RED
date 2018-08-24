@@ -41,7 +41,7 @@ public class PreviousLineHandler {
         LineContinueType continueType = LineContinueType.NONE;
 
         if (isPreviousLineContinueToken(currentLine, currentToken) || isCommentContinue(currentToken, storedStack)) {
-            final ParsingState currentState = stateHelper.getCurrentStatus(parsingStates);
+            final ParsingState currentState = stateHelper.getCurrentState(parsingStates);
 
             if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
                 if (isNewLine && containsAnySetting(model) && isSomethingToContinue(model)) {
@@ -62,7 +62,7 @@ public class PreviousLineHandler {
                 if (isNewLine) {
                     if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_NEWLINE_FOR_TESTCASE_TABLE, model,
                             currentLine, currentToken)) {
-                        final ParsingState state = stateHelper.getCurrentStatus(storedStack);
+                        final ParsingState state = stateHelper.getCurrentState(storedStack);
                         if (state == ParsingState.TEST_CASE_TABLE_HEADER) {
                             storedStack.remove(ParsingState.TEST_CASE_TABLE_HEADER);
                             storedStack.push(ParsingState.TEST_CASE_TABLE_INSIDE);
@@ -80,7 +80,7 @@ public class PreviousLineHandler {
                 if (isNewLine) {
                     if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_NEWLINE_FOR_KEYWORD_TABLE, model,
                             currentLine, currentToken)) {
-                        final ParsingState state = stateHelper.getCurrentStatus(storedStack);
+                        final ParsingState state = stateHelper.getCurrentState(storedStack);
                         if (state == ParsingState.KEYWORD_TABLE_HEADER) {
                             storedStack.remove(ParsingState.KEYWORD_TABLE_HEADER);
                             storedStack.push(ParsingState.KEYWORD_TABLE_INSIDE);

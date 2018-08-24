@@ -78,7 +78,7 @@ public class LibraryAliasDeclarationMapper implements IParsingMapper {
             final Stack<ParsingState> processingState) {
         boolean result;
         if (rt.getTypes().contains(RobotTokenType.SETTING_LIBRARY_ALIAS)) {
-            final ParsingState state = utility.getCurrentStatus(processingState);
+            final ParsingState state = utility.getCurrentState(processingState);
             if (state == ParsingState.SETTING_LIBRARY_NAME_OR_PATH
                     || state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
                 result = true;

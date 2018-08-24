@@ -31,7 +31,7 @@ public class KeywordTeardownNameMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (stateHelper.getCurrentStatus(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.KEYWORD_SETTING_TEARDOWN) {
             final List<UserKeyword> keywords = robotFileOutput.getFileModel().getKeywordTable().getKeywords();
             final UserKeyword keyword = keywords.get(keywords.size() - 1);
             final List<KeywordTeardown> teardowns = keyword.getTeardowns();

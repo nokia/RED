@@ -45,7 +45,7 @@ public abstract class ATestCaseSettingDeclarationMapper implements IParsingMappe
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
         if (rt.getTypes().get(0) == declarationType
-                && parsingStateHelper.getCurrentStatus(processingState).getTable() == TableType.TEST_CASE) {
+                && parsingStateHelper.getCurrentState(processingState).getTable() == TableType.TEST_CASE) {
 
             final List<IRobotLineElement> lineElements = currentLine.getLineElements();
             if (lineElements.size() == 1) {

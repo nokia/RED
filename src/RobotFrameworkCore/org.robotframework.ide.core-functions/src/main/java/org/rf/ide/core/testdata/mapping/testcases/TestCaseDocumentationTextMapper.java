@@ -28,7 +28,7 @@ public class TestCaseDocumentationTextMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        final ParsingState state = utility.getCurrentStatus(processingState);
+        final ParsingState state = utility.getCurrentState(processingState);
         return state == ParsingState.TEST_CASE_SETTING_DOCUMENTATION_DECLARATION
                 || state == ParsingState.TEST_CASE_SETTING_DOCUMENTATION_TEXT;
     }

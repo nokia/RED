@@ -44,7 +44,7 @@ public abstract class AKeywordSettingDeclarationMapper implements IParsingMapper
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
         if (rt.getTypes().get(0) == declarationType
-                && parsingStateHelper.getCurrentStatus(processingState).getTable() == TableType.KEYWORD) {
+                && parsingStateHelper.getCurrentState(processingState).getTable() == TableType.KEYWORD) {
 
             final List<IRobotLineElement> lineElements = currentLine.getLineElements();
             if (lineElements.size() == 1) {
