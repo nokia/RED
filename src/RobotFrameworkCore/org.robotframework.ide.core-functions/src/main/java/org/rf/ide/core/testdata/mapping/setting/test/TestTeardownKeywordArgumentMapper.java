@@ -36,14 +36,14 @@ public class TestTeardownKeywordArgumentMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (stateHelper.getCurrentStatus(processingState) == ParsingState.SETTING_TEST_TEARDOWN) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.SETTING_TEST_TEARDOWN) {
             final List<TestTeardown> testTeardowns = robotFileOutput.getFileModel()
                     .getSettingTable()
                     .getTestTeardowns();
             return canBeMappedTo(testTeardowns);
         }
-        return stateHelper.getCurrentStatus(processingState) == ParsingState.SETTING_TEST_TEARDOWN_KEYWORD
-                || stateHelper.getCurrentStatus(processingState) == ParsingState.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT;
+        return stateHelper.getCurrentState(processingState) == ParsingState.SETTING_TEST_TEARDOWN_KEYWORD
+                || stateHelper.getCurrentState(processingState) == ParsingState.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT;
     }
 
     protected boolean canBeMappedTo(final List<TestTeardown> testTeardowns) {

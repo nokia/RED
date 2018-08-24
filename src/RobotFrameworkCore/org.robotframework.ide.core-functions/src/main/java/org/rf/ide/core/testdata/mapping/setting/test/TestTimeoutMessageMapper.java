@@ -27,7 +27,7 @@ public class TestTimeoutMessageMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        final ParsingState currentState = utility.getCurrentStatus(processingState);
+        final ParsingState currentState = utility.getCurrentState(processingState);
         if (currentState == ParsingState.SETTING_TEST_TIMEOUT) {
             final List<TestTimeout> testTimeouts = robotFileOutput.getFileModel().getSettingTable().getTestTimeouts();
             return checkIfHasAlreadyValue(testTimeouts);

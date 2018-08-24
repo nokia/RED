@@ -90,7 +90,7 @@ public class ElementsUtility {
     public RobotToken computeCorrectRobotToken(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp, final String text, final boolean isNewLine,
             final List<RobotToken> robotTokens, final String fileName) {
-        final ParsingState state = parsingStateHelper.getCurrentStatus(processingState);
+        final ParsingState state = parsingStateHelper.getCurrentState(processingState);
 
         RobotToken correct = null;
 
@@ -411,7 +411,7 @@ public class ElementsUtility {
             final Separator currentSeparator, final RobotLine line, final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        final ParsingState state = parsingStateHelper.getCurrentStatus(processingState);
+        final ParsingState state = parsingStateHelper.getCurrentState(processingState);
         final TableType tableType = state.getTable();
         final List<IRobotLineElement> splittedLine = separator.getSplittedLine();
 

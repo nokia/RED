@@ -37,7 +37,7 @@ public class SuiteSetupKeywordMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (stateHelper.getCurrentStatus(processingState) == ParsingState.SETTING_SUITE_SETUP) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.SETTING_SUITE_SETUP) {
             final List<SuiteSetup> suiteSetups = robotFileOutput.getFileModel().getSettingTable().getSuiteSetups();
             return canBeMappedTo(suiteSetups);
         }

@@ -32,7 +32,7 @@ public class UnknownSettingMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        return utility.getCurrentStatus(processingState) == ParsingState.SETTING_TABLE_INSIDE && text != null
+        return utility.getCurrentState(processingState) == ParsingState.SETTING_TABLE_INSIDE && text != null
                 && positionResolver.isCorrectPosition(PositionExpected.SETTING_TABLE_ELEMENT_DECLARATION,
                         robotFileOutput.getFileModel(), currentLine, rt);
     }

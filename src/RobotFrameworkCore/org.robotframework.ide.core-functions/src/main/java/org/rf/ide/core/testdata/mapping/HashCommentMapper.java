@@ -135,7 +135,7 @@ public class HashCommentMapper implements IParsingMapper {
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        final ParsingState nearestState = stateHelper.getCurrentStatus(processingState);
+        final ParsingState nearestState = stateHelper.getCurrentState(processingState);
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                 || RobotExecutableRow.isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
             if (isInsideTestCase(nearestState) || isInsideKeyword(nearestState)) {
