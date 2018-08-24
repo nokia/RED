@@ -122,6 +122,40 @@ public class ExternalLibrariesImportCollectorTest {
     }
 
     @Test
+    public void librariesImportedByNameAreCollected_whenNamesContainSpaces() throws Exception {
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        projectProvider.configure(config);
+
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  R e m o t e  http://127.0.0.1:10000/  30",
+                "Library  Name Lib",
+                "Library  Unknown Lib",
+                "Library  Operation System",
+                "Library  C o l l e c t i o n s",
+                "Library  R e m o t e  https://127.0.0.1:8270/",
+                "*** Test Cases ***"));
+        final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
+        collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
+
+        final RobotDryRunLibraryImport libImport1 = createImport(NOT_ADDED, "R e m o t e");
+        final RobotDryRunLibraryImport libImport2 = createImport(NOT_ADDED, "Name Lib");
+        final RobotDryRunLibraryImport libImport3 = createImport(NOT_ADDED, "Unknown Lib");
+        final RobotDryRunLibraryImport libImport4 = createImport(NOT_ADDED, "Operation System");
+        final RobotDryRunLibraryImport libImport5 = createImport(NOT_ADDED, "C o l l e c t i o n s");
+        assertThat(collector.getLibraryImports())
+                .has(onlyLibImports(libImport1, libImport2, libImport3, libImport4, libImport5));
+        assertThat(collector.getLibraryImporters().asMap()).hasSize(5);
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite, suite));
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite));
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport3, newArrayList(suite));
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport4, newArrayList(suite));
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport5, newArrayList(suite));
+        assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
+    }
+
+    @Test
     public void singleLibraryImportIsCollected_whenLibraryIsImportedByPath() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
                 "*** Settings ***",
