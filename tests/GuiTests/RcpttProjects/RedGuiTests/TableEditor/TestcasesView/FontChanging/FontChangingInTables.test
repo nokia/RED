@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Vp4pICajEeesE7mkFuId1w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/1/17 10:33 AM
+Save-Time: 8/27/18 12:35 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -135,6 +135,6 @@ get-editor "TestFile.robot" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 
 
-check-fonts-in-all-tables -font_size [get-by-os -win "[89]\.\d\d?"  -linux "11.0"] -font_name [get-by-os -win "(Segoe UI|Tahoma)" -linux "Cantarell"]
+check-fonts-in-all-tables -font_size [get-by-os -win "[89]\.\d\d?"  -linux "1[01].0"] -font_name [get-by-os -win "(Segoe UI|Tahoma)" -linux "Cantarell"]
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
