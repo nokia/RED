@@ -7,6 +7,7 @@ package org.robotframework.red.jface.dialogs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
@@ -41,8 +42,9 @@ public class ScriptExportDialog {
     private void exportScriptFile(final String dir) {
         final File scriptFile = new File(dir + File.separator + scriptName);
         try {
-            Files.copy(RobotRuntimeEnvironment.getScriptFileAsStream(scriptName), scriptFile.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
+            try (InputStream source = RobotRuntimeEnvironment.getScriptFileAsStream(scriptName)) {
+                Files.copy(source, scriptFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (final IOException e) {
             final String message = "Unable to copy file to " + scriptFile.getAbsolutePath();
             ErrorDialog.openError(parent, "File copy problem", message,
