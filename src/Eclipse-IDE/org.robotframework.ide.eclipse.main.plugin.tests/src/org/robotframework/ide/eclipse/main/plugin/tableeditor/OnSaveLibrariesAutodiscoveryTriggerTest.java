@@ -56,6 +56,9 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         projectProvider.createFile("suite_with_unknown_library_2.robot",
                 "*** Settings ***",
                 "Library  unknown_2");
+        projectProvider.createFile("suite_with_unknown_remote_library.robot",
+                "*** Settings ***",
+                "Library  Remote  uri=http://127.0.0.1:9000/  timeout=60");
         projectProvider.createFile("suite_with_unknown_library_in_resource.robot",
                 "*** Settings ***",
                 "Resource  resources/resource_with_unknown_library.robot");
@@ -204,6 +207,28 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
+
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
+
+        final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
+        trigger.startLibrariesAutoDiscoveryIfRequired(suite);
+
+        verify(factory).create(suite.getProject(), newArrayList(suite));
+
+        verify(discoverer).start();
+        verifyNoMoreInteractions(discoverer);
+
+        turnOffAutoDiscoveringInProjectConfig();
+    }
+
+    @Test
+    public void autodiscovererStarts_whenUnknownRemoteLibraryIsDetected() {
+        turnOnAutoDiscoveringInProjectConfig();
+
+        final RobotSuiteFile suite = model
+                .createSuiteFile(projectProvider.getFile("suite_with_unknown_remote_library.robot"));
         final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
