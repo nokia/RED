@@ -137,37 +137,50 @@ class ExternalLibrariesImportCollector {
         protected void validateNameImport(final String name, final RobotToken nameToken,
                 final List<RobotToken> arguments) throws CoreException {
             if (name.contains(" ")) {
-                final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(name,
-                        "Extra spaces in library name.");
-                libraryImports.add(libImport);
-                libraryImporters.put(libImport, currentSuite);
+                reportUnknownLibrary(name, "Extra spaces in library name.");
             } else if (name.equals("Remote")) {
-                final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
-                final Optional<String> address = resolver.getUri();
-                if (address.isPresent()) {
-                    final String strippedAddress = RemoteArgumentsResolver
-                            .stripLastSlashAndProtocolIfNecessary(address.get());
-                    final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(
-                            "Remote " + RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/",
-                            URI.create(RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/"));
-                    final boolean isUnknown = libraryImports.stream()
-                            .filter(lib -> lib.getName().startsWith("Remote") && lib.getSource() != null)
-                            .noneMatch(lib -> strippedAddress.equals(RemoteArgumentsResolver
-                                    .stripLastSlashAndProtocolIfNecessary(lib.getSource().toString())));
-                    if (isUnknown) {
-                        libraryImports.add(libImport);
-                        knownLibraryNames.put(libImport.getName(), libImport);
-                    }
-                    libraryImporters.put(libImport, currentSuite);
-                }
+                locateRemoteLibrary(name, arguments);
             } else if (!name.isEmpty() && !standardLibraryNames.contains(name)) {
-                if (unknownLibraryNames.containsKey(name)) {
-                    unknownLibraryNames.put(name, currentSuite);
-                } else if (knownLibraryNames.containsKey(name)) {
-                    knownLibraryNames.get(name).forEach(libImport -> libraryImporters.put(libImport, currentSuite));
-                } else {
-                    libraryLocator.locateByName(currentSuite, name);
+                locateReferencedLibrary(name);
+            }
+        }
+
+        private void reportUnknownLibrary(final String name, final String additionalInfo) {
+            final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(name, additionalInfo);
+            libraryImports.add(libImport);
+            libraryImporters.put(libImport, currentSuite);
+        }
+
+        private void locateRemoteLibrary(final String name, final List<RobotToken> arguments) {
+            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+            final Optional<String> address = resolver.getUri();
+            if (address.isPresent()) {
+                final String strippedAddress = RemoteArgumentsResolver
+                        .stripLastSlashAndProtocolIfNecessary(address.get());
+                final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(
+                        "Remote " + RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/",
+                        URI.create(RemoteArgumentsResolver.addProtocolIfNecessary(strippedAddress) + "/"));
+                final boolean isUnknown = libraryImports.stream()
+                        .filter(lib -> lib.getName().startsWith("Remote") && lib.getSource() != null)
+                        .noneMatch(lib -> strippedAddress.equals(RemoteArgumentsResolver
+                                .stripLastSlashAndProtocolIfNecessary(lib.getSource().toString())));
+                if (isUnknown) {
+                    libraryImports.add(libImport);
+                    knownLibraryNames.put(libImport.getName(), libImport);
                 }
+                libraryImporters.put(libImport, currentSuite);
+            } else {
+                reportUnknownLibrary(name, "Invalid remote library arguments.");
+            }
+        }
+
+        private void locateReferencedLibrary(final String name) {
+            if (unknownLibraryNames.containsKey(name)) {
+                unknownLibraryNames.put(name, currentSuite);
+            } else if (knownLibraryNames.containsKey(name)) {
+                knownLibraryNames.get(name).forEach(libImport -> libraryImporters.put(libImport, currentSuite));
+            } else {
+                libraryLocator.locateByName(currentSuite, name);
             }
         }
 

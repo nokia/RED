@@ -263,14 +263,14 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return fixers;
         }
     },
-    NON_EXISTING_REMOTE_LIBRARY_IMPORT {
+    NON_REACHABLE_REMOTE_LIBRARY_IMPORT {
 
         @Override
         public String getProblemDescription() {
             return "Unknown 'Remote' library under '%s' location. Unable to connect";
         }
     },
-    REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML {
+    NON_EXISTING_REMOTE_LIBRARY_IMPORT {
 
         @Override
         public String getProblemDescription() {
@@ -286,11 +286,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final String path = marker.getAttribute(AdditionalMarkerAttributes.PATH, null);
-            final List<IMarkerResolution> fixers = new ArrayList<>();
-
-            fixers.add(new AddRemoteLibraryToRedXmlFixer(path));
-
-            return fixers;
+            return newArrayList(new AddRemoteLibraryToRedXmlFixer(path));
         }
     },
     INVALID_URI_IN_REMOTE_LIBRARY_IMPORT {

@@ -117,7 +117,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(26, 32))));
     }
 
@@ -128,7 +128,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(26, 32))));
     }
 
@@ -139,7 +139,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  timeout=60");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(26, 32))));
     }
 
@@ -164,7 +164,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 56))));
     }
 
@@ -173,7 +173,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 48))));
     }
 
@@ -182,7 +182,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=http://127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 59))));
     }
 
@@ -191,7 +191,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 53))));
     }
 
@@ -200,7 +200,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote    http://127.0.0.1:9000/    30");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(36, 58))));
     }
 
@@ -209,7 +209,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote    uri=http://127.0.0.1:9000    timeout=30");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(36, 61))));
     }
 
@@ -218,7 +218,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote    timeout=30    uri=http://127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(50, 75))));
     }
 
@@ -229,7 +229,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 56))));
     }
 
@@ -240,7 +240,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 48))));
     }
 
@@ -251,7 +251,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=https://127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 60))));
     }
 
@@ -262,7 +262,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 53))));
     }
 
@@ -273,7 +273,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote   http://127.0.0.1:9000/  30");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(35, 57))));
     }
 
@@ -284,7 +284,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  127.0.0.1:9000  30");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 48))));
     }
 
@@ -295,7 +295,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=http://127.0.0.1:9000  timeout=30");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 59))));
     }
 
@@ -306,7 +306,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  timeout=30  uri=127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(46, 65))));
     }
 
@@ -486,7 +486,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=http://127.0.0.1:9000/  timeout=wrong");
 
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 60))),
                 new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
                         new ProblemPosition(2, Range.closed(62, 75))));
@@ -497,7 +497,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  timeout=wrong  uri=http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(49, 75))),
                 new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
                         new ProblemPosition(2, Range.closed(34, 47))));
@@ -508,7 +508,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  timeout=wrong");
 
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(26, 32))),
                 new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
                         new ProblemPosition(2, Range.closed(34, 47))));
@@ -519,7 +519,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  http://127.0.0.1:9000/  wrong");
 
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML,
+                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 56))),
                 new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
                         new ProblemPosition(2, Range.closed(58, 63))));
