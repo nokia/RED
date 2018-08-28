@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YDbWsNnJEeeKxYJgF2NTmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/27/18 5:22 PM
+Save-Time: 8/28/18 9:35 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -21,7 +21,7 @@ proc "run-python-remote-server-in-background" [val project_name "RobotProject"] 
 	}
 } 
 
-proc "stop-python-remote-server"{
-	exec-process "python" "-m"  "robotremoteserver"  "stop"  "127.0.0.1:8270" | log
+proc "stop-python-remote-server" [val address "127.0.0.1:8270"]{
+	exec-process "python" "-m"  "robotremoteserver"  "stop"  $address | log
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
