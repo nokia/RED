@@ -11,6 +11,7 @@ import java.util.List;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
@@ -105,20 +106,27 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
         int max = 1 + RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
         if (keywords != null) {
             for (final Object element : keywords) {
-                if (element instanceof RobotKeywordDefinition) {
-                    final RobotKeywordDefinition keyword = (RobotKeywordDefinition) element;
-                    max = Math.max(max, keyword.getEmbeddedArguments().size());
-
-                } else if (element instanceof RobotKeywordCall) {
-                    final RobotKeywordCall keyword = (RobotKeywordCall) element;
-                    if (keyword.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
-                        // add 1 for empty cell
-                        max = Math.max(max, ExecutablesRowHolderCommentService.execRowView(keyword).size() + 1);
-                    }
-                }
+                max = Math.max(max, numberOfColumns(element));
             }
         }
         return max;
+    }
+
+    private int numberOfColumns(final Object element) {
+        if (element instanceof RobotKeywordDefinition) {
+            final RobotDefinitionSetting argumentsSetting = ((RobotKeywordDefinition) element).getArgumentsSetting();
+            if (argumentsSetting != null) {
+                final KeywordArguments arguments = (KeywordArguments) argumentsSetting.getLinkedElement();
+                // add 2 for keyword definition and empty cell
+                return arguments.getArguments().size() + 2;
+            }
+
+        } else if (element instanceof RobotKeywordCall && !(element instanceof RobotDefinitionSetting
+                && ((RobotDefinitionSetting) element).isDocumentation())) {
+            // add 1 for empty cell
+            return ExecutablesRowHolderCommentService.execRowView((RobotKeywordCall) element).size() + 1;
+        }
+        return 0;
     }
 
     SortedList<Object> getSortedList() {
