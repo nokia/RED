@@ -814,6 +814,22 @@ public class ExternalLibrariesImportCollectorTest {
     }
 
     @Test
+    public void remoteLibraryImportIsCollected_whenLibraryImportHasUnknownArguments() throws Exception {
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  Remote  http://127.0.0.1:10000/  http://127.0.0.1:10001/  http://127.0.0.1:10002/",
+                "*** Test Cases ***"));
+        final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
+        collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
+
+        final RobotDryRunLibraryImport libImport = createImport(NOT_ADDED, "Remote");
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
+        assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite));
+        assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
+    }
+
+    @Test
     public void remoteLibraryImportIsCollectedOnce_forSeveralImports() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
                 "*** Settings ***",

@@ -175,7 +175,8 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         @Override
         public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
                 final Map<String, Object> additionalAttributes) {
-            if (problem.getCause() == GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT) {
+            if (problem.getCause() == GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT
+                    || problem.getCause() == GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT) {
                 this.detectedLibraryProblem = true;
             }
         }

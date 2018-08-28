@@ -184,12 +184,12 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
 
         if (isInRemoteLocations(address)) {
             final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
+                    .causedBy(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT)
                     .formatMessageWith(address);
             reporter.handleProblem(problem, validationContext.getFile(), markerToken);
         } else {
             final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.REMOTE_LIBRARY_NOT_ADDED_TO_RED_XML)
+                    .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
                     .formatMessageWith(address);
             final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
             reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
