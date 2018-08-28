@@ -13,12 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,8 +35,6 @@ import com.google.common.base.Charsets;
 
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotRuntimeEnvironment {
-
-    private static Path temporaryDirectory = null;
 
     private final RobotCommandsExecutors executors;
 
@@ -183,86 +175,14 @@ public class RobotRuntimeEnvironment {
         return exactVersion(pythonLocation.getInterpreter(), executor.getRobotVersion());
     }
 
-    public String getPythonExecutablePath() {
-        final PythonInstallationDirectory pyLocation = (PythonInstallationDirectory) location;
-        final String pythonExec = pyLocation.interpreter.executableName();
-        return findFile(pyLocation, pythonExec).getAbsolutePath();
-    }
-
-    private static File findFile(final PythonInstallationDirectory pythonLocation, final String name) {
-        for (final File file : pythonLocation.listFiles()) {
-            if (name.equals(file.getName())) {
-                return file;
-            }
-        }
-        return null;
-    }
-
-    public static File createTemporaryFile() throws IOException {
-        final Path tempDir = createTemporaryDirectory();
-        return File.createTempFile("red_", null, tempDir.toFile());
-    }
-
-    public static File createTemporaryFile(final String filename) throws IOException {
-        final Path tempDir = createTemporaryDirectory();
-        final File tempFile = new File(tempDir.toString() + File.separator + filename);
-        tempFile.delete();
-        tempFile.createNewFile();
-        return tempFile;
-    }
-
     public static File copyScriptFile(final String filename) throws IOException {
-        final Path tempDir = createTemporaryDirectory();
-        final File scriptFile = new File(tempDir.toString() + File.separator + filename);
-        if (!scriptFile.exists()) {
-            Files.copy(getScriptFileAsStream(filename), scriptFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        try (InputStream source = getScriptFileAsStream(filename)) {
+            return RobotTemporaryDirectory.replaceTemporaryFile(filename, source);
         }
-        return scriptFile;
     }
 
     public static InputStream getScriptFileAsStream(final String filename) throws IOException {
         return RobotRuntimeEnvironment.class.getResourceAsStream("/scripts/" + filename);
-    }
-
-    static synchronized Path createTemporaryDirectory() throws IOException {
-        if (temporaryDirectory != null) {
-            return temporaryDirectory;
-        }
-        temporaryDirectory = Files.createTempDirectory("RobotTempDir");
-        addRemoveTemporaryDirectoryHook();
-        return temporaryDirectory;
-    }
-
-    private static void addRemoveTemporaryDirectoryHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                if (temporaryDirectory == null) {
-                    return;
-                }
-                try {
-                    Files.walkFileTree(temporaryDirectory, new SimpleFileVisitor<Path>() {
-
-                        @Override
-                        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
-                                throws IOException {
-                            Files.delete(file);
-                            return FileVisitResult.CONTINUE;
-                        }
-
-                        @Override
-                        public FileVisitResult postVisitDirectory(final Path dir, final IOException exc)
-                                throws IOException {
-                            Files.delete(dir);
-                            return FileVisitResult.CONTINUE;
-                        }
-                    });
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     private RobotRuntimeEnvironment(final File location, final String version) {
@@ -328,6 +248,16 @@ public class RobotRuntimeEnvironment {
 
     public File getFile() {
         return location;
+    }
+
+    public String getPythonExecutablePath() {
+        final PythonInstallationDirectory pyLocation = (PythonInstallationDirectory) location;
+        final String pythonExec = pyLocation.interpreter.executableName();
+        return Stream.of(pyLocation.listFiles())
+                .filter(file -> pythonExec.equals(file.getName()))
+                .findFirst()
+                .map(File::getAbsolutePath)
+                .orElse(pythonExec);
     }
 
     public void resetCommandExecutors() {

@@ -60,7 +60,7 @@ public class ArgumentsFile {
         final Optional<String> longestArg = argNames.stream()
                 .filter(line -> !line.startsWith("#"))
                 .max(Comparator.comparingInt(String::length));
-        
+
         final BiFunction<String, String, String> joiningFunction =
                 (arg, val) -> arg.startsWith("#") ? arg
                         : (Strings.padEnd(arg, longestArg.get().length() + 1, ' ') + val);
@@ -77,7 +77,7 @@ public class ArgumentsFile {
         final HashCode hash = md5Hasher.hashString(content, Charsets.UTF_8);
 
         final String fileName = "args_" + Strings.padStart(Integer.toHexString(hash.asInt()), 8, '0') + ".arg";
-        final Path dir = RobotRuntimeEnvironment.createTemporaryDirectory();
+        final Path dir = RobotTemporaryDirectory.createTemporaryDirectory();
 
         for (final File existingArgFile : dir.toFile().listFiles((d, name) -> name.equals(fileName))) {
             final HashCode candidateHash = md5Hasher
@@ -88,14 +88,14 @@ public class ArgumentsFile {
         }
 
         final File filePath = dir.resolve(fileName).toFile();
-        writeTo(filePath);
+        writeTo(filePath, content);
         return filePath;
     }
 
-    private void writeTo(final File file) throws IOException {
+    private void writeTo(final File file, final String content) throws IOException {
         if (!file.exists()) {
             file.createNewFile();
         }
-        Files.asCharSink(file, Charsets.UTF_8).write(generateContent());
+        Files.asCharSink(file, Charsets.UTF_8).write(content);
     }
 }
