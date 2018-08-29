@@ -79,13 +79,13 @@ class InterpretersComposite extends Composite {
                 checkEnvironmentBtn.setEnabled(true);
                 comboExecutorName.setEnabled(true);
                 listener.interpreterChanged(Optional
-                        .of(SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex()))));
+                        .of(SuiteExecutor.valueOf(comboExecutorName.getItem(comboExecutorName.getSelectionIndex()))));
             }
         });
         comboExecutorName = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
         comboExecutorName.setItems(SuiteExecutor.allExecutorNames().toArray(new String[0]));
         comboExecutorName.addModifyListener(e -> listener.interpreterChanged(
-                Optional.of(SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex())))));
+                Optional.of(SuiteExecutor.valueOf(comboExecutorName.getItem(comboExecutorName.getSelectionIndex())))));
         GridDataFactory.fillDefaults().applyTo(comboExecutorName);
         final Label systemExecutorLbl = new Label(this, SWT.NONE);
         systemExecutorLbl.setText("interpreter taken from sytem PATH environment variable");
@@ -102,7 +102,7 @@ class InterpretersComposite extends Composite {
                 final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
                 try {
                     new ProgressMonitorDialog(getShell()).run(false, false, monitor -> {
-                        final SuiteExecutor executor = SuiteExecutor.fromName(chosenExecutorName);
+                        final SuiteExecutor executor = SuiteExecutor.valueOf(chosenExecutorName);
                         final String version = RobotRuntimeEnvironment.getVersion(executor);
                         if (version == null) {
                             MessageDialog.openError(null, "Interpreter checked",
@@ -118,7 +118,8 @@ class InterpretersComposite extends Composite {
                 } catch (final InvocationTargetException e) {
                     StatusManager.getManager().handle(
                             new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                                    "Unable to find " + SuiteExecutor.fromName(chosenExecutorName).executableName()
+                                            "Unable to find "
+                                                    + SuiteExecutor.valueOf(chosenExecutorName).executableName()
                                             + " executable in the system.",
                                     e.getTargetException()),
                             StatusManager.BLOCK);
@@ -142,7 +143,7 @@ class InterpretersComposite extends Composite {
     }
 
     SuiteExecutor getChosenSystemExecutor() {
-        return SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex()));
+        return SuiteExecutor.valueOf(comboExecutorName.getItem(comboExecutorName.getSelectionIndex()));
     }
 
     @FunctionalInterface

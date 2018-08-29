@@ -5,7 +5,7 @@
 */
 package org.rf.ide.core.executor;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 public interface RobotCommandsExecutors {
 

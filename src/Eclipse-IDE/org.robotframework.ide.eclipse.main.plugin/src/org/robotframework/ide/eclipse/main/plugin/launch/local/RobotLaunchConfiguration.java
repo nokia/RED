@@ -193,7 +193,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public SuiteExecutor getInterpreter() throws CoreException {
         try {
             return SuiteExecutor
-                    .fromName(configuration.getAttribute(INTERPRETER_NAME_ATTRIBUTE, SuiteExecutor.Python.name()));
+                    .valueOf(configuration.getAttribute(INTERPRETER_NAME_ATTRIBUTE, SuiteExecutor.Python.name()));
         } catch (final IllegalArgumentException e) {
             return null;
         }

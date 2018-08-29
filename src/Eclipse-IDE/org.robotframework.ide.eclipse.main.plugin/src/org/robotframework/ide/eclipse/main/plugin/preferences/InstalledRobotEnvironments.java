@@ -19,8 +19,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -92,7 +93,7 @@ public class InstalledRobotEnvironments {
         } else if (exec.isEmpty()) {
             return RobotRuntimeEnvironment.create(path);
         } else {
-            return RobotRuntimeEnvironment.create(path, SuiteExecutor.fromName(exec));
+            return RobotRuntimeEnvironment.create(path, SuiteExecutor.valueOf(exec));
         }
     }
 
@@ -112,7 +113,7 @@ public class InstalledRobotEnvironments {
             final File location = new File(path);
 
             final String exec = execs.size() == 0 ? "" : execs.get(i);
-            final SuiteExecutor executor = exec.isEmpty() ? null : SuiteExecutor.fromName(exec);
+            final SuiteExecutor executor = exec.isEmpty() ? null : SuiteExecutor.valueOf(exec);
 
             final InterpreterWithLocation key = InterpreterWithLocation.create(location, executor);
             final Supplier<RobotRuntimeEnvironment> envSupplier = environmentSupplier(path,
@@ -150,8 +151,8 @@ public class InstalledRobotEnvironments {
 
         static InterpreterWithLocation create(final File file, final SuiteExecutor executor) {
             if (executor == null) {
-                final List<PythonInstallationDirectory> installations = RobotRuntimeEnvironment
-                        .possibleInstallationsFor(file);
+                final List<PythonInstallationDirectory> installations = PythonInstallationDirectoryFinder
+                        .findPossibleInstallationsFor(file);
                 if (installations.isEmpty()) {
                     return new InterpreterWithLocation(file, null);
                 } else {
