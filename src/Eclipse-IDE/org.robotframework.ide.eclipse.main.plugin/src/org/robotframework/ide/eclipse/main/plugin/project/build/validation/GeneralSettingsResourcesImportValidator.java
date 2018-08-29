@@ -9,6 +9,7 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -17,10 +18,14 @@ import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 
 class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsValidator {
 
@@ -66,6 +71,7 @@ class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsVali
     }
 
     @Override
+    @VisibleForTesting
     protected void validateFile(final File file, final String path, final RobotToken pathToken,
             final List<RobotToken> arguments) {
 
@@ -84,8 +90,22 @@ class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsVali
                         .formatMessageWith(path, ": given file is not a Resource file"), validationContext.getFile(),
                         pathToken);
             } else {
-                reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.NON_WORKSPACE_RESOURCE_IMPORT),
-                        validationContext.getFile(), pathToken);
+                final String parentContainerName = new File(file.getParent()).getName();
+                // When a relative path is too long to be properly resolved we get an absolute
+                // path with '..' (e.g. 'D:/../res.robot'). If such file exists the second
+                // condition avoids the problems caused by incorrect relative constructions.
+                if (parentContainerName.isEmpty() || parentContainerName.equals("..")) {
+                    reporter.handleProblem(
+                            RobotProblem.causedBy(
+                                    GeneralSettingsProblem.NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT),
+                            validationContext.getFile(), pathToken);
+                } else {
+                    final Map<String, Object> additionalAttributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
+                            pathToken.getText());
+                    reporter.handleProblem(
+                            RobotProblem.causedBy(GeneralSettingsProblem.NON_WORKSPACE_LINKABLE_RESOURCE_IMPORT),
+                            validationContext.getFile(), pathToken, additionalAttributes);
+                }
             }
         }
     }
