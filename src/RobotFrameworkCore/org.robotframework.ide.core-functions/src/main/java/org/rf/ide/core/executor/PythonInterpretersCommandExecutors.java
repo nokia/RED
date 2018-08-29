@@ -12,8 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.rf.ide.core.RedTemporaryDirectory;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.executor.RobotCommandRpcExecutor.RobotCommandExecutorException;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 
 /**
  * @author Michal Anglart
@@ -37,17 +38,17 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
     private PythonInterpretersCommandExecutors() {
         try {
-            xmlRpcServerScriptFile = RobotRuntimeEnvironment.copyScriptFile("robot_session_server.py");
-            RobotRuntimeEnvironment.copyScriptFile("classpath_updater.py");
-            RobotRuntimeEnvironment.copyScriptFile("red_keyword_autodiscover.py");
-            RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
-            RobotRuntimeEnvironment.copyScriptFile("red_library_autodiscover.py");
-            RobotRuntimeEnvironment.copyScriptFile("red_module_classes.py");
-            RobotRuntimeEnvironment.copyScriptFile("red_modules.py");
-            RobotRuntimeEnvironment.copyScriptFile("red_variables.py");
-            RobotRuntimeEnvironment.copyScriptFile("rflint_integration.py");
-            RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
-            RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py");
+            xmlRpcServerScriptFile = RedTemporaryDirectory.copyScriptFile("robot_session_server.py");
+            RedTemporaryDirectory.copyScriptFile("classpath_updater.py");
+            RedTemporaryDirectory.copyScriptFile("red_keyword_autodiscover.py");
+            RedTemporaryDirectory.copyScriptFile("red_libraries.py");
+            RedTemporaryDirectory.copyScriptFile("red_library_autodiscover.py");
+            RedTemporaryDirectory.copyScriptFile("red_module_classes.py");
+            RedTemporaryDirectory.copyScriptFile("red_modules.py");
+            RedTemporaryDirectory.copyScriptFile("red_variables.py");
+            RedTemporaryDirectory.copyScriptFile("rflint_integration.py");
+            RedTemporaryDirectory.copyScriptFile("SuiteVisitorImportProxy.py");
+            RedTemporaryDirectory.copyScriptFile("TestRunnerAgent.py");
         } catch (final IOException e) {
             xmlRpcServerScriptFile = null;
         }

@@ -51,8 +51,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -124,7 +125,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
                 @Override
                 protected IStatus run(final IProgressMonitor monitor) {
-                    addOnlyNonExisting(RobotRuntimeEnvironment.whereArePythonInterpreters());
+                    addOnlyNonExisting(PythonInstallationDirectoryFinder.whereArePythonInterpreters());
 
                     setProperty(key, null);
                     return Status.OK_STATUS;
@@ -273,8 +274,8 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
                 dirDialog.setMessage("Select location of python with robot framework installed");
                 final String path = dirDialog.open();
                 if (path != null) {
-                    final List<PythonInstallationDirectory> possibleExecutors = RobotRuntimeEnvironment
-                            .possibleInstallationsFor(new File(path));
+                    final List<PythonInstallationDirectory> possibleExecutors = PythonInstallationDirectoryFinder
+                            .findPossibleInstallationsFor(new File(path));
 
                     boolean changed = false;
                     if (possibleExecutors.size() > 1) {

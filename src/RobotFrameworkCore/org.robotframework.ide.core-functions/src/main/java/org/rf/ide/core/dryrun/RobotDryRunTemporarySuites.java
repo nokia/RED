@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.rf.ide.core.executor.RobotTemporaryDirectory;
+import org.rf.ide.core.RedTemporaryDirectory;
 
 /**
  * @author mmarzec
@@ -24,7 +24,7 @@ public class RobotDryRunTemporarySuites {
         }
 
         try {
-            final File file = RobotTemporaryDirectory.createTemporaryFile("DryRunTempSuite.robot");
+            final File file = RedTemporaryDirectory.createTemporaryFile("DryRunTempSuite.robot");
             try (PrintWriter printWriter = new PrintWriter(file, "UTF-8")) {
                 printWriter.println("*** Test Cases ***");
                 printWriter.println("T1");

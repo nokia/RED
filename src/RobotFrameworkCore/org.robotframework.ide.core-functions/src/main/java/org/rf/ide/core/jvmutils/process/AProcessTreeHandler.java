@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.RedSystemHelper;
 
 public abstract class AProcessTreeHandler implements IProcessTreeHandler {
 
@@ -20,7 +20,7 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
 
         try {
             final Queue<String> collectedOutput = new ConcurrentLinkedQueue<>();
-            final int returnCode = RobotRuntimeEnvironment.runExternalProcess(getChildPidsCommand(processPid),
+            final int returnCode = RedSystemHelper.runExternalProcess(getChildPidsCommand(processPid),
                     collectedOutput::add);
 
             if (returnCode == OSProcessHelper.SUCCESS) {
@@ -59,7 +59,7 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
         final List<String> output = new ArrayList<>();
 
         try {
-            returnCode = RobotRuntimeEnvironment.runExternalProcess(command, output::add);
+            returnCode = RedSystemHelper.runExternalProcess(command, output::add);
         } catch (final Exception e) {
             throw new ProcessInterruptException("Couldn't interrupt process", e);
         }
@@ -78,7 +78,7 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
     public void killProcess(final ProcessInformation procInformation) throws ProcessKillException {
         try {
             final Queue<String> collectedOutput = new ConcurrentLinkedQueue<>();
-            final int returnCode = RobotRuntimeEnvironment.runExternalProcess(getKillProcessCommand(procInformation),
+            final int returnCode = RedSystemHelper.runExternalProcess(getKillProcessCommand(procInformation),
                     collectedOutput::add);
 
             if (returnCode != OSProcessHelper.SUCCESS) {
@@ -97,8 +97,8 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
     public void killProcessTree(final ProcessInformation procInformation) throws ProcessKillException {
         try {
             final Queue<String> collectedOutput = new ConcurrentLinkedQueue<>();
-            final int returnCode = RobotRuntimeEnvironment
-                    .runExternalProcess(getKillProcessTreeCommand(procInformation), collectedOutput::add);
+            final int returnCode = RedSystemHelper.runExternalProcess(getKillProcessTreeCommand(procInformation),
+                    collectedOutput::add);
 
             if (returnCode == OSProcessHelper.SUCCESS) {
                 final List<ProcessInformation> children = procInformation.getChildren();

@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import org.rf.ide.core.RedTemporaryDirectory;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.hash.HashCode;
@@ -77,7 +79,7 @@ public class ArgumentsFile {
         final HashCode hash = md5Hasher.hashString(content, Charsets.UTF_8);
 
         final String fileName = "args_" + Strings.padStart(Integer.toHexString(hash.asInt()), 8, '0') + ".arg";
-        final Path dir = RobotTemporaryDirectory.createTemporaryDirectory();
+        final Path dir = RedTemporaryDirectory.createTemporaryDirectory();
 
         for (final File existingArgFile : dir.toFile().listFiles((d, name) -> name.equals(fileName))) {
             final HashCode candidateHash = md5Hasher
