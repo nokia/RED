@@ -459,7 +459,7 @@ public class RobotProjectConfig {
         }
 
         public SuiteExecutor getInterpreter() {
-            return interpreter == null ? null : SuiteExecutor.fromName(interpreter);
+            return interpreter == null ? null : SuiteExecutor.valueOf(interpreter);
         }
     }
 

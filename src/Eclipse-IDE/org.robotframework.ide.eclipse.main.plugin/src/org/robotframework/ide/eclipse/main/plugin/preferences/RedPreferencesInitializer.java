@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static com.google.common.collect.Iterables.transform;
+import static java.util.stream.Collectors.joining;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -14,8 +14,8 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
@@ -27,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priori
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 
 public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
 
@@ -52,15 +51,18 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
-        final List<PythonInstallationDirectory> interpreterPaths = RobotRuntimeEnvironment.whereArePythonInterpreters();
+        final List<PythonInstallationDirectory> interpreterPaths = PythonInstallationDirectoryFinder
+                .whereArePythonInterpreters();
         if (!interpreterPaths.isEmpty()) {
             final String activePath = interpreterPaths.get(0).getAbsolutePath();
             final String activeExec = interpreterPaths.get(0).getInterpreter().name();
 
-            final String allPaths = Joiner.on(';')
-                    .join(transform(interpreterPaths, PythonInstallationDirectory::getAbsolutePath));
-            final String allExecs = Joiner.on(';')
-                    .join(transform(interpreterPaths, dir -> dir.getInterpreter().name()));
+            final String allPaths = interpreterPaths.stream()
+                    .map(PythonInstallationDirectory::getAbsolutePath)
+                    .collect(joining(";"));
+            final String allExecs = interpreterPaths.stream()
+                    .map(dir -> dir.getInterpreter().name())
+                    .collect(joining(";"));
 
             preferences.put(RedPreferences.ACTIVE_RUNTIME, activePath);
             preferences.put(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);

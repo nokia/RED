@@ -18,8 +18,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.SystemVariableAccessor;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Streams;
@@ -243,7 +244,7 @@ public class RunCommandLineCallBuilder {
             cmdLine.add("robot.run");
 
             cmdLine.add("--listener");
-            cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py").toPath() + ":" + listenerPort);
+            cmdLine.add(RedTemporaryDirectory.copyScriptFile("TestRunnerAgent.py").toPath() + ":" + listenerPort);
 
             ArgumentsFile argumentsFile = null;
             if (useArgumentFile) {
@@ -351,7 +352,7 @@ public class RunCommandLineCallBuilder {
             final Path jythonPath = Paths.get(executorPath);
             Path jythonParentPath = jythonPath.getParent();
             if (jythonParentPath == null) {
-                final List<PythonInstallationDirectory> pythonInterpreters = RobotRuntimeEnvironment
+                final List<PythonInstallationDirectory> pythonInterpreters = PythonInstallationDirectoryFinder
                         .whereArePythonInterpreters();
                 for (final PythonInstallationDirectory pythonInstallationDirectory : pythonInterpreters) {
                     if (pythonInstallationDirectory.getInterpreter() == SuiteExecutor.Jython) {

@@ -7,31 +7,22 @@ package org.rf.ide.core.executor;
 
 import static java.util.stream.Collectors.toList;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import org.rf.ide.core.RedSystemProperties;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.rf.ide.core.rflint.RfLintRule;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
 
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotRuntimeEnvironment {
@@ -50,151 +41,20 @@ public class RobotRuntimeEnvironment {
         PythonInterpretersCommandExecutors.getInstance().removeProcessListener(listener);
     }
 
-    public static int runExternalProcess(final List<String> command, final Consumer<String> lineHandler)
-            throws IOException {
-        try {
-            final Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
-
-            final InputStream inputStream = process.getInputStream();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lineHandler.accept(line);
-            }
-            return process.waitFor();
-        } catch (final InterruptedException e) {
-            throw new IOException(e);
-        }
-    }
-
-    /**
-     * Locates directories in which python interpreters pointed in environment
-     * path are located. Uses where command in Windows and which command under
-     * Unix.
-     *
-     * @return Directories where python interpreters are installed or empty list
-     *         if there is no python at all.
-     */
-    public static List<PythonInstallationDirectory> whereArePythonInterpreters() {
-        final List<PythonInstallationDirectory> paths = new ArrayList<>();
-
-        for (final SuiteExecutor interpreter : EnumSet.allOf(SuiteExecutor.class)) {
-            paths.addAll(whereIsPythonInterpreter(interpreter));
-        }
-        return paths;
-    }
-
     public static String getVersion(final SuiteExecutor interpreter) throws RobotEnvironmentException {
-        final Collection<PythonInstallationDirectory> interpreterLocations = whereIsPythonInterpreter(interpreter);
-        final Optional<PythonInstallationDirectory> installationDirectory = interpreterLocations.stream().findFirst();
-        if (!installationDirectory.isPresent()) {
-            throw new RobotEnvironmentException(
-                    "There is no " + interpreter.name() + " interpreter in system PATH environment variable");
-        }
+        final Optional<PythonInstallationDirectory> installationDirectory = PythonInstallationDirectoryFinder
+                .whereIsPythonInterpreter(interpreter);
+        final PythonInstallationDirectory location = installationDirectory
+                .orElseThrow(() -> new RobotEnvironmentException(
+                        "There is no " + interpreter.name() + " interpreter in system PATH environment variable"));
+        return getExactVersion(location);
+    }
+
+    private static String getExactVersion(final PythonInstallationDirectory location) {
         final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                .getRobotCommandExecutor(installationDirectory.get());
-        return exactVersion(interpreter, executor.getRobotVersion());
-    }
-
-    private static String exactVersion(final SuiteExecutor interpreter, final String version) {
-        return version != null && interpreter == SuiteExecutor.IronPython64
-                ? version.replaceAll("IronPython", "IronPython x64")
-                : version;
-    }
-
-    public static Collection<PythonInstallationDirectory> whereIsPythonInterpreter(final SuiteExecutor interpreter) {
-        final List<String> paths = new ArrayList<>();
-        try {
-            final String cmd = RedSystemProperties.isWindowsPlatform() ? "where" : "which";
-            final int exitCode = runExternalProcess(Arrays.asList(cmd, interpreter.executableName()),
-                    line -> paths.add(line));
-            if (exitCode == 0) {
-                final List<PythonInstallationDirectory> installationDirectories = new ArrayList<>();
-
-                for (final String path : paths) {
-                    final URI dirUri = new File(path).getParentFile().toURI();
-                    installationDirectories.add(new PythonInstallationDirectory(dirUri, interpreter));
-                }
-                return installationDirectories;
-            } else {
-                return new ArrayList<>();
-            }
-        } catch (final IOException e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * Checks if given location is a directory which contains python
-     * interpreter. The {@link IllegalArgumentException} exception is thrown if
-     * given location does not contain python executable. Otherwise
-     * {@link PythonInstallationDirectory} instance (copy of location, but with
-     * other type) is returned.
-     *
-     * @param location
-     *            Location to check
-     * @return the same location given as {@link File} subtype
-     * @throws IllegalArgumentException
-     *             thrown when given location is not a directory or does not
-     *             contain python interpreter executables.
-     */
-    private static PythonInstallationDirectory checkPythonInstallationDir(final File location)
-            throws IllegalArgumentException {
-        if (!location.isDirectory()) {
-            throw new IllegalArgumentException("The location " + location.getAbsolutePath() + " is not a directory.");
-        }
-        final List<PythonInstallationDirectory> installations = possibleInstallationsFor(location);
-        if (installations.isEmpty()) {
-            throw new IllegalArgumentException("The location: " + location.getAbsolutePath()
-                    + " does not seem to be a valid python installation directory");
-        }
-        return installations.get(0);
-    }
-
-    public static List<PythonInstallationDirectory> possibleInstallationsFor(final File location) {
-        if (!location.exists()) {
-            return new ArrayList<>();
-        }
-        return Stream.of(location.listFiles())
-                .map(SuiteExecutor::fromLocation)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(interpreter -> new PythonInstallationDirectory(location.toURI(), interpreter))
-                .collect(toList());
-    }
-
-    /**
-     * Gets robot framework version.
-     *
-     * @param pythonLocation
-     * @return Robot version as returned by robot
-     */
-    private static String getRobotFrameworkVersion(final PythonInstallationDirectory pythonLocation) {
-        final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                .getRobotCommandExecutor(pythonLocation);
-        return exactVersion(pythonLocation.getInterpreter(), executor.getRobotVersion());
-    }
-
-    public static File copyScriptFile(final String filename) throws IOException {
-        try (InputStream source = getScriptFileAsStream(filename)) {
-            return RobotTemporaryDirectory.replaceTemporaryFile(filename, source);
-        }
-    }
-
-    public static InputStream getScriptFileAsStream(final String filename) throws IOException {
-        return RobotRuntimeEnvironment.class.getResourceAsStream("/scripts/" + filename);
-    }
-
-    private RobotRuntimeEnvironment(final File location, final String version) {
-        this(PythonInterpretersCommandExecutors.getInstance(), location, version);
-    }
-
-    @VisibleForTesting
-    public RobotRuntimeEnvironment(final RobotCommandsExecutors executors, final File location,
-            final String version) {
-        this.executors = executors;
-        this.location = location;
-        this.version = version;
+                .getRobotCommandExecutor(location);
+        final String version = executor.getRobotVersion();
+        return location.getInterpreter().exactVersion(version);
     }
 
     public static RobotRuntimeEnvironment create(final String pathToPython) {
@@ -203,8 +63,9 @@ public class RobotRuntimeEnvironment {
 
     public static RobotRuntimeEnvironment create(final File pathToPython) {
         try {
-            final PythonInstallationDirectory location = checkPythonInstallationDir(pathToPython);
-            return new RobotRuntimeEnvironment(location, getRobotFrameworkVersion(location));
+            final PythonInstallationDirectory location = PythonInstallationDirectoryFinder
+                    .checkPythonInstallationDir(pathToPython);
+            return new RobotRuntimeEnvironment(location, getExactVersion(location));
         } catch (final IllegalArgumentException e) {
             return new RobotRuntimeEnvironment(pathToPython, null);
         }
@@ -216,13 +77,25 @@ public class RobotRuntimeEnvironment {
 
     public static RobotRuntimeEnvironment create(final File pathToPython, final SuiteExecutor interpreter) {
         try {
-            final PythonInstallationDirectory location = checkPythonInstallationDir(pathToPython);
+            final PythonInstallationDirectory location = PythonInstallationDirectoryFinder
+                    .checkPythonInstallationDir(pathToPython);
             final PythonInstallationDirectory correctedLocation = new PythonInstallationDirectory(location.toURI(),
                     interpreter);
-            return new RobotRuntimeEnvironment(correctedLocation, getRobotFrameworkVersion(correctedLocation));
+            return new RobotRuntimeEnvironment(correctedLocation, getExactVersion(correctedLocation));
         } catch (final IllegalArgumentException e) {
             return new RobotRuntimeEnvironment(pathToPython, null);
         }
+    }
+
+    private RobotRuntimeEnvironment(final File location, final String version) {
+        this(PythonInterpretersCommandExecutors.getInstance(), location, version);
+    }
+
+    @VisibleForTesting
+    public RobotRuntimeEnvironment(final RobotCommandsExecutors executors, final File location, final String version) {
+        this.executors = executors;
+        this.location = location;
+        this.version = version;
     }
 
     public boolean isValidPythonInstallation() {
@@ -242,7 +115,8 @@ public class RobotRuntimeEnvironment {
     }
 
     public SuiteExecutor getInterpreter() {
-        return location instanceof PythonInstallationDirectory ? ((PythonInstallationDirectory) location).interpreter
+        return location instanceof PythonInstallationDirectory
+                ? ((PythonInstallationDirectory) location).getInterpreter()
                 : null;
     }
 
@@ -252,7 +126,7 @@ public class RobotRuntimeEnvironment {
 
     public String getPythonExecutablePath() {
         final PythonInstallationDirectory pyLocation = (PythonInstallationDirectory) location;
-        final String pythonExec = pyLocation.interpreter.executableName();
+        final String pythonExec = pyLocation.getInterpreter().executableName();
         return Stream.of(pyLocation.listFiles())
                 .filter(file -> pythonExec.equals(file.getName()))
                 .findFirst()
@@ -483,41 +357,6 @@ public class RobotRuntimeEnvironment {
 
         public RobotEnvironmentException(final String message, final Throwable cause) {
             super(message, cause);
-        }
-    }
-
-    @SuppressWarnings("serial")
-    public static class PythonInstallationDirectory extends File {
-
-        private final SuiteExecutor interpreter;
-
-        // we don't want anyone to create those objects; they should only be created when given uri
-        // is valid python location
-        PythonInstallationDirectory(final URI uri, final SuiteExecutor interpreter) {
-            super(uri);
-            this.interpreter = interpreter;
-        }
-
-        public SuiteExecutor getInterpreter() {
-            return interpreter;
-        }
-
-        public String getInterpreterPath() {
-            return toPath().resolve(interpreter.executableName()).toAbsolutePath().toString();
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj instanceof PythonInstallationDirectory) {
-                final PythonInstallationDirectory that = (PythonInstallationDirectory) obj;
-                return super.equals(obj) && this.interpreter == that.interpreter;
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return 31 * super.hashCode() + ((interpreter == null) ? 0 : interpreter.hashCode());
         }
     }
 

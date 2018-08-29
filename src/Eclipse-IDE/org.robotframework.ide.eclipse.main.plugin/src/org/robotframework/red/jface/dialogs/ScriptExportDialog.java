@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.RedTemporaryDirectory;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class ScriptExportDialog {
@@ -42,7 +42,7 @@ public class ScriptExportDialog {
     private void exportScriptFile(final String dir) {
         final File scriptFile = new File(dir + File.separator + scriptName);
         try {
-            try (InputStream source = RobotRuntimeEnvironment.getScriptFileAsStream(scriptName)) {
+            try (InputStream source = RedTemporaryDirectory.getScriptFileAsStream(scriptName)) {
                 Files.copy(source, scriptFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (final IOException e) {

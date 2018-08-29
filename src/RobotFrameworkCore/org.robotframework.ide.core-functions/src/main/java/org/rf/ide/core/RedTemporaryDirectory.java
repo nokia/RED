@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +15,21 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
-public class RobotTemporaryDirectory {
+public final class RedTemporaryDirectory {
 
     private static final String DIR_NAME_PREFIX = "RobotTempDir";
 
     private static Path temporaryDirectory;
+
+    public static File copyScriptFile(final String filename) throws IOException {
+        try (InputStream source = getScriptFileAsStream(filename)) {
+            return replaceTemporaryFile(filename, source);
+        }
+    }
+
+    public static InputStream getScriptFileAsStream(final String filename) throws IOException {
+        return RedTemporaryDirectory.class.getResourceAsStream("/scripts/" + filename);
+    }
 
     public static File createTemporaryFile(final String filename) throws IOException {
         final Path tempDir = createTemporaryDirectory();
@@ -36,7 +46,7 @@ public class RobotTemporaryDirectory {
         return tempFile;
     }
 
-    static synchronized Path createTemporaryDirectory() throws IOException {
+    public static synchronized Path createTemporaryDirectory() throws IOException {
         if (temporaryDirectory != null) {
             return temporaryDirectory;
         }

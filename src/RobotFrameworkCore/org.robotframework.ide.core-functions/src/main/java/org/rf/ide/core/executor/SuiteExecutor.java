@@ -7,10 +7,8 @@ package org.rf.ide.core.executor;
 
 import static java.util.stream.Collectors.toList;
 
-import java.io.File;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 
 import org.rf.ide.core.RedSystemProperties;
 
@@ -21,7 +19,13 @@ public enum SuiteExecutor {
     Python3("python3"),
     Jython("jython"),
     IronPython("ipy"),
-    IronPython64("ipy64"),
+    IronPython64("ipy64") {
+
+        @Override
+        public String exactVersion(final String version) {
+            return version != null ? version.replaceAll("IronPython", "IronPython x64") : version;
+        }
+    },
     PyPy("pypy");
 
     private String fileName;
@@ -30,25 +34,15 @@ public enum SuiteExecutor {
         this.fileName = fileName;
     }
 
-    public static SuiteExecutor fromName(final String name) {
-        return SuiteExecutor.valueOf(name);
-    }
-
-    public static Optional<SuiteExecutor> fromLocation(final File location) {
-        if (!location.isFile()) {
-            return Optional.empty();
-        }
-        return EnumSet.allOf(SuiteExecutor.class)
-                .stream()
-                .filter(executor -> location.getName().equals(executor.executableName()))
-                .findFirst();
-    }
-
     public static List<String> allExecutorNames() {
         return EnumSet.allOf(SuiteExecutor.class).stream().map(SuiteExecutor::name).collect(toList());
     }
 
     public String executableName() {
         return RedSystemProperties.isWindowsPlatform() ? fileName + ".exe" : fileName;
+    }
+
+    public String exactVersion(final String version) {
+        return version;
     }
 }

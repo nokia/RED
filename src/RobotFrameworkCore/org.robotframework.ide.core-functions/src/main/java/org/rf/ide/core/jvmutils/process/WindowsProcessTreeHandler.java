@@ -9,13 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.RedSystemProperties;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
+import org.rf.ide.core.RedTemporaryDirectory;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.executor.SuiteExecutor;
 
 import com.sun.jna.Pointer;
@@ -41,14 +42,16 @@ public class WindowsProcessTreeHandler extends AProcessTreeHandler {
             final EnumSet<SuiteExecutor> cPythons = EnumSet.of(SuiteExecutor.Python, SuiteExecutor.Python2,
                     SuiteExecutor.Python3);
             for (final SuiteExecutor interpreter : cPythons) {
-                final Collection<PythonInstallationDirectory> paths = RobotRuntimeEnvironment
+                final Optional<PythonInstallationDirectory> installationDirectory = PythonInstallationDirectoryFinder
                         .whereIsPythonInterpreter(interpreter);
-                for (final PythonInstallationDirectory pythonDir : paths) {
-                    cPythonInterpreterPath = pythonDir.toPath()
+                if (installationDirectory.isPresent()) {
+                    cPythonInterpreterPath = installationDirectory.get()
+                            .toPath()
                             .resolve(interpreter.executableName())
                             .toAbsolutePath()
                             .toString();
                     return;
+
                 }
             }
         }
@@ -115,7 +118,7 @@ public class WindowsProcessTreeHandler extends AProcessTreeHandler {
                     "Unable to generate interruption signal. Missing python executable path");
         }
         try {
-            final File script = RobotRuntimeEnvironment.copyScriptFile("interruptor.py");
+            final File script = RedTemporaryDirectory.copyScriptFile("interruptor.py");
             return Arrays.asList(execToUse, script.getAbsolutePath(), Long.toString(procInformation.pid()));
         } catch (final IOException e) {
             throw new ProcessInterruptException("Unable to generate interruption signal", e);
