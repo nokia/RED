@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +35,7 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -112,27 +115,27 @@ public class GeneralSettingsResourcesImportValidatorTest {
     public void markerIsReported_whenUsingUnescapedWindowsPaths_1() {
         validateResourceImport("d:\\folder\\res.robot");
 
-        assertThat(reporter.getReportedProblems()).containsOnly(new Problem(
-                GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS,
-                new ProblemPosition(2, Range.closed(27, 46))));
+        assertThat(reporter.getReportedProblems())
+                .containsOnly(new Problem(GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS,
+                        new ProblemPosition(2, Range.closed(27, 46))));
     }
 
     @Test
     public void markerIsReported_whenUsingUnescapedWindowsPaths_2() {
         validateResourceImport("..\\..\\res.robot");
 
-        assertThat(reporter.getReportedProblems()).containsOnly(new Problem(
-                GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS,
-                new ProblemPosition(2, Range.closed(27, 42))));
+        assertThat(reporter.getReportedProblems())
+                .containsOnly(new Problem(GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS,
+                        new ProblemPosition(2, Range.closed(27, 42))));
     }
 
     @Test
     public void markerIsReported_whenUsingUnescapedWindowsPaths_3() {
         validateResourceImport("..\\../res.robot");
 
-        assertThat(reporter.getReportedProblems()).containsOnly(new Problem(
-                GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS,
-                new ProblemPosition(2, Range.closed(27, 42))));
+        assertThat(reporter.getReportedProblems())
+                .containsOnly(new Problem(GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS,
+                        new ProblemPosition(2, Range.closed(27, 42))));
     }
 
     @Test
@@ -209,8 +212,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateResourceImport(absPath);
 
-        assertThat(reporter.getReportedProblems()).contains(
-                new Problem(GeneralSettingsProblem.NON_EXISTING_RESOURCE_IMPORT,
+        assertThat(reporter.getReportedProblems())
+                .contains(new Problem(GeneralSettingsProblem.NON_EXISTING_RESOURCE_IMPORT,
                         new ProblemPosition(2, Range.closed(27, 27 + absPath.length()))));
     }
 
@@ -229,9 +232,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateResourceImport(absPath);
 
-        assertThat(reporter.getReportedProblems())
-                .contains(new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
-                        new ProblemPosition(2, Range.closed(27, 27 + absPath.length()))));
+        assertThat(reporter.getReportedProblems()).contains(new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
+                new ProblemPosition(2, Range.closed(27, 27 + absPath.length()))));
     }
 
     @Test
@@ -239,8 +241,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final IFolder dir = projectProvider.createDir("directory");
 
         validateResourceImport("directory");
-        assertThat(reporter.getReportedProblems()).contains(new Problem(
-                GeneralSettingsProblem.INVALID_RESOURCE_IMPORT, new ProblemPosition(2, Range.closed(27, 36))));
+        assertThat(reporter.getReportedProblems()).contains(new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
+                new ProblemPosition(2, Range.closed(27, 36))));
 
         dir.delete(true, null);
     }
@@ -261,8 +263,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final IFile file = projectProvider.createFile("res.html");
 
         validateResourceImport("res.html");
-        assertThat(reporter.getReportedProblems()).contains(new Problem(GeneralSettingsProblem.HTML_RESOURCE_IMPORT,
-                new ProblemPosition(2, Range.closed(27, 35))));
+        assertThat(reporter.getReportedProblems()).contains(
+                new Problem(GeneralSettingsProblem.HTML_RESOURCE_IMPORT, new ProblemPosition(2, Range.closed(27, 35))));
 
         file.delete(true, null);
     }
@@ -285,9 +287,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final IFile file = projectProvider.createFile("res.robot", "*** Test Cases ***");
 
         validateResourceImport("res.robot");
-        assertThat(reporter.getReportedProblems()).contains(
-                new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
-                        new ProblemPosition(2, Range.closed(27, 36))));
+        assertThat(reporter.getReportedProblems()).contains(new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
+                new ProblemPosition(2, Range.closed(27, 36))));
 
         file.delete(true, null);
     }
@@ -374,7 +375,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
                         GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE,
-                        GeneralSettingsProblem.NON_WORKSPACE_RESOURCE_IMPORT));
+                        GeneralSettingsProblem.NON_WORKSPACE_LINKABLE_RESOURCE_IMPORT));
     }
 
     @Test
@@ -425,7 +426,19 @@ public class GeneralSettingsResourcesImportValidatorTest {
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
                         GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE,
-                        GeneralSettingsProblem.NON_WORKSPACE_RESOURCE_IMPORT));
+                        GeneralSettingsProblem.NON_WORKSPACE_LINKABLE_RESOURCE_IMPORT));
+    }
+
+    @Test
+    public void noMajorProblemsAreReported_whenResourceFileIsImportedFromExternalUnlinkableLocation() {
+        final File resource = mock(File.class);
+        when(resource.isFile()).thenReturn(true);
+        when(resource.getAbsolutePath()).thenReturn("absolute/path/to/resource.robot");
+        when(resource.getParent()).thenReturn("");
+
+        validateResourceFile(resource, "resource.robot");
+        assertThat(reporter.getReportedProblems())
+                .are(onlyCausedBy(GeneralSettingsProblem.NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT));
     }
 
     @Test
@@ -471,11 +484,23 @@ public class GeneralSettingsResourcesImportValidatorTest {
         }
     }
 
+    private void validateResourceFile(final File resource, final String toImport) {
+        final RobotSuiteFile suiteFile = createResourceImportingSuite(toImport);
+        final ResourceImport resImport = getImport(suiteFile);
+
+        final FileValidationContext context = prepareContext(suiteFile);
+
+        final GeneralSettingsResourcesImportValidator validator = new GeneralSettingsResourcesImportValidator(context,
+                suiteFile, newArrayList(resImport), reporter);
+
+        final RobotToken token = RobotToken.create(toImport);
+
+        validator.validateFile(resource, toImport, token, null);
+    }
+
     private RobotSuiteFile createResourceImportingSuite(final String toImport) {
         try {
-            final IFile file = projectProvider.createFile("suite.robot",
-                    "*** Settings ***",
-                    "Resource  " + toImport);
+            final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource  " + toImport);
             final RobotSuiteFile suite = model.createSuiteFile(file);
             suite.dispose();
             return suite;
@@ -491,10 +516,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
     }
 
     private ResourceImport getImport(final RobotSuiteFile suiteFile) {
-        return (ResourceImport) suiteFile.findSection(RobotSettingsSection.class)
-                .get()
-                .getChildren()
-                .get(0)
+        return (ResourceImport) suiteFile.findSection(RobotSettingsSection.class).get().getChildren().get(0)
                 .getLinkedElement();
     }
 
