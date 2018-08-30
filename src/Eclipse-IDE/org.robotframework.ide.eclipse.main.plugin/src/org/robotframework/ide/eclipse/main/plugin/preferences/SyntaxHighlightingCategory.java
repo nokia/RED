@@ -30,7 +30,7 @@ public enum SyntaxHighlightingCategory {
     private String id;
 
     private ColoringPreference defaultPref;
-    
+
     private ColoringPreference darkPref;
 
     private String desc;
@@ -78,7 +78,7 @@ public enum SyntaxHighlightingCategory {
     }
 
     public String getId() {
-        return this.id;
+        return id;
     }
 
     public String getPreferenceId() {
@@ -86,7 +86,7 @@ public enum SyntaxHighlightingCategory {
     }
 
     public String getShortDescription() {
-        return this.desc;
+        return desc;
     }
 
     public ColoringPreference getPreference() {
@@ -96,7 +96,7 @@ public enum SyntaxHighlightingCategory {
     public ColoringPreference getDefault() {
         return defaultPref;
     }
-    
+
     public ColoringPreference getDark() {
         return darkPref;
     }

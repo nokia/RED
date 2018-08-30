@@ -413,7 +413,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final IToken call = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL);
         final IToken setting = coloringTokens.get(SyntaxHighlightingCategory.SETTING);
         final IToken gherkin = coloringTokens.get(SyntaxHighlightingCategory.GHERKIN);
-        final IToken specialToken = coloringTokens.get(SyntaxHighlightingCategory.SPECIAL);
+        final IToken special = coloringTokens.get(SyntaxHighlightingCategory.SPECIAL);
         final IToken defaultSection = coloringTokens.get(SyntaxHighlightingCategory.DEFAULT_SECTION);
 
         final ISyntaxColouringRule[] defaultRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
@@ -427,9 +427,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 GherkinPrefixRule.forExecutableInTestCaseSetting(gherkin),
                 GherkinPrefixRule.forExecutableInTestCase(gherkin),
                 ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, variable),
-                ExecutableCallRule.forExecutableInTestCase(call, variable),
-                new NestedExecsSpecialTokensRule(specialToken), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new InTokenRule(specialToken) };
+                ExecutableCallRule.forExecutableInTestCase(call, variable), new NestedExecsSpecialTokensRule(special),
+                new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(special) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, store, testCasesRules);
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
@@ -437,17 +436,16 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 GherkinPrefixRule.forExecutableInKeywordSetting(gherkin),
                 GherkinPrefixRule.forExecutableInKeyword(gherkin),
                 ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, variable),
-                ExecutableCallRule.forExecutableInKeyword(call, variable),
-                new NestedExecsSpecialTokensRule(specialToken), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new InTokenRule(specialToken) };
+                ExecutableCallRule.forExecutableInKeyword(call, variable), new NestedExecsSpecialTokensRule(special),
+                new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(special) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, store, keywordsRules);
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsTemplateRule(call),
                 GherkinPrefixRule.forExecutableInSetting(gherkin),
                 ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, variable),
-                new NestedExecsSpecialTokensRule(specialToken), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new WithNameRule(specialToken) };
+                new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new WithNameRule(special) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, store, settingsRules);
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),

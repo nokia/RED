@@ -10,19 +10,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.ui.IWorkbench;
-import org.junit.Rule;
 import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
 
 import com.google.common.collect.Range;
 
 public class SyntaxHighlightingPreferencePageTest {
-
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
 
     @Test
     public void initDoesNothing() {
@@ -57,6 +53,22 @@ public class SyntaxHighlightingPreferencePageTest {
                     .as("Range %s has not empty intersection with range %s", r1, r2)
                     .isFalse();
         }
+    }
+
+    @Test
+    public void styleRangesAreEnclosedInSourceText() {
+        final SyntaxHighlightingPreferencePage page = new SyntaxHighlightingPreferencePage();
+
+        final Optional<Integer> minRangeStart = page.createStyleRanges()
+                .map(range -> range.start)
+                .min(Integer::compare);
+        final Optional<Integer> maxRangeEnd = page.createStyleRanges()
+                .map(range -> range.start + range.length)
+                .max(Integer::compare);
+
+        assertThat(minRangeStart).hasValueSatisfying(value -> assertThat(value).isNotNegative());
+        assertThat(maxRangeEnd).hasValueSatisfying(
+                value -> assertThat(value).isLessThanOrEqualTo(SyntaxHighlightingPreferencePageSource.source.length()));
     }
 
 }
