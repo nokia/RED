@@ -5,16 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -45,7 +45,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.collect.Iterables;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Streams;
 
 /**
  * @author Michal Anglart
@@ -84,7 +85,8 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
             if (isColoringPref) {
                 final SyntaxHighlightingCategory category = SyntaxHighlightingCategory
                         .fromPreferenceId(event.getProperty());
-                final ColoringPreference newPref = ColoringPreference.fromPreferenceString((String) event.getNewValue());
+                final ColoringPreference newPref = ColoringPreference
+                        .fromPreferenceString((String) event.getNewValue());
 
                 currentPreferences.put(category, newPref);
                 refreshPreview();
@@ -108,7 +110,7 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
         viewer.setContentProvider(new ListInputStructuredContentProvider());
         viewer.setLabelProvider(new SyntaxHighlightingCategoriesLabelProvider());
         viewer.addSelectionChangedListener(new SyntaxHighlightingCategoriesSelectionListener());
-        viewer.setInput(newArrayList(currentPreferences.keySet()));
+        viewer.setInput(new ArrayList<>(currentPreferences.keySet()));
 
         final Composite parentForSingleSettings = new Composite(parent, SWT.NONE);
         GridDataFactory.fillDefaults().grab(false, true).applyTo(parentForSingleSettings);
@@ -196,120 +198,53 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
     }
 
     private void refreshPreview() {
-        final List<StyleRange> ranges = newArrayList(Iterables.concat(getSectionHeaderRanges(), getCommentsRanges(),
-                getSettingRanges(), getDefinitionRanges(), getKeywordCallRanges(), getVariableRanges(),
-                getGherkinRanges(), getSpecialTokenRanges(), getTasksRanges()));
-        Collections.sort(ranges, (range1, range2) -> Integer.compare(range1.start, range2.start));
-        previewText.setStyleRanges(ranges.toArray(new StyleRange[0]));
+        final StyleRange[] sortedRanges = createStyleRanges()
+                .sorted((range1, range2) -> Integer.compare(range1.start, range2.start))
+                .toArray(StyleRange[]::new);
+        previewText.setStyleRanges(sortedRanges);
     }
 
-    private List<StyleRange> getCommentsRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.COMMENT);
-
-        return newArrayList(new StyleRange(689, 54, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(847, 2, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(853, 17, preference.getColor(), null, preference.getFontStyle()));
+    @VisibleForTesting
+    Stream<StyleRange> createStyleRanges() {
+        return Stream.of(
+                createStyleRanges(SyntaxHighlightingCategory.SECTION_HEADER,
+                        SyntaxHighlightingPreferencePageSource.sectionHeaderStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.sectionHeaderRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.SETTING,
+                        SyntaxHighlightingPreferencePageSource.settingStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.settingRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.DEFINITION,
+                        SyntaxHighlightingPreferencePageSource.definitionStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.definitionRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.VARIABLE,
+                        SyntaxHighlightingPreferencePageSource.variableStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.variableRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.KEYWORD_CALL,
+                        SyntaxHighlightingPreferencePageSource.keywordCallStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.keywordCallRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.COMMENT,
+                        SyntaxHighlightingPreferencePageSource.commentStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.commentRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.GHERKIN,
+                        SyntaxHighlightingPreferencePageSource.gherkinStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.gherkinRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.TASKS,
+                        SyntaxHighlightingPreferencePageSource.taskStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.taskRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.SPECIAL,
+                        SyntaxHighlightingPreferencePageSource.specialStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.specialRangeLengths))
+                .flatMap(identity());
     }
 
-    private List<StyleRange> getSectionHeaderRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.SECTION_HEADER);
-
-        return newArrayList(new StyleRange(0, 16, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(142, 17, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(263, 16, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(640, 18, preference.getColor(), null, preference.getFontStyle()));
-    }
-
-    private List<StyleRange> getSettingRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.SETTING);
-
-        return newArrayList(new StyleRange(17, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(63, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(103, 13, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(291, 11, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(312, 15, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(619, 8, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(672, 9, preference.getColor(), null, preference.getFontStyle()));
-    }
-
-    private List<StyleRange> getDefinitionRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.DEFINITION);
-
-        return newArrayList(new StyleRange(280, 9, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(659, 11, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(832, 13, preference.getColor(), null, preference.getFontStyle()));
-    }
-
-    private List<StyleRange> getKeywordCallRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.KEYWORD_CALL);
-
-        return newArrayList(new StyleRange(80, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(120, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(377, 12, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(413, 12, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(437, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(471, 1, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(490, 12, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(515, 1, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(534, 12, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(562, 1, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(581, 8, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(755, 9, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(772, 15, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(808, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(878, 19, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(904, 19, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(929, 25, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(961, 17, preference.getColor(), null, preference.getFontStyle()));
-    }
-
-    private List<StyleRange> getVariableRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.VARIABLE);
-
-        return newArrayList(new StyleRange(160, 26, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(196, 27, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(235, 26, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(306, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(363, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(393, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(399, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(429, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(445, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(465, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(476, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(506, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(520, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(550, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(567, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(597, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(610, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(631, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(745, 6, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(791, 5, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(800, 6, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(815, 15, preference.getColor(), null, preference.getFontStyle()));
-    }
-
-    private List<StyleRange> getGherkinRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.GHERKIN);
-
-        return newArrayList(new StyleRange(872, 5, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(899, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(925, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(956, 4, preference.getColor(), null, preference.getFontStyle()));
-    }
-
-    private List<StyleRange> getTasksRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.TASKS);
-
-        return newArrayList(new StyleRange(849, 4, preference.getColor(), null, preference.getFontStyle()));
-    }
-
-    private List<StyleRange> getSpecialTokenRanges() {
-        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.SPECIAL);
-
-        return newArrayList(new StyleRange(44, 9, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(453, 8, preference.getColor(), null, preference.getFontStyle()));
+    private Stream<StyleRange> createStyleRanges(final SyntaxHighlightingCategory category, final String startIndexes,
+            final String rangeLengths) {
+        final ColoringPreference preference = currentPreferences.get(category);
+        final Pattern separatorPattern = Pattern.compile("\\s*,\\s*");
+        final Stream<Integer> startIndexesStream = separatorPattern.splitAsStream(startIndexes).map(Integer::valueOf);
+        final Stream<Integer> rangeLengthsStream = separatorPattern.splitAsStream(rangeLengths).map(Integer::valueOf);
+        return Streams.zip(startIndexesStream, rangeLengthsStream, (start, length) -> new StyleRange(start, length,
+                preference.getColor(), null, preference.getFontStyle()));
     }
 
     @Override
