@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -38,7 +39,6 @@ import org.robotframework.red.nattable.TableCellStringData;
 import org.robotframework.red.nattable.TableCellsStrings;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -48,7 +48,7 @@ import com.google.common.collect.TreeRangeSet;
 
 /**
  * Cell painter which paints text with matches and hyperlinks using stylers.
- * 
+ *
  * @author Michal Anglart
  */
 public class RedTableTextPainter extends TextPainter {

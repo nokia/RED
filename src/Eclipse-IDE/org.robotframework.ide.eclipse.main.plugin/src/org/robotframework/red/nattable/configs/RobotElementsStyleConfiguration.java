@@ -5,6 +5,10 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import static org.eclipse.jface.viewers.Stylers.mixingStyler;
+
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.Style;
@@ -37,5 +41,12 @@ public abstract class RobotElementsStyleConfiguration extends AbstractRegistryCo
                 FontsManager.transformFontWithStyle(theme.getFont(), syntaxColoring.getFontStyle()));
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, syntaxColoring.getColor());
         return style;
+    }
+
+    protected Styler createStyler(final SyntaxHighlightingCategory category) {
+        final ColoringPreference syntaxColoring = preferences.getSyntaxColoring(category);
+
+        return mixingStyler(Stylers.withForeground(syntaxColoring.getRgb()),
+                Stylers.withFontStyle(syntaxColoring.getFontStyle()));
     }
 }

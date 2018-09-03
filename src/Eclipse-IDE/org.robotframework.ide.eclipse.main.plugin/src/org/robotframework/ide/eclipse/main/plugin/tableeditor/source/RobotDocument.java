@@ -16,6 +16,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.Document;
@@ -31,7 +32,6 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Supplier;
 
 public class RobotDocument extends Document {
 
@@ -60,12 +60,7 @@ public class RobotDocument extends Document {
 
     @VisibleForTesting
     public RobotDocument(final RobotParser parser, final File file) {
-        this.fileModelSupplier = new Supplier<RobotSuiteFile>() {
-            @Override
-            public RobotSuiteFile get() {
-                return null;
-            }
-        };
+        this.fileModelSupplier = () -> null;
         this.parser = parser;
         this.file = file;
     }
@@ -196,7 +191,7 @@ public class RobotDocument extends Document {
     /**
      * Gets newest parsed model. Waits for reparsing end if needed. IllegalStateException is thrown
      * when waiting has been interrupted.
-     * 
+     *
      * @return
      * @throws InterruptedException
      */
@@ -208,7 +203,7 @@ public class RobotDocument extends Document {
     /**
      * Gets newest parsed file output. Waits for reparsing end if needed. IllegalStateException is
      * thrown when waiting has been interrupted.
-     * 
+     *
      * @return
      * @throws InterruptedException
      */
@@ -227,7 +222,7 @@ public class RobotDocument extends Document {
         final PathsProvider pathsProvider = isNonFileModel(model) ? null : model.getProject().createPathsProvider();
         return RobotParser.create(holder, RobotParserConfig.allImportsLazy(version), pathsProvider);
     }
-    
+
     private static boolean isNonFileModel(final RobotSuiteFile model) {
         // e.g. history revision
         return model.getFile() == null;

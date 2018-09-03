@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
@@ -30,14 +31,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocume
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokensSource.LineElement;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Supplier;
-
 public class RedTokenScannerTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RedTokenScannerTest.class);
 
     private static RobotDocument document;
+
+    private final RedTokensQueueBuilder queueBuilder = new RedTokensQueueBuilder();
 
     @BeforeClass
     public static void beforeSuite() {
@@ -56,13 +57,7 @@ public class RedTokenScannerTest {
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
                 line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
                 line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
-
-        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
-            @Override
-            public Deque<IRobotLineElement> get() {
-                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
-            }
-        };
+        final Supplier<Deque<IRobotLineElement>> supplier = () -> queueBuilder.buildQueue(0, 38, lines, 0);
 
         final RedTokenScanner scanner = createScanner();
         scanner.setRange(document, 0, 38);
@@ -80,13 +75,7 @@ public class RedTokenScannerTest {
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
                 line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
                 line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
-
-        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
-            @Override
-            public Deque<IRobotLineElement> get() {
-                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
-            }
-        };
+        final Supplier<Deque<IRobotLineElement>> supplier = () -> queueBuilder.buildQueue(0, 38, lines, 0);
 
         final RedTokenScanner scanner = createScanner(nonApplicableRule(new Token("token")));
         scanner.setRange(document, 0, 38);
@@ -104,12 +93,7 @@ public class RedTokenScannerTest {
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
                 line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
                 line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
-        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
-            @Override
-            public Deque<IRobotLineElement> get() {
-                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
-            }
-        };
+        final Supplier<Deque<IRobotLineElement>> supplier = () -> queueBuilder.buildQueue(0, 38, lines, 0);
 
         final RedTokenScanner scanner = createScanner(nonMatchingRule());
         scanner.setRange(document, 0, 38);
@@ -127,13 +111,7 @@ public class RedTokenScannerTest {
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
                 line(1, new LineElement(1, 0, 13, "dddd"), new LineElement(1, 4, 17, "eeee"), new LineElement(1, 8, 21, "ffff")),
                 line(2, new LineElement(2, 0, 26, "gggg"), new LineElement(2, 4, 30, "hhhh"), new LineElement(2, 8, 34, "iiii")));
-
-        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
-            @Override
-            public Deque<IRobotLineElement> get() {
-                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
-            }
-        };
+        final Supplier<Deque<IRobotLineElement>> supplier = () -> queueBuilder.buildQueue(0, 38, lines, 0);
 
         final RedTokenScanner scanner = createScanner(textMatchingRule("bbbb", new Token("b_token")),
                 textMatchingRule("eeee", new Token("e_token")));
@@ -164,13 +142,7 @@ public class RedTokenScannerTest {
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
                 line(1, new LineElement(1, 0, 13, "dddd"), new LineElement(1, 4, 17, "eeee"), new LineElement(1, 8, 21, "ffff")),
                 line(2, new LineElement(2, 0, 26, "gggg"), new LineElement(2, 4, 30, "hhhh"), new LineElement(2, 8, 34, "iiii")));
-
-        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
-            @Override
-            public Deque<IRobotLineElement> get() {
-                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
-            }
-        };
+        final Supplier<Deque<IRobotLineElement>> supplier = () -> queueBuilder.buildQueue(0, 38, lines, 0);
 
         final RedTokenScanner scanner = createScanner(partiallyMatchingRule("gggg", new Token("g_token")));
         scanner.setRange(document, 0, 38);

@@ -5,8 +5,6 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import static org.eclipse.jface.viewers.Stylers.mixingStyler;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -15,14 +13,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.nattable.ITableStringsDecorationsSupport;
@@ -34,7 +30,6 @@ import com.google.common.collect.TreeRangeMap;
 
 /**
  * @author lwlodarc
- *
  */
 public class CommentsStyleConfiguration extends RobotElementsStyleConfiguration {
 
@@ -60,23 +55,21 @@ public class CommentsStyleConfiguration extends RobotElementsStyleConfiguration 
     private Style augmentCommentStyleWithTasks(final Style commentStyle) {
         final Set<String> tags = !preferences.isTasksDetectionEnabled() ? new HashSet<>()
                 : preferences.getTaskTagsWithPriorities().keySet();
-        final ColoringPreference tasksColoring = preferences.getSyntaxColoring(SyntaxHighlightingCategory.TASKS);
         if (!tags.isEmpty()) {
+            final Styler tasksStyler = createStyler(SyntaxHighlightingCategory.TASKS);
             commentStyle.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
-                    findTaskTags(Pattern.compile(String.join("|", tags)), tasksColoring));
+                    findTaskTags(Pattern.compile(String.join("|", tags)), tasksStyler));
         }
         return commentStyle;
     }
 
     private static Function<String, RangeMap<Integer, Styler>> findTaskTags(final Pattern pattern,
-            final ColoringPreference tasksColoring) {
+            final Styler tasksStyler) {
         return label -> {
             final TreeRangeMap<Integer, Styler> mapping = TreeRangeMap.create();
             final Matcher matcher = pattern.matcher(label);
             while (matcher.find()) {
-                final Styler styler = mixingStyler(Stylers.withForeground(tasksColoring.getRgb()),
-                        Stylers.withFontStyle(tasksColoring.getFontStyle()));
-                mapping.put(Range.closedOpen(matcher.start(), matcher.end()), styler);
+                mapping.put(Range.closedOpen(matcher.start(), matcher.end()), tasksStyler);
             }
             return mapping;
         };
