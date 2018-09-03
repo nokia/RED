@@ -28,7 +28,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 
 public class ExecutableCallRuleTest {
 
-    private final ExecutableCallRule testedRule = ExecutableCallRule.forExecutableInTestCase(new Token("call_token"),
+    private final ExecutableCallRule tcTestedRule = ExecutableCallRule.forExecutableInTestCase(new Token("call_token"),
+            new Token("var_token"));
+
+    private final ExecutableCallRule kwTestedRule = ExecutableCallRule.forExecutableInKeyword(new Token("call_token"),
             new Token("var_token"));
 
     @Test
@@ -38,27 +41,23 @@ public class ExecutableCallRuleTest {
         final RobotToken kwAction1 = RobotToken.create("", newArrayList(RobotTokenType.KEYWORD_ACTION_NAME));
         final RobotToken kwAction2 = RobotToken.create("", newArrayList(RobotTokenType.KEYWORD_ACTION_ARGUMENT));
 
-        assertThat(ExecutableCallRule.forExecutableInTestCase(new Token("call_token"), new Token("var_token"))
-                .isApplicable(caseAction1)).isTrue();
-        assertThat(ExecutableCallRule.forExecutableInTestCase(new Token("call_token"), new Token("var_token"))
-                .isApplicable(caseAction2)).isTrue();
-        assertThat(ExecutableCallRule.forExecutableInTestCase(new Token("call_token"), new Token("var_token"))
-                .isApplicable(kwAction1)).isFalse();
-        assertThat(ExecutableCallRule.forExecutableInTestCase(new Token("call_token"), new Token("var_token"))
-                .isApplicable(kwAction2)).isFalse();
+        assertThat(tcTestedRule.isApplicable(caseAction1)).isTrue();
+        assertThat(tcTestedRule.isApplicable(caseAction2)).isTrue();
+        assertThat(tcTestedRule.isApplicable(kwAction1)).isFalse();
+        assertThat(tcTestedRule.isApplicable(kwAction2)).isFalse();
 
-        assertThat(ExecutableCallRule.forExecutableInKeyword(new Token("call_token"), new Token("var_token"))
-                .isApplicable(caseAction1)).isFalse();
-        assertThat(ExecutableCallRule.forExecutableInKeyword(new Token("call_token"), new Token("var_token"))
-                .isApplicable(caseAction2)).isFalse();
-        assertThat(ExecutableCallRule.forExecutableInKeyword(new Token("call_token"), new Token("var_token"))
-                .isApplicable(kwAction1)).isTrue();
-        assertThat(ExecutableCallRule.forExecutableInKeyword(new Token("call_token"), new Token("var_token"))
-                .isApplicable(kwAction2)).isTrue();
+        assertThat(kwTestedRule.isApplicable(caseAction1)).isFalse();
+        assertThat(kwTestedRule.isApplicable(caseAction2)).isFalse();
+        assertThat(kwTestedRule.isApplicable(kwAction1)).isTrue();
+        assertThat(kwTestedRule.isApplicable(kwAction2)).isTrue();
 
-        assertThat(testedRule.isApplicable(new RobotToken())).isFalse();
-        assertThat(testedRule.isApplicable(new Separator())).isFalse();
-        assertThat(testedRule.isApplicable(mock(IRobotLineElement.class))).isFalse();
+        assertThat(tcTestedRule.isApplicable(new RobotToken())).isFalse();
+        assertThat(tcTestedRule.isApplicable(new Separator())).isFalse();
+        assertThat(tcTestedRule.isApplicable(mock(IRobotLineElement.class))).isFalse();
+
+        assertThat(kwTestedRule.isApplicable(new RobotToken())).isFalse();
+        assertThat(kwTestedRule.isApplicable(new Separator())).isFalse();
+        assertThat(kwTestedRule.isApplicable(mock(IRobotLineElement.class))).isFalse();
     }
 
     @Test
@@ -283,9 +282,7 @@ public class ExecutableCallRuleTest {
 
     private Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int position,
             final List<RobotLine> lines) {
-        return Stream
-                .of(ExecutableCallRule.forExecutableInTestCase(new Token("call_token"), new Token("var_token")),
-                        ExecutableCallRule.forExecutableInKeyword(new Token("call_token"), new Token("var_token")))
+        return Stream.of(tcTestedRule, kwTestedRule)
                 .filter(rule -> rule.isApplicable(token))
                 .findFirst()
                 .flatMap(rule -> rule.evaluate(token, position, lines));

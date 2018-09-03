@@ -63,9 +63,9 @@ public class NestedExecsSpecialTokensRule implements ISyntaxColouringRule {
             final List<RobotLine> context) {
         final List<RobotToken> tokensBefore = ExecutableCallRule.getPreviousTokensInThisExecutable(token, context,
                 this::shouldStopOnElement);
-        for (int j = tokensBefore.size() - 1; j >= 0; j--) {
+        for (int i = tokensBefore.size() - 1; i >= 0; i--) {
             final QualifiedKeywordName qualifiedKeywordName = QualifiedKeywordName
-                    .fromOccurrence(tokensBefore.get(j).getText());
+                    .fromOccurrence(tokensBefore.get(i).getText());
             if (SpecialKeywords.isNestingKeyword(qualifiedKeywordName)
                     && SpecialKeywords.isNestedSyntaxSpecialToken(qualifiedKeywordName, (RobotToken) token)) {
                 return Optional

@@ -5,14 +5,13 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import java.util.function.Supplier;
+
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.red.nattable.ITableStringsDecorationsSupport;
-
-import com.google.common.base.Supplier;
-
 
 public class TableMatchesSupplierRegistryConfiguration extends AbstractRegistryConfiguration {
 

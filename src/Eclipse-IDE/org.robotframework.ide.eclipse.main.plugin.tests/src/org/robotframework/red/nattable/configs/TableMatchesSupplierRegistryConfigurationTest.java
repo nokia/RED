@@ -9,13 +9,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.function.Supplier;
+
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.red.nattable.ITableStringsDecorationsSupport;
-
-import com.google.common.base.Supplier;
 
 public class TableMatchesSupplierRegistryConfigurationTest {
 
@@ -23,7 +23,7 @@ public class TableMatchesSupplierRegistryConfigurationTest {
     public void matchesSupplierIsProperlyRegistered() {
         final IConfigRegistry registry = mock(IConfigRegistry.class);
 
-        final Supplier<HeaderFilterMatchesCollection> supplier = createSupplier();
+        final Supplier<HeaderFilterMatchesCollection> supplier = () -> null;
         final TableMatchesSupplierRegistryConfiguration config = new TableMatchesSupplierRegistryConfiguration(
                 supplier);
         config.configureRegistry(registry);
@@ -31,15 +31,5 @@ public class TableMatchesSupplierRegistryConfigurationTest {
         verify(registry).registerConfigAttribute(ITableStringsDecorationsSupport.MATCHES_SUPPLIER, supplier,
                 DisplayMode.NORMAL);
         verifyNoMoreInteractions(registry);
-    }
-
-    private static Supplier<HeaderFilterMatchesCollection> createSupplier() {
-        return new Supplier<HeaderFilterMatchesCollection>() {
-
-            @Override
-            public HeaderFilterMatchesCollection get() {
-                return null;
-            }
-        };
     }
 }
