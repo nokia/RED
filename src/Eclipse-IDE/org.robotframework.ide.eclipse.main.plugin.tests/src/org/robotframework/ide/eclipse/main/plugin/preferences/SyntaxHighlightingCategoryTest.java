@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,6 +46,13 @@ public class SyntaxHighlightingCategoryTest {
                 .isEqualTo(SyntaxHighlightingCategory.VARIABLE);
         assertThat(SyntaxHighlightingCategory.fromPreferenceId("red.editor.syntaxColoring.tasks"))
                 .isEqualTo(SyntaxHighlightingCategory.TASKS);
+    }
+
+    @Test
+    public void testCreatingCategoryFromUnrecognizedPreferenceId() {
+        assertThatIllegalStateException().isThrownBy(() -> SyntaxHighlightingCategory.fromPreferenceId("xyz"))
+                .withMessage("Unrecognized preference key: xyz")
+                .withNoCause();
     }
 
     @Test

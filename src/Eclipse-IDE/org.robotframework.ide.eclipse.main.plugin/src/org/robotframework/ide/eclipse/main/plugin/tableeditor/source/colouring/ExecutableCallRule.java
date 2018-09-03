@@ -97,19 +97,18 @@ public class ExecutableCallRule extends VariableUsageRule {
 
     protected final boolean isNestedKeyword(final IRobotLineElement token, final List<RobotLine> context,
             final List<RobotToken> tokensBefore) {
-        for (int j = tokensBefore.size() - 1; j >= 0; j--) {
+        for (int i = tokensBefore.size() - 1; i >= 0; i--) {
             final QualifiedKeywordName qualifiedKeywordName = QualifiedKeywordName
-                    .fromOccurrence(tokensBefore.get(j).getText());
+                    .fromOccurrence(tokensBefore.get(i).getText());
             if (SpecialKeywords.isNestingKeyword(qualifiedKeywordName)) {
                 final List<RobotToken> execTokens = new ArrayList<>(tokensBefore);
                 execTokens.add((RobotToken) token);
                 execTokens.addAll(getNextTokensInThisExecutable(token, context));
 
-                if (SpecialKeywords.isKeywordNestedInKeyword(qualifiedKeywordName, j, tokensBefore.size() - j,
+                if (SpecialKeywords.isKeywordNestedInKeyword(qualifiedKeywordName, i, tokensBefore.size() - i,
                         execTokens)) {
                     return true;
                 }
-                // return false;
             }
         }
         return false;

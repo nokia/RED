@@ -5,14 +5,11 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import static org.eclipse.jface.viewers.Stylers.mixingStyler;
-
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
@@ -20,7 +17,6 @@ import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.nattable.ITableStringsDecorationsSupport;
@@ -32,7 +28,6 @@ import com.google.common.collect.TreeRangeMap;
 
 /**
  * @author lwlodarc
- *
  */
 public class ActionNamesStyleConfiguration extends RobotElementsStyleConfiguration {
 
@@ -48,7 +43,7 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
         final Style actionStyle = createStyle(SyntaxHighlightingCategory.KEYWORD_CALL);
-        augmentActionNamesStyleWithGherkinsAndVariables(actionStyle, preferences);
+        augmentActionNamesStyleWithGherkinsAndVariables(actionStyle);
 
         Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
             configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, actionStyle, mode,
@@ -56,15 +51,9 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
         });
     }
 
-    public static void augmentActionNamesStyleWithGherkinsAndVariables(final Style style,
-            final RedPreferences preferences) {
-        final ColoringPreference gherkinColoring = preferences.getSyntaxColoring(SyntaxHighlightingCategory.GHERKIN);
-        final ColoringPreference variableColoring = preferences.getSyntaxColoring(SyntaxHighlightingCategory.VARIABLE);
-        final Styler gherkinStyler = mixingStyler(Stylers.withForeground(gherkinColoring.getRgb()),
-                Stylers.withFontStyle(gherkinColoring.getFontStyle()));
-        final Styler variableStyler = mixingStyler(Stylers.withForeground(variableColoring.getRgb()),
-                Stylers.withFontStyle(variableColoring.getFontStyle()));
-
+    private void augmentActionNamesStyleWithGherkinsAndVariables(final Style style) {
+        final Styler gherkinStyler = createStyler(SyntaxHighlightingCategory.GHERKIN);
+        final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
                 findGherkinsAndVariables(gherkinStyler, variableStyler));
     }
@@ -77,7 +66,9 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
             if (gherkinRange.isPresent()) {
                 mapping.put(gherkinRange.get(), gherkinStyler);
             }
-            for (final Range<Integer> varRange : VariablesInNamesStyleConfiguration.markVariables(label)) {
+            for (final Range<Integer> varRange : VariablesInNamesStyleConfiguration
+                    .markVariables(label, VariablesInNamesStyleConfiguration.VAR_IN_NAMES_PATTERN)
+                    .asRanges()) {
                 mapping.put(varRange, variableStyler);
             }
             return mapping;

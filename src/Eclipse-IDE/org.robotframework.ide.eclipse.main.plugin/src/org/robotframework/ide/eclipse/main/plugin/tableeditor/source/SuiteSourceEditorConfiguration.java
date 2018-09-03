@@ -7,7 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
@@ -88,8 +91,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.V
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.WithNameRule;
 
-import com.google.common.base.Supplier;
-
 class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private final SuiteSourceEditor editor;
@@ -100,12 +101,13 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private ColoringTokens coloringTokens;
 
-    private RedTokensStore store;
+    private final RedTokensStore store;
 
     public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor,
             final KeySequence contentAssistActivationTrigger) {
         this.editor = editor;
         this.contentAssistActivationTrigger = contentAssistActivationTrigger;
+        this.store = new RedTokensStore();
     }
 
     ColoringTokens getColoringTokens() {
@@ -113,9 +115,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     void resetTokensStore() {
-        if (store != null) {
-            store.reset();
-        }
+        store.reset();
     }
 
     @Override
@@ -325,13 +325,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     private void createDefaultAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
             final AssistantCallbacks assistantAccessor) {
-        // we are adding all the assistants for default content type. Most of them
-        // (excluding
-        // section headers assistant) are working in default content type only at the
-        // very last
-        // position in file (this position always has default content type, but it can
-        // be actually
-        // prepended with some valid meaningful content type
+        // We are adding all the assistants for default content type. Most of them (excluding
+        // section headers assistant) are working in default content type only at the very last
+        // position in file (this position always has default content type, but it can be actually
+        // prepended with some valid meaningful content type)
 
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
@@ -395,14 +392,21 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IPresentationReconciler getPresentationReconciler(final ISourceViewer sourceViewer) {
-        final PresentationReconciler reconciler = new PresentationReconciler();
+        sourceViewer.addTextInputListener(store);
 
+        final PresentationReconciler reconciler = new PresentationReconciler();
+        createColoringRules().forEach((contentType, rules) -> {
+            final DefaultDamagerRepairer damagerRepairer = createDamageRepairer(rules);
+            reconciler.setDamager(damagerRepairer, contentType);
+            reconciler.setRepairer(damagerRepairer, contentType);
+        });
+        return reconciler;
+    }
+
+    private Map<String, ISyntaxColouringRule[]> createColoringRules() {
         if (coloringTokens == null) {
             coloringTokens = new ColoringTokens(RedPlugin.getDefault().getPreferences());
             coloringTokens.initialize();
-        }
-        if (store == null) {
-            store = new RedTokensStore();
         }
 
         final IToken section = coloringTokens.get(SyntaxHighlightingCategory.SECTION_HEADER);
@@ -418,9 +422,6 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] defaultRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CommentRule(comment, tasks), new MatchEverythingRule(defaultSection) };
-        sourceViewer.addTextInputListener(store);
-
-        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, store, defaultRules);
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new SettingsTemplateRule(call),
@@ -429,7 +430,6 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, variable),
                 ExecutableCallRule.forExecutableInTestCase(call, variable), new NestedExecsSpecialTokensRule(special),
                 new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(special) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, store, testCasesRules);
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
@@ -438,7 +438,6 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, variable),
                 ExecutableCallRule.forExecutableInKeyword(call, variable), new NestedExecsSpecialTokensRule(special),
                 new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(special) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, store, keywordsRules);
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsTemplateRule(call),
@@ -446,25 +445,27 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, variable),
                 new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new WithNameRule(special) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, store, settingsRules);
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new VariableDefinitionRule(variable), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, store, variablesRules);
 
-        return reconciler;
+        final Map<String, ISyntaxColouringRule[]> rules = new HashMap<>();
+        rules.put(IDocument.DEFAULT_CONTENT_TYPE, defaultRules);
+        rules.put(SuiteSourcePartitionScanner.TEST_CASES_SECTION, testCasesRules);
+        rules.put(SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules);
+        rules.put(SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules);
+        rules.put(SuiteSourcePartitionScanner.VARIABLES_SECTION, variablesRules);
+        return rules;
     }
 
-    private void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
-            final RedTokensStore store, final ISyntaxColouringRule[] rules) {
-        final boolean useDirectScanner = RedSystemProperties.shouldUseDirectScanner();
+    private DefaultDamagerRepairer createDamageRepairer(final ISyntaxColouringRule... rules) {
         final RedTokenScanner tokenScanner = new RedTokenScanner(rules);
-        final ITokenScanner scanner = useDirectScanner ? tokenScanner : new RedCachingScanner(tokenScanner, store);
-        final DefaultDamagerRepairer damagerRepairer = useDirectScanner ? new DefaultDamagerRepairer(scanner)
-                : new RedDamagerRepairer(scanner, editor.getViewer());
-        reconciler.setDamager(damagerRepairer, contentType);
-        reconciler.setRepairer(damagerRepairer, contentType);
+        if (RedSystemProperties.shouldUseDirectScanner()) {
+            return new DefaultDamagerRepairer(tokenScanner);
+        }
+        final ITokenScanner scanner = new RedCachingScanner(tokenScanner, store);
+        return new RedDamagerRepairer(scanner, editor.getViewer());
     }
 
     @Override

@@ -6,12 +6,12 @@
 package org.robotframework.red.nattable;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.ConfigAttribute;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.RangeMap;
 
 public interface ITableStringsDecorationsSupport {
