@@ -41,6 +41,10 @@ public class SyntaxHighlightingPreferencePageSource extends NLS {
 
     public static String keywordCallRangeLengths;
 
+    public static String keywordCallQuoteStartIndexes;
+
+    public static String keywordCallQuoteRangeLengths;
+
     public static String commentStartIndexes;
 
     public static String commentRangeLengths;
