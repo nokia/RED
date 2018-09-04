@@ -8,12 +8,8 @@ package org.robotframework.red.nattable.configs;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
-import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -45,27 +41,23 @@ public class VariablesInNamesStyleConfiguration extends RobotElementsStyleConfig
     }
 
     @Override
-    public void configureRegistry(final IConfigRegistry configRegistry) {
-        // for otherwise not styled elements - just color variables
-        final Style regularStyle = new Style();
-        augmentGivenStyleWithVariables(regularStyle);
-
-        Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
-            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, regularStyle, mode,
-                    VariablesInNamesLabelAccumulator.POSSIBLE_VARIABLES_IN_NAMES_CONFIG_LABEL);
-        });
+    String getConfigLabel() {
+        return VariablesInNamesLabelAccumulator.POSSIBLE_VARIABLES_IN_NAMES_CONFIG_LABEL;
     }
 
-    private void augmentGivenStyleWithVariables(final Style style) {
+    @Override
+    Style createElementStyle() {
+        final Style style = new Style();
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
                 findVariables(VAR_IN_NAMES_PATTERN, variableStyler));
+        return style;
     }
 
     static Function<String, RangeMap<Integer, Styler>> findVariables(final Pattern pattern,
             final Styler variableStyler) {
         return label -> {
-            final TreeRangeMap<Integer, Styler> mapping = TreeRangeMap.create();
+            final RangeMap<Integer, Styler> mapping = TreeRangeMap.create();
             for (final Range<Integer> varRange : markVariables(label, pattern).asRanges()) {
                 mapping.put(varRange, variableStyler);
             }

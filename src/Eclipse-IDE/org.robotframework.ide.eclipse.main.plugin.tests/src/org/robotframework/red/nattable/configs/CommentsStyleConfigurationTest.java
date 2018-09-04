@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
 import java.util.function.Function;
 
 import org.eclipse.jface.resource.JFaceResources;
@@ -97,7 +96,7 @@ public class CommentsStyleConfigurationTest {
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
                 CommentsLabelAccumulator.COMMENT_CONFIG_LABEL);
-        
+
         assertThat(style.getAttributeValue(CellStyleAttributes.FOREGROUND_COLOR).getRGB()).isEqualTo(new RGB(1, 2, 3));
     }
 
@@ -156,14 +155,14 @@ public class CommentsStyleConfigurationTest {
         assertThat(decoratingFunction).isNotNull();
 
         final RangeMap<Integer, Styler> styles = decoratingFunction.apply("abc TODO def FIXME ghi");
-        final Map<Range<Integer>, Styler> stylesAsMap = styles.asMapOfRanges();
-        
-        assertThat(stylesAsMap).hasSize(2);
-        assertThat(stylesAsMap.keySet()).containsExactly(Range.closedOpen(4, 8), Range.closedOpen(13, 18));
-        
+        assertThat(styles.asMapOfRanges()).hasSize(2)
+                .hasEntrySatisfying(Range.closedOpen(4, 8), styler -> hasForeground(styler, new RGB(4, 5, 6)))
+                .hasEntrySatisfying(Range.closedOpen(13, 18), styler -> hasForeground(styler, new RGB(4, 5, 6)));
+    }
+
+    private void hasForeground(final Styler styler, final RGB rgb) {
         final TextStyle styleToCheck = new TextStyle();
-        stylesAsMap.values().forEach(styler -> styler.applyStyles(styleToCheck));
-        
-        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(4, 5, 6));
+        styler.applyStyles(styleToCheck);
+        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(rgb);
     }
 }
