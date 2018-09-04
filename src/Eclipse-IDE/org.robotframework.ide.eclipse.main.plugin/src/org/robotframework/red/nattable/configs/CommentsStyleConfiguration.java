@@ -10,12 +10,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
-import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -43,30 +39,27 @@ public class CommentsStyleConfiguration extends RobotElementsStyleConfiguration 
     }
 
     @Override
-    public void configureRegistry(final IConfigRegistry configRegistry) {
-        final Style commentStyle = augmentCommentStyleWithTasks(createStyle(SyntaxHighlightingCategory.COMMENT));
-
-        Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
-            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, commentStyle, mode,
-                    CommentsLabelAccumulator.COMMENT_CONFIG_LABEL);
-        });
+    String getConfigLabel() {
+        return CommentsLabelAccumulator.COMMENT_CONFIG_LABEL;
     }
 
-    private Style augmentCommentStyleWithTasks(final Style commentStyle) {
+    @Override
+    Style createElementStyle() {
+        final Style style = createStyle(SyntaxHighlightingCategory.COMMENT);
         final Set<String> tags = !preferences.isTasksDetectionEnabled() ? new HashSet<>()
                 : preferences.getTaskTagsWithPriorities().keySet();
         if (!tags.isEmpty()) {
             final Styler tasksStyler = createStyler(SyntaxHighlightingCategory.TASKS);
-            commentStyle.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
+            style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
                     findTaskTags(Pattern.compile(String.join("|", tags)), tasksStyler));
         }
-        return commentStyle;
+        return style;
     }
 
     private static Function<String, RangeMap<Integer, Styler>> findTaskTags(final Pattern pattern,
             final Styler tasksStyler) {
         return label -> {
-            final TreeRangeMap<Integer, Styler> mapping = TreeRangeMap.create();
+            final RangeMap<Integer, Styler> mapping = TreeRangeMap.create();
             final Matcher matcher = pattern.matcher(label);
             while (matcher.find()) {
                 mapping.put(Range.closedOpen(matcher.start(), matcher.end()), tasksStyler);
