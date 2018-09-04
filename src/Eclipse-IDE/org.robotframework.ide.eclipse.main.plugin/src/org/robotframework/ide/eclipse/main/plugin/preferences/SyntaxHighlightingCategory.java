@@ -19,6 +19,7 @@ public enum SyntaxHighlightingCategory {
     COMMENT("comment", new ColoringPreference(new RGB(192, 192, 192), SWT.NORMAL), new ColoringPreference(new RGB(128, 128, 128), SWT.NORMAL), "Comments"),
     GHERKIN("gherkin", new ColoringPreference(new RGB(128, 128, 64), SWT.BOLD), new ColoringPreference(new RGB(128, 255, 255), SWT.BOLD), "Given/When/And/Then"),
     KEYWORD_CALL("call", new ColoringPreference(new RGB(0, 128, 192), SWT.BOLD), new ColoringPreference(new RGB(148, 100, 1), SWT.BOLD), "Keyword calls"),
+    KEYWORD_CALL_QUOTE("quote", new ColoringPreference(new RGB(0, 128, 192), SWT.BOLD), new ColoringPreference(new RGB(148, 100, 1), SWT.BOLD), "Keyword call quotes"),
     DEFINITION("definition", new ColoringPreference(new RGB(0, 0, 0), SWT.BOLD), new ColoringPreference(new RGB(64, 128, 191), SWT.BOLD), "Keyword/Test Cases definition headers"),
     SECTION_HEADER("section", new ColoringPreference(new RGB(255, 0, 0), SWT.NORMAL), new ColoringPreference(new RGB(233, 97, 148), SWT.NORMAL), "Section headers"),
     SETTING("setting", new ColoringPreference(new RGB(149, 0, 85), SWT.NORMAL), new ColoringPreference(new RGB(255, 255, 128), SWT.NORMAL), "Settings"),
@@ -51,6 +52,9 @@ public enum SyntaxHighlightingCategory {
 
         } else if (KEYWORD_CALL.getPreferenceId().equals(key)) {
             return KEYWORD_CALL;
+
+        } else if (KEYWORD_CALL_QUOTE.getPreferenceId().equals(key)) {
+            return KEYWORD_CALL_QUOTE;
 
         } else if (DEFINITION.getPreferenceId().equals(key)) {
             return DEFINITION;

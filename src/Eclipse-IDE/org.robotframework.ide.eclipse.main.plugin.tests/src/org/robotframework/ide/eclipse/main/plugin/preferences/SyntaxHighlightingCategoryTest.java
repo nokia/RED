@@ -36,6 +36,8 @@ public class SyntaxHighlightingCategoryTest {
                 .isEqualTo(SyntaxHighlightingCategory.GHERKIN);
         assertThat(SyntaxHighlightingCategory.fromPreferenceId("red.editor.syntaxColoring.call"))
                 .isEqualTo(SyntaxHighlightingCategory.KEYWORD_CALL);
+        assertThat(SyntaxHighlightingCategory.fromPreferenceId("red.editor.syntaxColoring.quote"))
+                .isEqualTo(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
         assertThat(SyntaxHighlightingCategory.fromPreferenceId("red.editor.syntaxColoring.section"))
                 .isEqualTo(SyntaxHighlightingCategory.SECTION_HEADER);
         assertThat(SyntaxHighlightingCategory.fromPreferenceId("red.editor.syntaxColoring.setting"))
