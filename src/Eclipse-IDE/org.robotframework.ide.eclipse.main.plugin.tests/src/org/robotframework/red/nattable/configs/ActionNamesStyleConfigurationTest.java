@@ -50,6 +50,8 @@ public class ActionNamesStyleConfigurationTest {
                 .thenReturn(new ColoringPreference(new RGB(4, 5, 6), SWT.NORMAL));
         when(preferences.getSyntaxColoring(SyntaxHighlightingCategory.GHERKIN))
                 .thenReturn(new ColoringPreference(new RGB(7, 8, 9), SWT.BOLD));
+        when(preferences.getSyntaxColoring(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE))
+                .thenReturn(new ColoringPreference(new RGB(10, 11, 12), SWT.BOLD));
     }
 
     @Test
@@ -209,6 +211,79 @@ public class ActionNamesStyleConfigurationTest {
                 .hasEntrySatisfying(Range.closedOpen(0, 5), styler -> hasForeground(styler, new RGB(7, 8, 9)))
                 .hasEntrySatisfying(Range.closedOpen(8, 25), styler -> hasForeground(styler, new RGB(4, 5, 6)))
                 .hasEntrySatisfying(Range.closedOpen(31, 48), styler -> hasForeground(styler, new RGB(4, 5, 6)));
+    }
+
+    @Test
+    public void rangeStylesFunctionForQuotesIsDefinedAndProperlyFindsQuotes_whenThereAreQuotes() {
+        final IConfigRegistry configRegistry = new ConfigRegistry();
+
+        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
+                preferences);
+        config.configureRegistry(configRegistry);
+
+        final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
+                ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+
+        final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
+                .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
+        assertThat(decoratingFunction).isNotNull();
+
+        final RangeMap<Integer, Styler> styles = decoratingFunction
+                .apply("An \"embedded\" keyword with \"x\", \"xy\" and \"xyz\" arguments ending with single \" quote");
+        assertThat(styles.asMapOfRanges()).hasSize(4)
+                .hasEntrySatisfying(Range.closedOpen(3, 13), styler -> hasForeground(styler, new RGB(10, 11, 12)))
+                .hasEntrySatisfying(Range.closedOpen(27, 30), styler -> hasForeground(styler, new RGB(10, 11, 12)))
+                .hasEntrySatisfying(Range.closedOpen(32, 36), styler -> hasForeground(styler, new RGB(10, 11, 12)))
+                .hasEntrySatisfying(Range.closedOpen(41, 46), styler -> hasForeground(styler, new RGB(10, 11, 12)));
+    }
+
+    @Test
+    public void rangeStylesFunctionForQuotesAndVariablesIsDefinedAndProperlyFindsThose_whenThereAreSuchElements() {
+        final IConfigRegistry configRegistry = new ConfigRegistry();
+
+        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
+                preferences);
+        config.configureRegistry(configRegistry);
+
+        final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
+                ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+
+        final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
+                .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
+        assertThat(decoratingFunction).isNotNull();
+
+        final RangeMap<Integer, Styler> styles = decoratingFunction
+                .apply("An \"embedded\" keyword with \"x\", \"x ${variable} y\" and ${other} arguments");
+        assertThat(styles.asMapOfRanges()).hasSize(6)
+                .hasEntrySatisfying(Range.closedOpen(3, 13), styler -> hasForeground(styler, new RGB(10, 11, 12)))
+                .hasEntrySatisfying(Range.closedOpen(27, 30), styler -> hasForeground(styler, new RGB(10, 11, 12)))
+                .hasEntrySatisfying(Range.closedOpen(32, 35), styler -> hasForeground(styler, new RGB(10, 11, 12)))
+                .hasEntrySatisfying(Range.closedOpen(35, 46), styler -> hasForeground(styler, new RGB(4, 5, 6)))
+                .hasEntrySatisfying(Range.closedOpen(46, 49), styler -> hasForeground(styler, new RGB(10, 11, 12)))
+                .hasEntrySatisfying(Range.closedOpen(54, 62), styler -> hasForeground(styler, new RGB(4, 5, 6)));
+    }
+
+    @Test
+    public void rangeStylesFunctionForGherkinsQuotesAndVariablesIsDefinedAndProperlyFindsThose_whenThereAreSuchElements() {
+        final IConfigRegistry configRegistry = new ConfigRegistry();
+
+        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
+                preferences);
+        config.configureRegistry(configRegistry);
+
+        final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
+                ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+
+        final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
+                .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
+        assertThat(decoratingFunction).isNotNull();
+
+        final RangeMap<Integer, Styler> styles = decoratingFunction
+                .apply("Then start kw with \"x\" and ${other} arguments");
+        assertThat(styles.asMapOfRanges()).hasSize(3)
+                .hasEntrySatisfying(Range.closedOpen(0, 5), styler -> hasForeground(styler, new RGB(7, 8, 9)))
+                .hasEntrySatisfying(Range.closedOpen(19, 22), styler -> hasForeground(styler, new RGB(10, 11, 12)))
+                .hasEntrySatisfying(Range.closedOpen(27, 35), styler -> hasForeground(styler, new RGB(4, 5, 6)));
     }
 
     private void hasForeground(final Styler styler, final RGB rgb) {
