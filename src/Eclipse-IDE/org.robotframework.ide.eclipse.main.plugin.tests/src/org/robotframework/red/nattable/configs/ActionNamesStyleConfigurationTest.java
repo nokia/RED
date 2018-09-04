@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
 import java.util.function.Function;
 
 import org.eclipse.jface.resource.JFaceResources;
@@ -122,9 +121,7 @@ public class ActionNamesStyleConfigurationTest {
         assertThat(decoratingFunction).isNotNull();
 
         final RangeMap<Integer, Styler> styles = decoratingFunction.apply("the}[re] is${ no var{iable");
-        final Map<Range<Integer>, Styler> stylesAsMap = styles.asMapOfRanges();
-
-        assertThat(stylesAsMap).isEmpty();
+        assertThat(styles.asMapOfRanges()).isEmpty();
     }
 
     @Test
@@ -144,15 +141,9 @@ public class ActionNamesStyleConfigurationTest {
 
         final RangeMap<Integer, Styler> styles = decoratingFunction
                 .apply("&{var@{${ia}ble}} sth} &{another}[index]]variable {nonvariable}");
-        final Map<Range<Integer>, Styler> stylesAsMap = styles.asMapOfRanges();
-
-        assertThat(stylesAsMap).hasSize(2);
-        assertThat(stylesAsMap.keySet()).containsExactly(Range.closedOpen(0, 17), Range.closedOpen(23, 40));
-
-        final TextStyle styleToCheck = new TextStyle();
-        stylesAsMap.values().forEach(styler -> styler.applyStyles(styleToCheck));
-
-        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(4, 5, 6));
+        assertThat(styles.asMapOfRanges()).hasSize(2)
+                .hasEntrySatisfying(Range.closedOpen(0, 17), styler -> hasForeground(styler, new RGB(4, 5, 6)))
+                .hasEntrySatisfying(Range.closedOpen(23, 40), styler -> hasForeground(styler, new RGB(4, 5, 6)));
     }
 
     @Test
@@ -172,15 +163,29 @@ public class ActionNamesStyleConfigurationTest {
 
         final RangeMap<Integer, Styler> styles = decoratingFunction
                 .apply("GiVeN keywordCall And sth But foo Then bar When");
-        final Map<Range<Integer>, Styler> stylesAsMap = styles.asMapOfRanges();
+        assertThat(styles.asMapOfRanges()).hasSize(1)
+                .hasEntrySatisfying(Range.closedOpen(0, 6), styler -> hasForeground(styler, new RGB(7, 8, 9)));
+    }
 
-        assertThat(stylesAsMap).hasSize(1);
-        assertThat(stylesAsMap.keySet()).containsExactly(Range.closedOpen(0, 5));
+    @Test
+    public void rangeStylesFunctionForGherkinsIsDefinedAndProperlyFindsGherkins_whenThereAreMultipleGherkins() {
+        final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final TextStyle styleToCheck = new TextStyle();
-        stylesAsMap.values().forEach(styler -> styler.applyStyles(styleToCheck));
+        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
+                preferences);
+        config.configureRegistry(configRegistry);
 
-        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(7, 8, 9));
+        final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
+                ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+
+        final Function<String, RangeMap<Integer, Styler>> decoratingFunction = style
+                .getAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES);
+        assertThat(decoratingFunction).isNotNull();
+
+        final RangeMap<Integer, Styler> styles = decoratingFunction
+                .apply("When Then Start Keyword Execution");
+        assertThat(styles.asMapOfRanges()).hasSize(1)
+                .hasEntrySatisfying(Range.closedOpen(0, 10), styler -> hasForeground(styler, new RGB(7, 8, 9)));
     }
 
     @Test
@@ -200,20 +205,15 @@ public class ActionNamesStyleConfigurationTest {
 
         final RangeMap<Integer, Styler> styles = decoratingFunction
                 .apply("When key&{var@{${ia}ble}} sth} &{another}[index]]variable But {nonvariable} And ${");
-        final Map<Range<Integer>, Styler> stylesAsMap = styles.asMapOfRanges();
+        assertThat(styles.asMapOfRanges()).hasSize(3)
+                .hasEntrySatisfying(Range.closedOpen(0, 5), styler -> hasForeground(styler, new RGB(7, 8, 9)))
+                .hasEntrySatisfying(Range.closedOpen(8, 25), styler -> hasForeground(styler, new RGB(4, 5, 6)))
+                .hasEntrySatisfying(Range.closedOpen(31, 48), styler -> hasForeground(styler, new RGB(4, 5, 6)));
+    }
 
-        assertThat(stylesAsMap).hasSize(3);
-        assertThat(stylesAsMap.keySet()).containsExactly(Range.closedOpen(0, 4), Range.closedOpen(8, 25),
-                Range.closedOpen(31, 48));
-
+    private void hasForeground(final Styler styler, final RGB rgb) {
         final TextStyle styleToCheck = new TextStyle();
-        stylesAsMap.get(Range.closedOpen(0, 4)).applyStyles(styleToCheck);
-        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(7, 8, 9));
-
-        stylesAsMap.get(Range.closedOpen(8, 25)).applyStyles(styleToCheck);
-        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(4, 5, 6));
-
-        stylesAsMap.get(Range.closedOpen(31, 48)).applyStyles(styleToCheck);
-        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(new RGB(4, 5, 6));
+        styler.applyStyles(styleToCheck);
+        assertThat(styleToCheck.foreground.getRGB()).isEqualTo(rgb);
     }
 }

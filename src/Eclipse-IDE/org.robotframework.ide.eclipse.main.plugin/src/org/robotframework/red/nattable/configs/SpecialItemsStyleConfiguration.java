@@ -5,11 +5,6 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import java.util.stream.Stream;
-
-import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
-import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -34,12 +29,12 @@ public class SpecialItemsStyleConfiguration extends RobotElementsStyleConfigurat
     }
 
     @Override
-    public void configureRegistry(final IConfigRegistry configRegistry) {
-        final Style specialStyle = createStyle(SyntaxHighlightingCategory.SPECIAL);
+    String getConfigLabel() {
+        return SpecialItemsLabelAccumulator.SPECIAL_ITEM_CONFIG_LABEL;
+    }
 
-        Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
-            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, specialStyle, mode,
-                    SpecialItemsLabelAccumulator.SPECIAL_ITEM_CONFIG_LABEL);
-        });
+    @Override
+    Style createElementStyle() {
+        return createStyle(SyntaxHighlightingCategory.SPECIAL);
     }
 }
