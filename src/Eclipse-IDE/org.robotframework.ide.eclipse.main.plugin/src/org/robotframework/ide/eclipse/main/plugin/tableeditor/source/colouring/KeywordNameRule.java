@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
 
 public class KeywordNameRule extends VariableUsageRule {
 
@@ -38,6 +39,11 @@ public class KeywordNameRule extends VariableUsageRule {
             return Optional.of(new PositionedTextToken(nameToken, token.getStartOffset(), token.getText().length()));
         }
         return Optional.empty();
+    }
+
+    @Override
+    protected VariableExtractor createVariableExtractor() {
+        return new VariableExtractor(new NonEnvironmentDeclarationMapper());
     }
 
     @Override
