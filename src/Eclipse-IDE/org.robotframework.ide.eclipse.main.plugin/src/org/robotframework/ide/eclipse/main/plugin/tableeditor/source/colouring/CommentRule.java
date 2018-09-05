@@ -18,7 +18,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class CommentRule implements ISyntaxColouringRule {
-    
+
     private final IToken textToken;
 
     private final ITodoTaskToken tasksToken;
