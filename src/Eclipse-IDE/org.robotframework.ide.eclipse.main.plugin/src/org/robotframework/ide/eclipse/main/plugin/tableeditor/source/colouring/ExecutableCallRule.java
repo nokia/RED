@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.eclipse.jface.text.rules.IToken;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -57,11 +59,6 @@ public class ExecutableCallRule extends VariableUsageRule {
     }
 
     @Override
-    protected IToken getTokenForNonVariablePart() {
-        return textToken;
-    }
-
-    @Override
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<RobotLine> context) {
         if (shouldBeColored(token, context, shouldStopOnElement)) {
@@ -73,6 +70,16 @@ public class ExecutableCallRule extends VariableUsageRule {
                     token.getText().length() - offsetInToken));
         }
         return Optional.empty();
+    }
+
+    @Override
+    protected VariableExtractor createVariableExtractor() {
+        return new VariableExtractor(new NonEnvironmentDeclarationMapper());
+    }
+
+    @Override
+    protected IToken getTokenForNonVariablePart() {
+        return textToken;
     }
 
     protected boolean shouldBeColored(final IRobotLineElement token, final List<RobotLine> context,

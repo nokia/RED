@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
-import org.rf.ide.core.testdata.model.ExecutableLineChecker;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IndexDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -41,13 +39,9 @@ public class VariableUsageRule implements ISyntaxColouringRule {
         final List<IRobotTokenType> tokenTypes = token.getTypes();
 
         if (tokenTypes.contains(RobotTokenType.VARIABLE_USAGE)) {
-            final VariableExtractor extractor = (tokenTypes.contains(RobotTokenType.KEYWORD_NAME)
-                    || ExecutableLineChecker.hasExecutableType(tokenTypes))
-                            ? new VariableExtractor(new NonEnvironmentDeclarationMapper())
-                            : new VariableExtractor();
+            final VariableExtractor extractor = createVariableExtractor();
             final MappingResult extract = extractor.extract((RobotToken) token, null);
             final List<IElementDeclaration> elements = extract.getMappedElements();
-
             for (int i = 0; i < elements.size(); i++) {
                 final IElementDeclaration declaration = elements.get(i);
                 final int startOffset = declaration.getStartFromFile().getOffset();
@@ -62,6 +56,10 @@ public class VariableUsageRule implements ISyntaxColouringRule {
             }
         }
         return Optional.empty();
+    }
+
+    protected VariableExtractor createVariableExtractor() {
+        return new VariableExtractor();
     }
 
     protected IToken getTokenForNonVariablePart() {
