@@ -36,7 +36,7 @@ public class GherkinPrefixRule implements ISyntaxColouringRule {
     public static GherkinPrefixRule forExecutableInKeyword(final IToken textToken) {
         return new GherkinPrefixRule(textToken,
                 EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT),
-                ExecutableCallRule.forExecutableInTestCase(null, null));
+                ExecutableCallRule.forExecutableInKeyword(null, null));
     }
 
     public static GherkinPrefixRule forExecutableInKeywordSetting(final IToken textToken) {
@@ -80,17 +80,14 @@ public class GherkinPrefixRule implements ISyntaxColouringRule {
     @Override
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<RobotLine> context) {
-
+        if (offsetInToken > 0) {
+            return Optional.empty();
+        }
         final String textAfterPrefix = GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(token.getText());
         final int prefixLength = token.getText().length() - textAfterPrefix.length();
-        if (prefixLength > 0 && shouldBeColored(token, offsetInToken, context)) {
+        if (prefixLength > 0 && executableCallRule.evaluate(token, offsetInToken, context).isPresent()) {
             return Optional.of(new PositionedTextToken(textToken, token.getStartOffset(), prefixLength));
         }
         return Optional.empty();
-    }
-
-    private boolean shouldBeColored(final IRobotLineElement token, final int offsetInToken,
-            final List<RobotLine> context) {
-        return offsetInToken == 0 && executableCallRule.evaluate(token, offsetInToken, context).isPresent();
     }
 }
