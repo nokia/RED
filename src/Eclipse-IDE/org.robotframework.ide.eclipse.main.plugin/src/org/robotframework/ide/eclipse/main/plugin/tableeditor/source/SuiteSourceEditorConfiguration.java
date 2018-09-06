@@ -73,7 +73,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.C
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule.ITodoTaskToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallInSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.GherkinPrefixRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.InTokenRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
@@ -425,24 +424,21 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new SettingsTemplateRule(call),
-                GherkinPrefixRule.forExecutableInTestCaseSetting(gherkin),
-                GherkinPrefixRule.forExecutableInTestCase(gherkin),
-                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, variable),
-                ExecutableCallRule.forExecutableInTestCase(call, variable), new NestedExecsSpecialTokensRule(special),
-                new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(special) };
+                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin, variable),
+                ExecutableCallRule.forExecutableInTestCase(call, gherkin, variable),
+                new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new InTokenRule(special) };
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
-                GherkinPrefixRule.forExecutableInKeywordSetting(gherkin),
-                GherkinPrefixRule.forExecutableInKeyword(gherkin),
-                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, variable),
-                ExecutableCallRule.forExecutableInKeyword(call, variable), new NestedExecsSpecialTokensRule(special),
-                new CommentRule(comment, tasks), new VariableUsageRule(variable), new InTokenRule(special) };
+                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, variable),
+                ExecutableCallRule.forExecutableInKeyword(call, gherkin, variable),
+                new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new InTokenRule(special) };
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsTemplateRule(call),
-                GherkinPrefixRule.forExecutableInSetting(gherkin),
-                ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, variable),
+                ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, gherkin, variable),
                 new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new WithNameRule(special) };
 
