@@ -29,10 +29,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 public class ExecutableCallRuleTest {
 
     private final ExecutableCallRule tcTestedRule = ExecutableCallRule.forExecutableInTestCase(new Token("call_token"),
-            new Token("var_token"));
+            new Token("gherkin_token"), new Token("var_token"));
 
     private final ExecutableCallRule kwTestedRule = ExecutableCallRule.forExecutableInKeyword(new Token("call_token"),
-            new Token("var_token"));
+            new Token("gherkin_token"), new Token("var_token"));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
@@ -70,8 +70,7 @@ public class ExecutableCallRuleTest {
             for (final IRobotLineElement token : line.getLineElements()) {
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, lines);
 
-                if (token.getText().equals("call") || token.getText().equals(":FOR")
-                        || token.getText().contains("gherkin_call")) {
+                if (token.getText().equals("call") || token.getText().equals(":FOR")) {
                     thereWasName = true;
 
                     assertThat(evaluatedToken).isPresent();
@@ -79,7 +78,7 @@ public class ExecutableCallRuleTest {
                             .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
                     assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("call_token");
 
-                } else if (!token.getText().contains("var_asgn")) {
+                } else if (!token.getText().contains("var_asgn") && !token.getText().contains("gherkin_call")) {
                     assertThat(evaluatedToken).isNotPresent();
                 }
                 previousTokens.add(token);
@@ -97,8 +96,7 @@ public class ExecutableCallRuleTest {
                 final int positionInsideToken = new Random().nextInt(token.getText().length());
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken, lines);
 
-                if (token.getText().equals("call") || token.getText().equals(":FOR")
-                        || token.getText().contains("gherkin_call")) {
+                if (token.getText().equals("call") || token.getText().equals(":FOR")) {
                     thereWasName = true;
 
                     assertThat(evaluatedToken).isPresent();
@@ -107,9 +105,36 @@ public class ExecutableCallRuleTest {
                                     token.getText().length() - positionInsideToken));
                     assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("call_token");
 
-                } else if (!token.getText().contains("var_asgn")) {
+                } else if (!token.getText().contains("var_asgn") && !token.getText().contains("gherkin_call")) {
                     assertThat(evaluatedToken).isNotPresent();
                 }
+            }
+        }
+        assertThat(thereWasName).isTrue();
+    }
+
+    @Test
+    public void gherkinPrefixIsRecognized() {
+        final List<IRobotLineElement> previousTokens = new ArrayList<>();
+
+        boolean thereWasName = false;
+        final List<RobotLine> lines = TokensSource.createTokensInLines();
+        for (final RobotLine line : lines) {
+            for (final IRobotLineElement token : line.getLineElements()) {
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, lines);
+
+                if (token.getText().contains("gherkin_call")) {
+                    thereWasName = true;
+
+                    assertThat(evaluatedToken).isPresent();
+                    assertThat(evaluatedToken.get().getPosition()).isEqualTo(
+                            new Position(token.getStartOffset(), token.getText().length() - "gherkin_call".length()));
+                    assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("gherkin_token");
+                } else if (!token.getText().contains("var_asgn") && !token.getText().equals("call")
+                        && !token.getText().equals(":FOR")) {
+                    assertThat(evaluatedToken).isNotPresent();
+                }
+                previousTokens.add(token);
             }
         }
         assertThat(thereWasName).isTrue();
