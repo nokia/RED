@@ -7,11 +7,17 @@ Element-Version: 3.0
 External-Reference: 
 Id: _hmnS8I7CEeWetPU-dn-gxQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/4/18 10:26 AM
+Save-Time: 9/6/18 3:32 PM
 Tags: Unstable
 Testcase-Type: ecl
 Verifications: _vFf3wM6GEeawFJWg5rP2EA
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+RED-1179 - double errors
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
