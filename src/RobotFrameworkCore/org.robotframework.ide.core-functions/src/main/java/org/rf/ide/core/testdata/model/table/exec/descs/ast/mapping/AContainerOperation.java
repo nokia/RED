@@ -11,27 +11,22 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElementType;
 
-
 public abstract class AContainerOperation implements IElementDeclaration {
 
     protected final List<IElementDeclaration> elementsDeclaredInside = new ArrayList<>();
-
 
     @Override
     public void addElementDeclarationInside(final IElementDeclaration elementToAdd) {
         elementsDeclaredInside.add(elementToAdd);
     }
 
-
     @Override
     public void removeElementDeclarationInside(final int indexOfElementToRemove) {
         elementsDeclaredInside.remove(indexOfElementToRemove);
     }
 
-
     @Override
-    public void removeExactlyTheSameInstance(
-            final IElementDeclaration elementToRemove) {
+    public void removeExactlyTheSameInstance(final IElementDeclaration elementToRemove) {
         for (int i = 0; i < elementsDeclaredInside.size(); i++) {
             final IElementDeclaration d = elementsDeclaredInside.get(i);
             if (d == elementToRemove) {
@@ -41,7 +36,6 @@ public abstract class AContainerOperation implements IElementDeclaration {
         }
     }
 
-
     @Override
     public List<ContainerElementType> getTypes() {
         final List<ContainerElementType> types = new ArrayList<>();
@@ -50,7 +44,6 @@ public abstract class AContainerOperation implements IElementDeclaration {
         }
         return types;
     }
-
 
     @Override
     public List<IElementDeclaration> getElementsDeclarationInside() {

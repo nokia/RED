@@ -11,47 +11,33 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElementType;
 
-
 public interface IElementDeclaration {
 
     TextPosition getStart();
 
-
     FilePosition getStartFromFile();
-
 
     TextPosition getEnd();
 
-
     FilePosition getEndFromFile();
 
-
-    void setRobotTokenPosition(final FilePosition robotTokenPosition);
-
+    void setRobotTokenPosition(FilePosition robotTokenPosition);
 
     FilePosition findRobotTokenPosition();
 
+    void addElementDeclarationInside(IElementDeclaration elementToAdd);
 
-    void addElementDeclarationInside(final IElementDeclaration elementToAdd);
+    void removeElementDeclarationInside(int indexOfElementToRemove);
 
-
-    void removeElementDeclarationInside(final int indexOfElementToRemove);
-
-
-    void removeExactlyTheSameInstance(final IElementDeclaration elementToRemove);
-
+    void removeExactlyTheSameInstance(IElementDeclaration elementToRemove);
 
     List<ContainerElementType> getTypes();
 
-
     List<IElementDeclaration> getElementsDeclarationInside();
 
-
-    void setLevelUpElement(final IElementDeclaration levelUpElement);
-
+    void setLevelUpElement(IElementDeclaration levelUpElement);
 
     IElementDeclaration getLevelUpElement();
-
 
     boolean isComplex();
 }

@@ -14,108 +14,86 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElementType;
 
-
 public class TextDeclaration implements IElementDeclaration {
 
     private IElementDeclaration levelUpElement;
+
     private final List<IElementDeclaration> elementsDeclaredInside = new ArrayList<>();
+
     private final TextPosition text;
+
     private final ContainerElementType mappedType;
+
     private FilePosition robotTokenPosition;
 
-
-    public TextDeclaration(final TextPosition text,
-            final ContainerElementType mappedType) {
+    public TextDeclaration(final TextPosition text, final ContainerElementType mappedType) {
         this.text = text;
         this.mappedType = mappedType;
     }
-
 
     @Override
     public void setLevelUpElement(final IElementDeclaration levelUpElement) {
         this.levelUpElement = levelUpElement;
     }
 
-
     @Override
     public void setRobotTokenPosition(final FilePosition robotTokenPosition) {
         this.robotTokenPosition = robotTokenPosition;
     }
 
-
     private FilePosition getRobotTokenPosition() {
         return robotTokenPosition;
     }
-
 
     @Override
     public TextPosition getStart() {
         return text;
     }
 
-
     @Override
     public FilePosition getStartFromFile() {
-        FilePosition position = findRobotTokenPosition();
-        position = new FilePosition(position.getLine(), position.getColumn()
-                + text.getStart(), position.getOffset() + text.getStart());
-        return position;
+        final FilePosition position = findRobotTokenPosition();
+        return new FilePosition(position.getLine(), position.getColumn() + text.getStart(),
+                position.getOffset() + text.getStart());
     }
-
 
     @Override
     public TextPosition getEnd() {
         return text;
     }
 
-
     @Override
     public FilePosition getEndFromFile() {
-        FilePosition position = findRobotTokenPosition();
-        position = new FilePosition(position.getLine(), position.getColumn()
-                + text.getEnd(), position.getOffset() + text.getEnd());
-        return position;
+        final FilePosition position = findRobotTokenPosition();
+        return new FilePosition(position.getLine(), position.getColumn() + text.getEnd(),
+                position.getOffset() + text.getEnd());
     }
-
 
     @Override
     public FilePosition findRobotTokenPosition() {
-        FilePosition position = getRobotTokenPosition();
-        if (position == null) {
-            position = this.levelUpElement.findRobotTokenPosition();
-        }
-
-        return position;
+        final FilePosition position = getRobotTokenPosition();
+        return position != null ? position : levelUpElement.findRobotTokenPosition();
     }
-
 
     public int getLength() {
-        int length = 0;
-        if (text != null) {
-            length = text.getLength();
-        }
-        return length;
+        return text != null ? text.getLength() : 0;
     }
-
 
     @Override
     public List<IElementDeclaration> getElementsDeclarationInside() {
         return Collections.unmodifiableList(elementsDeclaredInside);
     }
 
-
     @Override
     public IElementDeclaration getLevelUpElement() {
         return levelUpElement;
     }
-
 
     @Override
     public void addElementDeclarationInside(final IElementDeclaration elementToAdd) {
         throw new UnsupportedOperationException(
                 "Adding elements to TEXT declaration is not allowed please use container class for it.");
     }
-
 
     @Override
     public void removeElementDeclarationInside(final int indexOfElementToRemove) {
@@ -124,7 +102,6 @@ public class TextDeclaration implements IElementDeclaration {
 
     }
 
-
     @Override
     public void removeExactlyTheSameInstance(final IElementDeclaration elementToRemove) {
         throw new UnsupportedOperationException(
@@ -132,16 +109,19 @@ public class TextDeclaration implements IElementDeclaration {
 
     }
 
-
     @Override
     public List<ContainerElementType> getTypes() {
         return Arrays.asList(mappedType);
     }
 
-
     @Override
     public boolean isComplex() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("TextDeclaration [start=%s, end=%s]", getStart(), getEnd());
     }
 
 }

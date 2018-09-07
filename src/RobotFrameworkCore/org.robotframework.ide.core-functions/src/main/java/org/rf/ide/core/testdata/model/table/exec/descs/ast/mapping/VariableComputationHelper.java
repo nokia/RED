@@ -10,7 +10,7 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.GeneralVariableType;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.VariableDeclarationType;
 
 public class VariableComputationHelper {
 
@@ -33,45 +33,42 @@ public class VariableComputationHelper {
     private final static Pattern TEXT_OPERATION = Pattern
             .compile("^((\\s*(" + COUNT_OPERATIONS + ")+\\s*(" + NUMBER_PATTERN + "|" + QUOTA_TEXT + ")+\\s*)+)*");
 
-    public Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
-        final Optional<TextPosition> text = Optional.empty();
-
-        if (variableDec.getVariableType() == GeneralVariableType.COMPUTATION) {
-            final TextPosition textPositionVariableName = variableDec.getVariableName();
-            final String variableName = textPositionVariableName.getText().trim();
+    public static Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
+        if (variableDec.getVariableType() == VariableDeclarationType.COMPUTATION) {
+            final String variableName = variableDec.getVariableName().getText().trim();
             if (!variableName.isEmpty()) {
+                final String variableFullName = variableDec.getVariableName().getFullText();
                 if (!variableName.startsWith("(") && !variableName.startsWith("\"") && !variableName.startsWith("[")) {
                     if (!ILLEGAL_BRACKET_SYNTAX.matcher(variableName).find()) {
                         if (startsFromNumber(variableName)) {
-                            if (isNumberComputation(variableName)) {
+                            if (isNumberOperation(variableName)) {
                                 return Optional.of(new TextPosition("" + 3, 0, 1));
                             }
                         } else if (startsWithVariableName(variableName)) {
-                            final String variable = getVariableName(variableName);
+                            final String variable = extractVariableName(variableName);
                             if (variable != null) {
-                                final int startIndex = textPositionVariableName.getFullText().indexOf(variable);
+                                final int startIndex = variableFullName.indexOf(variable);
 
                                 if (startIndex >= 0) {
-                                    if (isPropertTextOperation(variableName, variable)) {
-                                        return Optional.of(new TextPosition(textPositionVariableName.getFullText(),
-                                                startIndex, startIndex + variable.length() - 1));
+                                    if (isTextOperation(variableName, variable)) {
+                                        return Optional.of(new TextPosition(variableFullName, startIndex,
+                                                startIndex + variable.length() - 1));
                                     }
                                 }
                             }
                         }
                     }
                 } else {
-                    final int startIndex = textPositionVariableName.getFullText().indexOf(variableName.charAt(0));
-                    return Optional
-                            .of(new TextPosition(textPositionVariableName.getFullText(), startIndex, startIndex));
+                    final int startIndex = variableFullName.indexOf(variableName.charAt(0));
+                    return Optional.of(new TextPosition(variableFullName, startIndex, startIndex));
                 }
             }
         }
 
-        return text;
+        return Optional.empty();
     }
 
-    private static boolean isPropertTextOperation(final String expression, final String variable) {
+    private static boolean isTextOperation(final String expression, final String variable) {
         final String restOperationText = expression.substring(variable.length()).trim();
         final String withoutBrackets = validateAndRemoveBrackets(restOperationText);
         if (withoutBrackets != null) {
@@ -81,7 +78,7 @@ public class VariableComputationHelper {
         return false;
     }
 
-    private String getVariableName(final String variableName) {
+    private static String extractVariableName(final String variableName) {
         final String[] split = COUNT_OPERATION_PATTERN.split(variableName);
         if (split.length >= 2) {
             return split[0].trim();
@@ -90,15 +87,15 @@ public class VariableComputationHelper {
         return null;
     }
 
-    private boolean startsFromNumber(final String expression) {
+    private static boolean startsFromNumber(final String expression) {
         return NUMBER_PATTERN.matcher(expression).matches();
     }
 
-    private boolean startsWithVariableName(final String expression) {
+    private static boolean startsWithVariableName(final String expression) {
         return !startsFromNumber(expression);
     }
 
-    private boolean isNumberComputation(final String expression) {
+    private static boolean isNumberOperation(final String expression) {
         final String bracketRemoved = validateAndRemoveBrackets(expression);
         if (bracketRemoved != null) {
             return NUMBER_OPERATION.matcher(bracketRemoved).matches();
