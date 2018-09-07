@@ -53,7 +53,7 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
     public boolean isEscaped() {
-        return (escape != null);
+        return escape != null;
     }
 
     public TextPosition getEscape() {
@@ -69,19 +69,13 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
     public VariableType getRobotType() {
-        char c = (char) -1;
         final String text = getTypeIdentificator().getText();
-        if (!text.isEmpty()) {
-            c = text.charAt(0);
-        }
-
-        final VariableType robotType = VariableType.getTypeByChar(c);
-
-        return robotType;
+        final char c = !text.isEmpty() ? text.charAt(0) : (char) -1;
+        return VariableType.getTypeByChar(c);
     }
 
-    public void setTypeIdentificator(final TextPosition variableIdentficator) {
-        this.variableIdentificator = variableIdentficator;
+    public void setTypeIdentificator(final TextPosition variableIdentificator) {
+        this.variableIdentificator = variableIdentificator;
     }
 
     @Override
@@ -94,24 +88,20 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
     public TextPosition getVariableText() {
-        int start = variableStart.getStart();
-        if (variableIdentificator != null) {
-            start = variableIdentificator.getStart();
-        }
+        final int start = variableIdentificator != null ? variableIdentificator.getStart() : variableStart.getStart();
         final int end = variableEnd.getEnd();
         return new TextPosition(variableStart.getFullText(), start, end);
     }
 
     public Optional<TextPosition> getTextWithoutComputation() {
-        return new VariableComputationHelper().extractVariableName(this);
+        return VariableComputationHelper.extractVariableName(this);
     }
 
     @Override
     public FilePosition getStartFromFile() {
-        FilePosition position = findRobotTokenPosition();
-        position = new FilePosition(position.getLine(), position.getColumn() + variableIdentificator.getStart(),
+        final FilePosition position = findRobotTokenPosition();
+        return new FilePosition(position.getLine(), position.getColumn() + variableIdentificator.getStart(),
                 position.getOffset() + variableIdentificator.getStart());
-        return position;
     }
 
     @Override
@@ -120,8 +110,6 @@ public class VariableDeclaration extends AContainerOperation {
     }
 
     public TextPosition getVariableName() {
-        TextPosition varName = new TextPosition(variableStart.getFullText(), variableStart.getEnd() + 1,
-                variableEnd.getStart() - 1);
         if (!isDynamic()) {
             final JoinedTextDeclarations nameJoined = new JoinedTextDeclarations();
             final List<IElementDeclaration> elementsDeclarationInside = super.getElementsDeclarationInside();
@@ -135,25 +123,24 @@ public class VariableDeclaration extends AContainerOperation {
 
             final TextPosition joined = nameJoined.join();
             if (joined != null) {
-                varName = nameJoined.join();
+                return joined;
             }
         }
 
-        return varName;
+        return new TextPosition(variableStart.getFullText(), variableStart.getEnd() + 1, variableEnd.getStart() - 1);
     }
 
     public TextPosition getObjectName() {
-        TextPosition objectName = null;
-        if (getVariableType() == GeneralVariableType.PYTHON_SPECIFIC_INVOKE_VALUE_GET) {
+        if (getVariableType() == VariableDeclarationType.PYTHON_SPECIFIC_INVOKE_VALUE_GET) {
             final TextPosition variableName = getVariableName();
             final String variableText = variableName.getText();
             final int dotCharPos = variableText.indexOf('.');
             if (dotCharPos >= 0) {
-                objectName = new TextPosition(variableName.getFullText(), variableName.getStart(),
+                return new TextPosition(variableName.getFullText(), variableName.getStart(),
                         variableName.getStart() + dotCharPos - 1);
             }
         }
-        return objectName;
+        return null;
     }
 
     public RobotToken asToken() {
@@ -171,20 +158,12 @@ public class VariableDeclaration extends AContainerOperation {
 
     /**
      * check if variable depends on other variables
-     * 
+     *
      * @return
      */
     public boolean isDynamic() {
-        boolean result = false;
         final List<IElementDeclaration> elementsDeclarationInside = super.getElementsDeclarationInside();
-        for (final IElementDeclaration iElementDeclaration : elementsDeclarationInside) {
-            if (iElementDeclaration instanceof VariableDeclaration) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
+        return elementsDeclarationInside.stream().anyMatch(declaration -> declaration instanceof VariableDeclaration);
     }
 
     @Override
@@ -194,20 +173,15 @@ public class VariableDeclaration extends AContainerOperation {
 
     @Override
     public FilePosition getEndFromFile() {
-        FilePosition position = findRobotTokenPosition();
-        position = new FilePosition(position.getLine(), position.getColumn() + variableEnd.getEnd(),
+        final FilePosition position = findRobotTokenPosition();
+        return new FilePosition(position.getLine(), position.getColumn() + variableEnd.getEnd(),
                 position.getOffset() + variableEnd.getEnd());
-        return position;
     }
 
     @Override
     public FilePosition findRobotTokenPosition() {
-        FilePosition position = getRobotTokenPosition();
-        if (position == null) {
-            position = this.levelUpElement.findRobotTokenPosition();
-        }
-
-        return position;
+        final FilePosition position = getRobotTokenPosition();
+        return position != null ? position : levelUpElement.findRobotTokenPosition();
     }
 
     @Override
@@ -225,60 +199,65 @@ public class VariableDeclaration extends AContainerOperation {
         return true;
     }
 
-    public IVariableType getVariableType() {
-        IVariableType type = null;
+    @Override
+    public String toString() {
+        return String.format("VariableDeclaration [start=%s, end=%s]", getStart(), getEnd());
+    }
+
+    public VariableDeclarationType getVariableType() {
         if (isDynamic()) {
-            type = GeneralVariableType.DYNAMIC;
+            return VariableDeclarationType.DYNAMIC;
         } else {
             final String variableNameText = getVariableName().getText();
             final VariableType varType = getRobotType();
             if (varType == VariableType.SCALAR || varType == VariableType.SCALAR_AS_LIST) {
                 if (EXPONENT_NUMBER_PATTERN.matcher(variableNameText).find()) {
-                    type = Number.EXPONENT_NUMBER;
+                    return VariableDeclarationType.EXPONENT_NUMBER;
                 } else if (COMPUTATION_PATTERN.matcher(variableNameText).find()) {
-                    type = GeneralVariableType.COMPUTATION;
+                    return VariableDeclarationType.COMPUTATION;
                 } else if (NUMBER_PATTERN.matcher(variableNameText).find()) {
-                    type = Number.NORMAL_NUMBER;
+                    return VariableDeclarationType.NORMAL_NUMBER;
                 } else if (BINARY_NUMBER_PATTERN.matcher(variableNameText).find()) {
-                    type = Number.BINARY_NUMBER;
+                    return VariableDeclarationType.BINARY_NUMBER;
                 } else if (OCTAL_NUMBER_PATTERN.matcher(variableNameText).find()) {
-                    type = Number.OCTAL_NUMBER;
+                    return VariableDeclarationType.OCTAL_NUMBER;
                 } else if (HEX_NUMBER_PATTERN.matcher(variableNameText).find()) {
-                    type = Number.HEX_NUMBER;
-                } else {
-                    if (PYTHON_METHOD_INVOKE_PATTERN.matcher(variableNameText).find()) {
-                        type = GeneralVariableType.PYTHON_SPECIFIC_INVOKE_METHOD;
-                    } else if (PYTHON_GET_INVOKE_PATTERN.matcher(variableNameText).find()) {
-                        type = GeneralVariableType.PYTHON_SPECIFIC_INVOKE_VALUE_GET;
-                    }
+                    return VariableDeclarationType.HEX_NUMBER;
+                } else if (PYTHON_METHOD_INVOKE_PATTERN.matcher(variableNameText).find()) {
+                    return VariableDeclarationType.PYTHON_SPECIFIC_INVOKE_METHOD;
+                } else if (PYTHON_GET_INVOKE_PATTERN.matcher(variableNameText).find()) {
+                    return VariableDeclarationType.PYTHON_SPECIFIC_INVOKE_VALUE_GET;
                 }
             }
 
-            if (type == null) {
-                type = GeneralVariableType.NORMAL_TEXT;
-            }
+            return VariableDeclarationType.NORMAL_TEXT;
         }
-
-        return type;
     }
 
-    public interface IVariableType {
-
-    }
-
-    public enum GeneralVariableType implements IVariableType {
+    public enum VariableDeclarationType {
         DYNAMIC,
         NORMAL_TEXT,
         PYTHON_SPECIFIC_INVOKE_VALUE_GET,
         PYTHON_SPECIFIC_INVOKE_METHOD,
-        COMPUTATION;
-    }
+        COMPUTATION,
+        NORMAL_NUMBER(true),
+        BINARY_NUMBER(true),
+        OCTAL_NUMBER(true),
+        HEX_NUMBER(true),
+        EXPONENT_NUMBER(true);
 
-    public enum Number implements IVariableType {
-        NORMAL_NUMBER,
-        BINARY_NUMBER,
-        OCTAL_NUMBER,
-        HEX_NUMBER,
-        EXPONENT_NUMBER;
+        private VariableDeclarationType() {
+            this(false);
+        }
+
+        private VariableDeclarationType(final boolean isNumber) {
+            this.isNumber = isNumber;
+        }
+
+        private boolean isNumber;
+
+        public boolean isNumber() {
+            return isNumber;
+        }
     }
 }

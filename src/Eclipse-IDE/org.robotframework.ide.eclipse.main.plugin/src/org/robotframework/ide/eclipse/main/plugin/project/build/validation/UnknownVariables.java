@@ -17,7 +17,6 @@ import java.util.function.Predicate;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.Number;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -45,7 +44,7 @@ class UnknownVariables {
         return declaration ->
                    !declaration.asToken().getTypes().contains(RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION)
                 && !declaration.isDynamic()
-                && !(declaration.getVariableType() instanceof Number)
+                && !declaration.getVariableType().isNumber()
                 && !VariableNamesSupport.isDefinedVariable(declaration, definedVariables)
                 && !VariableNamesSupport.isDefinedVariableInsideComputation(declaration, definedVariables);
     }

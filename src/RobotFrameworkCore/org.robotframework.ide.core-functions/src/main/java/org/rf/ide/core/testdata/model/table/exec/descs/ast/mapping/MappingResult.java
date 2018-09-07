@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.IVariableType;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.VariableDeclarationType;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 public class MappingResult {
@@ -48,9 +48,7 @@ public class MappingResult {
     }
 
     public void addMappedElements(final List<IElementDeclaration> mapped) {
-        for (final IElementDeclaration elemDec : mapped) {
-            addMappedElement(elemDec);
-        }
+        mappedElements.addAll(mapped);
     }
 
     public List<IElementDeclaration> getTextElements() {
@@ -69,68 +67,43 @@ public class MappingResult {
     }
 
     public boolean isOnlyPossibleCollectionVariable() {
-        boolean result = false;
-        if (mappedElements.size() == 1) {
-            IElementDeclaration elemDec = mappedElements.get(0);
-            if (elemDec instanceof VariableDeclaration) {
-                VariableDeclaration varDec = (VariableDeclaration) elemDec;
-                VariableType robotType = varDec.getRobotType();
-                if (robotType == VariableType.DICTIONARY || robotType == VariableType.LIST
-                        || robotType == VariableType.SCALAR || robotType == VariableType.SCALAR_AS_LIST) {
-                    IVariableType extractorVariableType = varDec.getVariableType();
-                    result = !isCollectionVariableElementGet()
-                            && (extractorVariableType == VariableDeclaration.GeneralVariableType.NORMAL_TEXT
-                                    || extractorVariableType == VariableDeclaration.GeneralVariableType.DYNAMIC);
-                }
+        if (mappedElements.size() == 1 && mappedElements.get(0) instanceof VariableDeclaration) {
+            final VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
+            final VariableType robotType = varDec.getRobotType();
+            if (robotType == VariableType.DICTIONARY || robotType == VariableType.LIST
+                    || robotType == VariableType.SCALAR || robotType == VariableType.SCALAR_AS_LIST) {
+                final VariableDeclarationType extractorVariableType = varDec.getVariableType();
+                return !isCollectionVariableElementGet()
+                        && (extractorVariableType == VariableDeclarationType.NORMAL_TEXT
+                                || extractorVariableType == VariableDeclarationType.DYNAMIC);
             }
         }
 
-        return result;
+        return false;
     }
 
     public boolean isCollectionVariableElementGet() {
-        boolean result = false;
-        if (mappedElements.size() == 2) {
-            final List<IElementDeclaration> elems = new ArrayList<>();
-            elems.addAll(mappedElements.get(0).getElementsDeclarationInside());
-            elems.addAll(mappedElements.get(1).getElementsDeclarationInside());
-
-            if (mappedElements.get(0) instanceof VariableDeclaration
-                    && mappedElements.get(1) instanceof IndexDeclaration) {
-                VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
-                if (varDec.getRobotType() != VariableType.ENVIRONMENT) {
-                    int indexElementsNumber = 0;
-                    for (final IElementDeclaration dec : elems) {
-                        if (dec instanceof IndexDeclaration) {
-                            indexElementsNumber = 1;
-                            break;
-                        }
-                    }
-
-                    if (indexElementsNumber == 0) {
-                        result = true;
-                    }
-                }
+        if (mappedElements.size() == 2 && mappedElements.get(0) instanceof VariableDeclaration
+                && mappedElements.get(1) instanceof IndexDeclaration) {
+            final VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
+            if (varDec.getRobotType() != VariableType.ENVIRONMENT) {
+                return mappedElements.stream()
+                        .map(IElementDeclaration::getElementsDeclarationInside)
+                        .flatMap(List<IElementDeclaration>::stream)
+                        .noneMatch(declaration -> declaration instanceof IndexDeclaration);
             }
-        } else if (mappedElements.size() == 1) {
-            if (mappedElements.get(0) instanceof VariableDeclaration) {
-                VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
-                if (varDec.getRobotType() != VariableType.ENVIRONMENT) {
-                    int indexElementsNumber = 0;
-                    for (final IElementDeclaration dec : mappedElements.get(0).getElementsDeclarationInside()) {
-                        if (dec instanceof IndexDeclaration) {
-                            indexElementsNumber++;
-                        }
-                    }
-
-                    if (indexElementsNumber == 1) {
-                        result = true;
-                    }
-                }
+        } else if (mappedElements.size() == 1 && mappedElements.get(0) instanceof VariableDeclaration) {
+            final VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
+            if (varDec.getRobotType() != VariableType.ENVIRONMENT) {
+                final long indexDeclarationsCount = varDec.getElementsDeclarationInside()
+                        .stream()
+                        .filter(declaration -> declaration instanceof IndexDeclaration)
+                        .count();
+                return indexDeclarationsCount == 1;
             }
         }
 
-        return result;
+        return false;
     }
 
     public List<VariableDeclaration> getCorrectVariables() {
@@ -142,9 +115,7 @@ public class MappingResult {
     }
 
     public void addCorrectVariables(final List<VariableDeclaration> variables) {
-        for (final VariableDeclaration variable : variables) {
-            addCorrectVariable(variable);
-        }
+        correctVariables.addAll(variables);
     }
 
     public void addBuildMessage(final BuildMessage msg) {
