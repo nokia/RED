@@ -1,8 +1,8 @@
 /*
-* Copyright 2016 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2016 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import java.util.List;
@@ -20,10 +20,17 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class VariableUsageRule implements ISyntaxColouringRule {
 
-    private final IToken textToken;
+    protected final IToken varToken;
 
-    public VariableUsageRule(final IToken textToken) {
-        this.textToken = textToken;
+    protected final IToken nonVarToken;
+
+    public VariableUsageRule(final IToken varToken) {
+        this(varToken, ISyntaxColouringRule.DEFAULT_TOKEN);
+    }
+
+    public VariableUsageRule(final IToken varToken, final IToken nonVarToken) {
+        this.varToken = varToken;
+        this.nonVarToken = nonVarToken;
     }
 
     @Override
@@ -39,18 +46,7 @@ public class VariableUsageRule implements ISyntaxColouringRule {
         if (tokenTypes.contains(RobotTokenType.VARIABLE_USAGE)) {
             final VariableExtractor extractor = createVariableExtractor();
             final MappingResult extract = extractor.extract((RobotToken) token, null);
-            final List<IElementDeclaration> elements = extract.getMappedElements();
-            for (int i = 0; i < elements.size(); i++) {
-                final IElementDeclaration declaration = elements.get(i);
-                final int startOffset = declaration.getStartFromFile().getOffset();
-                final int endOffset = declaration.getEndFromFile().getOffset();
-                final int currentOffset = token.getStartOffset() + offsetInToken;
-                if (currentOffset <= startOffset || currentOffset <= endOffset) {
-                    final IToken tokenToUse = declaration.isComplex() ? textToken : getTokenForNonVariablePart();
-                    final int offsetToUse = i == 0 ? startOffset + offsetInToken : startOffset;
-                    return Optional.of(new PositionedTextToken(tokenToUse, offsetToUse, endOffset - offsetToUse + 1));
-                }
-            }
+            return evaluateVariables(token, offsetInToken, extract.getMappedElements());
         }
         return Optional.empty();
     }
@@ -59,7 +55,19 @@ public class VariableUsageRule implements ISyntaxColouringRule {
         return new VariableExtractor();
     }
 
-    protected IToken getTokenForNonVariablePart() {
-        return ISyntaxColouringRule.DEFAULT_TOKEN;
+    private Optional<PositionedTextToken> evaluateVariables(final IRobotLineElement token, final int offsetInToken,
+            final List<IElementDeclaration> declarations) {
+        for (int i = 0; i < declarations.size(); i++) {
+            final IElementDeclaration declaration = declarations.get(i);
+            final int startOffset = declaration.getStartFromFile().getOffset();
+            final int endOffset = declaration.getEndFromFile().getOffset();
+            final int currentOffset = token.getStartOffset() + offsetInToken;
+            if (currentOffset <= startOffset || currentOffset <= endOffset) {
+                final IToken tokenToUse = declaration.isComplex() ? varToken : nonVarToken;
+                final int offsetToUse = i == 0 ? startOffset + offsetInToken : startOffset;
+                return Optional.of(new PositionedTextToken(tokenToUse, offsetToUse, endOffset - offsetToUse + 1));
+            }
+        }
+        return Optional.empty();
     }
 }

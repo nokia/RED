@@ -18,11 +18,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordNameRule extends VariableUsageRule {
 
-    private final IToken nameToken;
-
     public KeywordNameRule(final IToken nameToken, final IToken embeddedVariablesToken) {
-        super(embeddedVariablesToken);
-        this.nameToken = nameToken;
+        super(embeddedVariablesToken, nameToken);
     }
 
     @Override
@@ -36,7 +33,7 @@ public class KeywordNameRule extends VariableUsageRule {
                 return evaluated;
             }
 
-            return Optional.of(new PositionedTextToken(nameToken, token.getStartOffset(), token.getText().length()));
+            return Optional.of(new PositionedTextToken(nonVarToken, token.getStartOffset(), token.getText().length()));
         }
         return Optional.empty();
     }
@@ -44,10 +41,5 @@ public class KeywordNameRule extends VariableUsageRule {
     @Override
     protected VariableExtractor createVariableExtractor() {
         return new VariableExtractor(new NonEnvironmentDeclarationMapper());
-    }
-
-    @Override
-    protected IToken getTokenForNonVariablePart() {
-        return nameToken;
     }
 }
