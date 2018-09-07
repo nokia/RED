@@ -41,16 +41,13 @@ public class ExecutableCallRule extends VariableUsageRule {
 
     private final EnumSet<RobotTokenType> acceptableTypes;
 
-    private final IToken textToken;
-
     private final IToken gherkinToken;
 
     private final Predicate<IRobotLineElement> shouldStopOnElement;
 
     protected ExecutableCallRule(final IToken textToken, final IToken gherkinToken, final IToken embeddedVariablesToken,
             final EnumSet<RobotTokenType> acceptableTypes, final Predicate<IRobotLineElement> shouldStopOnElement) {
-        super(embeddedVariablesToken);
-        this.textToken = textToken;
+        super(embeddedVariablesToken, textToken);
         this.gherkinToken = gherkinToken;
         this.acceptableTypes = acceptableTypes;
         this.shouldStopOnElement = shouldStopOnElement;
@@ -76,7 +73,7 @@ public class ExecutableCallRule extends VariableUsageRule {
                 return evaluated;
             }
 
-            return Optional.of(new PositionedTextToken(textToken, token.getStartOffset() + offsetInToken,
+            return Optional.of(new PositionedTextToken(nonVarToken, token.getStartOffset() + offsetInToken,
                     token.getText().length() - offsetInToken));
         }
         return Optional.empty();
@@ -96,11 +93,6 @@ public class ExecutableCallRule extends VariableUsageRule {
     @Override
     protected VariableExtractor createVariableExtractor() {
         return new VariableExtractor(new NonEnvironmentDeclarationMapper());
-    }
-
-    @Override
-    protected IToken getTokenForNonVariablePart() {
-        return textToken;
     }
 
     protected boolean shouldBeColored(final IRobotLineElement token, final List<RobotLine> context,
@@ -189,13 +181,14 @@ public class ExecutableCallRule extends VariableUsageRule {
         boolean isFirst = true;
         for (final IRobotLineElement element : robotLine.getLineElements()) {
             if (element instanceof RobotToken) {
-                if (isFirst && element.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
+                final List<IRobotTokenType> types = element.getTypes();
+                if (isFirst && types.contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
                     isFirst = false;
                 } else {
-                    return element.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)
-                            || element.getTypes().contains(RobotTokenType.SETTING_NAME_DUPLICATION)
-                            || element.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION)
-                            || element.getTypes().contains(RobotTokenType.KEYWORD_SETTING_NAME_DUPLICATION);
+                    return types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)
+                            || types.contains(RobotTokenType.SETTING_NAME_DUPLICATION)
+                            || types.contains(RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION)
+                            || types.contains(RobotTokenType.KEYWORD_SETTING_NAME_DUPLICATION);
                 }
             }
         }
