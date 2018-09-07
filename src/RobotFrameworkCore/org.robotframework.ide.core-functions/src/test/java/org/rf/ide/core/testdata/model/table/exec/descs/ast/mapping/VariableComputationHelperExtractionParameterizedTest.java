@@ -84,8 +84,6 @@ public class VariableComputationHelperExtractionParameterizedTest {
         return o;
     }
 
-    private final VariableComputationHelper vch = new VariableComputationHelper();
-
     private final String testName;
 
     private final String text;
@@ -135,6 +133,6 @@ public class VariableComputationHelperExtractionParameterizedTest {
         final VariableExtractor varExtractor = new VariableExtractor();
         final MappingResult extract = varExtractor.extract(token, "fileName_" + testName);
         final List<VariableDeclaration> correctVariables = extract.getCorrectVariables();
-        return vch.extractVariableName(correctVariables.get(0));
+        return VariableComputationHelper.extractVariableName(correctVariables.get(0));
     }
 }
