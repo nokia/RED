@@ -5,10 +5,9 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import java.util.regex.Pattern;
-
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
@@ -21,8 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
  * @author lwlodarc
  */
 public class VariablesInElementsStyleConfiguration extends RobotElementsStyleConfiguration {
-
-    private static final Pattern VAR_IN_ELEMENTS_PATTERN = Pattern.compile("([$@&%]\\{|\\}(\\[[^\\]]+\\])?)");
 
     public VariablesInElementsStyleConfiguration(final TableTheme theme) {
         super(theme, RedPlugin.getDefault().getPreferences());
@@ -43,7 +40,7 @@ public class VariablesInElementsStyleConfiguration extends RobotElementsStyleCon
         final Style style = new Style();
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
-                VariablesInNamesStyleConfiguration.findVariables(VAR_IN_ELEMENTS_PATTERN, variableStyler));
+                VariablesInNamesStyleConfiguration.findVariables(new VariableExtractor(), variableStyler));
         return style;
     }
 }
