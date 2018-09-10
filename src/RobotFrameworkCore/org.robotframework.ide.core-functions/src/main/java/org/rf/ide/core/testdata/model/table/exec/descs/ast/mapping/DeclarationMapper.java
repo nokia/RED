@@ -22,13 +22,10 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.SimpleElement
 @SuppressWarnings("PMD.GodClass")
 public class DeclarationMapper {
 
-    private String fileMapped;
-
     private final SimpleElementsMapper mapperFactory;
 
     public DeclarationMapper() {
         this.mapperFactory = new SimpleElementsMapper();
-        this.fileMapped = "<NOT_SET>";
     }
 
     public MappingResult map(final FilePosition fp, final Container container, final String filename) {
@@ -106,9 +103,8 @@ public class DeclarationMapper {
                         } else {
                             mappingResult.removeExactlyTheSameInstance(variableIdentifier);
                         }
-                        variableDec.setTypeIdentificator(new TextPosition(
-                                variableIdentifier.getStart().getFullText(), variableIdentifier.getStart().getStart(),
-                                variableIdentifier.getEnd().getEnd()));
+                        variableDec.setTypeIdentificator(new TextPosition(variableIdentifier.getStart().getFullText(),
+                                variableIdentifier.getStart().getStart(), variableIdentifier.getEnd().getEnd()));
                     }
 
                     if (seemsToBeCorrectRobotVariable(previousForContainer, mappingResult, variableDec)) {
@@ -276,7 +272,7 @@ public class DeclarationMapper {
                     } else {
                         final BuildMessage warnMessage = BuildMessage.createWarnMessage(
                                 "Incorrect variable id with space between " + idText.charAt(0) + " and '{'.",
-                                getFileMapped());
+                                mappingResult.getFileName());
                         warnMessage.setFileRegion(new FileRegion(
                                 new FilePosition(currentPosition.getLine(), currentPosition.getColumn(),
                                         currentPosition.getOffset()),
@@ -291,8 +287,8 @@ public class DeclarationMapper {
         return false;
     }
 
-    private boolean seemsToBeCorrectRobotVariableIndex(List<IElementDeclaration> mappedElements,
-            IndexDeclaration indexDec, final boolean isClosed) {
+    private boolean seemsToBeCorrectRobotVariableIndex(final List<IElementDeclaration> mappedElements,
+            final IndexDeclaration indexDec, final boolean isClosed) {
         if (!isClosed) {
             return false;
         }
@@ -332,20 +328,12 @@ public class DeclarationMapper {
             if (numberOfMapped >= 2 && mappedElements.get(numberOfMapped - 1) instanceof VariableDeclaration) {
                 final IElementDeclaration previous = mappedElements.get(numberOfMapped - 2);
                 final String idText = previous.getStart().getText().trim();
-                if (idText.length() >= 1 && ContainerElementType.VARIABLE_TYPE_ID
-                        .getRepresentation().contains(idText.charAt(0))) {
+                if (idText.length() >= 1
+                        && ContainerElementType.VARIABLE_TYPE_ID.getRepresentation().contains(idText.charAt(0))) {
                     return previous;
                 }
             }
         }
         return null;
-    }
-
-    public String getFileMapped() {
-        return fileMapped;
-    }
-
-    public void setFileMapped(final String fileMapped) {
-        this.fileMapped = fileMapped;
     }
 }

@@ -264,7 +264,7 @@ public class VariableExtractorTest {
 
         // verify
         assertThat(mapResult.getMessages()).isEmpty();
-        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+        assertThat(mapResult.getFileName()).isEqualTo("myFile.robot");
 
         assertThat(mapResult.getMappedElements()).hasSize(1);
         assertThat(mapResult.getTextElements()).isEmpty();
@@ -291,7 +291,7 @@ public class VariableExtractorTest {
 
         // verify
         assertThat(mapResult.getMessages()).isEmpty();
-        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+        assertThat(mapResult.getFileName()).isEqualTo("myFile.robot");
 
         assertThat(mapResult.getMappedElements()).hasSize(1);
         assertThat(mapResult.getTextElements()).isEmpty();
@@ -317,7 +317,7 @@ public class VariableExtractorTest {
 
         // verify
         assertThat(mapResult.getMessages()).isEmpty();
-        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+        assertThat(mapResult.getFileName()).isEqualTo("myFile.robot");
 
         assertThat(mapResult.getMappedElements()).hasSize(2);
         assertThat(mapResult.getTextElements()).isEmpty();
@@ -349,7 +349,7 @@ public class VariableExtractorTest {
 
         // verify
         assertThat(mapResult.getMessages()).isEmpty();
-        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+        assertThat(mapResult.getFileName()).isEqualTo("myFile.robot");
 
         assertThat(mapResult.getMappedElements()).hasSize(5);
         assertThat(mapResult.getTextElements()).hasSize(4);
@@ -385,7 +385,7 @@ public class VariableExtractorTest {
         assertThat(mapResult.getMessages()).hasSize(1);
         assertThat(mapResult.getMessages().get(0).getMessage())
                 .isEqualTo("Missing closing bracket ']' for type INDEX.");
-        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+        assertThat(mapResult.getFileName()).isEqualTo("myFile.robot");
 
         assertThat(mapResult.getMappedElements()).hasSize(3);
         assertThat(mapResult.getTextElements()).hasSize(2);

@@ -17,17 +17,17 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElement;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElementType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.IContainerElement;
 
-
 public class ContainerMappingHelper {
 
     private final int contentStart;
+
     private final int contentEnd;
+
     private final IElementDeclaration dec;
+
     private final MappingResult mappingResult;
 
-
-    private ContainerMappingHelper(final int contentStart,
-            final int contentEnd, final IElementDeclaration dec,
+    private ContainerMappingHelper(final int contentStart, final int contentEnd, final IElementDeclaration dec,
             final MappingResult mappingResult) {
         this.contentStart = contentStart;
         this.contentEnd = contentEnd;
@@ -35,34 +35,28 @@ public class ContainerMappingHelper {
         this.mappingResult = mappingResult;
     }
 
-
     public int getContentStart() {
         return contentStart;
     }
-
 
     public int getContentEnd() {
         return contentEnd;
     }
 
-
     public IElementDeclaration getContainerDeclarationHolder() {
         return dec;
     }
-
 
     public MappingResult getMappingResult() {
         return mappingResult;
     }
 
-
-    public static ContainerMappingHelper createDeclaration(
-            final Container container, final FilePosition currentPosition,
-            final MappingResult mappingResult) {
+    public static ContainerMappingHelper createDeclaration(final Container container,
+            final FilePosition currentPosition, final MappingResult mappingResult) {
         ContainerMappingHelper mappingHelper = null;
 
-        ContainerType containerType = container.getContainerType();
-        List<IContainerElement> elements = container.getElements();
+        final ContainerType containerType = container.getContainerType();
+        final List<IContainerElement> elements = container.getElements();
 
         FilePosition newPosition = currentPosition;
         IElementDeclaration dec = null;
@@ -70,32 +64,28 @@ public class ContainerMappingHelper {
         int contentEnd = -1;
         if (!elements.isEmpty()) {
             contentStart = 1;
-            IContainerElement startElement = elements.get(0);
-            TextPosition startPos = startElement.getPosition();
-            int textLength = (startPos.getEnd() - startPos.getStart());
+            final IContainerElement startElement = elements.get(0);
+            final TextPosition startPos = startElement.getPosition();
+            final int textLength = (startPos.getEnd() - startPos.getStart());
             TextPosition endPos = null;
             if (containerType == ContainerType.MIX) {
                 contentStart = 0;
                 contentEnd = elements.size();
             } else {
-                newPosition = new FilePosition(currentPosition.getLine(),
-                        currentPosition.getColumn() + textLength,
+                newPosition = new FilePosition(currentPosition.getLine(), currentPosition.getColumn() + textLength,
                         currentPosition.getOffset() + textLength);
 
                 if (container.isOpenForModification()) {
                     if (container.getParent() != null) {
-                        BuildMessage warn = BuildMessage.createWarnMessage(
-                                createWarningAboutMissingClose(containerType,
-                                        startElement), mappingResult
-                                        .getFilename());
-                        warn.setFileRegion(new FileRegion(currentPosition,
-                                newPosition));
+                        final BuildMessage warn = BuildMessage.createWarnMessage(
+                                createWarningAboutMissingClose(containerType, startElement),
+                                mappingResult.getFileName());
+                        warn.setFileRegion(new FileRegion(currentPosition, newPosition));
                         mappingResult.addBuildMessage(warn);
                     }
                     contentEnd = elements.size();
                 } else {
-                    endPos = ((ContainerElement) elements
-                            .get(elements.size() - 1)).getPosition();
+                    endPos = ((ContainerElement) elements.get(elements.size() - 1)).getPosition();
                     contentEnd = elements.size() - 1;
                 }
 
@@ -104,38 +94,26 @@ public class ContainerMappingHelper {
                 } else if (containerType == ContainerType.VARIABLE) {
                     dec = new VariableDeclaration(startPos, endPos);
                 } else {
-                    throw new UnsupportedOperationException("Type "
-                            + containerType + " is not supported yet!");
+                    throw new UnsupportedOperationException("Type " + containerType + " is not supported yet!");
                 }
             }
         }
 
         mappingResult.setLastFilePosition(newPosition);
-        mappingHelper = new ContainerMappingHelper(contentStart, contentEnd,
-                dec, mappingResult);
+        mappingHelper = new ContainerMappingHelper(contentStart, contentEnd, dec, mappingResult);
         return mappingHelper;
     }
 
-
-    private static String createWarningAboutMissingClose(
-            final ContainerType containerType,
+    private static String createWarningAboutMissingClose(final ContainerType containerType,
             final IContainerElement startElement) {
-
-        return String.format(
-                "Missing closing bracket \'%s\' for type %s.",
-                ""
-                        + ContainerElementType.getCloseContainerType(
-                                containerType.getOpenType())
-                                .getRepresentation()
-                                .get(0),
+        return String.format("Missing closing bracket \'%s\' for type %s.",
+                ContainerElementType.getCloseContainerType(containerType.getOpenType()).getRepresentation().get(0),
                 containerType);
     }
 
-
     @Override
     public String toString() {
-        return String
-                .format("ContainerMappingHelper [contentStart=%s, contentEnd=%s, dec=%s, mappingResult=%s]",
-                        contentStart, contentEnd, dec, mappingResult);
+        return String.format("ContainerMappingHelper [contentStart=%s, contentEnd=%s, dec=%s, mappingResult=%s]",
+                contentStart, contentEnd, dec, mappingResult);
     }
 }
