@@ -5,12 +5,16 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import java.util.List;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
@@ -28,8 +32,6 @@ import com.google.common.collect.TreeRangeSet;
  * @author lwlodarc
  */
 public class VariablesInNamesStyleConfiguration extends RobotElementsStyleConfiguration {
-
-    static final Pattern VAR_IN_NAMES_PATTERN = Pattern.compile("([$@&]\\{|\\}(\\[[^\\]]+\\])?)");
 
     public VariablesInNamesStyleConfiguration(final TableTheme theme) {
         super(theme, RedPlugin.getDefault().getPreferences());
@@ -50,40 +52,42 @@ public class VariablesInNamesStyleConfiguration extends RobotElementsStyleConfig
         final Style style = new Style();
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
-                findVariables(VAR_IN_NAMES_PATTERN, variableStyler));
+                findVariables(new VariableExtractor(new NonEnvironmentDeclarationMapper()), variableStyler));
         return style;
     }
 
-    static Function<String, RangeMap<Integer, Styler>> findVariables(final Pattern pattern,
+    static Function<String, RangeMap<Integer, Styler>> findVariables(final VariableExtractor extractor,
             final Styler variableStyler) {
         return label -> {
             final RangeMap<Integer, Styler> mapping = TreeRangeMap.create();
-            for (final Range<Integer> varRange : markVariables(label, pattern).asRanges()) {
+            for (final Range<Integer> varRange : markVariables(label, extractor).asRanges()) {
                 mapping.put(varRange, variableStyler);
             }
             return mapping;
         };
     }
 
-    static RangeSet<Integer> markVariables(final String label, final Pattern pattern) {
+    static RangeSet<Integer> markVariables(final String label, final VariableExtractor extractor) {
+        final MappingResult extract = extractor.extract(FilePosition.createNotSet(), label);
+        final List<IElementDeclaration> mappedElements = extract.getMappedElements();
+
         final RangeSet<Integer> variableRanges = TreeRangeSet.create();
-        final Matcher matcher = pattern.matcher(label);
-        int deepLevel = 0;
-        int lastFirstLevelVarStart = -1;
-        while (matcher.find()) {
-            if (matcher.group().startsWith("}")) {
-                if (--deepLevel == 0) {
-                    variableRanges.add(Range.closedOpen(lastFirstLevelVarStart, matcher.end()));
+
+        IElementDeclaration variableStart = null;
+        for (final IElementDeclaration declaration : mappedElements) {
+            if (declaration.isComplex()) {
+                if (variableStart == null) {
+                    variableStart = declaration;
                 }
-                // just in case "}" was used as a nonvariable part
-                deepLevel = deepLevel < 0 ? 0 : deepLevel;
             } else {
-                if (deepLevel == 0) {
-                    lastFirstLevelVarStart = matcher.start();
+                if (variableStart != null) {
+                    variableRanges.add(Range.closedOpen(variableStart.getStart().getStart() - 1,
+                            declaration.getStart().getStart()));
+                    variableStart = null;
                 }
-                deepLevel++;
             }
         }
+
         return variableRanges;
     }
 }
