@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarker
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddRemoteLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateLinkedFolderFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResourceFileFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.JoinTemplateNameFixer;
@@ -56,31 +57,22 @@ public enum GeneralSettingsProblem implements IProblemCause {
             final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
             final RobotVersion robotVersion = Optional
                     .ofNullable(marker.getAttribute(AdditionalMarkerAttributes.ROBOT_VERSION, null))
-                    .map(RobotVersion::from)
-                    .orElse(new RobotVersion(3, 1));
+                    .map(RobotVersion::from).orElse(new RobotVersion(3, 1));
 
             final Map<Pattern, String> oldSettingName = new HashMap<>();
-            oldSettingName.put(SettingDocumentRecognizer.EXPECTED,
-                    RobotTokenType.SETTING_DOCUMENTATION_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
-            oldSettingName.put(SuitePreconditionRecognizer.EXPECTED,
-                    RobotTokenType.SETTING_SUITE_SETUP_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
-            oldSettingName.put(SuitePostconditionRecognizer.EXPECTED,
-                    RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
-            oldSettingName.put(TestPreconditionRecognizer.EXPECTED,
-                    RobotTokenType.SETTING_TEST_SETUP_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
-            oldSettingName.put(TestPostconditionRecognizer.EXPECTED,
-                    RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
+            oldSettingName.put(SettingDocumentRecognizer.EXPECTED, RobotTokenType.SETTING_DOCUMENTATION_DECLARATION
+                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
+            oldSettingName.put(SuitePreconditionRecognizer.EXPECTED, RobotTokenType.SETTING_SUITE_SETUP_DECLARATION
+                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
+            oldSettingName.put(SuitePostconditionRecognizer.EXPECTED, RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION
+                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
+            oldSettingName.put(TestPreconditionRecognizer.EXPECTED, RobotTokenType.SETTING_TEST_SETUP_DECLARATION
+                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
+            oldSettingName.put(TestPostconditionRecognizer.EXPECTED, RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION
+                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
 
-            return oldSettingName.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey().matcher(name).matches())
-                    .map(entry -> new ChangeToFixer(entry.getValue()))
-                    .collect(toList());
+            return oldSettingName.entrySet().stream().filter(entry -> entry.getKey().matcher(name).matches())
+                    .map(entry -> new ChangeToFixer(entry.getValue())).collect(toList());
         }
     },
     EMPTY_SETTING {
@@ -343,7 +335,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "HTML is valid resource type for Robot although RED does not support html files.";
         }
     },
-    NON_WORKSPACE_RESOURCE_IMPORT {
+    NON_WORKSPACE_LINKABLE_RESOURCE_IMPORT {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -352,7 +344,31 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "RED does not support importing resources located outside of workspace.";
+            return "RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. "
+                    + "Try to use Quick Fix (Ctrl+1) to link folder into the project.";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(
+                    new CreateLinkedFolderFixer(marker.getAttribute(AdditionalMarkerAttributes.PATH, null)));
+        }
+    },
+    NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.UNSUPPORTED_RESOURCE_IMPORT;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized.";
         }
     },
     NON_EXISTING_VARIABLES_IMPORT {
