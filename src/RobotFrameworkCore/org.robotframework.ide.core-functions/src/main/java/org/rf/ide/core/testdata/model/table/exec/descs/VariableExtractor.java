@@ -33,12 +33,7 @@ public class VariableExtractor {
         try {
             final Container mainContainer = structureExtractor.buildStructureTree(text);
 
-            String extractionInsideFile = fileName;
-            if (fileName == null) {
-                extractionInsideFile = "<NOT_SET>";
-            }
-
-            final MappingResult result = mapper.map(fp, mainContainer, extractionInsideFile);
+            final MappingResult result = mapper.map(fp, mainContainer, fileName);
             for (final IElementDeclaration dec : result.getMappedElements()) {
                 dec.setRobotTokenPosition(fp);
             }
@@ -50,8 +45,16 @@ public class VariableExtractor {
         }
     }
 
+    public MappingResult extract(final FilePosition fp, final String text) {
+        return extract(fp, text, "<NOT_SET>");
+    }
+
     public MappingResult extract(final RobotToken token, final String fileName) {
         return extract(token.getFilePosition(), token.getText(), fileName);
+    }
+
+    public MappingResult extract(final RobotToken token) {
+        return extract(token.getFilePosition(), token.getText());
     }
 
     private static class VariableExtractionException extends RuntimeException {

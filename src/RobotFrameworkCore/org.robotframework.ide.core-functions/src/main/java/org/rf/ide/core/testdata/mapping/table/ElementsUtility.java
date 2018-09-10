@@ -94,8 +94,7 @@ public class ElementsUtility {
 
         RobotToken correct = null;
 
-        final List<VariableDeclaration> correctVariables = varExtractor
-                .extract(FilePosition.createNotSet(), text, "fake")
+        final List<VariableDeclaration> correctVariables = varExtractor.extract(FilePosition.createNotSet(), text)
                 .getCorrectVariables();
 
         if (robotTokens.size() > 1) {
