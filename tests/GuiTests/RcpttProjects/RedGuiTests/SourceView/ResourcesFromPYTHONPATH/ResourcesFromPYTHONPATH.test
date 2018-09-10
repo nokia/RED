@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/30/18 1:31 PM
+Save-Time: 9/10/18 12:42 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -56,10 +56,10 @@ proc "check-warnings"{
 	        | equals "Path 'SimpleResource.robot' points to location outside your workspace" | verify-true
 	        
 	    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[6].getText()" 
-	        | equals "RED does not support importing resources located outside of workspace." | verify-true
+	        | equals "RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project." | verify-true
 	        
 	    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[7].getText()" 
-	        | equals "RED does not support importing resources located outside of workspace." | verify-true
+	        | equals "RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project." | verify-true
 	}
 
 }
