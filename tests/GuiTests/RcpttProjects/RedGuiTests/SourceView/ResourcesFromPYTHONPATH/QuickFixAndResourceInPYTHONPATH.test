@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _i2nE4CT9EeesE7mkFuId1w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/30/18 12:25 PM
+Save-Time: 9/10/18 12:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -85,9 +85,9 @@ let [val python_path [get-by-os -win [concat [$RCPTT_project_path | invoke subst
 	    get-item -path "Warnings \\(7 items\\)" | get-property "getItems().TreeItem[3].getText()" 
 	        | equals "Path 'SimpleResource.robot' points to location outside your workspace" | verify-true
 	    get-item -path "Warnings \\(7 items\\)" | get-property "getItems().TreeItem[4].getText()" 
-	        | equals "RED does not support importing resources located outside of workspace." | verify-true
+	        | equals "RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project."  | verify-true
 	    get-item -path "Warnings \\(7 items\\)" | get-property "getItems().TreeItem[5].getText()" 
-	        | equals "RED does not support importing resources located outside of workspace." | verify-true
+	        | equals "RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project."  | verify-true
 	    get-item -path "Warnings \\(7 items\\)" | get-property "getItems().TreeItem[6].getText()" 
 	        | equals "The path .*/RedGuiTests/TestData/LibsFromPythonPath is absolute. RED prefers using workspace-relative paths which makes your projects more portable" 
 	        | verify-true
