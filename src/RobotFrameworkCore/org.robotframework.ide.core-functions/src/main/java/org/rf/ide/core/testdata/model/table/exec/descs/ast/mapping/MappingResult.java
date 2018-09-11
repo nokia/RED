@@ -130,7 +130,7 @@ public class MappingResult {
         return Collections.unmodifiableList(messages);
     }
 
-    public String getFilename() {
+    public String getFileName() {
         return fileName;
     }
 

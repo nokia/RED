@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -67,7 +69,7 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
             }
             final RangeSet<Integer> quoteRanges = markQuotes(label);
             final RangeSet<Integer> varRanges = VariablesInNamesStyleConfiguration.markVariables(label,
-                    VariablesInNamesStyleConfiguration.VAR_IN_NAMES_PATTERN);
+                    new VariableExtractor(new NonEnvironmentDeclarationMapper()));
             quoteRanges.removeAll(varRanges);
             for (final Range<Integer> quoteRange : quoteRanges.asRanges()) {
                 mapping.put(quoteRange, quoteStyler);
