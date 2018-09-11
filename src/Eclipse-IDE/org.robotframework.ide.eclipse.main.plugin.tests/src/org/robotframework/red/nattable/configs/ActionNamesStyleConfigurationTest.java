@@ -142,10 +142,12 @@ public class ActionNamesStyleConfigurationTest {
         assertThat(decoratingFunction).isNotNull();
 
         final RangeMap<Integer, Styler> styles = decoratingFunction
-                .apply("&{var@{${ia}ble}} sth} &{another}[index]]variable {nonvariable}");
-        assertThat(styles.asMapOfRanges()).hasSize(2)
+                .apply("&{var@{${ia}ble}} sth} &{another}[index]]variable {nonvariable} @{list}");
+        assertThat(styles.asMapOfRanges()).hasSize(4)
                 .hasEntrySatisfying(Range.closedOpen(0, 17), styler -> hasForeground(styler, new RGB(4, 5, 6)))
-                .hasEntrySatisfying(Range.closedOpen(23, 40), styler -> hasForeground(styler, new RGB(4, 5, 6)));
+                .hasEntrySatisfying(Range.closedOpen(23, 32), styler -> hasForeground(styler, new RGB(4, 5, 6)))
+                .hasEntrySatisfying(Range.closedOpen(32, 40), styler -> hasForeground(styler, new RGB(4, 5, 6)))
+                .hasEntrySatisfying(Range.closedOpen(64, 71), styler -> hasForeground(styler, new RGB(4, 5, 6)));
     }
 
     @Test
@@ -207,10 +209,11 @@ public class ActionNamesStyleConfigurationTest {
 
         final RangeMap<Integer, Styler> styles = decoratingFunction
                 .apply("When key&{var@{${ia}ble}} sth} &{another}[index]]variable But {nonvariable} And ${");
-        assertThat(styles.asMapOfRanges()).hasSize(3)
+        assertThat(styles.asMapOfRanges()).hasSize(4)
                 .hasEntrySatisfying(Range.closedOpen(0, 5), styler -> hasForeground(styler, new RGB(7, 8, 9)))
                 .hasEntrySatisfying(Range.closedOpen(8, 25), styler -> hasForeground(styler, new RGB(4, 5, 6)))
-                .hasEntrySatisfying(Range.closedOpen(31, 48), styler -> hasForeground(styler, new RGB(4, 5, 6)));
+                .hasEntrySatisfying(Range.closedOpen(31, 40), styler -> hasForeground(styler, new RGB(4, 5, 6)))
+                .hasEntrySatisfying(Range.closedOpen(40, 48), styler -> hasForeground(styler, new RGB(4, 5, 6)));
     }
 
     @Test
@@ -253,13 +256,11 @@ public class ActionNamesStyleConfigurationTest {
         assertThat(decoratingFunction).isNotNull();
 
         final RangeMap<Integer, Styler> styles = decoratingFunction
-                .apply("An \"embedded\" keyword with \"x\", \"x ${variable} y\" and ${other} arguments");
-        assertThat(styles.asMapOfRanges()).hasSize(6)
+                .apply("An \"embedded\" keyword with \"x\", \"x ${variable} y\" and ${other} arguments ending with \"");
+        assertThat(styles.asMapOfRanges()).hasSize(4)
                 .hasEntrySatisfying(Range.closedOpen(3, 13), styler -> hasForeground(styler, new RGB(10, 11, 12)))
                 .hasEntrySatisfying(Range.closedOpen(27, 30), styler -> hasForeground(styler, new RGB(10, 11, 12)))
-                .hasEntrySatisfying(Range.closedOpen(32, 35), styler -> hasForeground(styler, new RGB(10, 11, 12)))
                 .hasEntrySatisfying(Range.closedOpen(35, 46), styler -> hasForeground(styler, new RGB(4, 5, 6)))
-                .hasEntrySatisfying(Range.closedOpen(46, 49), styler -> hasForeground(styler, new RGB(10, 11, 12)))
                 .hasEntrySatisfying(Range.closedOpen(54, 62), styler -> hasForeground(styler, new RGB(4, 5, 6)));
     }
 
