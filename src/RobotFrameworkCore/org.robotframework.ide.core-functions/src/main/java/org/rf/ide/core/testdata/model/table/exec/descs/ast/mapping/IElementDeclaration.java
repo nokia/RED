@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
@@ -40,4 +41,8 @@ public interface IElementDeclaration {
     IElementDeclaration getLevelUpElement();
 
     boolean isComplex();
+
+    default String getText() {
+        return getElementsDeclarationInside().stream().map(d -> d.getStart().getText()).collect(Collectors.joining());
+    }
 }
