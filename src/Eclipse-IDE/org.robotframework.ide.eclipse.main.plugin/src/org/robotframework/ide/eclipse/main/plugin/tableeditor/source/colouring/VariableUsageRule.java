@@ -45,7 +45,7 @@ public class VariableUsageRule implements ISyntaxColouringRule {
 
         if (tokenTypes.contains(RobotTokenType.VARIABLE_USAGE)) {
             final VariableExtractor extractor = createVariableExtractor();
-            final MappingResult extract = extractor.extract((RobotToken) token, null);
+            final MappingResult extract = extractor.extract((RobotToken) token);
             return evaluateVariables(token, offsetInToken, extract.getMappedElements());
         }
         return Optional.empty();
