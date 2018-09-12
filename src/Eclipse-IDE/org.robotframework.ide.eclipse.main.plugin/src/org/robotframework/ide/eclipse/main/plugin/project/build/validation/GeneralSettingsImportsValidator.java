@@ -201,7 +201,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 .formatMessageWith(path, absolutePath), validationContext.getFile(), pathToken, attributes);
     }
 
-    private Optional<MarkedUri> calculateAbsoluteUri(final String path) {
+    protected Optional<MarkedUri> calculateAbsoluteUri(final String path) {
         final Map<String, String> variablesMapping = suiteFile.getProject()
                 .getRobotProjectHolder()
                 .getVariableMappings();
