@@ -355,8 +355,9 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(
-                    new CreateLinkedFolderFixer(marker.getAttribute(AdditionalMarkerAttributes.PATH, null)));
+            final String path = marker.getAttribute(AdditionalMarkerAttributes.PATH, null);
+            final String absolutePath = marker.getAttribute(AdditionalMarkerAttributes.VALUE, null);
+            return newArrayList(new CreateLinkedFolderFixer(path, absolutePath));
         }
     },
     NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT {
