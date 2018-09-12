@@ -19,19 +19,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.ide.undo.CreateFolderOperation;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 
 import com.google.common.annotations.VisibleForTesting;
 
 public class CreateLinkedFolderFixer implements IMarkerResolution {
 
+    private final String absoluteResourcePath;
     private final String resourcePath;
 
-    public CreateLinkedFolderFixer(final String path) {
+    public CreateLinkedFolderFixer(final String absolutePath, final String path) {
+        absoluteResourcePath = absolutePath;
         resourcePath = path;
     }
 
@@ -54,7 +54,7 @@ public class CreateLinkedFolderFixer implements IMarkerResolution {
 
     @VisibleForTesting
     IStatus executeCreateFolderOperation(final IProgressMonitor monitor, final IMarker marker) {
-        final File resourceFile = new File(toAbsolute(resourcePath));
+        final File resourceFile = new File(absoluteResourcePath);
         final URI linkTargetPath = URI.create(addFileSchemeToPath(resourceFile.getParent().replace("\\", "/")));
         final IPath suitePath = marker.getResource().getParent().getFullPath();
         final IFolder newFolderHandle = createFolderHandle(resourceFile, marker, suitePath, "");
@@ -102,10 +102,6 @@ public class CreateLinkedFolderFixer implements IMarkerResolution {
             return matcher.group(1) + "(" + newSuffix + ")";
         }
         return folderName + "(1)";
-    }
-
-    private static String toAbsolute(final String path) {
-        return RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(path)).toOSString();
     }
 
     private static String addFileSchemeToPath(final String path) {
