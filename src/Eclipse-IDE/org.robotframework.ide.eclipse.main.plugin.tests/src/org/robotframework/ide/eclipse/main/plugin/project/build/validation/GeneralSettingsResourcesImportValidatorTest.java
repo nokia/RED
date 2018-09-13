@@ -430,13 +430,37 @@ public class GeneralSettingsResourcesImportValidatorTest {
     }
 
     @Test
-    public void noMajorProblemsAreReported_whenResourceFileIsImportedFromExternalUnlinkableLocation() {
+    public void noMajorProblemsAreReported_whenResourceFileIsImportedFromExternalUnlinkableLocationWithEmptyParent() {
         final File resource = mock(File.class);
         when(resource.isFile()).thenReturn(true);
         when(resource.getAbsolutePath()).thenReturn("absolute/path/to/resource.robot");
         when(resource.getParent()).thenReturn("");
 
-        validateResourceFile(resource, "resource.robot");
+        validateResourceFile(resource, "absolute/path/to/resource.robot");
+        assertThat(reporter.getReportedProblems())
+                .are(onlyCausedBy(GeneralSettingsProblem.NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT));
+    }
+
+    @Test
+    public void noMajorProblemsAreReported_whenResourceFileIsImportedFromExternalUnlinkableLocationWithEmptyAbsolutePath() {
+        final File resource = mock(File.class);
+        when(resource.isFile()).thenReturn(true);
+        when(resource.getAbsolutePath()).thenReturn("absolute/path/to/parent/resource.robot");
+        when(resource.getParent()).thenReturn("parent");
+
+        validateResourceFile(resource, "resource_with_empty_absolute_path.robot");
+        assertThat(reporter.getReportedProblems())
+                .are(onlyCausedBy(GeneralSettingsProblem.NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT));
+    }
+
+    @Test
+    public void noMajorProblemsAreReported_whenResourceFileIsImportedFromExternalUnlinkableLocationWithIncorrectAbsolutePathWithDots() {
+        final File resource = mock(File.class);
+        when(resource.isFile()).thenReturn(true);
+        when(resource.getAbsolutePath()).thenReturn("absolute/path/to/parent/resource.robot");
+        when(resource.getParent()).thenReturn("parent");
+
+        validateResourceFile(resource, "absolute/path/with/../to/parent/resource.robot");
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT));
     }

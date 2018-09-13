@@ -57,7 +57,7 @@ public class CreateLinkedFolderFixerTest {
                 .createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path));
 
         final IMarker marker = suite.getFile().createMarker(RedPlugin.PLUGIN_ID);
-        executeCreateFolderOperation(path, suite, marker);
+        executeCreateFolderOperation(path, path, suite, marker);
 
         final IPath newFolderPath = marker.getResource().getParent().getFullPath().append("external_dir");
         final IFolder newFolderHandle = marker.getResource().getWorkspace().getRoot().getFolder(newFolderPath);
@@ -75,7 +75,7 @@ public class CreateLinkedFolderFixerTest {
         projectProvider.createDir("external_dir");
 
         final IMarker marker = suite.getFile().createMarker(RedPlugin.PLUGIN_ID);
-        executeCreateFolderOperation(path, suite, marker);
+        executeCreateFolderOperation(path, path, suite, marker);
 
         final IPath newFolderPath = marker.getResource().getParent().getFullPath().append("parent_dir_external_dir");
         final IFolder newFolderHandle = marker.getResource().getWorkspace().getRoot().getFolder(newFolderPath);
@@ -84,12 +84,13 @@ public class CreateLinkedFolderFixerTest {
 
     @Test
     public void linkedFolderIsCreated_whenResourceFileIsImportedFromExternalLocationViaRelativePath() throws Exception {
-        final String path = "../external_dir/resource.robot";
+        final String path = "../../../../../../../../../external_dir/resource.robot";
+        final String absolutePath = "/external_dir/resource.robot";
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path));
 
         final IMarker marker = suite.getFile().createMarker(RedPlugin.PLUGIN_ID);
-        executeCreateFolderOperation(path, suite, marker);
+        executeCreateFolderOperation(absolutePath, path, suite, marker);
 
         final IPath newFolderPath = marker.getResource().getParent().getFullPath().append("external_dir");
         final IFolder newFolderHandle = marker.getResource().getWorkspace().getRoot().getFolder(newFolderPath);
@@ -100,13 +101,14 @@ public class CreateLinkedFolderFixerTest {
     @Test
     public void linkedFolderIsCreatedWithParentName_whenResourceFileIsImportedFromExternalLocationViaRelativePath()
             throws Exception {
-        final String path = "../../parent_dir/external_dir/resource.robot";
+        final String path = "../../../../../../../../../parent_dir/external_dir/resource.robot";
+        final String absolutePath = "/parent_dir/external_dir/resource.robot";
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path));
         projectProvider.createDir("external_dir");
 
         final IMarker marker = suite.getFile().createMarker(RedPlugin.PLUGIN_ID);
-        executeCreateFolderOperation(path, suite, marker);
+        executeCreateFolderOperation(absolutePath, path, suite, marker);
 
         final IPath newFolderPath = marker.getResource().getParent().getFullPath().append("parent_dir_external_dir");
         final IFolder newFolderHandle = marker.getResource().getWorkspace().getRoot().getFolder(newFolderPath);
@@ -117,13 +119,14 @@ public class CreateLinkedFolderFixerTest {
     @Test
     public void linkedFolderIsCreatedWithPrefix_whenResourceFileIsImportedFromExternalLocationViaRelativePath()
             throws Exception {
-        final String path = "../../../../../../../../../../../../../../../../../external_dir/resource.robot";
+        final String path = "../../../../../../../../../external_dir/resource.robot";
+        final String absolutePath = "/external_dir/resource.robot";
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path));
         projectProvider.createDir("external_dir");
 
         final IMarker marker = suite.getFile().createMarker(RedPlugin.PLUGIN_ID);
-        executeCreateFolderOperation(path, suite, marker);
+        executeCreateFolderOperation(absolutePath, path, suite, marker);
 
         final IPath newFolderPath = marker.getResource().getParent().getFullPath().append("external_dir(1)");
         final IFolder newFolderHandle = marker.getResource().getWorkspace().getRoot().getFolder(newFolderPath);
@@ -134,14 +137,15 @@ public class CreateLinkedFolderFixerTest {
     @Test
     public void linkedFolderIsCreatedWithIncrementedPrefix_whenResourceFileIsImportedFromExternalLocationViaRelativePath()
             throws Exception {
-        final String path = "../../../../../../../../../../../../../../../../../external_dir/resource.robot";
+        final String path = "../../../../../../../../../external_dir/resource.robot";
+        final String absolutePath = "/external_dir/resource.robot";
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path));
         projectProvider.createDir("external_dir");
         projectProvider.createDir("external_dir(1)");
 
         final IMarker marker = suite.getFile().createMarker(RedPlugin.PLUGIN_ID);
-        executeCreateFolderOperation(path, suite, marker);
+        executeCreateFolderOperation(absolutePath, path, suite, marker);
 
         final IPath newFolderPath = marker.getResource().getParent().getFullPath().append("external_dir(2)");
         final IFolder newFolderHandle = marker.getResource().getWorkspace().getRoot().getFolder(newFolderPath);
@@ -153,7 +157,7 @@ public class CreateLinkedFolderFixerTest {
     public void fixerExistInFixers_whenResourceIsLocatedOutsideWorkspace() throws Exception {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "non_existing.robot");
         final String path = tmpFile.getCanonicalPath().replaceAll("\\\\", "/");
-        final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(path);
+        final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(path, path);
 
         assertThat(fixer.getLabel().equals("Create Linked Folder for '" + path + "' resource"));
     }
@@ -166,10 +170,12 @@ public class CreateLinkedFolderFixerTest {
         }
     }
 
-    private void executeCreateFolderOperation(final String path, final RobotSuiteFile suite, final IMarker marker)
+    private void executeCreateFolderOperation(final String absolutePath, final String path, final RobotSuiteFile suite,
+            final IMarker marker)
             throws Exception {
-        final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(path);
-        marker.setAttribute(AdditionalMarkerAttributes.PATH, path);
+        final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(absolutePath, path);
+        marker.setAttribute(AdditionalMarkerAttributes.PATH, absolutePath);
+        marker.setAttribute(AdditionalMarkerAttributes.VALUE, path);
         fixer.executeCreateFolderOperation(new NullProgressMonitor(), marker);
     }
 }

@@ -10,10 +10,13 @@ import static com.google.common.collect.Sets.newHashSet;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.RedURI;
+import org.rf.ide.core.project.ImportSearchPaths.MarkedUri;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -29,10 +32,13 @@ import com.google.common.collect.ImmutableMap;
 
 class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsValidator {
 
+    final RobotSuiteFile suiteFile;
+
     GeneralSettingsResourcesImportValidator(final FileValidationContext validationContext,
             final RobotSuiteFile suiteFile, final List<ResourceImport> imports,
             final ValidationReportingStrategy reporter) {
         super(validationContext, suiteFile, imports, reporter);
+        this.suiteFile = suiteFile;
     }
 
     @Override
@@ -91,17 +97,19 @@ class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsVali
                         pathToken);
             } else {
                 final String parentContainerName = new File(file.getParent()).getName();
+                final Optional<MarkedUri> absoluteMarkedPath = calculateAbsoluteUri(path);
+                final String absoluteImportString = absoluteMarkedPath.isPresent() ? RedURI.reverseUriSpecialCharsEscapes(
+                        new File(absoluteMarkedPath.get().getPath()).getAbsolutePath().replaceAll("\\\\", "/")) : "";
                 // When a relative path is too long to be properly resolved we get an absolute
-                // path with '..' (e.g. 'D:/../res.robot'). If such file exists the second
+                // path with '..' (e.g. 'D:/../res.robot'). If such file exists the third
                 // condition avoids the problems caused by incorrect relative constructions.
-                if (parentContainerName.isEmpty() || parentContainerName.equals("..")) {
+                if (parentContainerName.isEmpty() || absoluteImportString.isEmpty() || absoluteImportString.contains("..")) {
                     reporter.handleProblem(
-                            RobotProblem.causedBy(
-                                    GeneralSettingsProblem.NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT),
+                            RobotProblem.causedBy(GeneralSettingsProblem.NON_WORKSPACE_UNLINKABLE_RESOURCE_IMPORT),
                             validationContext.getFile(), pathToken);
                 } else {
                     final Map<String, Object> additionalAttributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
-                            pathToken.getText());
+                            absoluteImportString, AdditionalMarkerAttributes.VALUE, pathToken.getText());
                     reporter.handleProblem(
                             RobotProblem.causedBy(GeneralSettingsProblem.NON_WORKSPACE_LINKABLE_RESOURCE_IMPORT),
                             validationContext.getFile(), pathToken, additionalAttributes);
