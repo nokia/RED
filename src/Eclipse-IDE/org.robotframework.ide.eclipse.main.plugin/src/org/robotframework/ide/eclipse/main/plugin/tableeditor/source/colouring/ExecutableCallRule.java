@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
@@ -26,15 +27,15 @@ import org.rf.ide.core.validation.SpecialKeywords;
 public class ExecutableCallRule extends VariableUsageRule {
 
     public static ExecutableCallRule forExecutableInTestCase(final IToken textToken, final IToken gherkinToken,
-            final IToken embeddedVariablesToken) {
-        return new ExecutableCallRule(textToken, gherkinToken, embeddedVariablesToken,
+            final IToken quoteToken, final IToken embeddedVariablesToken) {
+        return new ExecutableCallRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TEST_CASE_ACTION_ARGUMENT),
                 elem -> elem.getTypes().contains(RobotTokenType.TEST_CASE_NAME));
     }
 
     public static ExecutableCallRule forExecutableInKeyword(final IToken textToken, final IToken gherkinToken,
-            final IToken embeddedVariablesToken) {
-        return new ExecutableCallRule(textToken, gherkinToken, embeddedVariablesToken,
+            final IToken quoteToken, final IToken embeddedVariablesToken) {
+        return new ExecutableCallRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT),
                 elem -> elem.getTypes().contains(RobotTokenType.KEYWORD_NAME));
     }
@@ -43,12 +44,16 @@ public class ExecutableCallRule extends VariableUsageRule {
 
     private final IToken gherkinToken;
 
+    private final IToken quoteToken;
+
     private final Predicate<IRobotLineElement> shouldStopOnElement;
 
-    protected ExecutableCallRule(final IToken textToken, final IToken gherkinToken, final IToken embeddedVariablesToken,
-            final EnumSet<RobotTokenType> acceptableTypes, final Predicate<IRobotLineElement> shouldStopOnElement) {
+    protected ExecutableCallRule(final IToken textToken, final IToken gherkinToken, final IToken quoteToken,
+            final IToken embeddedVariablesToken, final EnumSet<RobotTokenType> acceptableTypes,
+            final Predicate<IRobotLineElement> shouldStopOnElement) {
         super(embeddedVariablesToken, textToken);
         this.gherkinToken = gherkinToken;
+        this.quoteToken = quoteToken;
         this.acceptableTypes = acceptableTypes;
         this.shouldStopOnElement = shouldStopOnElement;
     }
@@ -73,8 +78,7 @@ public class ExecutableCallRule extends VariableUsageRule {
                 return evaluated;
             }
 
-            return Optional.of(new PositionedTextToken(nonVarToken, token.getStartOffset() + offsetInToken,
-                    token.getText().length() - offsetInToken));
+            return evaluateQuotes(token.getStartOffset(), offsetInToken, token.getText(), offsetInToken);
         }
         return Optional.empty();
     }
@@ -90,9 +94,35 @@ public class ExecutableCallRule extends VariableUsageRule {
         return Optional.empty();
     }
 
+    private Optional<PositionedTextToken> evaluateQuotes(final int tokenStartOffset, final int offsetInToken,
+            final String textToEvaluate, final int fromIndex) {
+        final int quoteOpenIndex = textToEvaluate.indexOf('\"', fromIndex);
+        if (quoteOpenIndex != -1) {
+            if (fromIndex < quoteOpenIndex) {
+                return Optional.of(new PositionedTextToken(nonVarToken, tokenStartOffset + offsetInToken,
+                        quoteOpenIndex - fromIndex));
+            }
+            final int quoteCloseIndex = textToEvaluate.indexOf('\"', quoteOpenIndex + 1);
+            if (quoteOpenIndex < quoteCloseIndex) {
+                return Optional.of(new PositionedTextToken(quoteToken,
+                        tokenStartOffset + quoteOpenIndex + offsetInToken - fromIndex,
+                        quoteCloseIndex - quoteOpenIndex + 1));
+            }
+        }
+        return Optional.of(new PositionedTextToken(nonVarToken, tokenStartOffset + offsetInToken,
+                textToEvaluate.length() - fromIndex));
+    }
+
     @Override
     protected VariableExtractor createVariableExtractor() {
         return new VariableExtractor(new NonEnvironmentDeclarationMapper());
+    }
+
+    @Override
+    protected Optional<PositionedTextToken> evaluateNonVariablePart(final IRobotLineElement token,
+            final int offsetInToken, final IElementDeclaration declaration) {
+        return evaluateQuotes(token.getStartOffset(), offsetInToken, declaration.getText(),
+                offsetInToken - declaration.getStart().getStart());
     }
 
     protected boolean shouldBeColored(final IRobotLineElement token, final List<RobotLine> context,

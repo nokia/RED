@@ -1,8 +1,8 @@
 /*
-* Copyright 2016 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2016 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -12,8 +12,11 @@ import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.text.Position;
@@ -29,10 +32,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 public class ExecutableCallRuleTest {
 
     private final ExecutableCallRule tcTestedRule = ExecutableCallRule.forExecutableInTestCase(new Token("call_token"),
-            new Token("gherkin_token"), new Token("var_token"));
+            new Token("gherkin_token"), new Token("quote_token"), new Token("var_token"));
 
     private final ExecutableCallRule kwTestedRule = ExecutableCallRule.forExecutableInKeyword(new Token("call_token"),
-            new Token("gherkin_token"), new Token("var_token"));
+            new Token("gherkin_token"), new Token("quote_token"), new Token("var_token"));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
@@ -238,17 +241,15 @@ public class ExecutableCallRuleTest {
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
 
             final RobotToken token = createToken(actionType, content);
+            final List<RobotLine> lines = newArrayList(line(token));
 
             for (final Position position : varPositions) {
                 for (int offset = 0; offset < position.getLength(); offset++) {
-                    final RobotLine line = new RobotLine(0, null);
-                    line.getLineElements().add(token);
-
-                    final List<RobotLine> lines = newArrayList(line);
                     final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position.getOffset() + offset,
                             lines);
                     assertThat(evaluatedToken).isPresent();
-                    assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
+                    assertThat(evaluatedToken.get().getPosition())
+                            .isEqualTo(new Position(position.getOffset() + offset, position.getLength() - offset));
                     assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("var_token");
                 }
             }
@@ -274,21 +275,83 @@ public class ExecutableCallRuleTest {
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
 
             final RobotToken token = createToken(actionType, content);
+            final List<RobotLine> lines = newArrayList(line(token));
 
             for (final Position position : nonVarPositions) {
                 for (int offset = 0; offset < position.getLength(); offset++) {
-                    final RobotLine line = new RobotLine(0, null);
-                    line.getLineElements().add(token);
-
                     final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position.getOffset() + offset,
-                            newArrayList(line));
+                            lines);
                     assertThat(evaluatedToken).isPresent();
-                    final Position expectedPosition = nonVarPositions.indexOf(position) == 0
-                            ? new Position(position.getOffset() + offset, position.getLength() - offset)
-                            : position;
-                    assertThat(evaluatedToken.get().getPosition()).isEqualTo(expectedPosition);
+                    assertThat(evaluatedToken.get().getPosition())
+                            .isEqualTo(new Position(position.getOffset() + offset, position.getLength() - offset));
                     assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("call_token");
                 }
+            }
+        }
+    }
+
+    @Test
+    public void keywordCallQuoteTokenIsDetected() {
+        final String content = "abc\"x\"def\"xy\"ghi\"xyz\"jkl";
+
+        for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
+
+            final RobotToken token = createToken(actionType, content);
+            final List<RobotLine> lines = newArrayList(line(token));
+
+            for (int i = 0; i < content.length(); i++) {
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, i, lines);
+                assertThat(evaluatedToken).isPresent();
+
+                final int nextQuoteIndex = content.indexOf("\"", i + 1);
+                if (content.charAt(i) == '"' && nextQuoteIndex >= 0) {
+                    final int length = nextQuoteIndex - i + 1;
+                    assertThat(evaluatedToken.get().getPosition()).isEqualTo(new Position(i, length));
+                    assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("quote_token");
+                } else {
+                    final int length = nextQuoteIndex != -1 ? nextQuoteIndex - i : content.length() - i;
+                    assertThat(evaluatedToken.get().getPosition()).isEqualTo(new Position(i, length));
+                    assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("call_token");
+                }
+            }
+        }
+    }
+
+    @Test
+    public void allTokensAreDetected() {
+        final String content = "Given Embedded \"Name\" Kw @{variable}[0] With \"Argument\" With Quotes And ${var}";
+
+        final NavigableMap<Integer, String> tokenPositions = new TreeMap<>();
+        tokenPositions.put(0, "gherkin_token");
+        tokenPositions.put(6, "call_token");
+        tokenPositions.put(15, "quote_token");
+        tokenPositions.put(21, "call_token");
+        tokenPositions.put(25, "var_token");
+        tokenPositions.put(36, "var_token");
+        tokenPositions.put(39, "call_token");
+        tokenPositions.put(45, "quote_token");
+        tokenPositions.put(55, "call_token");
+        tokenPositions.put(72, "var_token");
+
+        for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
+
+            final RobotToken token = createToken(actionType, content);
+            final List<RobotLine> lines = newArrayList(line(token));
+
+            for (final Map.Entry<Integer, String> entry : tokenPositions.entrySet()) {
+                final int position = entry.getKey();
+                final int length = tokenPositions.higherEntry(position) == null ? content.length() - position
+                        : tokenPositions.higherEntry(position).getKey() - position;
+                final String tokenData = entry.getValue();
+
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position, lines);
+                assertThat(evaluatedToken).isPresent();
+                assertThat(evaluatedToken.get().getPosition()).isEqualTo(new Position(position, length));
+                assertThat(evaluatedToken.get().getToken().getData()).isEqualTo(tokenData);
             }
         }
     }
@@ -299,6 +362,12 @@ public class ExecutableCallRuleTest {
         token.setStartColumn(0);
         token.setStartOffset(0);
         return token;
+    }
+
+    private RobotLine line(final RobotToken token) {
+        final RobotLine line = new RobotLine(0, null);
+        line.addLineElement(token);
+        return line;
     }
 
     private Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final List<RobotLine> lines) {
