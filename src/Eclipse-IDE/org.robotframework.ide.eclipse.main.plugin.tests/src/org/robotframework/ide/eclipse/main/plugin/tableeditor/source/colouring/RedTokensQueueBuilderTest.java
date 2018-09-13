@@ -5,7 +5,6 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
-import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokensSource.line;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokensSource.lines;
@@ -50,8 +49,9 @@ public class RedTokensQueueBuilderTest {
                 line(2, new LineElement(2, 0, 26, "gggg"), new LineElement(2, 4, 30, "hhhh"), new LineElement(2, 8, 34, "iiii")));
 
         final Deque<IRobotLineElement> queue = builder.buildQueue(0, 100, lines, 0);
-        assertThat(transform(queue, IRobotLineElement::getText)).containsExactly("aaaa", "bbbb", "cccc", "\n", "dddd",
-                "eeee", "ffff", "\n", "gggg", "hhhh", "iiii", "\n");
+        assertThat(queue).extracting(IRobotLineElement::getText)
+                .containsExactly("aaaa", "bbbb", "cccc", "\n", "dddd", "eeee", "ffff", "\n", "gggg", "hhhh", "iiii",
+                        "\n");
     }
 
     @Test
@@ -62,8 +62,8 @@ public class RedTokensQueueBuilderTest {
                 line(2, new LineElement(2, 0, 26, "gggg"), new LineElement(2, 4, 30, "hhhh"), new LineElement(2, 8, 34, "iiii")));
 
         final Deque<IRobotLineElement> queue = builder.buildQueue(8, 26, lines, 0);
-        assertThat(transform(queue, IRobotLineElement::getText)).containsExactly("cccc", "\n", "dddd", "eeee", "ffff",
-                "\n", "gggg", "hhhh");
+        assertThat(queue).extracting(IRobotLineElement::getText)
+                .containsExactly("cccc", "\n", "dddd", "eeee", "ffff", "\n", "gggg", "hhhh");
     }
 
     @Test
@@ -74,8 +74,8 @@ public class RedTokensQueueBuilderTest {
                 line(2, new LineElement(2, 0, 26, "gggg"), new LineElement(2, 4, 30, "hhhh"), new LineElement(2, 8, 34, "iiii")));
 
         final Deque<IRobotLineElement> queue = builder.buildQueue(0, 25, lines, 0);
-        assertThat(transform(queue, IRobotLineElement::getText)).containsExactly("aaaa", "bbbb", "cccc", "\n", "dddd",
-                "eeee", "ffff");
+        assertThat(queue).extracting(IRobotLineElement::getText)
+                .containsExactly("aaaa", "bbbb", "cccc", "\n", "dddd", "eeee", "ffff");
     }
 
     @Test
@@ -86,8 +86,8 @@ public class RedTokensQueueBuilderTest {
                 line(2, new LineElement(2, 0, 26, "gggg"), new LineElement(2, 4, 30, "hhhh"), new LineElement(2, 8, 34, "iiii")));
 
         final Deque<IRobotLineElement> queue = builder.buildQueue(13, 25, lines, 0);
-        assertThat(transform(queue, IRobotLineElement::getText)).containsExactly("dddd", "eeee", "ffff", "\n", "gggg",
-                "hhhh", "iiii");
+        assertThat(queue).extracting(IRobotLineElement::getText)
+                .containsExactly("dddd", "eeee", "ffff", "\n", "gggg", "hhhh", "iiii");
     }
 
     @Test
@@ -96,7 +96,7 @@ public class RedTokensQueueBuilderTest {
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")));
 
         final Deque<IRobotLineElement> queue = builder.buildQueue(6, 6, lines, 0);
-        assertThat(transform(queue, IRobotLineElement::getText)).containsExactly("bbbb", "cccc");
+        assertThat(queue).extracting(IRobotLineElement::getText).containsExactly("bbbb", "cccc");
     }
 
     @Test
@@ -105,6 +105,6 @@ public class RedTokensQueueBuilderTest {
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")));
 
         final Deque<IRobotLineElement> queue = builder.buildQueue(0, 6, lines, 0);
-        assertThat(transform(queue, IRobotLineElement::getText)).containsExactly("aaaa", "bbbb");
+        assertThat(queue).extracting(IRobotLineElement::getText).containsExactly("aaaa", "bbbb");
     }
 }
