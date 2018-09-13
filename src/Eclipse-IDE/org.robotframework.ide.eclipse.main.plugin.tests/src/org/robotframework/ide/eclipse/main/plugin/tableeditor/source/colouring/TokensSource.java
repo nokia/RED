@@ -247,23 +247,16 @@ public class TokensSource {
 
         @Override
         public LineElement copyWithoutPosition() {
-            return copy(false);
+            return copy(FilePosition.createNotSet());
         }
 
         @Override
         public LineElement copy() {
-            return copy(true);
+            return copy(getFilePosition());
         }
 
-        private LineElement copy(final boolean posInclude) {
-            final FilePosition fp;
-            if (posInclude) {
-                fp = this.getFilePosition();
-            } else {
-                fp = FilePosition.createNotSet();
-            }
-
-            return new LineElement(fp.getLine(), fp.getColumn(), fp.getOffset(), this.getText());
+        private LineElement copy(final FilePosition fp) {
+            return new LineElement(fp.getLine(), fp.getColumn(), fp.getOffset(), getText());
         }
     }
 }

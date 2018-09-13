@@ -43,6 +43,9 @@ public interface IElementDeclaration {
     boolean isComplex();
 
     default String getText() {
-        return getElementsDeclarationInside().stream().map(d -> d.getStart().getText()).collect(Collectors.joining());
+        return getElementsDeclarationInside().stream()
+                .map(IElementDeclaration::getStart)
+                .map(TextPosition::getText)
+                .collect(Collectors.joining());
     }
 }

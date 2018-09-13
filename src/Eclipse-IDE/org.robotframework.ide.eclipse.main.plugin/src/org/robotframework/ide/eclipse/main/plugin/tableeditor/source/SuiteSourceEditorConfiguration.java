@@ -90,6 +90,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.V
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.WithNameRule;
 
+import com.google.common.annotations.VisibleForTesting;
+
 class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private final SuiteSourceEditor editor;
@@ -402,7 +404,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         return reconciler;
     }
 
-    private Map<String, ISyntaxColouringRule[]> createColoringRules() {
+    @VisibleForTesting
+    Map<String, ISyntaxColouringRule[]> createColoringRules() {
         if (coloringTokens == null) {
             coloringTokens = new ColoringTokens(RedPlugin.getDefault().getPreferences());
             coloringTokens.initialize();
@@ -414,6 +417,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final IToken definition = coloringTokens.get(SyntaxHighlightingCategory.DEFINITION);
         final IToken variable = coloringTokens.get(SyntaxHighlightingCategory.VARIABLE);
         final IToken call = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL);
+        final IToken quote = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
         final IToken setting = coloringTokens.get(SyntaxHighlightingCategory.SETTING);
         final IToken gherkin = coloringTokens.get(SyntaxHighlightingCategory.GHERKIN);
         final IToken special = coloringTokens.get(SyntaxHighlightingCategory.SPECIAL);
@@ -424,21 +428,22 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new SettingsTemplateRule(call),
-                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin, variable),
-                ExecutableCallRule.forExecutableInTestCase(call, gherkin, variable),
+                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin, quote, variable),
+                ExecutableCallRule.forExecutableInTestCase(call, gherkin, quote, variable),
                 new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new InTokenRule(special) };
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
-                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, variable),
-                ExecutableCallRule.forExecutableInKeyword(call, gherkin, variable),
+                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, quote, variable),
+                ExecutableCallRule.forExecutableInKeyword(call, gherkin, quote, variable),
                 new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new InTokenRule(special) };
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsTemplateRule(call),
-                ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, gherkin, variable),
+                ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, gherkin, quote,
+                        variable),
                 new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new WithNameRule(special) };
 
@@ -467,13 +472,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     @Override
     public IReconciler getReconciler(final ISourceViewer sourceViewer) {
         if (reconciler == null) {
-            reconciler = new MonoReconciler(getReconcilingStrategy(), true);
+            final IReconcilingStrategy strategy = new SuiteSourceReconcilingStrategy(editor);
+            reconciler = new MonoReconciler(strategy, true);
         }
         return reconciler;
-    }
-
-    private IReconcilingStrategy getReconcilingStrategy() {
-        return new SuiteSourceReconcilingStrategy(editor);
     }
 
     @Override

@@ -72,7 +72,8 @@ public class VariableUsageRuleTest {
             for (int offset = 0; offset < position.getLength(); offset++) {
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position.getOffset() + offset);
                 assertThat(evaluatedToken).isPresent();
-                assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
+                assertThat(evaluatedToken.get().getPosition())
+                        .isEqualTo(new Position(position.getOffset() + offset, position.getLength() - offset));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
             }
         }
@@ -98,10 +99,8 @@ public class VariableUsageRuleTest {
             for (int offset = 0; offset < position.getLength(); offset++) {
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position.getOffset() + offset);
                 assertThat(evaluatedToken).isPresent();
-                final Position expectedPosition = nonVarPositions.indexOf(position) == 0
-                        ? new Position(position.getOffset() + offset, position.getLength() - offset)
-                        : position;
-                assertThat(evaluatedToken.get().getPosition()).isEqualTo(expectedPosition);
+                assertThat(evaluatedToken.get().getPosition())
+                        .isEqualTo(new Position(position.getOffset() + offset, position.getLength() - offset));
                 assertThat(evaluatedToken.get().getToken()).isSameAs(ISyntaxColouringRule.DEFAULT_TOKEN);
             }
         }
