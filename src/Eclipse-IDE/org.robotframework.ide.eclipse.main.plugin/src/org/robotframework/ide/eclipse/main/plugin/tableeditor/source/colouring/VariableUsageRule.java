@@ -57,17 +57,24 @@ public class VariableUsageRule implements ISyntaxColouringRule {
 
     private Optional<PositionedTextToken> evaluateVariables(final IRobotLineElement token, final int offsetInToken,
             final List<IElementDeclaration> declarations) {
-        for (int i = 0; i < declarations.size(); i++) {
-            final IElementDeclaration declaration = declarations.get(i);
+        for (final IElementDeclaration declaration : declarations) {
             final int startOffset = declaration.getStartFromFile().getOffset();
             final int endOffset = declaration.getEndFromFile().getOffset();
             final int currentOffset = token.getStartOffset() + offsetInToken;
             if (currentOffset <= startOffset || currentOffset <= endOffset) {
-                final IToken tokenToUse = declaration.isComplex() ? varToken : nonVarToken;
-                final int offsetToUse = i == 0 ? startOffset + offsetInToken : startOffset;
-                return Optional.of(new PositionedTextToken(tokenToUse, offsetToUse, endOffset - offsetToUse + 1));
+                if (declaration.isComplex()) {
+                    return Optional.of(new PositionedTextToken(varToken, currentOffset, endOffset - currentOffset + 1));
+                } else {
+                    return evaluateNonVariablePart(token, offsetInToken, declaration);
+                }
             }
         }
         return Optional.empty();
+    }
+
+    protected Optional<PositionedTextToken> evaluateNonVariablePart(final IRobotLineElement token,
+            final int offsetInToken, final IElementDeclaration declaration) {
+        return Optional.of(new PositionedTextToken(nonVarToken, token.getStartOffset() + offsetInToken,
+                declaration.getEndFromFile().getOffset() - token.getStartOffset() - offsetInToken + 1));
     }
 }
