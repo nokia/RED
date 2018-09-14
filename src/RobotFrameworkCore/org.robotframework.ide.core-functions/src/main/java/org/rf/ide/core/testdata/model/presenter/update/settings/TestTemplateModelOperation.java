@@ -28,7 +28,8 @@ public class TestTemplateModelOperation implements ISettingTableElementOperation
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args,
+            final String comment) {
         final TestTemplate newTestTemplate = settingsTable.newTestTemplate();
         if (!args.isEmpty()) {
             newTestTemplate.setKeywordName(args.get(0));
@@ -48,14 +49,14 @@ public class TestTemplateModelOperation implements ISettingTableElementOperation
         if (index == 0) {
             testTemplate.setKeywordName(value != null ? value : "");
         } else if (index > 0) {
-            if(value != null) {
+            if (value != null) {
                 testTemplate.setUnexpectedTrashArgument(index - 1, value);
             } else {
-                testTemplate.removeElementToken(index-1);
+                testTemplate.removeElementToken(index - 1);
             }
         }
     }
-    
+
     @Override
     public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
         settingsTable.addTestTemplate((TestTemplate) modelElement);

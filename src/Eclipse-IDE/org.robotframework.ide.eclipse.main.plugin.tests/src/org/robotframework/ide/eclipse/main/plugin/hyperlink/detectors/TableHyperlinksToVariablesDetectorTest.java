@@ -170,7 +170,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(element);
-        
+
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         assertThat(detector.detectHyperlinks(0, 0, labelWithVar, 0)).isEmpty();
     }
@@ -195,13 +195,13 @@ public class TableHyperlinksToVariablesDetectorTest {
                 .get().getChildren().get(0);
         final VariablesImport varsImport = (VariablesImport) varSetting.getLinkedElement();
         final VariablesFileImportReference varsImportRef = new VariablesFileImportReference(varsImport);
-        varsImportRef.map(ImmutableMap.<String, Object> of("x", 100, "var", 42, "z", 1729));
+        varsImportRef.map(ImmutableMap.of("x", 100, "var", 42, "z", 1729));
         final RobotFileOutput output = suiteFile.getLinkedElement().getParent();
         output.setVariablesImportReferences(newArrayList(varsImportRef));
-        
+
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(element);
-        
+
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         assertThat(detector.detectHyperlinks(0, 0, labelWithVar, 0)).isEmpty();
     }
@@ -218,7 +218,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotProject robotProject = suiteFile.getProject();
         final ReferencedVariableFile varsImportRef = new ReferencedVariableFile();
-        varsImportRef.setVariables(ImmutableMap.<String, Object> of("x", 100, "var", 42, "z", 1729));
+        varsImportRef.setVariables(ImmutableMap.of("x", 100, "var", 42, "z", 1729));
         robotProject.setReferencedVariablesFiles(newArrayList(varsImportRef));
 
         final RobotKeywordCall element = suiteFile.findSection(RobotCasesSection.class).get()
@@ -227,7 +227,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(element);
-        
+
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         assertThat(detector.detectHyperlinks(0, 0, labelWithVar, 0)).isEmpty();
     }
@@ -251,7 +251,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(element);
-        
+
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         assertThat(detector.detectHyperlinks(0, 0, labelWithVar, 0)).isEmpty();
     }
@@ -273,7 +273,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(calls.get(2));
-        
+
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
@@ -301,7 +301,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(calls.get(2));
-        
+
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
@@ -385,7 +385,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(element);
-        
+
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
@@ -416,7 +416,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(0)).thenReturn(element);
-        
+
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 

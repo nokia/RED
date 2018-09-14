@@ -19,13 +19,11 @@ import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Range;
 
 /**
  * @author Michal Anglart
- *
  */
 public class ArgumentsDescriptor implements Iterable<Argument> {
 
@@ -41,7 +39,7 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
 
     public static ArgumentsDescriptor createDescriptor(final List<String> args) {
         if (args == null) {
-            return new ArgumentsDescriptor(Lists.<Argument> newArrayList());
+            return new ArgumentsDescriptor(newArrayList());
         }
 
         final List<Argument> arguments = newArrayList();
@@ -146,7 +144,7 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
     public static class Argument {
 
         private final ArgumentType type;
-        
+
         private final String argumentName;
 
         private final Optional<String> defaultValue;

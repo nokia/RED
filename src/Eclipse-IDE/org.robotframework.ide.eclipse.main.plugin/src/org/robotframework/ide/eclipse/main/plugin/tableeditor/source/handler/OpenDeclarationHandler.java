@@ -51,7 +51,7 @@ public class OpenDeclarationHandler extends DIParameterizedHandler<E4OpenDeclara
 
     private static Optional<IHyperlink> getHyperlink(final ITextViewer viewer, final IRegion hyperlinkRegion,
             final IHyperlinkDetector... detectors) {
-        for(final IHyperlinkDetector detector : detectors) {
+        for (final IHyperlinkDetector detector : detectors) {
             final Optional<IHyperlink> hyperlink = detect(viewer, hyperlinkRegion, detector);
             if (hyperlink.isPresent()) {
                 return hyperlink;

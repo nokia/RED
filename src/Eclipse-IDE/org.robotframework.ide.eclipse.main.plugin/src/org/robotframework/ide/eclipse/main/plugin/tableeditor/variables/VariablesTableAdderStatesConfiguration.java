@@ -70,7 +70,7 @@ class VariablesTableAdderStatesConfiguration extends AbstractUiBindingConfigurat
 
         @Override
         public void run(final NatTable natTable, final MouseEvent event) {
-            variablesDataProvider.switchAddderToNextState();
+            variablesDataProvider.switchAdderToNextState();
             natTable.refresh();
         }
     }

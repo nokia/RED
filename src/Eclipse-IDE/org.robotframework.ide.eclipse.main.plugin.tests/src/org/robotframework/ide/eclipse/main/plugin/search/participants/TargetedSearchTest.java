@@ -55,7 +55,7 @@ public class TargetedSearchTest {
                 projectProvider.getFile("file2.robot"), projectProvider.getFile("file3.robot"));
 
         final TargetedSearch targetedSearch = createTargetedSearch(new SearchPattern("doc"), new SearchResult(null));
-        targetedSearch.run(monitor, LinkedHashMultimap.<IProject, LibrarySpecification> create(), files);
+        targetedSearch.run(monitor, LinkedHashMultimap.create(), files);
 
         assertThat(monitor.getTotalWorkToBeDone()).isEqualTo(3);
         assertThat(monitor.getWorkDone()).isEqualTo(3);
@@ -70,18 +70,13 @@ public class TargetedSearchTest {
     @Test(expected = OperationCanceledException.class)
     public void whenTargetSearchWasCancelledWhenRunWithFiles_searchIsNotContinued() {
         final ProgressMonitorMock monitor = new ProgressMonitorMock();
-        monitor.performWhenTaskBegins(new Runnable() {
-            @Override
-            public void run() {
-                monitor.setCanceled(true);
-            }
-        });
+        monitor.performWhenTaskBegins(() -> monitor.setCanceled(true));
 
         final Set<IFile> files = newHashSet(projectProvider.getFile("file1.robot"),
                 projectProvider.getFile("file2.robot"), projectProvider.getFile("file3.robot"));
 
         final TargetedSearch targetedSearch = createTargetedSearch(new SearchPattern("doc"), new SearchResult(null));
-        targetedSearch.run(monitor, LinkedHashMultimap.<IProject, LibrarySpecification> create(), files);
+        targetedSearch.run(monitor, LinkedHashMultimap.create(), files);
     }
 
     @Test
@@ -117,12 +112,7 @@ public class TargetedSearchTest {
     @Test(expected = OperationCanceledException.class)
     public void whenTargetSearchWasCancelledWhenRunWithLibraries_searchIsNotContinued() {
         final ProgressMonitorMock monitor = new ProgressMonitorMock();
-        monitor.performWhenTaskBegins(new Runnable() {
-            @Override
-            public void run() {
-                monitor.setCanceled(true);
-            }
-        });
+        monitor.performWhenTaskBegins(() -> monitor.setCanceled(true));
 
         final Multimap<IProject, LibrarySpecification> libraries = LinkedHashMultimap.create();
         libraries.put(projectProvider.getProject(), new LibrarySpecification());

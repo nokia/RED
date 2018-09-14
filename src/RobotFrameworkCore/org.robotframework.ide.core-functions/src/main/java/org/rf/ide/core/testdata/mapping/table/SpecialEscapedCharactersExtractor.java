@@ -26,7 +26,7 @@ public class SpecialEscapedCharactersExtractor {
 
         int currentPos = 0;
         final Matcher matcher = PATTERN.matcher(text.toString());
-        while(matcher.find()) {
+        while (matcher.find()) {
             final int start_t = matcher.start();
             final int end_t = matcher.end();
             if (start_t - currentPos > 0) {

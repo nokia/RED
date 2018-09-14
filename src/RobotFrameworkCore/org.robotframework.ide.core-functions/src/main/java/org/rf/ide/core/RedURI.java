@@ -52,10 +52,10 @@ public class RedURI {
         final String escapedPath = URI_SPECIAL_CHARS_ESCAPER.escape(path);
         final String sep = RedSystemProperties.isWindowsPlatform() ? "/" : "//";
         final String escapedPathWithScheme = new File(path).isAbsolute() ? "file:" + sep + escapedPath : escapedPath;
-        final String normalizedPath = RedSystemProperties.isWindowsPlatform() ? 
-                escapedPathWithScheme.replaceAll("\\\\", "/") :
-                escapedPathWithScheme.replaceAll("\\\\", "%5c");
+        final String normalizedPath = RedSystemProperties.isWindowsPlatform()
+                ? escapedPathWithScheme.replaceAll("\\\\", "/")
+                : escapedPathWithScheme.replaceAll("\\\\", "%5c");
         return new URI(normalizedPath);
     }
-    
+
 }

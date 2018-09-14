@@ -43,7 +43,7 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
 
     private void createLists(final RobotSettingsSection section) {
         if (metadata == null) {
-            metadata = new SortedList<>(GlazedLists.<RobotKeywordCall> eventListOf(), null);
+            metadata = new SortedList<>(GlazedLists.eventListOf(), null);
             filteredMetadata = new FilterList<>(metadata);
         }
         if (section != null) {

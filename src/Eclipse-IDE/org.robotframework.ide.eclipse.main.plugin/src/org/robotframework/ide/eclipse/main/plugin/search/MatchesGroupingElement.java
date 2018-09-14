@@ -37,7 +37,7 @@ public final class MatchesGroupingElement {
     <T> Optional<T> getGroupingObjectOf(final Class<? extends T> clazz) {
         for (final Object element : groupingElements) {
             if (clazz.isInstance(element)) {
-                return Optional.<T> of(clazz.cast(element));
+                return Optional.of(clazz.cast(element));
             }
         }
         return Optional.empty();

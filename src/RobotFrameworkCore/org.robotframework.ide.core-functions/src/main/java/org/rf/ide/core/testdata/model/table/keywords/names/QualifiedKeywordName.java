@@ -54,7 +54,7 @@ public final class QualifiedKeywordName {
     }
     
     public static boolean isOccurrenceEqualToDefinition(final String keywordOccurrence, final String keywordDefinition) {
-        if(EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordDefinition)) { // ignore embedded keyword names
+        if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordDefinition)) { // ignore embedded keyword names
             return true;
         }
         final List<String> splittedOccurrence = Splitter.on('.').splitToList(keywordOccurrence);
