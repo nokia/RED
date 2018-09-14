@@ -13,6 +13,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.n
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.noFilePositions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.nullParent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -33,8 +34,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyInKeywordTableHandler.E4CopyInKeywordTableHandler;
 
-import com.google.common.collect.Lists;
-
 public class CopyInKeywordTableHandlerTest {
 
     private final E4CopyInKeywordTableHandler handler = new E4CopyInKeywordTableHandler();
@@ -53,7 +52,7 @@ public class CopyInKeywordTableHandlerTest {
     @Test
     public void nothingIsCopied_whenNothingIsSelected() {
         when(selectionLayerAccessor.getSelectedPositions()).thenReturn(new PositionCoordinate[] {});
-        final IStructuredSelection selection = new StructuredSelection(Lists.<Object> newArrayList());
+        final IStructuredSelection selection = new StructuredSelection(new ArrayList<>());
 
         final boolean copied = handler.copyContent(editor, selection, clipboard);
         assertThat(copied).isFalse();

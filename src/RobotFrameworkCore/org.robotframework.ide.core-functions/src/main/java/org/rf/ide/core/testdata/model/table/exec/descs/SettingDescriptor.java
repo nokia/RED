@@ -13,8 +13,8 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class SettingDescriptor<T> implements IExecutableRowDescriptor<T>{
-    
+public class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
+
     final AModelElement<T> line;
 
     public SettingDescriptor(final AModelElement<T> line) {
@@ -71,5 +71,4 @@ public class SettingDescriptor<T> implements IExecutableRowDescriptor<T>{
         return line;
     }
 
-    
 }

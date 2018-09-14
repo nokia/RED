@@ -17,7 +17,6 @@ import org.robotframework.red.nattable.IFilteringDataProvider;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.matchers.Matcher;
 
 /**
  * @author Michal Anglart
@@ -49,7 +48,7 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
 
     private void createLists(final RobotVariablesSection section) {
         if (variables == null) {
-            variables = new SortedList<>(GlazedLists.<RobotVariable> eventListOf(), null);
+            variables = new SortedList<>(GlazedLists.eventListOf(), null);
             filteredVariables = new FilterList<>(variables);
         }
         if (section != null) {
@@ -138,12 +137,7 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
         if (filter == null) {
             filteredVariables.setMatcher(null);
         } else {
-            filteredVariables.setMatcher(new Matcher<RobotVariable>() {
-                @Override
-                public boolean matches(final RobotVariable item) {
-                    return filter.isMatching(item);
-                }
-            });
+            filteredVariables.setMatcher(item -> filter.isMatching(item));
         }
     }
 
@@ -151,7 +145,7 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
         return filteredVariables.contains(robotVariable);
     }
 
-    void switchAddderToNextState() {
+    void switchAdderToNextState() {
         addingToken.switchToNext();
     }
 

@@ -42,7 +42,7 @@ public class AttributesAugmentingReportingStrategyTest {
 
     @Test
     public void additionalAttributesAreAppendedToCreatedMarker() throws CoreException {
-        final Map<String, Object> additionalMarkerAttributes = ImmutableMap.<String, Object> of("abc", "def");
+        final Map<String, Object> additionalMarkerAttributes = ImmutableMap.of("abc", "def");
         final ValidationReportingStrategy augmentingReportingStrategy = AttributesAugmentingReportingStrategy
                 .create(ValidationReportingStrategy.reportOnly(), additionalMarkerAttributes);
 

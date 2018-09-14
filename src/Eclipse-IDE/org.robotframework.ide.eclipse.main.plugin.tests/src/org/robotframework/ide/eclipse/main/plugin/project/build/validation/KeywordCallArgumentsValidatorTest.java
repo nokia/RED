@@ -99,7 +99,7 @@ public class KeywordCallArgumentsValidatorTest {
                 softly.assertThat(problemsOf(call("1")).against(zeroArgs)).extracting(ALL).containsOnly(
                         problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("1", "2")).against(zeroArgs)).extracting(ALL).containsOnly(
-                        problem(NUMBER_PROBLEM, 28, 35,"Keyword 'keyword' expects 0 arguments but 2 are provided"));
+                        problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 2 are provided"));
                 softly.assertThat(problemsOf(call("a=1")).against(zeroArgs)).extracting(ALL).containsOnly(
                         problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 1 is provided"));
                 softly.assertThat(problemsOf(call("a=1", "b=2")).against(zeroArgs)).extracting(ALL).containsOnly(
@@ -776,9 +776,9 @@ public class KeywordCallArgumentsValidatorTest {
                                     + "Although this argument looks like named one, it isn't because there is no "
                                     + "'x' argument in the keyword definition"),
                     problem(ORDER_PROBLEM, 53, 57, "Positional argument cannot be used after named arguments"));
-                softly.assertThat(problemsOf( call("1", "&{d}", "3")).against(fourArgs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "&{d}", "3")).against(fourArgs)).extracting(ALL).containsOnly(
                     problem(ORDER_PROBLEM, 52, 53, "Positional argument cannot be used after named arguments"));
-                softly.assertThat(problemsOf( call("1", "&{d}", "3", "4")).against(fourArgs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "&{d}", "3", "4")).against(fourArgs)).extracting(ALL).containsOnly(
                     problem(ORDER_PROBLEM, 52, 53, "Positional argument cannot be used after named arguments"),
                     problem(ORDER_PROBLEM, 57, 58, "Positional argument cannot be used after named arguments"));
             });

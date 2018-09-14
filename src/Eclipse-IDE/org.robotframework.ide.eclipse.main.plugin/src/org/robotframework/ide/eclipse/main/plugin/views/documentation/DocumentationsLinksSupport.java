@@ -180,8 +180,9 @@ public class DocumentationsLinksSupport {
     private Optional<? extends RobotFileInternalElement> findElement(final Optional<IFile> file,
             final Map<String, String> params) {
         final RobotModel model = RedPlugin.getModelManager().getModel();
-        final Stream<RobotSuiteFile> fileModel = file.map(model::createSuiteFile).map(Stream::of).orElseGet(
-                () -> Stream.empty());
+        final Stream<RobotSuiteFile> fileModel = file.map(model::createSuiteFile)
+                .map(Stream::of)
+                .orElseGet(Stream::empty);
 
         if (params.containsKey(WorkspaceFileUri.SUITE_PARAM)) {
             return fileModel.findFirst();

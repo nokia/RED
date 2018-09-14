@@ -5,14 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
-import com.google.common.collect.Lists;
 
 public class RobotVariablesSection extends RobotSuiteFileSection {
 
@@ -48,12 +47,11 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
     public RobotVariable createVariable(final int index, final VariableType variableType, final String name) {
         AVariable var;
         if (variableType == VariableType.SCALAR) {
-            var = getLinkedElement().createScalarVariable(index, name, Lists.<String> newArrayList());
+            var = getLinkedElement().createScalarVariable(index, name, new ArrayList<>());
         } else if (variableType == VariableType.LIST) {
-            var = getLinkedElement().createListVariable(index, name, Lists.<String> newArrayList());
+            var = getLinkedElement().createListVariable(index, name, new ArrayList<>());
         } else if (variableType == VariableType.DICTIONARY) {
-            var = getLinkedElement().createDictionaryVariable(index, name,
-                    Lists.<Entry<String, String>> newArrayList());
+            var = getLinkedElement().createDictionaryVariable(index, name, new ArrayList<>());
         } else {
             throw new IllegalArgumentException("Unable to create variable of type " + variableType.name());
         }

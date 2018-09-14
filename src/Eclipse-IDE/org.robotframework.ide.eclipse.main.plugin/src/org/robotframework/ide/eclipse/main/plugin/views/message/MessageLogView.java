@@ -29,12 +29,11 @@ import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author mmarzec
- *
  */
 public class MessageLogView {
-    
+
     public static final String ID = "org.robotframework.ide.MessageLogView";
-    
+
     private StyledText styledText;
 
     private final RobotTestExecutionService executionService;
@@ -44,7 +43,7 @@ public class MessageLogView {
     private ScheduledExecutorService executor;
 
     private RobotTestsLaunch launch;
-    
+
     public MessageLogView() {
         this(RedPlugin.getTestExecutionService());
     }
@@ -66,10 +65,10 @@ public class MessageLogView {
     @PostConstruct
     public void postConstruct(final Composite parent) {
         final FillLayout layout = new FillLayout();
-        layout.marginHeight=2;
-        layout.marginWidth=2;
+        layout.marginHeight = 2;
+        layout.marginWidth = 2;
         parent.setLayout(layout);
-        
+
         styledText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         styledText.setFont(JFaceResources.getTextFont());
         styledText.setEditable(false);
@@ -105,7 +104,7 @@ public class MessageLogView {
         synchronized (launch) {
             final ExecutionMessagesStore messagesStore = launch.getExecutionData(ExecutionMessagesStore.class,
                     ExecutionMessagesStore::new);
-            
+
             if (launch.isTerminated()) {
                 // since the given launch is terminated it will not change anymore
                 SwtThread.syncExec(() -> setMessage(messagesStore.getMessage()));

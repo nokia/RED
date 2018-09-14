@@ -108,9 +108,7 @@ public class RobotLine implements IChildElement<RobotFile> {
                         && offset <= (element.getStartOffset() + (element.getEndColumn() - element.getStartColumn())));
             }
         },
-        ENDS
-
-        {
+        ENDS {
 
             @Override
             public boolean meets(final IRobotLineElement element, final int offset) {

@@ -460,7 +460,7 @@ public class GeneralSettingsTableValidatorTest {
             softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteSetup("Run Keyword", "Run Keyword", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteSetup("Run Keywords", "No Args Kw", "No Args Kw", "No Args Kw"))).isEmpty();
-            softly.assertThat(problemsOf(context, suiteSetup("Run Keywords", "Log", "1", "AND", "Log", "1", "AND","Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteSetup("Run Keywords", "Log", "1", "AND", "Log", "1", "AND", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "1", "ELSE", "Log", "2"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
@@ -481,7 +481,7 @@ public class GeneralSettingsTableValidatorTest {
             softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword", "Run Keyword", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteTeardown("Run Keywords", "No Args Kw", "No Args Kw", "No Args Kw"))).isEmpty();
-            softly.assertThat(problemsOf(context, suiteTeardown("Run Keywords", "Log", "1", "AND", "Log", "1", "AND","Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, suiteTeardown("Run Keywords", "Log", "1", "AND", "Log", "1", "AND", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "1", "ELSE", "Log", "2"))).isEmpty();
             softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
@@ -502,7 +502,7 @@ public class GeneralSettingsTableValidatorTest {
             softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, testSetup("Run Keyword", "Run Keyword", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, testSetup("Run Keywords", "No Args Kw", "No Args Kw", "No Args Kw"))).isEmpty();
-            softly.assertThat(problemsOf(context, testSetup("Run Keywords", "Log", "1", "AND", "Log", "1", "AND","Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testSetup("Run Keywords", "Log", "1", "AND", "Log", "1", "AND", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "1", "ELSE", "Log", "2"))).isEmpty();
             softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
@@ -523,7 +523,7 @@ public class GeneralSettingsTableValidatorTest {
             softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, testTeardown("Run Keyword", "Run Keyword", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, testTeardown("Run Keywords", "No Args Kw", "No Args Kw", "No Args Kw"))).isEmpty();
-            softly.assertThat(problemsOf(context, testTeardown("Run Keywords", "Log", "1", "AND", "Log", "1", "AND","Log", "1"))).isEmpty();
+            softly.assertThat(problemsOf(context, testTeardown("Run Keywords", "Log", "1", "AND", "Log", "1", "AND", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log", "1"))).isEmpty();
             softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log", "1", "ELSE", "Log", "2"))).isEmpty();
             softly.assertThat(problemsOf(context, testTeardown("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();

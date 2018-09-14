@@ -31,13 +31,13 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
 
     private final Map<String, Button> extensionButtons;
 
-    private IStructuredSelection currentSelection;
+    private final IStructuredSelection currentSelection;
 
     WizardNewRobotResourceFileCreationPage(final String pageName, final IStructuredSelection selection,
             final String firstExtension, final String... restExtensions) {
         super(pageName, selection);
         currentSelection = selection;
-        extensionButtons = Maps.<String, Button> newLinkedHashMap();
+        extensionButtons = Maps.newLinkedHashMap();
         extensionButtons.put(firstExtension, null);
         for (final String extension : restExtensions) {
             extensionButtons.put(extension, null);
@@ -60,7 +60,8 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
                     if (e.getSource() == button && button.getSelection()) {
                         final String currentName = getFileName();
                         final String currentNameWithoutExtension = currentName.contains(".")
-                                ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
+                                ? currentName.substring(0, currentName.lastIndexOf("."))
+                                : currentName;
 
                         for (final Entry<String, Button> entry : extensionButtons.entrySet()) {
                             if (entry.getValue() == button) {
@@ -91,10 +92,8 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
 
     @Override
     protected boolean validatePage() {
-
-
-        boolean isProjectavailable = false;
-        Object[] selection = currentSelection.toArray();
+        boolean isProjectAvailable = false;
+        final Object[] selection = currentSelection.toArray();
         final boolean isValid = super.validatePage();
         if (!(selection.length == 0)) {
             for (Object project : selection) {
@@ -103,13 +102,13 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
                 }
                 if (project instanceof IProject) {
                     if (((IProject) project).isOpen()) {
-                    isProjectavailable = true;
-                    break;
-                }
+                        isProjectAvailable = true;
+                        break;
+                    }
                 }
             }
         }
-        if (!isProjectavailable && !isValid) {
+        if (!isProjectAvailable && !isValid) {
             setErrorMessage("Action impossible to finish: No project available");
             return false;
         }
@@ -120,7 +119,8 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
 
         final String currentName = getFileName();
         final String currentNameWithoutExtension = currentName.contains(".")
-                ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
+                ? currentName.substring(0, currentName.lastIndexOf("."))
+                : currentName;
 
         if (currentNameWithoutExtension.isEmpty()) {
             setErrorMessage("Name cannot be empty.");
@@ -130,7 +130,7 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
         final String name = currentName.contains(".") ? currentName : currentName + ".robot";
         final IPath resourcePath = getContainerFullPath().append(name);
         final IFile file = createFileHandle(resourcePath);
-        
+
         final IContainer container = file.getParent();
         if (!container.exists()) {
             setErrorMessage("Folder '" + container.getFullPath().toString() + "' does not exists.");

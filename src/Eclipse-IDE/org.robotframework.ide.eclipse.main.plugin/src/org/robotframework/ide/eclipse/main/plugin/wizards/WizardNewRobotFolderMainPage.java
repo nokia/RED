@@ -29,13 +29,13 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
 
     private final Map<String, Button> extensionButtons;
 
-    private IStructuredSelection currentSelection;
+    private final IStructuredSelection currentSelection;
 
     public WizardNewRobotFolderMainPage(final String pageName, final IStructuredSelection selection,
             final String firstExtension, final String... restExtensions) {
         super(pageName, selection);
         currentSelection = selection;
-        extensionButtons = Maps.<String, Button> newLinkedHashMap();
+        extensionButtons = Maps.newLinkedHashMap();
         extensionButtons.put(firstExtension, null);
         for (final String extension : restExtensions) {
             extensionButtons.put(extension, null);
@@ -46,7 +46,6 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
     protected void createAdvancedControls(final Composite parent) {
         initializationFileButton = new Button(parent, SWT.CHECK);
         initializationFileButton.setText("Create suite initialization file");
-
 
         boolean isFirst = true;
         for (final String extension : extensionButtons.keySet()) {
@@ -62,6 +61,7 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
         }
 
         initializationFileButton.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 for (final Button button : extensionButtons.values()) {
@@ -87,9 +87,9 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
 
     @Override
     protected boolean validatePage() {
-        boolean isProjectavailable = false;
-        Object[] selection = currentSelection.toArray();
-        boolean isValid = super.validatePage();
+        boolean isProjectAvailable = false;
+        final Object[] selection = currentSelection.toArray();
+        final boolean isValid = super.validatePage();
         if (!(selection.length == 0)) {
             for (Object project : selection) {
                 while (project instanceof IFolder || project instanceof IFile) {
@@ -97,17 +97,16 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
                 }
                 if (project instanceof IProject) {
                     if (((IProject) project).isOpen()) {
-                    isProjectavailable = true;
-                    break;
-                }
+                        isProjectAvailable = true;
+                        break;
+                    }
                 }
             }
         }
-        if (!isProjectavailable && !isValid) {
+        if (!isProjectAvailable && !isValid) {
             setErrorMessage("Action impossible to finish: No project available");
             return false;
         }
-
 
         return isValid;
 

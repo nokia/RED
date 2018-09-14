@@ -38,7 +38,7 @@ public class CellsHighlighter extends FocusCellHighlighter {
                     if (row == null) {
                         throw new IllegalStateException("Cells highlighter should be used with special kind of viewer");
                     }
-        
+
                     final ViewerCell cell = row.getCell(event.index);
                     if (focusCell == null || !cell.equals(focusCell)) {
                         removeSelectionInformation(event);
@@ -55,8 +55,8 @@ public class CellsHighlighter extends FocusCellHighlighter {
     }
 
     private void markFocusedCell(final Event event, final ViewerCell cell) {
-        final Color background = (cell.getControl().isFocusControl()) ?
-                RedTheme.Colors.getTableHighlightedCellColor() : RedTheme.Colors.getTableHiglihtedRowColor();
+        final Color background = (cell.getControl().isFocusControl()) ? RedTheme.Colors.getTableHighlightedCellColor()
+                : RedTheme.Colors.getTableHiglihtedRowColor();
         paint(event, background, getBlackColor());
     }
 

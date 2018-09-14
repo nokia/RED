@@ -34,7 +34,7 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
 
     private final Map<Template, Button> buttons = new LinkedHashMap<>();
 
-    private IStructuredSelection currentSelection;
+    private final IStructuredSelection currentSelection;
 
     WizardNewRobotPythonFilePage(final String pageName, final IStructuredSelection selection) {
         super(pageName, selection);
@@ -77,8 +77,8 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
 
     @Override
     protected boolean validatePage() {
-        boolean isProjectavailable = false;
-        Object[] selection = currentSelection.toArray();
+        boolean isProjectAvailable = false;
+        final Object[] selection = currentSelection.toArray();
         final boolean isValid = super.validatePage();
         if (!(selection.length == 0)) {
             for (Object project : selection) {
@@ -87,13 +87,13 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
                 }
                 if (project instanceof IProject) {
                     if (((IProject) project).isOpen()) {
-                        isProjectavailable = true;
+                        isProjectAvailable = true;
                         break;
                     }
                 }
             }
         }
-        if (!isProjectavailable && !isValid) {
+        if (!isProjectAvailable && !isValid) {
             setErrorMessage("Action impossible to finish: No project available");
             return false;
         }
@@ -101,10 +101,10 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
         if (!isValid) {
             return false;
         }
-        String name = getFileName().contains(".py") ? getFileName() : getFileName().concat(".py");
+        final String name = getFileName().contains(".py") ? getFileName() : getFileName().concat(".py");
 
-        IPath resourcePath = getContainerFullPath().append(getFileName() + getFileExtension());
-        IFile file = createFileHandle(resourcePath);
+        final IPath resourcePath = getContainerFullPath().append(getFileName() + getFileExtension());
+        final IFile file = createFileHandle(resourcePath);
 
         final IContainer container = file.getParent();
         if (!container.exists()) {
@@ -133,6 +133,7 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
         EMPTY("Empty content", "");
 
         private final String label;
+
         private final String content;
 
         private Template(final String label, final String content) {

@@ -44,15 +44,15 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
         }
 
         int argsNr = args.size();
-        int indexOfAlias = indexOfAliasStarting(args, settingsTable.getParent().getParent().getRobotVersion());
+        final int indexOfAlias = indexOfAliasStarting(args, settingsTable.getParent().getParent().getRobotVersion());
         if (indexOfAlias >= 0) {
-            RobotToken aliasText = new RobotToken();
+            final RobotToken aliasText = new RobotToken();
             aliasText.setText(args.get(argsNr - 1));
 
-            RobotToken aliasDecText = new RobotToken();
+            final RobotToken aliasDecText = new RobotToken();
             aliasDecText.setText(args.get(argsNr - 2));
 
-            LibraryAlias libAliasDec = new LibraryAlias(aliasDecText);
+            final LibraryAlias libAliasDec = new LibraryAlias(aliasDecText);
             libAliasDec.setLibraryAlias(aliasText);
 
             newLibraryImport.setAlias(libAliasDec);
@@ -71,10 +71,10 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
     private int indexOfAliasStarting(final List<String> args, final RobotVersion rVersionInstalled) {
         int aliasDecIndex = -1;
 
-        int size = args.size();
+        final int size = args.size();
         if (size >= 2) {
-            String lastArg = args.get(size - 1);
-            String penultimateArg = args.get(size - 2);
+            final String lastArg = args.get(size - 1);
+            final String penultimateArg = args.get(size - 2);
 
             final String aliasDecText = RobotTokenType.SETTING_LIBRARY_ALIAS
                     .getTheMostCorrectOneRepresentation(rVersionInstalled).getRepresentation();
@@ -85,7 +85,7 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
 
         return aliasDecIndex;
     }
-    
+
     @Override
     public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
         settingsTable.addImported((AImported) modelElement, index);
@@ -98,12 +98,12 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
             libraryImport.setPathOrName(value != null ? value : "");
         } else if (index > 0) {
             if (value == null) {
-                libraryImport.removeElementToken(index-1);
+                libraryImport.removeElementToken(index - 1);
             } else {
                 final int properIndex = index - 1;
 
-                int nrOfArgs = libraryImport.getArguments().size();
-                int nrOfArgsWithAlias = nrOfArgs + libraryImport.getAlias().getElementTokens().size();
+                final int nrOfArgs = libraryImport.getArguments().size();
+                final int nrOfArgsWithAlias = nrOfArgs + libraryImport.getAlias().getElementTokens().size();
 
                 if (nrOfArgs < nrOfArgsWithAlias) {
                     libraryImport.addArgument(libraryImport.getAlias().getDeclaration());
@@ -113,19 +113,19 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
 
                 libraryImport.setArguments(properIndex, value);
 
-                int indexOfAlias = indexOfAliasStarting(
+                final int indexOfAlias = indexOfAliasStarting(
                         Lists.transform(libraryImport.getArguments(), new GetTokenText()),
                         libraryImport.getParent().getParent().getParent().getRobotVersion());
 
                 if (indexOfAlias > -1) {
-                    RobotToken aliasDec = libraryImport.getArguments().get(libraryImport.getArguments().size() - 2);
-                    RobotToken aliasValue = libraryImport.getArguments().get(libraryImport.getArguments().size() - 1);
+                    final RobotToken aliasDec = libraryImport.getArguments().get(libraryImport.getArguments().size() - 2);
+                    final RobotToken aliasValue = libraryImport.getArguments().get(libraryImport.getArguments().size() - 1);
 
                     // remove alias value and alias declaration
                     libraryImport.removeArgument(indexOfAlias);
                     libraryImport.removeArgument(indexOfAlias);
 
-                    LibraryAlias alias = new LibraryAlias(aliasDec);
+                    final LibraryAlias alias = new LibraryAlias(aliasDec);
                     alias.setLibraryAlias(aliasValue);
 
                     libraryImport.setAlias(alias);

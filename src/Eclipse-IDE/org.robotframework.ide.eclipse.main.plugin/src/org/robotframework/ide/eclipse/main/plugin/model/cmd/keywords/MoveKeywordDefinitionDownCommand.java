@@ -35,10 +35,10 @@ public class MoveKeywordDefinitionDownCommand extends EditorCommand {
             return;
         }
         Collections.swap(section.getChildren(), index, index + 1);
-        
-        final Object linkedElement = ((RobotKeywordsSection)section).getLinkedElement();
-        if(linkedElement != null && linkedElement instanceof KeywordTable) {
-            ((KeywordTable)linkedElement).moveDownKeyword(keywordDef.getLinkedElement());
+
+        final Object linkedElement = ((RobotKeywordsSection) section).getLinkedElement();
+        if (linkedElement != null && linkedElement instanceof KeywordTable) {
+            ((KeywordTable) linkedElement).moveDownKeyword(keywordDef.getLinkedElement());
         }
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED, section);

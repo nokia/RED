@@ -52,7 +52,7 @@ public class ConvertEmptyToSettingTest {
                 .appendLine("  call  1  2  #comment")
                 .build();
         final RobotCase testCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotEmptyLine keywordCall = (RobotEmptyLine)testCase.getChildren().get(0);
+        final RobotEmptyLine keywordCall = (RobotEmptyLine) testCase.getChildren().get(0);
         @SuppressWarnings("unchecked")
         final RobotEmptyRow<TestCase> oldLinked = (RobotEmptyRow<TestCase>) keywordCall.getLinkedElement();
 

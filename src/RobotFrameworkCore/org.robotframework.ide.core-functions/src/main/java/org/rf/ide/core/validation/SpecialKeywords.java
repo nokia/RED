@@ -50,7 +50,7 @@ public class SpecialKeywords {
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Variable Should Exist", "BuiltIn"));
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Variable Should Not Exist", "BuiltIn"));
     }
-    
+
     // keywords for which some arguments should be validated for variable syntax
     private static final Set<QualifiedKeywordName> VARS_SYNTAX_CHECKING_KEYWORDS = new HashSet<>();
     static {
@@ -132,7 +132,7 @@ public class SpecialKeywords {
 
     /**
      * Returns collection of variables which were created by given keyword call.
-     * 
+     *
      * Currently supports:
      * BuiltIn.Set Test Variable
      * BuiltIn.Set Suite Variable
@@ -148,7 +148,7 @@ public class SpecialKeywords {
                     .stream()
                     .findFirst()
                     .map(Stream::of)
-                    .orElseGet(() -> Stream.empty())
+                    .orElseGet(Stream::empty)
                     .filter(arg -> !arg.getTypes().contains(RobotTokenType.VARIABLES_WRONG_DEFINED))
                     .map(RobotToken::getText)
                     .filter(VariableNamesSupport::isCleanVariable)
@@ -160,7 +160,7 @@ public class SpecialKeywords {
     /**
      * Returns variables used by given keyword call. Normally those are all the variables
      * used in arguments of a call, but for following keywords some variables are removed:
-     * 
+     *
      * BuiltIn.Comment - all variables are removed
      * BuiltIn.Set Test Variable - variable from first argument is removed
      * BuiltIn.Set Suite Variable - as above
@@ -177,7 +177,7 @@ public class SpecialKeywords {
                         .stream()
                         .findFirst()
                         .map(Stream::of)
-                        .orElseGet(() -> Stream.empty())
+                        .orElseGet(Stream::empty)
                         .filter(arg -> !arg.getTypes().contains(RobotTokenType.VARIABLES_WRONG_DEFINED))
                         .filter(token -> VariableNamesSupport.isCleanVariable(token.getText()))
                         .findFirst();
@@ -196,7 +196,7 @@ public class SpecialKeywords {
     /**
      * Returns tokens which should be checked if is provided with variable syntax. Currently
      * supports:
-     * 
+     *
      * BuiltIn.Set Test Variable
      * BuiltIn.Set Suite Variable
      * BuiltIn.Set Global Variable
@@ -250,7 +250,7 @@ public class SpecialKeywords {
                             && executableTokens.get(argIndex + offsetFromNested - 2).getText().equals("ELSE IF")
                             && !executableTokens.get(argIndex + offsetFromNested - 1).getText().equals("ELSE")
                             && !executableTokens.get(argIndex + offsetFromNested - 1).getText().equals("ELSE IF");
-            
+
         } else if (QualifiedKeywordName.create("Run Keywords", "BuiltIn").equals(actualKeyword)) {
             if (executableTokens.stream().skip(argIndex + 1).anyMatch(token -> token.getText().equals("AND"))) {
                 final RobotToken token = executableTokens.get(argIndex + offsetFromNested);
@@ -263,7 +263,7 @@ public class SpecialKeywords {
             } else {
                 return true;
             }
-            
+
         } else {
             return NESTED_EXECUTABLE_KEYWORDS.get(actualKeyword).intValue() == offsetFromNested - 1;
         }
@@ -309,7 +309,7 @@ public class SpecialKeywords {
         if (arguments.size() < 2) {
             return nested;
         }
-        
+
         final List<RobotToken> types = new ArrayList<>();
         final List<List<RobotToken>> splitted = new ArrayList<>();
 
@@ -363,7 +363,7 @@ public class SpecialKeywords {
         final List<RobotToken> problematicTokens = new ArrayList<>();
         for (int i = 0; i < types.size(); i++) {
             final RobotToken type = types.get(i);
-            
+
             if (type.getText().equals("ELSE IF") && splitted.get(i).size() < 2) {
                 if (splitted.get(i).isEmpty()
                         || !splitted.get(i).get(0).getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)) {

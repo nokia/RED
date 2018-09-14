@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationsFormatter;
 
 
 public class DocumentationsFormatterTest {
