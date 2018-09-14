@@ -26,13 +26,11 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.message.MessageLogView;
 
-import com.google.common.collect.Lists;
-
 public class RobotPerspectiveTest {
 
     @Test
     public void editorAreaShouldBeVisible() {
-        final IPageLayout layout = createMockPageLayout(Lists.<IFolderLayout> newArrayList());
+        final IPageLayout layout = createMockPageLayout(new ArrayList<>());
 
         final RobotPerspective perspective = new RobotPerspective();
         perspective.createInitialLayout(layout);
@@ -42,7 +40,7 @@ public class RobotPerspectiveTest {
 
     @Test
     public void thereIsADebugPerspectiveShortcutCreated() {
-        final IPageLayout layout = createMockPageLayout(Lists.<IFolderLayout> newArrayList());
+        final IPageLayout layout = createMockPageLayout(new ArrayList<>());
 
         final RobotPerspective perspective = new RobotPerspective();
         perspective.createInitialLayout(layout);
@@ -52,7 +50,7 @@ public class RobotPerspectiveTest {
 
     @Test
     public void thereAreShortcutsToMessageLogViewAndExecutionView() {
-        final IPageLayout layout = createMockPageLayout(Lists.<IFolderLayout> newArrayList());
+        final IPageLayout layout = createMockPageLayout(new ArrayList<>());
 
         final RobotPerspective perspective = new RobotPerspective();
         perspective.createInitialLayout(layout);
@@ -63,7 +61,7 @@ public class RobotPerspectiveTest {
 
     @Test
     public void thereIsAProjectExplorerShortcutInShowIn() {
-        final IPageLayout layout = createMockPageLayout(Lists.<IFolderLayout> newArrayList());
+        final IPageLayout layout = createMockPageLayout(new ArrayList<>());
 
         final RobotPerspective perspective = new RobotPerspective();
         perspective.createInitialLayout(layout);
@@ -73,7 +71,7 @@ public class RobotPerspectiveTest {
 
     @Test
     public void thereAreFourFoldersCreated() {
-        final ArrayList<IFolderLayout> folders = Lists.<IFolderLayout> newArrayList();
+        final List<IFolderLayout> folders = new ArrayList<>();
         final IPageLayout layout = createMockPageLayout(folders);
 
         final RobotPerspective perspective = new RobotPerspective();
@@ -84,7 +82,7 @@ public class RobotPerspectiveTest {
 
     @Test
     public void firstFolderContainsOnlyProjectExplorer() {
-        final ArrayList<IFolderLayout> folders = Lists.<IFolderLayout> newArrayList();
+        final List<IFolderLayout> folders = new ArrayList<>();
         final IPageLayout layout = createMockPageLayout(folders);
 
         final RobotPerspective perspective = new RobotPerspective();
@@ -96,7 +94,7 @@ public class RobotPerspectiveTest {
 
     @Test
     public void secondFolderContainsConsoleAndProblemViews() {
-        final ArrayList<IFolderLayout> folders = Lists.<IFolderLayout> newArrayList();
+        final List<IFolderLayout> folders = new ArrayList<>();
         final IPageLayout layout = createMockPageLayout(folders);
 
         final RobotPerspective perspective = new RobotPerspective();
@@ -109,7 +107,7 @@ public class RobotPerspectiveTest {
 
     @Test
     public void thirdFolderContainsOnlyOutlineView() {
-        final ArrayList<IFolderLayout> folders = Lists.<IFolderLayout> newArrayList();
+        final List<IFolderLayout> folders = new ArrayList<>();
         final IPageLayout layout = createMockPageLayout(folders);
 
         final RobotPerspective perspective = new RobotPerspective();
@@ -121,7 +119,7 @@ public class RobotPerspectiveTest {
 
     @Test
     public void fourthFolderContainsConsoleAndProblemViews() {
-        final ArrayList<IFolderLayout> folders = Lists.<IFolderLayout> newArrayList();
+        final List<IFolderLayout> folders = new ArrayList<>();
         final IPageLayout layout = createMockPageLayout(folders);
 
         final RobotPerspective perspective = new RobotPerspective();
@@ -142,7 +140,7 @@ public class RobotPerspectiveTest {
         when(layout.getEditorArea()).thenReturn("editor_area");
         when(layout.createFolder(anyString(), anyInt(), anyFloat(), anyString())).thenReturn(folderLayout1,
                 folderLayout2, folderLayout3, folderLayout4);
-        
+
         folderLayouts.addAll(newArrayList(folderLayout1, folderLayout2, folderLayout3, folderLayout4));
 
         return layout;

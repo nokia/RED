@@ -47,9 +47,9 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     public RobotKeywordDefinition createKeywordDefinition(final int index, final String name) {
         final RobotKeywordDefinition keywordDefinition;
-        
+
         final KeywordTable keywordsTable = getLinkedElement();
-        if(index >= 0 && index < keywordsTable.getKeywords().size() && index < getChildren().size()) {
+        if (index >= 0 && index < keywordsTable.getKeywords().size() && index < getChildren().size()) {
             keywordDefinition = new RobotKeywordDefinition(this, keywordsTable.createUserKeyword(name, index));
             elements.add(index, keywordDefinition);
         } else {
@@ -58,7 +58,7 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         }
         return keywordDefinition;
     }
-    
+
     List<RobotKeywordDefinition> getUserDefinedKeywords() {
         final List<RobotKeywordDefinition> userKeywords = newArrayList();
         for (final RobotElement child : getChildren()) {

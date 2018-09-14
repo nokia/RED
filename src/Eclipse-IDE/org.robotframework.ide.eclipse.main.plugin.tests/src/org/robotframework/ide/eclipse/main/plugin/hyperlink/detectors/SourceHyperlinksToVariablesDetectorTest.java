@@ -200,7 +200,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 .get().getChildren().get(0);
         final VariablesImport varsImport = (VariablesImport) varSetting.getLinkedElement();
         final VariablesFileImportReference varsImportRef = new VariablesFileImportReference(varsImport);
-        varsImportRef.map(ImmutableMap.<String, Object> of("x", 100, "var", 42, "z", 1729));
+        varsImportRef.map(ImmutableMap.of("x", 100, "var", 42, "z", 1729));
         final RobotFileOutput output = suiteFile.getLinkedElement().getParent();
         output.setVariablesImportReferences(newArrayList(varsImportRef));
         final Document document = new Document(getContent(file));
@@ -226,7 +226,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotProject robotProject = suiteFile.getProject();
         final ReferencedVariableFile varsImportRef = new ReferencedVariableFile();
-        varsImportRef.setVariables(ImmutableMap.<String, Object> of("x", 100, "var", 42, "z", 1729));
+        varsImportRef.setVariables(ImmutableMap.of("x", 100, "var", 42, "z", 1729));
         robotProject.setReferencedVariablesFiles(newArrayList(varsImportRef));
         final Document document = new Document(getContent(file));
 
@@ -235,7 +235,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
 
         final int begin = 29;
         assertThat(document.get(begin, 6)).isEqualTo("${var}");
-        
+
         final SourceHyperlinksToVariablesDetector detector = new SourceHyperlinksToVariablesDetector(model, suiteFile);
         assertThat(detector.detectHyperlinks(textViewer, new Region(begin + 3, 1), true)).isNull();
     }

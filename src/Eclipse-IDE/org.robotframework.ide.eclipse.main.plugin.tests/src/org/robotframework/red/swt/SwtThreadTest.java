@@ -23,12 +23,9 @@ public class SwtThreadTest {
     @Test
     public void syncOperationIsPerformed_1() {
         final AtomicBoolean operationPerformed = new AtomicBoolean(false);
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                sleep(200);
-                operationPerformed.set(true);
-            }
+        final Runnable runnable = () -> {
+            sleep(200);
+            operationPerformed.set(true);
         };
         SwtThread.syncExec(runnable);
         assertThat(operationPerformed.get()).isTrue();
@@ -37,12 +34,9 @@ public class SwtThreadTest {
     @Test
     public void syncOperationIsPerformed_2() {
         final AtomicBoolean operationPerformed = new AtomicBoolean(false);
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                sleep(200);
-                operationPerformed.set(true);
-            }
+        final Runnable runnable = () -> {
+            sleep(200);
+            operationPerformed.set(true);
         };
         SwtThread.syncExec(Display.getDefault(), runnable);
         assertThat(operationPerformed.get()).isTrue();
@@ -77,23 +71,20 @@ public class SwtThreadTest {
         final AtomicBoolean resultIsAsExpected = new AtomicBoolean(false);
 
         final Semaphore waitForAsyncEvalQueued = new Semaphore(0);
-        final Thread someThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final Evaluation<String> evaluation = new Evaluation<String>() {
-                    @Override
-                    public String runCalculation() {
-                        sleep(200);
-                        return "result";
-                    }
-                };
-                final Future<String> asyncResult = SwtThread.asyncEval(evaluation);
-                try {
-                    waitForAsyncEvalQueued.release();
-                    resultIsAsExpected.set(asyncResult.get().equals("result"));
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new IllegalStateException("Shouldn't be interrupted!", e);
+        final Thread someThread = new Thread(() -> {
+            final Evaluation<String> evaluation = new Evaluation<String>() {
+                @Override
+                public String runCalculation() {
+                    sleep(200);
+                    return "result";
                 }
+            };
+            final Future<String> asyncResult = SwtThread.asyncEval(evaluation);
+            try {
+                waitForAsyncEvalQueued.release();
+                resultIsAsExpected.set(asyncResult.get().equals("result"));
+            } catch (InterruptedException | ExecutionException e) {
+                throw new IllegalStateException("Shouldn't be interrupted!", e);
             }
         });
         someThread.start();
@@ -109,27 +100,23 @@ public class SwtThreadTest {
         final AtomicBoolean resultIsAsExpected = new AtomicBoolean(false);
 
         final Semaphore waitForAsyncEvalQueued = new Semaphore(0);
-        final Thread someThread = new Thread(new Runnable() {
+        final Thread someThread = new Thread(() -> {
+            final Evaluation<String> evaluation = new Evaluation<String>() {
 
-            @Override
-            public void run() {
-                final Evaluation<String> evaluation = new Evaluation<String>() {
-
-                    @Override
-                    public String runCalculation() {
-                        sleep(100);
-                        return "result";
-                    }
-                };
-                final Future<String> asyncResult = SwtThread.asyncEval(Display.getDefault(), evaluation);
-                try {
-                    waitForAsyncEvalQueued.release();
-                    resultIsAsExpected.set(asyncResult.get(10000, TimeUnit.MILLISECONDS).equals("result"));
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new IllegalStateException("Shouldn't be interrupted!", e);
-                } catch (final TimeoutException e) {
-                    resultIsAsExpected.set(false);
+                @Override
+                public String runCalculation() {
+                    sleep(100);
+                    return "result";
                 }
+            };
+            final Future<String> asyncResult = SwtThread.asyncEval(Display.getDefault(), evaluation);
+            try {
+                waitForAsyncEvalQueued.release();
+                resultIsAsExpected.set(asyncResult.get(10000, TimeUnit.MILLISECONDS).equals("result"));
+            } catch (InterruptedException | ExecutionException e1) {
+                throw new IllegalStateException("Shouldn't be interrupted!", e1);
+            } catch (final TimeoutException e2) {
+                resultIsAsExpected.set(false);
             }
         });
         someThread.start();
@@ -145,27 +132,23 @@ public class SwtThreadTest {
         final AtomicBoolean timeoutIsReached = new AtomicBoolean(false);
 
         final Semaphore waitForAsyncEvalQueued = new Semaphore(0);
-        final Thread someThread = new Thread(new Runnable() {
+        final Thread someThread = new Thread(() -> {
+            final Evaluation<String> evaluation = new Evaluation<String>() {
 
-            @Override
-            public void run() {
-                final Evaluation<String> evaluation = new Evaluation<String>() {
-
-                    @Override
-                    public String runCalculation() {
-                        sleep(1000);
-                        return "result";
-                    }
-                };
-                final Future<String> asyncResult = SwtThread.asyncEval(Display.getDefault(), evaluation);
-                try {
-                    waitForAsyncEvalQueued.release();
-                    asyncResult.get(200, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new IllegalStateException("Shouldn't be interrupted!", e);
-                } catch (final TimeoutException e) {
-                    timeoutIsReached.set(true);
+                @Override
+                public String runCalculation() {
+                    sleep(1000);
+                    return "result";
                 }
+            };
+            final Future<String> asyncResult = SwtThread.asyncEval(Display.getDefault(), evaluation);
+            try {
+                waitForAsyncEvalQueued.release();
+                asyncResult.get(200, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException | ExecutionException e1) {
+                throw new IllegalStateException("Shouldn't be interrupted!", e1);
+            } catch (final TimeoutException e2) {
+                timeoutIsReached.set(true);
             }
         });
         someThread.start();
@@ -181,18 +164,12 @@ public class SwtThreadTest {
         final AtomicBoolean operationPerformed = new AtomicBoolean(false);
 
         final Semaphore waitForAsyncEvalQueued = new Semaphore(0);
-        final Thread someThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SwtThread.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        sleep(200);
-                        operationPerformed.set(true);
-                    }
-                });
-                waitForAsyncEvalQueued.release();
-            }
+        final Thread someThread = new Thread(() -> {
+            SwtThread.asyncExec(() -> {
+                sleep(200);
+                operationPerformed.set(true);
+            });
+            waitForAsyncEvalQueued.release();
         });
         someThread.start();
         waitForAsyncEvalQueued.acquire();
@@ -207,18 +184,12 @@ public class SwtThreadTest {
         final AtomicBoolean operationPerformed = new AtomicBoolean(false);
 
         final Semaphore waitForAsyncEvalQueued = new Semaphore(0);
-        final Thread someThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SwtThread.asyncExec(Display.getDefault(), new Runnable() {
-                    @Override
-                    public void run() {
-                        sleep(200);
-                        operationPerformed.set(true);
-                    }
-                });
-                waitForAsyncEvalQueued.release();
-            }
+        final Thread someThread = new Thread(() -> {
+            SwtThread.asyncExec(Display.getDefault(), () -> {
+                sleep(200);
+                operationPerformed.set(true);
+            });
+            waitForAsyncEvalQueued.release();
         });
         someThread.start();
         waitForAsyncEvalQueued.acquire();

@@ -22,8 +22,8 @@ public class SetDictItemsCommand extends EditorCommand {
     private final RobotVariable variable;
 
     private final List<String> newValue;
-    
-    private List<String> previousValue = new ArrayList<>();
+
+    private final List<String> previousValue = new ArrayList<>();
 
     public SetDictItemsCommand(final RobotVariable variable, final List<String> newValue) {
         this.variable = variable;
@@ -35,16 +35,16 @@ public class SetDictItemsCommand extends EditorCommand {
         if (variable.getType() != VariableType.DICTIONARY) {
             throw new CommandExecutionException("Invalid type of variable: " + variable.getType());
         }
-        
-        for(final RobotToken token : VariablesValueConverter.convert(((DictionaryVariable) variable.getLinkedElement()).getItems(),
-                RobotToken.class)){
+
+        for (final RobotToken token : VariablesValueConverter
+                .convert(((DictionaryVariable) variable.getLinkedElement()).getItems(), RobotToken.class)) {
             previousValue.add(token.getText());
         }
 
         new VariableTableModelUpdater().addOrSet(variable.getLinkedElement(), 0, newValue);
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(new SetDictItemsCommand(variable, previousValue));

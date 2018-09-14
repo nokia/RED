@@ -120,7 +120,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         protected List<? extends ISectionFormFragment> createFormFragments() {
             generalFragment = new GeneralSettingsFormFragment();
             metadataFragment = shouldShowMetadata() ? Optional.of(new MetadataSettingsFormFragment())
-                    : Optional.<MetadataSettingsFormFragment> empty();
+                    : Optional.empty();
             importFragment = new ImportSettingsFormFragment();
 
             if (metadataFragment.isPresent()) {
@@ -150,7 +150,6 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             }
             return settingsEditorPageSelectionProvider.getSelectionLayerAccessor();
         }
-        
 
         @Override
         public Optional<TreeLayerAccessor> getTreeLayerAccessor() {

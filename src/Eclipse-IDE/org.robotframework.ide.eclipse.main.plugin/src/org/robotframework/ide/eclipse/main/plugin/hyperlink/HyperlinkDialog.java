@@ -10,7 +10,6 @@ import java.util.List;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
@@ -97,20 +96,11 @@ class HyperlinkDialog extends PopupDialog {
     }
 
     private IDoubleClickListener createDoubleClickListener() {
-        return new IDoubleClickListener() {
-
-            @Override
-            public void doubleClick(final DoubleClickEvent event) {
-                final RedHyperlink hyperlinkToFollow = Selections.getSingleElement((IStructuredSelection)event.getSelection(), RedHyperlink.class);
-                HyperlinkDialog.this.close();
-                SwtThread.asyncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        hyperlinkToFollow.open();
-                    }
-                });
-            }
+        return event -> {
+            final RedHyperlink hyperlinkToFollow = Selections
+                    .getSingleElement((IStructuredSelection) event.getSelection(), RedHyperlink.class);
+            HyperlinkDialog.this.close();
+            SwtThread.asyncExec(hyperlinkToFollow::open);
         };
     }
 

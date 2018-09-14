@@ -87,13 +87,14 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     }
 
     private void checkIfPreviousCommandWasAddingNewValue() {
-        if(!shouldReplaceValue) {
+        if (!shouldReplaceValue) {
             previousValue = null; // when new value was not replaced but added by undo command, then redo command should remove this value
         }
     }
 
     private void checkIfUndoCommandShouldAddArgument(final String currentArgValue, final boolean isSetting) {
-        if(currentArgValue != null && currentArgValue.equals("\\") && value == null && !isFirstArgumentInKeywordBasedSetting(isSetting)) {
+        if (currentArgValue != null && currentArgValue.equals("\\") && value == null
+                && !isFirstArgumentInKeywordBasedSetting(isSetting)) {
             shouldReplaceValue = false; // when arg is deleted not on last position, undo command will add new arg on this position and shifts other args to the right
         } else {
             shouldReplaceValue = true; // reset the flag for future undo commands

@@ -28,7 +28,8 @@ public class TestTimeoutModelOperation implements ISettingTableElementOperation 
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args,
+            final String comment) {
         final TestTimeout newTestTimeout = settingsTable.newTestTimeout();
         if (!args.isEmpty()) {
             newTestTimeout.setTimeout(args.get(0));
@@ -48,10 +49,10 @@ public class TestTimeoutModelOperation implements ISettingTableElementOperation 
         if (index == 0) {
             testTimeout.setTimeout(value != null ? value : "");
         } else if (index > 0) {
-            if(value != null) {
+            if (value != null) {
                 testTimeout.setMessageArgument(index - 1, value);
             } else {
-                testTimeout.removeElementToken(index-1);
+                testTimeout.removeElementToken(index - 1);
             }
         }
     }

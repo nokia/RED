@@ -70,7 +70,7 @@ public final class TableCellStringData {
             int endX = beginX + extent.x;
 
             while (beginX < (endX - 1)) {
-                final int midX = (beginX + endX) /2;
+                final int midX = (beginX + endX) / 2;
                 if (x >= midX) {
                     beginX = midX;
                     begin = (begin + end) / 2;
@@ -92,10 +92,10 @@ public final class TableCellStringData {
             final int lineHeight = height / lines.length;
             final int lineNo = Math.min(lines.length - 1,
                     Math.max(0, (int) Math.ceil((double) y / (double) lineHeight) - 1));
-            
+
             int currentLine = 0;
             int startLine = 0;
-            
+
             while (startLine < drawnString.length()) {
                 if (currentLine == lineNo) {
                     return Range.closedOpen(startLine, startLine + lines[lineNo].length());
@@ -106,7 +106,7 @@ public final class TableCellStringData {
                             startLine < drawnString.length() - 1 &&
                             (drawnString.charAt(startLine + 1) == '\n' || drawnString.charAt(startLine + 1) == '\r') &&
                             endChar != drawnString.charAt(startLine + 1)) {
-                        startLine+= 2;
+                        startLine += 2;
                     } else if (endChar == '\n' || endChar == '\r') {
                         startLine++;
                     }

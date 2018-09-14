@@ -129,7 +129,7 @@ class DocumentationViewPartListener implements IPartListener {
                 final SelectionLayerAccessor selectionLayerAccessor = currentlyActiveEditor.getSelectionLayerAccessor();
                 final Optional<TableSelectedCellInput> newInput = Optional.ofNullable(selectionLayerAccessor)
                         .map(Stream::of)
-                        .orElseGet(() -> Stream.empty())
+                        .orElseGet(Stream::empty)
                         .flatMap(accessor -> Stream.<PositionCoordinate> of(accessor.getSelectedPositions()))
                         .findFirst()
                         .map(pos -> new TableSelectedCellInput(selectionLayerAccessor.hashCode(), pos));
@@ -169,7 +169,7 @@ class DocumentationViewPartListener implements IPartListener {
                             final RobotFile newestModel = ((RobotDocument) document).getNewestModel();
                             RobotFile currentModel = fileModel.getLinkedElement();
                             if (!sourceEditor.isDirty()) {
-                                // if everythin is changed we do not have to wait for newer model
+                                // if everything is changed we do not have to wait for newer model
                                 return;
                             }
 

@@ -129,12 +129,12 @@ public class SuiteSourceEditorFoldingSupportTest {
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10)));
 
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(2), arrayOfSize(0));
         verifyNoMoreInteractions(annotationsModel);
     }
 
     @Test
-    public void whenNoFoldingPositionAppearsOrDissappears_theAnnotationsAreSendAsChanged() {
+    public void whenNoFoldingPositionAppearsOrDisappears_theAnnotationsAreSendAsChanged() {
         final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
@@ -145,9 +145,9 @@ public class SuiteSourceEditorFoldingSupportTest {
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10)));
 
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(2), arrayOfSize(0));
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(0), arrayOfSize(2));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(0), arrayOfSize(2));
         verifyNoMoreInteractions(annotationsModel);
     }
 
@@ -163,14 +163,14 @@ public class SuiteSourceEditorFoldingSupportTest {
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10), new Position(30, 10)));
 
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(2), arrayOfSize(0));
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(1), arrayOfSize(2));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(1), arrayOfSize(2));
         verifyNoMoreInteractions(annotationsModel);
     }
 
     @Test
-    public void whenFoldingPositionDissappears_itIsSendAsRemovedWhileOtherAreChanged() {
+    public void whenFoldingPositionDisappears_itIsSendAsRemovedWhileOtherAreChanged() {
         final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
@@ -181,9 +181,9 @@ public class SuiteSourceEditorFoldingSupportTest {
         support.updateFoldingStructure(newArrayList(new Position(0, 10)));
 
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(2), arrayOfSize(0));
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(1),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(0), arrayOfSize(1));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(0), arrayOfSize(1));
         verifyNoMoreInteractions(annotationsModel);
     }
 
@@ -204,9 +204,9 @@ public class SuiteSourceEditorFoldingSupportTest {
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 15)));
 
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(2), arrayOfSize(0));
         verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(1),
-                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(1), arrayOfSize(1));
+                SuiteSourceEditorFoldingSupportTest.mapOfSize(1), arrayOfSize(1));
         verifyNoMoreInteractions(annotationsModel);
     }
 
