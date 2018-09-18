@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xIMjIMMJEeex6qGARmUVfA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/6/17 5:01 PM
+Save-Time: 9/18/18 1:24 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -77,6 +77,7 @@ exec-with-options -disableJobWaiting -command{
 		if [$index | eq 0]{
 			//resume
 			get-view Console | get-button "Resume tests"  | click	
+			wait-for-message-log -last_line "RobotProject.TestFile.test 2" 
 			get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
 		    + ".* : INFO : 7\n"
 		    + ".* : INFO : Slept 4 seconds\n"
