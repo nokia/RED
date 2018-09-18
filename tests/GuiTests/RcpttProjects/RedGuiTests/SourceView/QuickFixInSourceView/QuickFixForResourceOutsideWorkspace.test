@@ -6,14 +6,14 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cIzC4LpgEei9gP1RMN7i8g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 9/18/18 10:05 AM
+Save-Time: 9/18/18 11:35 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-concat $user_folder "/new_folder"| let [val project_path_outside_ws -input] {
+concat [replace $RED_workspace_path -old "\\" -new "/"] "../../../new_folder"| let [val project_path_outside_ws -input] {
 	if [get-file [uri-from-path $project_path_outside_ws] | get exists]{
 		delete-file [uri-from-path $project_path_outside_ws]
 	}
@@ -65,45 +65,60 @@ get-view "Project Explorer" | get-tree | select new | get-menu -path Delete | cl
 get-window "Delete Resources" | get-button OK | click
 //// --------------------------------- import resource via relative path  --------------------------------- 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-//with [get-editor "TestFile.robot" | get-text-viewer] {
-//    key-type Enter
-//    key-type Up
-//    type-text "**"
-//    key-type "M1+SPACE"
-//    key-type Down
-//    key-type Enter
-//    type-text Resource
-//    key-type Tab
-//    type-text "../../new_folder/resource.robot"
-//    key-type "M1+s"
-//}
-//// verify problems
-//wait-for-warnings -amount 2 -times 6 -delay 1000
-//// use QuickFix to add linked folder
-//with [get-view Problems] {
-//    click
-//    get-tree 
-//        | select "Warnings (2 items)/RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project." 
-//        | key-type "M1+1"
-//}
-//with [get-window "Quick Fix"] {
-//    get-button Finish | click
-//}
-//// verify if linked folder exist
-//with [get-view "Project Explorer" | get-tree] {
-//    get-item -path "RobotProject/new_folder" | get-property caption | equals "new_folder" | verify-true
-//    get-item -path "RobotProject/new_folder" | get-property "getItemCount()" | equals 3 | verify-true
-//}
-//with [get-editor "TestFile.robot" | get-text-viewer] {
-//    set-caret-pos 3 19
-//    key-type "M1+s"
-//}
-//wait-for-zero-items -times 5 -delay 500
+if [get-by-os -win "Windows" -linux "Linux" | eq "Windows"]{
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    key-type Enter
+	    key-type Up
+	    type-text "**"
+	    key-type "M1+SPACE"
+	    key-type Down
+	    key-type Enter
+	    type-text Resource
+	    key-type Tab
+	    type-text "../../../../../root/new_folder/resource.robot"
+	    key-type "M1+s"
+	}
+}-else{
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    key-type Enter
+	    key-type Up
+	    type-text "**"
+	    key-type "M1+SPACE"
+	    key-type Down
+	    key-type Enter
+	    type-text Resource
+	    key-type Tab
+	    type-text "../../../User/cloud/new_folder/resource.robot"
+	    key-type "M1+s"
+	}
+}
+// verify problems
+wait-for-warnings -amount 2 -times 6 -delay 500
+// use QuickFix to add linked folder
+with [get-view Problems] {
+    click
+    get-tree 
+        | select "Warnings (2 items)/RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project." 
+        | key-type "M1+1"
+}
+with [get-window "Quick Fix"] {
+    get-button Finish | click
+}
+// verify if linked folder exist
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "RobotProject/new_folder" | get-property caption | equals "new_folder" | verify-true
+    get-item -path "RobotProject/new_folder" | get-property "getItemCount()" | equals 3 | verify-true
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 19
+    key-type "M1+s"
+}
+wait-for-zero-items -times 5 -delay 500
 
 // --------------------------------- import resource via absolute path  --------------------------------- 
 // del linked folder
-//get-view "Project Explorer" | get-tree | select "RobotProject/new_folder" | key-type Del
-//get-window "Delete Resources" | get-button OK | click
+get-view "Project Explorer" | get-tree | select "RobotProject/new_folder" | key-type Del
+get-window "Delete Resources" | get-button OK | click
 // add import
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 2 44
