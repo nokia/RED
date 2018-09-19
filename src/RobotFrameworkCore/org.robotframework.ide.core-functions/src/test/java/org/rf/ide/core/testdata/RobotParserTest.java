@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -133,8 +136,12 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
-        final RobotParser parser = spy(
-                RobotParser.create(projectHolder, RobotParserConfig.allImportsEager(new RobotVersion(2, 9))));
+        final PathsProvider pathsProvider = mock(PathsProvider.class);
+        when(pathsProvider.targetExist(any(URI.class)))
+                .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
+
+        final RobotParser parser = spy(RobotParser.create(projectHolder,
+                RobotParserConfig.allImportsEager(new RobotVersion(2, 9)), pathsProvider));
 
         //// prepare paths
         final String mainPath = "parser/bugs/RED_352_ReadManyTimesPrevReadReferenceFile_LoopPrevent/";

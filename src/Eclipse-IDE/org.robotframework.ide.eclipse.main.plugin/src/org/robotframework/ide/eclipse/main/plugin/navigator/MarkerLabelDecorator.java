@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -30,9 +29,9 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class MarkerLabelDecorator implements ILightweightLabelDecorator, IResourceChangeListener {
 
-    private final List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
+    private final List<ILabelProviderListener> listeners = new ArrayList<>();
 
-    private final List<IMarker> markersCache = new ArrayList<IMarker>();
+    private final List<IMarker> markersCache = new ArrayList<>();
 
     private static final ImageDescriptor ERROR = RedImages.getErrorImage();
 
@@ -174,18 +173,20 @@ public class MarkerLabelDecorator implements ILightweightLabelDecorator, IResour
     }
 
     private boolean isDescendentOf(final IMarker marker, final IFolder folder) {
-        final IResource resource = marker.getResource();
-        if (resource != null && resource.exists()) {
-            final IPath resourcePath = resource.getLocation();
-            final IPath folderPath = folder.getLocation();
-            return folderPath.isPrefixOf(resourcePath);
+        IResource resource = marker.getResource();
+
+        while (resource != null) {
+            if (resource.equals(folder)) {
+                return true;
+            }
+            resource = resource.getParent();
         }
         return false;
     }
 
     private static class CollectAllResourcesVisitor implements IResourceDeltaVisitor {
 
-        private final List<IResource> resources = new ArrayList<IResource>();
+        private final List<IResource> resources = new ArrayList<>();
 
         @Override
         public boolean visit(final IResourceDelta delta) {

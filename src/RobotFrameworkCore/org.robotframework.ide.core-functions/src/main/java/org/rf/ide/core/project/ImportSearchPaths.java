@@ -29,14 +29,14 @@ public class ImportSearchPaths {
     public Optional<MarkedUri> findAbsoluteMarkedUri(final URI importingFileUri, final ResolvedImportPath importPath) {
 
         final URI absoluteUri = importPath.resolveInRespectTo(importingFileUri);
-        if (targetExist(absoluteUri)) {
+        if (pathsProvider.targetExist(absoluteUri)) {
             return Optional.of(new MarkedUri(absoluteUri, PathRelativityPoint.FILE));
         }
 
         final List<File> modulesSearchPaths = pathsProvider.providePythonModulesSearchPaths();
         for (final File moduleSearchPath : modulesSearchPaths) {
             final URI searchPathUri = importPath.resolveInRespectTo(moduleSearchPath.toURI());
-            if (targetExist(searchPathUri)) {
+            if (pathsProvider.targetExist(searchPathUri)) {
                 return Optional.of(new MarkedUri(searchPathUri, PathRelativityPoint.PYTHON_MODULE_SEARCH_PATH));
             }
         }
@@ -44,19 +44,11 @@ public class ImportSearchPaths {
         final List<File> userSearchPaths = pathsProvider.provideUserSearchPaths();
         for (final File userSearchPath : userSearchPaths) {
             final URI searchPathUri = importPath.resolveInRespectTo(userSearchPath.toURI());
-            if (targetExist(searchPathUri)) {
+            if (pathsProvider.targetExist(searchPathUri)) {
                 return Optional.of(new MarkedUri(searchPathUri, PathRelativityPoint.USER_DEFINED_SEARCH_PATH));
             }
         }
         return Optional.empty();
-    }
-
-    private static boolean targetExist(final URI uri) {
-        try {
-            return new File(uri).exists();
-        } catch (final IllegalArgumentException e) {
-            return false;
-        }
     }
 
     /**
@@ -65,6 +57,8 @@ public class ImportSearchPaths {
      * @author anglart
      */
     public static interface PathsProvider {
+
+        boolean targetExist(URI uri);
 
         List<File> providePythonModulesSearchPaths();
 

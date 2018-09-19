@@ -10,6 +10,7 @@ import static com.google.common.collect.Streams.concat;
 import static java.util.stream.Collectors.toList;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -24,6 +25,8 @@ import java.util.stream.Stream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IEditorPart;
@@ -403,6 +406,25 @@ public class RobotProject extends RobotContainer {
     }
 
     private class ProjectPathsProvider implements PathsProvider {
+
+        @Override
+        public boolean targetExist(final URI uri) {
+            if (uri.getScheme().equalsIgnoreCase("file")) {
+                try {
+                    return new File(uri).exists();
+                } catch (final IllegalArgumentException e) {
+                    return false;
+                }
+            } else {
+                final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+                return Stream
+                        .concat(Stream.of(root.findFilesForLocationURI(uri)),
+                                Stream.of(root.findContainersForLocationURI(uri)))
+                        .filter(IResource::exists)
+                        .findFirst()
+                        .isPresent();
+            }
+        }
 
         @Override
         public List<File> providePythonModulesSearchPaths() {
