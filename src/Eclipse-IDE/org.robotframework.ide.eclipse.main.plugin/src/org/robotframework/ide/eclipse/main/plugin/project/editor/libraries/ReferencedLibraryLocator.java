@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
+import java.net.URI;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
@@ -102,8 +104,8 @@ public class ReferencedLibraryLocator {
         final Map<String, String> vars = suiteFile.getProject().getRobotProjectHolder().getVariableMappings();
         return ResolvedImportPath.from(ImportPath.from(path), vars).flatMap(resolvedPath -> {
             final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
-            return new ImportSearchPaths(pathsProvider).findAbsoluteUri(suiteFile.getFile().getLocationURI(),
-                    resolvedPath);
+            final URI importingFileUri = RedWorkspace.tryToGetLocalUri(suiteFile.getFile());
+            return new ImportSearchPaths(pathsProvider).findAbsoluteUri(importingFileUri, resolvedPath);
         }).map(File::new);
     }
 

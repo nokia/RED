@@ -42,6 +42,7 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesConfigUpdater;
@@ -146,7 +147,8 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     void setImporters(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> suites) {
         final Set<URI> importers = suites.stream()
-                .map(suite -> suite.getFile().getLocationURI())
+                .map(RobotSuiteFile::getFile)
+                .map(RedWorkspace::tryToGetLocalUri)
                 .filter(uri -> uri != null)
                 .collect(toSet());
         libraryImport.setImporters(importers);
