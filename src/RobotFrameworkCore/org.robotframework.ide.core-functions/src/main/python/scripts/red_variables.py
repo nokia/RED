@@ -108,11 +108,15 @@ def _get_variables_from_file(path, arguments):
 
     variables = robot.variables.Variables()
     variables.set_from_file(path, arguments)
-    try:
-        return variables.data
-    except AttributeError:  # for robot >2.9
-        return variables.store.data._data
+    
+    if __get_robot_version() < (2, 9, 0):
+        return variables
+    else:
+        return variables.store.data
 
+def __get_robot_version():
+    import robot.version as ver
+    return tuple(map(int, ver.get_version(True).split('.')))
 
 def _extract_dot_dict(dict):
     return dict((_escape_unicode(k), _escape_unicode(v)) for k, v in dict.items())
