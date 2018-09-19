@@ -1,0 +1,4 @@
+first=123
+SECOND=234
+ThIrD=345
+FORTH_with_UnderSCORES=456
