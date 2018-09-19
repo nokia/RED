@@ -60,6 +60,14 @@ class VariablesRetrievingTests(unittest.TestCase):
 
         self.assertEqual(result, {'a': '1_arg', 'b': '2_arg', 'c': '3_arg'})
 
+    def test_if_result_is_returned_for_vars_with_proper_casing(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        vars_location = os.path.join(parent_path, 'res_test_red_variables', 'vars_with_case_sensitive_names.py')
+
+        result = get_variables(vars_location, ['_arg'])
+
+        self.assertEqual(result, {'first': '123', 'SECOND': '234', 'ThIrD': '345', 'FORTH_with_UnderSCORES' : '456'})
+
     def test_if_data_error_is_raised_for_file_without_arguments(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         vars_location = os.path.join(parent_path, 'res_test_red_variables', 'vars_with_argument.py')
