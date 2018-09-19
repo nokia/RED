@@ -11,8 +11,6 @@ import java.util.function.BiConsumer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -127,8 +125,7 @@ public class SourceOpeningSupport {
 
     private static IFile resolveFile(final IPath location, final IProject project, final LibrarySpecification libSpec)
             throws CoreException {
-        final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-        final IResource wsResource = new RedWorkspace(wsRoot).forUri(location.toFile().toURI());
+        final IResource wsResource = new RedWorkspace().forUri(location.toFile().toURI());
         if (wsResource instanceof IFile && wsResource.isAccessible()) {
             return (IFile) wsResource;
         } else {
