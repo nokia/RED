@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cIzC4LpgEei9gP1RMN7i8g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 9/19/18 9:56 AM
+Save-Time: 9/19/18 12:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -65,6 +65,8 @@ get-view "Project Explorer" | get-tree | select new | get-menu -path Delete | cl
 get-window "Delete Resources" | get-button OK | click
 //// --------------------------------- import resource via relative path  --------------------------------- 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+// linux and windows paths below are typed according to the position on the machines
+// to run this test locally you need to adapt it
 if [get-by-os -win "Windows" -linux "Linux" | eq "Linux"]{
 	with [get-editor "TestFile.robot" | get-text-viewer] {
 	    key-type Enter
@@ -88,7 +90,7 @@ if [get-by-os -win "Windows" -linux "Linux" | eq "Linux"]{
 	    key-type Enter
 	    type-text Resource
 	    key-type Tab
-	    type-text "../../../../../../../User/cloud/new_output_folder/resource.robot"
+	    type-text "../../../../../../../Users/cloud/new_output_folder/resource.robot"
 	    key-type "M1+s"
 	}
 }
@@ -148,5 +150,15 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 4 19
     key-type "M1+s"
 }
+// verify problems
 wait-for-warnings -amount 1 -times 4 -delay 500
+// del folder created outside of workspace
+if [get-file [uri-from-path [concat [replace $user_folder -old "\\" -new "/"] "/new_output_folder"]] | get exists] {
+	delete-file [uri-from-path [concat [replace $user_folder -old "\\" -new "/"] "/new_output_folder"]]
+}
+// ---------------------------------------------------------------------------------------------------
+// del old folder, which shoulde be deleted from machines
+if [get-file [uri-from-path [concat [replace $user_folder -old "\\" -new "/"] "/new_folder"]] | get exists] {
+	delete-file [uri-from-path [concat [replace $user_folder -old "\\" -new "/"] "/new_folder"]]
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
