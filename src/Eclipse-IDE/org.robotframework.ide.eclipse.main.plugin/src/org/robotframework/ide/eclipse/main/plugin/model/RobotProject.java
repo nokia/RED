@@ -226,14 +226,17 @@ public class RobotProject extends RobotContainer {
                     final IPath path = Path.fromPortableString(descriptor.getPath());
                     if (!path.isAbsolute()) {
                         final IFile file = robotProject.getProject().getParent().getFile(path);
-                        fileToRead = new File(file.getLocationURI());
+                        fileToRead = RedWorkspace.getLocalFile(file).orElse(null);
                     }
                 }
                 if (fileToRead == null) {
                     final LibspecsFolder libspecsFolder = robotProject.getLibspecsFolder();
 
                     final String fileName = descriptor.generateLibspecFileName();
-                    fileToRead = new File(libspecsFolder.getXmlSpecFile(fileName).getLocationURI());
+                    fileToRead = RedWorkspace.getLocalFile(libspecsFolder.getXmlSpecFile(fileName)).orElse(null);
+                }
+                if (fileToRead == null) {
+                    return null;
                 }
 
                 final LibrarySpecification spec = LibrarySpecificationReader.readSpecification(fileToRead);

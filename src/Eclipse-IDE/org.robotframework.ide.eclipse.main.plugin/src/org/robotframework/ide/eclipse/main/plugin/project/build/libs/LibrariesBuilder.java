@@ -315,7 +315,9 @@ public class LibrariesBuilder {
     }
 
     private static boolean hasSameVersion(final IFile file, final String version) {
-        final String fileVersion = LibrarySpecification.getVersion(file.getLocation().toFile());
+        final String fileVersion = RedWorkspace.getLocalFile(file)
+                .map(LibrarySpecification::getVersion)
+                .orElse("unknown");
         return version.startsWith(String.format("Robot Framework %s (", fileVersion));
     }
 
