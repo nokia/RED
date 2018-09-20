@@ -137,7 +137,7 @@ public class RobotParserTest {
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
         final PathsProvider pathsProvider = mock(PathsProvider.class);
-        when(pathsProvider.targetExist(any(URI.class)))
+        when(pathsProvider.targetExists(any(URI.class)))
                 .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
 
         final RobotParser parser = spy(RobotParser.create(projectHolder,

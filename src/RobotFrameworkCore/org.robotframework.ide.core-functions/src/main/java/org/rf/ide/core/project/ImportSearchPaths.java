@@ -29,14 +29,14 @@ public class ImportSearchPaths {
     public Optional<MarkedUri> findAbsoluteMarkedUri(final URI importingFileUri, final ResolvedImportPath importPath) {
 
         final URI absoluteUri = importPath.resolveInRespectTo(importingFileUri);
-        if (pathsProvider.targetExist(absoluteUri)) {
+        if (pathsProvider.targetExists(absoluteUri)) {
             return Optional.of(new MarkedUri(absoluteUri, PathRelativityPoint.FILE));
         }
 
         final List<File> modulesSearchPaths = pathsProvider.providePythonModulesSearchPaths();
         for (final File moduleSearchPath : modulesSearchPaths) {
             final URI searchPathUri = importPath.resolveInRespectTo(moduleSearchPath.toURI());
-            if (pathsProvider.targetExist(searchPathUri)) {
+            if (pathsProvider.targetExists(searchPathUri)) {
                 return Optional.of(new MarkedUri(searchPathUri, PathRelativityPoint.PYTHON_MODULE_SEARCH_PATH));
             }
         }
@@ -44,7 +44,7 @@ public class ImportSearchPaths {
         final List<File> userSearchPaths = pathsProvider.provideUserSearchPaths();
         for (final File userSearchPath : userSearchPaths) {
             final URI searchPathUri = importPath.resolveInRespectTo(userSearchPath.toURI());
-            if (pathsProvider.targetExist(searchPathUri)) {
+            if (pathsProvider.targetExists(searchPathUri)) {
                 return Optional.of(new MarkedUri(searchPathUri, PathRelativityPoint.USER_DEFINED_SEARCH_PATH));
             }
         }
@@ -58,7 +58,7 @@ public class ImportSearchPaths {
      */
     public static interface PathsProvider {
 
-        boolean targetExist(URI uri);
+        boolean targetExists(URI uri);
 
         List<File> providePythonModulesSearchPaths();
 
