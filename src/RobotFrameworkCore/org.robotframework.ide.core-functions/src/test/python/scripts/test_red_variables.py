@@ -64,9 +64,17 @@ class VariablesRetrievingTests(unittest.TestCase):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         vars_location = os.path.join(parent_path, 'res_test_red_variables', 'vars_with_case_sensitive_names.py')
 
-        result = get_variables(vars_location, ['_arg'])
+        result = get_variables(vars_location, [])
 
         self.assertEqual(result, {'first': '123', 'SECOND': '234', 'ThIrD': '345', 'FORTH_with_UnderSCORES' : '456'})
+
+    def test_if_result_is_returned_with_defined_classes_visible_as_variables(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        vars_location = os.path.join(parent_path, 'res_test_red_variables', 'vars_class_as_var.py')
+
+        result = get_variables(vars_location, [])
+
+        self.assertSetEqual(set(result.keys()), set(['SomeClass']))
 
     def test_if_data_error_is_raised_for_file_without_arguments(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
