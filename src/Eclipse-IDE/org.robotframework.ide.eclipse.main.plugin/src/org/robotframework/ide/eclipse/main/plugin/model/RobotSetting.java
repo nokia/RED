@@ -258,8 +258,8 @@ public class RobotSetting extends RobotKeywordCall {
             return Optional.of(resolvedImportPath.get().getUri());
         } else {
             final PathsProvider pathsProvider = project.createPathsProvider();
-            return new ImportSearchPaths(pathsProvider).findAbsoluteUri(getSuiteFile().getFile().getLocationURI(),
-                    resolvedImportPath.get());
+            return new ImportSearchPaths(pathsProvider)
+                    .findAbsoluteUri(RedWorkspace.tryToGetLocalUri(getSuiteFile().getFile()), resolvedImportPath.get());
         }
     }
 

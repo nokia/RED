@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupDirector;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.debug.SourceInLibraryEditorInput.SourceOfStackFrameInLibrary;
@@ -22,11 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 
 public class RobotSourceLookupDirector extends AbstractSourceLookupDirector {
 
-    private final RedWorkspace workspace;
-
-    public RobotSourceLookupDirector() {
-        this.workspace = new RedWorkspace(ResourcesPlugin.getWorkspace().getRoot());
-    }
+    private final RedWorkspace workspace = new RedWorkspace();
 
     @Override
     public void initializeParticipants() {

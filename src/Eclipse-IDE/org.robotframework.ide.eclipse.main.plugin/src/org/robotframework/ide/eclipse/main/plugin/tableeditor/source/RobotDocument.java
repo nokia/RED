@@ -111,7 +111,8 @@ public class RobotDocument extends Document {
         if (parser == null) {
             final RobotSuiteFile suiteFile = fileModelSupplier.get();
             parser = createParser(suiteFile);
-            file = suiteFile.getFile() == null ? new File(suiteFile.getName())
+            file = suiteFile.getFile() == null || suiteFile.getFile().getLocation() == null
+                    ? new File(suiteFile.getName())
                     : suiteFile.getFile().getLocation().toFile();
             reparse();
         }

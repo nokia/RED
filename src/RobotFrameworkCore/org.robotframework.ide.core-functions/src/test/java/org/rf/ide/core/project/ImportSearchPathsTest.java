@@ -224,6 +224,11 @@ public class ImportSearchPathsTest {
         return new PathsProvider() {
 
             @Override
+            public boolean targetExist(final URI uri) {
+                return new File(uri).exists();
+            }
+
+            @Override
             public List<File> providePythonModulesSearchPaths() {
                 return pythonPaths;
             }

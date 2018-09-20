@@ -20,6 +20,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.RedURI;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ResolvedImportPath;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 
@@ -54,9 +55,10 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
         }
         final IPath fullPath = new Path(ResolvedImportPath.from(ImportPath.from(srcPath))
                 .get()
-                .resolveInRespectTo(marker.getResource().getLocationURI())
+                .resolveInRespectTo(RedWorkspace.tryToGetLocalUri(marker.getResource()))
                 .toString());
-        final IPath workspaceDir = new Path(marker.getResource().getWorkspace().getRoot().getLocationURI().toString());
+        final IPath workspaceDir = new Path(
+                RedWorkspace.tryToGetLocalUri(marker.getResource().getWorkspace().getRoot()).toString());
         if (workspaceDir.matchingFirstSegments(fullPath) != workspaceDir.segmentCount()) {
             return Optional.empty();
         }

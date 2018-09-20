@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -109,7 +108,7 @@ class SourceInLibraryEditorControls implements RedDebuggerAssistantEditorControl
     }
 
     private void openKeywordSource() {
-        final RedWorkspace workspace = new RedWorkspace(ResourcesPlugin.getWorkspace().getRoot());
+        final RedWorkspace workspace = new RedWorkspace();
         final Optional<IFile> file = uri.flatMap(u -> workspace.fileForUri(u));
         if (!file.isPresent()) {
             final String message = "Unable to open editor for keyword:\n" + keywordName;
