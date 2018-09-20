@@ -224,7 +224,7 @@ public class ImportSearchPathsTest {
         return new PathsProvider() {
 
             @Override
-            public boolean targetExist(final URI uri) {
+            public boolean targetExists(final URI uri) {
                 return new File(uri).exists();
             }
 

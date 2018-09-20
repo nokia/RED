@@ -408,7 +408,7 @@ public class RobotProject extends RobotContainer {
     private class ProjectPathsProvider implements PathsProvider {
 
         @Override
-        public boolean targetExist(final URI uri) {
+        public boolean targetExists(final URI uri) {
             if (uri.getScheme().equalsIgnoreCase("file")) {
                 try {
                     return new File(uri).exists();
