@@ -6,11 +6,13 @@
 package org.rf.ide.core.testdata.importer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 import org.junit.Rule;
@@ -78,6 +80,9 @@ public class VariablesImporterTest {
     public void importVariables_fromEmptyFile_shouldReturn_anEmptyList_andSetWarningMessage() throws IOException {
         // prepare
         final PathsProvider pathsProvider = mock(PathsProvider.class);
+        when(pathsProvider.targetExist(any(URI.class)))
+                .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
+
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
         when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
 
@@ -116,6 +121,9 @@ public class VariablesImporterTest {
             throws IOException {
         // prepare
         final PathsProvider pathsProvider = mock(PathsProvider.class);
+        when(pathsProvider.targetExist(any(URI.class)))
+                .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
+
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
         when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
 
@@ -149,6 +157,9 @@ public class VariablesImporterTest {
             throws IOException {
         // prepare
         final PathsProvider pathsProvider = mock(PathsProvider.class);
+        when(pathsProvider.targetExist(any(URI.class)))
+                .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
+
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
         when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
 

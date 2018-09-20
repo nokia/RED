@@ -11,7 +11,6 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -50,8 +49,7 @@ public class RfLintProblem {
     }
 
     void createMarker(final File file, final int line) {
-        final RedWorkspace ws = new RedWorkspace(ResourcesPlugin.getWorkspace().getRoot());
-        final IFile wsFile = ws.fileForUri(file.toURI()).orElseThrow(
+        final IFile wsFile = new RedWorkspace().fileForUri(file.toURI()).orElseThrow(
                 () -> new IllegalStateException("The file " + file.getAbsolutePath() + " cannot be find in workspace"));
         createMarker(wsFile, line);
     }

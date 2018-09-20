@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.OpenableUri;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.UnableToOpenUriException;
@@ -44,41 +43,45 @@ public class WorkspaceFileUri implements OpenableUri {
     }
 
     public static URI createFileUri(final IFile file) {
-        return file.getLocationURI();
+        return getFileUri(file);
     }
 
     public static URI createShowSuiteSourceUri(final IFile file) throws URISyntaxException {
         final Map<String, String> values = ImmutableMap.of(SHOW_SRC_PARAM, Boolean.toString(true), SUITE_PARAM, "");
-        return createUri(file.getLocationURI(), values);
+        return createUri(getFileUri(file), values);
     }
 
     public static URI createShowSuiteDocUri(final IFile file) throws URISyntaxException {
         final Map<String, String> values = ImmutableMap.of(SHOW_DOC_PARAM, Boolean.toString(true), SUITE_PARAM, "");
-        return createUri(file.getLocationURI(), values);
+        return createUri(getFileUri(file), values);
     }
 
     public static URI createShowKeywordSourceUri(final IFile file, final String keywordName) throws URISyntaxException {
         final Map<String, String> values = ImmutableMap.of(SHOW_SRC_PARAM, Boolean.toString(true), KEYWORD_PARAM,
                 keywordName);
-        return createUri(file.getLocationURI(), values);
+        return createUri(getFileUri(file), values);
     }
 
     public static URI createShowKeywordDocUri(final IFile file, final String keywordName) throws URISyntaxException {
         final Map<String, String> values = ImmutableMap.of(SHOW_DOC_PARAM, Boolean.toString(true), KEYWORD_PARAM,
                 keywordName);
-        return createUri(file.getLocationURI(), values);
+        return createUri(getFileUri(file), values);
     }
 
     public static URI createShowCaseSourceUri(final IFile file, final String testName) throws URISyntaxException {
         final Map<String, String> values = ImmutableMap.of(SHOW_SRC_PARAM, Boolean.toString(true), TEST_PARAM,
                 testName);
-        return createUri(file.getLocationURI(), values);
+        return createUri(getFileUri(file), values);
     }
 
     public static URI createShowCaseDocUri(final IFile file, final String testName) throws URISyntaxException {
         final Map<String, String> values = ImmutableMap.of(SHOW_DOC_PARAM, Boolean.toString(true), TEST_PARAM,
                 testName);
-        return createUri(file.getLocationURI(), values);
+        return createUri(getFileUri(file), values);
+    }
+
+    private static URI getFileUri(final IFile file) {
+        return RedWorkspace.tryToGetLocalUri(file);
     }
 
     private static URI createUri(final URI uri, final Map<String, String> values) throws URISyntaxException {
@@ -114,8 +117,7 @@ public class WorkspaceFileUri implements OpenableUri {
             // was causing the file not to be found under linux-based systems
             final URI fileUri = new URI("file", null, uri.getPath(), null, null);
 
-            final RedWorkspace workspace = new RedWorkspace(ResourcesPlugin.getWorkspace().getRoot());
-            final Optional<IFile> file = workspace.fileForUri(fileUri);
+            final Optional<IFile> file = new RedWorkspace().fileForUri(fileUri);
 
             fileConsumer.accept(file, extractParams(uri.getQuery()));
         } catch (final URISyntaxException e) {

@@ -62,7 +62,7 @@ abstract class HyperlinksToFilesDetector {
             }
             final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
             final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
-            return searchPaths.findAbsoluteUri(suiteFile.getFile().getLocationURI(), resolvedPath.get());
+            return searchPaths.findAbsoluteUri(RedWorkspace.tryToGetLocalUri(suiteFile.getFile()), resolvedPath.get());
         } catch (final MalformedPathImportException e) {
             return Optional.empty();
         }
