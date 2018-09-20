@@ -82,8 +82,7 @@ class UnknownVariables {
 
                 final int variableOffset = declaration.getStartFromFile().getOffset();
                 final ProblemPosition position = new ProblemPosition(declaration.getStartFromFile().getLine(),
-                        Range.closed(variableOffset,
-                                variableOffset + ((declaration.getEndFromFile().getOffset() + 1) - variableOffset)));
+                        Range.closed(variableOffset, declaration.getEndFromFile().getOffset() + 1));
 
                 final Map<String, Object> additionalArguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
                         getVariableNameWithBrackets(declaration));
