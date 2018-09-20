@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 9/18/18 12:02 PM
+Save-Time: 9/20/18 10:11 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -113,6 +113,7 @@ get-view Problems | get-tree
     | select "Warnings (8 items)/RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project." 
     | key-type "M1+1"
 get-window "Quick Fix" | get-button Finish | click
+
 // verify if linked folder exist in Project Explorer
 with [get-view "Project Explorer" | get-tree] {
     get-item -path "ResourceProject/LibsFromPythonPath" | get-property caption | equals LibsFromPythonPath | verify-true
