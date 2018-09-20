@@ -80,7 +80,7 @@ public class VariablesImporterTest {
     public void importVariables_fromEmptyFile_shouldReturn_anEmptyList_andSetWarningMessage() throws IOException {
         // prepare
         final PathsProvider pathsProvider = mock(PathsProvider.class);
-        when(pathsProvider.targetExist(any(URI.class)))
+        when(pathsProvider.targetExists(any(URI.class)))
                 .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
 
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
@@ -121,7 +121,7 @@ public class VariablesImporterTest {
             throws IOException {
         // prepare
         final PathsProvider pathsProvider = mock(PathsProvider.class);
-        when(pathsProvider.targetExist(any(URI.class)))
+        when(pathsProvider.targetExists(any(URI.class)))
                 .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
 
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
@@ -157,7 +157,7 @@ public class VariablesImporterTest {
             throws IOException {
         // prepare
         final PathsProvider pathsProvider = mock(PathsProvider.class);
-        when(pathsProvider.targetExist(any(URI.class)))
+        when(pathsProvider.targetExists(any(URI.class)))
                 .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
 
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
