@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _laalYAKCEeeoIJPDKwyifg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 9/20/18 10:06 AM
+Save-Time: 9/20/18 10:47 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -122,10 +122,11 @@ is-row-fully-selected -row 0 -table"User Keywords" -file_name "res.robot" -index
 
 //goto settings table
 get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv" | double-click
+wait 200
 get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Settings | click
 
 get-view Outline | get-tree | select "tsv_file.tsv/Settings/Force Tags" | click
-wait 300
+wait 100
 
 //check if in force tag kw is visible
 with [get-editor "tsv_file.tsv" | get-section General | get-canvas] {
