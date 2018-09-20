@@ -45,6 +45,10 @@ public class LibraryLocationFinder {
             final LibrarySpecification libSpec) {
         final IPath libPath = RedWorkspace.Paths
                 .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(descriptor.getFilepath()));
+        final Optional<IPath> libPathToModule = tryToFindPathToModule(libPath);
+        if (libPathToModule.isPresent()) {
+            return libPathToModule;
+        }
         final Optional<IPath> libPathWithExtension = tryToFindPathWithExtension(libPath);
         if (libPathWithExtension.isPresent()) {
             return libPathWithExtension;
@@ -54,7 +58,7 @@ public class LibraryLocationFinder {
                 return pathWithoutQualifiedPart;
             }
         }
-        return tryToFindPathToModule(libPath);
+        return Optional.empty();
     }
 
     private static Optional<IPath> tryToFindPathWithExtension(final IPath libPath) {
