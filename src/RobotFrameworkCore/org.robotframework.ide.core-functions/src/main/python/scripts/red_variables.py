@@ -93,11 +93,10 @@ def get_variables(path, arguments):
         try:
             if isinstance(v, DotDict):
                 filtered_vars[k] = _extract_dot_dict(v)
-            elif not inspect.ismodule(v) and not inspect.isfunction(v) and not inspect.isclass(v):
+            elif not inspect.ismodule(v) and not inspect.isfunction(v):
                 filtered_vars[k] = _escape_unicode(v)
-            #we do not support modules, functions or classes as variables
-            #else:
-            #    filtered_vars[k] = _escape_unicode(str(v))
+            # we filter out modules and functions so that they will not be avaliable
+            # in assistant as well as not visible for validator
         except Exception as e:
             filtered_vars[k] = 'None'
     return filtered_vars
