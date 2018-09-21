@@ -130,8 +130,8 @@ def get_modules_search_paths():
 
 @logresult
 @encode_result_or_exception
-@logargs
 @cleanup_sys_path
+@logargs
 def get_module_path(module_name, python_paths, class_paths):
     import red_modules
     __extend_paths(python_paths, class_paths)
@@ -140,9 +140,9 @@ def get_module_path(module_name, python_paths, class_paths):
 
 @logresult
 @encode_result_or_exception
-@logargs
 @cleanup_modules
 @cleanup_sys_path
+@logargs
 def get_classes_from_module(module_location, python_paths, class_paths):
     import red_module_classes
     __extend_paths(python_paths, class_paths)
@@ -151,8 +151,8 @@ def get_classes_from_module(module_location, python_paths, class_paths):
 
 @logresult
 @encode_result_or_exception
-@logargs
 @cleanup_modules
+@logargs
 def get_variables(path, args):
     import red_variables
     return red_variables.get_variables(path, args)
@@ -273,9 +273,9 @@ def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, add
 
 @logresult
 @encode_result_or_exception
-@logargs
 @cleanup_modules
 @cleanup_sys_path
+@logargs
 def create_libdoc(libname, format, python_paths, class_paths):
     import red_libraries
     __extend_paths(python_paths, class_paths)
