@@ -9,8 +9,8 @@ import java.nio.file.Path;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 /**
  * @author wypych
