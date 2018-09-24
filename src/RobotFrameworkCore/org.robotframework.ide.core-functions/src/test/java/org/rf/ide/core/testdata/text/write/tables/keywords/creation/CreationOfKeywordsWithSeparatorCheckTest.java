@@ -39,8 +39,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getLazyParser());
 
-        final DumpContext ctx = new DumpContext();
-        ctx.setPreferedSeparator(" | ");
+        final DumpContext ctx = new DumpContext(" | ", true);
 
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
@@ -61,8 +60,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getLazyParser());
 
-        final DumpContext ctx = new DumpContext();
-        ctx.setPreferedSeparator("\t");
+        final DumpContext ctx = new DumpContext("\t", true);
 
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
@@ -83,8 +81,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getLazyParser());
 
-        final DumpContext ctx = new DumpContext();
-        ctx.setPreferedSeparator(" | ");
+        final DumpContext ctx = new DumpContext(" | ", true);
 
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
@@ -105,8 +102,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getLazyParser());
 
-        final DumpContext ctx = new DumpContext();
-        ctx.setPreferedSeparator(" | ");
+        final DumpContext ctx = new DumpContext(" | ", true);
 
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
@@ -132,8 +128,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getLazyParser());
 
-        final DumpContext ctx = new DumpContext();
-        ctx.setPreferedSeparator(" | ");
+        final DumpContext ctx = new DumpContext(" | ", true);
 
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();

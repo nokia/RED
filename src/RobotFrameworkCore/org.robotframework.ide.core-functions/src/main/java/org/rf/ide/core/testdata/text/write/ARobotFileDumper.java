@@ -5,9 +5,6 @@
  */
 package org.rf.ide.core.testdata.text.write;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +44,6 @@ import org.rf.ide.core.testdata.text.write.tables.TestCasesSectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.VariablesSectionTableDumper;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Files;
 
 public abstract class ARobotFileDumper implements IRobotFileDumper {
 
@@ -59,24 +55,15 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
     public ARobotFileDumper() {
         this.aDumpHelper = new DumperHelper(this);
-        this.tableDumpers = new ArrayList<ISectionTableDumper>(
+        this.tableDumpers = new ArrayList<>(
                 Arrays.asList(new SettingsSectionTableDumper(aDumpHelper), new VariablesSectionTableDumper(aDumpHelper),
                         new TestCasesSectionTableDumper(aDumpHelper), new KeywordsSectionTableDumper(aDumpHelper)));
     }
 
     @Override
-    public void dump(final File robotFile, final RobotFile model) throws IOException {
-        Files.asCharSink(robotFile, Charset.forName("utf-8")).write(dump(model));
-    }
-
-    @Override
-    public DumpedResult dumpToResultObject(final RobotFile model) {
+    public DumpedResult dump(final DumpContext ctx, final RobotFile model) {
+        this.dumpContext = ctx;
         return newLines(model, new DumpedResultBuilder());
-    }
-
-    @Override
-    public String dump(final RobotFile model) {
-        return dumpToResultObject(model).newContent();
     }
 
     private DumpedResult newLines(final RobotFile model, final DumpedResultBuilder builder) {
@@ -542,11 +529,6 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         }
 
         return sep;
-    }
-
-    @Override
-    public void setContext(final DumpContext ctx) {
-        this.dumpContext = ctx;
     }
 
     public boolean isFileDirty() {

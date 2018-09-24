@@ -5,21 +5,13 @@
  */
 package org.rf.ide.core.testdata;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public interface IRobotFileDumper {
 
-    boolean canDumpFile(final File file);
+    boolean isApplicableFor(final FileFormat format);
 
-    void dump(final File robotFile, final RobotFile model) throws IOException;
-
-    String dump(final RobotFile model);
-
-    DumpedResult dumpToResultObject(final RobotFile model);
-
-    void setContext(final DumpContext ctx);
+    DumpedResult dump(final DumpContext ctx, final RobotFile model);
 }
