@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cr2voLk0EeWzJthH3JoEWQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 9/24/18 11:26 AM
+Save-Time: 9/24/18 3:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,18 +34,20 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[1].getText()" | equals "var 2.py" | verify-true
     get-property "getItems().TableItem[2].getText()" | equals "var 3.py" | verify-true
     get-property "getItems().TableItem[3].getText()" | equals "var.py" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "space in name/ abc.py" | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals "space in name/ def.py" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals "space in name/after  .py" | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals "space in name/var here .py" | verify-true
-    
+    get-property "getItems().TableItem[4].getText()" | equals "Adding/AddingVars.py" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "space in name/ abc.py" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "space in name/ def.py" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "space in name/after  .py" | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals "space in name/var here .py" | verify-true
     //check if next are parameters
-    get-property "getItems().TableItem[8].getText()" | equals "${a}" | verify-true
-    get-property "getItems().TableItem[9].getText()" | equals "${sum_of_2_digit}" | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals "${a}" | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals "${sum_of_2_digit}" | verify-true
     
-    get-property "getItems().TableItem[34].getText()" | equals "${True}" | verify-true
-    get-property "getItems().TableItem[35].getText()" | equals "@{EMPTY}" | verify-true
-    get-property "getItems().TableItem[36].getText()" | equals "&{mapFromVar3}" | verify-true
+    get-property "getItems().TableItem[35].getText()" | equals "${True}" | verify-true
+    get-property "getItems().TableItem[36].getText()" | equals "@{EMPTY}" | verify-true
+    get-property "getItems().TableItem[37].getText()" | equals "&{mapFromVar3}" | verify-true
+    get-property "getItems().TableItem[38].getText()" | equals "&{EMPTY}" | verify-true
+    get-property "getItems().TableItem[39].getText()" | equals "&{SUITE_METADATA}" | verify-true
 }
 //add var with spaces in name
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
@@ -114,7 +116,7 @@ get-editor "VariableProject/red.xml" | get-section "Referenced libraries" | get-
 set-dialog-result File "platform:/resource/VariableProject/space in name/ abc.py"
 get-editor "VariableProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
 with [get-window "Select library class"] {
-    get-table | select " abc.Cat"
+    get-table | select " abc.SimpleClass"
     get-button OK | click
 }
 get-button "Save \((Ctrl|M1)\+S\)" | click
@@ -132,7 +134,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
 }
 
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "abc.Cat" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "abc.SimpleClass" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals Collections | verify-true
     get-property "getItems().TableItem[2].getText()" | equals DateTime | verify-true
     get-property "getItems().TableItem[3].getText()" | equals Dialogs | verify-true
@@ -153,10 +155,11 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[16].getText()" | equals "var 2.py" | verify-true
     get-property "getItems().TableItem[17].getText()" | equals "var 3.py" | verify-true
     get-property "getItems().TableItem[18].getText()" | equals "var.py" | verify-true
-    get-property "getItems().TableItem[19].getText()" | equals "space in name/ abc.py" | verify-true
-    get-property "getItems().TableItem[20].getText()" | equals "space in name/ def.py" | verify-true
-    get-property "getItems().TableItem[21].getText()" | equals "space in name/after  .py" | verify-true
-    get-property "getItems().TableItem[22].getText()" | equals "space in name/var here .py" | verify-true
+    get-property "getItems().TableItem[19].getText()" | equals "Adding/AddingVars.py" | verify-true
+    get-property "getItems().TableItem[20].getText()" | equals "space in name/ abc.py" | verify-true
+    get-property "getItems().TableItem[21].getText()" | equals "space in name/ def.py" | verify-true
+    get-property "getItems().TableItem[22].getText()" | equals "space in name/after  .py" | verify-true
+    get-property "getItems().TableItem[23].getText()" | equals "space in name/var here .py" | verify-true
 
 	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "Selenium2Library" 
 	    | get-property enablement | equals false | verify-true
@@ -182,10 +185,10 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
 }
 
 //remove one file and add new
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select " abc.Cat" | click -default
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select " abc.SimpleClass" | click -default
 
 with [get-editor "tsv_test.tsv" | get-text-viewer] {
-    key-type BackSpace -times 9
+    key-type BackSpace -times 17
     key-type "M1+SPACE"
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select getVar | click -default
