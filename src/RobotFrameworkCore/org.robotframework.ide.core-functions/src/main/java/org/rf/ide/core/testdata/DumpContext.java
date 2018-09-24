@@ -11,19 +11,20 @@ public class DumpContext {
 
     private boolean isDirty = true;
 
-    public void setPreferedSeparator(final String preferedSeparator) {
+    public DumpContext() {
+        this(null, true);
+    }
+
+    public DumpContext(final String preferedSeparator, final boolean isDirty) {
         this.preferedSeparator = preferedSeparator;
-    }
-
-    public String getPreferedSeparator() {
-        return this.preferedSeparator;
-    }
-
-    public void setDirtyFlag(final boolean isDirty) {
         this.isDirty = isDirty;
     }
 
+    public String getPreferedSeparator() {
+        return preferedSeparator;
+    }
+
     public boolean isDirty() {
-        return this.isDirty;
+        return isDirty;
     }
 }

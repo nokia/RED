@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
+import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.mapping.QuickTokenListenerBaseTwoModelReferencesLinker;
@@ -68,7 +69,7 @@ public class UpdateExecRowWithEmptyElementsInside extends RobotFormatParameteriz
         newRow.addArgument(RobotToken.create("ok"));
         userKeyword.addElement(newRow);
 
-        final DumpedResult dumpToResultObject = new RobotFileDumper().dumpToResultObject(modelFile.getParent());
+        final DumpedResult dumpToResultObject = new RobotFileDumper().dump(new DumpContext(), modelFile.getParent());
         final QuickTokenListenerBaseTwoModelReferencesLinker linker = new QuickTokenListenerBaseTwoModelReferencesLinker();
         linker.update(modelFile.getParent(), dumpToResultObject);
 
