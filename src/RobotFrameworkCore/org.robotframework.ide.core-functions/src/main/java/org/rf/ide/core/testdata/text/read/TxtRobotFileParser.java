@@ -19,14 +19,11 @@ public class TxtRobotFileParser extends ATextualRobotFileParser {
 
     @Override
     public boolean canParseFile(final File file, final boolean isFromStringContent) {
-        boolean result = false;
-
         if (file != null && (file.isFile() || isFromStringContent)) {
             final String fileName = file.getName().toLowerCase();
-            result = (fileName.endsWith(".txt") || fileName.endsWith(".robot"));
+            return fileName.endsWith(".txt") || fileName.endsWith(".robot") || fileName.endsWith(".resource");
         }
-
-        return result;
+        return false;
     }
 
     @Override

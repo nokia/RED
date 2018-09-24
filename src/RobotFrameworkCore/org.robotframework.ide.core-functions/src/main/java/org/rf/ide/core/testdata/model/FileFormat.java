@@ -19,7 +19,7 @@ public enum FileFormat {
     public static FileFormat getByExtension(final String fileExtension) {
         if (fileExtension != null) {
             final String fileExt = fileExtension.toLowerCase();
-            if ("txt".equals(fileExt) || "robot".equals(fileExt)) {
+            if ("txt".equals(fileExt) || "robot".equals(fileExt) || "resource".equals(fileExt)) {
                 return TXT_OR_ROBOT;
             } else if ("tsv".equals(fileExt)) {
                 return TSV;

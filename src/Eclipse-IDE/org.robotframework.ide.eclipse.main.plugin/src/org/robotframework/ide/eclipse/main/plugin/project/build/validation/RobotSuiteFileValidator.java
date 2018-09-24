@@ -17,9 +17,11 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.Range;
 
@@ -33,9 +35,18 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
     @Override
     public void validate(final RobotSuiteFile fileModel, final FileValidationContext validationContext)
             throws CoreException {
+        reportVersionSpecificProblems(fileModel, validationContext);
+
         super.validate(fileModel, validationContext);
 
         validateFileName(fileModel);
+    }
+
+    private void reportVersionSpecificProblems(final RobotSuiteFile fileModel,
+            final FileValidationContext validationContext) {
+        final VersionDependentValidators versionDependentValidators = new VersionDependentValidators(validationContext,
+                reporter);
+        versionDependentValidators.getTestSuiteFileValidators(fileModel).forEach(ModelUnitValidator::validate);
     }
 
     private void validateFileName(final RobotSuiteFile fileModel) {

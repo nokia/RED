@@ -83,7 +83,7 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         try {
             final Integer start = (Integer) annotation.getMarker().getAttribute(IMarker.CHAR_START);
             final Integer end = (Integer) annotation.getMarker().getAttribute(IMarker.CHAR_END);
-            return new Position(start, end - start);
+            return start != null && end != null ? new Position(start, end - start) : null;
         } catch (final CoreException e) {
             return null;
         }

@@ -19,6 +19,7 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 
@@ -32,6 +33,13 @@ public class VersionDependentValidators {
             final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.reporter = reporter;
+    }
+
+    public Stream<VersionDependentModelUnitValidator> getTestSuiteFileValidators(final RobotSuiteFile fileModel) {
+        final IFile file = validationContext.getFile();
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream
+                .of(new TestSuiteFileExtensionValidator(file, fileModel, reporter));
+        return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
     public Stream<VersionDependentModelUnitValidator> getVariableValidators(final IVariableHolder variable) {

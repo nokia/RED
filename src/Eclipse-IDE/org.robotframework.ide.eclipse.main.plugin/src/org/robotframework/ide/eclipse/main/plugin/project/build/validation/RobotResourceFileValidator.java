@@ -21,11 +21,14 @@ import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.validation.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 
 import com.google.common.collect.Range;
 
@@ -42,7 +45,22 @@ public class RobotResourceFileValidator extends RobotFileValidator {
         super.validate(fileModel, validationContext);
 
         final Optional<RobotSettingsSection> settingsSection = fileModel.findSection(RobotSettingsSection.class);
+        final Optional<RobotCasesSection> unsupportedSection = fileModel.findSection(RobotCasesSection.class);
+
+        validateIfThereIsUnsupportedTable(unsupportedSection);
         validateIfThereAreNoForbiddenSettings(settingsSection);
+    }
+
+    private void validateIfThereIsUnsupportedTable(final Optional<? extends RobotSuiteFileSection> maybeSection) {
+        if (maybeSection.isPresent()) {
+            final RobotSuiteFileSection section = maybeSection.get();
+
+            final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.UNSUPPORTED_TABLE)
+                    .formatMessageWith(section.getName(), "resource");
+            final ProblemPosition position = ProblemPosition
+                    .fromRegion(maybeSection.get().getDefinitionPosition().toFileRegion());
+            reporter.handleProblem(problem, file, position);
+        }
     }
 
     private void validateIfThereAreNoForbiddenSettings(final Optional<RobotSettingsSection> settingsSection) {
