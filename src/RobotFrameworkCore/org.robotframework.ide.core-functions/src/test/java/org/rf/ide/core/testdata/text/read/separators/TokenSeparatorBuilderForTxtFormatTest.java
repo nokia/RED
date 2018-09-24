@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
+import org.rf.ide.core.testdata.model.FileFormat;
 
 public class TokenSeparatorBuilderForTxtFormatTest {
 

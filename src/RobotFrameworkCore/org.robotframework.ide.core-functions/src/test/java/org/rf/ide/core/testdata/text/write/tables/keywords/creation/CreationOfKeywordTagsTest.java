@@ -6,12 +6,12 @@
 package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 

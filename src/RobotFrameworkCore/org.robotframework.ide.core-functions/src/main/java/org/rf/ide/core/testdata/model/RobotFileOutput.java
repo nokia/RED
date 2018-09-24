@@ -20,7 +20,6 @@ import org.rf.ide.core.testdata.importer.VariablesImporter;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class RobotFileOutput {
 

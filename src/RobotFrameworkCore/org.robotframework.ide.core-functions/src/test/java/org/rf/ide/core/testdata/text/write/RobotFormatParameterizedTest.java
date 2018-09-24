@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
+import org.rf.ide.core.testdata.model.FileFormat;
 
 @RunWith(Parameterized.class)
 public abstract class RobotFormatParameterizedTest {

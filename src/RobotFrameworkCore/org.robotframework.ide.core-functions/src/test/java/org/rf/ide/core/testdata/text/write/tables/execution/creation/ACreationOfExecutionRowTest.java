@@ -11,11 +11,11 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 import org.rf.ide.core.testdata.text.write.tables.execution.creation.ATestFilesCompareStore.InvalidTestStoreException;
