@@ -8,8 +8,8 @@ package org.rf.ide.core.testdata.text.read;
 import java.io.File;
 
 import org.rf.ide.core.testdata.IRobotFileParser;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class TxtRobotFileParser extends ATextualRobotFileParser {
 

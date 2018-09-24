@@ -13,8 +13,8 @@ import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.RobotFileDumper;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
 
 public class KeywordsNotChangedDumperTest extends RobotFormatParameterizedTest {

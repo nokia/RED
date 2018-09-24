@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -22,7 +23,6 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentHolder, Serializable {
 
