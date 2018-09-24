@@ -58,6 +58,25 @@ public enum SuiteFileProblem implements IProblemCause {
             return newArrayList(new ChangeToFixer(targetName));
         }
     },
+    UNSUPPORTED_TABLE {
+
+        @Override
+        public String getProblemDescription() {
+            return "'%s' table is not supported inside %s file";
+        }
+    },
+    DEPRECATED_TEST_SUITE_FILE_EXTENSION {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_API;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "The '*.%s' file extension is deprecated. Only '*.robot' should be used.";
+        }
+    },
     BUILD_ERROR_MESSAGE {
 
         @Override
