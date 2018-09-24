@@ -79,7 +79,8 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
 
     // this method should be implemented elsewhere
     private static boolean isExtensionValid(final String extension) {
-        final List<String> validExts = Arrays.asList("html", "htm", "xhtml", "tsv", "txt", "rst", "robot", "rest");
+        final List<String> validExts = Arrays.asList("html", "htm", "xhtml", "tsv", "txt", "rst", "robot", "resource",
+                "rest");
         return extension != null && validExts.contains(extension.toLowerCase());
     }
 

@@ -19,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.Ro
 
 public class NewRobotResourceWizard extends BasicNewResourceWizard {
 
-    private WizardNewRobotResourceFileCreationPage mainPage;
+    private WizardNewRobotFileCreationPage mainPage;
 
     @Override
     public void init(final IWorkbench workbench, final IStructuredSelection currentSelection) {
@@ -32,8 +32,7 @@ public class NewRobotResourceWizard extends BasicNewResourceWizard {
     public void addPages() {
         super.addPages();
 
-        mainPage = new WizardNewRobotResourceFileCreationPage("New Robot Resource file", getSelection(), "robot", "txt",
-                "tsv");
+        mainPage = new WizardNewRobotResourceFileCreationPage("New Robot Resource file", getSelection());
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Resource file");
         mainPage.setDescription("Create new Robot resource file");

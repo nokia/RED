@@ -91,7 +91,7 @@ class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsVali
             if ("html".equals(extension)) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.HTML_RESOURCE_IMPORT),
                         validationContext.getFile(), pathToken);
-            } else if (!newHashSet("txt", "tsv", "robot").contains(extension)) {
+            } else if (!newHashSet("txt", "tsv", "robot", "resource").contains(extension)) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
                         .formatMessageWith(path, ": given file is not a Resource file"), validationContext.getFile(),
                         pathToken);
