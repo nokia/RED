@@ -45,13 +45,11 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.mapping.QuickTokenListenerBaseTwoModelReferencesLinker;
-import org.rf.ide.core.testdata.mapping.TwoModelReferencesLinker;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
@@ -462,28 +460,15 @@ public class RobotFormEditor extends FormEditor {
             final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
             final RobotFile model = provideSuiteModel().getLinkedElement();
             final RobotFileOutput currentRobotOutputFile = model.getParent();
+
             final String separatorFromPreference = RedPlugin.getDefault()
                     .getPreferences()
                     .getSeparatorToUse(currentRobotOutputFile.getFileFormat() == FileFormat.TSV);
-            final DumpContext ctx = new DumpContext();
-            ctx.setPreferedSeparator(separatorFromPreference);
-            ctx.setDirtyFlag(true);
+            final DumpContext ctx = new DumpContext(separatorFromPreference, true);
 
-            final RobotFileDumper dumper = new RobotFileDumper();
-            dumper.setContext(ctx);
-            final String content;
-            if (RedSystemProperties.shouldUseOldReparsedLinkMode()) {
-                content = dumper.dump(currentRobotOutputFile);
-                RobotFileOutput alreadyDumpedContent = suiteModel.getProject()
-                        .getRobotParser()
-                        .parseEditorContent(content, currentRobotOutputFile.getProcessedFile());
-                new TwoModelReferencesLinker().update(currentRobotOutputFile, alreadyDumpedContent);
-                alreadyDumpedContent = null;
-            } else {
-                final DumpedResult dumpResult = dumper.dumpToResultObject(currentRobotOutputFile);
-                content = dumpResult.newContent();
-                new QuickTokenListenerBaseTwoModelReferencesLinker().update(currentRobotOutputFile, dumpResult);
-            }
+            final DumpedResult dumpResult = new RobotFileDumper().dump(ctx, currentRobotOutputFile);
+            final String content = dumpResult.newContent();
+            new QuickTokenListenerBaseTwoModelReferencesLinker().update(currentRobotOutputFile, dumpResult);
 
             document.set(content);
         }

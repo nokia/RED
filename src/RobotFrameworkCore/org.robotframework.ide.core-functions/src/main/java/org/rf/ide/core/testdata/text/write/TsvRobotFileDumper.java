@@ -5,35 +5,20 @@
  */
 package org.rf.ide.core.testdata.text.write;
 
-import java.io.File;
-
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class TsvRobotFileDumper extends ARobotFileDumper {
 
     @Override
-    public boolean canDumpFile(final File file) {
-        boolean result = false;
-
-        if (file != null) {
-            boolean check = true;
-            if (file.exists()) {
-                check = file.isFile();
-            }
-
-            if (check) {
-                final String fileName = file.getName().toLowerCase();
-                result = (fileName.endsWith(".tsv"));
-            }
-        }
-
-        return result;
+    public boolean isApplicableFor(final FileFormat format) {
+        return format == FileFormat.TSV;
     }
 
     @Override
     protected Separator getSeparatorDefault() {
-        Separator sep = new Separator();
+        final Separator sep = new Separator();
         sep.setRaw("\t");
         sep.setText("\t");
         sep.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);

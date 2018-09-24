@@ -5,73 +5,28 @@
  */
 package org.rf.ide.core.testdata;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.rf.ide.core.testdata.text.write.TsvRobotFileDumper;
 import org.rf.ide.core.testdata.text.write.TxtRobotFileDumper;
 
 public class RobotFileDumper {
 
-    private static final List<IRobotFileDumper> AVAILABLE_FORMAT_DUMPERS = new ArrayList<>();
+    private static final List<IRobotFileDumper> AVAILABLE_FORMAT_DUMPERS = newArrayList(new TxtRobotFileDumper(),
+            new TsvRobotFileDumper());
 
-    private DumpContext ctx = new DumpContext();
-
-    static {
-        AVAILABLE_FORMAT_DUMPERS.add(new TxtRobotFileDumper());
-        AVAILABLE_FORMAT_DUMPERS.add(new TsvRobotFileDumper());
+    public DumpedResult dump(final DumpContext context, final RobotFileOutput output) {
+        return getDumper(output).dump(context, output.getFileModel());
     }
 
-    public void setContext(final DumpContext ctx) {
-        this.ctx = ctx;
-    }
-
-    public void dump(final File file, final RobotFileOutput output) throws IOException {
-        final IRobotFileDumper dumperToUse = getDumper(file);
-        dumperToUse.setContext(ctx);
-        dumperToUse.dump(file, output.getFileModel());
-    }
-
-    public String dump(final RobotFileOutput output) {
-        final IRobotFileDumper dumper = prepareDumper(output);
-
-        return dumper.dump(output.getFileModel());
-    }
-
-    public DumpedResult dumpToResultObject(final RobotFileOutput output) {
-        final IRobotFileDumper dumper = prepareDumper(output);
-        return dumper.dumpToResultObject(output.getFileModel());
-    }
-
-    private IRobotFileDumper prepareDumper(final RobotFileOutput output) {
-        File fake = null;
-        if (output.getFileFormat() == FileFormat.TSV) {
-            fake = new File("fake.tsv");
-        } else {
-            fake = new File("fake.txt");
-        }
-
-        IRobotFileDumper dumper = getDumper(fake);
-        if (dumper == null) {
-            dumper = new TxtRobotFileDumper();
-        }
-        dumper.setContext(ctx);
-        return dumper;
-    }
-
-    private IRobotFileDumper getDumper(final File file) {
-        IRobotFileDumper dumperToUse = null;
-        for (final IRobotFileDumper dumper : AVAILABLE_FORMAT_DUMPERS) {
-            if (dumper.canDumpFile(file)) {
-                dumperToUse = dumper;
-                break;
-            }
-        }
-        return dumperToUse;
+    private IRobotFileDumper getDumper(final RobotFileOutput output) {
+        return AVAILABLE_FORMAT_DUMPERS.stream()
+                .filter(dumper -> dumper.isApplicableFor(output.getFileFormat()))
+                .findFirst()
+                .orElseGet(() -> new TxtRobotFileDumper());
     }
 }

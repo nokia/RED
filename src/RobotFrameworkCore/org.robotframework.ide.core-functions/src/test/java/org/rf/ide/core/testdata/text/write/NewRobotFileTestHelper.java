@@ -30,10 +30,11 @@ public class NewRobotFileTestHelper {
                 .readWithLineSeparatorPresave(inputFile)
                 .replaceAll("(\r)?\n", System.lineSeparator());
         final RobotFileDumper dumper = new RobotFileDumper();
-        dumper.setContext(ctx);
 
         // execute
-        final String dumpResult = dumper.dump(modelFile.getParent()).replaceAll("(\r)?\n", System.lineSeparator());
+        final String dumpResult = dumper.dump(ctx, modelFile.getParent())
+                .newContent()
+                .replaceAll("(\r)?\n", System.lineSeparator());
 
         // verify
         final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
