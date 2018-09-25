@@ -223,7 +223,7 @@ public class EclipseElementsLocator implements ElementsLocator {
         final String[] splittedRemote = remote.getPath().split("/");
         final String lastSegment = splittedRemote[splittedRemote.length - 1];
         try {
-            return new URI("file", null, null, -1, local.getPath() + "/" + lastSegment, null, null);
+            return new URI(local.getScheme(), null, null, -1, local.getPath() + "/" + lastSegment, null, null);
         } catch (final URISyntaxException e) {
             return null;
         }
