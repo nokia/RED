@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gjwJoLpnEee_RrklJFm4zA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/27/18 11:42 AM
+Save-Time: 9/25/18 2:38 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -94,6 +94,9 @@ with [get-window Preferences] {
 get-view "Project Explorer" | get-tree | select "project_a"
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
+    try -times 4 -delay 500 -command{
+    	  get-window "Problem Occurred"
+    }
     get-window "Problem Occurred" | get-button "Details >>" | click
     get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
         | get-property text | contains  "ValueError: invalid literal for int() with base 10: 'jkl'" | verify-true
