@@ -12,7 +12,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +22,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 /**
  * @author wypych
@@ -40,7 +40,7 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test(timeout = 10000)
     public void twoCorrectors_inWrongPositionShouldPutInCorrectOrder_theSecondIsNew() {
         // prepare
-        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<>();
         final AModelElement<SettingTable> correctorOne = mock(AModelElement.class);
         when(correctorOne.getBeginPosition()).thenReturn(new FilePosition(1, 1, 1));
         final AModelElement<SettingTable> correctorTwo = mock(AModelElement.class);
@@ -49,7 +49,7 @@ public class RepositionElementsBaseOnListMethodTest {
         correctorsList.add(correctorTwo);
         final List<? extends AModelElement<SettingTable>> correctors = spy(correctorsList);
 
-        final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<AModelElement<SettingTable>>();
+        final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<>();
         srcList.add(correctorTwo);
         srcList.add(correctorOne);
         srcList.setMaxSize(srcList.size() + 1);
@@ -67,7 +67,7 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test(timeout = 10000)
     public void twoCorrectors_inWrongPositionShouldPutInCorrectOrder_theFirstIsNew() {
         // prepare
-        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<>();
         final AModelElement<SettingTable> correctorOne = mock(AModelElement.class);
         when(correctorOne.getBeginPosition()).thenReturn(FilePosition.createNotSet());
         final AModelElement<SettingTable> correctorTwo = mock(AModelElement.class);
@@ -76,7 +76,7 @@ public class RepositionElementsBaseOnListMethodTest {
         correctorsList.add(correctorTwo);
         final List<? extends AModelElement<SettingTable>> correctors = spy(correctorsList);
 
-        final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<AModelElement<SettingTable>>();
+        final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<>();
         srcList.add(correctorTwo);
         srcList.add(correctorOne);
         srcList.setMaxSize(srcList.size() + 1);
@@ -94,7 +94,7 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test(timeout = 10000)
     public void twoCorrectors_inWrongPositionShouldPutInCorrectOrder_bothAreNew() {
         // prepare
-        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<>();
         final AModelElement<SettingTable> correctorOne = mock(AModelElement.class);
         when(correctorOne.getBeginPosition()).thenReturn(FilePosition.createNotSet());
         final AModelElement<SettingTable> correctorTwo = mock(AModelElement.class);
@@ -103,7 +103,7 @@ public class RepositionElementsBaseOnListMethodTest {
         correctorsList.add(correctorTwo);
         final List<? extends AModelElement<SettingTable>> correctors = spy(correctorsList);
 
-        final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<AModelElement<SettingTable>>();
+        final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<>();
         srcList.add(correctorTwo);
         srcList.add(correctorOne);
         srcList.setMaxSize(srcList.size() + 1);
@@ -121,10 +121,10 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test(timeout = 10000)
     public void oneCorrector_shouldDoNothing() {
         // prepare
-        final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<AModelElement<SettingTable>>();
+        final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<>();
         srcList.setMaxSize(1);
         final List<AModelElement<SettingTable>> src = spy(srcList);
-        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<>();
         final AModelElement<SettingTable> correctorOne = mock(AModelElement.class);
         correctorsList.add(correctorOne);
         final List<? extends AModelElement<SettingTable>> correctors = spy(correctorsList);
@@ -133,7 +133,7 @@ public class RepositionElementsBaseOnListMethodTest {
         testable.repositionElementsBaseOnList(src, correctors);
 
         // verify
-        InOrder order = inOrder(src, correctors);
+        final InOrder order = inOrder(src, correctors);
         order.verify(correctors, times(1)).size();
         order.verifyNoMoreInteractions();
 
@@ -144,16 +144,16 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test(timeout = 10000)
     public void empty_correctors_shouldDoNothing() {
         // prepare
-        final List<AModelElement<SettingTable>> srcList = new LimitedSizeList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> srcList = new LimitedSizeList<>();
         final List<AModelElement<SettingTable>> src = spy(srcList);
-        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> correctorsList = new ArrayList<>();
         final List<? extends AModelElement<SettingTable>> correctors = spy(correctorsList);
 
         // execute
         testable.repositionElementsBaseOnList(src, correctors);
 
         // verify
-        InOrder order = inOrder(src, correctors);
+        final InOrder order = inOrder(src, correctors);
         order.verify(correctors, times(1)).size();
         order.verifyNoMoreInteractions();
 
@@ -165,19 +165,19 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test
     public void test_isNextTheSameAsCurrent_enoughElementsAndTheSame_shouldReturn_TRUE() {
         // prepare
-        final List<AModelElement<SettingTable>> srcList = new ArrayList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> srcList = new ArrayList<>();
         srcList.add(mock(AModelElement.class));
         final AModelElement<SettingTable> m = mock(AModelElement.class);
         srcList.add(m);
         final List<AModelElement<SettingTable>> src = spy(srcList);
 
         // execute
-        boolean result = testable.isNextTheSameAsCurrent(src, m, 0);
+        final boolean result = testable.isNextTheSameAsCurrent(src, m, 0);
 
         // verify
         assertThat(result).isTrue();
 
-        InOrder order = inOrder(src);
+        final InOrder order = inOrder(src);
         order.verify(src, times(1)).size();
         order.verify(src, times(1)).get(1);
         order.verifyNoMoreInteractions();
@@ -187,19 +187,19 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test
     public void test_isNextTheSameAsCurrent_enoughElementsButNotTheSame_shouldReturn_FALSE() {
         // prepare
-        final List<AModelElement<SettingTable>> srcList = new ArrayList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> srcList = new ArrayList<>();
         srcList.add(mock(AModelElement.class));
         srcList.add(mock(AModelElement.class));
         final List<AModelElement<SettingTable>> src = spy(srcList);
         final AModelElement<SettingTable> m = mock(AModelElement.class);
 
         // execute
-        boolean result = testable.isNextTheSameAsCurrent(src, m, 0);
+        final boolean result = testable.isNextTheSameAsCurrent(src, m, 0);
 
         // verify
         assertThat(result).isFalse();
 
-        InOrder order = inOrder(src);
+        final InOrder order = inOrder(src);
         order.verify(src, times(1)).size();
         order.verify(src, times(1)).get(1);
         order.verifyNoMoreInteractions();
@@ -208,18 +208,18 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test
     public void test_isNextTheSameAsCurrent_notEnoughElements_shouldReturn_FALSE() {
         // prepare
-        final List<AModelElement<SettingTable>> srcList = new ArrayList<AModelElement<SettingTable>>();
+        final List<AModelElement<SettingTable>> srcList = new ArrayList<>();
         final List<AModelElement<SettingTable>> src = spy(srcList);
         @SuppressWarnings("unchecked")
         final AModelElement<SettingTable> m = mock(AModelElement.class);
 
         // execute
-        boolean result = testable.isNextTheSameAsCurrent(src, m, 0);
+        final boolean result = testable.isNextTheSameAsCurrent(src, m, 0);
 
         // verify
         assertThat(result).isFalse();
 
-        InOrder order = inOrder(src);
+        final InOrder order = inOrder(src);
         order.verify(src, times(1)).size();
         order.verifyNoMoreInteractions();
     }
@@ -274,7 +274,7 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void test_limitedSizeList_addPos_notEnoughSpace() {
         // prepare
-        LimitedSizeList<String> p = new LimitedSizeList<>();
+        final LimitedSizeList<String> p = new LimitedSizeList<>();
         p.setMaxSize(2);
 
         // execute
@@ -289,7 +289,7 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test
     public void test_limitedSizeList_addPos_enoughSpace() {
         // prepare
-        LimitedSizeList<String> p = new LimitedSizeList<>();
+        final LimitedSizeList<String> p = new LimitedSizeList<>();
         p.setMaxSize(3);
 
         // execute
@@ -304,7 +304,7 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void test_limitedSizeList_add_notEnoughSpace() {
         // prepare
-        LimitedSizeList<String> p = new LimitedSizeList<>();
+        final LimitedSizeList<String> p = new LimitedSizeList<>();
         p.setMaxSize(1);
 
         // execute
@@ -318,7 +318,7 @@ public class RepositionElementsBaseOnListMethodTest {
     @Test
     public void test_limitedSizeList_add_enoughSpace() {
         // prepare
-        LimitedSizeList<String> p = new LimitedSizeList<>();
+        final LimitedSizeList<String> p = new LimitedSizeList<>();
         p.setMaxSize(2);
 
         // execute
@@ -332,7 +332,7 @@ public class RepositionElementsBaseOnListMethodTest {
     private class RobotFileDumperInheritance extends ARobotFileDumper {
 
         @Override
-        public boolean canDumpFile(final File file) {
+        public boolean isApplicableFor(final FileFormat format) {
             // Irrelevant for this test
             return false;
         }
@@ -351,12 +351,12 @@ public class RepositionElementsBaseOnListMethodTest {
 
         @Override
         public boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src,
-                final AModelElement<SettingTable> m, int currentIndex) {
+                final AModelElement<SettingTable> m, final int currentIndex) {
             return super.isNextTheSameAsCurrent(src, m, currentIndex);
         }
 
         @Override
-        protected boolean isAcceptableForDefault(Separator separator) {
+        protected boolean isAcceptableForDefault(final Separator separator) {
             // irrelevant
             return false;
         }
