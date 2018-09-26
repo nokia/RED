@@ -90,7 +90,7 @@ def cleanup_modules(to_call):
 
             # some modules should not be removed because it causes rpc server problems
             to_remove = [m for m in current_modules - old_modules - builtin_modules if
-                         not m.startswith('robot.') and not m.startswith('encodings.')]
+                         not m == 'robot' and not m.startswith('robot.') and not m.startswith('encodings.')]
             for m in to_remove:
                 del sys.modules[m]
                 del m
