@@ -26,7 +26,7 @@ public class PythonVersion {
      *            taken from sys.version
      */
     public static PythonVersion from(final String version) {
-        final Matcher matcher = Pattern.compile("\\(.+(\\d)\\.(\\d+)\\.(\\d+) on .+\\)").matcher(version);
+        final Matcher matcher = Pattern.compile("\\(.+(\\d)\\.(\\d+)\\.(\\d+).* on .+\\)").matcher(version);
         if (matcher.find()) {
             return new PythonVersion(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)),
                     Integer.parseInt(matcher.group(3)));
