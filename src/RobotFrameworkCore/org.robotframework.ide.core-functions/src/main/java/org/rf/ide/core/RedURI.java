@@ -8,6 +8,7 @@ package org.rf.ide.core;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Pattern;
 
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
@@ -49,13 +50,21 @@ public class RedURI {
     }
 
     public static URI fromString(final String path) throws URISyntaxException {
+        final boolean isWindows = RedSystemProperties.isWindowsPlatform();
+
         final String escapedPath = URI_SPECIAL_CHARS_ESCAPER.escape(path);
-        final String sep = RedSystemProperties.isWindowsPlatform() ? "/" : "//";
-        final String escapedPathWithScheme = new File(path).isAbsolute() ? "file:" + sep + escapedPath : escapedPath;
-        final String normalizedPath = RedSystemProperties.isWindowsPlatform()
-                ? escapedPathWithScheme.replaceAll("\\\\", "/")
+        final String sep = isWindows ? "/" : "//";
+        final String escapedPathWithScheme = shouldAddScheme(path, isWindows) ? "file:" + sep + escapedPath
+                : escapedPath;
+        final String normalizedPath = isWindows ? escapedPathWithScheme.replaceAll("\\\\", "/")
                 : escapedPathWithScheme.replaceAll("\\\\", "%5c");
         return new URI(normalizedPath);
     }
 
+    private static boolean shouldAddScheme(final String path, final boolean isWindows) {
+        // The path is absolute under this operating system, or this is a unix and the path
+        // looks like windows absolute path. This is done in order not to create URI with
+        // e.g. "C" scheme from paths like "C:/something"
+        return new File(path).isAbsolute() || !isWindows && Pattern.matches("^[a-zA-Z]:.+", path);
+    }
 }
