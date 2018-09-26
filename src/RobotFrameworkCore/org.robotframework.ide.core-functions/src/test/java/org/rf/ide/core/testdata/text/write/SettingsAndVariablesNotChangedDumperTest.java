@@ -33,11 +33,10 @@ public class SettingsAndVariablesNotChangedDumperTest extends RobotFormatParamet
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(fileContent, getFormat(),
                 RobotModelTestProvider.getParser());
         final RobotFileDumper dumper = new RobotFileDumper();
-        final DumpContext ctx = new DumpContext();
-        ctx.setDirtyFlag(false);
-        dumper.setContext(ctx);
+        final DumpContext ctx = new DumpContext(null, false);
+
         // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
+        final String dumpResult = dumper.dump(ctx, modelFile.getParent()).newContent();
 
         // verify
         final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
