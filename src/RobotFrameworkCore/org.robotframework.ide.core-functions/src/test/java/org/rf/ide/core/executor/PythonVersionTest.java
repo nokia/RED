@@ -30,6 +30,10 @@ public class PythonVersionTest {
                     .isEqualTo(new PythonVersion(2, 7, 0));
             softly.assertThat(PythonVersion.from("Robot Framework 3.0.4 (Python 2.6.6 on win32)"))
                     .isEqualTo(new PythonVersion(2, 6, 6));
+            softly.assertThat(PythonVersion.from("Robot Framework 3.0.5 (Python 2.7.13+ on linux)"))
+                    .isEqualTo(new PythonVersion(2, 7, 13));
+            softly.assertThat(PythonVersion.from("Robot Framework 3.0.6 (Python 2.6.8a3 on linux)"))
+                    .isEqualTo(new PythonVersion(2, 6, 8));
         });
     }
 
