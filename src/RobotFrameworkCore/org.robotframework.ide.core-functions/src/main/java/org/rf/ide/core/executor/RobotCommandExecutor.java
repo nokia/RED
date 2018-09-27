@@ -49,4 +49,6 @@ interface RobotCommandExecutor {
 
     void runRfLint(String host, int port, File projectLocation, List<String> excludedPaths, File filepath,
             List<RfLintRule> rules, List<String> rulesFiles, List<String> additionalArguments);
+
+    String convertRobotDataFile(File originalFile);
 }

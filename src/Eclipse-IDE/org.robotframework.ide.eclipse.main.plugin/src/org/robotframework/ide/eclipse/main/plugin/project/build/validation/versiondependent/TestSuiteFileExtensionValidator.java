@@ -9,6 +9,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.validation.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
@@ -41,10 +43,14 @@ class TestSuiteFileExtensionValidator extends VersionDependentModelUnitValidator
         if (fileModel.isSuiteFile()) {
             final String extension = file.getFileExtension();
             if (!"robot".equals(extension)) {
+                final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class).get();
+                final ProblemPosition position = ProblemPosition
+                        .fromRegion(section.getDefinitionPosition().toFileRegion());
+
                 final RobotProblem problem = RobotProblem
                         .causedBy(SuiteFileProblem.DEPRECATED_TEST_SUITE_FILE_EXTENSION)
                         .formatMessageWith(extension);
-                reporter.handleProblem(problem, file, 1);
+                reporter.handleProblem(problem, file, position);
             }
         }
     }
