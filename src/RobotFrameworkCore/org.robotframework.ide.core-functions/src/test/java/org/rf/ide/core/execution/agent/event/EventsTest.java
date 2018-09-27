@@ -43,8 +43,8 @@ public class EventsTest {
 
     @Test
     public void properListOfOrderedStringToObjectMapIsReturned_whenListOfObjectsIsProvided() {
-        final List<?> list = newArrayList(ImmutableMap.of("x", 1, "y", 2),
-                ImmutableMap.of("1", Boolean.TRUE, "2", "abc"));
+        final List<?> list = newArrayList(ImmutableMap.<String, Object> of("x", 1, "y", 2),
+                ImmutableMap.<String, Object> of("1", Boolean.TRUE, "2", "abc"));
         final List<Map<String, Object>> result = Events.ensureListOfOrderedMapOfStringsToObjects(list);
 
         assertThat(result).hasSize(2);
