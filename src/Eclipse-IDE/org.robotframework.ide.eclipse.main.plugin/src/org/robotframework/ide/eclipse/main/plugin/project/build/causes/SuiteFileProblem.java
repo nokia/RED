@@ -7,13 +7,17 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ConvertToRobotFileFormat;
 
 public enum SuiteFileProblem implements IProblemCause {
     SUITE_FILE_IS_NAMED_INIT {
@@ -73,8 +77,19 @@ public enum SuiteFileProblem implements IProblemCause {
         }
 
         @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
         public String getProblemDescription() {
-            return "The '*.%s' file extension is deprecated. Only '*.robot' should be used.";
+            return "The '*.%s' file extension is deprecated. Only '*.robot' should be used for suites.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final Optional<File> file = RedWorkspace.getLocalFile(marker.getResource());
+            return file.isPresent() ? newArrayList(new ConvertToRobotFileFormat(file.get())) : new ArrayList<>();
         }
     },
     BUILD_ERROR_MESSAGE {

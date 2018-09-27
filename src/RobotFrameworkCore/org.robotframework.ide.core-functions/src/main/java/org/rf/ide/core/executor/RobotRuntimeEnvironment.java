@@ -272,6 +272,15 @@ public class RobotRuntimeEnvironment {
         }
     }
 
+    public String convertRobotDataFile(final File originalFile) {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = executors
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            return executor.convertRobotDataFile(originalFile);
+        }
+        return "";
+    }
+
     /**
      * Start library auto discovering with robot dryrun
      *

@@ -270,6 +270,20 @@ def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, add
 
     subprocess.Popen(command, stdin=subprocess.PIPE)
 
+@logresult
+@encode_result_or_exception
+@logargs
+def convert_robot_data_file(original_filepath):
+    from robot.tidy import Tidy
+    from base64 import b64encode
+
+    target_filepath = original_filepath.rsplit('.', 1)[0] + '.robot'
+    converted_content = Tidy(format='robot').file(original_filepath)
+
+    if sys.version_info < (3, 0, 0):
+        return b64encode(converted_content.encode('utf-8'))
+    else:
+        return str(b64encode(bytes(converted_content, 'utf-8')), 'utf-8')
 
 @logresult
 @encode_result_or_exception
@@ -363,6 +377,7 @@ if __name__ == '__main__':
     server.register_function(start_library_auto_discovering, 'startLibraryAutoDiscovering')
     server.register_function(start_keyword_auto_discovering, 'startKeywordAutoDiscovering')
     server.register_function(stop_auto_discovering, 'stopAutoDiscovering')
+    server.register_function(convert_robot_data_file, "convertRobotDataFile")
     server.register_function(run_rf_lint, "runRfLint")
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(create_html_doc, 'createHtmlDoc')
