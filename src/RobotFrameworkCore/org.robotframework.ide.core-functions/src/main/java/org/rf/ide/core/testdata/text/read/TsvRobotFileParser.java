@@ -11,7 +11,6 @@ import org.rf.ide.core.testdata.IRobotFileParser;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
-@SuppressWarnings("PMD.GodClass")
 public class TsvRobotFileParser extends ATextualRobotFileParser {
 
     public TsvRobotFileParser() {
