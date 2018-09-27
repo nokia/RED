@@ -7,6 +7,8 @@ from robot_session_server import create_libdoc
 from robot_session_server import get_classes_from_module
 from robot_session_server import get_module_path
 from robot_session_server import get_variables
+from robot_session_server import convert_robot_data_file
+from base64 import b64encode
 
 
 class RobotSessionServerTests(unittest.TestCase):
@@ -88,3 +90,47 @@ class VariablesRetrievingTests(unittest.TestCase):
         response2 = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'b', 'vars.py'), [])
 
         self.assertNotEqual(response1, response2)
+        
+class RobotFilesConvertingTests(unittest.TestCase):
+    
+    def test_txt_file_is_properly_converted_to_robot_format(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert.txt')
+
+        from base64 import b64decode
+        converted = b64decode(convert_robot_data_file(path)['result'])
+        
+        golden_file_path = os.path.join(parent_path, 'res_test_robot_session_server', 'converted.robot')
+        self.assertEqualToGoldenFileContent(converted, golden_file_path)
+    
+    def test_tsv_file_is_properly_converted_to_robot_format(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert.tsv')
+
+        from base64 import b64decode
+        converted = b64decode(convert_robot_data_file(path)['result'])
+        
+        golden_file_path = os.path.join(parent_path, 'res_test_robot_session_server', 'converted.robot')
+        self.assertEqualToGoldenFileContent(converted, golden_file_path)
+    
+    def test_file_with_unicode_charactes_is_converted_to_robot_format_without_exceptions(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert_unicode.tsv')
+        
+        from base64 import b64decode
+        b64decode(convert_robot_data_file(path)['result'])
+
+    def assertEqualToGoldenFileContent(self, content, golden_file_path):
+        if sys.version_info < (3, 0, 0):
+            with open(golden_file_path, 'r') as golden_file:
+                content_in_lines = content.splitlines()
+                golden_file_lines = golden_file.readlines()
+        else:
+            with open(golden_file_path, 'r', encoding='utf-8') as golden_file:
+                content_in_lines = content.decode('utf-8').splitlines()
+                golden_file_lines = golden_file.readlines()
+                
+        self.assertEqual(len(content_in_lines), len(golden_file_lines))
+        
+        for i in range(len(content_in_lines)):
+            self.assertEqual(content_in_lines[i], golden_file_lines[i].rstrip())

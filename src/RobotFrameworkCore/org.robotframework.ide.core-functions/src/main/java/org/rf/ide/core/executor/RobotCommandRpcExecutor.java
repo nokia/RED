@@ -382,6 +382,19 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         return arguments;
     }
 
+    @Override
+    public String convertRobotDataFile(final File originalFile) {
+        try {
+            final String b64encodedContent = (String) callRpcFunction("convertRobotDataFile",
+                    originalFile.getAbsolutePath());
+            final byte[] bytes = Base64.getDecoder().decode(b64encodedContent);
+            return new String(bytes, Charsets.UTF_8);
+
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+        }
+    }
+
     private Object callRpcFunction(final String functionName, final Object... arguments) throws XmlRpcException {
         final Object rpcResult = client.execute(functionName, arguments);
         return resultOrException(rpcResult);
