@@ -33,7 +33,6 @@ import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class VariablesImporterTest {
 
     @Rule
