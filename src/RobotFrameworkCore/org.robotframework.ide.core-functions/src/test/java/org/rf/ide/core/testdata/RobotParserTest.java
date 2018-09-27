@@ -44,7 +44,6 @@ import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-@SuppressWarnings("PMD.MethodNamingConventions")
 public class RobotParserTest {
 
     @Test
