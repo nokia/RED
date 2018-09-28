@@ -111,7 +111,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                         address.get());
                 validateWithSpec(specification, name, nameToken, arguments, false);
             } else {
-                reportProblemOnRemoteLibraryArguments(name, nameToken, arguments);
+                reportProblemOnRemoteLibraryArguments(nameToken, arguments);
             }
         } else {
             final List<String> args = arguments.stream().map(RobotToken::getText).collect(toList());
@@ -130,7 +130,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                     importArguments).validate(new NullProgressMonitor());
         } else {
             if (pathOrName.equals("Remote")) {
-                reportProblemOnRemoteLibraryArguments(pathOrName, pathOrNameToken, importArguments);
+                reportProblemOnRemoteLibraryArguments(pathOrNameToken, importArguments);
             } else {
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
                         .formatMessageWith(pathOrName);
@@ -142,8 +142,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         }
     }
 
-    private void reportProblemOnRemoteLibraryArguments(final String name, final RobotToken nameToken,
-            final List<RobotToken> arguments) {
+    private void reportProblemOnRemoteLibraryArguments(final RobotToken nameToken, final List<RobotToken> arguments) {
         final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
 
         final Optional<String> address = resolver.getUri();

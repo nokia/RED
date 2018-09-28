@@ -8,8 +8,8 @@ package org.rf.ide.core.testdata.text.read;
 import java.io.File;
 
 import org.rf.ide.core.testdata.IRobotFileParser;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class TxtRobotFileParser extends ATextualRobotFileParser {
 
@@ -19,14 +19,11 @@ public class TxtRobotFileParser extends ATextualRobotFileParser {
 
     @Override
     public boolean canParseFile(final File file, final boolean isFromStringContent) {
-        boolean result = false;
-
         if (file != null && (file.isFile() || isFromStringContent)) {
             final String fileName = file.getName().toLowerCase();
-            result = (fileName.endsWith(".txt") || fileName.endsWith(".robot"));
+            return fileName.endsWith(".txt") || fileName.endsWith(".robot") || fileName.endsWith(".resource");
         }
-
-        return result;
+        return false;
     }
 
     @Override

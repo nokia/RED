@@ -5,9 +5,9 @@
  */
 package org.rf.ide.core.testdata.text.write;
 
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class TxtRobotFileDumper extends ARobotFileDumper {
 

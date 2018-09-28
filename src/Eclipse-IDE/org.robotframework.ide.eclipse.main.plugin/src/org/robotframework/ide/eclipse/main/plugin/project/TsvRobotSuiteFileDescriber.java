@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class TsvRobotSuiteFileDescriber extends ASuiteFileDescriber {
     public TsvRobotSuiteFileDescriber() {
