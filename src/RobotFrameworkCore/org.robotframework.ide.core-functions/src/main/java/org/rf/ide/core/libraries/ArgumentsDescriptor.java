@@ -44,16 +44,37 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
 
         final List<Argument> arguments = newArrayList();
         for (final String arg : args) {
+            final ArgumentType type;
+            final String possiblyAnnotatedName ;
+            String value = null;
             if (arg.contains("=")) {
-                final List<String> splitted = Splitter.on("=").splitToList(arg);
-                arguments.add(new Argument(ArgumentType.DEFAULT, splitted.get(0), splitted.get(1)));
+                type = ArgumentType.DEFAULT;
+                final List<String> splitted = Splitter.on('=').splitToList(arg);
+                possiblyAnnotatedName = splitted.get(0);
+                value = splitted.get(1);
+                
             } else if (arg.startsWith("**")) {
-                arguments.add(new Argument(ArgumentType.KWARG, arg.substring(2)));
+                type = ArgumentType.KWARG;
+                possiblyAnnotatedName = arg.substring(2);
+
             } else if (arg.startsWith("*")) {
-                arguments.add(new Argument(ArgumentType.VARARG, arg.substring(1)));
+                type = ArgumentType.VARARG;
+                possiblyAnnotatedName = arg.substring(1);
+
             } else {
-                arguments.add(new Argument(ArgumentType.REQUIRED, arg));
+                type = ArgumentType.REQUIRED;
+                possiblyAnnotatedName = arg;
             }
+
+            String name = possiblyAnnotatedName;
+            String annotation = null;
+
+            if (possiblyAnnotatedName.contains(":")) {
+                final List<String> splitted = Splitter.on(':').splitToList(possiblyAnnotatedName);
+                name = splitted.get(0);
+                annotation = splitted.get(1);
+            }
+            arguments.add(new Argument(type, name, annotation, value));
         }
         return new ArgumentsDescriptor(arguments);
     }
@@ -147,16 +168,16 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
 
         private final String argumentName;
 
+        private final Optional<String> annotation;
+
         private final Optional<String> defaultValue;
 
-        public Argument(final ArgumentType type, final String arg) {
-            this(type, arg, null);
-        }
-
-        public Argument(final ArgumentType type, final String arg, final String defaultValue) {
+        private Argument(final ArgumentType type, final String name, final String annotation,
+                final String defaultValue) {
             this.type = type;
-            this.argumentName = arg;
-            this.defaultValue = Optional.ofNullable(defaultValue);
+            this.argumentName = name;
+            this.annotation = Optional.ofNullable(annotation).map(String::trim);
+            this.defaultValue = Optional.ofNullable(defaultValue).map(String::trim);
         }
 
         public String getName() {
@@ -179,8 +200,22 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
             return type == ArgumentType.KWARG;
         }
 
+        public Optional<String> getAnnotation() {
+            return annotation;
+        }
+
+        public Optional<String> getDefaultValue() {
+            return defaultValue;
+        }
+
         public String getDescription() {
-            return getPrefix() + (defaultValue.isPresent() ? argumentName + "=" + defaultValue.get() : argumentName);
+            final StringBuilder desc = new StringBuilder();
+            desc.append(getPrefix());
+            desc.append(argumentName);
+            annotation.ifPresent(a -> desc.append(": ").append(a));
+            defaultValue.ifPresent(v -> desc.append("=").append(v));
+
+            return desc.toString();
         }
 
         private String getPrefix() {
@@ -197,6 +232,7 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
             if (obj instanceof Argument) {
                 final Argument that = (Argument) obj;
                 return this.type == that.type && this.argumentName.equals(that.argumentName)
+                        && this.annotation.equals(that.annotation)
                         && this.defaultValue.equals(that.defaultValue);
             }
             return false;
@@ -204,7 +240,7 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
 
         @Override
         public int hashCode() {
-            return Objects.hash(type, argumentName, defaultValue);
+            return Objects.hash(type, argumentName, annotation, defaultValue);
         }
 
         @Override
