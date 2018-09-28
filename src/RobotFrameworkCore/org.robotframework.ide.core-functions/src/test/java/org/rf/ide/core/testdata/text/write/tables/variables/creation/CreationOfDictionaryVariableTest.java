@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 

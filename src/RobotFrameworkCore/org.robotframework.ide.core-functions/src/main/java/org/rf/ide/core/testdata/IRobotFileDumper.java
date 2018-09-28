@@ -6,8 +6,8 @@
 package org.rf.ide.core.testdata;
 
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public interface IRobotFileDumper {
 

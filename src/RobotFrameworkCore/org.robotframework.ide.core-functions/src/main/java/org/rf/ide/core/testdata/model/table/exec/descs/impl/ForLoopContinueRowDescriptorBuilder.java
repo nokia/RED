@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
@@ -23,7 +24,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilder {
 

@@ -60,7 +60,7 @@ class RedRfLint(RfLint):
 
     def __is_robot_file(self, filepath):
         _, ext = os.path.splitext(filepath)
-        return ext.lower() in (".robot", ".txt", ".tsv")
+        return ext.lower() in (".robot", ".resource", ".txt", ".tsv")
 
     def __is_excluded_path(self, root, path):
         return path.startswith('.') or os.path.join(root, path) in self._to_exclude

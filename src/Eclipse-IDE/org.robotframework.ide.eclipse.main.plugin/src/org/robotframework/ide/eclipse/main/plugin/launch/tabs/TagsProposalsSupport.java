@@ -39,6 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.LinkedHashMultimap;
@@ -58,7 +59,7 @@ class TagsProposalsSupport {
 
     TagsProposalsSupport() {
         this.allTagsCache = LinkedHashMultimap.create();
-        this.currentSuitesToRun = new HashMap<IResource, List<String>>();
+        this.currentSuitesToRun = new HashMap<>();
         this.proposals = Optional.empty();
     }
 
@@ -120,12 +121,10 @@ class TagsProposalsSupport {
                         @Override
                         public boolean visit(final IResource resource) throws CoreException {
                             if (resource.getType() == IResource.FILE
-                                    && (resource.getFileExtension().equalsIgnoreCase("robot")
-                                            || resource.getFileExtension().equalsIgnoreCase("txt")
-                                            || resource.getFileExtension().equalsIgnoreCase("tsv"))) {
+                                    && ASuiteFileDescriber.isSuiteFile((IFile) resource)) { // only suites files contains tags
                                 final RobotSuiteFile suiteModel = RedPlugin.getModelManager()
                                         .createSuiteFile((IFile) resource);
-                                if (suiteModel != null && suiteModel.isSuiteFile()) {
+                                if (suiteModel != null) {
                                     final IPath groupingPath = suiteModel.getFile().getFullPath();
 
                                     if (!allTagsCache.containsKey(groupingPath)) {

@@ -55,14 +55,14 @@ class KeywordTableValidator implements ModelUnitValidator {
         final KeywordTable keywordTable = robotKeywordsSection.getLinkedElement();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
 
-        reportVersionSpecificProblems(keywordTable, monitor);
+        reportVersionSpecificProblems(keywordTable);
 
         reportDuplicatedKeywords(keywords);
 
         validateKeywords(keywords);
     }
 
-    private void reportVersionSpecificProblems(final KeywordTable table, final IProgressMonitor monitor)
+    private void reportVersionSpecificProblems(final KeywordTable table)
             throws CoreException {
         versionDependentValidators.getKeywordTableValidators(table).forEach(ModelUnitValidator::validate);
     }

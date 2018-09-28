@@ -7,6 +7,8 @@ package org.rf.ide.core.testdata.text.read.separators;
 
 import java.util.regex.Pattern;
 
+import org.rf.ide.core.testdata.model.FileFormat;
+
 import com.google.common.annotations.VisibleForTesting;
 
 public class TokenSeparatorBuilder {
@@ -42,34 +44,5 @@ public class TokenSeparatorBuilder {
         }
 
         return result;
-    }
-
-    public enum FileFormat {
-        UNKNOWN(null),
-        TXT_OR_ROBOT("robot"),
-        TSV("tsv");
-
-        private final String extension;
-
-        private FileFormat(final String extension) {
-            this.extension = extension;
-        }
-
-        public static FileFormat getByExtension(final String fileExtension) {
-            FileFormat format = FileFormat.UNKNOWN;
-            if (fileExtension != null) {
-                String lowerCase = fileExtension.toLowerCase();
-                if ("txt".equals(lowerCase) || "robot".equals(lowerCase)) {
-                    format = TXT_OR_ROBOT;
-                } else if ("tsv".equals(lowerCase)) {
-                    format = TSV;
-                }
-            }
-            return format;
-        }
-
-        public String getExtension() {
-            return this.extension;
-        }
     }
 }

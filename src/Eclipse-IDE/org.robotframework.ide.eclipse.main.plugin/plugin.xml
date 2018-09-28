@@ -94,7 +94,7 @@
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
-            file-extensions="robot,tsv,txt"
+            file-extensions="robot,tsv,txt,resource"
             id="org.robotframework.red.robotfile"
             name="Robot file"
             priority="high">
@@ -593,6 +593,10 @@
                    <test
                          property="org.eclipse.core.resources.extension"
                          value="robot">
+                   </test>
+                   <test
+                         property="org.eclipse.core.resources.extension"
+                         value="resource">
                    </test>
                    <test
                          property="org.eclipse.core.resources.extension"
@@ -1632,6 +1636,7 @@
                         <adapt type="org.eclipse.core.resources.IFile">
                             <or>
 	                            <test property="org.eclipse.core.resources.name" value="*.robot"/>
+                                <test property="org.eclipse.core.resources.name" value="*.resource"/>
                                 <test property="org.eclipse.core.resources.name" value="*.txt"/>
                                 <test property="org.eclipse.core.resources.name" value="*.tsv"/>
                             </or>
@@ -1700,6 +1705,10 @@
 	                            <test
                                      property="org.eclipse.core.resources.name"
                                      value="*.robot">
+                                </test>
+                                <test
+                                     property="org.eclipse.core.resources.name"
+                                     value="*.resource">
                                 </test>
                                 <test
                                      property="org.eclipse.core.resources.name"
@@ -1781,6 +1790,10 @@
                              </test>
                              <test
                                    property="org.eclipse.core.resources.name"
+                                   value="*.resource">
+                             </test>
+                             <test
+                                   property="org.eclipse.core.resources.name"
                                    value="*.txt">
                              </test>
                              <test
@@ -1850,6 +1863,10 @@
                           <test
                                 property="org.eclipse.core.resources.name"
                                 value="*.robot">
+                          </test>
+                          <test
+                                property="org.eclipse.core.resources.name"
+                                value="*.resource">
                           </test>
                           <test
                                 property="org.eclipse.core.resources.name"
