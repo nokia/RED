@@ -118,22 +118,9 @@ public class RobotFileOutput {
     }
 
     public void setProcessedFile(final File processedFile) {
-        final String fileExtension = getFileExtension(processedFile);
-        format = FileFormat.getByExtension(fileExtension);
+        this.format = FileFormat.getByFile(processedFile);
         this.processedFile = processedFile;
         this.lastModificationEpoch = processedFile.lastModified();
-    }
-
-    private String getFileExtension(final File processedFile) {
-        String fileExtension = null;
-        if (processedFile != null) {
-            final String filename = processedFile.getName();
-            final int lastDot = filename.lastIndexOf('.');
-            if (lastDot > -1) {
-                fileExtension = filename.substring(lastDot + 1);
-            }
-        }
-        return fileExtension;
     }
 
     public void setLastModificationEpochTime(final long lastModificationEpoch) {
@@ -297,30 +284,40 @@ public class RobotFileOutput {
 
         @Override
         public boolean equals(final Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             final BuildMessage other = (BuildMessage) obj;
             if (fileName == null) {
-                if (other.fileName != null)
+                if (other.fileName != null) {
                     return false;
-            } else if (!fileName.equals(other.fileName))
+                }
+            } else if (!fileName.equals(other.fileName)) {
                 return false;
+            }
             if (fileRegion == null) {
-                if (other.fileRegion != null)
+                if (other.fileRegion != null) {
                     return false;
-            } else if (!fileRegion.equals(other.fileRegion))
+                }
+            } else if (!fileRegion.equals(other.fileRegion)) {
                 return false;
+            }
             if (message == null) {
-                if (other.message != null)
+                if (other.message != null) {
                     return false;
-            } else if (!message.equals(other.message))
+                }
+            } else if (!message.equals(other.message)) {
                 return false;
-            if (type != other.type)
+            }
+            if (type != other.type) {
                 return false;
+            }
             return true;
         }
     }
