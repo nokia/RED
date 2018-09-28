@@ -1,3 +1,35 @@
+RED 0.8.8 - 2018/09/28
+Enhancement
+
+    [RED-200] - Changing colours in editor immediately after changing preference
+    [RED-704] - Mark timeout setting messages as deprecated for RF >= 3.0.1
+    [RED-1036] - Too many problems are reported when duplicated settings are combined
+    [RED-1074] - Gherkin prefixes used in setting calls
+    [RED-1163] - [GitHub #237] Provide QuickFix of suggestion for cases when Keywords are not found if the resource with this Keywords is outside the project
+	[RED-1168] - [GitHub #239] Add editor color setting for strings
+    [RED-1171] - Remote library autodiscovering on save trigger
+
+Bug
+
+    [RED-135] - Cannot remove duplicated keyword by Quick fix
+    [RED-539] - Focus and edition of cell are in different place after adding [section] in tables
+    [RED-777] - Double errors after saving suite with problematic imported file
+    [RED-1051] - Coloring kw name if is in the same line as test case name
+    [RED-1058] - How to color special cases for variables?
+	[RED-1105] - GitHub #201 handle URI other than "file- "Validation not working when project is connected to Jazz source control
+    [RED-1135] - In table view number of arguments is shown as is in preference
+    [RED-1181] - QuckFix for resources located outside of workspace is not working for PYTHONPATH
+    [RED-1186] - [GitHub #243] imported variables are always lower cased
+    [RED-1187] - [GitHub #242] classes as variables are filtered out from proposals
+
+Task
+
+    [RED-943] - Remove unused compatibility Java properties
+    [RED-1099] - GitHub #200 - 3 - Robotic Process Automation - new Task table
+    [RED-1102] - GitHub #200 - 6 - deprecated syntax for RF 3.1
+    [RED-1103] - GitHub #200 - 7 - remove Pyt2.6 and Pyt3.3 support from RF
+
+	
 RED 0.8.7 - 2018/08/06
 Enhancement
 
