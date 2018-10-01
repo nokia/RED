@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Sxwy4OOvEeaJ-cAS1pFGxQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/13/18 12:23 PM
+Save-Time: 10/1/18 9:10 PM
 Testcase-Type: ecl
 Verifications: _XqT4gPqgEeaJ8_kc5pFRQQ
 
@@ -95,7 +95,7 @@ with [get-window "Run Configurations" | get-tree] {
 }
 
 //test 3 is selected
-with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-item "TestFile.robot" | get-property childCount | equals 4 | verify-true
     get-item "TestFile.robot/empty test" | get-property checked | equals false | verify-true
     get-item "TestFile.robot/test 1" | get-property checked | equals false | verify-true
@@ -162,7 +162,7 @@ with [get-window "Run Configurations" | get-tree] {
 
 //check config for entire suite
 get-window "Run Configurations" | get-tree | select "Robot/tsv_file.tsv"
-with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-item "tsv_file.tsv" | get-property childCount | equals 2 | verify-true
     get-item "tsv_file.tsv/check text" | get-property checked | equals true | verify-true
     get-item "tsv_file.tsv/embeded kw" | get-property checked | equals true | verify-true
@@ -170,7 +170,7 @@ with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
 
 //check for single test
 get-window "Run Configurations" | get-tree | select "Robot/tsv_file.tsv (Selected Test Cases)"
-with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-item "tsv_file.tsv" | get-property childCount | equals 2 | verify-true
     get-item "tsv_file.tsv/check text" | get-property checked | equals false | verify-true
     get-item "tsv_file.tsv/embeded kw" | get-property checked | equals true | verify-true
