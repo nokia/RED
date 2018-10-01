@@ -35,10 +35,11 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final File libFile = new File(libPath);
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
-        runtimeEnvironment.createLibdoc(libName, targetSpecFile.getLocation().toFile(), format, additionalPaths);
+        final String libPathOrName = libName.contains(".") ? libName : libPath + File.separatorChar + libName + ".py";
+        runtimeEnvironment.createLibdoc(libPathOrName, targetSpecFile.getLocation().toFile(), format, additionalPaths);
     }
 
-    private String extractLibParent() { //e.g. libPath=Project1/Plib/ca libName=Plib.ca.ab => parent=Project1
+    private String extractLibParent() { // e.g. libPath=Project1/Plib/ca libName=Plib.ca.ab => parent=Project1
         String parent = libPath;
         final String[] libNameElements = libName.split("\\.");
         if (libNameElements.length > 1) {
