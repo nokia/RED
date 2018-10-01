@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _x2ENoKdEEeazyPh6f3_hNQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/4/17 11:42 AM
+Save-Time: 10/1/18 2:14 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -174,7 +174,7 @@ with [get-window Preferences] {
     }
     with [get-section "Name shadowing and conflicts"] {
         get-combo -after [get-label "Duplicated variable name"] | get-property selection | equals Error | verify-true
-        get-combo -after [get-label "Duplicated test case name"] | get-property selection | equals Warning | verify-true
+        get-combo -after [get-label "Duplicated test case/task name"] | get-property selection | equals Warning | verify-true
         get-combo -after [get-label "Masked keyword name"] | get-property selection | equals Warning | verify-true
     }
 }

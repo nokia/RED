@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7EzTMPfVEeSx2Y7ZMEilqw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 9/6/18 3:06 PM
+Save-Time: 10/1/18 2:19 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -21,8 +21,8 @@ Entry-Name: .content
 
 //create folder
 
-get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suites folder" | click
-with [get-window "New Robot Test Suites folder"] {
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot suites folder" | click
+with [get-window "New Robot suites folder"] {
     get-editbox -after [get-label "Folder name:"] | set-text NewFolder
     get-button Finish | click
 }
