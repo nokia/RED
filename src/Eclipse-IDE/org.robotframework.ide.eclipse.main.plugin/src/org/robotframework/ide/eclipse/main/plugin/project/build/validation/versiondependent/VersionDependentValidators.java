@@ -20,7 +20,9 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 
@@ -39,7 +41,14 @@ public class VersionDependentValidators {
     public Stream<VersionDependentModelUnitValidator> getTestSuiteFileValidators(final RobotSuiteFile fileModel) {
         final IFile file = validationContext.getFile();
         final Stream<VersionDependentModelUnitValidator> allValidators = Stream
-                .of(new TestSuiteFileExtensionValidator(file, fileModel, reporter));
+                .of(new SuiteFileExtensionValidator(file, fileModel, RobotCasesSection.class, reporter));
+        return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
+    }
+
+    public Stream<VersionDependentModelUnitValidator> getTaskSuiteFileValidators(final RobotSuiteFile fileModel) {
+        final IFile file = validationContext.getFile();
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream
+                .of(new SuiteFileExtensionValidator(file, fileModel, RobotTasksSection.class, reporter));
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
