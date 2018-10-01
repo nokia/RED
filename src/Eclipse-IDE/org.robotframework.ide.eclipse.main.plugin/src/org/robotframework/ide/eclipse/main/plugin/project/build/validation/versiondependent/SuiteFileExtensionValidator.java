@@ -5,31 +5,37 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.validation.ProblemPosition;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 
 import com.google.common.collect.Range;
 
-class TestSuiteFileExtensionValidator extends VersionDependentModelUnitValidator {
+class SuiteFileExtensionValidator extends VersionDependentModelUnitValidator {
 
     private final IFile file;
 
     private final RobotSuiteFile fileModel;
 
+    private final Class<? extends RobotSuiteFileSection> suiteSectionClass;
+
     private final ValidationReportingStrategy reporter;
 
-    public TestSuiteFileExtensionValidator(final IFile file, final RobotSuiteFile fileModel,
+    public SuiteFileExtensionValidator(final IFile file, final RobotSuiteFile fileModel,
+            final Class<? extends RobotSuiteFileSection> suiteSectionClass,
             final ValidationReportingStrategy reporter) {
         this.file = file;
         this.fileModel = fileModel;
+        this.suiteSectionClass = suiteSectionClass;
         this.reporter = reporter;
     }
 
@@ -40,15 +46,15 @@ class TestSuiteFileExtensionValidator extends VersionDependentModelUnitValidator
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        if (fileModel.isSuiteFile()) {
-            final String extension = file.getFileExtension();
-            if (!"robot".equals(extension)) {
-                final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class).get();
+        final String extension = file.getFileExtension();
+        if (!"robot".equals(extension)) {
+            final Optional<? extends RobotSuiteFileSection> suiteSection = fileModel.findSection(suiteSectionClass);
+            if (suiteSection.isPresent()) {
+                final RobotSuiteFileSection section = suiteSection.get();
                 final ProblemPosition position = ProblemPosition
                         .fromRegion(section.getDefinitionPosition().toFileRegion());
 
-                final RobotProblem problem = RobotProblem
-                        .causedBy(SuiteFileProblem.DEPRECATED_TEST_SUITE_FILE_EXTENSION)
+                final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.DEPRECATED_SUITE_FILE_EXTENSION)
                         .formatMessageWith(extension);
                 reporter.handleProblem(problem, file, position);
             }

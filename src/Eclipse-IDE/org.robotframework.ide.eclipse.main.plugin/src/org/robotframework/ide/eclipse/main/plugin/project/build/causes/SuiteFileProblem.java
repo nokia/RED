@@ -83,7 +83,7 @@ public enum SuiteFileProblem implements IProblemCause {
             return "'%s' table is not supported inside %s file";
         }
     },
-    DEPRECATED_TEST_SUITE_FILE_EXTENSION {
+    DEPRECATED_SUITE_FILE_EXTENSION {
 
         @Override
         public ProblemCategory getProblemCategory() {
