@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9OjrEHZzEeWYifgNPLzx_Q
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 10/20/15 1:43 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/1/18 9:36 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -50,7 +50,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 get-window "File content mismatch" 
     | get-label -index 1 
     | get-property caption 
-    | equals "The file TestFile.robot is a Suite file, but after changes there is no Test Cases section. From now on this file will be recognized as Resource file.\n\n"
+    | equals "The file TestFile.robot is a tests suite file but after changes there is no Test Cases nor Tasks section defined. From now on this file will be recognized as a resource file.\n\n"
     + "Click OK to save and reopen editor or cancel saving" | verify-true
         
 get-window "File content mismatch" | get-button Cancel | click
@@ -80,7 +80,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 get-window "File content mismatch" 
     | get-label -index 1 
     | get-property caption 
-    | equals "The file TestFile.robot is a Suite file, but after changes there is no Test Cases section. From now on this file will be recognized as Resource file.\n\n"
+    | equals  "The file TestFile.robot is a tests suite file but after changes there is no Test Cases nor Tasks section defined. From now on this file will be recognized as a resource file.\n\n"
     + "Click OK to save and reopen editor or cancel saving" | verify-true
 get-window "File content mismatch" | get-button OK | click
 
@@ -108,9 +108,9 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 //Resource will be switch to Suite - cancel
 get-window "File content mismatch" 
-    | get-label "The file TestFile.robot is a Resource file, but after changes there is a Test Cases section defined. From now on this file will be recognized as Suite file.Click OK to save and reopen editor or cancel saving" 
+    | get-label "The file TestFile.robot is a resource file but after changes there is a Test Cases section defined. From now on this file will be recognized as a tests suite file.Click OK to save and reopen editor or cancel saving" 
     | get-property caption 
-    | equals "The file TestFile.robot is a Resource file, but after changes there is a Test Cases section defined. From now on this file will be recognized as Suite file.\n\n"
+    | equals "The file TestFile.robot is a resource file but after changes there is a Test Cases section defined. From now on this file will be recognized as a tests suite file.\n\n"
     + "Click OK to save and reopen editor or cancel saving" | verify-true
 get-window "File content mismatch" | get-button Cancel | click
 
