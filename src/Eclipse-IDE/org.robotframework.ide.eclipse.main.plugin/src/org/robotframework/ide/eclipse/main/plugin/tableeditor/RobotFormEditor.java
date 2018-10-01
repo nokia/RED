@@ -259,10 +259,11 @@ public class RobotFormEditor extends FormEditor {
 
         final String contentTypeId = ASuiteFileDescriber.getContentType(suiteModel.getFile().getName(),
                 getSourceEditor().getDocument().get());
-        final boolean contentTypeMismatchDetected =
+        final boolean contentTypeMismatchDetected = 
                 currentModel.isSuiteFile() && !ASuiteFileDescriber.isSuiteFile(contentTypeId)
                 || currentModel.isRpaSuiteFile() && !ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)
-                || currentModel.isResourceFile() && !ASuiteFileDescriber.isResourceFile(contentTypeId);
+                || currentModel.isResourceFile() && !suiteModel.getFileExtension().equals("resource")
+                        && !ASuiteFileDescriber.isResourceFile(contentTypeId);
 
         boolean shouldSave = true;
         if (contentTypeMismatchDetected) {
@@ -301,11 +302,13 @@ public class RobotFormEditor extends FormEditor {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "tests suite", "a Tasks", "tasks suite"));
 
-        } else if (currentModel.isResourceFile() && ASuiteFileDescriber.isSuiteFile(contentTypeId)) {
+        } else if (currentModel.isResourceFile() && !getFileExtension().equals("resource")
+                && ASuiteFileDescriber.isSuiteFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "resource", "a Test Cases", "tests suite"));
 
-        } else if (currentModel.isResourceFile() && ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)) {
+        } else if (currentModel.isResourceFile() && !getFileExtension().equals("resource")
+                && ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "resource", "a Tasks", "tasks suite"));
 
@@ -318,6 +321,10 @@ public class RobotFormEditor extends FormEditor {
                     String.format(description, "tasks suite", "no Test Cases nor Tasks", "resource"));
         }
         return false;
+    }
+
+    private String getFileExtension() {
+        return suiteModel.getFileExtension();
     }
 
     private void waitForPendingEditorJobs() {
