@@ -37,7 +37,7 @@ public class StyledTextCaretPositionProviderTest {
             throws InterruptedException {
         // given
         styledText.setText("\n\rfoobar\n\rpixel\n\r");
-        Rectangle textBounds = styledText.getTextBounds(0, styledText.getCharCount() - 1);
+        final Rectangle textBounds = styledText.getTextBounds(0, styledText.getCharCount() - 1);
 
         // when
         final int beginOfTheFirstLine = StyledTextCaretPositionProvider.getOffset(styledText, new Point(0, 0));
@@ -57,11 +57,11 @@ public class StyledTextCaretPositionProviderTest {
             throws InterruptedException {
         // given
         styledText.setText("\n\rfoobar\n\rpixel\n\r");
-        Rectangle textBounds = styledText.getTextBounds(0, styledText.getCharCount() - 1);
+        final Rectangle textBounds = styledText.getTextBounds(0, styledText.getCharCount() - 1);
 
         // when
         final int offsetOfSecondLine = styledText.getOffsetAtLine(2);
-        Point secondLineLocation = styledText.getLocationAtOffset(offsetOfSecondLine);
+        final Point secondLineLocation = styledText.getLocationAtOffset(offsetOfSecondLine);
         final int beginOfTheSecondLine = StyledTextCaretPositionProvider.getOffset(styledText,
                 new Point(0, secondLineLocation.y));
         final int justFewPointsAfterTheSecondLineBegin = StyledTextCaretPositionProvider.getOffset(styledText,
@@ -77,16 +77,16 @@ public class StyledTextCaretPositionProviderTest {
     }
 
     @Test
-    public void test_windowsEOLsHandling_whenUserClickOnEndOfLineAtThridLine_shouldReturnCorrectPosition()
+    public void test_windowsEOLsHandling_whenUserClickOnEndOfLineAtThirdLine_shouldReturnCorrectPosition()
             throws InterruptedException {
         // given
         styledText.setText("\n\rfoobar\n\rpixel\n\r");
-        Rectangle textBounds = styledText.getTextBounds(0, styledText.getCharCount() - 1);
+        final Rectangle textBounds = styledText.getTextBounds(0, styledText.getCharCount() - 1);
 
         // when
         final int offsetOfThirdLine = styledText.getOffsetAtLine(3);
-        Point thirdLineLocation = styledText.getLocationAtOffset(offsetOfThirdLine);
-        final int beginOfTheThridLine = StyledTextCaretPositionProvider.getOffset(styledText,
+        final Point thirdLineLocation = styledText.getLocationAtOffset(offsetOfThirdLine);
+        final int beginOfTheThirdLine = StyledTextCaretPositionProvider.getOffset(styledText,
                 new Point(0, thirdLineLocation.y));
         final int justFewPointsAfterTheThirdLineBegin = StyledTextCaretPositionProvider.getOffset(styledText,
                 new Point(10, thirdLineLocation.y));
@@ -94,7 +94,7 @@ public class StyledTextCaretPositionProviderTest {
                 new Point(textBounds.width - 1, thirdLineLocation.y));
 
         // then
-        assertThat(beginOfTheThridLine).isEqualTo(offsetOfThirdLine);
+        assertThat(beginOfTheThirdLine).isEqualTo(offsetOfThirdLine);
         // characters are 10 pixels
         assertThat(justFewPointsAfterTheThirdLineBegin).isEqualTo(offsetOfThirdLine);
         assertThat(theEndOfTheLine).isEqualTo(offsetOfThirdLine + styledText.getLine(3).length());
@@ -107,7 +107,7 @@ public class StyledTextCaretPositionProviderTest {
         shell.setLayout(new GridLayout());
         styledText = new StyledText(shell, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         styledText.setLayoutData(new GridData(GridData.FILL_BOTH));
-        Font font = new Font(shell.getDisplay(), "Arial", 10, SWT.NORMAL);
+        final Font font = new Font(shell.getDisplay(), "Arial", 10, SWT.NORMAL);
         styledText.setFont(font);
 
         shell.setSize(360, 120);

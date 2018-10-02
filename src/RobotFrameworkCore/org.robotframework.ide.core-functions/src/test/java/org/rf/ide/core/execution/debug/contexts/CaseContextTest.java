@@ -419,7 +419,7 @@ public class CaseContextTest {
     }
 
     @Test
-    public void erroneousTeardownContextIsReturned_whenMovingToLocalTestTeardownButTheTearodownDoesNotMatchKeyword() {
+    public void erroneousTeardownContextIsReturned_whenMovingToLocalTestTeardownButTheTeardownDoesNotMatchKeyword() {
         final RobotFile model = ModelBuilder.modelForFile()
                 .withTestCasesTable()
                     .withTestCase("test")
@@ -775,7 +775,7 @@ public class CaseContextTest {
     }
 
     @Test
-    public void erroneousSetupContextIsReturned_whenMovingToTestSetupAndMatchingCallIsOverridenWithNonMatchingInFileUnder() {
+    public void erroneousSetupContextIsReturned_whenMovingToTestSetupAndMatchingCallIsOverriddenWithNonMatchingInFileUnder() {
         final RobotFile model1 = ModelBuilder.modelForFile()
                 .withSettingsTable()
                     .withTestSetup("non-matching", "2")
@@ -797,7 +797,7 @@ public class CaseContextTest {
     }
 
     @Test
-    public void erroneousTeardownContextIsReturned_whenMovingToTestTeardownAndMatchingCallIsOverridenWithNonMatchingInFileUnder() {
+    public void erroneousTeardownContextIsReturned_whenMovingToTestTeardownAndMatchingCallIsOverriddenWithNonMatchingInFileUnder() {
         final RobotFile model1 = ModelBuilder.modelForFile()
                 .withSettingsTable()
                     .withTestTeardown("non-matching", "2")
