@@ -82,6 +82,6 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
         final Entry<?, ?> entry = (Entry<?, ?>) dataProvider.getRowObject(row);
         final RobotSetting setting = (RobotSetting) entry.getValue();
 
-        return setting.isAnySetupOrTeardown() || setting.isTemplate();
+        return setting != null && (setting.isAnySetupOrTeardown() || setting.isTemplate());
     }
 }
