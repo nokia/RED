@@ -173,7 +173,7 @@ public class VariablesEventTest {
                         new VariableTypedValue("list", newArrayList(4, 2)),
                     new Variable("&{c}", VariableScope.LOCAL),
                         new VariableTypedValue("dict", ImmutableMap.of("a", 4, "b", 5))));
-        
+
         assertThat(new VariablesEvent(vars1, "error")).isEqualTo(new VariablesEvent(vars2, "error2"));
         assertThat(new VariablesEvent(vars1, null)).isEqualTo(new VariablesEvent(vars2, null));
 
@@ -208,10 +208,6 @@ public class VariablesEventTest {
 
     private static List<?> listValue(final Object... elements) {
         return newArrayList(elements);
-    }
-
-    private static Map<?, ?> mapValue(final Object key, final Object value) {
-        return ImmutableMap.of(key, value);
     }
 
     private static List<Object> typeValueScope(final String type, final Object value, final String scope) {

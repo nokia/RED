@@ -209,7 +209,7 @@ public class PasteVariablesCellsCommandsCollectorTest {
     }
 
     @Test
-    public void commandForSettingVariableCommentIsReturned_whenPastingValuesIntoThridColumn() {
+    public void commandForSettingVariableCommentIsReturned_whenPastingValuesIntoThirdColumn() {
         final PasteVariablesCellsCommandsCollector collector = new PasteVariablesCellsCommandsCollector();
 
         final ScalarVariable s = new ScalarVariable("${scalar}", RobotToken.create("${scalar}"),
