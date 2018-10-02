@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/1/18 12:38 PM
+Save-Time: 10/2/18 11:01 AM
 Tags: Quick
 Testcase-Type: ecl
 Verifications: _Xbz7EJUqEeaXOtocAkFx_w
@@ -30,26 +30,28 @@ proc "compare-items" [val item_amount] [val ref_list_of_items] {
 proc "compare-menu-for_new-items"{
 
 	get-menu "File/New"|  get-object  | invoke getMenu | invoke getItemCount |int | let [val items_in_menu -input]{
-		if [ $items_in_menu | eq 9]{
-			compare-items -item_amount 9 -ref_list_of_items [list 
+		if [ $items_in_menu | eq 10]{
+			compare-items -item_amount 10 -ref_list_of_items [list 
 			        "MenuItem {Robot Project}"
 					"MenuItem {P&roject...}"
 					"MenuItem {|}"
-					"MenuItem {Robot Test Suites folder}"
+					"MenuItem {Robot suites folder}"
 					"MenuItem {Robot Resource file}"
 					"MenuItem {Robot Test Suite}"
+					"MenuItem {Robot Task Suite}"
 					"MenuItem {Robot python file}"
 					"MenuItem {|}"
 					"MenuItem {&Other...	M1+N}"] 
 					
 		}-else {
-			compare-items -item_amount 11 -ref_list_of_items [list 
+			compare-items -item_amount 12 -ref_list_of_items [list 
 			        "MenuItem {Robot Project}"
 					"MenuItem {P&roject...}"
 					"MenuItem {|}"
-					"MenuItem {Robot Test Suites folder}"
+					"MenuItem {Robot suites folder}"
 					"MenuItem {Robot Resource file}"
 					"MenuItem {Robot Test Suite}"
+					"MenuItem {Robot Task Suite}"
 					"MenuItem {Robot python file}"
 					"MenuItem {|}"
 					"MenuItem {E&xample...}"
@@ -337,9 +339,9 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "</projectConfiguration>" | verify-true
 //-----------------------------------------------------------------------------------------------------------------------    
 //add Robot test suite folder
-get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Test Suites folder" | click
+get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot suites folder" | click
 
-with [get-window "New Robot Test Suites folder" | get-control Any -index 5] {
+with [get-window "New Robot suites folder" | get-control Any -index 5] {
     get-property "getChildren().Control[1].getSelection()" | equals false | verify-true
     get-property "getChildren().Control[1].getText()" | equals "Create suite initialization file" | verify-true
     
@@ -357,7 +359,7 @@ with [get-window "New Robot Test Suites folder" | get-control Any -index 5] {
 }
 
 
-with [get-window "New Robot Test Suites folder"] {
+with [get-window "New Robot suites folder"] {
     with [get-editbox -after [get-label "Folder name:"]] {
         set-text "new_suite_folder"
     }
@@ -368,8 +370,8 @@ get-view "Project Explorer" | get-tree | get-item "New/new_suite_folder" | get-p
  
 //-------------------------------------------------------------------------------------------------------------    
 //add Robot test suite folder with _init_
-get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Test Suites folder" | click
-with [get-window "New Robot Test Suites folder"] {
+get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot suites folder" | click
+with [get-window "New Robot suites folder"] {
     with [get-editbox -after [get-label "Folder name:"]] {
         set-text "new_suite_folder_with_init"
     }
@@ -399,8 +401,8 @@ with [get-tab-folder -index 1] {
 
 ////-----------------------------------------------------------------------------------------------------------
 //add init.tsv
-get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot Test Suites folder" | click
-with [get-window "New Robot Test Suites folder"] {
+get-view "Project Explorer" | get-tree | select New | get-menu "New/Robot suites folder" | click
+with [get-window "New Robot suites folder"] {
     get-button "Create suite initialization file" | check
     get-button "as .tsv file" | click
     wait 500
@@ -425,8 +427,8 @@ with [get-tab-folder -index 1] {
 }
 //--------------------------------------------------------------------------------------------------------------------------
 //add suite folder with .txt init
-get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot Test Suites folder" | click
-with [get-window "New Robot Test Suites folder"] {
+get-view "Project Explorer" | get-tree | select New | select New | get-menu "New/Robot suites folder" | click
+with [get-window "New Robot suites folder"] {
     with [get-editbox -after [get-label "Folder name:"]] {
         set-text "new_txt_suite_fo"
         set-text "new_txt_suite_fol"

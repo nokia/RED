@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9aBo4JQ7EeWNpL9oeriwCw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/30/18 11:24 AM
+Save-Time: 10/2/18 11:09 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,7 +42,7 @@ with [get-window "Run Configurations"] {
     with [get-control Any -after [get-label "Name:"] -index 8] {
         get-property "getChildren().length" | equals 4 | verify-true
         get-property "getChildren().Control[0].getText()" | equals Project | verify-true
-        get-property "getChildren().Control[1].getText()" | equals "Test Suite(s)" | verify-true
+        get-property "getChildren().Control[1].getText()" | equals "Suite(s)" | verify-true
         get-property "getChildren().Control[2].getText()" | equals Tags | verify-true
         get-property "getChildren().Control[3].getText()" | equals Arguments | verify-true
     }
@@ -58,7 +58,7 @@ with [get-window "Run Configurations"] {
 
 //check test suites
 with [get-window "Run Configurations"] {
-    with [get-group "Test Suite(s)"] {
+    with [get-group "Suite(s)"] {
         with [get-tree] {
            get-item "Script.robot" | expand-all
             get-property "getItems().TreeItem[0].getItems().length" | equals 2 | verify-true
@@ -154,14 +154,14 @@ with [get-window "Run Configurations"] {
         get-button "Skip tests with these tags:" | get-property selected | equals false | verify-true
     }
     get-group Project | get-editbox | get-property text | equals "" | verify-true
-    get-group "Test Suite(s)" | get-tree | get-property itemCount | equals 0 | verify-true
+    get-group "Suite(s)" | get-tree | get-property itemCount | equals 0 | verify-true
     
     get-group Arguments | get-editbox  -after [get-label "Additional Robot Framework arguments:"] | get-property text | equals "" | verify-true
 }
 
 //select test without selecting project
-get-window "Run Configurations" | get-group "Test Suite(s)" | get-button "Browse..." | click
-with [get-window "Run Configurations" | get-window "Select test suite"] {
+get-window "Run Configurations" | get-group "Suite(s)" | get-button "Browse..." | click
+with [get-window "Run Configurations" | get-window "Select suite"] {
     get-tree | get-property itemCount | equals 0 | verify-true
     get-label "No entries available." | get-property caption | equals "No entries available." | verify-true
     get-button OK | get-property enablement | equals false | verify-true
@@ -188,31 +188,31 @@ with [get-window "Run Configurations"] {
     }
     
     //select test from project
-    get-group "Test Suite(s)" | get-button "Browse..." | click
+    get-group "Suite(s)" | get-button "Browse..." | click
 }
 
 //check that is only one project in window
-with [get-window "Run Configurations" | get-window "Select test suite" | get-tree] {
+with [get-window "Run Configurations" | get-window "Select suite" | get-tree] {
     get-property itemCount | equals 1 | verify-true
     get-property "getItems().length" | equals 1 | verify-true
 }
 
 //check how many items from project are shown
-get-window "Run Configurations" | get-window "Select test suite" | get-tree | select "SecondProject/SingleTest.tsv"
-get-window "Run Configurations" | get-window "Select test suite" | get-tree 
+get-window "Run Configurations" | get-window "Select suite" | get-tree | select "SecondProject/SingleTest.tsv"
+get-window "Run Configurations" | get-window "Select suite" | get-tree 
     | get-property "getItems().TreeItem[0].getItemCount()" | equals 4 | verify-true
     
 //select tsv file    
-get-window "Run Configurations" | get-window "Select test suite" | get-tree | select "SecondProject/SingleTest.tsv" 
+get-window "Run Configurations" | get-window "Select suite" | get-tree | select "SecondProject/SingleTest.tsv" 
     | double-click
 
 //check that 2 tests are shown to be selected    
-with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-item "SingleTest.tsv" | get-property checked | equals true | verify-true
     get-item "SingleTest.tsv/test1" | get-property checked | equals false | verify-true
     get-item "SingleTest.tsv/test2" | get-property checked | equals false | verify-true
 }
-with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-property "getItems().TreeItem[0].getText()" | equals "SingleTest.tsv" | verify-true
     get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals test1 | verify-true
     get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals test2 | verify-true
@@ -220,7 +220,7 @@ with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
 }
 //select only on test (test1) and run 
 with [get-window "Run Configurations"] {
-    get-group "Test Suite(s)" | get-tree | get-item "SingleTest.tsv/test1" | check
+    get-group "Suite(s)" | get-tree | get-item "SingleTest.tsv/test1" | check
     get-button Apply | click
     get-button Run | click
 }

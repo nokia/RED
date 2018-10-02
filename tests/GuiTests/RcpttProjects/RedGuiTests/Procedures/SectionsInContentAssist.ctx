@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _cBDNYMN4Eeat3OoBX2X2jQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/1/18 9:22 PM
+Save-Time: 10/2/18 10:51 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -40,24 +40,26 @@ proc "check-content-assist-for-settings"{
 
 proc "check-content-assist-for-variables"{
 	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
-	    get-property itemCount | equals 7 | verify-true
+	    get-property itemCount | equals 8 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
 	    get-property "getItems().TableItem[2].getText()" | equals "Fresh dictionary" | verify-true
 	    get-property "getItems().TableItem[3].getText()" | equals "*** Keywords ***" | verify-true
 	    get-property "getItems().TableItem[4].getText()" | equals "*** Settings ***" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "*** Test Cases ***" | verify-true
-	    get-property "getItems().TableItem[6].getText()" | equals "*** Variables ***" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "*** Tasks ***" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "*** Test Cases ***" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals "*** Variables ***" | verify-true
 	}
 }
 
 proc "check-content-assist-for-empty-file"{
 	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
-	    get-property itemCount | equals 4 | verify-true
+	    get-property itemCount | equals 5 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "*** Test Cases ***" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "*** Variables ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Tasks ***" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Test Cases ***" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "*** Variables ***" | verify-true
 	}
 }
 
