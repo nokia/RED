@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _p1t0sIlwEeaMF54F4EAT1Q
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 10:38 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/2/18 2:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -24,7 +24,7 @@ with [get-window Preferences | get-control Any -after [get-label Folding] -index
     get-property "getChildren().Control[0].getText()" 
         | equals "Configure which elements are foldable in Red Source Editor" | verify-true
     get-property "getChildren().Control[1].getChildren().length" | equals 3 | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().length" | equals 4 | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().length" | equals 5 | verify-true
     
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getText()" 
         | equals "Sections (tables)" | verify-true
@@ -35,15 +35,22 @@ with [get-window Preferences | get-control Any -after [get-label Folding] -index
         | equals "Test cases" | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getSelection()" 
         | equals true | verify-true
-        
+    
+    
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getText()" 
-        | equals Keywords | verify-true
+        | equals "Tasks" | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getSelection()" 
         | equals true | verify-true
+    
         
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getText()" 
-        | equals "Documentations settings (of suites, keywords, cases)" | verify-true
+        | equals Keywords | verify-true
     get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getSelection()" 
+        | equals true | verify-true
+        
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[4].getText()" 
+        | equals "Documentations settings (of suites, keywords, cases)" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[4].getSelection()" 
         | equals true | verify-true
         
     get-property "getChildren().Control[1].getChildren().Control[1].getText()" 
