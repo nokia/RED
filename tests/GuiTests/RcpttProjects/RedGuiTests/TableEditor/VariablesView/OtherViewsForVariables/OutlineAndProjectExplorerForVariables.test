@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/16/16 5:32 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/2/18 11:39 AM
 Testcase-Type: ecl
 Verifications: _h9dwwETtEeaEVfxTnoQ14g
 
@@ -276,7 +276,7 @@ with [get-window "New Robot Resource file"] {
 with [get-editor "text_file.txt" | get-text-viewer] {
     key-type "M1+SPACE"
     wait 200
-    key-type Down -times 3
+    key-type Down -times 4
     key-type Enter
     //add list
     key-type "M1+SPACE"
