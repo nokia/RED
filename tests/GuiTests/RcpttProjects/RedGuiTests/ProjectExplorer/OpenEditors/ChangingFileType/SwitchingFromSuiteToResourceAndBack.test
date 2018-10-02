@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: __TFz8HJoEeWGwMKsQg8irg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/19/15 11:52 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/2/18 12:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -54,8 +54,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 with [get-window "File content mismatch"] {
      get-label ".*" -index 1 
         | get-property caption 
-        | equals "The file TestFile.robot is a Suite file, but after changes there is no Test Cases section. From now on this file will be recognized as Resource file.\n\n"
-        + "Click OK to save and reopen editor or cancel saving" | verify-true
+        | equals "The file TestFile.robot is a tests suite file but after changes there is no Test Cases nor Tasks section defined. From now on this file will be recognized as a resource file.\n\n"
+  			  + "Click OK to save and reopen editor or cancel saving" | verify-true
     with [get-button OK] {
         get-property caption | equals OK | verify-true
         get-property selected | equals false | verify-true
@@ -81,8 +81,6 @@ with [get-editor "TestFile.robot" | get-tab-folder] {
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/TestFile.robot" | get-property "image.path" 
         | equals "org.robotframework.ide.eclipse.main.plugin/resources/file_robot.png" | verify-true
-    get-item "RobotProject/TestFile.robot" | get-property "image.decorations[0].path" 
-        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_resource_file.png" | verify-true
 }  
 
 //add test cases at the end
@@ -101,8 +99,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 with [get-window "File content mismatch"] {
     get-label ".*" -index 1 
         | get-property caption 
-        | equals "The file TestFile.robot is a Resource file, but after changes there is a Test Cases section defined. From now on this file will be recognized as Suite file.\n\n"
-        + "Click OK to save and reopen editor or cancel saving" | verify-true
+        | equals "The file TestFile.robot is a resource file but after changes there is a Test Cases section defined. From now on this file will be recognized as a tests suite file.\n\n"
+   			 + "Click OK to save and reopen editor or cancel saving" | verify-true
     get-button OK | get-property caption | equals OK | verify-true
     with [get-button Cancel] {
         get-property caption | equals Cancel | verify-true
@@ -140,5 +138,12 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 with [get-editor "TestFile.robot" | get-text-viewer] {
     get-property "caretPosition.line" | equals 1 | verify-true
     get-property "caretPosition.column" | equals 1 | verify-true
+}
+
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "RobotProject/TestFile.robot" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/file_robot.png" | verify-true
+    get-item -path "RobotProject/TestFile.robot" | get-property "image.decorations[0].path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_test_suite.png" | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
