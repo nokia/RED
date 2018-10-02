@@ -14,7 +14,7 @@ public class HashCommentRecognizerTest {
     private final HashCommentRecognizer rec = new HashCommentRecognizer();
 
     @Test
-    public void test_threeHashsTheThridEscapedCommentSignsExists() {
+    public void test_threeHashesTheThirdEscapedCommentSignsExists() {
         final StringBuilder text = new StringBuilder("##\\#comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
@@ -27,7 +27,7 @@ public class HashCommentRecognizerTest {
     }
 
     @Test
-    public void test_threeHashsTheSecondEscapedCommentSignsExists() {
+    public void test_threeHashesTheSecondEscapedCommentSignsExists() {
         final StringBuilder text = new StringBuilder("#\\##comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
@@ -40,7 +40,7 @@ public class HashCommentRecognizerTest {
     }
 
     @Test
-    public void test_threeHashsCommentSignsExists() {
+    public void test_threeHashesCommentSignsExists() {
         final StringBuilder text = new StringBuilder("###comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
@@ -53,7 +53,7 @@ public class HashCommentRecognizerTest {
     }
 
     @Test
-    public void test_twoHashsCommentSignsExists() {
+    public void test_twoHashesCommentSignsExists() {
         final StringBuilder text = new StringBuilder("##comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
