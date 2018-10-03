@@ -87,15 +87,22 @@ def cleanup_modules(to_call):
         finally:
             current_modules = set(sys.modules.keys())
             builtin_modules = set(sys.builtin_module_names)
+            to_preserve_with_submodules = ['robot', 'encodings']
 
             # some modules should not be removed because it causes rpc server problems
-            to_remove = [m for m in current_modules - old_modules - builtin_modules if
-                         not m == 'robot' and not m.startswith('robot.') and not m.startswith('encodings.')]
+            to_remove = [m for m in current_modules - old_modules - builtin_modules if 
+                         not __has_to_be_preserved(m, to_preserve_with_submodules)]
             for m in to_remove:
                 del sys.modules[m]
                 del m
 
     return inner
+
+def __has_to_be_preserved(module_name, modules_to_preserve):
+    for to_preserve in modules_to_preserve:
+        if module_name == to_preserve or module_name.startswith(to_preserve + '.'):
+            return True
+    return False
 
 
 # decorator which cleans system path changed during decorated call
