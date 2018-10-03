@@ -28,11 +28,12 @@ class PasteCasesCellsCommandsCollector extends PasteCodeHoldersCellsCommandsColl
 
     @Override
     protected List<String> getValuesFromCodeHolder(final RobotCodeHoldingElement<?> codeHolder,
-            final int clipboardElementColumnIndex) {
+            final int clipboardElementColumnIndex, final int tableColumnsCount) {
 
         if (clipboardElementColumnIndex == 0) {
             return newArrayList(codeHolder.getName());
         }
         return new ArrayList<>();
     }
+
 }

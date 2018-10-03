@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -73,11 +74,16 @@ public class RunTestFromTableDynamicMenuItem extends CompoundContributionItem {
                 final String elemTypeLabel = isTask(testCase) ? "task" : "test";
                 final String label = firstCases.size() == 1 ? elemTypeLabel + ": '" + testCase.getName() + "'"
                         : "selected " + elemTypeLabel + "s";
+                contributeBefore(contributedItems);
                 contributedItems.add(createCurrentCaseItem(activeWindow, label));
 
             }
         }
         return contributedItems.toArray(new IContributionItem[0]);
+    }
+
+    protected void contributeBefore(final List<IContributionItem> contributedItems) {
+        contributedItems.add(new Separator());
     }
 
     private Set<RobotCodeHoldingElement<?>> findFirstCases(final IStructuredSelection selection) {
