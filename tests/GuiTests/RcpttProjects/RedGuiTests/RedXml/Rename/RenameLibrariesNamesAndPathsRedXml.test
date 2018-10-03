@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _m_PqIB6aEeeW-PmLWrUUww
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/12/17 10:30 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/3/18 10:53 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -25,8 +25,10 @@ with [get-window "New Robot project"] {
 get-view "Project Explorer" | get-tree | select "RobotProject/here_is_class.py" 
     | get-menu "Robot Framework/Add Library to red.xml" | click
 get-window "Select library class" | get-table | select "here_is_class" | click -default
+
 get-view "Project Explorer" | get-tree | select "RobotProject/only_function.py" 
     | get-menu "Robot Framework/Add Library to red.xml" | click
+    
 // verify if libraries are in Robot Referenced libraries
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries/here_is_class RobotProject \\(0\\)" | get-property caption 
