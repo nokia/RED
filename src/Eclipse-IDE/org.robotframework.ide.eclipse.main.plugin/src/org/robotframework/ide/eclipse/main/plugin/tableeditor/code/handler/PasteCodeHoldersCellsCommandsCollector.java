@@ -59,7 +59,7 @@ public abstract class PasteCodeHoldersCellsCommandsCollector extends PasteRobotE
 
         } else if (elementFromClipboard instanceof RobotCodeHoldingElement<?>) {
             return getValuesFromCodeHolder((RobotCodeHoldingElement<?>) elementFromClipboard,
-                    clipboardElementColumnIndex);
+                    clipboardElementColumnIndex, tableColumnsCount);
         }
         return new ArrayList<>();
     }
@@ -111,5 +111,5 @@ public abstract class PasteCodeHoldersCellsCommandsCollector extends PasteRobotE
     }
 
     protected abstract List<String> getValuesFromCodeHolder(final RobotCodeHoldingElement<?> codeHolder,
-            final int tableColumnsCount);
+            final int clipboardElementColumnIndex, int tableColumnsCount);
 }
