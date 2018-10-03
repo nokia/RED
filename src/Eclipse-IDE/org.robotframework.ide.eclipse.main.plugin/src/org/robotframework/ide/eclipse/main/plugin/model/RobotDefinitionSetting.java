@@ -90,10 +90,7 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
     }
 
     public ExecutableSetting getExecutableSetting() {
-        final ModelType modelType = getLinkedElement().getModelType();
-        if (modelType == ModelType.USER_KEYWORD_TEARDOWN) {
-            return (ExecutableSetting) getLinkedElement();
-        } else if (isExecutableSetting()) {
+        if (isExecutableSetting()) {
             return ((LocalSetting<?>) getLinkedElement()).adaptTo(ExecutableSetting.class);
         }
         throw new IllegalStateException("Non-executable setting cannot be viewed as executable one");
