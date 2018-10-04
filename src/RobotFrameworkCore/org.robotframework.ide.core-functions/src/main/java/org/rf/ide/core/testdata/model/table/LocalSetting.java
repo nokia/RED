@@ -61,19 +61,20 @@ public class LocalSetting<T> extends AModelElement<T> implements ICommentHolder,
 
     public void changeModelType(final ModelType type) {
         // firstly we remove types of tokens tied to old model type
-        removeTypes();
+        removeTypes(0);
 
         // then we change the type and properly add token types tied to new model type
         this.modelType = type;
         fixTypes();
     }
 
-    private void removeTypes() {
+    private void removeTypes(final int startingIndex) {
         final List<RobotTokenType> tokenTypes = LocalSettingTokenTypes.getPossibleTokenTypes(modelType);
-        for (final RobotToken token : tokens) {
+        for (int i = startingIndex; i < tokens.size(); i++) {
+            final RobotToken token = tokens.get(i);
             for (final RobotTokenType type : tokenTypes) {
                 if (token.getTypes().contains(type)) {
-                    token.getTypes().remove(type);
+                    token.getTypes().removeIf(t -> t == type);
                 }
             }
         }
@@ -129,6 +130,7 @@ public class LocalSetting<T> extends AModelElement<T> implements ICommentHolder,
     public void insertValueAt(final String value, final int position) {
         final RobotToken tokenToInsert = RobotToken.create(value);
         if (1 <= position && position <= tokens.size()) {
+            removeTypes(position);
             tokens.add(position, tokenToInsert);
             fixTypes();
 
