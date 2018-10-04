@@ -33,14 +33,14 @@ public class PasteKeywordsCellsCommandsCollector extends PasteCodeHoldersCellsCo
 
     @Override
     protected List<String> getValuesFromCodeHolder(final RobotCodeHoldingElement<?> codeHolder,
-            final int tableColumnsCount) {
+            final int clipboardElementColumnIndex, final int tableColumnsCount) {
 
-        if (tableColumnsCount == 0) {
+        if (clipboardElementColumnIndex == 0) {
             return newArrayList(codeHolder.getName());
 
-        } else if (tableColumnsCount > 0 && tableColumnsCount < tableColumnsCount - 1) {
+        } else if (clipboardElementColumnIndex > 0 && clipboardElementColumnIndex < tableColumnsCount - 1) {
             final RobotDefinitionSetting argumentsSetting = ((RobotKeywordDefinition) codeHolder).getArgumentsSetting();
-            final int argIndex = tableColumnsCount - 1;
+            final int argIndex = clipboardElementColumnIndex - 1;
             if (argumentsSetting != null && argIndex < argumentsSetting.getArguments().size()) {
                 return newArrayList(argumentsSetting.getArguments().get(argIndex));
             }
