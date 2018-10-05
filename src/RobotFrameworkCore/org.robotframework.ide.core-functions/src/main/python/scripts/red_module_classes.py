@@ -63,7 +63,10 @@ def _try_to_find_names_in_module(module_name, module_location):
         return _try_to_find_names_in_module_for_jython(module_name)
     with open(module_location) as f:
         code = compile(f.read(), module_location, 'exec')
-    return _extract_names_from_code_object(code, module_name)
+    if platform.python_version_tuple()[0] == '3':
+        return _extract_names_from_code_object_for_python3(code, module_name)
+    else:
+        return _extract_names_from_code_object_for_python2(code, module_name)
     
     
 def _try_to_find_names_in_module_for_jython(module_name):
@@ -87,18 +90,26 @@ def _find_names_in_module_for_jython(module, name):
     return result
 
 
-def _extract_names_from_code_object(code, base_name):
+def _extract_names_from_code_object_for_python3(code, base_name):
     result = list()
     try:
         code_parts = code.co_consts
-        for i in range(0, len(code_parts), 2):
-            if isinstance(code_parts[i], str) and inspect.iscode(code_parts[i+1]): #python2
+        for i in range(0, len(code_parts)):
+            if inspect.iscode(code_parts[i]) and isinstance(code_parts[i+1], str) and code_parts[i].co_names and \
+            code_parts[i].co_name == code_parts[i+1] and code_parts[i].co_consts[0] is not None:
+                result.append(code_parts[i+1])
+    except:
+        return result
+    return result
+
+
+def _extract_names_from_code_object_for_python2(code, base_name):
+    result = list()
+    try:
+        code_parts = code.co_consts
+        for i in range(0, len(code_parts)):
+            if isinstance(code_parts[i], str) and inspect.iscode(code_parts[i+1]) and code_parts[i+1].co_name == code_parts[i]:
                 result.append(code_parts[i])
-            elif inspect.iscode(code_parts[i]) and isinstance(code_parts[i+1], str): #python3
-                if code_parts[i].co_consts[0] is not None:
-                    result.append(code_parts[i+1])
-            else:
-                return result
     except:
         return result
     return result

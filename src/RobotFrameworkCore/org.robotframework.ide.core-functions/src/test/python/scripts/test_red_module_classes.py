@@ -64,6 +64,22 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         self.assertEqual(result, ['several_classes_and_methods', 'several_classes_and_methods.First', 'several_classes_and_methods.Second',
                                 'several_classes_and_methods.Third'])
+        
+    def test_retrieving_classes_from_file_with_several_classes_and_comments(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'classes_with_comments.py')
+
+        result = get_classes_from_module(module_location)
+        
+        self.assertEqual(result, ['classes_with_comments', 'classes_with_comments.Cat', 'classes_with_comments.Dog'])
+        
+    def test_retrieving_classes_from_file_with_several_methods_and_documentation(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'docs_and_methods.py')
+
+        result = get_classes_from_module(module_location)
+        
+        self.assertEqual(result, ['docs_and_methods'])
 
     def test_retrieving_classes_from_file_with_same_name_inside_module(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
@@ -183,20 +199,12 @@ class ClassesRetrievingTests(unittest.TestCase):
 
         result = get_classes_from_module(module_location)
 
-        import platform
-        if 'Jython' in platform.python_implementation():
-            self.assertEqual(result, ['mod_a', 'mod_a.ClassA', 'mod_a.ClassA.ClassA', 'mod_a.OtherClassA', 'mod_a.OtherClassA.OtherClassA',
-                                      'mod_a.mod_a', 'mod_inner.mod_a', 'mod_inner.mod_a.ClassA', 'mod_inner.mod_a.ClassA.ClassA',
-                                      'mod_inner.mod_a.OtherClassA', 'mod_inner.mod_a.OtherClassA.OtherClassA', 'mod_inner.mod_a.mod_a',
-                                      'mod_outer.mod_inner.mod_a', 'mod_outer.mod_inner.mod_a.ClassA', 'mod_outer.mod_inner.mod_a.ClassA.ClassA',
-                                      'mod_outer.mod_inner.mod_a.OtherClassA', 'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA',
-                                      'mod_outer.mod_inner.mod_a.mod_a'])
-        else:
-            self.assertEqual(result, ['mod_a', 'mod_a.ClassA', 'mod_a.ClassA.ClassA', 'mod_a.OtherClassA', 'mod_a.OtherClassA.OtherClassA',
-                                  'mod_inner.mod_a', 'mod_inner.mod_a.ClassA', 'mod_inner.mod_a.ClassA.ClassA', 'mod_inner.mod_a.OtherClassA',
-                                  'mod_inner.mod_a.OtherClassA.OtherClassA', 'mod_outer.mod_inner.mod_a', 'mod_outer.mod_inner.mod_a.ClassA',
-                                  'mod_outer.mod_inner.mod_a.ClassA.ClassA', 'mod_outer.mod_inner.mod_a.OtherClassA',
-                                  'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA'])
+        self.assertEqual(result, ['mod_a', 'mod_a.ClassA', 'mod_a.ClassA.ClassA', 'mod_a.OtherClassA', 'mod_a.OtherClassA.OtherClassA',
+                                  'mod_a.mod_a', 'mod_inner.mod_a', 'mod_inner.mod_a.ClassA', 'mod_inner.mod_a.ClassA.ClassA',
+                                  'mod_inner.mod_a.OtherClassA', 'mod_inner.mod_a.OtherClassA.OtherClassA', 'mod_inner.mod_a.mod_a',
+                                  'mod_outer.mod_inner.mod_a', 'mod_outer.mod_inner.mod_a.ClassA', 'mod_outer.mod_inner.mod_a.ClassA.ClassA',
+                                  'mod_outer.mod_inner.mod_a.OtherClassA', 'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA',
+                                  'mod_outer.mod_inner.mod_a.mod_a'])
 
     def test_retrieving_classes_from_python_module_in_zip(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
