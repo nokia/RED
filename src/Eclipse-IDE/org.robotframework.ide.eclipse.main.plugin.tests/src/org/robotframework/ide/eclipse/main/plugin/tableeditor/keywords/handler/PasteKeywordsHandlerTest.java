@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
-import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.children;
@@ -56,7 +55,7 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(emptyModel.getSections()).hasSize(1);
         final RobotKeywordsSection section = emptyModel.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 
@@ -70,9 +69,8 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1",
-                "existing kw 2",
-                "existing kw 3", "kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "existing kw 2", "existing kw 3", "kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 
@@ -87,9 +85,8 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1",
-                "existing kw 2",
-                "existing kw 3", "kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "existing kw 2", "existing kw 3", "kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 
@@ -109,9 +106,8 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1", "kw 1",
-                "kw 2", "kw 3",
-                "existing kw 2", "existing kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "kw 1", "kw 2", "kw 3", "existing kw 2", "existing kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 
@@ -132,9 +128,8 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1", "kw 1",
-                "kw 2", "kw 3",
-                "existing kw 2", "existing kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "kw 1", "kw 2", "kw 3", "existing kw 2", "existing kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 
@@ -154,9 +149,8 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1", "kw 1",
-                "kw 2", "kw 3",
-                "existing kw 2", "existing kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "kw 1", "kw 2", "kw 3", "existing kw 2", "existing kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 
@@ -183,9 +177,8 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1",
-                "existing kw 2",
-                "existing kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "existing kw 2", "existing kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 
@@ -201,9 +194,8 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1",
-                "existing kw 2",
-                "existing kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "existing kw 2", "existing kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 
@@ -223,24 +215,23 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1",
-                "existing kw 2",
-                "existing kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "existing kw 2", "existing kw 3");
 
         final RobotKeywordDefinition fstKeyword = section.getChildren().get(0);
         assertThat(fstKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(fstKeyword.getChildren(), RobotElement::getName)).containsExactly("a", "b");
+        assertThat(fstKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("a", "b");
         assertThat(fstKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotKeywordDefinition sndKeyword = section.getChildren().get(1);
         assertThat(sndKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(sndKeyword.getChildren(), RobotElement::getName)).containsExactly("c", "d", "call1",
-                "call2");
+        assertThat(sndKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("c", "d", "call1", "call2");
         assertThat(sndKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotKeywordDefinition trdKeyword = section.getChildren().get(2);
         assertThat(trdKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(trdKeyword.getChildren(), RobotElement::getName)).containsExactly("e", "f");
+        assertThat(trdKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("e", "f");
         assertThat(trdKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
     }
 
@@ -261,24 +252,23 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1",
-                "existing kw 2",
-                "existing kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "existing kw 2", "existing kw 3");
 
         final RobotKeywordDefinition fstKeyword = section.getChildren().get(0);
         assertThat(fstKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(fstKeyword.getChildren(), RobotElement::getName)).containsExactly("a", "b");
+        assertThat(fstKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("a", "b");
         assertThat(fstKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotKeywordDefinition sndKeyword = section.getChildren().get(1);
         assertThat(sndKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(sndKeyword.getChildren(), RobotElement::getName)).containsExactly("c", "call1", "call2",
-                "d");
+        assertThat(sndKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("c", "call1", "call2", "d");
         assertThat(sndKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotKeywordDefinition trdKeyword = section.getChildren().get(2);
         assertThat(trdKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(trdKeyword.getChildren(), RobotElement::getName)).containsExactly("e", "f");
+        assertThat(trdKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("e", "f");
         assertThat(trdKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
     }
 
@@ -298,24 +288,23 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1",
-                "existing kw 2",
-                "existing kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "existing kw 2", "existing kw 3");
 
         final RobotKeywordDefinition fstKeyword = section.getChildren().get(0);
         assertThat(fstKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(fstKeyword.getChildren(), RobotElement::getName)).containsExactly("a", "b");
+        assertThat(fstKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("a", "b");
         assertThat(fstKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotKeywordDefinition sndKeyword = section.getChildren().get(1);
         assertThat(sndKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(sndKeyword.getChildren(), RobotElement::getName)).containsExactly("c", "d", "call1",
-                "call2");
+        assertThat(sndKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("c", "d", "call1", "call2");
         assertThat(sndKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
 
         final RobotKeywordDefinition trdKeyword = section.getChildren().get(2);
         assertThat(trdKeyword).has(RobotKeywordDefinitionConditions.properlySetParent());
-        assertThat(transform(trdKeyword.getChildren(), RobotElement::getName)).containsExactly("e", "f");
+        assertThat(trdKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("e", "f");
         assertThat(trdKeyword.getChildren()).have(RobotKeywordCallConditions.properlySetParent());
     }
 
@@ -330,9 +319,8 @@ public class PasteKeywordsHandlerTest {
 
         assertThat(model.getSections()).hasSize(1);
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("existing kw 1",
-                "existing kw 2",
-                "existing kw 3", "kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("existing kw 1", "existing kw 2", "existing kw 3", "kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(children(2)).have(RobotKeywordDefinitionConditions.properlySetParent());
     }
 

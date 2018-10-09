@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -74,16 +73,15 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "case 2",
-                "case 3",
-                "inserted case 1", "inserted case 2");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "case 2", "case 3", "inserted case 1", "inserted case 2");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "case 2",
-                "case 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED),
@@ -102,15 +100,15 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "inserted case 1",
-                "inserted case 2", "case 2", "case 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "inserted case 1", "inserted case 2", "case 2", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "case 2",
-                "case 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED),
@@ -129,15 +127,15 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "case 2",
-                "case 3", "case 4");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "case 2", "case 3", "case 4");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "case 2",
-                "case 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED),
@@ -175,15 +173,14 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3",
-                "inserted kw 1",
-                "inserted kw 2");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("kw 1", "kw 2", "kw 3", "inserted kw 1", "inserted kw 2");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED), eq(ImmutableMap
@@ -202,14 +199,14 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "inserted kw 1",
-                "inserted kw 2", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("kw 1", "inserted kw 1", "inserted kw 2", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED), eq(ImmutableMap
@@ -227,14 +224,14 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3",
-                "kw 4");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("kw 1", "kw 2", "kw 3", "kw 4");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED), eq(ImmutableMap
@@ -271,16 +268,15 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("task 1", "task 2",
-                "task 3",
-                "inserted task 1", "inserted task 2");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("task 1", "task 2", "task 3", "inserted task 1", "inserted task 2");
         assertThat(section.getChildren()).have(RobotTaskConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("task 1", "task 2",
-                "task 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("task 1", "task 2", "task 3");
         assertThat(section.getChildren()).have(RobotTaskConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED), eq(ImmutableMap
@@ -298,15 +294,15 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("task 1", "inserted task 1",
-                "inserted task 2", "task 2", "task 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("task 1", "inserted task 1", "inserted task 2", "task 2", "task 3");
         assertThat(section.getChildren()).have(RobotTaskConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("task 1", "task 2",
-                "task 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("task 1", "task 2", "task 3");
         assertThat(section.getChildren()).have(RobotTaskConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED), eq(ImmutableMap
@@ -324,15 +320,15 @@ public class InsertHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("task 1", "task 2",
-                "task 3", "task 4");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("task 1", "task 2", "task 3", "task 4");
         assertThat(section.getChildren()).have(RobotTaskConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("task 1", "task 2",
-                "task 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("task 1", "task 2", "task 3");
         assertThat(section.getChildren()).have(RobotTaskConditions.properlySetParent()).have(children());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED), eq(ImmutableMap

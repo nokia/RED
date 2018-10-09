@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
@@ -69,9 +68,10 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Default Tags", "Documentation",
-                "Force Tags", "Library", "Metadata", "Resource", "Suite Setup", "Suite Teardown", "Test Setup",
-                "Test Teardown", "Test Template", "Test Timeout", "Variables");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Default Tags", "Documentation", "Force Tags", "Library", "Metadata", "Resource",
+                        "Suite Setup", "Suite Teardown", "Test Setup", "Test Teardown", "Test Template", "Test Timeout",
+                        "Variables");
     }
 
     @Test
@@ -86,8 +86,9 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("Te", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("Te")));
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Suite Teardown", "Suite Setup",
-                "Test Timeout", "Test Template", "Test Teardown", "Test Setup");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Suite Teardown", "Suite Setup", "Test Timeout", "Test Template", "Test Teardown",
+                        "Test Setup");
     }
 
     @Test
@@ -95,8 +96,9 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("es");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Resource", "Test Setup",
-                "Test Teardown", "Test Template", "Test Timeout", "Variables");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Resource", "Test Setup", "Test Teardown", "Test Template", "Test Timeout",
+                        "Variables");
     }
 
     @Test
@@ -104,8 +106,8 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
                 .getSettingsProposals("me");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Metadata", "Documentation",
-                "Test Timeout");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Metadata", "Documentation", "Test Timeout");
     }
 
     @Test
@@ -113,7 +115,7 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS,
                 prefixesMatcher()).getSettingsProposals("D");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Default Tags", "Documentation");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("Default Tags", "Documentation");
     }
 
     @Test
@@ -121,8 +123,8 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
                 .getSettingsProposals("");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Arguments]", "[Documentation]",
-                "[Return]", "[Tags]", "[Teardown]", "[Timeout]");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("[Arguments]", "[Documentation]", "[Return]", "[Tags]", "[Teardown]", "[Timeout]");
     }
 
     @Test
@@ -137,7 +139,7 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
                 .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("[T")));
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Timeout]", "[Teardown]", "[Tags]");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("[Timeout]", "[Teardown]", "[Tags]");
     }
 
     @Test
@@ -145,8 +147,8 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
                 .getSettingsProposals("me");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Arguments]", "[Documentation]",
-                "[Timeout]");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("[Arguments]", "[Documentation]", "[Timeout]");
     }
 
     @Test
@@ -154,7 +156,7 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD,
                 prefixesMatcher()).getSettingsProposals("[T");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Tags]", "[Teardown]", "[Timeout]");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("[Tags]", "[Teardown]", "[Timeout]");
     }
 
     @Test
@@ -162,8 +164,8 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
                 .getSettingsProposals("");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Documentation]", "[Setup]",
-                "[Tags]", "[Teardown]", "[Template]", "[Timeout]");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("[Documentation]", "[Setup]", "[Tags]", "[Teardown]", "[Template]", "[Timeout]");
     }
 
     @Test
@@ -178,8 +180,8 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
                 .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("[T")));
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Timeout]", "[Template]",
-                "[Teardown]", "[Tags]");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("[Timeout]", "[Template]", "[Teardown]", "[Tags]");
     }
 
     @Test
@@ -187,7 +189,7 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
                 .getSettingsProposals("me");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Documentation]", "[Timeout]");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("[Documentation]", "[Timeout]");
     }
 
     @Test
@@ -195,6 +197,6 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE,
                 prefixesMatcher()).getSettingsProposals("[D");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Documentation]");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("[Documentation]");
     }
 }

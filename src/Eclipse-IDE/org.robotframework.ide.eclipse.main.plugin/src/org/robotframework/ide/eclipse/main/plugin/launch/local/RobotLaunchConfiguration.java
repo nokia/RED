@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getFirst;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -75,7 +75,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
         final Map<IResource, List<String>> suitesMapping = new HashMap<>();
         for (final IResource resource : resources) {
-            suitesMapping.put(resource, new ArrayList<String>());
+            suitesMapping.put(resource, new ArrayList<>());
         }
         return prepareCopy(suitesMapping, RobotLaunchConfigurationType.GENERAL_PURPOSE);
     }
@@ -119,7 +119,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             final String outputFilePath) throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         robotConfig.setRobotArguments("-R " + outputFilePath);
-        robotConfig.setSuitePaths(new HashMap<String, List<String>>());
+        robotConfig.setSuitePaths(new HashMap<>());
     }
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -141,11 +141,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         setExecutableFilePath(preferences.getLaunchExecutableFilePath());
         setExecutableFileArguments(preferences.getLaunchAdditionalExecutableFileArguments());
         setRobotArguments(preferences.getLaunchAdditionalRobotArguments());
-        setSuitePaths(new HashMap<String, List<String>>());
+        setSuitePaths(new HashMap<>());
         setIsIncludeTagsEnabled(false);
         setIsExcludeTagsEnabled(false);
-        setIncludedTags(new ArrayList<String>());
-        setExcludedTags(new ArrayList<String>());
+        setIncludedTags(new ArrayList<>());
+        setExcludedTags(new ArrayList<>());
         setIsGeneralPurposeEnabled(true);
         super.fillDefaults();
     }
@@ -246,14 +246,12 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public void setSuitePaths(final Map<String, List<String>> suitesToCases) throws CoreException {
         // test case names should be always in lower case
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(), path -> {
-            final List<String> testSuites = new ArrayList<>();
-            final Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
-            for (final String s : temp) {
-                testSuites.add(s.toLowerCase());
-            }
-            return String.join("::", testSuites);
-        });
+        final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(),
+                path -> suitesToCases.get(path)
+                        .stream()
+                        .filter(Predicates.notNull())
+                        .map(String::toLowerCase)
+                        .collect(Collectors.joining("::")));
         launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
     }
 

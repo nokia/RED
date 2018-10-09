@@ -32,7 +32,8 @@ public class TableMenuConfiguration extends AbstractUiBindingConfiguration {
 
     @Override
     public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-        uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3), new PopupMenuAction(menu));
+        uiBindingRegistry.registerMouseDownBinding(
+                new MouseEventMatcher(SWT.NONE, null, MouseEventMatcher.RIGHT_BUTTON), new PopupMenuAction(menu));
     }
 
 }

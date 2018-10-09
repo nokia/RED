@@ -5,17 +5,16 @@
  */
 package org.robotframework.red.viewers;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
@@ -36,8 +35,10 @@ public class Selections {
 
     public static <T> List<T> getAdaptableElements(final IStructuredSelection selection, final Class<T> elementsClass) {
         final List<?> selectionAsList = selection.toList();
-        return newArrayList(Iterables.filter(transform(selectionAsList, toObjectOfClassUsingAdapters(elementsClass)),
-                Predicates.notNull()));
+        return selectionAsList.stream()
+                .map(obj -> RedPlugin.getAdapter(obj, elementsClass))
+                .filter(Predicates.notNull())
+                .collect(Collectors.toList());
     }
 
     public static <T> T getSingleElement(final IStructuredSelection selection, final Class<T> elementsClass) {
@@ -51,20 +52,6 @@ public class Selections {
 
     public static <T> Optional<T> getOptionalFirstElement(final IStructuredSelection selection,
             final Class<T> elementsClass) {
-        final List<T> elements = getElements(selection, elementsClass);
-        if (!elements.isEmpty()) {
-            return Optional.of(elements.get(0));
-        }
-        return Optional.empty();
-    }
-
-    private static <T> Function<Object, T> toObjectOfClassUsingAdapters(final Class<T> elementsClass) {
-        return new Function<Object, T>() {
-
-            @Override
-            public T apply(final Object obj) {
-                return RedPlugin.getAdapter(obj, elementsClass);
-            }
-        };
+        return getElements(selection, elementsClass).stream().findFirst();
     }
 }

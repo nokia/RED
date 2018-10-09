@@ -5,13 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
@@ -152,8 +151,7 @@ public class VariablesImportAssistProcessorTest {
         assertThat(proposals).hasSize(2).haveExactly(2,
                 proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("py"))));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Settings ***", "Library   cell", "Variables  dir1_1/vars.py",
                         "Variables  cell1  cell2", "Variables  dir1cell"),
                 new Document("*** Settings ***", "Library   cell", "Variables  dir2/lib.py", "Variables  cell1  cell2",
@@ -178,8 +176,7 @@ public class VariablesImportAssistProcessorTest {
         assertThat(proposals).hasSize(2).haveExactly(2,
                 proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("py"))));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Settings ***", "Library   cell", "Variables  ", "Variables  cell1  cell2",
                         "Variables  dir1_1/vars.py"),
                 new Document("*** Settings ***", "Library   cell", "Variables  ", "Variables  cell1  cell2",
@@ -204,9 +201,9 @@ public class VariablesImportAssistProcessorTest {
         assertThat(proposals).hasSize(1).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("py"))));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(new Document("*** Settings ***", "Library   cell", "Variables  ",
-                "Variables  cell1  cell2", "Variables  dir1_1/vars.py"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
+                .containsOnly(new Document("*** Settings ***", "Library   cell", "Variables  ",
+                        "Variables  cell1  cell2", "Variables  dir1_1/vars.py"));
     }
 
     private static IDocument documentFromImportingFile() throws Exception {

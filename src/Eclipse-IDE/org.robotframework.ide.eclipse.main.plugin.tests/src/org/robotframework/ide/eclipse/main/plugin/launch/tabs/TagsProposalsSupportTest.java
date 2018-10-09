@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,8 +20,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Function;
-
 public class TagsProposalsSupportTest {
 
     private static final String PROJECT_NAME = TagsProposalsSupportTest.class.getSimpleName();
@@ -33,27 +30,27 @@ public class TagsProposalsSupportTest {
     @BeforeClass
     public static void before() throws Exception {
         projectProvider.createDir(Path.fromPortableString("suites"));
-        projectProvider.createFile(Path.fromPortableString("suites/s1.robot"), 
+        projectProvider.createFile(Path.fromPortableString("suites/s1.robot"),
                 "*** Settings ***",
                 "Documentation  docu",
-                "Force Tags  tag1", 
-                "Default Tags  tag2", 
-                "*** Test Cases ***", 
-                "case1", 
+                "Force Tags  tag1",
+                "Default Tags  tag2",
+                "*** Test Cases ***",
+                "case1",
                 "  [Tags]  tag3",
                 "  Log  10");
-        projectProvider.createFile(Path.fromPortableString("suites/s2.robot"), 
-                "*** Test Cases ***", 
-                "case2", 
-                "  [Tags]  tag4", 
+        projectProvider.createFile(Path.fromPortableString("suites/s2.robot"),
+                "*** Test Cases ***",
+                "case2",
+                "  [Tags]  tag4",
                 "  Log  10");
-        projectProvider.createFile(Path.fromPortableString("s3.robot"), 
-                "*** Test Cases ***", 
-                "case3", 
-                "  [Tags]  tag5", 
+        projectProvider.createFile(Path.fromPortableString("s3.robot"),
+                "*** Test Cases ***",
+                "case3",
+                "  [Tags]  tag5",
                 "  Log  10",
                 "case4",
-                "  [Tags]  tag4", 
+                "  [Tags]  tag4",
                 "  Log 10",
                 "case5",
                 "  Log 10");
@@ -64,28 +61,28 @@ public class TagsProposalsSupportTest {
         final TagsProposalsSupport support = new TagsProposalsSupport();
         assertThat(support.getProposals("")).isEmpty();
 
-        support.switchTo(PROJECT_NAME, new HashMap<IResource, List<String>>());
+        support.switchTo(PROJECT_NAME, new HashMap<>());
 
-        assertThat(transform(support.getProposals(""), toContents())).containsOnly("tag1", "tag2", "tag3", "tag4",
-                "tag5");
-        assertThat(transform(support.getProposals("3"), toContents())).containsOnly("tag3");
+        assertThat(support.getProposals("")).extracting(IContentProposal::getContent)
+                .containsOnly("tag1", "tag2", "tag3", "tag4", "tag5");
+        assertThat(support.getProposals("3")).extracting(IContentProposal::getContent).containsOnly("tag3");
     }
-    
+
     @Test
     public void whenSwitchingToNonExistingProject_noProposalAreProvided_1() {
         final TagsProposalsSupport support = new TagsProposalsSupport();
-        support.switchTo(PROJECT_NAME, new HashMap<IResource, List<String>>());
+        support.switchTo(PROJECT_NAME, new HashMap<>());
 
-        support.switchTo("", new HashMap<IResource, List<String>>());
+        support.switchTo("", new HashMap<>());
         assertThat(support.getProposals("")).isEmpty();
     }
 
     @Test
     public void whenSwitchingToNonExistingProject_noProposalAreProvided_2() {
         final TagsProposalsSupport support = new TagsProposalsSupport();
-        support.switchTo(PROJECT_NAME, new HashMap<IResource, List<String>>());
+        support.switchTo(PROJECT_NAME, new HashMap<>());
 
-        support.switchTo("B", new HashMap<IResource, List<String>>());
+        support.switchTo("B", new HashMap<>());
         assertThat(support.getProposals("")).isEmpty();
     }
 
@@ -93,68 +90,61 @@ public class TagsProposalsSupportTest {
     public void whenSupportIsSwitched_proposalsWouldChangeAccordingly_1() {
         final TagsProposalsSupport support = new TagsProposalsSupport();
 
-        support.switchTo(PROJECT_NAME, new HashMap<IResource, List<String>>());
+        support.switchTo(PROJECT_NAME, new HashMap<>());
 
-        final HashMap<IResource, List<String>> suites = new HashMap<IResource, List<String>>();
-        suites.put(projectProvider.getDir(Path.fromPortableString("suites")), new ArrayList<String>());
+        final HashMap<IResource, List<String>> suites = new HashMap<>();
+        suites.put(projectProvider.getDir(Path.fromPortableString("suites")), new ArrayList<>());
         support.switchTo(PROJECT_NAME, suites);
 
-        assertThat(transform(support.getProposals(""), toContents())).containsOnly("tag1", "tag2", "tag3", "tag4");
+        assertThat(support.getProposals("")).extracting(IContentProposal::getContent)
+                .containsOnly("tag1", "tag2", "tag3", "tag4");
     }
 
     @Test
     public void whenSupportIsSwitched_proposalsWouldChangeAccordingly_2() {
         final TagsProposalsSupport support = new TagsProposalsSupport();
 
-        support.switchTo(PROJECT_NAME, new HashMap<IResource, List<String>>());
+        support.switchTo(PROJECT_NAME, new HashMap<>());
 
-        final HashMap<IResource, List<String>> suites = new HashMap<IResource, List<String>>();
-        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s1.robot")), new ArrayList<String>());
-        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s2.robot")), new ArrayList<String>());
+        final HashMap<IResource, List<String>> suites = new HashMap<>();
+        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s1.robot")), new ArrayList<>());
+        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s2.robot")), new ArrayList<>());
         support.switchTo(PROJECT_NAME, suites);
 
-        assertThat(transform(support.getProposals(""), toContents())).containsOnly("tag1", "tag2", "tag3", "tag4");
+        assertThat(support.getProposals("")).extracting(IContentProposal::getContent)
+                .containsOnly("tag1", "tag2", "tag3", "tag4");
     }
 
     @Test
     public void whenSupportIsSwitched_proposalsWouldChangeAccordingly_3() {
         final TagsProposalsSupport support = new TagsProposalsSupport();
 
-        support.switchTo(PROJECT_NAME, new HashMap<IResource, List<String>>());
+        support.switchTo(PROJECT_NAME, new HashMap<>());
 
-        final HashMap<IResource, List<String>> suites = new HashMap<IResource, List<String>>();
-        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s1.robot")), new ArrayList<String>());
+        final HashMap<IResource, List<String>> suites = new HashMap<>();
+        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s1.robot")), new ArrayList<>());
         support.switchTo(PROJECT_NAME, suites);
 
-        assertThat(transform(support.getProposals(""), toContents())).containsOnly("tag1", "tag2", "tag3");
+        assertThat(support.getProposals("")).extracting(IContentProposal::getContent)
+                .containsOnly("tag1", "tag2", "tag3");
     }
 
     @Test
     public void whenSupportIsSwitched_proposalsWouldChangeAccordingly_4() {
         final TagsProposalsSupport support = new TagsProposalsSupport();
 
-        support.switchTo(PROJECT_NAME, new HashMap<IResource, List<String>>());
+        support.switchTo(PROJECT_NAME, new HashMap<>());
 
-        final HashMap<IResource, List<String>> suites1 = new HashMap<IResource, List<String>>();
+        final HashMap<IResource, List<String>> suites1 = new HashMap<>();
         suites1.put(projectProvider.getFile(Path.fromPortableString("s3.robot")), newArrayList("case4"));
         support.switchTo(PROJECT_NAME, suites1);
 
-        assertThat(transform(support.getProposals(""), toContents())).containsOnly("tag4");
+        assertThat(support.getProposals("")).extracting(IContentProposal::getContent).containsOnly("tag4");
 
-        final HashMap<IResource, List<String>> suites2 = new HashMap<IResource, List<String>>();
+        final HashMap<IResource, List<String>> suites2 = new HashMap<>();
         suites2.put(projectProvider.getFile(Path.fromPortableString("s3.robot")), newArrayList("case3"));
         support.switchTo(PROJECT_NAME, suites2);
 
-        assertThat(transform(support.getProposals(""), toContents())).containsOnly("tag5");
-    }
-
-
-    private static Function<IContentProposal, String> toContents() {
-        return new Function<IContentProposal, String>() {
-            @Override
-            public String apply(final IContentProposal proposal) {
-                return proposal.getContent();
-            }
-        };
+        assertThat(support.getProposals("")).extracting(IContentProposal::getContent).containsOnly("tag5");
     }
 }

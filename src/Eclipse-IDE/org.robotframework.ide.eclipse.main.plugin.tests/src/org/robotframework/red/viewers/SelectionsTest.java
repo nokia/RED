@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -77,7 +76,7 @@ public class SelectionsTest {
     }
 
     @Test
-    public void selectedObjectIsReturned_whenTryingToGetSingleElementFromMultiselectioButWithOnlyOneMatchingObject() {
+    public void selectedObjectIsReturned_whenTryingToGetSingleElementFromMultiselectionButWithOnlyOneMatchingObject() {
         final IStructuredSelection selection = new StructuredSelection(
                 Arrays.asList(new Integer(7), new String(""), new Object()));
 
@@ -89,16 +88,14 @@ public class SelectionsTest {
     public void elementIsAbsent_whenTryingToGetOptionalFirstFromEmptySelection() {
         final IStructuredSelection selection = StructuredSelection.EMPTY;
 
-        final Optional<Object> optionalFirst = Selections.getOptionalFirstElement(selection, Object.class);
-        assertThat(optionalFirst.isPresent()).isFalse();
+        assertThat(Selections.getOptionalFirstElement(selection, Object.class)).isNotPresent();
     }
 
     @Test
     public void elementIsAbsent_whenTryingToGetOptionalFirstFromSelectionWithNonMatchingTypes() {
         final IStructuredSelection selection = new StructuredSelection(Arrays.asList(new Integer(7), new Long(42)));
-        
-        final Optional<String> optionalFirst = Selections.getOptionalFirstElement(selection, String.class);
-        assertThat(optionalFirst.isPresent()).isFalse();
+
+        assertThat(Selections.getOptionalFirstElement(selection, String.class)).isNotPresent();
     }
 
     @Test
@@ -106,8 +103,6 @@ public class SelectionsTest {
         final IStructuredSelection selection = new StructuredSelection(
                 Arrays.asList(new Integer(7), new String("1"), new Long(42), new String("2")));
 
-        final Optional<String> optionalFirst = Selections.getOptionalFirstElement(selection, String.class);
-        assertThat(optionalFirst.isPresent()).isTrue();
-        assertThat(optionalFirst.get()).isEqualTo("1");
+        assertThat(Selections.getOptionalFirstElement(selection, String.class)).isPresent().hasValue("1");
     }
 }

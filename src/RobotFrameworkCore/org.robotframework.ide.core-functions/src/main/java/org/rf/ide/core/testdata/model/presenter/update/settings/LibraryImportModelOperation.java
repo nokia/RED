@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.model.presenter.update.settings;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -18,9 +19,6 @@ import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 
 public class LibraryImportModelOperation implements ISettingTableElementOperation {
 
@@ -113,8 +111,11 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
 
                 libraryImport.setArguments(properIndex, value);
 
-                final int indexOfAlias = indexOfAliasStarting(
-                        Lists.transform(libraryImport.getArguments(), new GetTokenText()),
+                final List<String> args = libraryImport.getArguments()
+                        .stream()
+                        .map(RobotToken::getText)
+                        .collect(Collectors.toList());
+                final int indexOfAlias = indexOfAliasStarting(args,
                         libraryImport.getParent().getParent().getParent().getRobotVersion());
 
                 if (indexOfAlias > -1) {
@@ -132,15 +133,6 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
                 }
             }
         }
-    }
-
-    private class GetTokenText implements Function<RobotToken, String> {
-
-        @Override
-        public String apply(final RobotToken token) {
-            return token.getText();
-        }
-
     }
 
     @Override

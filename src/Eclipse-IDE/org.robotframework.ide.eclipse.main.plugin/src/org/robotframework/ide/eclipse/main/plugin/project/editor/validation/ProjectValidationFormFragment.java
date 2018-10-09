@@ -5,14 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -298,7 +297,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     private Set<ProjectTreeElement> getExcludedElementsInTheTree(final Collection<ProjectTreeElement> allElements) {
-        return newHashSet(filter(allElements, ProjectTreeElement::isExcluded));
+        return allElements.stream().filter(ProjectTreeElement::isExcluded).collect(Collectors.toSet());
     }
 
     private List<ExcludedFolderPath> getExcludedNotShownInTheTree(final List<ExcludedFolderPath> allExcluded,

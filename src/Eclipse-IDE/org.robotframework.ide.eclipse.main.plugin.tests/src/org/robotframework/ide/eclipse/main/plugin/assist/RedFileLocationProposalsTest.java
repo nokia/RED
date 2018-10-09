@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
@@ -84,7 +83,7 @@ public class RedFileLocationProposalsTest {
                 suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("1");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/res1.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/res1.robot");
     }
 
     @Test
@@ -93,7 +92,7 @@ public class RedFileLocationProposalsTest {
                 suiteFile, prefixesMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir1");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/res1.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/res1.robot");
     }
 
     @Test
@@ -102,8 +101,8 @@ public class RedFileLocationProposalsTest {
                 suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/res1.robot",
-                "dir2/res2.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("dir1/res1.robot", "dir2/res2.robot");
     }
 
     @Test
@@ -113,8 +112,8 @@ public class RedFileLocationProposalsTest {
 
         final Comparator<IFile> comparator = firstFileNameContaining("2");
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir2/res2.robot",
-                "dir1/res1.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("dir2/res2.robot", "dir1/res1.robot");
     }
 
     @Test
@@ -131,7 +130,7 @@ public class RedFileLocationProposalsTest {
                 suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("vars");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/vars1.py", "dir2/vars2.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/vars1.py", "dir2/vars2.py");
     }
 
     @Test
@@ -140,7 +139,7 @@ public class RedFileLocationProposalsTest {
                 suiteFile, prefixesMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir1/");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/lib1.py", "dir1/vars1.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/lib1.py", "dir1/vars1.py");
     }
 
     @Test
@@ -149,8 +148,8 @@ public class RedFileLocationProposalsTest {
                 suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/lib1.py", "dir1/vars1.py",
-                "dir2/lib2.py", "dir2/vars2.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("dir1/lib1.py", "dir1/vars1.py", "dir2/lib2.py", "dir2/vars2.py");
     }
 
     @Test
@@ -160,7 +159,7 @@ public class RedFileLocationProposalsTest {
 
         final Comparator<IFile> comparator = firstFileNameContaining("vars");
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("2", comparator);
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir2/vars2.py", "dir2/lib2.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir2/vars2.py", "dir2/lib2.py");
     }
 
     @Test
@@ -177,7 +176,7 @@ public class RedFileLocationProposalsTest {
                 suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("lib");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/lib1.py", "dir2/lib2.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/lib1.py", "dir2/lib2.py");
     }
 
     @Test
@@ -186,7 +185,7 @@ public class RedFileLocationProposalsTest {
                 suiteFile, prefixesMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir2/");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir2/lib2.py", "dir2/vars2.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir2/lib2.py", "dir2/vars2.py");
     }
 
     @Test
@@ -195,7 +194,8 @@ public class RedFileLocationProposalsTest {
                 suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/lib1.py", "dir1/vars1.py",
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("dir1/lib1.py", "dir1/vars1.py",
                 "dir2/lib2.py", "dir2/vars2.py");
     }
 
@@ -206,7 +206,7 @@ public class RedFileLocationProposalsTest {
 
         final Comparator<IFile> comparator = firstFileNameContaining("vars");
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("1", comparator);
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/vars1.py", "dir1/lib1.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/vars1.py", "dir1/lib1.py");
     }
 
     private static Comparator<IFile> firstFileNameContaining(final String toContain) {

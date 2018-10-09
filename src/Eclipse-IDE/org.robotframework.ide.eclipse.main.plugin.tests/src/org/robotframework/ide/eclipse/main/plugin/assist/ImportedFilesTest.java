@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Comparator;
@@ -41,29 +40,29 @@ public class ImportedFilesTest {
     @Test
     public void pythonFilesAreProperlyProvided() {
         final List<IFile> pythonFiles = ImportedFiles.getPythonFiles();
-        assertThat(transform(pythonFiles, IFile::getName)).containsOnly("lib.py", "vars.py");
+        assertThat(pythonFiles).extracting(IFile::getName).containsOnly("lib.py", "vars.py");
     }
 
     @Test
     public void resourceFilesAreProperlyProvided_1() {
         final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("res.robot"));
-        assertThat(transform(resourceFiles, IFile::getName)).containsOnly("res1.robot", "res2.robot");
+        assertThat(resourceFiles).extracting(IFile::getName).containsOnly("res1.robot", "res2.robot");
     }
 
     @Test
     public void resourceFilesAreProperlyProvided_2() {
         final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("dir1/res1.robot"));
-        assertThat(transform(resourceFiles, IFile::getName)).containsOnly("res.robot", "res2.robot");
+        assertThat(resourceFiles).extracting(IFile::getName).containsOnly("res.robot", "res2.robot");
     }
 
     @Test
     public void resourceFilesAreProperlyProvided_3() {
         final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("dir2/res2.robot"));
-        assertThat(transform(resourceFiles, IFile::getName)).containsOnly("res.robot", "res1.robot");
+        assertThat(resourceFiles).extracting(IFile::getName).containsOnly("res.robot", "res1.robot");
     }
 
     @Test
-    public void pathsComparatorGivesPrecendenceForPathsInGivenProjectOverPathsFromDifferentProjects() {
+    public void pathsComparatorGivesPrecedenceForPathsInGivenProjectOverPathsFromDifferentProjects() {
         final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
 
         assertThat(compare(comparator, "/ImportedFilesTest/file.txt", "/Other/file.txt")).isNegative();
@@ -71,7 +70,7 @@ public class ImportedFilesTest {
     }
 
     @Test
-    public void pathsComparatorGivesPrecendenceForShorterPathsInSameProject() {
+    public void pathsComparatorGivesPrecedenceForShorterPathsInSameProject() {
         final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
 
         assertThat(compare(comparator, "/ImportedFilesTest/file.txt", "/ImportedFilesTest/dir/file.txt")).isNegative();
@@ -79,7 +78,7 @@ public class ImportedFilesTest {
     }
 
     @Test
-    public void pathsComparatorGivesPrecendenceForPathWithSecondSegmentStartingFromPrefixInSameProject() {
+    public void pathsComparatorGivesPrecedenceForPathWithSecondSegmentStartingFromPrefixInSameProject() {
         final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "xyz");
 
         assertThat(compare(comparator, "ImportedFilesTest/xyz_file.txt", "ImportedFilesTest/file_xyz.txt"))
@@ -93,7 +92,7 @@ public class ImportedFilesTest {
     }
 
     @Test
-    public void pathsComparatorGivesPrecendenceForPathWhichFirstDifferentSegmentIsLexicographicallySmaller() {
+    public void pathsComparatorGivesPrecedenceForPathWhichFirstDifferentSegmentIsLexicographicallySmaller() {
         final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
 
         assertThat(compare(comparator, "/ImportedFilesTest/bc/d.txt", "/ImportedFilesTest/bd/d.txt")).isNegative();

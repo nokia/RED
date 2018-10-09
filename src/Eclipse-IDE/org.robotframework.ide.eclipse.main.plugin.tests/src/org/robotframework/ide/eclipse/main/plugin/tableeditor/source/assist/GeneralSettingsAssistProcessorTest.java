@@ -6,13 +6,12 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
@@ -91,8 +90,7 @@ public class GeneralSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(13).haveExactly(13,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Settings ***", "Library  "),
                 new Document("*** Settings ***", "Resource  "),
                 new Document("*** Settings ***", "Variables  "),
@@ -125,8 +123,7 @@ public class GeneralSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(4).haveExactly(4,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Settings ***", "Test Setup"),
                 new Document("*** Settings ***", "Test Teardown"),
                 new Document("*** Settings ***", "Test Timeout"),
