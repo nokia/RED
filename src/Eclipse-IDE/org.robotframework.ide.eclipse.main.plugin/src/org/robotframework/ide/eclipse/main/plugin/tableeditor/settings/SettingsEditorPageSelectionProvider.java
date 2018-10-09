@@ -5,12 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -25,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 
 public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
 
@@ -33,10 +31,10 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
 
     private ISettingsFormFragment activeFormFragment;
 
-    private final List<TranslatingSelectionChangeListener> listeners = newArrayList();
+    private final List<TranslatingSelectionChangeListener> listeners = new ArrayList<>();
 
     public SettingsEditorPageSelectionProvider(final ISettingsFormFragment... formFragments) {
-        this.formFragments = newArrayList(Iterables.filter(Arrays.asList(formFragments), Predicates.notNull()));
+        this.formFragments = Stream.of(formFragments).filter(Predicates.notNull()).collect(Collectors.toList());
         for (final ISettingsFormFragment formFragment : formFragments) {
             addFocusListener(formFragment);
         }

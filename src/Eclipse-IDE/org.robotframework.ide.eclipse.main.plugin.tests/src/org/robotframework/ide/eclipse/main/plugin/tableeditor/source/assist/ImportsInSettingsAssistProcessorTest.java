@@ -5,13 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
@@ -242,9 +241,7 @@ public class ImportsInSettingsAssistProcessorTest {
                 .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
                 .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     alias.  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
@@ -285,9 +282,7 @@ public class ImportsInSettingsAssistProcessorTest {
                 .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
                 .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  alias.  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
@@ -328,9 +323,7 @@ public class ImportsInSettingsAssistProcessorTest {
                 .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
                 .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      alias.  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
@@ -371,9 +364,7 @@ public class ImportsInSettingsAssistProcessorTest {
                 .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
                 .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   alias.  def  ghi", "Test Template   abc  def  ghi",
@@ -414,9 +405,7 @@ public class ImportsInSettingsAssistProcessorTest {
                 .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
                 .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   alias.  def  ghi",
@@ -456,12 +445,13 @@ public class ImportsInSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(1).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(new Document("*** Settings ***", "Resource  res.robot",
-                "Suite Setup     alias.  def  ghi", "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
-                "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi", "Force Tags      abc  def  ghi",
-                "Default Tags    abc  def  ghi", "Documentation   abc  def  ghi", "Metadata        abc  def  ghi",
-                "Library  lib", "Library  lib2  WITH NAME  alias"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
+                .containsOnly(new Document("*** Settings ***", "Resource  res.robot",
+                        "Suite Setup     alias.  def  ghi", "Suite Teardown  abc  def  ghi",
+                        "Test Setup      abc  def  ghi", "Test Teardown   abc  def  ghi",
+                        "Test Template   abc  def  ghi", "Force Tags      abc  def  ghi",
+                        "Default Tags    abc  def  ghi", "Documentation   abc  def  ghi",
+                        "Metadata        abc  def  ghi", "Library  lib", "Library  lib2  WITH NAME  alias"));
     }
 
     private static IDocument documentFromSuiteFile() throws Exception {

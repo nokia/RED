@@ -5,7 +5,6 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -42,12 +41,12 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(secondCase.getChildren(), RobotElement::getName)).containsExactly("Setup", "Log");
+        assertThat(secondCase.getChildren()).extracting(RobotElement::getName).containsExactly("Setup", "Log");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(secondCase.getChildren(), RobotElement::getName)).containsExactly("Setup", "Log");
+        assertThat(secondCase.getChildren()).extracting(RobotElement::getName).containsExactly("Setup", "Log");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -63,12 +62,12 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(secondKeyword.getChildren(), RobotElement::getName)).containsExactly("Teardown", "Log");
+        assertThat(secondKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Teardown", "Log");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(secondKeyword.getChildren(), RobotElement::getName)).containsExactly("Teardown", "Log");
+        assertThat(secondKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Teardown", "Log");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -84,12 +83,12 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstCase.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2", "Log3");
+        assertThat(firstCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstCase.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2", "Log3");
+        assertThat(firstCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2", "Log3");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -105,14 +104,14 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstKeyword.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2",
-                "Log3");
+        assertThat(firstKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Log1", "Log2", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstKeyword.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2",
-                "Log3");
+        assertThat(firstKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Log1", "Log2", "Log3");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -128,16 +127,14 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstCase.getChildren(), RobotElement::getName)).containsExactly("Tags", "Log1",
-                "Documentation",
-                "Log2", "Log3");
+        assertThat(firstCase.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Tags", "Log1", "Documentation", "Log2", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstCase.getChildren(), RobotElement::getName)).containsExactly("Tags", "Documentation",
-                "Log1",
-                "Log2", "Log3");
+        assertThat(firstCase.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Tags", "Documentation", "Log1", "Log2", "Log3");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstCase);
         verifyNoMoreInteractions(eventBroker);
@@ -154,16 +151,14 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstKeyword.getChildren(), RobotElement::getName)).containsExactly("Tags", "Log1",
-                "Documentation",
-                "Log2", "Log3");
+        assertThat(firstKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Tags", "Log1", "Documentation", "Log2", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstKeyword.getChildren(), RobotElement::getName)).containsExactly("Tags",
-                "Documentation", "Log1",
-                "Log2", "Log3");
+        assertThat(firstKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Tags", "Documentation", "Log1", "Log2", "Log3");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstKeyword);
         verifyNoMoreInteractions(eventBroker);
@@ -180,16 +175,14 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstCase.getChildren(), RobotElement::getName)).containsExactly("Documentation", "Tags",
-                "Log1",
-                "Log2", "Log3");
+        assertThat(firstCase.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Documentation", "Tags", "Log1", "Log2", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstCase.getChildren(), RobotElement::getName)).containsExactly("Tags", "Documentation",
-                "Log1",
-                "Log2", "Log3");
+        assertThat(firstCase.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Tags", "Documentation", "Log1", "Log2", "Log3");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstCase);
         verifyNoMoreInteractions(eventBroker);
@@ -206,16 +199,14 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstKeyword.getChildren(), RobotElement::getName)).containsExactly("Documentation",
-                "Tags", "Log1",
-                "Log2", "Log3");
+        assertThat(firstKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Documentation", "Tags", "Log1", "Log2", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstKeyword.getChildren(), RobotElement::getName)).containsExactly("Tags",
-                "Documentation", "Log1",
-                "Log2", "Log3");
+        assertThat(firstKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Tags", "Documentation", "Log1", "Log2", "Log3");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstKeyword);
         verifyNoMoreInteractions(eventBroker);
@@ -232,12 +223,12 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstCase.getChildren(), RobotElement::getName)).containsExactly("Log2", "Log1", "Log3");
+        assertThat(firstCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log2", "Log1", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstCase.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2", "Log3");
+        assertThat(firstCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2", "Log3");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstCase);
         verifyNoMoreInteractions(eventBroker);
@@ -254,14 +245,14 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstKeyword.getChildren(), RobotElement::getName)).containsExactly("Log2", "Log1",
-                "Log3");
+        assertThat(firstKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Log2", "Log1", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstKeyword.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2",
-                "Log3");
+        assertThat(firstKeyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Log1", "Log2", "Log3");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstKeyword);
         verifyNoMoreInteractions(eventBroker);
@@ -280,14 +271,14 @@ public class MoveKeywordCallUpCommandTest {
                 .isInjectedInto(new MoveKeywordCallUpCommand(callToMove));
         command.execute();
 
-        assertThat(transform(fstCase.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2", "Log3");
-        assertThat(transform(sndCase.getChildren(), RobotElement::getName)).containsExactly("Log");
+        assertThat(fstCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2", "Log3");
+        assertThat(sndCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(fstCase.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2", "Log3");
-        assertThat(transform(sndCase.getChildren(), RobotElement::getName)).containsExactly("Log");
+        assertThat(fstCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2", "Log3");
+        assertThat(sndCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -305,14 +296,14 @@ public class MoveKeywordCallUpCommandTest {
                 .isInjectedInto(new MoveKeywordCallUpCommand(callToMove));
         command.execute();
 
-        assertThat(transform(fstKeyword.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2", "Log3");
-        assertThat(transform(sndKeyword.getChildren(), RobotElement::getName)).containsExactly("Log");
+        assertThat(fstKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2", "Log3");
+        assertThat(sndKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Log");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(fstKeyword.getChildren(), RobotElement::getName)).containsExactly("Log1", "Log2", "Log3");
-        assertThat(transform(sndKeyword.getChildren(), RobotElement::getName)).containsExactly("Log");
+        assertThat(fstKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2", "Log3");
+        assertThat(sndKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Log");
 
         verifyZeroInteractions(eventBroker);
     }

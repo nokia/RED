@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -35,8 +34,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken.TokenState;
-
-import com.google.common.base.Function;
 
 @RunWith(Theories.class)
 public class CodeElementsTreeFormatTest {
@@ -189,7 +186,8 @@ public class CodeElementsTreeFormatTest {
         final List<Node> nodes = createNodes(holders);
         Collections.sort(nodes, new NodeComparator(format));
 
-        assertThat(transform(nodes, toNames())).containsExactlyElementsOf(expectedOrderedElements);
+        assertThat(nodes).extracting(CodeElementsTreeFormatTest::toName)
+                .containsExactlyElementsOf(expectedOrderedElements);
     }
 
     private static List<Node> createNodes(final List<? extends RobotCodeHoldingElement<?>> holders) {
@@ -204,15 +202,9 @@ public class CodeElementsTreeFormatTest {
         return nodes;
     }
 
-    private static Function<Node, String> toNames() {
-        return new Function<Node, String>() {
-
-            @Override
-            public String apply(final Node node) {
-                final Object last = node.pathElements[node.pathElements.length - 1];
-                return last instanceof AddingToken ? "..." : ((RobotElement) last).getName();
-            }
-        };
+    private static String toName(final Node node) {
+        final Object last = node.pathElements[node.pathElements.length - 1];
+        return last instanceof AddingToken ? "..." : ((RobotElement) last).getName();
     }
 
     private static List<RobotCase> createCases() {
@@ -278,7 +270,7 @@ public class CodeElementsTreeFormatTest {
 
     private static class NodeComparator implements Comparator<Node> {
 
-        // comaparator is based on ca.odell.glazedlists.TreeList.NodeComparator<E> class in order
+        // comparator is based on ca.odell.glazedlists.TreeList.NodeComparator<E> class in order
         // to simulate its behavior
 
         private final CodeElementsTreeFormat format;

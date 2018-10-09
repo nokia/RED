@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -147,12 +146,12 @@ public class DeleteHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -166,13 +165,13 @@ public class DeleteHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_ELEMENT_REMOVED, section);
@@ -191,13 +190,13 @@ public class DeleteHoldersCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 2");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 2");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent()).have(children());
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_ELEMENT_REMOVED, section);

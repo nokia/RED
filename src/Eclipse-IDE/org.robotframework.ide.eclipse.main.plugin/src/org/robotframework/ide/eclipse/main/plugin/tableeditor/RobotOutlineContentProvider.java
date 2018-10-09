@@ -5,12 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,8 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
 import org.robotframework.red.viewers.TreeContentProvider;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -126,21 +123,17 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
     }
 
     private List<RobotElement> filteredRobotKeywordCalls(final List<? extends RobotElement> children) {
-        return newArrayList(Iterables.filter(children, new Predicate<RobotElement>() {
-
-            @Override
-            public boolean apply(final RobotElement element) {
-                if (element instanceof RobotKeywordCall) {
-                    final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
-                    if (linkedElement != null && linkedElement instanceof RobotExecutableRow<?>) {
-                        final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-                        // TODO: checking row type should be done without building line description
-                        return row.isExecutable() && row.buildLineDescription().getRowType() != ERowType.FOR_CONTINUE;
-                    }
+        return children.stream().filter(element -> {
+            if (element instanceof RobotKeywordCall) {
+                final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
+                if (linkedElement != null && linkedElement instanceof RobotExecutableRow<?>) {
+                    final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
+                    // TODO: checking row type should be done without building line description
+                    return row.isExecutable() && row.buildLineDescription().getRowType() != ERowType.FOR_CONTINUE;
                 }
-                return false;
             }
-        }));
+            return false;
+        }).collect(Collectors.toList());
     }
 
     @Override

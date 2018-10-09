@@ -5,7 +5,6 @@
 */
 package org.rf.ide.core.testdata.model.presenter.update;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -26,11 +25,8 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Function;
 
 public class TestCaseTableModelUpdaterTest {
 
@@ -118,7 +114,7 @@ public class TestCaseTableModelUpdaterTest {
     }
 
     @Test
-    public void executableRowOpreationsTest() {
+    public void executableRowOperationsTest() {
         final TestCase testCase = createCase();
 
         assertThat(testCase.getExecutionContext()).isEmpty();
@@ -134,28 +130,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedRow.getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
         assertThat(addedRow.getAction().getText()).isEqualTo("some action");
 
-        assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "a", "b", "c",
-                "#comment");
+        assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("some action", "a", "b", "c", "#comment");
 
         updater.updateComment(addedRow, "new comment");
-        assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "a", "b", "c",
-                "#new comment");
+        assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("some action", "a", "b", "c", "#new comment");
 
         updater.updateArgument(addedRow, 2, "x");
-        assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "a", "b", "x",
-                "#new comment");
+        assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("some action", "a", "b", "x", "#new comment");
 
         updater.updateArgument(addedRow, 5, "z");
-        assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "a", "b", "x", "",
-                "", "z", "#new comment");
+        assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("some action", "a", "b", "x", "", "", "z", "#new comment");
 
         updater.updateArgument(addedRow, 3, null);
-        assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "a", "b", "x", "",
-                "z", "#new comment");
+        assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("some action", "a", "b", "x", "", "z", "#new comment");
 
         updater.setArguments(addedRow, newArrayList("1", "2", "3"));
-        assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "1", "2", "3",
-                "#new comment");
+        assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("some action", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedRow);
         assertThat(testCase.getExecutionContext()).hasSize(2);
@@ -196,32 +192,32 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getParent()).isSameAs(testCase);
         assertThat(addedSetting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETUP);
 
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "a", "b", "c",
-                "#comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "a", "b", "c", "#comment");
 
         updater.updateComment(addedSetting, "new comment");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "a", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "a", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 0, "kw");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "kw", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "kw", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 2, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "kw", "b", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "kw", "b", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 5, "z");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "kw", "b", "x", "",
-                "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "kw", "b", "x", "", "", "z", "#new comment");
 
         updater.updateArgument(addedSetting, 3, null);
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "kw", "b", "x", "",
-                "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "kw", "b", "x", "", "z", "#new comment");
 
         updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "1", "2", "3",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getSetups()).hasSize(2);
@@ -244,32 +240,32 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getParent()).isSameAs(testCase);
         assertThat(addedSetting.getModelType()).isEqualTo(ModelType.TEST_CASE_TAGS);
 
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "a", "b", "c",
-                "#comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "a", "b", "c", "#comment");
 
         updater.updateComment(addedSetting, "new comment");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "a", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "a", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 0, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "x", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "x", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 2, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "x", "b", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "x", "b", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 5, "z");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "x", "b", "x", "",
-                "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "x", "b", "x", "", "", "z", "#new comment");
 
         updater.updateArgument(addedSetting, 3, null);
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "x", "b", "x", "",
-                "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "x", "b", "x", "", "z", "#new comment");
 
         updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "1", "2", "3",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getTags()).hasSize(2);
@@ -292,32 +288,32 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getParent()).isSameAs(testCase);
         assertThat(addedSetting.getModelType()).isEqualTo(ModelType.TEST_CASE_TIMEOUT);
 
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "a", "b", "c",
-                "#comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "a", "b", "c", "#comment");
 
         updater.updateComment(addedSetting, "new comment");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "a", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "a", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 0, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "x", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "x", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 2, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "x", "b", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "x", "b", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 5, "z");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "x", "b", "x", "",
-                "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "x", "b", "x", "", "", "z", "#new comment");
 
         updater.updateArgument(addedSetting, 3, null);
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "x", "b", "x", "",
-                "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "x", "b", "x", "", "z", "#new comment");
 
         updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "1", "2", "3",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getTimeouts()).hasSize(2);
@@ -340,32 +336,32 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getParent()).isSameAs(testCase);
         assertThat(addedSetting.getModelType()).isEqualTo(ModelType.TEST_CASE_TEARDOWN);
 
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "a", "b", "c",
-                "#comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "a", "b", "c", "#comment");
 
         updater.updateComment(addedSetting, "new comment");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "a", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "a", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 0, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "x", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "x", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 2, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "x", "b", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "x", "b", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 5, "z");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "x", "b", "x",
-                "", "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "x", "b", "x", "", "", "z", "#new comment");
 
         updater.updateArgument(addedSetting, 3, null);
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "x", "b", "x",
-                "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "x", "b", "x", "", "z", "#new comment");
 
         updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "1", "2", "3",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getTeardowns()).hasSize(2);
@@ -388,32 +384,32 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getParent()).isSameAs(testCase);
         assertThat(addedSetting.getModelType()).isEqualTo(ModelType.TEST_CASE_TEMPLATE);
 
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "a", "b", "c",
-                "#comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "a", "b", "c", "#comment");
 
         updater.updateComment(addedSetting, "new comment");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "a", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "a", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 0, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "x", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "x", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 2, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "x", "b", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "x", "b", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 5, "z");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "x", "b", "x",
-                "", "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "x", "b", "x", "", "", "z", "#new comment");
 
         updater.updateArgument(addedSetting, 3, null);
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "x", "b", "x",
-                "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "x", "b", "x", "", "z", "#new comment");
 
         updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "1", "2", "3",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getTemplates()).hasSize(2);
@@ -436,32 +432,32 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getParent()).isSameAs(testCase);
         assertThat(addedSetting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETTING_UNKNOWN);
 
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "a", "b", "c",
-                "#comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[unknown]", "a", "b", "c", "#comment");
 
         updater.updateComment(addedSetting, "new comment");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "a", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[unknown]", "a", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 0, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "x", "b", "c",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[unknown]", "x", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 2, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "x", "b", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[unknown]", "x", "b", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 5, "z");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "x", "b", "x",
-                "", "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[unknown]", "x", "b", "x", "", "", "z", "#new comment");
 
         updater.updateArgument(addedSetting, 3, null);
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "x", "b", "x",
-                "", "z", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[unknown]", "x", "b", "x", "", "z", "#new comment");
 
         updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "1", "2", "3",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[unknown]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getUnknownSettings()).hasSize(2);
@@ -484,32 +480,32 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getParent()).isSameAs(testCase);
         assertThat(addedSetting.getModelType()).isEqualTo(ModelType.TEST_CASE_DOCUMENTATION);
 
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "a", "b",
-                "c", "#comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "a", "b", "c", "#comment");
 
         updater.updateComment(addedSetting, "new comment");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "a", "b",
-                "c", "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "a", "b", "c", "#new comment");
 
         updater.updateArgument(addedSetting, 0, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 2, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 5, "z");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "x", "#new comment");
 
         updater.updateArgument(addedSetting, 3, null);
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "#new comment");
 
         updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "1",
-                "#new comment");
+        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "1", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getDocumentation()).hasSize(2);
@@ -537,11 +533,11 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(row.getParent()).isSameAs(testCase);
         assertThat(row.getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
 
-        assertThat(transform(row.getElementTokens(), toText())).containsExactly("action", "a", "b",
-                "#comment");
-        assertThat(transform(row.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+        assertThat(row.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("action", "a", "b", "#comment");
+        assertThat(row.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                        RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -560,12 +556,13 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETTING_UNKNOWN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Arguments]", "a", "b",
-                "c", "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Arguments]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -584,12 +581,13 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETTING_UNKNOWN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Return]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Return]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -608,12 +606,12 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_TAGS);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Tags]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
+                        RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
+                        RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -632,12 +630,13 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_TEARDOWN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Teardown]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_TEARDOWN, RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME,
-                RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
-                RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_TEARDOWN,
+                        RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME,
+                        RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
+                        RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -656,12 +655,13 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_TIMEOUT);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Timeout]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_TIMEOUT, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE,
-                RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_TIMEOUT,
+                        RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE,
+                        RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE,
+                        RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -680,13 +680,13 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_DOCUMENTATION);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Documentation]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT,
-                RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT,
-                RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION,
+                        RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT,
+                        RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT,
+                        RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -709,12 +709,13 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETUP);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Setup]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_SETUP, RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME,
-                RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT,
-                RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_SETUP,
+                        RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME,
+                        RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT,
+                        RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -737,12 +738,14 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_TEMPLATE);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Template]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_TEMPLATE, RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME,
-                RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT,
-                RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_TEMPLATE,
+                        RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME,
+                        RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT,
+                        RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT,
+                        RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -765,12 +768,13 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(testCase);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TEST_CASE_SETTING_UNKNOWN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[something]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[something]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
     private static TestCase createCase() {
@@ -793,25 +797,5 @@ public class TestCaseTableModelUpdaterTest {
         keyword.setParent(table);
         table.addKeyword(keyword);
         return keyword;
-    }
-
-    private static Function<RobotToken, String> toText() {
-        return new Function<RobotToken, String>() {
-
-            @Override
-            public String apply(final RobotToken token) {
-                return token.getText();
-            }
-        };
-    }
-
-    private static Function<RobotToken, IRobotTokenType> toType() {
-        return new Function<RobotToken, IRobotTokenType>() {
-
-            @Override
-            public IRobotTokenType apply(final RobotToken token) {
-                return token.getTypes().get(0);
-            }
-        };
     }
 }

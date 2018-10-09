@@ -13,7 +13,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 
-import com.google.common.base.Function;
 
 /**
  * @author Michal Anglart
@@ -50,16 +49,10 @@ class Proposals {
         };
     }
 
-    static Function<ICompletionProposal, IDocument> byApplyingToDocument(final IDocument document) {
-        return new Function<ICompletionProposal, IDocument>() {
-
-            @Override
-            public IDocument apply(final ICompletionProposal proposal) {
-                final Document docCopy = new Document(document);
-                proposal.apply(docCopy);
-                return docCopy;
-            }
-        };
+    static IDocument applyToDocument(final IDocument document, final ICompletionProposal proposal) {
+        final Document docCopy = new Document(document);
+        proposal.apply(docCopy);
+        return docCopy;
     }
 
 }

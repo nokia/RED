@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -116,8 +115,8 @@ public class InsertKeywordCallsCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(testCase.getChildren(), RobotElement::getName)).containsExactly("tags", "setup",
-                "teardown", "call1", "setting", "call2", "call3");
+        assertThat(testCase.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("tags", "setup", "teardown", "call1", "setting", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
                 .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
@@ -133,8 +132,8 @@ public class InsertKeywordCallsCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(testCase.getChildren(), RobotElement::getName)).containsExactly("tags", "action", "setup",
-                "teardown", "call1", "call2", "call3");
+        assertThat(testCase.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("tags", "action", "setup", "teardown", "call1", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
                 .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
@@ -231,8 +230,8 @@ public class InsertKeywordCallsCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(keyword.getChildren(), RobotElement::getName)).containsExactly("arguments", "tags",
-                "return", "call1", "setting", "call2", "call3");
+        assertThat(keyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("arguments", "tags", "return", "call1", "setting", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
                 .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));
@@ -248,8 +247,8 @@ public class InsertKeywordCallsCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(keyword.getChildren(), RobotElement::getName)).containsExactly("arguments", "action",
-                "tags", "return", "call1", "call2", "call3");
+        assertThat(keyword.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("arguments", "action", "tags", "return", "call1", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
                 .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, Arrays.asList(callsToInsert))));

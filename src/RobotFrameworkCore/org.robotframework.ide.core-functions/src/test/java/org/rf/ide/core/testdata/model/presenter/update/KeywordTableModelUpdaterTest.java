@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.testdata.model.presenter.update;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,12 +30,9 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-
-import com.google.common.base.Function;
 
 public class KeywordTableModelUpdaterTest {
 
@@ -366,10 +362,11 @@ public class KeywordTableModelUpdaterTest {
         assertThat(row.getParent()).isSameAs(keyword);
         assertThat(row.getModelType()).isEqualTo(ModelType.USER_KEYWORD_EXECUTABLE_ROW);
 
-        assertThat(transform(row.getElementTokens(), toText())).containsExactly("action", "a", "b", "#comment");
-        assertThat(transform(row.getElementTokens(), toType())).containsExactly(RobotTokenType.KEYWORD_ACTION_NAME,
-                RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(row.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("action", "a", "b", "#comment");
+        assertThat(row.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
+                        RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -388,12 +385,13 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_SETTING_UNKNOWN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Setup]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Setup]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -412,12 +410,13 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_SETTING_UNKNOWN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Template]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Template]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -436,12 +435,12 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TAGS);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Tags]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_TAGS, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME,
-                RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Tags]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_TAGS, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME,
+                        RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME,
+                        RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -460,12 +459,13 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TEARDOWN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Teardown]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_TEARDOWN, RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME,
-                RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
-                RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Teardown]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_TEARDOWN,
+                        RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME,
+                        RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
+                        RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -484,12 +484,12 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TIMEOUT);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Timeout]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_TIMEOUT, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE,
-                RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Timeout]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_TIMEOUT, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE,
+                        RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE,
+                        RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -508,12 +508,13 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_DOCUMENTATION);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Documentation]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_DOCUMENTATION, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT,
-                RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Documentation]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION,
+                        RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT,
+                        RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT,
+                        RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -536,12 +537,12 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_ARGUMENTS);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Arguments]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_ARGUMENTS, RobotTokenType.KEYWORD_SETTING_ARGUMENT,
-                RobotTokenType.KEYWORD_SETTING_ARGUMENT, RobotTokenType.KEYWORD_SETTING_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Arguments]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_ARGUMENTS, RobotTokenType.KEYWORD_SETTING_ARGUMENT,
+                        RobotTokenType.KEYWORD_SETTING_ARGUMENT, RobotTokenType.KEYWORD_SETTING_ARGUMENT,
+                        RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -564,12 +565,12 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_RETURN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[Return]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_RETURN, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE,
-                RobotTokenType.KEYWORD_SETTING_RETURN_VALUE, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[Return]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_RETURN, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE,
+                        RobotTokenType.KEYWORD_SETTING_RETURN_VALUE, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE,
+                        RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -592,12 +593,13 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(keyword);
         assertThat(setting.getModelType()).isEqualTo(ModelType.USER_KEYWORD_SETTING_UNKNOWN);
 
-        assertThat(transform(setting.getElementTokens(), toText())).containsExactly("[something]", "a", "b", "c",
-                "#comment");
-        assertThat(transform(setting.getElementTokens(), toType())).containsExactly(
-                RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(setting.getElementTokens()).extracting(RobotToken::getText)
+                .containsExactly("[something]", "a", "b", "c", "#comment");
+        assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
+                .containsExactly(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
     private static List<String> cellsOf(final LocalSetting<?> setting) {
@@ -641,25 +643,5 @@ public class KeywordTableModelUpdaterTest {
         keyword.setParent(table);
         table.addKeyword(keyword);
         return keyword;
-    }
-
-    private static Function<RobotToken, String> toText() {
-        return new Function<RobotToken, String>() {
-
-            @Override
-            public String apply(final RobotToken token) {
-                return token.getText();
-            }
-        };
-    }
-
-    private static Function<RobotToken, IRobotTokenType> toType() {
-        return new Function<RobotToken, IRobotTokenType>() {
-
-            @Override
-            public IRobotTokenType apply(final RobotToken token) {
-                return token.getTypes().get(0);
-            }
-        };
     }
 }

@@ -5,9 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Sets.newHashSet;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -22,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -50,8 +50,6 @@ import org.robotframework.red.swt.StyledTextWrapper;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 
 class SuiteSourceEditorFoldingSupport {
 
@@ -114,10 +112,10 @@ class SuiteSourceEditorFoldingSupport {
             positions.addAll(calculateDocumentationFoldingPositions(model));
         }
 
-        final Iterable<Position> positionsSpanningOverLimit = filter(positions,
-                onlyPositionsSpanning(document, preferences.getFoldingLineLimit()));
-
-        return newHashSet(transform(positionsSpanningOverLimit, nextLineShiftedPosition(document)));
+        return positions.stream()
+                .filter(onlyPositionsSpanning(document, preferences.getFoldingLineLimit()))
+                .map(nextLineShiftedPosition(document))
+                .collect(Collectors.toSet());
     }
 
     private Collection<Position> calculateSectionsFoldingPositions(final RobotSuiteFile model) {
@@ -254,19 +252,15 @@ class SuiteSourceEditorFoldingSupport {
     }
 
     private static Predicate<Position> onlyPositionsSpanning(final IDocument document, final int linesToSpan) {
-        return new Predicate<Position>() {
-
-            @Override
-            public boolean apply(final Position position) {
-                final int startLine = DocumentUtilities.getLine(document, position.getOffset());
-                final int endLine;
-                if (position.getOffset() + position.getLength() == document.getLength()) {
-                    endLine = DocumentUtilities.getLine(document, position.getOffset() + position.getLength() - 1);
-                } else {
-                    endLine = DocumentUtilities.getLine(document, position.getOffset() + position.getLength());
-                }
-                return endLine - startLine + 1 >= linesToSpan;
+        return position -> {
+            final int startLine = DocumentUtilities.getLine(document, position.getOffset());
+            final int endLine;
+            if (position.getOffset() + position.getLength() == document.getLength()) {
+                endLine = DocumentUtilities.getLine(document, position.getOffset() + position.getLength() - 1);
+            } else {
+                endLine = DocumentUtilities.getLine(document, position.getOffset() + position.getLength());
             }
+            return endLine - startLine + 1 >= linesToSpan;
         };
     }
 

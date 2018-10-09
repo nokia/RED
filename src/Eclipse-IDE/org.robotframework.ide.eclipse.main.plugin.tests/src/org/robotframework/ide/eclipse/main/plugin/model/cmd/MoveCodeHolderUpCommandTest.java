@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -40,14 +39,14 @@ public class MoveCodeHolderUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveCodeHolderUpCommand(caseToMove));
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "case 2",
-                "case 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "case 2", "case 3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "case 2",
-                "case 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "case 2", "case 3");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -63,15 +62,15 @@ public class MoveCodeHolderUpCommandTest {
                 .isInjectedInto(new MoveCodeHolderUpCommand(caseToMove));
         command.execute();
 
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 2", "case 1",
-                "case 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 2", "case 1", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("case 1", "case 2",
-                "case 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("case 1", "case 2", "case 3");
         assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent());
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_ELEMENT_MOVED, section);
@@ -87,12 +86,12 @@ public class MoveCodeHolderUpCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -107,13 +106,13 @@ public class MoveCodeHolderUpCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 2", "kw 1", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 2", "kw 1", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("kw 1", "kw 2", "kw 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
         assertThat(section.getChildren()).have(RobotKeywordDefinitionConditions.properlySetParent());
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_ELEMENT_MOVED, section);

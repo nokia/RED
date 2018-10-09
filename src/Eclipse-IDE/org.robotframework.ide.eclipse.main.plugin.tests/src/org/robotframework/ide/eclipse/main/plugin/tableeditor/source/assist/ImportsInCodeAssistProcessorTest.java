@@ -5,14 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.activatingAssistantAfterAccept;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
@@ -140,8 +139,7 @@ public class ImportsInCodeAssistProcessorTest {
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("robot"))));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
                         "Resource  abcde.robot", "*** Keywords ***", "keyword", "  Lib1.", "  rst", "  acb  lkj"),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
@@ -172,8 +170,7 @@ public class ImportsInCodeAssistProcessorTest {
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("robot"))));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
                         "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  Lib1.", "  acb  lkj"),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
@@ -203,8 +200,7 @@ public class ImportsInCodeAssistProcessorTest {
             .are(activatingAssistantAfterAccept())
             .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("robot"))));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
                         "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj"));
     }
@@ -228,8 +224,7 @@ public class ImportsInCodeAssistProcessorTest {
             .are(activatingAssistantAfterAccept())
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
                         "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib1."),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
