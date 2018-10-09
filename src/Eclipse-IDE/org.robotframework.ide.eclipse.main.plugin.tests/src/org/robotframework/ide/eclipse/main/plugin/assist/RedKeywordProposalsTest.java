@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates.alwaysTrue;
@@ -87,7 +86,7 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("2");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw2 - file.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("b_kw2 - file.robot");
     }
 
     @Test
@@ -109,8 +108,8 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("EF");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Enable Frequency - file.robot",
-                "ef_kw - file.robot", "c_kw_ef - file.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Enable Frequency - file.robot", "ef_kw - file.robot", "c_kw_ef - file.robot");
     }
 
     @Test
@@ -128,7 +127,7 @@ public class RedKeywordProposalsTest {
                 alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("c_");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("c_kw3 - file.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("c_kw3 - file.robot");
     }
 
     @Test
@@ -144,9 +143,8 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_kw1 - file.robot",
-                "b_kw2 - file.robot",
-                "c_kw3 - file.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("a_kw1 - file.robot", "b_kw2 - file.robot", "c_kw3 - file.robot");
     }
 
     @Test
@@ -164,9 +162,8 @@ public class RedKeywordProposalsTest {
         final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("2");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw2 - file.robot",
-                "a_kw1 - file.robot",
-                "c_kw3 - file.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("b_kw2 - file.robot", "a_kw1 - file.robot", "c_kw3 - file.robot");
     }
 
     @Test
@@ -194,7 +191,7 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("c_res_kw3 - res.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("c_res_kw3 - res.robot");
     }
 
     @Test
@@ -219,8 +216,8 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("CD");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Create Duplicate - res2.robot",
-                "cd_res_kw - res2.robot", "b_res_kw_cd - res2.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Create Duplicate - res2.robot", "cd_res_kw - res2.robot", "b_res_kw_cd - res2.robot");
     }
 
     @Test
@@ -235,7 +232,7 @@ public class RedKeywordProposalsTest {
                 AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("b_");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_res_kw2 - res.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("b_res_kw2 - res.robot");
     }
 
     @Test
@@ -249,9 +246,8 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_res_kw1 - res.robot",
-                "b_res_kw2 - res.robot",
-                "c_res_kw3 - res.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("a_res_kw1 - res.robot", "b_res_kw2 - res.robot", "c_res_kw3 - res.robot");
     }
 
     @Test
@@ -267,9 +263,8 @@ public class RedKeywordProposalsTest {
         final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("2");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_res_kw2 - res.robot",
-                "a_res_kw1 - res.robot",
-                "c_res_kw3 - res.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("b_res_kw2 - res.robot", "a_res_kw1 - res.robot", "c_res_kw3 - res.robot");
     }
 
     @Test
@@ -307,8 +302,8 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("2");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_rlib_kw2 - refLib",
-                "b_slib_kw2 - stdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("b_rlib_kw2 - refLib", "b_slib_kw2 - stdLib");
     }
 
     @Test
@@ -330,12 +325,9 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("AB");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Activate Bluetooth - refLib",
-                "Add Bookmark - stdLib",
-                "ab_rlib_kw - refLib",
-                "ab_slib_kw - stdLib",
-                "a_rlib_kw_ab - refLib",
-                "a_slib_kw_ab - stdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Activate Bluetooth - refLib", "Add Bookmark - stdLib", "ab_rlib_kw - refLib",
+                        "ab_slib_kw - stdLib", "a_rlib_kw_ab - refLib", "a_slib_kw_ab - stdLib");
     }
 
     @Test
@@ -355,8 +347,8 @@ public class RedKeywordProposalsTest {
                 AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("c_");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("c_rlib_kw3 - refLib",
-                "c_slib_kw3 - stdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("c_rlib_kw3 - refLib", "c_slib_kw3 - stdLib");
     }
 
     @Test
@@ -375,12 +367,9 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_rlib_kw1 - refLib",
-                "a_slib_kw1 - stdLib",
-                "b_rlib_kw2 - refLib",
-                "b_slib_kw2 - stdLib",
-                "c_rlib_kw3 - refLib",
-                "c_slib_kw3 - stdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("a_rlib_kw1 - refLib", "a_slib_kw1 - stdLib", "b_rlib_kw2 - refLib",
+                        "b_slib_kw2 - stdLib", "c_rlib_kw3 - refLib", "c_slib_kw3 - stdLib");
     }
 
     @Test
@@ -400,8 +389,7 @@ public class RedKeywordProposalsTest {
         final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b_");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw - stdLib",
-                "a_kw - stdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("b_kw - stdLib", "a_kw - stdLib");
     }
 
     @Test
@@ -423,7 +411,7 @@ public class RedKeywordProposalsTest {
                 predicate);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_slib_kw1 - stdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("a_slib_kw1 - stdLib");
     }
 
     @Test
@@ -445,9 +433,8 @@ public class RedKeywordProposalsTest {
         for (final String bddPrefix : newArrayList("Given", "When", "And", "But", "Then")) {
             final List<? extends AssistProposal> proposals = provider.getKeywordProposals(bddPrefix + " a");
 
-            assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_kw - file.robot",
-                    "a_res_kw1 - res.robot",
-                    "a_slib_kw - stdLib");
+            assertThat(proposals).extracting(AssistProposal::getLabel)
+                    .containsExactly("a_kw - file.robot", "a_res_kw1 - res.robot", "a_slib_kw - stdLib");
         }
     }
 
@@ -469,7 +456,7 @@ public class RedKeywordProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("stdLib.");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_slib_kw - stdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("a_slib_kw - stdLib");
     }
 
     @Test
@@ -492,7 +479,7 @@ public class RedKeywordProposalsTest {
         assertThat(provider.getKeywordProposals("stdLib.")).isEmpty();
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("myLib.");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_slib_kw - myLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("a_slib_kw - myLib");
     }
 
     @Test
@@ -514,9 +501,8 @@ public class RedKeywordProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("res.");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_res_kw1 - res.robot",
-                "b_res_kw2 - res.robot",
-                "c_res_kw3 - res.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("a_res_kw1 - res.robot", "b_res_kw2 - res.robot", "c_res_kw3 - res.robot");
     }
 
     @Test
@@ -537,7 +523,7 @@ public class RedKeywordProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("file.");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_kw - file.robot");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("a_kw - file.robot");
     }
 
     @Test
@@ -553,7 +539,7 @@ public class RedKeywordProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("kw with something");
 
-        assertThat(transform(proposals, AssistProposal::getLabel))
+        assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("kw with ${arg} and ${arg2} - file.robot");
     }
 
@@ -639,8 +625,8 @@ public class RedKeywordProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("a_");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_kw1 - BuiltIn",
-                "a_lib_kw1 - stdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("a_kw1 - BuiltIn", "a_lib_kw1 - stdLib");
     }
 
     @Test
@@ -666,10 +652,9 @@ public class RedKeywordProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("a_");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_kw1 - BuiltIn",
-                "a_lib_kw1 - stdLib",
-                "a_other_kw1 - otherLib",
-                "a_rlib_kw1 - refLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("a_kw1 - BuiltIn", "a_lib_kw1 - stdLib", "a_other_kw1 - otherLib",
+                        "a_rlib_kw1 - refLib");
     }
 
     @Test
@@ -688,8 +673,8 @@ public class RedKeywordProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("otherLib.");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_other_kw1 - otherLib",
-                "a_other_kw2 - otherLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("a_other_kw1 - otherLib", "a_other_kw2 - otherLib");
     }
 
     @Test

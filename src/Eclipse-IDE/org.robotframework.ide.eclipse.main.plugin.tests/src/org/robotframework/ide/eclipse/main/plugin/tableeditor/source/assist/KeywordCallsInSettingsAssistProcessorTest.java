@@ -5,13 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithOperationsToPerformAfterAccepting;
 
@@ -249,9 +248,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(3).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     akeyword  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
@@ -291,9 +288,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(3).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  akeyword  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
@@ -333,9 +328,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(3).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      akeyword  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
@@ -375,9 +368,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(3).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   akeyword  def  ghi", "Test Template   abc  def  ghi",
@@ -417,9 +408,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(3).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
-                .containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   akeyword  def  ghi",
@@ -459,12 +448,13 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         assertThat(proposals).hasSize(1).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(new Document("*** Settings ***", "Resource  res.robot",
-                "Suite Setup     akeyword  def  ghi", "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
-                "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi", "Force Tags      abc  def  ghi",
-                "Default Tags    abc  def  ghi", "Documentation   abc  def  ghi", "Metadata        abc  def  ghi",
-                "*** Keywords ***", "akeyword", "keyword"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
+                .containsOnly(new Document("*** Settings ***", "Resource  res.robot",
+                        "Suite Setup     akeyword  def  ghi", "Suite Teardown  abc  def  ghi",
+                        "Test Setup      abc  def  ghi", "Test Teardown   abc  def  ghi",
+                        "Test Template   abc  def  ghi", "Force Tags      abc  def  ghi",
+                        "Default Tags    abc  def  ghi", "Documentation   abc  def  ghi",
+                        "Metadata        abc  def  ghi", "*** Keywords ***", "akeyword", "keyword"));
     }
 
     @Test

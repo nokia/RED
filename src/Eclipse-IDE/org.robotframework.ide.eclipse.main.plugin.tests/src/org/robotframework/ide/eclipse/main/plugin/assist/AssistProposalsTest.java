@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -411,8 +410,8 @@ public class AssistProposalsTest {
 
         Collections.sort(proposals, AssistProposals.sortedByLabels());
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("ABC", "abc1", "xyz", "Xyz1", "ZZZ",
-                "zzz1");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("ABC", "abc1", "xyz", "Xyz1", "ZZZ", "zzz1");
     }
 
     @Test
@@ -423,8 +422,8 @@ public class AssistProposalsTest {
 
         Collections.sort(proposals, AssistProposals.sortedByLabelsPrefixedFirst("cd"));
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Cd1", "cD2", "CD345", "ABC", "abc1",
-                "abCD", "xyz", "Xyz1", "ZZZ", "zzz1");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Cd1", "cD2", "CD345", "ABC", "abc1", "abCD", "xyz", "Xyz1", "ZZZ", "zzz1");
     }
 
     @Test
@@ -446,10 +445,10 @@ public class AssistProposalsTest {
 
         Collections.sort(proposals, AssistProposals.sortedByLabelsCamelCaseAndPrefixedFirst("CD"));
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Can Detect - src3",
-                "Create Duplicated Name - src2", "Cd1 - src3", "cD2 - src2", "CD345 - src1", "ABC - src2",
-                "abc1 - src1", "abCD - src3", "Do Not Create Docs - src1", "xyz - src1", "Xyz1 - src2", "ZZZ - src3",
-                "zzz1 - src1");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Can Detect - src3", "Create Duplicated Name - src2", "Cd1 - src3", "cD2 - src2",
+                        "CD345 - src1", "ABC - src2", "abc1 - src1", "abCD - src3", "Do Not Create Docs - src1",
+                        "xyz - src1", "Xyz1 - src2", "ZZZ - src3", "zzz1 - src1");
     }
 
     @Test
@@ -475,9 +474,10 @@ public class AssistProposalsTest {
                 varProposal("@{klm1}", VariableOrigin.LOCAL));
         Collections.sort(proposals, AssistProposals.sortedByTypesAndOrigin());
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${abc1}", "${abc2}", "${klm1}", "${klm2}",
-                "${Xyz1}", "${Xyz2}", "${abc3}", "${klm3}", "${Xyz3}", "@{abc1}", "@{abc2}", "@{klm1}", "@{klm2}",
-                "@{Xyz1}", "@{Xyz2}", "@{abc3}", "@{klm3}", "@{Xyz3}");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("${abc1}", "${abc2}", "${klm1}", "${klm2}", "${Xyz1}", "${Xyz2}", "${abc3}", "${klm3}",
+                        "${Xyz3}", "@{abc1}", "@{abc2}", "@{klm1}", "@{klm2}", "@{Xyz1}", "@{Xyz2}", "@{abc3}",
+                        "@{klm3}", "@{Xyz3}");
     }
 
     @Test
@@ -491,7 +491,8 @@ public class AssistProposalsTest {
                 libProposal("klm1", false));
         Collections.sort(proposals, AssistProposals.sortedByLabelsNotImportedFirst());
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("abc1", "klm1", "Xyz1", "abc2", "klm2", "Xyz2");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("abc1", "klm1", "Xyz1", "abc2", "klm2", "Xyz2");
     }
 
     @Test
@@ -504,9 +505,8 @@ public class AssistProposalsTest {
         proposals.add(new RedSitePackagesLibraryProposal("library", false, ProposalMatch.EMPTY));
         Collections.sort(proposals, AssistProposals.sortedByLabelsNotImportedFirstForSitePackagesLibraries());
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("libOne", "library", "oneLib",
-                "libTwo",
-                "myLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("libOne", "library", "oneLib", "libTwo", "myLib");
     }
 
     private AssistProposal proposal(final String content) {

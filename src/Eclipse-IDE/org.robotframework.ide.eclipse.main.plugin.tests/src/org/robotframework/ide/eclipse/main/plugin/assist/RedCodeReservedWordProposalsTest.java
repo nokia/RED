@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
@@ -34,8 +33,9 @@ public class RedCodeReservedWordProposalsTest {
                 predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly(":FOR", "And", "But", "Given", "IN",
-                "IN ENUMERATE", "IN RANGE", "IN ZIP", "Then", "When");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly(":FOR", "And", "But", "Given", "IN", "IN ENUMERATE", "IN RANGE", "IN ZIP", "Then",
+                        "When");
     }
 
     @Test
@@ -45,7 +45,7 @@ public class RedCodeReservedWordProposalsTest {
                 predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("And", "But", "IN");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("And", "But", "IN");
     }
 
     @Test
@@ -54,8 +54,8 @@ public class RedCodeReservedWordProposalsTest {
                 AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("En");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Given", "IN ENUMERATE", "Then",
-                "When");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("Given", "IN ENUMERATE", "Then", "When");
     }
 
     @Test
@@ -64,8 +64,8 @@ public class RedCodeReservedWordProposalsTest {
                 AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("iN");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("IN", "IN ENUMERATE", "IN RANGE",
-                "IN ZIP");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("IN", "IN ENUMERATE", "IN RANGE", "IN ZIP");
     }
 
     @Test
@@ -75,7 +75,8 @@ public class RedCodeReservedWordProposalsTest {
 
         final Comparator<AssistProposal> comparator = reverseComparator(AssistProposals.sortedByLabels());
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("", comparator);
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("When", "Then", "IN ZIP", "IN RANGE",
-                "IN ENUMERATE", "IN", "Given", "But", "And", ":FOR");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("When", "Then", "IN ZIP", "IN RANGE", "IN ENUMERATE", "IN", "Given", "But", "And",
+                        ":FOR");
     }
 }

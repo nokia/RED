@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -109,8 +108,8 @@ public class CreateFreshHolderCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("Keyword 1", "Keyword 2",
-                "Keyword 3", "Keyword 4");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Keyword 1", "Keyword 2", "Keyword 3", "Keyword 4");
 
         final RobotKeywordDefinition addedKeyword = section.getChildren().get(3);
         assertThat(addedKeyword).has(RobotKeywordDefinitionConditions.properlySetParent())
@@ -120,8 +119,8 @@ public class CreateFreshHolderCommandTest {
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("Keyword 1", "Keyword 2",
-                "Keyword 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Keyword 1", "Keyword 2", "Keyword 3");
 
         verify(eventBroker).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED),
                 eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedKeyword)));
@@ -137,8 +136,8 @@ public class CreateFreshHolderCommandTest {
         command.setEventBroker(eventBroker);
 
         command.execute();
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("Keyword 1", "Keyword 4",
-                "Keyword 2", "Keyword 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Keyword 1", "Keyword 4", "Keyword 2", "Keyword 3");
 
         final RobotKeywordDefinition addedKeyword = section.getChildren().get(1);
         assertThat(addedKeyword).has(RobotKeywordDefinitionConditions.properlySetParent())
@@ -148,8 +147,8 @@ public class CreateFreshHolderCommandTest {
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(section.getChildren(), RobotElement::getName)).containsExactly("Keyword 1", "Keyword 2",
-                "Keyword 3");
+        assertThat(section.getChildren()).extracting(RobotElement::getName)
+                .containsExactly("Keyword 1", "Keyword 2", "Keyword 3");
 
         verify(eventBroker).send(eq(RobotModelEvents.ROBOT_ELEMENT_ADDED),
                 eq(ImmutableMap.of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedKeyword)));

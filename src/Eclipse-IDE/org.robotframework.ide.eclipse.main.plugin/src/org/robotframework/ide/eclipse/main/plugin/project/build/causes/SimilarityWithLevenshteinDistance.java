@@ -5,32 +5,29 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Ints;
 
 /**
  * <p>With great power comes great responsibility. Use wisely since this is a naive implementation
- * (not a Levenshtein automaton), so performance is poor for really big (hundreds of thousands) 
+ * (not a Levenshtein automaton), so performance is poor for really big (hundreds of thousands)
  * candidates sets.</p>
- * 
- * <p>For the definition of Levenshtein distance and algorithm for calculating it see 
+ *
+ * <p>For the definition of Levenshtein distance and algorithm for calculating it see
  * {@link https://en.wikipedia.org/wiki/Levenshtein_distance}</p>
- * 
+ *
  * <p>TODO : if this functionality is needed for bigger sets then either:
  *    <ol>
  *      <li>use Trie representation as described in {@link http://stevehanov.ca/blog/index.php?id=114}</li>
  *      <li>implement automaton instead</li>
  *    </ol>
  * </p>
- * 
+ *
  * @author Michal Anglart
  */
 class SimilarityWithLevenshteinDistance {
@@ -45,8 +42,7 @@ class SimilarityWithLevenshteinDistance {
                 result.add(new StringWithDistance(candidate, distance));
             }
         }
-        Collections.sort(result);
-        return newArrayList(transform(result, stringWithDistance -> stringWithDistance.word));
+        return result.stream().sorted().map(stringWithDistance -> stringWithDistance.word).collect(Collectors.toList());
     }
 
     private int distance(final String word1, final String word2) {
@@ -59,7 +55,7 @@ class SimilarityWithLevenshteinDistance {
         for (int j = 0; j < len2; j++) {
             dist[0][j] = j;
         }
-        
+
         for (int i = 1; i < len1; i++) {
             for (int j = 1; j < len2; j++) {
                 if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
@@ -71,7 +67,7 @@ class SimilarityWithLevenshteinDistance {
         }
         return dist[word1.length()][word2.length()];
     }
-    
+
     private static final class StringWithDistance implements Comparable<StringWithDistance> {
 
         final String word;

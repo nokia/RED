@@ -5,13 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
@@ -113,8 +112,7 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).hasSize(6).are(proposalWithImage(null));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  :FOR  ", "  cell1  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  Given ", "  cell1  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  When ", "  cell1  cell2", "  Giv"),
@@ -137,13 +135,12 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).hasSize(1).are(proposalWithImage(null));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  ", "  cell1  cell2", "  Given "));
     }
 
     @Test
-    public void gherkinAndForProposalsAreProvided_whenAtTheBeginingEndOfFirstCellOfKeywordsSection() throws Exception {
+    public void gherkinAndForProposalsAreProvided_whenAtTheBeginningEndOfFirstCellOfKeywordsSection() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(documentFromFile("suite.robot"));
 
@@ -156,8 +153,7 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).hasSize(6).are(proposalWithImage(null));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  ", "  :FOR  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  ", "  Given  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  ", "  When  cell2", "  Giv"),
@@ -180,8 +176,7 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).hasSize(4).are(proposalWithImage(null));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  IN  ", "  :FOR  ${x}  IN cell"),
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  IN RANGE  ", "  :FOR  ${x}  IN cell"),
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  IN ENUMERATE  ", "  :FOR  ${x}  IN cell"),
@@ -202,8 +197,7 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).hasSize(4).are(proposalWithImage(null));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN"),
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN RANGE"),
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN ENUMERATE"),
@@ -224,8 +218,7 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).hasSize(4).are(proposalWithImage(null));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN"),
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN RANGE"),
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN ENUMERATE"),

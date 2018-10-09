@@ -5,13 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
@@ -282,8 +281,7 @@ public class VariablesAssistProcessorTest {
                 .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotListVariableImage())))
                 .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotDictionaryVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Test Cases ***", "case", "  call  ${a}  d${bcdef", "*** Keywords ***", "keyword",
                         "  call  abc  d${abc}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
                         "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"),
@@ -316,10 +314,10 @@ public class VariablesAssistProcessorTest {
         assertThat(proposals).hasSize(1).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(new Document("*** Test Cases ***", "case",
-                "  call  abc  d${b}cdef", "*** Keywords ***", "keyword", "  call  abc  d${abc}d", "*** Variables ***",
-                "${a}  1", "${b}  2", "@{c}  1  2  3", "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
+                .containsOnly(new Document("*** Test Cases ***", "case", "  call  abc  d${b}cdef", "*** Keywords ***",
+                        "keyword", "  call  abc  d${abc}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
+                        "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
     }
 
     @Test
@@ -340,10 +338,10 @@ public class VariablesAssistProcessorTest {
         assertThat(proposals).hasSize(1).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(new Document("*** Test Cases ***", "case",
-                "  call  abc  d${bcdef", "*** Keywords ***", "keyword", "  call  abc  d${a}d", "*** Variables ***",
-                "${a}  1", "${b}  2", "@{c}  1  2  3", "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
+                .containsOnly(new Document("*** Test Cases ***", "case", "  call  abc  d${bcdef", "*** Keywords ***",
+                        "keyword", "  call  abc  d${a}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
+                        "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
     }
 
     @Test
@@ -364,10 +362,10 @@ public class VariablesAssistProcessorTest {
         assertThat(proposals).hasSize(1).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(new Document("*** Test Cases ***", "case",
-                "  call  ${a}  d${bcdef", "*** Keywords ***", "keyword", "  call  abc  d${abc}d", "*** Variables ***",
-                "${a}  1", "${b}  2", "@{c}  1  2  3", "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
+                .containsOnly(new Document("*** Test Cases ***", "case", "  call  ${a}  d${bcdef", "*** Keywords ***",
+                        "keyword", "  call  abc  d${abc}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
+                        "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
     }
 
     @Test
@@ -388,10 +386,10 @@ public class VariablesAssistProcessorTest {
         assertThat(proposals).hasSize(1).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotDictionaryVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(new Document("*** Test Cases ***", "case",
-                "  call  abc  d${bcdef", "*** Keywords ***", "keyword", "  call  abc  &{d}", "*** Variables ***",
-                "${a}  1", "${b}  2", "@{c}  1  2  3", "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
+                .containsOnly(new Document("*** Test Cases ***", "case", "  call  abc  d${bcdef", "*** Keywords ***",
+                        "keyword", "  call  abc  &{d}", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
+                        "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
     }
 
     @Test
@@ -411,8 +409,7 @@ public class VariablesAssistProcessorTest {
         assertThat(proposals).hasSize(2).haveExactly(2,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  ${x}  def  ",
                         "*** Test Cases ***"),
                 new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  ${y}  def  ",
@@ -437,8 +434,7 @@ public class VariablesAssistProcessorTest {
         assertThat(proposals).hasSize(2).haveExactly(2,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  abc  def  ${x}",
                         "*** Test Cases ***"),
                 new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  abc  def  ${y}",

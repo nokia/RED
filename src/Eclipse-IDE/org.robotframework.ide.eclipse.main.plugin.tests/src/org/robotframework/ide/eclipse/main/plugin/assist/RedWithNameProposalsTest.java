@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 
@@ -30,7 +29,7 @@ public class RedWithNameProposalsTest {
         final RedWithNameProposals proposalsProvider = new RedWithNameProposals(predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("WITH NAME");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("WITH NAME");
     }
 
     @Test
@@ -48,7 +47,7 @@ public class RedWithNameProposalsTest {
         final RedWithNameProposals proposalsProvider = new RedWithNameProposals(predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("WITH NAME");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("WITH NAME");
     }
 
     @Test
@@ -56,7 +55,7 @@ public class RedWithNameProposalsTest {
         final RedWithNameProposals proposalsProvider = new RedWithNameProposals(AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("am");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("WITH NAME");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("WITH NAME");
     }
 
     @Test
@@ -65,6 +64,6 @@ public class RedWithNameProposalsTest {
                 AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("with");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("WITH NAME");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("WITH NAME");
     }
 }

@@ -5,13 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
@@ -104,8 +103,7 @@ public class VariablesDefinitionsAssistProcessorTest {
         assertThat(proposals.get(2))
                 .is(proposalWithImage(ImagesManager.getImage(RedImages.getRobotDictionaryVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("line1", "${newScalar}  "),
                 new Document("line1", "@{newList}  item  "),
                 new Document("line1", "&{newDict}  key=value  "));
@@ -133,8 +131,7 @@ public class VariablesDefinitionsAssistProcessorTest {
         assertThat(proposals.get(2))
                 .is(proposalWithImage(ImagesManager.getImage(RedImages.getRobotDictionaryVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("line1", "${newScalar}"),
                 new Document("line1", "@{newList}"),
                 new Document("line1", "&{newDict}"));
@@ -162,8 +159,7 @@ public class VariablesDefinitionsAssistProcessorTest {
         assertThat(proposals.get(2))
                 .is(proposalWithImage(ImagesManager.getImage(RedImages.getRobotDictionaryVariableImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("line1", "${newScalar}  "),
                 new Document("line1", "@{newList}  item  "),
                 new Document("line1", "&{newDict}  key=value  "));

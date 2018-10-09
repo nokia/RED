@@ -5,13 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
@@ -149,8 +148,7 @@ public class LibrariesImportAssistProcessorTest {
         assertThat(proposals).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).contains(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).contains(
                 new Document("*** Settings ***", "Resources  cell", "Library  StdLib1  ", "Library  cell1  cell2"),
                 new Document("*** Settings ***", "Resources  cell", "Library  StdLib2  ", "Library  cell1  cell2"),
                 new Document("*** Settings ***", "Resources  cell", "Library  cRefLib  ", "Library  cell1  cell2"));
@@ -174,8 +172,7 @@ public class LibrariesImportAssistProcessorTest {
         assertThat(proposals).haveExactly(3,
                 proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).contains(
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).contains(
                 new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  StdLib1  cell2"),
                 new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  StdLib2  cell2"),
                 new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  cRefLib  cell2"));
@@ -199,8 +196,7 @@ public class LibrariesImportAssistProcessorTest {
         assertThat(proposals).haveExactly(1,
                 proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
-        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments)
+        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
                 .contains(new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  cRefLib  cell2"));
     }
 

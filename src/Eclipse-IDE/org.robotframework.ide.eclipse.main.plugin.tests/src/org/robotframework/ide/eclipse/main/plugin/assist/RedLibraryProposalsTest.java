@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,7 +70,7 @@ public class RedLibraryProposalsTest {
         final RedLibraryProposals proposalsProvider = new RedLibraryProposals(suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getLibrariesProposals("dl");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("StdLib");
     }
 
     @Test
@@ -79,7 +78,7 @@ public class RedLibraryProposalsTest {
         final RedLibraryProposals proposalsProvider = new RedLibraryProposals(suiteFile, prefixesMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getLibrariesProposals("Std");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("StdLib");
     }
 
     @Test
@@ -87,7 +86,7 @@ public class RedLibraryProposalsTest {
         final RedLibraryProposals proposalsProvider = new RedLibraryProposals(suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getLibrariesProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib", "TestLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("StdLib", "TestLib");
     }
 
     @Test
@@ -96,7 +95,7 @@ public class RedLibraryProposalsTest {
 
         final Comparator<? super RedLibraryProposal> comparator = firstProposalContaining("TestLib");
         final List<? extends AssistProposal> proposals = proposalsProvider.getLibrariesProposals("", comparator);
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("TestLib", "StdLib");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("TestLib", "StdLib");
     }
 
     @Test
@@ -122,7 +121,7 @@ public class RedLibraryProposalsTest {
 
         final RedLibraryProposals proposalsProvider = new RedLibraryProposals(suiteFile);
         final List<? extends AssistProposal> proposals = proposalsProvider.getSitePackagesLibrariesProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).isEmpty();
+        assertThat(proposals).extracting(AssistProposal::getLabel).isEmpty();
     }
 
     @Test
@@ -138,6 +137,6 @@ public class RedLibraryProposalsTest {
 
         final RedLibraryProposals proposalsProvider = new RedLibraryProposals(suiteFile);
         final List<? extends AssistProposal> proposals = proposalsProvider.getSitePackagesLibrariesProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("libOne", "libThree", "libTwo");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("libOne", "libThree", "libTwo");
     }
 }

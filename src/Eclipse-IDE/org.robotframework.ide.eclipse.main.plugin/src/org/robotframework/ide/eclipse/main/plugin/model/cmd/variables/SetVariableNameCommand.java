@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
-import static com.google.common.collect.Iterables.filter;
-
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -26,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-import com.google.common.base.Predicate;
 
 public class SetVariableNameCommand extends EditorCommand {
 
@@ -71,8 +70,9 @@ public class SetVariableNameCommand extends EditorCommand {
 
     private AVariable createProjectedVariable(final Optional<RobotToken> modifiedToken) {
         final List<RobotToken> elementTokens = variable.getLinkedElement().getElementTokens();
-        final Iterable<RobotToken> valueTokens = filter(elementTokens,
-                containingOneOf(RobotTokenType.VARIABLES_VARIABLE_VALUE));
+        final List<RobotToken> valueTokens = elementTokens.stream()
+                .filter(containingOneOf(RobotTokenType.VARIABLES_VARIABLE_VALUE))
+                .collect(Collectors.toList());
 
         final AVariable newHolder;
 
@@ -91,8 +91,9 @@ public class SetVariableNameCommand extends EditorCommand {
             break;
         }
 
-        final Iterable<RobotToken> commentTokens = filter(elementTokens, containingOneOf(
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE));
+        final List<RobotToken> commentTokens = elementTokens.stream()
+                .filter(containingOneOf(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE))
+                .collect(Collectors.toList());
         for (final RobotToken commentToken : commentTokens) {
             newHolder.addCommentPart(commentToken);
         }
@@ -141,16 +142,13 @@ public class SetVariableNameCommand extends EditorCommand {
     }
 
     private static Predicate<RobotToken> containingOneOf(final RobotTokenType... types) {
-        return new Predicate<RobotToken>() {
-            @Override
-            public boolean apply(final RobotToken token) {
-                for (final RobotTokenType type : types) {
-                    if (token.getTypes().contains(type)) {
-                        return true;
-                    }
+        return token -> {
+            for (final RobotTokenType type : types) {
+                if (token.getTypes().contains(type)) {
+                    return true;
                 }
-                return false;
             }
+            return false;
         };
     }
 

@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
@@ -20,8 +19,9 @@ public class RedSectionProposalsTest {
     public void allProposalsAreProvided_whenInputIsEmpty() {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Keywords ***",
-                "*** Settings ***", "*** Tasks ***", "*** Test Cases ***", "*** Variables ***");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("*** Keywords ***", "*** Settings ***", "*** Tasks ***", "*** Test Cases ***",
+                        "*** Variables ***");
     }
 
     @Test
@@ -35,16 +35,17 @@ public class RedSectionProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("*",
                 reverseComparator(AssistProposals.sortedByLabels()));
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Variables ***",
-                "*** Test Cases ***", "*** Tasks ***", "*** Settings ***", "*** Keywords ***");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("*** Variables ***", "*** Test Cases ***", "*** Tasks ***", "*** Settings ***",
+                        "*** Keywords ***");
     }
 
     @Test
     public void onlyProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("es");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Test Cases ***",
-                "*** Variables ***");
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("*** Test Cases ***", "*** Variables ***");
     }
 
     @Test
@@ -52,6 +53,6 @@ public class RedSectionProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSectionProposals(prefixesMatcher())
                 .getSectionsProposals("*** K");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Keywords ***");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("*** Keywords ***");
     }
 }
