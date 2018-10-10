@@ -132,7 +132,7 @@ class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab impl
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).extendedMargins(0, 0, 0, 20).applyTo(group);
 
-        interpretersComposite = new InterpretersComposite(group, newExecutor -> updateLaunchConfigurationDialog());
+        interpretersComposite = new InterpretersComposite(group, () -> updateLaunchConfigurationDialog());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(interpretersComposite);
 
         final Label interpreterArgumentsDescription = new Label(group, SWT.WRAP);
