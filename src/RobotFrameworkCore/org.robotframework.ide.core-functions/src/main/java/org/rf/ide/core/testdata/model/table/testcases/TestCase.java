@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -132,7 +131,7 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
 
     @Override
     public List<RobotExecutableRow<TestCase>> getExecutionContext() {
-        return executablesStream().collect(Collectors.toList());
+        return executablesStream().collect(toList());
     }
 
     public LocalSetting<TestCase> newDocumentation(final int index) {
@@ -256,15 +255,15 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
     }
 
     public List<LocalSetting<TestCase>> getDocumentation() {
-        return documentationsStream().collect(Collectors.toList());
+        return documentationsStream().collect(toList());
     }
 
     public List<LocalSetting<TestCase>> getTags() {
-        return tagsStream().collect(Collectors.toList());
+        return tagsStream().collect(toList());
     }
 
     public List<LocalSetting<TestCase>> getSetups() {
-        return setupsStream().collect(Collectors.toList());
+        return setupsStream().collect(toList());
     }
 
     @Override
@@ -273,7 +272,7 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
     }
 
     public List<LocalSetting<TestCase>> getTeardowns() {
-        return teardownsStream().collect(Collectors.toList());
+        return teardownsStream().collect(toList());
     }
 
     @Override
@@ -282,15 +281,15 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
     }
 
     public List<LocalSetting<TestCase>> getTemplates() {
-        return templatesStream().collect(Collectors.toList());
+        return templatesStream().collect(toList());
     }
 
     public List<LocalSetting<TestCase>> getTimeouts() {
-        return timeoutsStream().collect(Collectors.toList());
+        return timeoutsStream().collect(toList());
     }
 
     public List<LocalSetting<TestCase>> getUnknownSettings() {
-        return unknownSettingsStream().collect(Collectors.toList());
+        return unknownSettingsStream().collect(toList());
     }
 
     public LocalSetting<TestCase> getLastDocumentation() {
@@ -389,7 +388,7 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
         } else {
             return allElements.stream()
                     .filter(el -> el.getModelType() == setting.getModelType())
-                    .collect(Collectors.toList())
+                    .collect(toList())
                     .indexOf(setting) > 0;
         }
     }

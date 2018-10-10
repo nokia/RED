@@ -33,13 +33,6 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCall_forDefault() throws IOException {
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forDefault(12345).build();
-        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith(SuiteExecutor.Python.executableName(), "-m",
-                "robot.run", "--listener");
-    }
-
-    @Test
     public void testSimpleCall_withRuntimeEnvironment_argsFile() throws IOException {
         final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
 

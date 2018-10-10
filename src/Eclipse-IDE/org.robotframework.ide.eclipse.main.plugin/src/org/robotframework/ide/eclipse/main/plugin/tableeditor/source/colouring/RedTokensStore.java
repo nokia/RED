@@ -94,7 +94,7 @@ public class RedTokensStore implements ITextInputListener, IDocumentListener, IR
 
     List<PositionedTextToken> tokensAt(final int offset) {
         final Range<Integer> range = entriesAt(offset);
-        final ArrayList<PositionedTextToken> entries = new ArrayList<>();
+        final List<PositionedTextToken> entries = new ArrayList<>();
         if (range == null) {
             return entries;
         }
@@ -171,17 +171,17 @@ public class RedTokensStore implements ITextInputListener, IDocumentListener, IR
             }
         } else {
             int toRemove = -delta;
-            
+
             int length = firstEntry.getLength();
             firstEntry.setLength(
                     Math.max(damageOffset - firstEntry.getOffset(), firstEntry.getLength() - toRemove));
             int removedSoFar = length - firstEntry.getLength();
             toRemove -= removedSoFar;
-            
+
             int i = startIndex + 1;
             while (i < tokens.size()) {
                 final PositionedTextToken entry = tokens.get(i);
-                
+
                 entry.setOffset(entry.getOffset() - removedSoFar);
 
                 if (toRemove > 0) {

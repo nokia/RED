@@ -6,6 +6,7 @@
 package org.robotframework.red.jface.assist;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
@@ -903,7 +904,7 @@ public class RedContentProposalAdapter {
          * Internal class used to implement the secondary popup.
          */
         private class InfoPopupDialog extends PopupDialog {
-            
+
             private boolean isBrowserAvailable;
 
             private Control control; // Browser or StyledText
@@ -1443,7 +1444,7 @@ public class RedContentProposalAdapter {
 
             // Check each string for a match. Use the string displayed to the
             // user, not the proposal content.
-            final ArrayList<RedContentProposal> list = new ArrayList<>();
+            final List<RedContentProposal> list = new ArrayList<>();
             for (int i = 0; i < proposals.length; i++) {
                 final String string = getString(proposals[i]);
                 if (string.length() >= filterString.length()
