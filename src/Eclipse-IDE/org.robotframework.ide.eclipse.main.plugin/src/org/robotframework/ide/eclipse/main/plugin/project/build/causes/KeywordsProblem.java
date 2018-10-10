@@ -49,12 +49,11 @@ public enum KeywordsProblem implements IProblemCause {
             final String keywordOriginalName = marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null);
             final IFile suiteFile = (IFile) marker.getResource();
 
-            final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
+            final List<IMarkerResolution> fixers = new ArrayList<>();
             fixers.addAll(KeywordsImportsFixes.changeByImportingLibraryWithMissingKeyword(suiteFile, keywordName));
             fixers.addAll(CreateKeywordFixer.createFixers(keywordOriginalName));
             fixers.addAll(ChangeToFixer
                     .createFixers(new SimilaritiesAnalyst().provideSimilarAccessibleKeywords(suiteFile, keywordName)));
-
             return fixers;
         }
     },
@@ -72,13 +71,10 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
             final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
             final List<String> sources = Splitter.on(';')
                     .splitToList(marker.getAttribute(AdditionalMarkerAttributes.SOURCES, ""));
-
-            fixers.addAll(AddPrefixToKeywordUsage.createFixers(name, sources));
-            return fixers;
+            return newArrayList(AddPrefixToKeywordUsage.createFixers(name, sources));
         }
     },
     DEPRECATED_KEYWORD {
@@ -323,11 +319,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-
-            final ArrayList<IMarkerResolution> fixers = newArrayList();
-            fixers.addAll(ChangeToFixer.createFixers(newArrayList("IN", "IN RANGE", "IN ENUMERATE", "IN ZIP")));
-
-            return fixers;
+            return newArrayList(ChangeToFixer.createFixers(newArrayList("IN", "IN RANGE", "IN ENUMERATE", "IN ZIP")));
         }
     },
     VARIABLE_AS_KEYWORD_NAME {
