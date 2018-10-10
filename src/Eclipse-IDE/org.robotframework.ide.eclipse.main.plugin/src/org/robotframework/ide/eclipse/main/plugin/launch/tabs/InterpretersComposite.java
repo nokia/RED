@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Optional;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -63,7 +62,7 @@ class InterpretersComposite extends Composite {
             public void widgetSelected(final SelectionEvent e) {
                 checkEnvironmentBtn.setEnabled(false);
                 comboExecutorName.setEnabled(false);
-                listener.interpreterChanged(Optional.empty());
+                listener.interpreterChanged();
             }
         });
     }
@@ -78,17 +77,15 @@ class InterpretersComposite extends Composite {
             public void widgetSelected(final SelectionEvent e) {
                 checkEnvironmentBtn.setEnabled(true);
                 comboExecutorName.setEnabled(true);
-                listener.interpreterChanged(Optional
-                        .of(SuiteExecutor.valueOf(comboExecutorName.getItem(comboExecutorName.getSelectionIndex()))));
+                listener.interpreterChanged();
             }
         });
         comboExecutorName = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
         comboExecutorName.setItems(SuiteExecutor.allExecutorNames().toArray(new String[0]));
-        comboExecutorName.addModifyListener(e -> listener.interpreterChanged(
-                Optional.of(SuiteExecutor.valueOf(comboExecutorName.getItem(comboExecutorName.getSelectionIndex())))));
+        comboExecutorName.addModifyListener(e -> listener.interpreterChanged());
         GridDataFactory.fillDefaults().applyTo(comboExecutorName);
         final Label systemExecutorLbl = new Label(this, SWT.NONE);
-        systemExecutorLbl.setText("interpreter taken from sytem PATH environment variable");
+        systemExecutorLbl.setText("interpreter taken from system PATH environment variable");
     }
 
     private void createCheckEnvironmentButton() {
@@ -149,6 +146,6 @@ class InterpretersComposite extends Composite {
     @FunctionalInterface
     public interface InterpreterListener {
 
-        void interpreterChanged(Optional<SuiteExecutor> newExecutor);
+        void interpreterChanged();
     }
 }
