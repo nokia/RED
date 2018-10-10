@@ -181,7 +181,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
             final List<String> fixedPaths = new ArrayList<>();
             fixedPaths.add(path.replace('\\', '/'));
             fixedPaths.add(path.replaceAll("\\\\", "\\${/}"));
-            return (List<? extends IMarkerResolution>) ChangeToFixer.createFixers(fixedPaths);
+            return ChangeToFixer.createFixers(fixedPaths);
         }
     },
     IMPORT_PATH_ABSOLUTE {
@@ -505,7 +505,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(ChangeToFixer.createFixers(newArrayList("WITH NAME")));
+            return newArrayList(new ChangeToFixer("WITH NAME"));
         }
     },
     LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION_NOT_RECOGNIZED {
@@ -527,7 +527,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(ChangeToFixer.createFixers(newArrayList("WITH NAME")));
+            return newArrayList(new ChangeToFixer("WITH NAME"));
         }
     },
     VARIABLE_AS_KEYWORD_USAGE_IN_SETTING {
