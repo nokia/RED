@@ -8,6 +8,7 @@ package org.rf.ide.core.executor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,11 @@ import org.rf.ide.core.executor.RobotCommandRpcExecutor.RobotCommandExecutorExce
  * @author Michal Anglart
  */
 class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
+
+    private static final List<String> SCRIPT_FILES = Arrays.asList("robot_session_server.py", "classpath_updater.py",
+            "red_keyword_autodiscover.py", "red_libraries.py", "red_library_autodiscover.py", "red_module_classes.py",
+            "red_modules.py", "red_variables.py", "rflint_integration.py", "SuiteVisitorImportProxy.py",
+            "TestRunnerAgent.py");
 
     private static class InstanceHolder {
 
@@ -34,24 +40,10 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
     private final List<PythonProcessListener> processListeners = new ArrayList<>();
 
-    private File xmlRpcServerScriptFile;
+    private List<File> xmlRpcServerScriptFiles;
 
     private PythonInterpretersCommandExecutors() {
-        try {
-            xmlRpcServerScriptFile = RedTemporaryDirectory.copyScriptFile("robot_session_server.py");
-            RedTemporaryDirectory.copyScriptFile("classpath_updater.py");
-            RedTemporaryDirectory.copyScriptFile("red_keyword_autodiscover.py");
-            RedTemporaryDirectory.copyScriptFile("red_libraries.py");
-            RedTemporaryDirectory.copyScriptFile("red_library_autodiscover.py");
-            RedTemporaryDirectory.copyScriptFile("red_module_classes.py");
-            RedTemporaryDirectory.copyScriptFile("red_modules.py");
-            RedTemporaryDirectory.copyScriptFile("red_variables.py");
-            RedTemporaryDirectory.copyScriptFile("rflint_integration.py");
-            RedTemporaryDirectory.copyScriptFile("SuiteVisitorImportProxy.py");
-            RedTemporaryDirectory.copyScriptFile("TestRunnerAgent.py");
-        } catch (final IOException e) {
-            xmlRpcServerScriptFile = null;
-        }
+        initializeScripts();
     }
 
     List<PythonProcessListener> getListeners() {
@@ -78,8 +70,12 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
     @Override
     public synchronized RobotCommandExecutor getRobotCommandExecutor(
             final PythonInstallationDirectory interpreterPath) {
+        if (!xmlRpcServerScriptFiles.stream().allMatch(File::exists)) {
+            initializeScripts();
+        }
+
         final String pathAsName = interpreterPath.getInterpreterPath();
-        if (xmlRpcServerScriptFile != null) {
+        if (new File(pathAsName).exists()) {
             RobotCommandRpcExecutor executor = executors.get(pathAsName);
             if (executor != null && (executor.isAlive() || executor.isExternal())) {
                 return executor;
@@ -87,13 +83,25 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
                 executors.remove(pathAsName);
             }
             executor = new RobotCommandRpcExecutor(pathAsName, interpreterPath.getInterpreter(),
-                    xmlRpcServerScriptFile);
+                    xmlRpcServerScriptFiles.get(0));
             executor.waitForEstablishedConnection();
             if (executor.isAlive() || executor.isExternal()) {
                 executors.put(pathAsName, executor);
                 return executor;
             }
         }
-        throw new RobotCommandExecutorException("Unable to start XML-RPC server");
+
+        throw new RobotCommandExecutorException("Unable to start XML-RPC server on file: " + interpreterPath);
+    }
+
+    private void initializeScripts() {
+        try {
+            xmlRpcServerScriptFiles = new ArrayList<>();
+            for (final String scriptFile : SCRIPT_FILES) {
+                xmlRpcServerScriptFiles.add(RedTemporaryDirectory.copyScriptFile(scriptFile));
+            }
+        } catch (final IOException e) {
+            throw new RobotCommandExecutorException("Unable to create temporary directory for XML-RPC server", e);
+        }
     }
 }

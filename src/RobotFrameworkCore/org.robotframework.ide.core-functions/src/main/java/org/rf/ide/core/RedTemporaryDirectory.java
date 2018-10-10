@@ -47,7 +47,7 @@ public final class RedTemporaryDirectory {
     }
 
     public static synchronized Path createTemporaryDirectory() throws IOException {
-        if (temporaryDirectory != null) {
+        if (temporaryDirectory != null && temporaryDirectory.toFile().exists()) {
             return temporaryDirectory;
         }
         temporaryDirectory = Files.createTempDirectory(DIR_NAME_PREFIX);
