@@ -40,7 +40,7 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
     private final List<PythonProcessListener> processListeners = new ArrayList<>();
 
-    private List<File> xmlRpcServerScriptFiles;
+    private final List<File> xmlRpcServerScriptFiles = new ArrayList<>();
 
     private PythonInterpretersCommandExecutors() {
         initializeScripts();
@@ -71,6 +71,7 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
     public synchronized RobotCommandExecutor getRobotCommandExecutor(
             final PythonInstallationDirectory interpreterPath) {
         if (!xmlRpcServerScriptFiles.stream().allMatch(File::exists)) {
+            xmlRpcServerScriptFiles.clear();
             initializeScripts();
         }
 
@@ -96,7 +97,6 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
     private void initializeScripts() {
         try {
-            xmlRpcServerScriptFiles = new ArrayList<>();
             for (final String scriptFile : SCRIPT_FILES) {
                 xmlRpcServerScriptFiles.add(RedTemporaryDirectory.copyScriptFile(scriptFile));
             }
