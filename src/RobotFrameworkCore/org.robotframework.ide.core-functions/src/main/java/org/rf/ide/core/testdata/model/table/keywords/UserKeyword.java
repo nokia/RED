@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -114,8 +113,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
 
     @Override
     public List<RobotExecutableRow<UserKeyword>> getExecutionContext() {
-        return executablesStream()
-                .collect(Collectors.toList());
+        return executablesStream().collect(toList());
     }
 
     public LocalSetting<UserKeyword> newDocumentation(final int index) {
@@ -202,23 +200,23 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public List<LocalSetting<UserKeyword>> getDocumentation() {
-        return documentationsStream().collect(Collectors.toList());
+        return documentationsStream().collect(toList());
     }
 
     public List<LocalSetting<UserKeyword>> getTags() {
-        return tagsStream().collect(Collectors.toList());
+        return tagsStream().collect(toList());
     }
 
     public List<LocalSetting<UserKeyword>> getArguments() {
-        return argumentsStream().collect(Collectors.toList());
+        return argumentsStream().collect(toList());
     }
 
     public List<LocalSetting<UserKeyword>> getReturns() {
-        return returnsStream().collect(Collectors.toList());
+        return returnsStream().collect(toList());
     }
 
     public List<LocalSetting<UserKeyword>> getTeardowns() {
-        return teardownsStream().collect(Collectors.toList());
+        return teardownsStream().collect(toList());
     }
 
     public List<? extends ExecutableSetting> getTeardownExecutables() {
@@ -226,11 +224,11 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public List<LocalSetting<UserKeyword>> getTimeouts() {
-        return timeoutsStream().collect(Collectors.toList());
+        return timeoutsStream().collect(toList());
     }
 
     public List<LocalSetting<UserKeyword>> getUnknownSettings() {
-        return unknownSettingsStream().collect(Collectors.toList());
+        return unknownSettingsStream().collect(toList());
     }
 
     private Stream<RobotExecutableRow<UserKeyword>> executablesStream() {
@@ -356,7 +354,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
         } else {
             return allElements.stream()
                     .filter(el -> el.getModelType() == setting.getModelType())
-                    .collect(Collectors.toList())
+                    .collect(toList())
                     .indexOf(setting) > 0;
         }
     }

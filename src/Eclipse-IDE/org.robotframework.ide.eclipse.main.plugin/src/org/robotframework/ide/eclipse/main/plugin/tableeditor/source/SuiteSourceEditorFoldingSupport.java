@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +22,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -115,7 +115,7 @@ class SuiteSourceEditorFoldingSupport {
         return positions.stream()
                 .filter(onlyPositionsSpanning(document, preferences.getFoldingLineLimit()))
                 .map(nextLineShiftedPosition(document))
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     private Collection<Position> calculateSectionsFoldingPositions(final RobotSuiteFile model) {

@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.robotframework.red.swt.Listeners.keyReleasedAdapter;
 import static org.robotframework.red.swt.Listeners.mouseDoubleClickAdapter;
@@ -18,7 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -232,7 +232,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         final String copied = Stream.of(discoveredLibrariesViewer.getStructuredSelection().toArray())
                 .filter(element -> element instanceof RobotDryRunLibraryImport)
                 .map(element -> ((RobotDryRunLibraryImport) element).getName())
-                .collect(Collectors.joining("\n"));
+                .collect(joining("\n"));
         if (!copied.isEmpty()) {
             clipboard.insertContent(copied);
         }
@@ -282,7 +282,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         if (selection instanceof RobotDryRunLibraryImport) {
             return createChildElements((RobotDryRunLibraryImport) selection).stream()
                     .map(LibrariesAutoDiscovererWindow::convertToText)
-                    .collect(Collectors.joining("\n"));
+                    .collect(joining("\n"));
         } else if (selection instanceof DryRunLibraryImportChildElement) {
             final String name = ((DryRunLibraryImportChildElement) selection).getName();
             final String value = ((DryRunLibraryImportChildElement) selection).getValue();
@@ -291,7 +291,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             final String importerPaths = ((DryRunLibraryImportListChildElement) selection).getList()
                     .stream()
                     .map(LibrariesAutoDiscovererWindow::convertToText)
-                    .collect(Collectors.joining("\n"));
+                    .collect(joining("\n"));
             return ((DryRunLibraryImportListChildElement) selection).getName() + "\n" + importerPaths;
         }
         return "";
@@ -330,7 +330,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         } else {
             final List<DryRunLibraryImportChildElement> list = importersPaths.stream()
                     .map(value -> new DryRunLibraryImportChildElement(null, value))
-                    .collect(Collectors.toList());
+                    .collect(toList());
             children.add(new DryRunLibraryImportListChildElement(IMPORTERS_ELEMENT_NAME, list));
         }
 

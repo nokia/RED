@@ -11,7 +11,6 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -90,12 +89,11 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             if (testsMode == TestsMode.RUN) {
                 userController = new UserProcessController();
 
-                final ArrayList<AgentServerStatusListener> additionalServerListeners = newArrayList(
+                final List<AgentServerStatusListener> additionalServerListeners = newArrayList(
                         new ProcessConnectingInRunServerListener(launch));
 
-                final List<RobotAgentEventListener> additionalAgentListeners = new ArrayList<>();
-                additionalAgentListeners.add(new AgentServerVersionsChecker());
-                additionalAgentListeners.add(testsStarter);
+                final List<RobotAgentEventListener> additionalAgentListeners = newArrayList(
+                        new AgentServerVersionsChecker(), testsStarter);
 
                 launchExecution = doLaunch(robotConfig, launch, testsLaunchContext, host, port, timeout, userController,
                         additionalServerListeners, additionalAgentListeners);
@@ -103,24 +101,22 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             } else {
                 final Stacktrace stacktrace = new Stacktrace();
                 final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-                userController = new UserProcessDebugController(stacktrace,
-                        new DebuggerPreferences(new DebuggerErrorDecider(preferences),
-                                !preferences.shouldDebuggerOmitLibraryKeywords()));
+                userController = new UserProcessDebugController(stacktrace, new DebuggerPreferences(
+                        new DebuggerErrorDecider(preferences), !preferences.shouldDebuggerOmitLibraryKeywords()));
 
-                final RobotDebugTarget debugTarget = new RobotDebugTarget("Robot Test at " + host + ":" + port,
-                        launch, stacktrace, (UserProcessDebugController) userController);
+                final RobotDebugTarget debugTarget = new RobotDebugTarget("Robot Test at " + host + ":" + port, launch,
+                        stacktrace, (UserProcessDebugController) userController);
 
-                final EclipseElementsLocator elementsLocator = new EclipseElementsLocator(robotConfig.getProject());
+                final StacktraceBuilder stacktraceBuilder = new StacktraceBuilder(stacktrace,
+                        new EclipseElementsLocator(robotConfig.getProject()),
+                        (uri, line) -> new RobotBreakpoints().getBreakpointAtLine(line, uri));
 
                 final List<AgentServerStatusListener> additionalServerListeners = newArrayList(
                         new ProcessConnectingInDebugServerListener(launch), new BreakpointsEnabler());
 
-                final List<RobotAgentEventListener> additionalAgentListeners = new ArrayList<>();
-                additionalAgentListeners.add(new AgentServerVersionsDebugChecker());
-                additionalAgentListeners.add(testsStarter);
-                additionalAgentListeners.add(new StacktraceBuilder(stacktrace, elementsLocator,
-                        (uri, line) -> new RobotBreakpoints().getBreakpointAtLine(line, uri)));
-                additionalAgentListeners.add(new RobotEvaluationErrorsHandler());
+                final List<RobotAgentEventListener> additionalAgentListeners = newArrayList(
+                        new AgentServerVersionsDebugChecker(), testsStarter, stacktraceBuilder,
+                        new RobotEvaluationErrorsHandler());
 
                 launchExecution = doLaunch(robotConfig, launch, testsLaunchContext, host, port, timeout, userController,
                         additionalServerListeners, additionalAgentListeners);
@@ -195,17 +191,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
     RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject,
             final int port, final RedPreferences preferences) throws CoreException, IOException {
 
-        final IRunCommandLineBuilder builder;
-        if (robotConfig.isUsingInterpreterFromProject()) {
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-            if (runtimeEnvironment != null) {
-                builder = RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port);
-            } else {
-                builder = RunCommandLineCallBuilder.forDefault(port);
-            }
-        } else {
-            builder = RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
-        }
+        final IRunCommandLineBuilder builder = createBuilder(robotConfig, robotProject, port);
 
         builder.useArgumentFile(preferences.shouldLaunchUsingArgumentsFile());
         if (!robotConfig.getExecutableFilePath().isEmpty()) {
@@ -242,6 +228,20 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             builder.excludeTags(robotConfig.getExcludedTags());
         }
         return builder.build();
+    }
+
+    private IRunCommandLineBuilder createBuilder(final RobotLaunchConfiguration robotConfig,
+            final RobotProject robotProject, final int port) throws CoreException {
+        if (robotConfig.isUsingInterpreterFromProject()) {
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            if (runtimeEnvironment != null) {
+                return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port);
+            } else {
+                return RunCommandLineCallBuilder.forExecutor(SuiteExecutor.Python, port);
+            }
+        } else {
+            return RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
+        }
     }
 
     private boolean shouldUseSingleTestPathInCommandLine(final RobotLaunchConfiguration robotConfig,

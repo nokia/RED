@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.rf.ide.core.RedURI;
 
@@ -31,7 +30,7 @@ class Events {
     }
 
     static List<String> ensureListOfStrings(final List<?> list) {
-        return list.stream().map(String.class::cast).collect(Collectors.toList());
+        return list.stream().map(String.class::cast).collect(toList());
     }
 
     static List<Map<String, Object>> ensureListOfOrderedMapOfStringsToObjects(final List<?> list) {

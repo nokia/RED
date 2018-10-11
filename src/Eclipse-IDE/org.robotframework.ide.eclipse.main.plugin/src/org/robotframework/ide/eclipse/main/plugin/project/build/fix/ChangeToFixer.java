@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IMarker;
@@ -27,7 +28,7 @@ import org.robotframework.red.graphics.ImagesManager;
  */
 public class ChangeToFixer extends RedSuiteMarkerResolution {
 
-    public static Collection<ChangeToFixer> createFixers(final Collection<String> replacements) {
+    public static List<ChangeToFixer> createFixers(final Collection<String> replacements) {
         return replacements.stream().map(ChangeToFixer::new).collect(toList());
     }
 

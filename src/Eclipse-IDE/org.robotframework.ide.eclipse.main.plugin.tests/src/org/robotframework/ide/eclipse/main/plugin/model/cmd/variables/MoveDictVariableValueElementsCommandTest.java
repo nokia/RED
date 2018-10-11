@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -66,7 +65,7 @@ public class MoveDictVariableValueElementsCommandTest {
     public void exceptionIsThrown_whenTryingToMoveElementsInsideInvalid() {
         final RobotVariable variable = createVariables().get(4);
 
-        final ArrayList<DictionaryKeyValuePair> elements = newArrayList(
+        final List<DictionaryKeyValuePair> elements = newArrayList(
                 new DictionaryKeyValuePair(new RobotToken(), new RobotToken(), new RobotToken()));
         final MoveDictVariableValueElementsCommand command = new MoveDictVariableValueElementsCommand(variable,
                 elements, MoveDirection.UP);
