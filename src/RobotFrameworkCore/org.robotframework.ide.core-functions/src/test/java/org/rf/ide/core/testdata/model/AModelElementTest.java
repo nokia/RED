@@ -37,7 +37,7 @@ public class AModelElementTest {
     }
 
     @Test
-    public void test_updateOrCreatTokenInside_withExpectedTypeToSet_threeElementListAndTheSecondToUpdate() {
+    public void test_updateOrCreateTokenInside_withExpectedTypeToSet_threeElementListAndTheSecondToUpdate() {
         // prepare
         final RobotToken tok1 = token("tok1");
         final RobotToken tok2 = token("tok2");
@@ -61,7 +61,7 @@ public class AModelElementTest {
     }
 
     @Test
-    public void test_updateOrCreatTokenInside_withExpectedTypeToSet_oneElementListAndSetElementIndex2_shouldFillLack() {
+    public void test_updateOrCreateTokenInside_withExpectedTypeToSet_oneElementListAndSetElementIndex2_shouldFillLack() {
         // prepare
         final List<RobotToken> toks = new ArrayList<>(Arrays.asList(token("tok1")));
         final RobotToken toSet = token("tok3");
@@ -78,7 +78,7 @@ public class AModelElementTest {
     }
 
     @Test
-    public void test_updateOrCreatTokenInside_withExpectedTypeToSet_emptyListAndSetElementIndex2_shouldFillLack() {
+    public void test_updateOrCreateTokenInside_withExpectedTypeToSet_emptyListAndSetElementIndex2_shouldFillLack() {
         // prepare
         final List<RobotToken> toks = new ArrayList<>();
         final RobotToken toSet = token("tok3");
@@ -131,8 +131,7 @@ public class AModelElementTest {
         }
 
         @Override
-        public boolean removeElementToken(int index) {
-            // TODO Auto-generated method stub
+        public boolean removeElementToken(final int index) {
             return false;
         }
     }

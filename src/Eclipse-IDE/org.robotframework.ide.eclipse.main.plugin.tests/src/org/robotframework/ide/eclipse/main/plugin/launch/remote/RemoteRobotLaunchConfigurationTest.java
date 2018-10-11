@@ -65,12 +65,6 @@ public class RemoteRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void projectIsReturned_whenAskedForResourcesUnderDebug() throws CoreException {
-        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(projectProvider.getProject());
-    }
-
-    @Test
     public void whenServerIpIsEmpty_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Server IP cannot be empty");

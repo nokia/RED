@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.VariablesPlugin;
@@ -212,11 +214,12 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             builder.addVariableFiles(redConfig.getVariableFilePaths());
         }
 
-        if (shouldUseSingleTestPathInCommandLine(robotConfig, preferences)) {
-            builder.withProject(robotConfig.getSuiteResources().get(0).getLocation().toFile());
-            builder.testsToRun(robotConfig.getSuitePaths().values().iterator().next());
+        final List<IResource> resources = robotConfig.getSuiteResources();
+        if (shouldUseSingleTestPathInCommandLine(resources, preferences)) {
+            builder.withDataSources(newArrayList(getOnlyElement(resources).getLocation().toFile()));
+            builder.testsToRun(getOnlyElement(robotConfig.getSuitePaths().values()));
         } else {
-            builder.withProject(robotProject.getProject().getLocation().toFile());
+            builder.withDataSources(newArrayList(robotProject.getProject().getLocation().toFile()));
             builder.suitesToRun(robotConfig.getSuitesToRun());
             builder.testsToRun(robotConfig.getTestsToRun());
         }
@@ -244,11 +247,11 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         }
     }
 
-    private boolean shouldUseSingleTestPathInCommandLine(final RobotLaunchConfiguration robotConfig,
+    private boolean shouldUseSingleTestPathInCommandLine(final List<IResource> resources,
             final RedPreferences preferences) throws CoreException {
         // FIXME temporary fix for https://github.com/robotframework/robotframework/issues/2564
-        return preferences.shouldUseSingleFileDataSource() && robotConfig.getSuiteResources().size() == 1
-                && robotConfig.getSuiteResources().get(0) instanceof IFile;
+        return preferences.shouldUseSingleFileDataSource() && resources.size() == 1
+                && getOnlyElement(resources) instanceof IFile;
     }
 
     private File resolveExecutableFile(final String path) throws CoreException {

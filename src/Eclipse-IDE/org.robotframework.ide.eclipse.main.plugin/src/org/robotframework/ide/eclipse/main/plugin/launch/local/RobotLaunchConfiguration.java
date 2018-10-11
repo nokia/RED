@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Iterables.getFirst;
-import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
@@ -73,10 +71,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public static final String CURRENT_CONFIGURATION_VERSION = "1";
 
     static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
-        final Map<IResource, List<String>> suitesMapping = new HashMap<>();
-        for (final IResource resource : resources) {
-            suitesMapping.put(resource, new ArrayList<>());
-        }
+        final Map<IResource, List<String>> suitesMapping = resources.stream()
+                .collect(Collectors.toMap(r -> r, r -> new ArrayList<>()));
         return prepareCopy(suitesMapping, RobotLaunchConfigurationType.GENERAL_PURPOSE);
     }
 
@@ -124,12 +120,6 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
         super(config);
-    }
-
-    @Override
-    public List<IResource> getResourcesUnderDebug() throws CoreException {
-        final List<IResource> suiteResources = getSuiteResources();
-        return suiteResources.isEmpty() ? newArrayList(getProject()) : suiteResources;
     }
 
     @Override
@@ -246,18 +236,21 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public void setSuitePaths(final Map<String, List<String>> suitesToCases) throws CoreException {
         // test case names should be always in lower case
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(),
-                path -> suitesToCases.get(path)
-                        .stream()
-                        .filter(Predicates.notNull())
-                        .map(String::toLowerCase)
-                        .collect(Collectors.joining("::")));
+
+        final Map<String, String> suites = new HashMap<>();
+        for (final Entry<String, List<String>> entry : suitesToCases.entrySet()) {
+            final String joinedTestNames = entry.getValue()
+                    .stream()
+                    .filter(Predicates.notNull())
+                    .map(String::toLowerCase)
+                    .collect(Collectors.joining("::"));
+            suites.put(entry.getKey(), joinedTestNames);
+        }
         launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
     }
 
     public Map<String, List<String>> getSuitePaths() throws CoreException {
-        final Map<String, String> mapping = configuration.getAttribute(TEST_SUITES_ATTRIBUTE,
-                new HashMap<String, String>());
+        final Map<String, String> mapping = configuration.getAttribute(TEST_SUITES_ATTRIBUTE, new HashMap<>());
         final Map<String, List<String>> suitesToTestsMapping = new HashMap<>();
         for (final Entry<String, String> entry : mapping.entrySet()) {
             final List<String> splittedTestNames = Splitter.on("::").omitEmptyStrings().splitToList(entry.getValue());
@@ -268,10 +261,10 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public void updateTestCases(final Map<IResource, List<String>> suitesMapping) throws CoreException {
         final Map<String, List<String>> suitesNamesMapping = new HashMap<>();
-        for (final IResource resource : suitesMapping.keySet()) {
+        for (final Entry<IResource, List<String>> entry : suitesMapping.entrySet()) {
+            final IResource resource = entry.getKey();
             if (!(resource instanceof IProject)) {
-                suitesNamesMapping.put(resource.getProjectRelativePath().toPortableString(),
-                        suitesMapping.get(resource));
+                suitesNamesMapping.put(resource.getProjectRelativePath().toPortableString(), entry.getValue());
             }
         }
         setSuitePaths(suitesNamesMapping);
