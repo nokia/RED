@@ -58,9 +58,7 @@ public class RunCommandLineCallBuilder {
 
         IRunCommandLineBuilder addUserArgumentsForRobot(final Collection<String> arguments);
 
-        IRunCommandLineBuilder withProject(final File project);
-
-        IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<File> additionalProjectsLocations);
+        IRunCommandLineBuilder withDataSources(final Collection<File> dataSources);
 
         RunCommandLine build() throws IOException;
     }
@@ -89,9 +87,7 @@ public class RunCommandLineCallBuilder {
 
         private final List<String> tagsToExclude = new ArrayList<>();
 
-        private File project = null;
-
-        private final List<File> additionalProjectsLocations = new ArrayList<>();
+        private final List<File> dataSources = new ArrayList<>();
 
         private final List<String> robotUserArgs = new ArrayList<>();
 
@@ -188,15 +184,8 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder withProject(final File project) {
-            this.project = project;
-            return this;
-        }
-
-        @Override
-        public IRunCommandLineBuilder withAdditionalProjectsLocations(
-                final Collection<File> additionalProjectsLocations) {
-            this.additionalProjectsLocations.addAll(additionalProjectsLocations);
+        public IRunCommandLineBuilder withDataSources(final Collection<File> dataSources) {
+            this.dataSources.addAll(dataSources);
             return this;
         }
 
@@ -255,11 +244,8 @@ public class RunCommandLineCallBuilder {
                 cmdLine.addAll(createInlinedArguments());
             }
 
-            if (project != null) {
-                cmdLine.add(project.getAbsolutePath());
-            }
-            for (final File projectLocation : additionalProjectsLocations) {
-                cmdLine.add(projectLocation.getAbsolutePath());
+            for (final File dataSource : dataSources) {
+                cmdLine.add(dataSource.getAbsolutePath());
             }
             return new RunCommandLine(cmdLine, argumentsFile);
         }

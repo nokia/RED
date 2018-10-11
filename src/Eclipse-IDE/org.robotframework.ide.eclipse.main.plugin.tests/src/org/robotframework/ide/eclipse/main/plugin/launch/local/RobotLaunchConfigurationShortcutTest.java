@@ -64,7 +64,6 @@ public class RobotLaunchConfigurationShortcutTest {
         assertThat(configs.length).isEqualTo(1);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configs[0]);
         assertThat(robotConfig.getProject()).isEqualTo(project);
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resource);
         assertThat(robotConfig.isGeneralPurposeConfiguration()).isTrue();
     }
 
@@ -83,7 +82,6 @@ public class RobotLaunchConfigurationShortcutTest {
         assertThat(configs.length).isEqualTo(1);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configs[0]);
         assertThat(robotConfig.getProject()).isEqualTo(project);
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resource);
         assertThat(robotConfig.isGeneralPurposeConfiguration()).isFalse();
     }
 
@@ -128,7 +126,6 @@ public class RobotLaunchConfigurationShortcutTest {
         assertThat(configs.length).isEqualTo(1);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configs[0]);
         assertThat(robotConfig.getProject()).isEqualTo(project);
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resource);
         assertThat(robotConfig.isGeneralPurposeConfiguration()).isTrue();
     }
 

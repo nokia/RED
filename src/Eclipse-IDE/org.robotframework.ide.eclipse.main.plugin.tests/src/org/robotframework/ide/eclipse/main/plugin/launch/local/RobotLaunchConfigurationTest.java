@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -296,25 +295,6 @@ public class RobotLaunchConfigurationTest {
         RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
         assertThat(robotConfig.getRobotArguments()).isEqualTo("-R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
-    }
-
-    @Test
-    public void projectIsReturned_whenAskedForResourcesUnderDebug() throws CoreException {
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        robotConfig.setSuitePaths(Collections.emptyMap());
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(projectProvider.getProject());
-    }
-
-    @Test
-    public void resourcesAreReturned_whenAskedForResourcesUnderDebug() throws CoreException, IOException {
-        final IResource res1 = projectProvider.createFile("DebugResource1.robot");
-        final IResource res2 = projectProvider.createFile("DebugResource2.robot");
-        final List<String> casesForRes1 = asList("case1");
-        final List<String> casesForRes2 = asList("case2");
-
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
-        assertThat(robotConfig.getResourcesUnderDebug()).containsOnly(res1, res2);
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {

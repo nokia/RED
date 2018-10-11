@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.wizards;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -21,8 +22,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewFolderMainPage;
 
-import com.google.common.collect.Maps;
-
 public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
 
     private Button initializationFileButton;
@@ -35,7 +34,7 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
             final String firstExtension, final String... restExtensions) {
         super(pageName, selection);
         currentSelection = selection;
-        extensionButtons = Maps.newLinkedHashMap();
+        extensionButtons = new LinkedHashMap<>();
         extensionButtons.put(firstExtension, null);
         for (final String extension : restExtensions) {
             extensionButtons.put(extension, null);
