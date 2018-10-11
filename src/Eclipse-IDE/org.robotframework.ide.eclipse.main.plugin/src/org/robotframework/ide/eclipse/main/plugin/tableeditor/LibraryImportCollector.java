@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -50,7 +49,7 @@ public class LibraryImportCollector {
                 .distinct()
                 .filter(res -> isExistingFile(res) && !alreadyVisited.contains(res))
                 .map(IFile.class::cast)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     private static boolean isExistingFile(final IResource res) {

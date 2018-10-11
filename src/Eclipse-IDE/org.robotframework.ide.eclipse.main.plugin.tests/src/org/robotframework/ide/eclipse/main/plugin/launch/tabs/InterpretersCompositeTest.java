@@ -69,7 +69,7 @@ public class InterpretersCompositeTest {
     @Test
     public void whenSystemInterpreterIsChosen_listenerIsNotified() {
         final AtomicBoolean listenerWasCalled = new AtomicBoolean(false);
-        final InterpreterListener listener = newExecutor -> listenerWasCalled.set(true);
+        final InterpreterListener listener = () -> listenerWasCalled.set(true);
 
         final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(), listener);
         composite.setInput(true, SuiteExecutor.Jython);
@@ -97,7 +97,7 @@ public class InterpretersCompositeTest {
     @Test
     public void whenProjectInterpreterIsChosen_listenerIsNotified() {
         final AtomicBoolean listenerWasCalled = new AtomicBoolean(false);
-        final InterpreterListener listener = newExecutor -> listenerWasCalled.set(true);
+        final InterpreterListener listener = () -> listenerWasCalled.set(true);
 
         final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(), listener);
         composite.setInput(false, SuiteExecutor.PyPy);
@@ -125,7 +125,7 @@ public class InterpretersCompositeTest {
     @Test
     public void whenSystemInterpreterHasChanged_listenerIsNotified() {
         final AtomicBoolean listenerWasCalled = new AtomicBoolean(false);
-        final InterpreterListener listener = newExecutor -> listenerWasCalled.set(true);
+        final InterpreterListener listener = () -> listenerWasCalled.set(true);
 
         final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(), listener);
         composite.setInput(false, SuiteExecutor.PyPy);
@@ -198,6 +198,7 @@ public class InterpretersCompositeTest {
 
     private static Condition<? super Button> selected() {
         return new Condition<Button>() {
+
             @Override
             public boolean matches(final Button button) {
                 return button.getSelection();
@@ -207,6 +208,7 @@ public class InterpretersCompositeTest {
 
     private static Condition<? super Control> enabled() {
         return new Condition<Control>() {
+
             @Override
             public boolean matches(final Control control) {
                 return control.isEnabled();

@@ -380,10 +380,6 @@ public class RunCommandLineCallBuilder {
         return new Builder(executor, executor.executableName(), listenerPort);
     }
 
-    public static IRunCommandLineBuilder forDefault(final int listenerPort) {
-        return forExecutor(SuiteExecutor.Python, listenerPort);
-    }
-
     public static class RunCommandLine {
 
         private final List<String> commandLine;

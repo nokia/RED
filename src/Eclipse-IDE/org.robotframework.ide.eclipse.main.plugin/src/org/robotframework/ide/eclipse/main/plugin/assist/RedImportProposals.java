@@ -63,7 +63,7 @@ public class RedImportProposals {
             }
         }
 
-        final ArrayList<RedImportProposal> resProposals = new ArrayList<>();
+        final List<RedImportProposal> resProposals = new ArrayList<>();
         for (final String path : suiteFile.getResourcesPaths()) {
             final String nameToUse = Files.getNameWithoutExtension(path);
 

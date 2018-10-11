@@ -99,7 +99,7 @@ public enum VariablesProblem implements IProblemCause {
             final String varName = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
             final boolean defineLocally = marker.getAttribute(AdditionalMarkerAttributes.DEFINE_VAR_LOCALLY, false);
 
-            final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
+            final List<IMarkerResolution> fixers = new ArrayList<>();
             if (defineLocally) {
                 fixers.add(new CreateLocalVariableFixer(varName));
             }
@@ -125,7 +125,7 @@ public enum VariablesProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final String value = marker.getAttribute(AdditionalMarkerAttributes.VALUE, null);
 
-            final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
+            final List<IMarkerResolution> fixers = new ArrayList<>();
             if (value != null) {
                 fixers.addAll(ChangeToFixer.createFixers(newArrayList(value + "=value")));
             }

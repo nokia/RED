@@ -78,21 +78,17 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     void waitForEstablishedConnection() {
-        if (new File(interpreterPath).exists() && scriptFile.exists()) {
-            isExternal = RedSystemProperties.shouldConnectToRunningServer();
+        isExternal = RedSystemProperties.shouldConnectToRunningServer();
 
-            if (isExternal) {
-                client = createClient(RedSystemProperties.getSessionServerAddress());
-            } else {
-                final int port = findFreePort();
-                server = new XmlRpcServer();
-                server.start(port);
-                client = createClient("127.0.0.1:" + port);
-            }
-            waitForConnectionToServer(CONNECTION_TIMEOUT);
+        if (isExternal) {
+            client = createClient(RedSystemProperties.getSessionServerAddress());
         } else {
-            throw new RobotCommandExecutorException("Unable to start XML-RPC server on file: " + interpreterPath);
+            final int port = findFreePort();
+            server = new XmlRpcServer();
+            server.start(port);
+            client = createClient("127.0.0.1:" + port);
         }
+        waitForConnectionToServer(CONNECTION_TIMEOUT);
     }
 
     private static int findFreePort() {

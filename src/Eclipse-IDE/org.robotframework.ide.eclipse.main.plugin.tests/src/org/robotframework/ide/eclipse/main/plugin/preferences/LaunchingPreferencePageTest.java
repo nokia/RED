@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -41,12 +40,13 @@ public class LaunchingPreferencePageTest {
         final LaunchingPreferencePage page = new LaunchingPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<String> prefNames = FieldEditorPreferencePageHelper.getEditorsOfType(page,
-                BooleanFieldEditor.class).stream().map(FieldEditor::getPreferenceName).collect(toList());
+        final List<BooleanFieldEditor> editors = FieldEditorPreferencePageHelper.getEditorsOfType(page,
+                BooleanFieldEditor.class);
 
-        assertThat(prefNames).containsOnly(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
-                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE,
-                RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT, RedPreferences.LIMIT_MSG_LOG_OUTPUT);
+        assertThat(editors).extracting(FieldEditor::getPreferenceName)
+                .containsOnly(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
+                        RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE,
+                        RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT, RedPreferences.LIMIT_MSG_LOG_OUTPUT);
 
     }
 
@@ -55,11 +55,10 @@ public class LaunchingPreferencePageTest {
         final LaunchingPreferencePage page = new LaunchingPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<String> prefNames = FieldEditorPreferencePageHelper.getEditorsOfType(page, IntegerFieldEditor.class)
-                .stream()
-                .map(FieldEditor::getPreferenceName)
-                .collect(toList());
+        final List<IntegerFieldEditor> editors = FieldEditorPreferencePageHelper.getEditorsOfType(page,
+                IntegerFieldEditor.class);
 
-        assertThat(prefNames).containsOnly(RedPreferences.LIMIT_MSG_LOG_LENGTH);
+        assertThat(editors).extracting(FieldEditor::getPreferenceName)
+                .containsOnly(RedPreferences.LIMIT_MSG_LOG_LENGTH);
     }
 }

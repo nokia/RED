@@ -12,7 +12,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -215,7 +214,7 @@ public class RobotSetting extends RobotKeywordCall {
             final List<RobotToken> arguments = args.subList(1, args.size())
                     .stream()
                     .map(arg -> RobotToken.create(arg))
-                    .collect(Collectors.toList());
+                    .collect(toList());
             final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
             final Optional<String> uri = resolver.getUri();
             try {
