@@ -5,11 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import static com.google.common.collect.Iterables.getFirst;
+import static com.google.common.collect.Iterables.getOnlyElement;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -20,18 +20,15 @@ public class RobotLaunchConfigurationNaming {
 
     public static String getBasicName(final Collection<IResource> resources, final RobotLaunchConfigurationType type) {
         if (resources.size() == 1) {
-            return getFirst(resources, null).getName() + type.getNameSuffix();
+            return getOnlyElement(resources).getName() + type.getNameSuffix();
         }
-        final Set<IProject> projects = new HashSet<>();
-        for (final IResource res : resources) {
-            if (projects.add(res.getProject())) {
-                if (projects.size() > 1) {
-                    break;
-                }
-            }
-        }
+        final Set<IProject> projects = resources.stream()
+                .map(IResource::getProject)
+                .distinct()
+                .limit(2)
+                .collect(Collectors.toSet());
         if (projects.size() == 1) {
-            return getFirst(projects, null).getName() + type.getNameSuffix();
+            return getOnlyElement(projects).getName() + type.getNameSuffix();
         }
         return NEW_CONFIGURATION_NAME;
     }

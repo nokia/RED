@@ -5,11 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 public interface IRobotLaunchConfiguration {
@@ -27,8 +25,6 @@ public interface IRobotLaunchConfiguration {
     void setProjectName(String projectName) throws CoreException;
 
     IProject getProject() throws CoreException;
-
-    List<IResource> getResourcesUnderDebug() throws CoreException;
 
     boolean isUsingRemoteAgent() throws CoreException;
 
