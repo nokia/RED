@@ -6,27 +6,22 @@
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 public class ExecutionViewNodesPropertyTesterTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private final ExecutionViewNodesPropertyTester tester = new ExecutionViewNodesPropertyTester();
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotExecutionView() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
-                + ExecutionTreeNode.class.getName());
-
-        tester.test(new Object(), "property", null, true);
+        assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
+                .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
+                        + ExecutionTreeNode.class.getName())
+                .withNoCause();
     }
 
     @Test

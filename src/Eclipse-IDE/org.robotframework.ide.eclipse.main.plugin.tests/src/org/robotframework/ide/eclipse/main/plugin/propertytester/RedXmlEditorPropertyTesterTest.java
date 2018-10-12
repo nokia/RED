@@ -6,31 +6,26 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 
 public class RedXmlEditorPropertyTesterTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private final RedXmlEditorPropertyTester tester = new RedXmlEditorPropertyTester();
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotRedXmlEditor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
-                + RedProjectEditor.class.getName());
-
-        tester.test(new Object(), "property", null, true);
+        assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
+                .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
+                        + RedProjectEditor.class.getName())
+                .withNoCause();
     }
 
     @Test

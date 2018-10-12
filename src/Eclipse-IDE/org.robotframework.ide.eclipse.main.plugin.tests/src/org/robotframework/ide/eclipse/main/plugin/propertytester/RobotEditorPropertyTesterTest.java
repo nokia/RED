@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,9 +17,7 @@ import java.util.Optional;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.editors.text.TextEditor;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.RedClipboardMock;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -38,18 +37,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
 public class RobotEditorPropertyTesterTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private final RobotEditorPropertyTester tester = new RobotEditorPropertyTester();
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotRobotEditor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
-                + RobotFormEditor.class.getName());
-
-        tester.test(new Object(), "property", null, true);
+        assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
+                .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
+                        + RobotFormEditor.class.getName())
+                .withNoCause();
     }
 
     @Test
@@ -100,7 +95,7 @@ public class RobotEditorPropertyTesterTest {
         when(editorOnSectionPageWithSection.provideSuiteModel()).thenReturn(new RobotSuiteFileCreator().build());
         when(editorOnSectionPageWithoutSection.getActiveEditor()).thenReturn(sectionEditorPartWithoutSection);
         when(editorOnSectionPageWithoutSection.provideSuiteModel()).thenReturn(new RobotSuiteFileCreator().build());
-        
+
         when(sectionEditorPartWithSection.provideSection(any(RobotSuiteFile.class)))
                 .thenReturn(Optional.of(mock(RobotSuiteFileSection.class)));
         when(sectionEditorPartWithoutSection.provideSection(any(RobotSuiteFile.class))).thenReturn(Optional.empty());

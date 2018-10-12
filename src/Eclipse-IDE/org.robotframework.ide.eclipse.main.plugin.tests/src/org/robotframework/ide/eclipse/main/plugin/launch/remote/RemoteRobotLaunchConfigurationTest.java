@@ -6,21 +6,18 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.RunConfigurationProvider;
 
 public class RemoteRobotLaunchConfigurationTest {
 
     private static final String PROJECT_NAME = RemoteRobotLaunchConfigurationTest.class.getSimpleName();
-
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
 
     @Rule
     public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
@@ -66,92 +63,92 @@ public class RemoteRobotLaunchConfigurationTest {
 
     @Test
     public void whenServerIpIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Server IP cannot be empty");
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionHostValue("");
-        robotConfig.getAgentConnectionHost();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionHost)
+                .withMessage("Server IP cannot be empty")
+                .withNoCause();
     }
 
     @Test
     public void whenPortIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(String.format("Server port '' must be an Integer between 1 and %,d", 65_535));
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("");
-        robotConfig.getAgentConnectionPort();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionPort)
+                .withMessage("Server port '' must be an Integer between 1 and %,d", 65_535)
+                .withNoCause();
     }
 
     @Test
     public void whenPortIsNotANumber_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(String.format("Server port 'abc' must be an Integer between 1 and %,d", 65_535));
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("abc");
-        robotConfig.getAgentConnectionPort();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionPort)
+                .withMessage("Server port 'abc' must be an Integer between 1 and %,d", 65_535)
+                .withNoCause();
     }
 
     @Test
     public void whenPortIsBelowRange_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(String.format("Server port '0' must be an Integer between 1 and %,d", 65_535));
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("0");
-        robotConfig.getAgentConnectionPort();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionPort)
+                .withMessage("Server port '0' must be an Integer between 1 and %,d", 65_535)
+                .withNoCause();
     }
 
     @Test
     public void whenPortIsAboveRange_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(String.format("Server port '65536' must be an Integer between 1 and %,d", 65_535));
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("65536");
-        robotConfig.getAgentConnectionPort();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionPort)
+                .withMessage("Server port '65536' must be an Integer between 1 and %,d", 65_535)
+                .withNoCause();
     }
 
     @Test
     public void whenTimeoutIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(String.format("Connection timeout '' must be an Integer between 1 and %,d", 3_600));
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("");
-        robotConfig.getAgentConnectionTimeout();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionTimeout)
+                .withMessage("Connection timeout '' must be an Integer between 1 and %,d", 3_600)
+                .withNoCause();
     }
 
     @Test
     public void whenTimeoutIsNotANumber_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(String.format("Connection timeout 'abc' must be an Integer between 1 and %,d", 3_600));
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("abc");
-        robotConfig.getAgentConnectionTimeout();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionTimeout)
+                .withMessage("Connection timeout 'abc' must be an Integer between 1 and %,d", 3_600)
+                .withNoCause();
     }
 
     @Test
     public void whenTimeoutIsBelowRange_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(String.format("Connection timeout '0' must be an Integer between 1 and %,d", 3_600));
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("0");
-        robotConfig.getAgentConnectionTimeout();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionTimeout)
+                .withMessage("Connection timeout '0' must be an Integer between 1 and %,d", 3_600)
+                .withNoCause();
     }
 
     @Test
     public void whenTimeoutIsAboveRange_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(String.format("Connection timeout '3601' must be an Integer between 1 and %,d", 3_600));
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("3601");
-        robotConfig.getAgentConnectionTimeout();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionTimeout)
+                .withMessage("Connection timeout '3601' must be an Integer between 1 and %,d", 3_600)
+                .withNoCause();
     }
 
     @Test
@@ -173,33 +170,33 @@ public class RemoteRobotLaunchConfigurationTest {
 
     @Test
     public void whenProjectNotInWorkspace_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Project 'not_existing' cannot be found in workspace");
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setProjectName("not_existing");
-        robotConfig.getProject();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
+                .withMessage("Project 'not_existing' cannot be found in workspace")
+                .withNoCause();
     }
 
     @Test
     public void whenProjectIsClosed_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Project '" + PROJECT_NAME + "' is currently closed");
-
         projectProvider.getProject().close(null);
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
-        robotConfig.getProject();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
+                .withMessage("Project '%s' is currently closed", PROJECT_NAME)
+                .withNoCause();
     }
 
     @Test
     public void whenProjectIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Project cannot be empty");
-
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setProjectName("");
-        robotConfig.getProject();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
+                .withMessage("Project cannot be empty")
+                .withNoCause();
     }
 
     private RemoteRobotLaunchConfiguration getDefaultRemoteRobotLaunchConfiguration() throws CoreException {

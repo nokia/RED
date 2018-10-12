@@ -6,14 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.core.resources.IResource;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -21,9 +20,6 @@ public class RedXmlForNavigatorPropertyTesterTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RedXmlForNavigatorPropertyTesterTest.class);
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     private final RedXmlForNavigatorPropertyTester tester = new RedXmlForNavigatorPropertyTester();
 
@@ -42,11 +38,10 @@ public class RedXmlForNavigatorPropertyTesterTest {
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotResource() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
-                + IResource.class.getName());
-
-        tester.test(new Object(), "property", null, true);
+        assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
+                .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
+                        + IResource.class.getName())
+                .withNoCause();
     }
 
     @Test

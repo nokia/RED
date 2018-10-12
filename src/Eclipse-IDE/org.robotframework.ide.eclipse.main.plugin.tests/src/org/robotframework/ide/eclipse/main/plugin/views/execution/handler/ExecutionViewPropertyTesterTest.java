@@ -6,14 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
@@ -22,18 +21,14 @@ import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewW
 @SuppressWarnings("restriction")
 public class ExecutionViewPropertyTesterTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private final ExecutionViewPropertyTester tester = new ExecutionViewPropertyTester();
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotExecutionView() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
-                + ExecutionViewWrapper.class.getName());
-
-        tester.test(new Object(), "property", null, true);
+        assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
+                .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
+                        + ExecutionViewWrapper.class.getName())
+                .withNoCause();
     }
 
     @Test
