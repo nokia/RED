@@ -167,11 +167,11 @@ class LaunchConfigurationTabValidator {
         });
         if (!problematicSuites.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Following suites does not exist: " + String.join(", ", problematicSuites));
+                    "Following suites do not exist: " + String.join(", ", problematicSuites));
         }
         if (!problematicTests.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Following tests does not exist: " + String.join(", ", problematicTests));
+                    "Following tests do not exist: " + String.join(", ", problematicTests));
         }
     }
 

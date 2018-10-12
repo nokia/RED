@@ -116,7 +116,7 @@ public class LaunchConfigurationTabValidatorTest {
 
         assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
                 .isThrownBy(() -> validator.validateRobotTab(launchConfig))
-                .withMessageStartingWith("Following suites does not exist: ")
+                .withMessageStartingWith("Following suites do not exist: ")
                 .withMessageContaining(PROJECT_NAME + "/file2.robot")
                 .withMessageContaining(PROJECT_NAME + "/suite/dir")
                 .withNoCause();
@@ -141,7 +141,7 @@ public class LaunchConfigurationTabValidatorTest {
 
         assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
                 .isThrownBy(() -> validator.validateRobotTab(launchConfig))
-                .withMessage("Following tests does not exist: case4, case5")
+                .withMessage("Following tests do not exist: case4, case5")
                 .withNoCause();
     }
 

@@ -6,16 +6,14 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Iterables.getFirst;
-import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -33,7 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotPathsNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Predicates;
@@ -72,7 +69,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
         final Map<IResource, List<String>> suitesMapping = resources.stream()
-                .collect(Collectors.toMap(r -> r, r -> new ArrayList<>()));
+                .collect(toMap(r -> r, r -> new ArrayList<>()));
         return prepareCopy(suitesMapping, RobotLaunchConfigurationType.GENERAL_PURPOSE);
     }
 
@@ -234,44 +231,42 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     public void setSuitePaths(final Map<String, List<String>> suitesToCases) throws CoreException {
-        // test case names should be always in lower case
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        final Map<String, String> testSuites = suitesToCases.entrySet()
+                .stream()
+                .collect(toMap(e -> e.getKey(), e -> joinTestCases(e.getValue())));
+        launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, testSuites);
+    }
 
-        final Map<String, String> suites = new HashMap<>();
-        for (final Entry<String, List<String>> entry : suitesToCases.entrySet()) {
-            final String joinedTestNames = entry.getValue()
-                    .stream()
-                    .filter(Predicates.notNull())
-                    .map(String::toLowerCase)
-                    .collect(Collectors.joining("::"));
-            suites.put(entry.getKey(), joinedTestNames);
-        }
-        launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
+    private String joinTestCases(final List<String> testCases) {
+        // test case names should be always in lower case
+        return testCases.stream()
+                .filter(Predicates.notNull())
+                .map(String::toLowerCase)
+                .collect(joining("::"));
     }
 
     public Map<String, List<String>> getSuitePaths() throws CoreException {
-        final Map<String, String> mapping = configuration.getAttribute(TEST_SUITES_ATTRIBUTE, new HashMap<>());
-        final Map<String, List<String>> suitesToTestsMapping = new HashMap<>();
-        for (final Entry<String, String> entry : mapping.entrySet()) {
-            final List<String> splittedTestNames = Splitter.on("::").omitEmptyStrings().splitToList(entry.getValue());
-            suitesToTestsMapping.put(entry.getKey(), splittedTestNames);
-        }
-        return suitesToTestsMapping;
+        final Map<String, String> testSuites = configuration.getAttribute(TEST_SUITES_ATTRIBUTE, new HashMap<>());
+        return testSuites.entrySet()
+                .stream()
+                .collect(toMap(e -> e.getKey(), e -> splitTestCases(e.getValue())));
+    }
+
+    private List<String> splitTestCases(final String testCases) {
+        return Splitter.on("::").omitEmptyStrings().splitToList(testCases);
     }
 
     public void updateTestCases(final Map<IResource, List<String>> suitesMapping) throws CoreException {
-        final Map<String, List<String>> suitesNamesMapping = new HashMap<>();
-        for (final Entry<IResource, List<String>> entry : suitesMapping.entrySet()) {
-            final IResource resource = entry.getKey();
-            if (!(resource instanceof IProject)) {
-                suitesNamesMapping.put(resource.getProjectRelativePath().toPortableString(), entry.getValue());
-            }
-        }
-        setSuitePaths(suitesNamesMapping);
+        final Map<String, List<String>> suitesToCases = suitesMapping.entrySet()
+                .stream()
+                .filter(e -> !(e.getKey() instanceof IProject))
+                .collect(toMap(e -> e.getKey().getProjectRelativePath().toPortableString(), e -> e.getValue()));
+        setSuitePaths(suitesToCases);
     }
 
     public Map<IResource, List<String>> collectSuitesToRun() throws CoreException {
-        final Map<IResource, List<String>> suitesToRun = new HashMap<>();
+        final Map<IResource, List<String>> suitesMapping = new HashMap<>();
         final String projectName = getProjectName();
         if (!projectName.isEmpty()) {
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -281,49 +276,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
                     final IPath path = Path.fromPortableString(entry.getKey());
                     final IResource resource = path.getFileExtension() == null ? project.getFolder(path)
                             : project.getFile(path);
-                    suitesToRun.put(resource, entry.getValue());
+                    suitesMapping.put(resource, entry.getValue());
                 }
             }
         }
-        return suitesToRun;
-    }
-
-    public List<String> getSuitesToRun() throws CoreException {
-        final List<String> suiteNames = new ArrayList<>();
-        for (final IResource suite : getSuiteResources()) {
-            suiteNames.add(RobotPathsNaming.createSuiteName(suite));
-        }
-        return suiteNames;
-    }
-
-    List<IResource> getSuiteResources() throws CoreException {
-        final List<IResource> resources = new ArrayList<>();
-        final Set<String> problems = new HashSet<>();
-        for (final String suitePath : getSuitePaths().keySet()) {
-            final IProject project = getProject();
-            final IResource resource = project.findMember(Path.fromPortableString(suitePath));
-            if (resource != null) {
-                resources.add(resource);
-            } else {
-                problems.add("Suite '" + suitePath + "' does not exist in project '" + project.getName() + "'");
-            }
-        }
-        if (!problems.isEmpty()) {
-            throw newCoreException(String.join("\n", problems));
-        }
-        return resources;
-    }
-
-    public List<String> getTestsToRun() throws CoreException {
-        final List<String> tests = new ArrayList<>();
-        for (final Entry<String, List<String>> entry : getSuitePaths().entrySet()) {
-            final IProject project = getProject();
-            final IPath path = Path.fromPortableString(entry.getKey());
-            for (final String testName : entry.getValue()) {
-                tests.add(RobotPathsNaming.createTestName(project, path, testName));
-            }
-        }
-        return tests;
+        return suitesMapping;
     }
 
     public void setIsGeneralPurposeEnabled(final boolean isGeneralPurposeEnabled) throws CoreException {
