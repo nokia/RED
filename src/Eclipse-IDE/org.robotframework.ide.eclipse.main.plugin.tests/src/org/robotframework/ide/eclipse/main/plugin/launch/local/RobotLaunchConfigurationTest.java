@@ -13,7 +13,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -208,45 +207,6 @@ public class RobotLaunchConfigurationTest {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName("");
         assertThat(robotConfig.collectSuitesToRun()).isEmpty();
-    }
-
-    @Test
-    public void suitesToRunAreRetrievedFromConfiguration() throws CoreException, IOException {
-        final IResource res1 = projectProvider.createFile("Suite1.robot");
-        final IResource res2 = projectProvider.createFile("Suite2.robot");
-        final List<String> casesForRes1 = asList("case1");
-        final List<String> casesForRes2 = asList("case2");
-
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
-        assertThat(robotConfig.getSuitesToRun()).containsOnly(PROJECT_NAME + ".Suite1", PROJECT_NAME + ".Suite2");
-    }
-
-    @Test
-    public void whenResourceDoesNotExist_coreExceptionIsThrown() throws CoreException, IOException {
-        final IResource res = projectProvider.createFile("suite.robot", "case");
-        final List<IResource> resources = asList(res);
-
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        res.delete(true, null);
-
-        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getSuitesToRun)
-                .withMessage("Suite 'suite.robot' does not exist in project '" + PROJECT_NAME + "'")
-                .withNoCause();
-    }
-
-    @Test
-    public void testsToRunAreRetrievedFromConfiguration() throws CoreException, IOException {
-        final IResource res1 = projectProvider.createFile("Test1.robot");
-        final IResource res2 = projectProvider.createFile("Test2.robot");
-        final List<String> casesForRes1 = asList("case1", "case2");
-        final List<String> casesForRes2 = asList("case3");
-
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
-        assertThat(robotConfig.getTestsToRun()).containsOnly(PROJECT_NAME + ".Test1.case1",
-                PROJECT_NAME + ".Test1.case2", PROJECT_NAME + ".Test2.case3");
     }
 
     @Test

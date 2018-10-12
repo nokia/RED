@@ -5,22 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.toList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.variables.IStringVariableManager;
-import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -38,14 +30,10 @@ import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.execution.server.AgentServerVersionsChecker;
 import org.rf.ide.core.execution.server.AgentServerVersionsDebugChecker;
 import org.rf.ide.core.execution.server.TestsPidReader;
-import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotBreakpoints;
@@ -65,7 +53,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionServi
 import org.robotframework.ide.eclipse.main.plugin.launch.TestsExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
@@ -168,8 +155,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             return new LaunchExecution(serverJob, null, null);
         }
 
-        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port,
-                RedPlugin.getDefault().getPreferences());
+        final RunCommandLine cmdLine = new LocalProcessCommandLineBuilder(robotConfig, robotProject)
+                .createRunCommandLine(port, RedPlugin.getDefault().getPreferences());
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, execProcess,
@@ -187,91 +174,6 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         redConsole.writeLine("Suite Executor: " + consoleData.getSuiteExecutorVersion());
 
         return new LaunchExecution(serverJob, execProcess, robotProcess);
-    }
-
-    @VisibleForTesting
-    RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject,
-            final int port, final RedPreferences preferences) throws CoreException, IOException {
-
-        final IRunCommandLineBuilder builder = createBuilder(robotConfig, robotProject, port);
-
-        builder.useArgumentFile(preferences.shouldLaunchUsingArgumentsFile());
-        if (!robotConfig.getExecutableFilePath().isEmpty()) {
-            builder.withExecutableFile(resolveExecutableFile(robotConfig.getExecutableFilePath()));
-            builder.addUserArgumentsForExecutableFile(parseArguments(robotConfig.getExecutableFileArguments()));
-            builder.useSingleRobotCommandLineArg(preferences.shouldUseSingleCommandLineArgument());
-        }
-        builder.addUserArgumentsForInterpreter(parseArguments(robotConfig.getInterpreterArguments()));
-        builder.addUserArgumentsForRobot(parseArguments(robotConfig.getRobotArguments()));
-
-        final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
-        if (projectConfig != null) {
-            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotConfig.getProject(),
-                    projectConfig);
-            final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();
-            builder.addLocationsToClassPath(searchPaths.getClassPaths());
-            builder.addLocationsToPythonPath(searchPaths.getPythonPaths());
-            builder.addVariableFiles(redConfig.getVariableFilePaths());
-        }
-
-        final List<IResource> resources = robotConfig.getSuiteResources();
-        if (shouldUseSingleTestPathInCommandLine(resources, preferences)) {
-            builder.withDataSources(newArrayList(getOnlyElement(resources).getLocation().toFile()));
-            builder.testsToRun(getOnlyElement(robotConfig.getSuitePaths().values()));
-        } else {
-            builder.withDataSources(newArrayList(robotProject.getProject().getLocation().toFile()));
-            builder.suitesToRun(robotConfig.getSuitesToRun());
-            builder.testsToRun(robotConfig.getTestsToRun());
-        }
-
-        if (robotConfig.isIncludeTagsEnabled()) {
-            builder.includeTags(robotConfig.getIncludedTags());
-        }
-        if (robotConfig.isExcludeTagsEnabled()) {
-            builder.excludeTags(robotConfig.getExcludedTags());
-        }
-        return builder.build();
-    }
-
-    private IRunCommandLineBuilder createBuilder(final RobotLaunchConfiguration robotConfig,
-            final RobotProject robotProject, final int port) throws CoreException {
-        if (robotConfig.isUsingInterpreterFromProject()) {
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-            if (runtimeEnvironment != null) {
-                return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port);
-            } else {
-                return RunCommandLineCallBuilder.forExecutor(SuiteExecutor.Python, port);
-            }
-        } else {
-            return RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
-        }
-    }
-
-    private boolean shouldUseSingleTestPathInCommandLine(final List<IResource> resources,
-            final RedPreferences preferences) throws CoreException {
-        // FIXME temporary fix for https://github.com/robotframework/robotframework/issues/2564
-        return preferences.shouldUseSingleFileDataSource() && resources.size() == 1
-                && getOnlyElement(resources) instanceof IFile;
-    }
-
-    private File resolveExecutableFile(final String path) throws CoreException {
-        final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
-        final File executableFile = new File(variableManager.performStringSubstitution(path));
-        if (!executableFile.exists()) {
-            throw newCoreException("Executable file '" + executableFile.getAbsolutePath() + "' does not exist");
-        }
-        return executableFile;
-    }
-
-    private List<String> parseArguments(final String arguments) {
-        final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
-        return Stream.of(DebugPlugin.parseArguments(arguments)).map(argument -> {
-            try {
-                return variableManager.performStringSubstitution(argument);
-            } catch (final CoreException e) {
-                return argument;
-            }
-        }).collect(toList());
     }
 
     @VisibleForTesting
