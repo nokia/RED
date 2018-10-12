@@ -74,10 +74,11 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         final IRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
                 .robotLaunchConfiguration(configuration);
         if (!robotConfig.hasValidVersion()) {
-            throw newCoreException("This configuration is incompatible with RED version you are currently using."
-                    + "\nExpected: " + robotConfig.getCurrentConfigurationVersion() + ", but was: "
-                    + robotConfig.getConfigurationVersion()
-                    + "\n\nResolution: Delete old configurations manually and create the new ones.");
+            throw newCoreException(String.format(
+                    "This configuration is incompatible with RED version you are currently using.%n"
+                            + "Expected: %s, but was: %s"
+                            + "%n%nResolution: Delete old configurations manually and create the new ones.",
+                    robotConfig.getCurrentConfigurationVersion(), robotConfig.getConfigurationVersion()));
         }
         robotConfig.getProject();
     }

@@ -6,27 +6,21 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 
 public class RedXmlSearchPathsPropertyTesterTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     private final RedXmlSearchPathsPropertyTester tester = new RedXmlSearchPathsPropertyTester();
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotASearchPath() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(
-                "Property tester is unable to test properties of java.lang.Object. It should be used with "
-                        + SearchPath.class.getName());
-
-        tester.test(new Object(), "property", null, true);
+        assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
+                .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
+                        + SearchPath.class.getName())
+                .withNoCause();
     }
 
     @Test

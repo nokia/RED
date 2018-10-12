@@ -6,30 +6,25 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 
 public class TableCellPropertyTesterTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private final TableCellPropertyTester tester = new TableCellPropertyTester();
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotStructuredSelection() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
-                + RobotFormEditor.class.getName());
-
-        tester.test(new Object(), "property", null, true);
+        assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
+                .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
+                        + RobotFormEditor.class.getName())
+                .withNoCause();
     }
 
     @Test

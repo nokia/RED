@@ -27,7 +27,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
@@ -55,9 +54,6 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
 
     @Rule
     public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
@@ -455,9 +451,6 @@ public class RobotLaunchConfigurationDelegateTest {
     public void coreExceptionIsThrown_whenExecutableFileDoesNotExist() throws Exception {
         final String executablePath = projectProvider.getFile("not_existing.bat").getLocation().toOSString();
 
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Executable file '" + executablePath + "' does not exist");
-
         final RedPreferences preferences = mock(RedPreferences.class);
 
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
@@ -466,7 +459,11 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.setExecutableFilePath(executablePath);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, preferences);
+
+        assertThatExceptionOfType(CoreException.class)
+                .isThrownBy(() -> launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, preferences))
+                .withMessage("Executable file '%s' does not exist", executablePath)
+                .withNoCause();
     }
 
     @Test
@@ -630,17 +627,17 @@ public class RobotLaunchConfigurationDelegateTest {
         }
         assumeTrue(thereIsNoPypy);
 
-        thrown.expect(CoreException.class);
-        thrown.expectMessage(
-                "There is no " + SuiteExecutor.PyPy.name() + " interpreter in system PATH environment variable");
-
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         robotConfig.setUsingInterpreterFromProject(false);
         robotConfig.setInterpreter(SuiteExecutor.PyPy);
 
-        RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject);
+        assertThatExceptionOfType(CoreException.class)
+                .isThrownBy(() -> RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject))
+                .withMessage("There is no %s interpreter in system PATH environment variable",
+                        SuiteExecutor.PyPy.name())
+                .withNoCause();
     }
 
     @Test()
@@ -660,30 +657,31 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @Test()
     public void coreExceptionIsThrown_whenThereIsNoActiveRuntimeEnvironment() throws Exception {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("There is no active runtime environment for project '" + PROJECT_NAME + "'");
-
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(null);
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
-        RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject);
+        assertThatExceptionOfType(CoreException.class)
+                .isThrownBy(() -> RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject))
+                .withMessage("There is no active runtime environment for project '%s'", PROJECT_NAME)
+                .withNoCause();
     }
 
     @Test()
     public void coreExceptionIsThrown__whenActiveRuntimeEnvironmentIsNotValid() throws Exception {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("The runtime environment " + new File("some/path/to/python").getAbsolutePath()
-                + " is either not a python installation or it has no Robot installed");
-
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidRobotEnvironment();
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
-        RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject);
+        assertThatExceptionOfType(CoreException.class)
+                .isThrownBy(() -> RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject))
+                .withMessage(
+                        "The runtime environment %s is either not a python installation or it has no Robot installed",
+                        new File("some/path/to/python").getAbsolutePath())
+                .withNoCause();
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
@@ -696,11 +694,6 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @Test
     public void whenConfigurationVersionIsInvalid_coreExceptionIsThrown() throws Exception {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("This configuration is incompatible with RED version you are currently using."
-                + "\nExpected: " + RobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION + ", but was: invalid"
-                + "\n\nResolution: Delete old configurations manually and create the new ones.");
-
         final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.fillDefaults();
@@ -710,7 +703,15 @@ public class RobotLaunchConfigurationDelegateTest {
         launchCopy.setAttribute("Version of configuration", "invalid");
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        launchDelegate.launch(launchCopy, "run", null, null);
+
+        assertThatExceptionOfType(CoreException.class)
+                .isThrownBy(() -> launchDelegate.launch(launchCopy, "run", null, null))
+                .withMessage(
+                        "This configuration is incompatible with RED version you are currently using.%n"
+                                + "Expected: %s, but was: %s"
+                                + "%n%nResolution: Delete old configurations manually and create the new ones.",
+                        RobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION, "invalid")
+                .withNoCause();
     }
 
     @Test

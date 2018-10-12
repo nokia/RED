@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -24,7 +25,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
@@ -36,9 +36,6 @@ import com.google.common.collect.ImmutableMap;
 public class RobotLaunchConfigurationTest {
 
     private static final String PROJECT_NAME = RobotLaunchConfigurationTest.class.getSimpleName();
-
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
 
     @Rule
     public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
@@ -227,16 +224,16 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void whenResourceDoesNotExist_coreExceptionIsThrown() throws CoreException, IOException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Suite 'suite.robot' does not exist in project '" + PROJECT_NAME + "'");
-
         final IResource res = projectProvider.createFile("suite.robot", "case");
         final List<IResource> resources = asList(res);
 
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         res.delete(true, null);
-        robotConfig.getSuitesToRun();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getSuitesToRun)
+                .withMessage("Suite 'suite.robot' does not exist in project '" + PROJECT_NAME + "'")
+                .withNoCause();
     }
 
     @Test
@@ -260,33 +257,33 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void whenProjectNotInWorkspace_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Project 'not_existing' cannot be found in workspace");
-
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setProjectName("not_existing");
-        robotConfig.getProject();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
+                .withMessage("Project 'not_existing' cannot be found in workspace")
+                .withNoCause();
     }
 
     @Test
     public void whenProjectIsClosed_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Project '" + PROJECT_NAME + "' is currently closed");
-
         projectProvider.getProject().close(null);
 
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        robotConfig.getProject();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
+                .withMessage("Project '" + PROJECT_NAME + "' is currently closed")
+                .withNoCause();
     }
 
     @Test
     public void whenProjectIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Project cannot be empty");
-
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setProjectName("");
-        robotConfig.getProject();
+
+        assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
+                .withMessage("Project cannot be empty")
+                .withNoCause();
     }
 
     @Test
