@@ -9,11 +9,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -51,12 +48,10 @@ public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
                 final IFile initFile = RobotSuiteFile.createRobotInitializationFile(newFolder,
                         mainPage.getInitFileExtension());
                 selectAndReveal(initFile);
-
-                final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-                final IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().findEditor(
-                        RobotFormEditor.ID);
-                page.openEditor(new FileEditorInput(initFile), desc.getId());
-
+                if (initFile.exists()) {
+                    RobotFormEditor.tryToOpen(initFile,
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage());
+                }
             } catch (final CoreException e) {
                 throw new SuiteCreatingException("Unable to create suites directory " + newFolder.getName(), e);
             }

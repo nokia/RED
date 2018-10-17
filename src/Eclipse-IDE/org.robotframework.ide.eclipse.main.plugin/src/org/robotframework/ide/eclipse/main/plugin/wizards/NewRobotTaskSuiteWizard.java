@@ -7,15 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.wizards;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 
 public class NewRobotTaskSuiteWizard extends BasicNewResourceWizard {
 
@@ -45,13 +40,8 @@ public class NewRobotTaskSuiteWizard extends BasicNewResourceWizard {
         mainPage.setExtension();
         final IFile newFile = mainPage.createNewFile();
         selectAndReveal(newFile);
-
-        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        final IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().findEditor(RobotFormEditor.ID);
-        try {
-            page.openEditor(new FileEditorInput(newFile), desc.getId());
-        } catch (final PartInitException e) {
-            throw new RobotEditorOpeningException("Unable to open editor for file: " + newFile.getName(), e);
+        if (newFile.exists()) {
+            RobotFormEditor.tryToOpen(newFile, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage());
         }
         return true;
     }
