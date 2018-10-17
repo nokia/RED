@@ -79,24 +79,26 @@ def logresult(func):
 # decorator which cleans up all modules that were loaded during decorated call
 def cleanup_modules(to_call):
     def inner(*args, **kwargs):
-        old_modules = set(sys.modules.keys())
+        old_modules = sys.modules.copy()
         try:
             return to_call(*args, **kwargs)
         except:
             raise
         finally:
-            current_modules = set(sys.modules.keys())
+            current_modules = sys.modules
             builtin_modules = set(sys.builtin_module_names)
             to_preserve_with_submodules = ['robot', 'encodings']
-
             # some modules should not be removed because it causes rpc server problems
-            to_remove = [m for m in current_modules - old_modules - builtin_modules if 
-                         not __has_to_be_preserved(m, to_preserve_with_submodules)]
+            to_remove = [m for m in current_modules if
+                         m not in builtin_modules and not __has_to_be_preserved(m, to_preserve_with_submodules) and
+                         not (m in old_modules and old_modules[m] is current_modules[m])]
+ 
             for m in to_remove:
                 del sys.modules[m]
                 del m
-
+ 
     return inner
+
 
 def __has_to_be_preserved(module_name, modules_to_preserve):
     for to_preserve in modules_to_preserve:
