@@ -44,10 +44,10 @@ public class NewRobotPythonFileWizard extends BasicNewResourceWizard {
     public boolean performFinish() {
         final IFile newFile = mainPage.createNewFile();
         selectAndReveal(newFile);
-
-        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        SourceOpeningSupport.tryToOpenInEditor(page, newFile);
-
+        if (newFile.exists()) {
+            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            SourceOpeningSupport.tryToOpenInEditor(page, newFile);
+        }
         return true;
     }
 
