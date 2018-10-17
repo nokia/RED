@@ -350,16 +350,19 @@ public class RobotFormEditor extends FormEditor {
 
     private void reopenEditor() {
         close(false);
-        getSite().getShell().getDisplay().asyncExec(() -> {
-            final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-            final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
-            final IWorkbenchPage page = RobotFormEditor.this.getSite().getPage();
-            try {
-                page.openEditor(new FileEditorInput(suiteModel.getFile()), desc.getId());
-            } catch (final PartInitException e) {
-                throw new IllegalStateException("Unable to reopen editor", e);
-            }
-        });
+        getSite().getShell()
+                .getDisplay()
+                .asyncExec(() -> tryToOpen(suiteModel.getFile(), RobotFormEditor.this.getSite().getPage()));
+    }
+
+    public static void tryToOpen(final IFile file, final IWorkbenchPage page) {
+        final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+        final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
+        try {
+            page.openEditor(new FileEditorInput(file), desc.getId());
+        } catch (final PartInitException e) {
+            throw new RobotEditorOpeningException("Unable to open editor for file: " + file.getName(), e);
+        }
     }
 
     @Override
