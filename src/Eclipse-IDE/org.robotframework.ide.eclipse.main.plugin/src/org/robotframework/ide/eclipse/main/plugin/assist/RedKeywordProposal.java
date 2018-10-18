@@ -83,10 +83,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
                     .map(Argument::getName)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            final Range<Integer> noOfArgs = getArgumentsDescriptor().getPossibleNumberOfArguments();
-            final boolean mayHaveMoreArguments = !noOfArgs.hasUpperBound()
-                    || noOfArgs.upperEndpoint() > arguments.size();
-            if (mayHaveMoreArguments) {
+            if (!getArgumentsDescriptor().hasFixedNumberOfArguments()) {
                 arguments.add("");
             }
             return arguments;

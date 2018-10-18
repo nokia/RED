@@ -5,26 +5,21 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 
-import com.google.common.collect.Streams;
-
 class KeywordCallArgumentsOfRunKwVariantValidator extends KeywordCallArgumentsValidator {
 
-    KeywordCallArgumentsOfRunKwVariantValidator(final IFile file, final RobotToken definingToken,
-            final ValidationReportingStrategy reporter, final ArgumentsDescriptor argumentsDescriptor,
-            final List<RobotToken> arguments) {
-        super(file, definingToken, reporter, argumentsDescriptor, arguments);
+    KeywordCallArgumentsOfRunKwVariantValidator(final FileValidationContext validationContext,
+            final RobotToken definingToken, final ValidationReportingStrategy reporter,
+            final ArgumentsDescriptor argumentsDescriptor, final List<RobotToken> arguments) {
+        super(validationContext, definingToken, reporter, argumentsDescriptor, arguments);
     }
 
     @Override
@@ -33,11 +28,8 @@ class KeywordCallArgumentsOfRunKwVariantValidator extends KeywordCallArgumentsVa
         // libraries and it's not possible to have libspec generated for libraries having methods
         // with invalid descriptors
 
-        final Map<String, Argument> argsByNames = Streams.stream(descriptor)
-                .filter(arg -> arg.isRequired() || arg.isDefault())
-                .collect(toMap(Argument::getName, arg -> arg));
-        final TaggedCallSiteArguments taggedArguments = TaggedCallSiteArguments.tagArguments(arguments, argsByNames,
-                descriptor.supportsKwargs());
+        final Map<String, Argument> argsByNames = groupDescriptorArgumentsByNames();
+        final TaggedCallSiteArguments taggedArguments = tagArguments(argsByNames);
 
         try {
             validateNumberOfArgs(taggedArguments);

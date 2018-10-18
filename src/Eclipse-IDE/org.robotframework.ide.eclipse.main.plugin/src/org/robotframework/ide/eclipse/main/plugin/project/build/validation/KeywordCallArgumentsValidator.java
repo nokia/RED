@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -17,10 +18,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
+import org.rf.ide.core.libraries.ArgumentsDescriptor.InvalidArgumentsDescriptorException;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -40,20 +41,20 @@ import com.google.common.collect.Streams;
  */
 class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
-    private final IFile file;
+    private final FileValidationContext validationContext;
 
     private final RobotToken definingToken;
 
     private final ValidationReportingStrategy reporter;
 
-    protected final ArgumentsDescriptor descriptor;
+    private final ArgumentsDescriptor descriptor;
 
-    protected final List<RobotToken> arguments;
+    private final List<RobotToken> arguments;
 
-    KeywordCallArgumentsValidator(final IFile file, final RobotToken definingToken,
+    KeywordCallArgumentsValidator(final FileValidationContext validationContext, final RobotToken definingToken,
             final ValidationReportingStrategy reporter, final ArgumentsDescriptor descriptor,
             final List<RobotToken> arguments) {
-        this.file = file;
+        this.validationContext = validationContext;
         this.definingToken = definingToken;
         this.reporter = reporter;
         this.descriptor = descriptor;
@@ -65,11 +66,8 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         try {
             validateDescriptor();
 
-            final Map<String, Argument> argsByNames = Streams.stream(descriptor)
-                    .filter(arg -> arg.isRequired() || arg.isDefault())
-                    .collect(toMap(Argument::getName, arg -> arg));
-            final TaggedCallSiteArguments taggedArguments = TaggedCallSiteArguments.tagArguments(arguments, argsByNames,
-                    descriptor.supportsKwargs());
+            final Map<String, Argument> argsByNames = groupDescriptorArgumentsByNames();
+            final TaggedCallSiteArguments taggedArguments = tagArguments(argsByNames);
 
             validatePositionalAndNamedOrder(taggedArguments);
 
@@ -84,6 +82,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                 validateCollectionArguments(taggedArguments, bindedArguments);
             } else {
                 validateAllRequiredAreProvided(bindedArguments);
+                validateNoKeywordUnexpectedIsProvided(bindedArguments);
             }
 
         } catch (final ArgumentsProblemFoundException e) {
@@ -92,13 +91,26 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
     }
 
     private void validateDescriptor() {
-        if (!descriptor.isValid()) {
+        try {
+            descriptor.validate(validationContext.getVersion());
+        } catch (final InvalidArgumentsDescriptorException e) {
             final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_ARGUMENTS_DESCRIPTOR)
-                    .formatMessageWith(definingToken.getText());
-            reporter.handleProblem(problem, file, definingToken);
+                    .formatMessageWith(definingToken.getText(), e.getMessage());
+            reporter.handleProblem(problem, validationContext.getFile(), definingToken);
 
             throw new ArgumentsProblemFoundException();
         }
+    }
+
+    protected final Map<String, Argument> groupDescriptorArgumentsByNames() {
+        return Streams.stream(descriptor)
+                .filter(arg -> arg.isRequired() || arg.isDefault() || arg.isKeywordOnly())
+                .collect(toMap(Argument::getName, arg -> arg));
+    }
+
+    protected final TaggedCallSiteArguments tagArguments(final Map<String, Argument> argsByNames) {
+        return TaggedCallSiteArguments.tagArguments(arguments, argsByNames,
+                descriptor.supportsKwargs() || descriptor.supportsKeywordOnlyArguments());
     }
 
     private void validatePositionalAndNamedOrder(final TaggedCallSiteArguments taggedArguments) {
@@ -115,7 +127,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                         : "";
                 final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.POSITIONAL_ARGUMENT_AFTER_NAMED)
                         .formatMessageWith(additionalMsg);
-                reporter.handleProblem(problem, file, arg);
+                reporter.handleProblem(problem, validationContext.getFile(), arg);
                 orderIsWrong = true;
             }
         }
@@ -140,7 +152,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                     final RobotToken argToken = values.get(i);
                     final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.MULTIPLE_MATCH_TO_SINGLE_ARG)
                             .formatMessageWith(arg.getName(), firstValue);
-                    reporter.handleProblem(problem, file, argToken);
+                    reporter.handleProblem(problem, validationContext.getFile(), argToken);
                     isPositionalDuplicatedByNamed = true;
                 }
             }
@@ -155,26 +167,28 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         for (final RobotToken callSiteArg : arguments) {
             if (taggedArguments.isNamedDuplicateArgument(callSiteArg)) {
                 reporter.handleProblem(RobotProblem.causedBy(ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT)
-                        .formatMessageWith(getName(callSiteArg.getText())), file, callSiteArg);
+                        .formatMessageWith(getName(callSiteArg.getText())), validationContext.getFile(), callSiteArg);
             }
         }
     }
 
     protected final void validateNumberOfArgs(final TaggedCallSiteArguments taggedArguments) {
-        final int actual = descriptor.supportsKwargs() ? taggedArguments.getNumberOfNonKeywordArguments(arguments)
+        final boolean supportsKeyword = descriptor.supportsKwargs() || descriptor.supportsKeywordOnlyArguments();
+        final int actual = supportsKeyword
+                ? taggedArguments.getNumberOfNonKeywordArguments(arguments)
                 : taggedArguments.getNumberOfArguments(arguments);
-        final Range<Integer> possibleRange = descriptor.supportsKwargs()
+        final Range<Integer> possibleRange = supportsKeyword
                 ? descriptor.getPossibleNumberOfNonKwargsArguments()
                 : descriptor.getPossibleNumberOfArguments();
 
         if (!possibleRange.contains(actual) && !taggedArguments.containsCollectionArgument()) {
             // there can be any number of arguments when collection is passed, so we
             // cannot say if that's ok or not
-            final String element = descriptor.supportsKwargs() ? "non-keyword argument" : "argument";
+            final String element = supportsKeyword ? "non-named argument" : "argument";
             reporter.handleProblem(RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS)
                     .formatMessageWith(definingToken.getText(), getRangesInfo(possibleRange, element), actual,
                             toBeInProperForm(actual)),
-                    file, definingToken);
+                    validationContext.getFile(), definingToken);
 
             throw new ArgumentsProblemFoundException();
 
@@ -187,11 +201,11 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                         ? Range.atLeast(noOfNonCollectionArgs)
                         : Range.closed(noOfNonCollectionArgs, noOfNonCollectionArgs);
 
-                final String element = descriptor.supportsKwargs() ? "non-keyword argument" : "argument";
+                final String element = supportsKeyword ? "non-named argument" : "argument";
                 reporter.handleProblem(RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS)
                         .formatMessageWith(definingToken.getText(), getRangesInfo(possibleRange, element),
                                 getRangesInfo(actualRange, ""), toBeInProperForm(actual)),
-                        file, definingToken);
+                        validationContext.getFile(), definingToken);
 
                 throw new ArgumentsProblemFoundException();
             }
@@ -199,16 +213,33 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
     }
 
     private void validateAllRequiredAreProvided(final BindedCallSiteArguments bindedArguments) {
-        final List<String> missingArguments = descriptor.stream()
-                .filter(Argument::isRequired)
+        final List<Argument> missingArguments = descriptor.stream()
+                .filter(arg -> arg.isRequired() || arg.isKeywordOnlyRequired())
                 .filter(arg -> bindedArguments.callSiteArgumentsOf(arg).isEmpty())
-                .map(Argument::getName)
                 .collect(toList());
         if (!missingArguments.isEmpty()) {
+            final boolean hasKeywordOnly = missingArguments.stream().anyMatch(Argument::isKeywordOnlyRequired);
+            final String argType = hasKeywordOnly ? " keyword-only" : "";
+            final String args = missingArguments.stream().map(Argument::getName).collect(joining(", ", "(", ")"));
+
             final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.NO_VALUE_PROVIDED_FOR_REQUIRED_ARG)
-                    .formatMessageWith(definingToken.getText(), "(" + String.join(", ", missingArguments) + ") "
-                            + toPluralIfNeeded("argument", missingArguments.size()));
-            reporter.handleProblem(problem, file, definingToken);
+                    .formatMessageWith(definingToken.getText(),
+                            args + argType + toPluralIfNeeded(" argument", missingArguments.size()));
+            reporter.handleProblem(problem, validationContext.getFile(), definingToken);
+        }
+    }
+
+    private void validateNoKeywordUnexpectedIsProvided(final BindedCallSiteArguments bindedArguments) {
+        if (!descriptor.supportsKwargs() && descriptor.supportsKeywordOnlyArguments()) {
+            final List<RobotToken> tokensWithMissingBinding = arguments.stream()
+                    .filter(token -> bindedArguments.definitionArgumentsOf(token).isEmpty())
+                    .collect(toList());
+
+            for (final RobotToken argToken : tokensWithMissingBinding) {
+                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.UNEXPECTED_NAMED_ARGUMENT)
+                        .formatMessageWith(getName(argToken.getText()));
+                reporter.handleProblem(problem, validationContext.getFile(), argToken);
+            }
         }
     }
 
@@ -223,17 +254,20 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             final RobotToken callSiteArg = arguments.get(i);
 
             // all lists/dictionaries will be reported to be empty except the last ones
-            if (taggedArguments.isListArgument(callSiteArg) && listValidated && listProblemFound
+            if (taggedArguments.isListArgument(callSiteArg)
+                    && (listValidated && listProblemFound || dictValidated && dictProblemFound)
                     || taggedArguments.isDictionaryArgument(callSiteArg) && dictValidated && dictProblemFound) {
                 final String type = taggedArguments.isListArgument(callSiteArg) ? "List" : "Dictionary";
                 final RobotProblem problem = RobotProblem
                         .causedBy(ArgumentProblem.COLLECTION_ARGUMENT_SHOULD_PROVIDE_ARGS)
                         .formatMessageWith(type, callSiteArg.getText(), "has to be empty");
-                reporter.handleProblem(problem, file, callSiteArg);
+                reporter.handleProblem(problem, validationContext.getFile(), callSiteArg);
 
             } else {
                 final List<String> nonBindedRequired = new ArrayList<>();
                 final List<String> nonBindedDefaults = new ArrayList<>();
+                final List<String> nonBindedKeywordRequired = new ArrayList<>();
+                final List<String> nonBindedKeywordDefaults = new ArrayList<>();
 
                 for (final Argument arg : descriptor) {
                     if (bindedArguments.callSiteArgumentsOf(arg).isEmpty()) {
@@ -241,6 +275,10 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                             nonBindedRequired.add(arg.getName());
                         } else if (arg.isDefault()) {
                             nonBindedDefaults.add(arg.getName());
+                        } else if (arg.isKeywordOnlyRequired()) {
+                            nonBindedKeywordRequired.add(arg.getName());
+                        } else if (arg.isKeywordOnlyDefault()) {
+                            nonBindedKeywordDefaults.add(arg.getName());
                         }
                     }
                 }
@@ -248,7 +286,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                 if (taggedArguments.isListArgument(callSiteArg)) {
                     final Optional<RobotProblem> problem = findListArgumentProblem(callSiteArg,
                             nonBindedRequired.size(), nonBindedDefaults.size());
-                    problem.ifPresent(p -> reporter.handleProblem(p, file, callSiteArg));
+                    problem.ifPresent(p -> reporter.handleProblem(p, validationContext.getFile(), callSiteArg));
                     listProblemFound = problem.isPresent();
                     listValidated = true;
 
@@ -262,12 +300,34 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                             .collect(toList());
 
                     final Optional<RobotProblem> problem = validateDictionaryArgument(callSiteArg, nonBindedRequired,
-                            nonBindedDefaults, forbiddenArgs);
-                    problem.ifPresent(p -> reporter.handleProblem(p, file, callSiteArg));
+                            nonBindedDefaults, nonBindedKeywordRequired, nonBindedKeywordDefaults, forbiddenArgs);
+                    problem.ifPresent(p -> reporter.handleProblem(p, validationContext.getFile(), callSiteArg));
                     dictProblemFound = problem.isPresent();
                     dictValidated = true;
                 }
             }
+        }
+
+        if (listValidated && !dictValidated) {
+            // if there is no dictionary then lists cannot provide keyword-only arguments so we need
+            // to raise
+            // an error if there are missing keyword only arguments
+            validateAllKeywordOnlyRequiredAreProvided(bindedArguments);
+        }
+    }
+
+    private void validateAllKeywordOnlyRequiredAreProvided(final BindedCallSiteArguments bindedArguments) {
+        final List<Argument> missingArguments = descriptor.stream()
+                .filter(Argument::isKeywordOnlyRequired)
+                .filter(arg -> bindedArguments.callSiteArgumentsOf(arg).isEmpty())
+                .collect(toList());
+        if (!missingArguments.isEmpty()) {
+            final String args = missingArguments.stream().map(Argument::getName).collect(joining(", ", "(", ")"));
+
+            final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.NO_VALUE_PROVIDED_FOR_REQUIRED_ARG)
+                    .formatMessageWith(definingToken.getText(),
+                            args + " keyword-only" + toPluralIfNeeded(" argument", missingArguments.size()));
+            reporter.handleProblem(problem, validationContext.getFile(), definingToken);
         }
     }
 
@@ -292,32 +352,40 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
     private Optional<RobotProblem> validateDictionaryArgument(final RobotToken collectionArgument,
             final List<String> nonBindedRequired, final List<String> nonBindedDefaults,
+            final List<String> nonBindedKeywordRequired, final List<String> nonBindedKeywordDefaults,
             final List<String> forbiddenArgs) {
 
-        final int noOfNonBindedRequired = nonBindedRequired.size();
-        final int noOfNonBindedDefaults = nonBindedDefaults.size();
+        final List<String> allRequired = new ArrayList<>();
+        allRequired.addAll(nonBindedRequired);
+        allRequired.addAll(nonBindedKeywordRequired);
+        final List<String> allDefaults = new ArrayList<>();
+        allDefaults.addAll(nonBindedDefaults);
+        allDefaults.addAll(nonBindedKeywordDefaults);
+
+        final int required = allRequired.size();
+        final int defaults = allDefaults.size();
         final int noOfForbidden = forbiddenArgs.size();
 
-        final Range<Integer> range = descriptor.supportsKwargs() ? Range.atLeast(noOfNonBindedRequired)
-                : Range.closed(noOfNonBindedRequired, noOfNonBindedRequired + noOfNonBindedDefaults);
+        final Range<Integer> range = descriptor.supportsKwargs() ? Range.atLeast(required)
+                : Range.closed(required, required + defaults);
 
         String description;
-        if (!range.hasUpperBound() && noOfNonBindedRequired == 0 && noOfForbidden == 0) {
+        if (!range.hasUpperBound() && required == 0 && noOfForbidden == 0) {
             description = null;
-        } else if (!range.hasUpperBound() && noOfNonBindedRequired == 0) {
+        } else if (!range.hasUpperBound() && required == 0) {
             description = "cannot have " + toPluralIfNeeded("key", noOfForbidden) + ": ("
                     + String.join(", ", forbiddenArgs) + ")";
-        } else if (range.hasUpperBound() && noOfNonBindedRequired == 0 && noOfNonBindedDefaults == 0) {
+        } else if (range.hasUpperBound() && required == 0 && defaults == 0) {
             description = "has to be empty";
         } else {
             final List<String> details = new ArrayList<>();
-            if (noOfNonBindedRequired > 0) {
-                details.add("required " + toPluralIfNeeded("key", noOfNonBindedRequired) + ": ("
-                        + String.join(", ", nonBindedRequired) + ")");
+            if (required > 0) {
+                details.add("required " + toPluralIfNeeded("key", required) + ": ("
+                        + String.join(", ", allRequired) + ")");
             }
-            if (range.hasUpperBound() && noOfNonBindedDefaults > 0) {
-                details.add("possible " + toPluralIfNeeded("key", noOfNonBindedDefaults) + ": ("
-                        + String.join(", ", nonBindedDefaults) + ")");
+            if (range.hasUpperBound() && defaults > 0) {
+                details.add("possible " + toPluralIfNeeded("key", defaults) + ": ("
+                        + String.join(", ", allDefaults) + ")");
             }
             if (noOfForbidden > 0) {
                 details.add("forbidden " + toPluralIfNeeded("key", noOfForbidden) + ": ("
@@ -484,7 +552,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                             bindings.bind(arg, ArgumentTag.POSITIONAL);
 
                         } else if (argsByNames.keySet().contains(name)) {
-                            bindings.bind(arg, ArgumentTag.NAMED);
+                            bindings.bind(arg, argsByNames.get(name).isKeywordOnly() ? ArgumentTag.KEYWORD : ArgumentTag.NAMED);
 
                             if (previousWithSameName.get(name) != null) {
                                 bindings.bind(previousWithSameName.get(name), ArgumentTag.NAMED_DUPLICATE);
@@ -543,7 +611,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             final SymmetricRelation<Argument, RobotToken> mapping = new SymmetricRelation<>();
             bindPositionalArguments(descriptor, mapping, positional, taggedArguments);
             bindNamedArguments(mapping, named, argsByNames, taggedArguments);
-            bindKeywordArguments(descriptor, arguments, taggedArguments, mapping);
+            bindKeywordArguments(descriptor, mapping, arguments, argsByNames, taggedArguments);
             return new BindedCallSiteArguments(mapping);
         }
 
@@ -599,11 +667,17 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             }
         }
 
-        private static void bindKeywordArguments(final ArgumentsDescriptor descriptor, final List<RobotToken> arguments,
-                final TaggedCallSiteArguments taggedArguments, final SymmetricRelation<Argument, RobotToken> mapping) {
-            for (final RobotToken kwArg : arguments) {
-                if (taggedArguments.isKeywordNonDictionaryArgument(kwArg)) {
-                    mapping.bind(descriptor.getKwargArgument().get(), kwArg);
+        private static void bindKeywordArguments(final ArgumentsDescriptor descriptor,
+                final SymmetricRelation<Argument, RobotToken> mapping, final List<RobotToken> arguments,
+                final Map<String, Argument> argsByNames, final TaggedCallSiteArguments taggedArguments) {
+            for (final RobotToken argToken : arguments) {
+                if (taggedArguments.isKeywordNonDictionaryArgument(argToken)) {
+                    final Argument arg = argsByNames.get(getName(argToken.getText()));
+                    if (arg != null && arg.isKeywordOnly()) {
+                        mapping.bind(arg, argToken);
+                    } else if (descriptor.supportsKwargs()) {
+                        mapping.bind(descriptor.getKwargArgument().get(), argToken);
+                    }
                 }
             }
         }

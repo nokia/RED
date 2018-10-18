@@ -19,7 +19,7 @@ public enum ArgumentProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Keyword '%s' has invalid arguments descriptor";
+            return "Keyword '%s' has invalid arguments descriptor. %s";
         }
     },
     INVALID_NUMBER_OF_PARAMETERS {
@@ -60,6 +60,13 @@ public enum ArgumentProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' requires %s to be specified";
+        }
+    },
+    UNEXPECTED_NAMED_ARGUMENT {
+
+        @Override
+        public String getProblemDescription() {
+            return "Unexpected named argument '%s'";
         }
     },
     COLLECTION_ARGUMENT_SHOULD_PROVIDE_ARGS {

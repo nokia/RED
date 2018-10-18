@@ -16,11 +16,14 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
+import org.rf.ide.core.testdata.model.RobotVersion;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Range;
+import com.google.common.collect.Streams;
 
 /**
  * @author Michal Anglart
@@ -29,8 +32,12 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
 
     private final List<Argument> arguments;
 
-    private ArgumentsDescriptor(final List<Argument> args) {
+    private final int lastPositional;
+
+    @VisibleForTesting
+    ArgumentsDescriptor(final List<Argument> args, final int lastPositional) {
         this.arguments = args;
+        this.lastPositional = lastPositional;
     }
 
     public static ArgumentsDescriptor createDescriptor(final String... args) {
@@ -39,19 +46,21 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
 
     public static ArgumentsDescriptor createDescriptor(final List<String> args) {
         if (args == null) {
-            return new ArgumentsDescriptor(newArrayList());
+            return new ArgumentsDescriptor(newArrayList(), -1);
         }
 
+        int lastPositional = -1;
+        boolean foundEndOfPositional = false;
         final List<Argument> arguments = newArrayList();
         for (final String arg : args) {
             final ArgumentType type;
             final String possiblyAnnotatedName ;
             String value = null;
             if (arg.contains("=")) {
-                type = ArgumentType.DEFAULT;
+                type = foundEndOfPositional ? ArgumentType.KEYWORD_ONLY : ArgumentType.DEFAULT;
                 final List<String> splitted = Splitter.on('=').splitToList(arg);
                 possiblyAnnotatedName = splitted.get(0);
-                value = splitted.get(1);
+                value = String.join("=", splitted.subList(1, splitted.size()));
                 
             } else if (arg.startsWith("**")) {
                 type = ArgumentType.KWARG;
@@ -60,9 +69,16 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
             } else if (arg.startsWith("*")) {
                 type = ArgumentType.VARARG;
                 possiblyAnnotatedName = arg.substring(1);
+                foundEndOfPositional = true;
+
+                if (possiblyAnnotatedName.isEmpty()) {
+                    // this is omitted because it's a artificial * argument which only marks end of positional
+                    lastPositional = arguments.size();
+                    continue;
+                }
 
             } else {
-                type = ArgumentType.REQUIRED;
+                type = foundEndOfPositional ? ArgumentType.KEYWORD_ONLY : ArgumentType.REQUIRED;
                 possiblyAnnotatedName = arg;
             }
 
@@ -72,11 +88,11 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
             if (possiblyAnnotatedName.contains(":")) {
                 final List<String> splitted = Splitter.on(':').splitToList(possiblyAnnotatedName);
                 name = splitted.get(0);
-                annotation = splitted.get(1);
+                annotation = String.join(":", splitted.subList(1, splitted.size()));
             }
             arguments.add(new Argument(type, name, annotation, value));
         }
-        return new ArgumentsDescriptor(arguments);
+        return new ArgumentsDescriptor(arguments, lastPositional);
     }
 
     @Override
@@ -96,13 +112,34 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         return arguments.get(index);
     }
 
-    public boolean isValid() {
-        // there can be at most one vararg and at most one kwarg; the order should be:
-        // required, default, vararg, kwarg
-        final List<Integer> order = arguments.stream().map(arg -> arg.type.order).collect(toList());
-        return Ordering.natural().isOrdered(order) && arguments.stream().filter(Argument::isVarArg).count() <= 1
-                && arguments.stream().filter(Argument::isKwArg).count() <= 1
-                && arguments.stream().map(Argument::getName).distinct().count() == arguments.size();
+    public void validate(final RobotVersion robotVersion) {
+        if (!Ordering.natural().isOrdered(arguments.stream().map(arg -> arg.type.order).collect(toList()))) {
+            throw new InvalidArgumentsDescriptorException("Order of arguments is wrong");
+        }
+        if (arguments.stream().filter(Argument::isVarArg).count() > 1) {
+            throw new InvalidArgumentsDescriptorException("There should be only one vararg");
+        }
+        if (arguments.stream().filter(Argument::isKwArg).count() > 1) {
+            throw new InvalidArgumentsDescriptorException("There should be only one kwarg");
+        }
+        if (arguments.stream().map(Argument::getName).distinct().count() != arguments.size()) {
+            throw new InvalidArgumentsDescriptorException("Argument names can't be duplicated");
+        }
+        if (robotVersion.isOlderThan(new RobotVersion(3, 1))
+                && (arguments.stream().filter(Argument::isKeywordOnly).count() > 0 || lastPositional > -1)) {
+            throw new InvalidArgumentsDescriptorException(
+                    "Keyword-only arguments are only supported with Robot Framework 3.1 or newer");
+        }
+    }
+
+    public Range<Integer> getPossibleNumberOfArgumentsPassedByPosition() {
+        final int min = getRequiredArguments().size();
+        return supportsVarargs() ? Range.atLeast(min) : Range.closed(min, min + getDefaultArguments().size());
+    }
+
+    public Range<Integer> getPossibleNumberOfArgumentsPassedByName() {
+        final int min = getKeywordOnlyRequiredArguments().size();
+        return supportsKwargs() ? Range.atLeast(min) : Range.closed(min, min + getKeywordOnlyDefaultArguments().size());
     }
 
     public Range<Integer> getPossibleNumberOfNonKwargsArguments() {
@@ -115,6 +152,23 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         return supportsVarargs() || supportsKwargs() ? Range.atLeast(min) : Range.closed(min, arguments.size());
     }
 
+    public boolean hasFixedNumberOfArguments() {
+        // has fixed number when there are only required arguments (no defaults, no vararg, no kwarg)
+        return arguments.stream().allMatch(arg -> arg.isRequired() || arg.isKeywordOnlyRequired());
+    }
+
+    public boolean supportsVarargs() {
+        return getVarargArgument().isPresent();
+    }
+
+    public boolean supportsKeywordOnlyArguments() {
+        return arguments.stream().filter(Argument::isKeywordOnly).findFirst().isPresent();
+    }
+
+    public boolean supportsKwargs() {
+        return getKwargArgument().isPresent();
+    }
+
     public List<Argument> getRequiredArguments() {
         return arguments.stream().filter(Argument::isRequired).collect(toList());
     }
@@ -123,16 +177,16 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         return arguments.stream().filter(Argument::isDefault).collect(toList());
     }
 
-    public boolean supportsVarargs() {
-        return getVarargArgument().isPresent();
-    }
-
     public Optional<Argument> getVarargArgument() {
         return arguments.stream().filter(Argument::isVarArg).findFirst();
     }
 
-    public boolean supportsKwargs() {
-        return getKwargArgument().isPresent();
+    public List<Argument> getKeywordOnlyRequiredArguments() {
+        return arguments.stream().filter(Argument::isKeywordOnlyRequired).collect(toList());
+    }
+
+    public List<Argument> getKeywordOnlyDefaultArguments() {
+        return arguments.stream().filter(Argument::isKeywordOnlyDefault).collect(toList());
     }
 
     public Optional<Argument> getKwargArgument() {
@@ -140,21 +194,28 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
     }
 
     public String getDescription() {
-        return arguments.stream().map(Argument::getDescription).collect(joining(", ", "[", "]"));
+        final Stream<String> descriptionsStream;
+        if (lastPositional == -1) {
+            descriptionsStream = arguments.stream().map(Argument::getDescription);
+        } else {
+            descriptionsStream = Streams.concat(arguments.stream().limit(lastPositional).map(Argument::getDescription),
+                    Stream.of("*"), arguments.stream().skip(lastPositional).map(Argument::getDescription));
+        }
+        return descriptionsStream.collect(joining(", ", "[", "]"));
     }
 
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof ArgumentsDescriptor) {
             final ArgumentsDescriptor that = (ArgumentsDescriptor) obj;
-            return this.arguments.equals(that.arguments);
+            return this.arguments.equals(that.arguments) && this.lastPositional == that.lastPositional;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return arguments.hashCode();
+        return Objects.hash(arguments, lastPositional);
     }
 
     @Override
@@ -172,8 +233,8 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
 
         private final Optional<String> defaultValue;
 
-        private Argument(final ArgumentType type, final String name, final String annotation,
-                final String defaultValue) {
+        @VisibleForTesting
+        Argument(final ArgumentType type, final String name, final String annotation, final String defaultValue) {
             this.type = type;
             this.argumentName = name;
             this.annotation = Optional.ofNullable(annotation).map(String::trim);
@@ -194,6 +255,18 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
 
         public boolean isVarArg() {
             return type == ArgumentType.VARARG;
+        }
+
+        public boolean isKeywordOnly() {
+            return type == ArgumentType.KEYWORD_ONLY;
+        }
+
+        public boolean isKeywordOnlyRequired() {
+            return isKeywordOnly() && !defaultValue.isPresent();
+        }
+
+        public boolean isKeywordOnlyDefault() {
+            return isKeywordOnly() && defaultValue.isPresent();
         }
 
         public boolean isKwArg() {
@@ -253,12 +326,22 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         REQUIRED(1),
         DEFAULT(2),
         VARARG(3),
-        KWARG(4);
+        KEYWORD_ONLY(4),
+        KWARG(5);
 
         private int order;
 
         private ArgumentType(final int order) {
             this.order = order;
+        }
+    }
+
+    public static class InvalidArgumentsDescriptorException extends RuntimeException {
+
+        private static final long serialVersionUID = -5633858508868505276L;
+
+        public InvalidArgumentsDescriptorException(final String message) {
+            super(message);
         }
     }
 }

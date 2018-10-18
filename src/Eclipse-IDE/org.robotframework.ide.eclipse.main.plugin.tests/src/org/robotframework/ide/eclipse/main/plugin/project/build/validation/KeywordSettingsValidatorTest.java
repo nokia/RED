@@ -13,8 +13,6 @@ import static org.robotframework.ide.eclipse.main.plugin.project.build.validatio
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotVersion;
@@ -35,7 +33,7 @@ import com.google.common.collect.Range;
 public class KeywordSettingsValidatorTest {
 
     @Test
-    public void unknownSettingIsReported() throws CoreException {
+    public void unknownSettingIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [SomeSetting]")
@@ -47,7 +45,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void emptyReturnSettingIsReported() throws CoreException {
+    public void emptyReturnSettingIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Return]")
@@ -59,7 +57,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenReturnHasValueToReturn() throws CoreException {
+    public void nothingIsReported_whenReturnHasValueToReturn() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Return]    0")
@@ -70,7 +68,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedReturnsAreReported_inRf30() throws CoreException {
+    public void duplicatedReturnsAreReported_inRf30() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Return]    1")
@@ -84,7 +82,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void emptyTagsSettingIsReported() throws CoreException {
+    public void emptyTagsSettingIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]")
@@ -96,7 +94,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenThereIsATagDefined() throws CoreException {
+    public void nothingIsReported_whenThereIsATagDefined() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]    tag")
@@ -107,7 +105,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedTagsAreReportedInRf3() throws CoreException {
+    public void duplicatedTagsAreReportedInRf3() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]    tag1")
@@ -121,7 +119,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void undeclaredVariableInTagsIsReported() throws CoreException {
+    public void undeclaredVariableInTagsIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]  ${var}")
@@ -133,7 +131,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void emptyDocumentationSettingIsReported() throws CoreException {
+    public void emptyDocumentationSettingIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Documentation]")
@@ -145,7 +143,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenThereIsADocumentationWritten() throws CoreException {
+    public void nothingIsReported_whenThereIsADocumentationWritten() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Documentation]    docu")
@@ -156,7 +154,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedDocumentationsAreReportedInRf3() throws CoreException {
+    public void duplicatedDocumentationsAreReportedInRf3() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Documentation]    doc1")
@@ -170,7 +168,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void documentSettingIsNotReported_inOlderRobot() throws CoreException {
+    public void documentSettingIsNotReported_inOlderRobot() {
         final RobotVersion version = new RobotVersion(2, 9);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
                 .appendLine("*** Keywords ***")
@@ -183,7 +181,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void documentSettingIsReportedAsDeprecated_inRf3() throws CoreException {
+    public void documentSettingIsReportedAsDeprecated_inRf3() {
         final RobotVersion version = new RobotVersion(3, 0);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
                 .appendLine("*** Keywords ***")
@@ -197,7 +195,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void documentSettingIsNotRecognized_inRf31() throws CoreException {
+    public void documentSettingIsNotRecognized_inRf31() {
         final RobotVersion version = new RobotVersion(3, 1);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
                 .appendLine("*** Keywords ***")
@@ -211,7 +209,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void emptyTimeoutSettingIsReported() throws CoreException {
+    public void emptyTimeoutSettingIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Timeout]")
@@ -223,7 +221,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenThereIsATimeoutProvided() throws CoreException {
+    public void nothingIsReported_whenThereIsATimeoutProvided() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Timeout]    10")
@@ -234,7 +232,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedTimeoutsAreReportedInRf3() throws CoreException {
+    public void duplicatedTimeoutsAreReportedInRf3() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Timeout]    1")
@@ -248,7 +246,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void invalidSyntaxInKeywordTimeoutIsReported() throws CoreException {
+    public void invalidSyntaxInKeywordTimeoutIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("kw1")
                 .appendLine("  [Timeout]  something")
@@ -260,7 +258,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void undeclaredVariableInKeywordTimeoutIsReported() throws CoreException {
+    public void undeclaredVariableInKeywordTimeoutIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("kw1")
                 .appendLine("  [Timeout]  ${var1}")
@@ -272,7 +270,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void emptyTeardownSettingIsReported() throws CoreException {
+    public void emptyTeardownSettingIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Teardown]")
@@ -284,7 +282,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenThereIsATeardownProvided() throws CoreException {
+    public void nothingIsReported_whenThereIsATeardownProvided() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Teardown]    keyword")
@@ -297,7 +295,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedTeardownsAreReportedInRf3() throws CoreException {
+    public void duplicatedTeardownsAreReportedInRf3() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("kw")
                 .appendLine("  [Teardown]    keyword")
@@ -313,7 +311,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void postconditionSettingIsNotRecognized_inOlderRobot() throws CoreException {
+    public void postconditionSettingIsNotRecognized_inOlderRobot() {
         final RobotVersion version = new RobotVersion(2, 9);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
                 .appendLine("*** Keywords ***")
@@ -329,7 +327,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void postconditionSettingIsReportedAsDeprecated_inRf30() throws CoreException {
+    public void postconditionSettingIsReportedAsDeprecated_inRf30() {
         final RobotVersion version = new RobotVersion(3, 0);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
                 .appendLine("*** Keywords ***")
@@ -345,7 +343,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void postconditionSettingIsNotRecognized_inRf31() throws CoreException {
+    public void postconditionSettingIsNotRecognized_inRf31() {
         final RobotVersion version = new RobotVersion(3, 1);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
                 .appendLine("*** Keywords ***")
@@ -361,7 +359,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void emptyArgumentsSettingIsReported() throws CoreException {
+    public void emptyArgumentsSettingIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]")
@@ -373,7 +371,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedArgumentsAreReported_inArgumentsSetting() throws CoreException {
+    public void duplicatedArgumentsAreReported_inArgumentsSetting() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  ${x}  ${x}")
@@ -387,7 +385,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedArgumentsAreReported_inEmbeddedArguments() throws CoreException {
+    public void duplicatedArgumentsAreReported_inEmbeddedArguments() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword ${x} ${y} ${x} rest of name")
                 .appendLine("  [Return]  10")
@@ -400,7 +398,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedArgumentsAreReported_inEmbeddedArgumentsWithRegex() throws CoreException {
+    public void duplicatedArgumentsAreReported_inEmbeddedArgumentsWithRegex() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword ${x:\\d+} ${y} ${x} rest of name")
                 .appendLine("  [Return]  10")
@@ -413,7 +411,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void duplicatedArgumentsAreReported_whenDefinedInDuplicatedSettings_inRf3() throws CoreException {
+    public void duplicatedArgumentsAreReported_whenDefinedInDuplicatedSettings_inRf3() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword ${x:\\d+} rest of name")
                 .appendLine("  [Arguments]  ${a}  ${x}")
@@ -432,7 +430,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void defaultArgumentsAreReported_whenTheyOccurBeforeNonDefaultOnes() throws CoreException {
+    public void defaultArgumentsAreReported_whenTheyOccurBeforeNonDefaultOnes() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  ${a}=10  ${b}  ${c}")
@@ -448,7 +446,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenDefaultArgumentIsFollowedByVarargs() throws CoreException {
+    public void nothingIsReported_whenDefaultArgumentIsFollowedByVarargs() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  ${a}=10  @{b}")
@@ -460,7 +458,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenDefaultArgumentIsFollowedByKwargs() throws CoreException {
+    public void nothingIsReported_whenDefaultArgumentIsFollowedByKwargs() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  ${a}=10  &{b}")
@@ -472,7 +470,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void scalarIsReported_whenItFollowsVararg() throws CoreException {
+    public void scalarIsReported_whenItFollowsVararg() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  @{a}  ${b}")
@@ -485,20 +483,33 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void listIsReported_whenItFollowsVararg() throws CoreException {
+    public void listIsReported_whenItFollowsVararg_1() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  @{a}  @{b}")
                 .appendLine("  [Return]  10")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(KeywordsProblem.ARGUMENT_AFTER_VARARG, new ProblemPosition(3, Range.closed(46, 50))));
     }
 
     @Test
-    public void nothingIsReported_whenDictionaryFollowsVararg() throws CoreException {
+    public void listIsReported_whenItFollowsVararg_2() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  @{a}  @{b}")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 1)), fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.ARGUMENT_AFTER_VARARG, new ProblemPosition(3, Range.closed(46, 50))));
+    }
+
+    @Test
+    public void nothingIsReported_whenDictionaryFollowsVararg() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  @{a}  &{b}")
@@ -510,7 +521,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void scalarIsReported_whenItFollowsKwargs() throws CoreException {
+    public void scalarIsReported_whenItFollowsKwargs() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  &{a}  ${b}")
@@ -523,7 +534,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void listIsReported_whenItFollowsKwargs() throws CoreException {
+    public void listIsReported_whenItFollowsKwargs() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  &{a}  @{b}")
@@ -536,7 +547,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void dictIsReported_whenItFollowsKwargs() throws CoreException {
+    public void dictIsReported_whenItFollowsKwargs() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  &{a}  &{b}")
@@ -549,7 +560,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void unknownVariableIsReported_whenItIsUsedInDefaultValueAndNotKnown() throws CoreException {
+    public void unknownVariableIsReported_whenItIsUsedInDefaultValueAndNotKnown() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  ${x}  ${y}=${unknown}")
@@ -562,7 +573,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenDefaultValuesUsesVariableDefinedJustBefore() throws CoreException {
+    public void nothingIsReported_whenDefaultValuesUsesVariableDefinedJustBefore() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  ${x}  ${y}=${x}  ${z}=${y}")
@@ -574,7 +585,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenDefaultValuesUsesNumbersOrComputations() throws CoreException {
+    public void nothingIsReported_whenDefaultValuesUsesNumbersOrComputations() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  ${x}=${0}  ${y}=${1+2}")
@@ -586,7 +597,82 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void syntaxProblemsAreReported_whenDefinitionIsInvalid() throws CoreException {
+    public void requiredArgumentIsReported_whenItFollowsVarargInRfOlderThan31() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}  @{v}  ${b}")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.ARGUMENT_AFTER_VARARG, new ProblemPosition(3, Range.closed(52, 56))));
+    }
+
+    @Test
+    public void requiredArgumentIsNotReported_whenItFollowsVarargInRfNewerThan31() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}  @{v}  ${b}")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 1)), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void defaultArgumentIsReported_whenItFollowsVarargInRfOlderThan31() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}  @{v}  ${b}=3")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.ARGUMENT_AFTER_VARARG, new ProblemPosition(3, Range.closed(52, 58))));
+    }
+
+    @Test
+    public void defaultArgumentIsNotReported_whenItFollowsVarargInRfNewerThan31() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}  @{v}  ${b}=3")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 1)), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void syntaxProblemIsReported_whenEndOfPositionalsIsUsedInRfOlderThan31() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}  @{}  ${b}")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(46, 49))));
+    }
+
+    @Test
+    public void syntaxProblemIsNotReported_whenEndOfPositionalsIsUsedInRfNewerThan31() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}  @{}  ${b}")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 1)), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void syntaxProblemsAreReported_whenDefinitionIsInvalid() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  123  ${x  {y}  ${x} =123  ${}  ${a} ${b}  @{m}=0")
@@ -604,15 +690,14 @@ public class KeywordSettingsValidatorTest {
                 new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(82, 88))));
     }
 
-    private Collection<Problem> validate(final FileValidationContext context, final RobotSuiteFile fileModel)
-            throws CoreException {
+    private Collection<Problem> validate(final FileValidationContext context, final RobotSuiteFile fileModel) {
         final MockReporter reporter = new MockReporter();
         final UserKeyword keyword = fileModel.findSection(RobotKeywordsSection.class)
                 .get()
                 .getChildren()
                 .get(0)
                 .getLinkedElement();
-        new KeywordSettingsValidator(context, keyword, reporter).validate(new NullProgressMonitor());
+        new KeywordSettingsValidator(context, keyword, reporter).validate();
         return reporter.getReportedProblems();
     }
 }
