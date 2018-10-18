@@ -34,9 +34,9 @@ public class RedXmlChangesCollectorTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        projectProvider.createDir(new Path("a"));
-        projectProvider.createDir(new Path("a/b"));
-        projectProvider.createDir(new Path("c"));
+        projectProvider.createDir("a");
+        projectProvider.createDir("a/b");
+        projectProvider.createDir("c");
     }
 
     @Before

@@ -40,9 +40,9 @@ public class RedXmlInProjectEditorChangesCollectorTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        projectProvider.createDir(new Path("a"));
-        projectProvider.createDir(new Path("a/b"));
-        projectProvider.createDir(new Path("c"));
+        projectProvider.createDir("a");
+        projectProvider.createDir("a/b");
+        projectProvider.createDir("c");
         projectProvider.createDir("libs");
         projectProvider.createFile("libs/lib.py", "class lib(object):", "    ROBOT_LIBRARY_VERSION = 1.0",
                 "    def __init__(self):", "        pass", "    def keyword(self):", "        pass");
@@ -75,7 +75,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
 
     @Test
     public void noChangeIsCollected_whenTheFileIsNotOpened() {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
 
         final RedXmlInProjectEditorChangesCollector collector = new RedXmlInProjectEditorChangesCollector(redXmlFile,
                 new Path(PROJECT_NAME + "/a"), Optional.empty());
@@ -86,7 +86,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
 
     @Test
     public void noChangeIsCollected_whenTheFileIsOpenedInTextEditor() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
         Editors.openInTextEditor(redXmlFile);
 
         final RedXmlInProjectEditorChangesCollector collector = new RedXmlInProjectEditorChangesCollector(redXmlFile,
@@ -98,7 +98,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
 
     @Test
     public void noChangeIsCollected_whenRemovedResourceDoesNotAffectExcludedFolders() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
         Editors.openInProjectEditor(redXmlFile);
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
@@ -109,7 +109,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
 
     @Test
     public void noChangeIsCollected_whenMovedResourceDoesNotAffectExcludedFolders() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
         Editors.openInProjectEditor(redXmlFile);
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
@@ -122,7 +122,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
     @Test
     public void changeIsCollected_whenFileIsOpenedInProjectConfigEditorAndResourceRemoveAffectsExcludedPaths()
             throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
         final IEditorPart editor = Editors.openInProjectEditor(redXmlFile);
 
         final RedXmlInProjectEditorChangesCollector collector = new RedXmlInProjectEditorChangesCollector(redXmlFile,
@@ -149,7 +149,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
     @Test
     public void changeIsCollected_whenFileIsOpenedInProjectConfigEditorAndResourceMoveAffectsExcludedPaths()
             throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
         final IEditorPart editor = Editors.openInProjectEditor(redXmlFile);
 
         final RedXmlInProjectEditorChangesCollector collector = new RedXmlInProjectEditorChangesCollector(redXmlFile,
@@ -178,7 +178,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
     @Test
     public void changeIsCollected_whenFileIsOpenedInProjectConfigEditorAndResourceRemoveAffectsLibraries()
             throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
         final IEditorPart editor = Editors.openInProjectEditor(redXmlFile);
 
         final RedXmlInProjectEditorChangesCollector collector = new RedXmlInProjectEditorChangesCollector(redXmlFile,
@@ -218,7 +218,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
     @Test
     public void changeIsCollected_whenFileIsOpenedInProjectConfigEditorAndResourceMoveAffectsLibraries()
             throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
         final IEditorPart editor = Editors.openInProjectEditor(redXmlFile);
 
         final RedXmlInProjectEditorChangesCollector collector = new RedXmlInProjectEditorChangesCollector(redXmlFile,

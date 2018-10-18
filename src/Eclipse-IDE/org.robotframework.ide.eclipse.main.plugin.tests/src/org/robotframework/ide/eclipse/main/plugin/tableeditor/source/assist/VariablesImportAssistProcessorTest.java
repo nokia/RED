@@ -207,7 +207,8 @@ public class VariablesImportAssistProcessorTest {
     }
 
     private static IDocument documentFromImportingFile() throws Exception {
-        final String content = projectProvider.getFileContent(importingFile.getProjectRelativePath());
+        final String path = importingFile.getProjectRelativePath().toPortableString();
+        final String content = projectProvider.getFileContent(path);
         return new Document(Splitter.on('\n').splitToList(content));
     }
 }

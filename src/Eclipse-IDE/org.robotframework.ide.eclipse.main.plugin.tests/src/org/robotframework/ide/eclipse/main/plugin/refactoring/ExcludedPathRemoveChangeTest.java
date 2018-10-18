@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.junit.BeforeClass;
@@ -39,9 +38,8 @@ public class ExcludedPathRemoveChangeTest {
         final RobotProjectConfig config = new RobotProjectConfig();
         final ExcludedFolderPath excludedPathToAdd = ExcludedFolderPath.create("a/b/c");
 
-        final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(
-                projectProvider.getFile(new Path("red.xml")),
-                config, excludedPathToAdd);
+        final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(projectProvider.getFile("red.xml"), config,
+                excludedPathToAdd);
 
         assertThat(change.getName()).isEqualTo("The path 'a/b/c' will be removed");
         assertThat(change.getModifiedElement()).isSameAs(excludedPathToAdd);
@@ -55,9 +53,8 @@ public class ExcludedPathRemoveChangeTest {
         final ExcludedFolderPath excludedPathToRemove = config.getExcludedPath().get(0);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(
-                projectProvider.getFile(new Path("red.xml")),
-                config, excludedPathToRemove, eventBroker);
+        final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(projectProvider.getFile("red.xml"), config,
+                excludedPathToRemove, eventBroker);
 
         change.initializeValidationData(null);
         assertThat(change.isValid(null).isOK()).isTrue();

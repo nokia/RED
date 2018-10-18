@@ -51,7 +51,7 @@ public class AssistProposalsTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        file = projectProvider.createFile(new Path("suite.robot"),
+        file = projectProvider.createFile("suite.robot",
                 "*** Keywords ***",
                 "kw1",
                 "  [Arguments]  ${x}  @{list}",

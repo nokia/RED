@@ -12,8 +12,6 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,11 +81,7 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenThereAreNoSuitesSpecified_warningExceptionIsThrown() throws Exception {
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0");
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -100,19 +94,14 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenSuitesSpecifiedToRunDoesNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
-        final IPath filePath = Path.fromPortableString("file.robot");
-        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", " Log 10");
+        projectProvider.createFile("file.robot", "*** Test Cases ***", "case1", " Log 10");
 
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0");
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList(), "file2.robot",
-                newArrayList(), "suite/dir", newArrayList()));
+        launchConfig.setSuitePaths(ImmutableMap.of("file.robot", newArrayList(), "file2.robot", newArrayList(),
+                "suite/dir", newArrayList()));
 
         assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
                 .isThrownBy(() -> validator.validateRobotTab(launchConfig))
@@ -124,20 +113,14 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenTestsSpecifiedInSuiteDoNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
-        final IPath filePath = Path.fromPortableString("file.robot");
-        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20", "case3",
-                "  Log  30");
+        projectProvider.createFile("file.robot", "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20",
+                "case3", "  Log  30");
 
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0");
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig
-                .setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList("case3", "case4", "case5")));
+        launchConfig.setSuitePaths(ImmutableMap.of("file.robot", newArrayList("case3", "case4", "case5")));
 
         assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
                 .isThrownBy(() -> validator.validateRobotTab(launchConfig))
@@ -147,19 +130,14 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void nothingIsThrown_whenEverythingIsOkWithRobotTab() throws Exception, CoreException {
-        final IPath filePath = Path.fromPortableString("file.robot");
-        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20", "case3",
-                "  Log  30");
+        projectProvider.createFile("file.robot", "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20",
+                "case3", "  Log  30");
 
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0");
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList("case2", "case3")));
+        launchConfig.setSuitePaths(ImmutableMap.of("file.robot", newArrayList("case2", "case3")));
         validator.validateRobotTab(launchConfig);
     }
 
@@ -217,13 +195,12 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenSystemInterpreterIsUsed_warningExceptionIsThrown() throws Exception {
-        final IPath filePath = Path.fromPortableString("file.robot");
-        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10");
+        projectProvider.createFile("file.robot", "*** Test Cases ***", "case1", "  Log  10");
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator();
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setUsingInterpreterFromProject(false);
-        launchConfig.setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList()));
+        launchConfig.setSuitePaths(ImmutableMap.of("file.robot", newArrayList()));
 
         assertThatExceptionOfType(LaunchConfigurationValidationException.class)
                 .isThrownBy(() -> validator.validateExecutorTab(launchConfig))
@@ -272,11 +249,7 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_2() throws Exception {
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidPythonEnvironment();
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createInvalidPythonEnvironment());
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -289,11 +262,7 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_3() throws Exception {
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidRobotEnvironment();
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createInvalidRobotEnvironment());
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -327,11 +296,7 @@ public class LaunchConfigurationTabValidatorTest {
     public void nothingIsThrown_whenProjectIsUsingInvalidEnvironmentButExecutableFileIsSet() throws Exception {
         final IFile executableFile = projectProvider.createFile("robot_executable_file.txt", "run robot command");
 
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidRobotEnvironment();
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createInvalidRobotEnvironment());
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -354,6 +319,14 @@ public class LaunchConfigurationTabValidatorTest {
         launchConfig.fillDefaults();
         launchConfig.setProjectName(projectName);
         return launchConfig;
+    }
+
+    private RobotModel createRobotModel(final RobotRuntimeEnvironment environment) {
+        final RobotProject robotProject = mock(RobotProject.class);
+        final RobotModel model = mock(RobotModel.class);
+        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+        return model;
     }
 
 }

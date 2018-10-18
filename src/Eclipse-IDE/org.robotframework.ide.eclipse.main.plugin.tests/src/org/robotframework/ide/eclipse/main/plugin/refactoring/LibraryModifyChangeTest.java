@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import java.util.Objects;
 
 import org.assertj.core.api.Condition;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.junit.BeforeClass;
@@ -43,7 +42,7 @@ public class LibraryModifyChangeTest {
         final ReferencedLibrary libraryToModify = ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b");
         final ReferencedLibrary modifiedLibrary = ReferencedLibrary.create(LibraryType.PYTHON, "d", "x/y");
 
-        final LibraryModifyChange change = new LibraryModifyChange(projectProvider.getFile(new Path("red.xml")),
+        final LibraryModifyChange change = new LibraryModifyChange(projectProvider.getFile("red.xml"),
                 libraryToModify, modifiedLibrary);
 
         assertThat(change.getName()).isEqualTo("The library 'c' (a/b) will be changed to 'd' (x/y)");
@@ -59,7 +58,7 @@ public class LibraryModifyChangeTest {
         final ReferencedLibrary modifiedLibrary = ReferencedLibrary.create(LibraryType.PYTHON, "d", "x/y");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final LibraryModifyChange change = new LibraryModifyChange(projectProvider.getFile(new Path("red.xml")),
+        final LibraryModifyChange change = new LibraryModifyChange(projectProvider.getFile("red.xml"),
                 libraryToModify, modifiedLibrary, eventBroker);
 
         change.initializeValidationData(null);

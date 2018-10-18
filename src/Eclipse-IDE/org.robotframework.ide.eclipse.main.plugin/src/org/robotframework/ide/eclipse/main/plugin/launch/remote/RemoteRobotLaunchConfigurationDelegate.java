@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -71,9 +70,8 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
                 final List<AgentServerStatusListener> additionalServerListeners = newArrayList(
                         new ProcessConnectingInRunServerListener(launch));
 
-                final List<RobotAgentEventListener> additionalAgentListeners = new ArrayList<>();
-                additionalAgentListeners.add(new AgentServerVersionsChecker());
-                additionalAgentListeners.add(testsStarter);
+                final List<RobotAgentEventListener> additionalAgentListeners = newArrayList(
+                        new AgentServerVersionsChecker(), testsStarter);
 
                 launchExecution = doLaunch(launch, testsLaunchContext, host, port, timeout, userController,
                         additionalServerListeners, additionalAgentListeners);
@@ -82,24 +80,22 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
             } else {
                 final Stacktrace stacktrace = new Stacktrace();
                 final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-                userController = new UserProcessDebugController(stacktrace,
-                        new DebuggerPreferences(new DebuggerErrorDecider(preferences),
-                                !preferences.shouldDebuggerOmitLibraryKeywords()));
+                userController = new UserProcessDebugController(stacktrace, new DebuggerPreferences(
+                        new DebuggerErrorDecider(preferences), !preferences.shouldDebuggerOmitLibraryKeywords()));
 
                 final RobotDebugTarget debugTarget = new RobotDebugTarget("Remote Robot Test at " + host + ":" + port,
                         launch, stacktrace, (UserProcessDebugController) userController);
 
-                final EclipseElementsLocator elementsLocator = new EclipseElementsLocator(robotConfig.getProject());
+                final StacktraceBuilder stacktraceBuilder = new StacktraceBuilder(stacktrace,
+                        new EclipseElementsLocator(robotConfig.getProject()),
+                        (uri, line) -> new RobotBreakpoints().getBreakpointAtLine(line, uri));
 
                 final List<AgentServerStatusListener> additionalServerListeners = newArrayList(
                         new ProcessConnectingInDebugServerListener(launch), new BreakpointsEnabler());
-                
-                final List<RobotAgentEventListener> additionalAgentListeners = new ArrayList<>();
-                additionalAgentListeners.add(new AgentServerVersionsDebugChecker());
-                additionalAgentListeners.add(testsStarter);
-                additionalAgentListeners.add(new StacktraceBuilder(stacktrace, elementsLocator,
-                        (uri, line) -> new RobotBreakpoints().getBreakpointAtLine(line, uri)));
-                additionalAgentListeners.add(new RobotEvaluationErrorsHandler());
+
+                final List<RobotAgentEventListener> additionalAgentListeners = newArrayList(
+                        new AgentServerVersionsDebugChecker(), testsStarter, stacktraceBuilder,
+                        new RobotEvaluationErrorsHandler());
 
                 launchExecution = doLaunch(launch, testsLaunchContext, host, port, timeout, userController,
                         additionalServerListeners, additionalAgentListeners);

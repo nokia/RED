@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -29,8 +28,8 @@ public class TagsProposalsSupportTest {
 
     @BeforeClass
     public static void before() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("suites"));
-        projectProvider.createFile(Path.fromPortableString("suites/s1.robot"),
+        projectProvider.createDir("suites");
+        projectProvider.createFile("suites/s1.robot",
                 "*** Settings ***",
                 "Documentation  docu",
                 "Force Tags  tag1",
@@ -39,12 +38,12 @@ public class TagsProposalsSupportTest {
                 "case1",
                 "  [Tags]  tag3",
                 "  Log  10");
-        projectProvider.createFile(Path.fromPortableString("suites/s2.robot"),
+        projectProvider.createFile("suites/s2.robot",
                 "*** Test Cases ***",
                 "case2",
                 "  [Tags]  tag4",
                 "  Log  10");
-        projectProvider.createFile(Path.fromPortableString("s3.robot"),
+        projectProvider.createFile("s3.robot",
                 "*** Test Cases ***",
                 "case3",
                 "  [Tags]  tag5",
@@ -93,7 +92,7 @@ public class TagsProposalsSupportTest {
         support.switchTo(PROJECT_NAME, new HashMap<>());
 
         final HashMap<IResource, List<String>> suites = new HashMap<>();
-        suites.put(projectProvider.getDir(Path.fromPortableString("suites")), new ArrayList<>());
+        suites.put(projectProvider.getDir("suites"), new ArrayList<>());
         support.switchTo(PROJECT_NAME, suites);
 
         assertThat(support.getProposals("")).extracting(IContentProposal::getContent)
@@ -107,8 +106,8 @@ public class TagsProposalsSupportTest {
         support.switchTo(PROJECT_NAME, new HashMap<>());
 
         final HashMap<IResource, List<String>> suites = new HashMap<>();
-        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s1.robot")), new ArrayList<>());
-        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s2.robot")), new ArrayList<>());
+        suites.put(projectProvider.getFile("suites/s1.robot"), new ArrayList<>());
+        suites.put(projectProvider.getFile("suites/s2.robot"), new ArrayList<>());
         support.switchTo(PROJECT_NAME, suites);
 
         assertThat(support.getProposals("")).extracting(IContentProposal::getContent)
@@ -122,7 +121,7 @@ public class TagsProposalsSupportTest {
         support.switchTo(PROJECT_NAME, new HashMap<>());
 
         final HashMap<IResource, List<String>> suites = new HashMap<>();
-        suites.put(projectProvider.getFile(Path.fromPortableString("suites/s1.robot")), new ArrayList<>());
+        suites.put(projectProvider.getFile("suites/s1.robot"), new ArrayList<>());
         support.switchTo(PROJECT_NAME, suites);
 
         assertThat(support.getProposals("")).extracting(IContentProposal::getContent)
@@ -136,13 +135,13 @@ public class TagsProposalsSupportTest {
         support.switchTo(PROJECT_NAME, new HashMap<>());
 
         final HashMap<IResource, List<String>> suites1 = new HashMap<>();
-        suites1.put(projectProvider.getFile(Path.fromPortableString("s3.robot")), newArrayList("case4"));
+        suites1.put(projectProvider.getFile("s3.robot"), newArrayList("case4"));
         support.switchTo(PROJECT_NAME, suites1);
 
         assertThat(support.getProposals("")).extracting(IContentProposal::getContent).containsOnly("tag4");
 
         final HashMap<IResource, List<String>> suites2 = new HashMap<>();
-        suites2.put(projectProvider.getFile(Path.fromPortableString("s3.robot")), newArrayList("case3"));
+        suites2.put(projectProvider.getFile("s3.robot"), newArrayList("case3"));
         support.switchTo(PROJECT_NAME, suites2);
 
         assertThat(support.getProposals("")).extracting(IContentProposal::getContent).containsOnly("tag5");
