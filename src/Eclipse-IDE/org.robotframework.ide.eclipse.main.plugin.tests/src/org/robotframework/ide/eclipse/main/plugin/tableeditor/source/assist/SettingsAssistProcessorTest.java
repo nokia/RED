@@ -17,7 +17,6 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -73,7 +72,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 25;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  keyword  argument");
 
-        final IFile file = projectProvider.createFile(new Path("1.robot"), lines.toArray(new String[0]));
+        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));
@@ -93,7 +92,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 27;
         final List<String> lines = newArrayList("*** Keywords ***", "keyword", "  ");
 
-        final IFile file = projectProvider.createFile(new Path("1.robot"), lines.toArray(new String[0]));
+        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));
@@ -122,7 +121,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 29;
         final List<String> lines = newArrayList("*** Keywords ***", "keyword", "  [T");
 
-        final IFile file = projectProvider.createFile(new Path("1.robot"), lines.toArray(new String[0]));
+        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));
@@ -148,7 +147,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 26;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  ");
 
-        final IFile file = projectProvider.createFile(new Path("1.robot"), lines.toArray(new String[0]));
+        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));
@@ -177,7 +176,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 29;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  [Te");
 
-        final IFile file = projectProvider.createFile(new Path("1.robot"), lines.toArray(new String[0]));
+        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));

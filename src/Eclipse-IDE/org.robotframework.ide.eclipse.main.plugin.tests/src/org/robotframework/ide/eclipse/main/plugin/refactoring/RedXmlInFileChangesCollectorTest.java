@@ -65,7 +65,7 @@ public class RedXmlInFileChangesCollectorTest {
 
     @Test
     public void noChangeIsCollected_whenRemovedResourceDoesNotAffectAnything() {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
                 new Path(PROJECT_NAME + "/x"), Optional.empty());
@@ -75,7 +75,7 @@ public class RedXmlInFileChangesCollectorTest {
 
     @Test
     public void noChangeIsCollected_whenMovedResourceDoesNotAffectAnything() {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
                 new Path(PROJECT_NAME + "/x"), Optional.of(new Path(PROJECT_NAME + "/renamed")));
@@ -86,7 +86,7 @@ public class RedXmlInFileChangesCollectorTest {
 
     @Test
     public void textFileChangeIsCollected_whenRemovedResourceAffectsExcludedFolders() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
                 new Path(PROJECT_NAME + "/a"), Optional.empty());
@@ -101,7 +101,7 @@ public class RedXmlInFileChangesCollectorTest {
 
     @Test
     public void textFileChangeIsCollected_whenMovedResourceAffectsExcludedFolders() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
                 new Path(PROJECT_NAME + "/a"), Optional.of(new Path(PROJECT_NAME + "/moved")));
@@ -117,7 +117,7 @@ public class RedXmlInFileChangesCollectorTest {
 
     @Test
     public void testFileChangeIsCollected_whenRemovedResourceAffectsLibraries() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
                 new Path(PROJECT_NAME + "/libs/inner_lib"), Optional.empty());
@@ -134,7 +134,7 @@ public class RedXmlInFileChangesCollectorTest {
 
     @Test
     public void testFileChangeIsCollected_whenMovedResourceAffectsLibraries() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
+        final IFile redXmlFile = projectProvider.getFile("red.xml");
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
                 new Path(PROJECT_NAME + "/libs/inner_lib"), Optional.of(new Path(PROJECT_NAME + "/libs/moved")));

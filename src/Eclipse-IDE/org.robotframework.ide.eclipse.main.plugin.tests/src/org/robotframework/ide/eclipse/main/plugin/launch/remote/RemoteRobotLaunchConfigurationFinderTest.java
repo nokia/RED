@@ -21,6 +21,7 @@ public class RemoteRobotLaunchConfigurationFinderTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
 
+    // this rule is needed for cleaning saved configurations
     @Rule
     public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
             RemoteRobotLaunchConfiguration.TYPE_ID);

@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.junit.BeforeClass;
@@ -39,7 +38,7 @@ public class ExcludedPathAddChangeTest {
         final RobotProjectConfig config = new RobotProjectConfig();
         final ExcludedFolderPath excludedPathToAdd = ExcludedFolderPath.create("a/b/c");
 
-        final ExcludedPathAddChange change = new ExcludedPathAddChange(projectProvider.getFile(new Path("red.xml")),
+        final ExcludedPathAddChange change = new ExcludedPathAddChange(projectProvider.getFile("red.xml"),
                 config, excludedPathToAdd);
 
         assertThat(change.getName()).isEqualTo("The path 'a/b/c' will be added");
@@ -52,7 +51,7 @@ public class ExcludedPathAddChangeTest {
         final ExcludedFolderPath excludedPathToAdd = ExcludedFolderPath.create("a/b/c");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final ExcludedPathAddChange change = new ExcludedPathAddChange(projectProvider.getFile(new Path("red.xml")),
+        final ExcludedPathAddChange change = new ExcludedPathAddChange(projectProvider.getFile("red.xml"),
                 config, excludedPathToAdd, eventBroker);
 
         change.initializeValidationData(null);

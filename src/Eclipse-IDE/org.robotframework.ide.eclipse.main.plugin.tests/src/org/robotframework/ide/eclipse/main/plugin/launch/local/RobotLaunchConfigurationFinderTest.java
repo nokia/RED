@@ -39,6 +39,7 @@ public class RobotLaunchConfigurationFinderTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
 
+    // this rule is needed for cleaning saved configurations
     @Rule
     public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
             RobotLaunchConfiguration.TYPE_ID);

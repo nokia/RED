@@ -19,7 +19,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Path;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -42,9 +41,9 @@ public class TargetedSearchTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile(new Path("file1.robot"), "line");
-        projectProvider.createFile(new Path("file2.robot"), "line");
-        projectProvider.createFile(new Path("file3.robot"), "line");
+        projectProvider.createFile("file1.robot", "line");
+        projectProvider.createFile("file2.robot", "line");
+        projectProvider.createFile("file3.robot", "line");
     }
 
     @Test

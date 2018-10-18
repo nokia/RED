@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -26,7 +25,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
 
 /**
@@ -69,7 +67,7 @@ public class ProjectProvider implements TestRule {
     }
 
     public void configure(final RobotProjectConfig config) throws IOException, CoreException {
-        createFile(Path.fromPortableString(RobotProjectConfig.FILENAME), "");
+        createFile(RobotProjectConfig.FILENAME, "");
         new RedEclipseProjectConfigWriter().writeConfiguration(config, project);
     }
 
@@ -101,32 +99,32 @@ public class ProjectProvider implements TestRule {
         };
     }
 
-    public IFolder createDir(final String dirPath) throws CoreException {
-        return createDir(Path.fromPortableString(dirPath));
+    public IFolder getDir(final String dirPath) {
+        return project.getFolder(Path.fromPortableString(dirPath));
     }
 
-    public IFolder createDir(final IPath dirPath) throws CoreException {
-        final IFolder directory = project.getFolder(dirPath);
+    public IFolder createDir(final String dirPath) throws CoreException {
+        final IFolder directory = getDir(dirPath);
         directory.create(true, true, null);
         return directory;
     }
 
-    public IFile createFile(final String filePath, final String... lines) throws IOException, CoreException {
-        return createFile(Path.fromPortableString(filePath), lines);
+    public IFile getFile(final String filePath) {
+        return project.getFile(Path.fromPortableString(filePath));
     }
 
-    public IFile createFile(final IPath filePath, final String... lines) throws IOException, CoreException {
-        return createFile(project.getFile(filePath), lines);
+    public IFile createFile(final String filePath, final String... lines) throws IOException, CoreException {
+        return createFile(getFile(filePath), lines);
     }
 
     public IFile createFile(final IFile file, final String... lines) throws IOException, CoreException {
-        try (InputStream source = new ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
+        try (InputStream source = new ByteArrayInputStream(String.join("\n", lines).getBytes(Charsets.UTF_8))) {
             return createFile(file, source);
         }
     }
 
     public IFile createFile(final String filePath, final InputStream fileSource) throws IOException, CoreException {
-        return createFile(project.getFile(Path.fromPortableString(filePath)), fileSource);
+        return createFile(getFile(filePath), fileSource);
     }
 
     public IFile createFile(final IFile file, final InputStream fileSource) throws IOException, CoreException {
@@ -139,19 +137,7 @@ public class ProjectProvider implements TestRule {
         return file;
     }
 
-    public IFile getFile(final IPath filePath) {
-        return project.getFile(filePath);
-    }
-
-    public IFile getFile(final String filePath) {
-        return getFile(new Path(filePath));
-    }
-
     public String getFileContent(final String filePath) throws IOException, CoreException {
-        return getFileContent(new Path(filePath));
-    }
-
-    public String getFileContent(final IPath filePath) throws IOException, CoreException {
         return getFileContent(getFile(filePath));
     }
 
@@ -159,14 +145,6 @@ public class ProjectProvider implements TestRule {
         try (final InputStream stream = file.getContents()) {
             return CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
         }
-    }
-
-    public IFolder getDir(final IPath dirPath) {
-        return project.getFolder(dirPath);
-    }
-
-    public IFolder getDir(final String dirPath) {
-        return getDir(new Path(dirPath));
     }
 
 }
