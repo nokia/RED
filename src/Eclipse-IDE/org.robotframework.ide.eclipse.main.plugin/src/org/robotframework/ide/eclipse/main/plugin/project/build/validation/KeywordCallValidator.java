@@ -139,15 +139,13 @@ class KeywordCallValidator implements ModelUnitValidator {
 
     protected void validateArguments() {
         final QualifiedKeywordName qualifiedKeywordName = getFoundKeywordName().get();
-        final IFile file = validationContext.getFile();
-
         // validate the arguments
         final KeywordCallArgumentsValidator argsValidator;
         if (SpecialKeywords.isRunKeywordVariant(qualifiedKeywordName)) {
-            argsValidator = new KeywordCallArgumentsOfRunKwVariantValidator(file, keywordNameToken, reporter,
-                    foundKeyword.getArgumentsDescriptor(), arguments);
+            argsValidator = new KeywordCallArgumentsOfRunKwVariantValidator(validationContext, keywordNameToken,
+                    reporter, foundKeyword.getArgumentsDescriptor(), arguments);
         } else {
-            argsValidator = new KeywordCallArgumentsValidator(file, keywordNameToken, reporter,
+            argsValidator = new KeywordCallArgumentsValidator(validationContext, keywordNameToken, reporter,
                     foundKeyword.getArgumentsDescriptor(), arguments);
         }
         argsValidator.validate(null);
@@ -159,7 +157,7 @@ class KeywordCallValidator implements ModelUnitValidator {
             if (!hasValidVarSyntax(varToken)) {
                 final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_VARIABLE_SYNTAX)
                         .formatMessageWith(varToken.getText());
-                reporter.handleProblem(problem, file, varToken);
+                reporter.handleProblem(problem, validationContext.getFile(), varToken);
             }
         }
     }

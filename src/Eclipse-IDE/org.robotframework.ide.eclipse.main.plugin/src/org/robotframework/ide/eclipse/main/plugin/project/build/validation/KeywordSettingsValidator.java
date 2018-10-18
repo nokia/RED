@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
@@ -211,7 +212,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
             final String rest = argToken.getText().substring(matcher.end());
             return rest.isEmpty() || rest.startsWith("=") && argToken.getText().startsWith("$");
         }
-        return false;
+        // if keyword-only args are supported then @{} marks place where positional arguments ends
+        return keywordOnlyArgumentsAreSupported() ? "@{}".equals(argToken.getText()) : false;
     }
 
     private void reportDuplicatedArguments() {
@@ -287,12 +289,14 @@ class KeywordSettingsValidator implements ModelUnitValidator {
             final boolean isVararg = argumentToken.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION);
             final boolean isKwarg = argumentToken.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
 
-            if (wasDefault && !isDefault && !isVararg && !isKwarg) {
+            if (wasDefault && !isDefault && !isVararg && !wasVararg && !isKwarg) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.NON_DEFAULT_ARGUMENT_AFTER_DEFAULT)
                         .formatMessageWith(argumentToken.getText());
                 reporter.handleProblem(problem, validationContext.getFile(), argumentToken);
             }
-            if (wasVararg && !isKwarg) {
+            // when keyword-only arguments are supported then they are placed after vararg
+            if (keywordOnlyArgumentsAreSupported() && wasVararg && isVararg
+                    || !keywordOnlyArgumentsAreSupported() && wasVararg && !isKwarg) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENT_AFTER_VARARG)
                         .formatMessageWith(argumentToken.getText());
                 reporter.handleProblem(problem, validationContext.getFile(), argumentToken);
@@ -341,5 +345,9 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
     private boolean isDefaultArgument(final RobotToken argumentToken) {
         return argumentToken.getText().contains("}=");
+    }
+
+    private boolean keywordOnlyArgumentsAreSupported() {
+        return validationContext.getVersion().isNewerOrEqualTo(new RobotVersion(3, 1));
     }
 }
