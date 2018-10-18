@@ -126,7 +126,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final ArgumentsDescriptor descriptor = specification.getConstructor() == null
                     ? ArgumentsDescriptor.createDescriptor()
                     : specification.getConstructor().createArgumentsDescriptor();
-            new KeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
+            new KeywordCallArgumentsValidator(validationContext, pathOrNameToken, reporter, descriptor,
                     importArguments).validate(new NullProgressMonitor());
         } else {
             if (pathOrName.equals("Remote")) {
@@ -150,7 +150,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final RobotToken uriOrNameToken = resolver.getUriToken().orElse(nameToken);
             reportProblemOnRemoteLocation(uriOrNameToken, address.get());
         } else {
-            new KeywordCallArgumentsValidator(validationContext.getFile(), nameToken, reporter,
+            new KeywordCallArgumentsValidator(validationContext, nameToken, reporter,
                     resolver.getDescriptor(), arguments).validate(new NullProgressMonitor());
         }
 
