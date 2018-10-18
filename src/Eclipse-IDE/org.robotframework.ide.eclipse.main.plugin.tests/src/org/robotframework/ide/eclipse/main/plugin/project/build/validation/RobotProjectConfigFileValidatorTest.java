@@ -19,7 +19,6 @@ import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -226,7 +225,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenLibraryFileDoesNotExist_missingFileIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("libs"));
+        projectProvider.createDir("libs");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
                 PROJECT_NAME + "/libs/notExisting.py");
 
@@ -252,8 +251,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenLibraryFileExistAndHasAbsolutePath_absolutePathWarningIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("libs"));
-        projectProvider.createFile(Path.fromPortableString("libs/pyLib.py"));
+        projectProvider.createDir("libs");
+        projectProvider.createFile("libs/pyLib.py");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
                 projectProvider.getProject().getLocation() + "/libs/pyLib.py");
 
@@ -280,7 +279,7 @@ public class RobotProjectConfigFileValidatorTest {
     @Test
     public void whenLibraryDoesNotExistAndHasAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
             throws Exception {
-        projectProvider.createDir(Path.fromPortableString("libs"));
+        projectProvider.createDir("libs");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
                 projectProvider.getProject().getLocation() + "/libs/notExisting.xml");
 
@@ -307,8 +306,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenJavaLibraryFileDoesNotHaveJarExtension_notJarFileWarningIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("libs"));
-        projectProvider.createFile(Path.fromPortableString("libs/JavaLib.zip"));
+        projectProvider.createDir("libs");
+        projectProvider.createFile("libs/JavaLib.zip");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
                 PROJECT_NAME + "/libs/JavaLib.zip");
 
@@ -335,8 +334,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenJavaLibraryFileIsUsedWithoutPythonExecutor_nonJavaEnvironmentWarningIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("libs"));
-        projectProvider.createFile(Path.fromPortableString("libs/JavaLib.jar"));
+        projectProvider.createDir("libs");
+        projectProvider.createFile("libs/JavaLib.jar");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
                 PROJECT_NAME + "/libs/JavaLib.jar");
 
@@ -445,7 +444,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenRelativePathExist_nothingIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("folder"));
+        projectProvider.createDir("folder");
 
         final SearchPath searchPath = SearchPath.create(PROJECT_NAME + "/folder");
 
@@ -500,7 +499,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenPathContainsKnownEnvironmentVariable_nothingIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("folder"));
+        projectProvider.createDir("folder");
 
         final SearchPath searchPath = SearchPath.create("%{ENV_VAR}");
 
@@ -606,8 +605,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenVariableFileExist_nothingIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("a"));
-        projectProvider.createFile(Path.fromPortableString("a/vars.py"), "VAR = 100");
+        projectProvider.createDir("a");
+        projectProvider.createFile("a/vars.py", "VAR = 100");
 
         final ReferencedVariableFile variableFile = ReferencedVariableFile.create(PROJECT_NAME + "/a/vars.py");
 
@@ -626,8 +625,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenVariableFileDoesNotExist_missingFileIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("a"));
-        projectProvider.createFile(Path.fromPortableString("a/vars2.py"), "VAR = 100");
+        projectProvider.createDir("a");
+        projectProvider.createFile("a/vars2.py", "VAR = 100");
 
         final ReferencedVariableFile variableFile = ReferencedVariableFile.create(PROJECT_NAME + "a/vars.py");
 
@@ -647,8 +646,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenVariableFileExistAndHasAbsolutePath_absolutePathWarningIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("a"));
-        projectProvider.createFile(Path.fromPortableString("a/vars.py"), "VAR = 100");
+        projectProvider.createDir("a");
+        projectProvider.createFile("a/vars.py", "VAR = 100");
 
         final ReferencedVariableFile variableFile = ReferencedVariableFile
                 .create(projectProvider.getProject().getLocation() + "/a/vars.py");
@@ -670,8 +669,8 @@ public class RobotProjectConfigFileValidatorTest {
     @Test
     public void whenVariableFileDoesNotExistAndHasAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
             throws Exception {
-        projectProvider.createDir(Path.fromPortableString("a"));
-        projectProvider.createFile(Path.fromPortableString("a/vars2.py"), "VAR = 100");
+        projectProvider.createDir("a");
+        projectProvider.createFile("a/vars2.py", "VAR = 100");
 
         final ReferencedVariableFile variableFile = ReferencedVariableFile
                 .create(projectProvider.getProject().getLocation() + "/a/vars.py");
@@ -693,7 +692,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenValidationExcludedPathDoesNotExistInProject_warningIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("directory"));
+        projectProvider.createDir("directory");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("does/not/exist");
@@ -711,7 +710,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenValidationExcludedPathExistInProject_nothingIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("directory"));
+        projectProvider.createDir("directory");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("directory");
@@ -728,11 +727,11 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenValidationExcludedPathExcludesAnotherPath_warningIsReported() throws Exception {
-        projectProvider.createDir(Path.fromPortableString("directory"));
-        projectProvider.createDir(Path.fromPortableString("directory/nested"));
-        projectProvider.createDir(Path.fromPortableString("directory/nested/1"));
-        projectProvider.createDir(Path.fromPortableString("directory/nested/1/2"));
-        projectProvider.createDir(Path.fromPortableString("directory/nested/1/2/3"));
+        projectProvider.createDir("directory");
+        projectProvider.createDir("directory/nested");
+        projectProvider.createDir("directory/nested/1");
+        projectProvider.createDir("directory/nested/1/2");
+        projectProvider.createDir("directory/nested/1/2/3");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("directory/nested");

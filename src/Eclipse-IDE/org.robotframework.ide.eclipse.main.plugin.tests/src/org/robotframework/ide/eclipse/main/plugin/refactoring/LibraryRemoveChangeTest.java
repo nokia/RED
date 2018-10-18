@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import java.util.Objects;
 
 import org.assertj.core.api.Condition;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.junit.BeforeClass;
@@ -44,7 +43,7 @@ public class LibraryRemoveChangeTest {
         final ReferencedLibrary libraryToRemove = ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b");
         config.addReferencedLibrary(libraryToRemove);
 
-        final LibraryRemoveChange change = new LibraryRemoveChange(projectProvider.getFile(new Path("red.xml")), config,
+        final LibraryRemoveChange change = new LibraryRemoveChange(projectProvider.getFile("red.xml"), config,
                 libraryToRemove);
 
         assertThat(change.getName()).isEqualTo("The library 'c' (a/b) will be removed");
@@ -58,7 +57,7 @@ public class LibraryRemoveChangeTest {
         config.addReferencedLibrary(libraryToRemove);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final LibraryRemoveChange change = new LibraryRemoveChange(projectProvider.getFile(new Path("red.xml")), config,
+        final LibraryRemoveChange change = new LibraryRemoveChange(projectProvider.getFile("red.xml"), config,
                 libraryToRemove, eventBroker);
 
         change.initializeValidationData(null);

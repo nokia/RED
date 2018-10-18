@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.junit.BeforeClass;
@@ -39,8 +38,8 @@ public class ExcludedPathModifyChangeTest {
         final ExcludedFolderPath excludedPathToModify = ExcludedFolderPath.create("a/b/c");
         final ExcludedFolderPath modifiedPath = ExcludedFolderPath.create("d/e/f/b/c");
 
-        final ExcludedPathModifyChange change = new ExcludedPathModifyChange(
-                projectProvider.getFile(new Path("red.xml")), excludedPathToModify, modifiedPath);
+        final ExcludedPathModifyChange change = new ExcludedPathModifyChange(projectProvider.getFile("red.xml"),
+                excludedPathToModify, modifiedPath);
 
         assertThat(change.getName()).isEqualTo("The path 'a/b/c' will change to 'd/e/f/b/c'");
         assertThat(change.getModifiedElement()).isSameAs(excludedPathToModify);
@@ -55,8 +54,8 @@ public class ExcludedPathModifyChangeTest {
         final ExcludedFolderPath modifiedPath = ExcludedFolderPath.create("d/e/f/b/c");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final ExcludedPathModifyChange change = new ExcludedPathModifyChange(
-                projectProvider.getFile(new Path("red.xml")), excludedPathToModify, modifiedPath, eventBroker);
+        final ExcludedPathModifyChange change = new ExcludedPathModifyChange(projectProvider.getFile("red.xml"),
+                excludedPathToModify, modifiedPath, eventBroker);
 
         change.initializeValidationData(null);
         assertThat(change.isValid(null).isOK()).isTrue();

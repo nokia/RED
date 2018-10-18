@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Path;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -40,7 +39,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        file = projectProvider.createFile(new Path("suite.robot"), "");
+        file = projectProvider.createFile("suite.robot", "");
     }
 
     @AfterClass

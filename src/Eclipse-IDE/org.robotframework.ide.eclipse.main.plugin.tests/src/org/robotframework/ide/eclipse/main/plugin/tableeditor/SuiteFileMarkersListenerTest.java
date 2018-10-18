@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -62,7 +61,7 @@ public class SuiteFileMarkersListenerTest {
 
         final RobotModel robotModel = new RobotModel();
 
-        final IFile varsFile = projectProvider.createFile(new Path("vars.robot"),
+        final IFile varsFile = projectProvider.createFile("vars.robot",
                 "*** Test Cases ***",
                 "*** Variables ***",
                 "${var}  1",
@@ -71,7 +70,7 @@ public class SuiteFileMarkersListenerTest {
                 "{var}  4",
                 "{var}  4");
         varsSuiteModel = robotModel.createSuiteFile(varsFile);
-        final IFile settingsFile = projectProvider.createFile(new Path("settings.robot"),
+        final IFile settingsFile = projectProvider.createFile("settings.robot",
                 "*** Test Cases ***",
                 "*** Settings ***",
                 "Documentation  doc",
@@ -79,7 +78,7 @@ public class SuiteFileMarkersListenerTest {
                 "Suite Teardown",
                 "Test Template  unknown  1  2");
         settingsSuiteModel = robotModel.createSuiteFile(settingsFile);
-        final IFile casesFile = projectProvider.createFile(new Path("cases.robot"),
+        final IFile casesFile = projectProvider.createFile("cases.robot",
                 "*** Test Cases ***",
                 "case1",
                 "  Log  1",
@@ -92,7 +91,7 @@ public class SuiteFileMarkersListenerTest {
                 "  [Arguments]  ${x}",
                 "  [Return]  ${x}");
         casesSuiteModel = robotModel.createSuiteFile(casesFile);
-        final IFile keywordsFile = projectProvider.createFile(new Path("keywords.robot"),
+        final IFile keywordsFile = projectProvider.createFile("keywords.robot",
                 "*** Test Cases ***",
                 "*** Keywords ***",
                 "kw1",
