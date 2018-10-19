@@ -52,6 +52,47 @@ public enum SuiteFileProblem implements IProblemCause {
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.UNRECOGNIZED_HEADER;
         }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String wrongName = marker.getAttribute(AdditionalMarkerAttributes.VALUE, "");
+
+            final List<ChangeToFixer> fixers = new ArrayList<>();
+            new SimilaritiesAnalyst().provideSimilarSectionNames(wrongName)
+                    .stream()
+                    .map(name -> "*** " + name + " ***")
+                    .map(ChangeToFixer::new)
+                    .forEach(fixers::add);
+            fixers.add(new ChangeToFixer("*** Comments ***"));
+            return fixers;
+        }
+    },
+    UNRECOGNIZED_TABLE_HEADER_RF31 {
+
+        @Override
+        public String getProblemDescription() {
+            return "Unrecognized table header: '%s'";
+        }
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.RUNTIME_ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return UNRECOGNIZED_TABLE_HEADER.createFixers(marker);
+        }
     },
     DEPRECATED_TABLE_HEADER {
 

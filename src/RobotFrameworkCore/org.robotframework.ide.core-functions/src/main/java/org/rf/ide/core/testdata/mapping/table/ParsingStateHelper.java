@@ -63,6 +63,8 @@ public class ParsingStateHelper {
                     processingState.push(ParsingState.TASKS_TABLE_INSIDE);
                 } else if (status == ParsingState.KEYWORD_TABLE_HEADER) {
                     processingState.push(ParsingState.KEYWORD_TABLE_INSIDE);
+                } else if (status == ParsingState.COMMENT_TABLE_HEADER) {
+                    processingState.push(ParsingState.COMMENT_TABLE_INSIDE);
                 }
                 break;
 
@@ -92,7 +94,7 @@ public class ParsingStateHelper {
     public boolean isTableHeaderState(final ParsingState state) {
         return state == ParsingState.TEST_CASE_TABLE_HEADER || state == ParsingState.TASKS_TABLE_HEADER
                 || state == ParsingState.SETTING_TABLE_HEADER || state == ParsingState.VARIABLE_TABLE_HEADER
-                || state == ParsingState.KEYWORD_TABLE_HEADER;
+                || state == ParsingState.KEYWORD_TABLE_HEADER || state == ParsingState.COMMENT_TABLE_HEADER;
     }
 
     boolean isTableInsideStateInHierarchy(final ParsingState state) {
@@ -109,7 +111,7 @@ public class ParsingStateHelper {
     boolean isTableInsideState(final ParsingState state) {
         return state == ParsingState.SETTING_TABLE_INSIDE || state == ParsingState.TEST_CASE_TABLE_INSIDE
                 || state == ParsingState.TASKS_TABLE_INSIDE || state == ParsingState.KEYWORD_TABLE_INSIDE
-                || state == ParsingState.VARIABLE_TABLE_INSIDE;
+                || state == ParsingState.VARIABLE_TABLE_INSIDE || state == ParsingState.COMMENT_TABLE_INSIDE;
     }
 
     public ParsingState getCurrentState(final Stack<ParsingState> processingState) {
@@ -132,6 +134,9 @@ public class ParsingStateHelper {
 
         } else if (types.contains(RobotTokenType.KEYWORDS_TABLE_HEADER)) {
             return ParsingState.KEYWORD_TABLE_HEADER;
+
+        } else if (types.contains(RobotTokenType.COMMENTS_TABLE_HEADER)) {
+            return ParsingState.COMMENT_TABLE_HEADER;
         }
         return ParsingState.UNKNOWN;
     }

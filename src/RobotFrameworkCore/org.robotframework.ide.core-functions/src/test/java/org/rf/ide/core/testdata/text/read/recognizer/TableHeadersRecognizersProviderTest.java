@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.text.read.recognizer.header.CommentsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.header.MetadataTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
@@ -39,11 +40,12 @@ public class TableHeadersRecognizersProviderTest {
         final List<ATokenRecognizer> recognizers = new TableHeadersRecognizersProvider()
                 .getRecognizers(new RobotVersion(3, 1));
 
-        assertThat(recognizers).hasSize(4);
+        assertThat(recognizers).hasSize(5);
         assertThat(recognizers).hasAtLeastOneElementOfType(SettingsTableHeaderRecognizer.class);
         assertThat(recognizers).hasAtLeastOneElementOfType(TestCasesTableHeaderRecognizer.class);
         assertThat(recognizers).hasAtLeastOneElementOfType(KeywordsTableHeaderRecognizer.class);
         assertThat(recognizers).hasAtLeastOneElementOfType(VariablesTableHeaderRecognizer.class);
+        assertThat(recognizers).hasAtLeastOneElementOfType(CommentsTableHeaderRecognizer.class);
     }
 
 }

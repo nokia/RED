@@ -30,7 +30,7 @@ public class ParsingStateHelperTest {
 
         private static final List<ParsingState> TABLE_INSIDE_STATES = asList(ParsingState.SETTING_TABLE_INSIDE,
                 ParsingState.TEST_CASE_TABLE_INSIDE, ParsingState.TASKS_TABLE_INSIDE, ParsingState.KEYWORD_TABLE_INSIDE,
-                ParsingState.VARIABLE_TABLE_INSIDE);
+                ParsingState.VARIABLE_TABLE_INSIDE, ParsingState.COMMENT_TABLE_INSIDE);
 
         @Test
         public void allTableInsideStatesAreRecognized() {
@@ -50,7 +50,7 @@ public class ParsingStateHelperTest {
 
         private static final List<ParsingState> TABLE_HEADER_STATES = asList(ParsingState.SETTING_TABLE_HEADER,
                 ParsingState.VARIABLE_TABLE_HEADER, ParsingState.TEST_CASE_TABLE_HEADER,
-                ParsingState.TASKS_TABLE_HEADER, ParsingState.KEYWORD_TABLE_HEADER);
+                ParsingState.TASKS_TABLE_HEADER, ParsingState.KEYWORD_TABLE_HEADER, ParsingState.COMMENT_TABLE_HEADER);
 
         @Test
         public void allTableHeaderStatesAreRecognized() {
@@ -90,7 +90,8 @@ public class ParsingStateHelperTest {
 
         private static final List<RobotTokenType> TABLE_HEADER_TYPES = asList(RobotTokenType.KEYWORDS_TABLE_HEADER,
                 RobotTokenType.SETTINGS_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
-                RobotTokenType.TASKS_TABLE_HEADER, RobotTokenType.VARIABLES_TABLE_HEADER);
+                RobotTokenType.TASKS_TABLE_HEADER, RobotTokenType.VARIABLES_TABLE_HEADER,
+                RobotTokenType.COMMENTS_TABLE_HEADER);
 
         @Test
         public void unknownStateIsReturned_whenTokenDoesNotContainTableHeaderTypes() {
@@ -112,7 +113,7 @@ public class ParsingStateHelperTest {
                     .collect(toList());
             assertThat(states).containsExactly(ParsingState.KEYWORD_TABLE_HEADER, ParsingState.SETTING_TABLE_HEADER,
                     ParsingState.TEST_CASE_TABLE_HEADER, ParsingState.TASKS_TABLE_HEADER,
-                    ParsingState.VARIABLE_TABLE_HEADER);
+                    ParsingState.VARIABLE_TABLE_HEADER, ParsingState.COMMENT_TABLE_HEADER);
         }
     }
 

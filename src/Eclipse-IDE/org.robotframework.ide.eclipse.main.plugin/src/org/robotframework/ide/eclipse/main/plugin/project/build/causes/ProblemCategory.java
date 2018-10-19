@@ -128,7 +128,7 @@ public enum ProblemCategory {
             ProblemCategoryType.UNNECESSARY_CODE,
             "Unrecognized header type",
             "Occurs when Robot Framework does not recognize section header.\n"
-                    + "Only ***Settings***, ***Variables***, ***Test Cases*** or ***Keywords*** sections are valid."),
+                    + "Only ***Settings***, ***Variables***, ***Test Cases***, ***Tasks***, ***Keywords*** or ***Comments*** sections are valid."),
     DUPLICATED_PATH(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Duplicated configuration path",

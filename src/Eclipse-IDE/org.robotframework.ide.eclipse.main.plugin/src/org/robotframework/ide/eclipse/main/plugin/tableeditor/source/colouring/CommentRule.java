@@ -37,7 +37,7 @@ public class CommentRule implements ISyntaxColouringRule {
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<RobotLine> context) {
 
-        if (isComment(token) && tasksToken.isTaskDetectionEnabled()) {
+        if (isLineComment(token) && tasksToken.isTaskDetectionEnabled()) {
             final Matcher tasksMatcher = tasksToken.getTasksPattern().matcher(token.getText());
             if (tasksMatcher.find(offsetInToken)) {
                 final int start = tasksMatcher.start();
@@ -54,7 +54,7 @@ public class CommentRule implements ISyntaxColouringRule {
             return Optional.of(new PositionedTextToken(textToken, token.getStartOffset() + offsetInToken,
                     token.getText().length() - offsetInToken));
 
-        } else if (isComment(token) && !tasksToken.isTaskDetectionEnabled()) {
+        } else if (isLineComment(token) && !tasksToken.isTaskDetectionEnabled() || isInCommentsTable(token)) {
             return Optional.of(new PositionedTextToken(textToken, token.getStartOffset(), token.getText().length()));
 
         } else {
@@ -62,9 +62,13 @@ public class CommentRule implements ISyntaxColouringRule {
         }
     }
 
-    private static boolean isComment(final IRobotLineElement token) {
+    private static boolean isLineComment(final IRobotLineElement token) {
         final List<IRobotTokenType> types = token.getTypes();
         return types.contains(RobotTokenType.START_HASH_COMMENT) || types.contains(RobotTokenType.COMMENT_CONTINUE);
+    }
+
+    private static boolean isInCommentsTable(final IRobotLineElement token) {
+        return token.getTypes().contains(RobotTokenType.COMMENTS_TABLE_INNER_TOKEN);
     }
 
     public static interface ITodoTaskToken extends IToken {

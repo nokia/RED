@@ -5,10 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Ints;
@@ -32,17 +30,13 @@ import com.google.common.primitives.Ints;
  */
 class SimilarityWithLevenshteinDistance {
 
-    List<String> onlyWordsWithinDistance(final Collection<String> candidates, final String word,
+    Stream<String> onlyWordsWithinDistance(final Collection<String> candidates, final String word,
             final int maxDistance) {
-        final List<StringWithDistance> result = new ArrayList<>();
-
-        for (final String candidate : candidates) {
-            final int distance = distance(candidate, word);
-            if (distance <= maxDistance) {
-                result.add(new StringWithDistance(candidate, distance));
-            }
-        }
-        return result.stream().sorted().map(stringWithDistance -> stringWithDistance.word).collect(Collectors.toList());
+        return candidates.stream()
+                .map(candidate -> new StringWithDistance(candidate, distance(candidate, word)))
+                .filter(swd -> swd.distance <= maxDistance)
+                .sorted()
+                .map(stringWithDistance -> stringWithDistance.word);
     }
 
     private int distance(final String word1, final String word2) {
