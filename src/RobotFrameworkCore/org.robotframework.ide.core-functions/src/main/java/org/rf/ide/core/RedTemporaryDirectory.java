@@ -32,7 +32,7 @@ public final class RedTemporaryDirectory {
     }
 
     public static File createTemporaryFile(final String filename) throws IOException {
-        final Path tempDir = createTemporaryDirectory();
+        final Path tempDir = createTemporaryDirectoryIfNotExists();
         final File tempFile = new File(tempDir.toString() + File.separator + filename);
         tempFile.delete();
         tempFile.createNewFile();
@@ -40,13 +40,13 @@ public final class RedTemporaryDirectory {
     }
 
     public static File replaceTemporaryFile(final String filename, final InputStream source) throws IOException {
-        final Path tempDir = createTemporaryDirectory();
+        final Path tempDir = createTemporaryDirectoryIfNotExists();
         final File tempFile = new File(tempDir.toString() + File.separator + filename);
         Files.copy(source, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         return tempFile;
     }
 
-    public static synchronized Path createTemporaryDirectory() throws IOException {
+    public static synchronized Path createTemporaryDirectoryIfNotExists() throws IOException {
         if (temporaryDirectory != null && temporaryDirectory.toFile().exists()) {
             return temporaryDirectory;
         }

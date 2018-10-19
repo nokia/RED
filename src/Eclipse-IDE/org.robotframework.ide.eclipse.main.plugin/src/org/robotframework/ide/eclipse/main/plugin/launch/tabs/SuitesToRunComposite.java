@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -273,8 +271,8 @@ class SuitesToRunComposite extends Composite {
     }
 
     private void setLaunchElementsChecked(final boolean isChecked) {
-        final List<TestCaseLaunchElement> testsToCheck = newArrayList();
-        final List<SuiteLaunchElement> suitesToCheck = newArrayList();
+        final List<TestCaseLaunchElement> testsToCheck = new ArrayList<>();
+        final List<SuiteLaunchElement> suitesToCheck = new ArrayList<>();
 
         if (viewer.getTree().getSelectionCount() == 0) {
             suitesToCheck.addAll(suitesToLaunch);
@@ -320,7 +318,7 @@ class SuitesToRunComposite extends Composite {
                 : project.getFile(path);
         final SuiteLaunchElement suite = new SuiteLaunchElement(resource);
 
-        final List<String> allCases = newArrayList(entry.getValue());
+        final List<String> allCases = new ArrayList<>(entry.getValue());
 
         for (final RobotCodeHoldingElement<?> theCase : getCases(resource)) {
             final String name = theCase.getName();
@@ -356,7 +354,7 @@ class SuitesToRunComposite extends Composite {
     }
 
     Map<String, List<String>> extractSuitesToRun() {
-        final LinkedHashMap<String, List<String>> suitesToRun = new LinkedHashMap<>();
+        final Map<String, List<String>> suitesToRun = new LinkedHashMap<>();
 
         for (final SuiteLaunchElement suite : suitesToLaunch) {
             if (suite.isChecked()) {

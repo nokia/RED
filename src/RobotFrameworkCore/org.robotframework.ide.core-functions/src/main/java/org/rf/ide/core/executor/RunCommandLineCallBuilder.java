@@ -42,9 +42,9 @@ public class RunCommandLineCallBuilder {
 
         IRunCommandLineBuilder useArgumentFile(boolean shouldUseArgumentFile);
 
-        IRunCommandLineBuilder addLocationsToPythonPath(final Collection<String> pythonPathLocations);
+        IRunCommandLineBuilder addLocationsToPythonPath(final Collection<String> paths);
 
-        IRunCommandLineBuilder addLocationsToClassPath(final Collection<String> classPathLocations);
+        IRunCommandLineBuilder addLocationsToClassPath(final Collection<String> paths);
 
         IRunCommandLineBuilder addVariableFiles(final Collection<String> varFiles);
 
@@ -73,9 +73,9 @@ public class RunCommandLineCallBuilder {
 
         private boolean useArgumentFile = false;
 
-        private final List<String> pythonPath = new ArrayList<>();
+        private final List<String> pythonPathLocations = new ArrayList<>();
 
-        private final List<String> classPath = new ArrayList<>();
+        private final List<String> classPathLocations = new ArrayList<>();
 
         private final List<String> variableFiles = new ArrayList<>();
 
@@ -136,14 +136,14 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder addLocationsToPythonPath(final Collection<String> pythonPathLocations) {
-            pythonPath.addAll(pythonPathLocations);
+        public IRunCommandLineBuilder addLocationsToPythonPath(final Collection<String> paths) {
+            pythonPathLocations.addAll(paths);
             return this;
         }
 
         @Override
-        public IRunCommandLineBuilder addLocationsToClassPath(final Collection<String> classPathLocations) {
-            classPath.addAll(classPathLocations);
+        public IRunCommandLineBuilder addLocationsToClassPath(final Collection<String> paths) {
+            classPathLocations.addAll(paths);
             return this;
         }
 
@@ -211,24 +211,13 @@ public class RunCommandLineCallBuilder {
                 cmdLine.addAll(Arrays.asList(robotRunCommandLine.getCommandLine()));
             }
 
-            if (robotRunCommandLine.getArgumentFile().isPresent()) {
-                return new RunCommandLine(cmdLine, robotRunCommandLine.getArgumentFile().get());
-            }
-            return new RunCommandLine(cmdLine, null);
+            return new RunCommandLine(cmdLine, robotRunCommandLine.getArgumentFile().orElse(null));
         }
 
         private RunCommandLine buildRobotRunCommandLine() throws IOException {
             final List<String> cmdLine = new ArrayList<>();
             cmdLine.add(executorPath);
-            if (executor == SuiteExecutor.Jython) {
-                final String additionalPythonPathLocationForJython = extractAdditionalPythonPathLocationForJython();
-                if (!additionalPythonPathLocationForJython.isEmpty()) {
-                    cmdLine.add(additionalPythonPathLocationForJython);
-                }
-                cmdLine.add("-J-cp");
-                cmdLine.add(classPath());
-            }
-            cmdLine.addAll(interpreterUserArgs);
+            cmdLine.addAll(createInterpreterArguments());
             cmdLine.add("-m");
             cmdLine.add("robot.run");
 
@@ -250,11 +239,31 @@ public class RunCommandLineCallBuilder {
             return new RunCommandLine(cmdLine, argumentsFile);
         }
 
+        private List<String> createInterpreterArguments() {
+            final List<String> interpreterArgs = new ArrayList<>();
+            if (executor == SuiteExecutor.Jython) {
+                // in case of 'robot' folder existing in project
+                final Path jythonSitePackagesPath = findJythonSitePackagesPath();
+                if (jythonSitePackagesPath != null) {
+                    interpreterArgs.add("-J-Dpython.path=" + jythonSitePackagesPath.toString());
+                }
+
+                final String classPath = classPath();
+                if (!classPath.isEmpty()) {
+                    interpreterArgs.add("-J-cp");
+                    interpreterArgs.add(classPath);
+                }
+            }
+            interpreterArgs.addAll(interpreterUserArgs);
+            return interpreterArgs;
+        }
+
         private List<String> createInlinedArguments() throws IOException {
             final List<String> robotArgs = new ArrayList<>();
+            final String pythonPath = pythonPath();
             if (!pythonPath.isEmpty()) {
                 robotArgs.add("-P");
-                robotArgs.add(pythonPath());
+                robotArgs.add(pythonPath);
             }
             for (final String varFile : variableFiles) {
                 robotArgs.add("-V");
@@ -283,8 +292,9 @@ public class RunCommandLineCallBuilder {
         private ArgumentsFile createArgumentsFile() throws IOException {
             final ArgumentsFile argumentsFile = new ArgumentsFile();
             argumentsFile.addCommentLine("arguments automatically generated");
+            final String pythonPath = pythonPath();
             if (!pythonPath.isEmpty()) {
-                argumentsFile.addLine("--pythonpath", pythonPath());
+                argumentsFile.addLine("--pythonpath", pythonPath);
             }
             for (final String varFile : variableFiles) {
                 argumentsFile.addLine("--variablefile", varFile);
@@ -324,17 +334,17 @@ public class RunCommandLineCallBuilder {
         }
 
         private String classPath() {
-            return Streams.concat(new SystemVariableAccessor().getPaths("CLASSPATH").stream(), classPath.stream())
+            return Streams
+                    .concat(new SystemVariableAccessor().getPaths("CLASSPATH").stream(), classPathLocations.stream())
                     .filter(not(Strings::isNullOrEmpty))
                     .collect(joining(File.pathSeparator));
         }
 
         private String pythonPath() {
-            return pythonPath.stream().filter(not(Strings::isNullOrEmpty)).collect(joining(":"));
+            return pythonPathLocations.stream().filter(not(Strings::isNullOrEmpty)).collect(joining(":"));
         }
 
-        private String extractAdditionalPythonPathLocationForJython() {
-            String additionalPythonPathLocation = "";
+        private Path findJythonSitePackagesPath() {
             final Path jythonPath = Paths.get(executorPath);
             Path jythonParentPath = jythonPath.getParent();
             if (jythonParentPath == null) {
@@ -350,11 +360,9 @@ public class RunCommandLineCallBuilder {
             if (jythonParentPath != null && jythonParentPath.getFileName() != null
                     && jythonParentPath.getFileName().toString().equalsIgnoreCase("bin")) {
                 final Path mainDir = jythonParentPath.getParent();
-                final Path sitePackagesDir = Paths.get(mainDir.toString(), "Lib", "site-packages");
-                // in case of 'robot' folder existing in project
-                additionalPythonPathLocation = "-J-Dpython.path=" + sitePackagesDir.toString();
+                return Paths.get(mainDir.toString(), "Lib", "site-packages");
             }
-            return additionalPythonPathLocation;
+            return null;
         }
     }
 
@@ -370,15 +378,15 @@ public class RunCommandLineCallBuilder {
 
         private final List<String> commandLine;
 
-        private final Optional<ArgumentsFile> argFile;
+        private final ArgumentsFile argFile;
 
-        RunCommandLine(final List<String> commandLine, final ArgumentsFile argumentsFile) {
+        RunCommandLine(final List<String> commandLine, final ArgumentsFile argFile) {
             this.commandLine = new ArrayList<>(commandLine);
-            this.argFile = Optional.ofNullable(argumentsFile);
+            this.argFile = argFile;
         }
 
         public Optional<ArgumentsFile> getArgumentFile() {
-            return argFile;
+            return Optional.ofNullable(argFile);
         }
 
         public String[] getCommandLine() {

@@ -17,7 +17,6 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-
 public class ResourceCreator implements TestRule {
 
     private final List<IResource> createdResources = new ArrayList<>();
@@ -30,6 +29,11 @@ public class ResourceCreator implements TestRule {
     public void createLink(final URI targetUri, final IFolder linkingFolder) throws CoreException {
         linkingFolder.createLink(targetUri, IResource.REPLACE, null);
         createdResources.add(linkingFolder);
+    }
+
+    public void createVirtual(final IFolder virtualFolder) throws CoreException {
+        virtualFolder.create(IResource.REPLACE | IResource.VIRTUAL, true, null);
+        createdResources.add(virtualFolder);
     }
 
     @Override

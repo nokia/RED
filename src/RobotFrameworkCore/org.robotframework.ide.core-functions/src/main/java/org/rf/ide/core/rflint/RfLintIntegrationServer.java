@@ -206,8 +206,8 @@ public class RfLintIntegrationServer {
     }
 
     static Map<String, Object> ensureOrderedMapOfStringsToObjects(final Map<?, ?> map) {
-        final LinkedHashMap<String, Object> result = new LinkedHashMap<>();
-        map.entrySet().stream().forEach(e -> result.put((String) e.getKey(), e.getValue()));
+        final Map<String, Object> result = new LinkedHashMap<>();
+        map.forEach((key, value) -> result.put((String) key, value));
         return result;
     }
 }

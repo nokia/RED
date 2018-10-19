@@ -6,9 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import java.util.HashMap;
-import java.util.List;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -67,7 +65,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
             includeExcludeTagsComposite.switchTo(robotConfig.getProjectName(), robotConfig.collectSuitesToRun());
             robotArgumentsComposite.setInput(robotConfig.getRobotArguments());
         } catch (final CoreException e) {
-            includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
+            includeExcludeTagsComposite.switchTo("", new HashMap<>());
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
     }
@@ -94,7 +92,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
         setWarningMessage(null);
-        includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
+        includeExcludeTagsComposite.switchTo("", new HashMap<>());
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         try {

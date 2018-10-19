@@ -24,8 +24,8 @@ public class RobotTestExecutionServiceTest {
     @Test
     public void thereIsNoLastLaunch_whenThereWereNoLaunches() {
         final RobotTestExecutionService service = new RobotTestExecutionService();
-        
-        assertThat(service.getLastLaunch().isPresent()).isFalse();
+
+        assertThat(service.getLastLaunch()).isNotPresent();
     }
 
     @Test
@@ -63,13 +63,13 @@ public class RobotTestExecutionServiceTest {
             final RobotTestsLaunch launch = service.testExecutionStarting(null);
             service.testExecutionEnded(launch);
         }
-        
+
         final Collection<RobotTestsLaunch> launchesHistory = service.getLaunches();
         assertThat(launchesHistory).hasSize(RobotTestExecutionService.LAUNCHES_HISTORY_LIMIT);
         assertThat(launchesHistory).doesNotContain(oldestLaunch);
 
         final Optional<ExecutionData> oldestData = oldestLaunch.getExecutionData(ExecutionData.class);
-        assertThat(oldestData.isPresent()).isFalse();
+        assertThat(oldestData).isNotPresent();
     }
 
     @Test
