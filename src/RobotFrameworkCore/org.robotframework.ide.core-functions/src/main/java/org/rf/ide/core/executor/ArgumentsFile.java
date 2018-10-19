@@ -79,7 +79,7 @@ public class ArgumentsFile {
         final HashCode hash = md5Hasher.hashString(content, Charsets.UTF_8);
 
         final String fileName = "args_" + Strings.padStart(Integer.toHexString(hash.asInt()), 8, '0') + ".arg";
-        final Path dir = RedTemporaryDirectory.createTemporaryDirectory();
+        final Path dir = RedTemporaryDirectory.createTemporaryDirectoryIfNotExists();
 
         for (final File existingArgFile : dir.toFile().listFiles((d, name) -> name.equals(fileName))) {
             final HashCode candidateHash = md5Hasher

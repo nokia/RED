@@ -79,7 +79,7 @@ class TagsProposalsSupport {
         if (currentSuitesToRun.isEmpty() && !projectName.isEmpty()) {
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
             if (project.exists() && project.isOpen()) {
-                currentSuitesToRun.put(project, new ArrayList<String>());
+                currentSuitesToRun.put(project, new ArrayList<>());
             }
         }
     }

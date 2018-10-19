@@ -13,10 +13,15 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -36,9 +41,11 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotPathsNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
+
+import com.google.common.collect.Maps;
 
 class LocalProcessCommandLineBuilder {
 
@@ -54,43 +61,10 @@ class LocalProcessCommandLineBuilder {
     RunCommandLine createRunCommandLine(final int port, final RedPreferences preferences)
             throws CoreException, IOException {
         final IRunCommandLineBuilder builder = createBuilder(port);
-
-        builder.useArgumentFile(preferences.shouldLaunchUsingArgumentsFile());
-        if (!robotConfig.getExecutableFilePath().isEmpty()) {
-            builder.withExecutableFile(resolveExecutableFile(robotConfig.getExecutableFilePath()));
-            builder.addUserArgumentsForExecutableFile(parseArguments(robotConfig.getExecutableFileArguments()));
-            builder.useSingleRobotCommandLineArg(preferences.shouldUseSingleCommandLineArgument());
-        }
-        builder.addUserArgumentsForInterpreter(parseArguments(robotConfig.getInterpreterArguments()));
-        builder.addUserArgumentsForRobot(parseArguments(robotConfig.getRobotArguments()));
-
-        final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
-        if (projectConfig != null) {
-            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(),
-                    projectConfig);
-            final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();
-            builder.addLocationsToClassPath(searchPaths.getClassPaths());
-            builder.addLocationsToPythonPath(searchPaths.getPythonPaths());
-            builder.addVariableFiles(redConfig.getVariableFilePaths());
-        }
-
-        final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
-        final List<IResource> resources = findSuiteResources(suitePaths, robotProject.getProject());
-        if (shouldUseSingleTestPathInCommandLine(resources, preferences)) {
-            builder.withDataSources(newArrayList(getOnlyElement(resources).getLocation().toFile()));
-            builder.testsToRun(getOnlyElement(suitePaths.values()));
-        } else {
-            builder.withDataSources(newArrayList(robotProject.getProject().getLocation().toFile()));
-            builder.suitesToRun(createSuitesToRun(resources));
-            builder.testsToRun(createTestsToRun(suitePaths, robotProject.getProject()));
-        }
-
-        if (robotConfig.isIncludeTagsEnabled()) {
-            builder.includeTags(robotConfig.getIncludedTags());
-        }
-        if (robotConfig.isExcludeTagsEnabled()) {
-            builder.excludeTags(robotConfig.getExcludedTags());
-        }
+        addArgumentEntries(builder, preferences);
+        addProjectConfigEntries(builder);
+        addTags(builder);
+        addDataSources(builder, preferences);
         return builder.build();
     }
 
@@ -107,14 +81,71 @@ class LocalProcessCommandLineBuilder {
         }
     }
 
-    private boolean shouldUseSingleTestPathInCommandLine(final List<IResource> resources,
-            final RedPreferences preferences) throws CoreException {
-        // FIXME temporary fix for https://github.com/robotframework/robotframework/issues/2564
-        return preferences.shouldUseSingleFileDataSource() && resources.size() == 1
-                && getOnlyElement(resources) instanceof IFile;
+    private void addArgumentEntries(final IRunCommandLineBuilder builder, final RedPreferences preferences)
+            throws CoreException {
+        builder.useArgumentFile(preferences.shouldLaunchUsingArgumentsFile());
+        if (!robotConfig.getExecutableFilePath().isEmpty()) {
+            builder.withExecutableFile(resolveExecutableFile(robotConfig.getExecutableFilePath()));
+            builder.addUserArgumentsForExecutableFile(parseArguments(robotConfig.getExecutableFileArguments()));
+            builder.useSingleRobotCommandLineArg(preferences.shouldUseSingleCommandLineArgument());
+        }
+        builder.addUserArgumentsForInterpreter(parseArguments(robotConfig.getInterpreterArguments()));
+        builder.addUserArgumentsForRobot(parseArguments(robotConfig.getRobotArguments()));
     }
 
-    private File resolveExecutableFile(final String path) throws CoreException {
+    private void addProjectConfigEntries(final IRunCommandLineBuilder builder) {
+        final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
+        if (projectConfig != null) {
+            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(),
+                    projectConfig);
+            final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();
+            builder.addLocationsToClassPath(searchPaths.getClassPaths());
+            builder.addLocationsToPythonPath(searchPaths.getPythonPaths());
+            builder.addVariableFiles(redConfig.getVariableFilePaths());
+        }
+    }
+
+    private void addTags(final IRunCommandLineBuilder builder) throws CoreException {
+        if (robotConfig.isIncludeTagsEnabled()) {
+            builder.includeTags(robotConfig.getIncludedTags());
+        }
+        if (robotConfig.isExcludeTagsEnabled()) {
+            builder.excludeTags(robotConfig.getExcludedTags());
+        }
+    }
+
+    private void addDataSources(final IRunCommandLineBuilder builder, final RedPreferences preferences)
+            throws CoreException {
+        final Map<IResource, List<String>> resources = findResources(robotProject.getProject(),
+                robotConfig.getSuitePaths());
+        if (shouldUseSingleTestPathInCommandLine(resources.keySet(), preferences)) {
+            builder.withDataSources(newArrayList(getOnlyElement(resources.keySet()).getLocation().toFile()));
+            final Function<IResource, List<String>> mapper = r -> newArrayList(
+                    r.getLocation().removeFileExtension().lastSegment());
+            builder.testsToRun(RobotPathsNaming.createTestNames(resources, "", mapper));
+        } else {
+            final Map<IResource, List<String>> linkedResources = findLinkedResources(resources);
+            final Map<IResource, List<String>> notLinkedResources = Maps.filterKeys(resources,
+                    resource -> !resource.isVirtual() && !resource.isLinked(IResource.CHECK_ANCESTORS));
+
+            final List<IResource> dataSources = new ArrayList<>();
+            dataSources.add(robotProject.getProject());
+            dataSources.addAll(linkedResources.keySet());
+            builder.withDataSources(
+                    dataSources.stream().map(IResource::getLocation).map(IPath::toFile).collect(toList()));
+
+            final String topLevelSuiteName = RobotPathsNaming.createTopLevelSuiteName(dataSources);
+            final Function<IResource, List<String>> mapper = r -> r.isLinked(IResource.CHECK_ANCESTORS)
+                    ? newArrayList(r.getLocation().removeFileExtension().lastSegment())
+                    : newArrayList(r.getFullPath().removeFileExtension().segments());
+            builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, topLevelSuiteName, mapper));
+            builder.suitesToRun(RobotPathsNaming.createSuiteNames(linkedResources, topLevelSuiteName, mapper));
+            builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, topLevelSuiteName, mapper));
+            builder.testsToRun(RobotPathsNaming.createTestNames(linkedResources, topLevelSuiteName, mapper));
+        }
+    }
+
+    private static File resolveExecutableFile(final String path) throws CoreException {
         final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
         final File executableFile = new File(variableManager.performStringSubstitution(path));
         if (!executableFile.exists()) {
@@ -123,7 +154,7 @@ class LocalProcessCommandLineBuilder {
         return executableFile;
     }
 
-    private List<String> parseArguments(final String arguments) {
+    private static List<String> parseArguments(final String arguments) {
         final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
         return Stream.of(DebugPlugin.parseArguments(arguments)).map(argument -> {
             try {
@@ -134,33 +165,65 @@ class LocalProcessCommandLineBuilder {
         }).collect(toList());
     }
 
-    private List<IResource> findSuiteResources(final Map<String, List<String>> suitePaths, final IProject project)
-            throws CoreException {
-        final List<IResource> resources = new ArrayList<>();
+    private static Map<IResource, List<String>> findResources(final IProject project,
+            final Map<String, List<String>> suitePaths) throws CoreException {
+        final Map<IResource, List<String>> result = new LinkedHashMap<>();
+        if (suitePaths.isEmpty()) {
+            result.put(project, new ArrayList<>());
+            return result;
+        }
+
         final Set<String> problems = new HashSet<>();
-        for (final String suitePath : suitePaths.keySet()) {
-            final IResource resource = project.findMember(Path.fromPortableString(suitePath));
+
+        final Map<String, List<String>> sortedSuitePaths = new TreeMap<>(suitePaths);
+        for (final Entry<String, List<String>> entry : sortedSuitePaths.entrySet()) {
+            final IResource resource = project.findMember(Path.fromPortableString(entry.getKey()));
             if (resource != null) {
-                resources.add(resource);
+                if (resource.isVirtual() || isNotIncluded(resource, result.keySet())) {
+                    result.put(resource, entry.getValue());
+                }
             } else {
-                problems.add("Suite '" + suitePath + "' does not exist in project '" + project.getName() + "'");
+                problems.add("Suite '" + entry.getKey() + "' does not exist in project '" + project.getName() + "'");
             }
         }
+
         if (!problems.isEmpty()) {
             throw newCoreException(String.join("\n", problems));
         }
-        return resources;
+
+        return result;
     }
 
-    private List<String> createSuitesToRun(final List<IResource> resources) {
-        return resources.stream().map(RobotPathsNaming::createSuiteName).collect(toList());
+    private static Map<IResource, List<String>> findLinkedResources(final Map<IResource, List<String>> resourcesMapping)
+            throws CoreException {
+        final Map<IResource, List<String>> result = new LinkedHashMap<>();
+
+        for (final Entry<IResource, List<String>> entry : resourcesMapping.entrySet()) {
+            entry.getKey().accept(r -> {
+                if (r.isLinked(IResource.CHECK_ANCESTORS) && isNotIncluded(r, result.keySet()) && isDataSource(r)) {
+                    result.put(r, entry.getValue());
+                }
+                return true;
+            });
+        }
+
+        return result;
     }
 
-    private List<String> createTestsToRun(final Map<String, List<String>> suitePaths, final IProject project) {
-        return suitePaths.entrySet().stream().flatMap(e -> {
-            final IPath path = Path.fromPortableString(e.getKey());
-            return e.getValue().stream().map(testName -> RobotPathsNaming.createTestName(project, path, testName));
-        }).collect(toList());
+    private static boolean shouldUseSingleTestPathInCommandLine(final Collection<IResource> resources,
+            final RedPreferences preferences) throws CoreException {
+        return preferences.shouldUseSingleFileDataSource() && resources.size() == 1
+                && getOnlyElement(resources) instanceof IFile;
+    }
+
+    private static boolean isDataSource(final IResource resource) {
+        return resource.getType() != IResource.FILE || ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource);
+    }
+
+    private static boolean isNotIncluded(final IResource resource, final Set<IResource> resources) {
+        return !resource.isVirtual() && resources.stream()
+                .noneMatch(r -> !r.isVirtual() && r.getLocation().isPrefixOf(resource.getLocation()));
     }
 
 }
