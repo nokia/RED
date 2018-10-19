@@ -66,7 +66,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
     protected void validate(final RobotSuiteFile fileModel, final FileValidationContext validationContext)
             throws CoreException {
 
-        new UnknownTablesValidator(fileModel, reporter).validate(null);
+        new UnknownTablesValidator(validationContext, fileModel, reporter).validate(null);
         new TestCaseTableValidator(validationContext, fileModel.findSection(RobotCasesSection.class), reporter)
                 .validate(null);
         new TaskTableValidator(validationContext, fileModel.findSection(RobotTasksSection.class), reporter)

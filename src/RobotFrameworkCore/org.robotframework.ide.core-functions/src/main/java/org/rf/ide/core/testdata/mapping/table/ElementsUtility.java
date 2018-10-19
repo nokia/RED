@@ -352,27 +352,12 @@ public class ElementsUtility {
     }
 
     public boolean isTableSection(final RobotLine line) {
-        boolean result = false;
-        for (final IRobotLineElement elem : line.getLineElements()) {
-            if (isTableHeader(elem)) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
+        return line.getLineElements().stream().anyMatch(this::isTableHeader);
     }
 
     public AImported getNearestImport(final RobotFileOutput robotFileOutput) {
-        AImported result;
         final List<AImported> imports = robotFileOutput.getFileModel().getSettingTable().getImports();
-        if (!imports.isEmpty()) {
-            result = imports.get(imports.size() - 1);
-        } else {
-            result = null;
-        }
-
-        return result;
+        return imports.isEmpty() ? null : imports.get(imports.size() - 1);
     }
 
     public List<TableHeader<? extends ARobotSectionTable>> getKnownHeadersForTable(
@@ -397,45 +382,22 @@ public class ElementsUtility {
     }
 
     public boolean isTableHeader(final IRobotTokenType type) {
-        return (type == RobotTokenType.SETTINGS_TABLE_HEADER || type == RobotTokenType.VARIABLES_TABLE_HEADER
+        return type == RobotTokenType.SETTINGS_TABLE_HEADER || type == RobotTokenType.VARIABLES_TABLE_HEADER
                 || type == RobotTokenType.TEST_CASES_TABLE_HEADER || type == RobotTokenType.TASKS_TABLE_HEADER
-                || type == RobotTokenType.KEYWORDS_TABLE_HEADER);
+                || type == RobotTokenType.KEYWORDS_TABLE_HEADER || type == RobotTokenType.COMMENTS_TABLE_HEADER;
     }
 
     public boolean isTableHeader(final RobotToken t) {
-        boolean result = false;
-        final List<IRobotTokenType> declaredTypes = t.getTypes();
-        for (final IRobotTokenType type : declaredTypes) {
-            if (isTableHeader(type)) {
-                result = true;
-                break;
-            }
-        }
-
-        if (!t.getText().trim().startsWith("*")) {
-            result = false;
-        }
-
-        return result;
+        return t.getText().trim().startsWith("*") && t.getTypes().stream().anyMatch(this::isTableHeader);
     }
 
     public boolean isTableHeader(final IRobotLineElement elem) {
-        boolean result = false;
-        if (elem instanceof RobotToken) {
-            result = isTableHeader((RobotToken) elem);
-        }
-
-        return result;
+        return elem instanceof RobotToken && isTableHeader((RobotToken) elem);
     }
 
-    public boolean isUserTableHeader(final RobotToken t) {
-        boolean result = false;
-        final String text = t.getText();
-        if (text != null && text.length() > 1) {
-            result = text.trim().startsWith("*");
-        }
-
-        return result;
+    public boolean isUserTableHeader(final RobotToken token) {
+        final String text = token.getText();
+        return text != null && text.length() > 1 && text.trim().startsWith("*");
     }
 
     public boolean checkIfFirstHasKeywordNameAlready(final List<? extends ExecutableSetting> keywordBased) {
@@ -447,15 +409,13 @@ public class ElementsUtility {
     }
 
     public boolean isNotOnlySeparatorOrEmptyLine(final RobotLine currentLine) {
-        boolean anyValuableToken = false;
         final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         for (final IRobotLineElement lineElem : lineElements) {
             if (lineElem instanceof RobotToken && !lineElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
-                anyValuableToken = true;
-                break;
+                return true;
             }
         }
-        return anyValuableToken;
+        return false;
     }
 
     public boolean shouldGiveEmptyToProcess(final RobotFileOutput parsingOutput, final ALineSeparator separator,
@@ -588,7 +548,6 @@ public class ElementsUtility {
     }
 
     public ARobotSectionTable getTable(final RobotFile robotModel, final TableType type) {
-        final ARobotSectionTable table = null;
         if (type == TableType.SETTINGS) {
             return robotModel.getSettingTable();
         } else if (type == TableType.VARIABLES) {
@@ -600,7 +559,7 @@ public class ElementsUtility {
         } else if (type == TableType.TASKS) {
             return robotModel.getTasksTable();
         }
-        return table;
+        return null;
     }
 
     private static class LineTokenInfo {

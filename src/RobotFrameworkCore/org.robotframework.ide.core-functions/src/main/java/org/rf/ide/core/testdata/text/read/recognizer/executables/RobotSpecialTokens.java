@@ -69,16 +69,14 @@ public class RobotSpecialTokens {
 
     public List<RobotToken> recognize(final FilePosition fp, final String text) {
         final List<RobotToken> possibleRobotTokens = new ArrayList<>();
-        final StringBuilder sb = new StringBuilder(text);
         for (final ATokenRecognizer rec : SPECIAL_RECOGNIZERS) {
             final ATokenRecognizer newInstance = rec.newInstance();
-            if (newInstance.hasNext(sb, fp.getLine(), fp.getColumn())) {
+            if (newInstance.hasNext(text, fp.getLine(), fp.getColumn())) {
                 final RobotToken t = newInstance.next();
                 t.setStartColumn(t.getStartColumn() + fp.getColumn());
                 possibleRobotTokens.add(t);
             }
         }
-
         return possibleRobotTokens;
     }
 }
