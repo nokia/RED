@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabels;
 
 import java.util.ArrayList;
@@ -20,12 +19,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 
 public class RedSectionProposals {
 
-    private static final List<String> SECTION_NAMES = newArrayList(RobotKeywordsSection.SECTION_NAME,
+    public static final List<String> SECTION_NAMES = ImmutableList.of(RobotKeywordsSection.SECTION_NAME,
             RobotCasesSection.SECTION_NAME, RobotTasksSection.SECTION_NAME, RobotSettingsSection.SECTION_NAME,
-            RobotVariablesSection.SECTION_NAME);
+            RobotVariablesSection.SECTION_NAME, "Comments");
 
     private final ProposalMatcher matcher;
 

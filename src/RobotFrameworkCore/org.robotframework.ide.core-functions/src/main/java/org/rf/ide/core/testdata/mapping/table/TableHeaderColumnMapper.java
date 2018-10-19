@@ -23,25 +23,50 @@ import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 public class TableHeaderColumnMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
-    private final ParsingStateHelper stateHelper;
+    private final ElementsUtility utility = new ElementsUtility();
 
-
-    public TableHeaderColumnMapper() {
-        this.utility = new ElementsUtility();
-        this.stateHelper = new ParsingStateHelper();
-    }
-
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+
+        final ParsingState currentState = stateHelper.getCurrentState(processingState);
+        if (!processingState.isEmpty() && currentState != ParsingState.COMMENT_TABLE_HEADER
+                && !stateHelper.isTableInsideStateInHierarchy(currentState)
+                && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                && lineContinueDoesNotExistAfterHeader(currentLine)) {
+
+            final ParsingState state = processingState.peek();
+            return stateHelper.isTableHeaderState(state) || state == ParsingState.TABLE_HEADER_COLUMN;
+        }
+        return false;
+    }
+
+    private boolean lineContinueDoesNotExistAfterHeader(final RobotLine currentLine) {
+        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
+
+        for (int i = 0; i < lineElements.size() || i == 2; i++) {
+            final List<IRobotTokenType> types = lineElements.get(i).getTypes();
+            if (types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+                return false;
+            } else if (!(types.contains(SeparatorType.PIPE)
+                    || types.contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE))) {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+
         final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TABLE_HEADER_COLUMN);
         rt.setText(text);
+
         final ParsingState state = stateHelper.getCurrentState(processingState);
         if (state != ParsingState.TABLE_HEADER_COLUMN) {
             processingState.push(ParsingState.TABLE_HEADER_COLUMN);
@@ -52,38 +77,7 @@ public class TableHeaderColumnMapper implements IParsingMapper {
         if (!headersForTable.isEmpty()) {
             final TableHeader<?> lastHeader = headersForTable.get(headersForTable.size() - 1);
             lastHeader.addColumnName(rt);
-        } else {
-            // FIXME: error to log
         }
-
         return rt;
-    }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
-            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        final ParsingState currentState = stateHelper.getCurrentState(processingState);
-        if (!processingState.isEmpty() && !stateHelper.isTableInsideStateInHierarchy(currentState)
-                && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                && isNotExistLineContinueAfterHeader(currentLine)) {
-            final ParsingState state = processingState.peek();
-            return stateHelper.isTableHeaderState(state) || state == ParsingState.TABLE_HEADER_COLUMN;
-        }
-        return false;
-    }
-
-    private boolean isNotExistLineContinueAfterHeader(final RobotLine currentLine) {
-        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
-        for (int i = 0; i < lineElements.size() || i == 2; i++) {
-            final IRobotLineElement element = lineElements.get(i);
-            final List<IRobotTokenType> types = element.getTypes();
-            if (types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
-                return false;
-            } else if (!(types.contains(SeparatorType.PIPE)
-                    || types.contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE))) {
-                break;
-            }
-        }
-        return true;
     }
 }

@@ -20,8 +20,8 @@ public class RedSectionProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("");
 
         assertThat(proposals).extracting(AssistProposal::getLabel)
-                .containsExactly("*** Keywords ***", "*** Settings ***", "*** Tasks ***", "*** Test Cases ***",
-                        "*** Variables ***");
+                .containsExactly("*** Comments ***", "*** Keywords ***", "*** Settings ***", "*** Tasks ***",
+                        "*** Test Cases ***", "*** Variables ***");
     }
 
     @Test
@@ -37,7 +37,7 @@ public class RedSectionProposalsTest {
 
         assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("*** Variables ***", "*** Test Cases ***", "*** Tasks ***", "*** Settings ***",
-                        "*** Keywords ***");
+                        "*** Keywords ***", "*** Comments ***");
     }
 
     @Test
