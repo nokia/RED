@@ -38,14 +38,14 @@ class Events {
     }
 
     static Map<String, Object> ensureOrderedMapOfStringsToObjects(final Map<?, ?> map) {
-        final LinkedHashMap<String, Object> result = new LinkedHashMap<>();
-        map.entrySet().stream().forEach(e -> result.put((String) e.getKey(), e.getValue()));
+        final Map<String, Object> result = new LinkedHashMap<>();
+        map.forEach((key, value) -> result.put((String) key, value));
         return result;
     }
 
     static Map<String, String> ensureOrderedMapOfStringsToStrings(final Map<?, ?> map) {
-        final LinkedHashMap<String, String> result = new LinkedHashMap<>();
-        map.entrySet().stream().forEach(e -> result.put((String) e.getKey(), (String) e.getValue()));
+        final Map<String, String> result = new LinkedHashMap<>();
+        map.forEach((key, value) -> result.put((String) key, (String) value));
         return result;
     }
 }

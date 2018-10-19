@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +113,7 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
                     final List<? extends RobotCodeHoldingElement<?>> robotCases) {
 
                 return robotCases.stream()
-                        .collect(groupingBy(testCase -> testCase.getSuiteFile().getFile(),
+                        .collect(groupingBy(testCase -> testCase.getSuiteFile().getFile(), LinkedHashMap::new,
                                 mapping(RobotCodeHoldingElement::getName, toList())));
             }
 
@@ -148,11 +149,11 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
     public static enum Mode {
         RUN("Run", ILaunchManager.RUN_MODE, IDebugUIConstants.IMG_ACT_RUN),
         DEBUG("Debug", ILaunchManager.DEBUG_MODE, IDebugUIConstants.IMG_ACT_DEBUG);
-        
+
         private final String actionName;
 
         private final String launchMgrName;
-        
+
         private final String imageConst;
 
         private Mode(final String actionName, final String launchMgrName, final String imageConst) {

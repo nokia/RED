@@ -80,7 +80,7 @@ public class RemoteRobotLaunchConfigurationShortcutTest {
         final IStructuredSelection selection = new StructuredSelection();
         final Optional<IProject> project = RemoteRobotLaunchConfigurationShortcut.getProjectFromSelection(selection);
 
-        assertThat(project.isPresent()).isFalse();
+        assertThat(project).isNotPresent();
     }
 
     @Test
@@ -92,7 +92,7 @@ public class RemoteRobotLaunchConfigurationShortcutTest {
         final IStructuredSelection selection = new StructuredSelection(resources);
         final Optional<IProject> project = RemoteRobotLaunchConfigurationShortcut.getProjectFromSelection(selection);
 
-        assertThat(project.isPresent()).isFalse();
+        assertThat(project).isNotPresent();
     }
 
     @Test
@@ -116,7 +116,7 @@ public class RemoteRobotLaunchConfigurationShortcutTest {
         final IStructuredSelection selection = new StructuredSelection(testCases);
         final Optional<IProject> project = RemoteRobotLaunchConfigurationShortcut.getProjectFromSelection(selection);
 
-        assertThat(project.isPresent()).isFalse();
+        assertThat(project).isNotPresent();
     }
 
     @Test
@@ -140,7 +140,7 @@ public class RemoteRobotLaunchConfigurationShortcutTest {
         final IStructuredSelection selection = new StructuredSelection(casesSections);
         final Optional<IProject> project = RemoteRobotLaunchConfigurationShortcut.getProjectFromSelection(selection);
 
-        assertThat(project.isPresent()).isFalse();
+        assertThat(project).isNotPresent();
     }
 
     @Test
@@ -151,8 +151,8 @@ public class RemoteRobotLaunchConfigurationShortcutTest {
         final IStructuredSelection selection = new StructuredSelection(resources);
         final Optional<IProject> project = RemoteRobotLaunchConfigurationShortcut.getProjectFromSelection(selection);
 
-        assertThat(project.isPresent()).isTrue();
-        assertThat(project.get()).isEqualTo(projectProvider1.getProject());
+        assertThat(project).isPresent();
+        assertThat(project).hasValue(projectProvider1.getProject());
     }
 
     @Test
@@ -174,8 +174,8 @@ public class RemoteRobotLaunchConfigurationShortcutTest {
         final IStructuredSelection selection = new StructuredSelection(testCases);
         final Optional<IProject> project = RemoteRobotLaunchConfigurationShortcut.getProjectFromSelection(selection);
 
-        assertThat(project.isPresent()).isTrue();
-        assertThat(project.get()).isEqualTo(projectProvider1.getProject());
+        assertThat(project).isPresent();
+        assertThat(project).hasValue(projectProvider1.getProject());
     }
 
     @Test
@@ -197,7 +197,7 @@ public class RemoteRobotLaunchConfigurationShortcutTest {
         final IStructuredSelection selection = new StructuredSelection(casesSections);
         final Optional<IProject> project = RemoteRobotLaunchConfigurationShortcut.getProjectFromSelection(selection);
 
-        assertThat(project.isPresent()).isTrue();
-        assertThat(project.get()).isEqualTo(projectProvider1.getProject());
+        assertThat(project).isPresent();
+        assertThat(project).hasValue(projectProvider1.getProject());
     }
 }
