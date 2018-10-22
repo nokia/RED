@@ -24,6 +24,14 @@ public class RobotSuiteFileCreator {
 
     private RobotVersion version;
 
+    public RobotSuiteFileCreator() {
+        this(null);
+    }
+
+    public RobotSuiteFileCreator(final RobotVersion version) {
+        this.version = version;
+    }
+
     public RobotSuiteFileCreator setVersion(final RobotVersion version) {
         this.version = version;
         return this;

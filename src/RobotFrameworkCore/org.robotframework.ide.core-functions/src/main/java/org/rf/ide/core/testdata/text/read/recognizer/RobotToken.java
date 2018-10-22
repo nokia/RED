@@ -46,6 +46,16 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return create(text, newArrayList(types));
     }
 
+    public static RobotToken create(final String text, final int line, final int column,
+            final IRobotTokenType... types) {
+        return create(text, line, column, newArrayList(types));
+    }
+
+    public static RobotToken create(final String text, final FilePosition filePosition,
+            final IRobotTokenType... types) {
+        return create(text, filePosition, newArrayList(types));
+    }
+
     public static RobotToken create(final String text, final Collection<? extends IRobotTokenType> types) {
         final RobotToken token = new RobotToken();
         token.setText(text);
@@ -53,6 +63,31 @@ public class RobotToken implements IRobotLineElement, Serializable {
             token.getTypes().clear();
         }
         token.getTypes().addAll(types);
+        return token;
+    }
+
+    public static RobotToken create(final String text, final int line, final int column,
+            final Collection<? extends IRobotTokenType> types) {
+        final RobotToken token = new RobotToken();
+        token.setText(text);
+        if (!types.isEmpty()) {
+            token.getTypes().clear();
+        }
+        token.getTypes().addAll(types);
+        token.setLineNumber(line);
+        token.setStartColumn(column);
+        return token;
+    }
+
+    public static RobotToken create(final String text, final FilePosition filePosition,
+            final Collection<? extends IRobotTokenType> types) {
+        final RobotToken token = new RobotToken();
+        token.setText(text);
+        if (!types.isEmpty()) {
+            token.getTypes().clear();
+        }
+        token.getTypes().addAll(types);
+        token.setFilePosition(filePosition);
         return token;
     }
 
