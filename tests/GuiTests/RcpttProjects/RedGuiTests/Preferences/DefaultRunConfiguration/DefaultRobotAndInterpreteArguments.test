@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/1/18 2:03 PM
+Save-Time: 10/22/18 5:12 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -122,7 +122,7 @@ set-dialog-result File [get-arg-file-path]
 get-menu "File/Open File..." | click 
 
 get-editor "args_.*.arg" | get-text-viewer  | get-property text | equals "# arguments automatically generated\n"
-    + "--suite RobotProject.Test_for_run_config\n"
+    + "--suite RobotProject.Test For Run Config\n"
     + "# arguments specified manually by user\n"
     + "-i      test 1\n"
     + "-o      None\n"
@@ -140,12 +140,12 @@ wait-for-console
 if [not [get-view Console | get-text-viewer | get-property text -raw
     | matches "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
-    + "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test_for_run_config.def' in suite 'RobotProject.Test_for_run_config'.\n\n"
+    + "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test For Run Config.def' in suite 'RobotProject.Test For Run Config'.\n\n"
     + "Try --help for usage information." ]]{
     
     //check if order is different in linux sometimes
     get-view Console | get-text-viewer | get-property text 
-    	|equals "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test_for_run_config.def' in suite 'RobotProject.Test_for_run_config'.\n\n"
+    	|equals "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test For Run Config.def' in suite 'RobotProject.Test For Run Config'.\n\n"
     + "Try --help for usage information.\n"
     + "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*RobotProject\n"
     + "Suite Executor: Robot Framework .*" | verify-true 
