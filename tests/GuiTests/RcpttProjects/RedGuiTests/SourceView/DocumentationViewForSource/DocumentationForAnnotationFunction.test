@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HYGA8NFSEei8hricfexH0g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/22/18 5:00 PM
+Save-Time: 10/22/18 5:02 PM
 Tags: notTestable
 Testcase-Type: ecl
 
@@ -87,6 +87,19 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library    libs/SimpleClass.py    \n"
+    + "Library    libs/fibon.py    \n"
+    + "Library    libs/many_functions.py\n"
+    + "Library    libs/one_function.py        \n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Div    a    b\n"
+    + "    Div With Return Annot    a    b\n"
+    + "    many_functions.Example    argument\n"
+    + "    one_function.Example    argument\n"
+    + "    many_functions.Sum    a    b    c" | verify-true
+    
 
 get-view "Project Explorer" | get-tree 
     | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs \\(8\\)/Div With Return Annot" 
