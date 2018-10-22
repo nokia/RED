@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.text.read.recognizer.header.CommentsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.header.MetadataTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
@@ -26,7 +27,8 @@ public class TableHeadersRecognizersProvider {
             new TestCasesTableHeaderRecognizer(),
             new KeywordsTableHeaderRecognizer(),
             new UserKeywordsTableHeaderRecognizer(),
-            new VariablesTableHeaderRecognizer());
+            new VariablesTableHeaderRecognizer(),
+            new CommentsTableHeaderRecognizer());
 
 
     public List<ATokenRecognizer> getRecognizers(final RobotVersion robotVersion) {

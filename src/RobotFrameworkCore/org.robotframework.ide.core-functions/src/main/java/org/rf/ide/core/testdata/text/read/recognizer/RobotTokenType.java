@@ -47,6 +47,10 @@ public enum RobotTokenType implements IRobotTokenType {
             TableType.VARIABLES,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Variable").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Variables").build()),
+    COMMENTS_TABLE_HEADER(
+            TableType.COMMENTS,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Comment").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Comments").build()),
     /**
      */
     TEST_CASES_TABLE_HEADER(
@@ -81,6 +85,7 @@ public enum RobotTokenType implements IRobotTokenType {
     PREVIOUS_LINE_CONTINUE(
             TableType.NOT_STRICTLY_BELONGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("...").build()),
+    COMMENTS_TABLE_INNER_TOKEN(TableType.COMMENTS),
     /**
      */
     SETTING_NAME_DUPLICATION(TableType.SETTINGS, true),
@@ -645,7 +650,7 @@ public enum RobotTokenType implements IRobotTokenType {
     FOR_CONTINUE_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()), FOR_CONTINUE_ARTIFICIAL_TOKEN(
-                    TableType.NOT_STRICTLY_BELONGS);
+            TableType.NOT_STRICTLY_BELONGS);
 
     private final List<String> text = new ArrayList<>(0);
 
@@ -688,12 +693,19 @@ public enum RobotTokenType implements IRobotTokenType {
     }
 
     private enum TableType {
-        NOT_STRICTLY_BELONGS, SETTINGS, VARIABLES, TEST_CASES, TASKS, KEYWORDS;
+        NOT_STRICTLY_BELONGS,
+        SETTINGS,
+        VARIABLES,
+        TEST_CASES,
+        TASKS,
+        KEYWORDS,
+        COMMENTS;
     }
 
     public static boolean isTableHeader(final IRobotTokenType type) {
-        return (type == SETTINGS_TABLE_HEADER || type == VARIABLES_TABLE_HEADER || type == TEST_CASES_TABLE_HEADER
-                || type == TASKS_TABLE_HEADER || type == KEYWORDS_TABLE_HEADER || type == USER_OWN_TABLE_HEADER);
+        return type == SETTINGS_TABLE_HEADER || type == VARIABLES_TABLE_HEADER || type == TEST_CASES_TABLE_HEADER
+                || type == TASKS_TABLE_HEADER || type == KEYWORDS_TABLE_HEADER || type == COMMENTS_TABLE_HEADER
+                || type == USER_OWN_TABLE_HEADER;
     }
 
     public static List<RobotTokenType> getTypesForSettingsTable() {

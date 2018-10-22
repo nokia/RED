@@ -69,10 +69,11 @@ public class SectionsAssistProcessorTest {
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 19);
 
-        assertThat(proposals).hasSize(5)
-                .haveExactly(5, proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
+        assertThat(proposals).hasSize(6)
+                .haveExactly(6, proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
 
         assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
+                new Document("*** Test Cases ***", "*** Comments ***", ""),
                 new Document("*** Test Cases ***", "*** Keywords ***", ""),
                 new Document("*** Test Cases ***", "*** Test Cases ***", ""),
                 new Document("*** Test Cases ***", "*** Tasks ***", ""),
@@ -93,11 +94,12 @@ public class SectionsAssistProcessorTest {
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 0);
 
-        assertThat(proposals).hasSize(5)
-                .haveExactly(5,
+        assertThat(proposals).hasSize(6)
+                .haveExactly(6,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
 
         assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
+                new Document("*** Comments ***", ""),
                 new Document("*** Keywords ***", ""),
                 new Document("*** Test Cases ***", ""),
                 new Document("*** Tasks ***", ""),

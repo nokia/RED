@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.Collection;
@@ -19,6 +19,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSectionProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -29,8 +30,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-
-import com.google.common.collect.Iterables;
 
 /**
  * @author Michal Anglart
@@ -63,12 +62,16 @@ class SimilaritiesAnalyst {
         final Collection<String> allLibs = robotProject.getLibrarySpecificationsStream()
                 .map(LibrarySpecification::getName)
                 .collect(toSet());
-        return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allLibs, libraryName, maximumDistance));
+        return similaritiesAlgorithm.onlyWordsWithinDistance(allLibs, libraryName, maximumDistance)
+                .limit(limit)
+                .collect(toList());
     }
 
     Collection<String> provideSimilarAccessibleKeywords(final IFile suiteFile, final String keywordName) {
         final Collection<String> allNames = collectAccessibleKeywordNames(suiteFile);
-        return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allNames, keywordName, maximumDistance));
+        return similaritiesAlgorithm.onlyWordsWithinDistance(allNames, keywordName, maximumDistance)
+                .limit(limit)
+                .collect(toList());
     }
 
     private Collection<String> collectAccessibleKeywordNames(final IFile suiteFile) {
@@ -101,7 +104,9 @@ class SimilaritiesAnalyst {
     Collection<String> provideSimilarAccessibleVariables(final IFile suiteFile, final int offset,
             final String varName) {
         final Collection<String> allNames = collectAccessibleVariableNames(suiteFile, offset);
-        return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allNames, varName, maximumDistance));
+        return similaritiesAlgorithm.onlyWordsWithinDistance(allNames, varName, maximumDistance)
+                .limit(limit)
+                .collect(toList());
     }
 
     private Collection<String> collectAccessibleVariableNames(final IFile suiteFile, final int offset) {
@@ -137,7 +142,10 @@ class SimilaritiesAnalyst {
         return names;
     }
 
-    private <T> Collection<T> limit(final Collection<T> elements) {
-        return newArrayList(Iterables.limit(elements, limit));
+    Collection<String> provideSimilarSectionNames(final String sectionName) {
+        return similaritiesAlgorithm
+                .onlyWordsWithinDistance(RedSectionProposals.SECTION_NAMES, sectionName, DEFAULT_MAXIMUM_DISTANCE)
+                .limit(1)
+                .collect(toList());
     }
 }

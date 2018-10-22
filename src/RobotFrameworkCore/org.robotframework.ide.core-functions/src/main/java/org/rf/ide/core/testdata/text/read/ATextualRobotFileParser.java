@@ -24,6 +24,7 @@ import org.rf.ide.core.testdata.IRobotFileParser;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler.LineContinueType;
 import org.rf.ide.core.testdata.mapping.setting.imports.LibraryAliasFixer;
+import org.rf.ide.core.testdata.mapping.table.CommentsMapperProvider;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
@@ -179,6 +180,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         mappers.addAll(new TestCaseMapperProvider().getMappers(robotVersion));
         mappers.addAll(new TaskMapperProvider().getMappers(robotVersion));
         mappers.addAll(new UserKeywordMapperProvider().getMappers(robotVersion));
+        mappers.addAll(new CommentsMapperProvider().getMappers(robotVersion));
 
         unknownTableElementsMapper.clear();
         unknownTableElementsMapper.addAll(new UnknownTableElementsMapper().getMappers(robotVersion));
@@ -448,77 +450,59 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 if (!text.trim().equals(robotToken.getText().trim())) {
                     wasRecognizedCorrectly = false;
                     // FIXME: incorrect type
-                    final RobotToken newRobotToken = new RobotToken();
-                    newRobotToken.setLineNumber(fp.getLine());
-                    newRobotToken.setStartColumn(fp.getColumn());
-                    newRobotToken.setText(text);
-                    newRobotToken.setType(RobotTokenType.UNKNOWN);
+                    final RobotToken newRobotToken = RobotToken.create(text, fp.getLine(), fp.getColumn(),
+                            RobotTokenType.UNKNOWN);
                     newRobotToken.getTypes().addAll(robotToken.getTypes());
                     robotToken = newRobotToken;
+
                     newState = ParsingState.UNKNOWN;
                 }
             } else {
-                robotToken = new RobotToken();
-                robotToken.setLineNumber(fp.getLine());
-                robotToken.setStartColumn(fp.getColumn());
-                robotToken.setText(text);
-                robotToken.setType(RobotTokenType.UNKNOWN);
+                robotToken = RobotToken.create(text, fp.getLine(), fp.getColumn(), RobotTokenType.UNKNOWN);
 
                 newState = ParsingState.UNKNOWN;
             }
 
             boolean useMapper = true;
-            final RobotFile fileModel = robotFileOutput.getFileModel();
-            if (utility.isTableHeader(robotToken)) {
-                if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, currentLine,
-                        robotToken) && isCorrectTableHeader(robotToken)) {
-                    if (wasRecognizedCorrectly) {
-                        robotToken.getTypes().remove(RobotTokenType.UNKNOWN);
-                        @SuppressWarnings("rawtypes")
-                        final TableHeader<?> header = new TableHeader(robotToken);
-                        ARobotSectionTable table = null;
-                        if (newState == ParsingState.SETTING_TABLE_HEADER) {
-                            table = fileModel.getSettingTable();
-                        } else if (newState == ParsingState.VARIABLE_TABLE_HEADER) {
-                            table = fileModel.getVariableTable();
-                        } else if (newState == ParsingState.TEST_CASE_TABLE_HEADER) {
-                            table = fileModel.getTestCaseTable();
-                        } else if (newState == ParsingState.TASKS_TABLE_HEADER) {
-                            table = fileModel.getTasksTable();
-                        } else if (newState == ParsingState.KEYWORD_TABLE_HEADER) {
-                            table = fileModel.getKeywordTable();
-                        }
+            if (wasRecognizedCorrectly && utility.isTableHeader(robotToken)
+                    && positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, currentLine, robotToken)
+                    && isCorrectTableHeader(robotToken)) {
 
-                        table.addHeader(header);
-                        processingState.clear();
-                        processingState.push(newState);
+                robotToken.getTypes().remove(RobotTokenType.UNKNOWN);
 
-                        useMapper = false;
-                    } else {
-                        // FIXME: add warning about incorrect table
-                    }
-                } else {
-                    // FIXME: add warning about wrong place
-                }
-            }
+                if (newState == ParsingState.SETTING_TABLE_HEADER
+                        || newState == ParsingState.VARIABLE_TABLE_HEADER
+                        || newState == ParsingState.TEST_CASE_TABLE_HEADER
+                        || newState == ParsingState.TASKS_TABLE_HEADER
+                        || newState == ParsingState.KEYWORD_TABLE_HEADER) {
 
-            if (useMapper && utility.isUserTableHeader(robotToken)) {
-                if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, currentLine, robotToken)) {
-                    // FIXME: add warning about user trash table
+                    final ARobotSectionTable table = utility.getTable(robotFileOutput.getFileModel(),
+                            newState.getTable());
+                    table.addHeader(new TableHeader<>(robotToken));
+
+                } else if (newState == ParsingState.COMMENT_TABLE_HEADER) {
                     robotToken.getTypes().add(0, RobotTokenType.USER_OWN_TABLE_HEADER);
-                    robotToken.getTypes().remove(RobotTokenType.UNKNOWN);
-                    processingState.clear();
-                    processingState.push(ParsingState.TRASH);
-
-                    useMapper = false;
                 }
+
+                processingState.clear();
+                processingState.push(newState);
+
+                useMapper = false;
+
+            } else if (utility.isUserTableHeader(robotToken)
+                    && positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, currentLine, robotToken)) {
+                // FIXME: add warning about user trash table
+                robotToken.getTypes().add(0, RobotTokenType.USER_OWN_TABLE_HEADER);
+                robotToken.getTypes().remove(RobotTokenType.UNKNOWN);
+                processingState.clear();
+                processingState.push(ParsingState.TRASH);
+
+                useMapper = false;
             }
 
             robotToken = alignUtility.applyPrettyAlignTokenIfIsValid(processingState, text, robotToken);
 
-            useMapper = useMapper && !robotToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE);
-
-            if (useMapper) {
+            if (useMapper && !robotToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                 robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState, robotFileOutput,
                         fp, text, robotToken);
             }
@@ -532,22 +516,17 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
     private RobotToken processEmptyLine(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final FilePosition fp, final String text) {
 
-        RobotToken robotToken = new RobotToken();
-        robotToken.setFilePosition(fp);
-        robotToken.setText(text);
-        robotToken.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-
-        robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState, robotFileOutput, fp,
-                text, robotToken);
-
-        return robotToken;
+        final RobotToken robotToken = RobotToken.create(text, fp, RobotTokenType.PRETTY_ALIGN_SPACE);
+        return mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState, robotFileOutput, fp, text,
+                robotToken);
 
     }
 
     private boolean isCorrectTableHeader(final RobotToken robotToken) {
         final List<RobotTokenType> tableHeadersTypes = newArrayList(RobotTokenType.SETTINGS_TABLE_HEADER,
                 RobotTokenType.VARIABLES_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
-                RobotTokenType.TASKS_TABLE_HEADER, RobotTokenType.KEYWORDS_TABLE_HEADER);
+                RobotTokenType.TASKS_TABLE_HEADER, RobotTokenType.KEYWORDS_TABLE_HEADER,
+                RobotTokenType.COMMENTS_TABLE_HEADER);
 
         final String raw = robotToken.getText().replaceAll("\\s+|[*]", "");
         final List<IRobotTokenType> types = robotToken.getTypes();
@@ -594,25 +573,16 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
     private List<RobotToken> recognize(final FilePosition fp, final String text) {
         final List<RobotToken> possibleRobotTokens = new ArrayList<>();
 
-        final StringBuilder sb = new StringBuilder(text);
         for (final ATokenRecognizer rec : recognizers) {
-            if (rec.hasNext(sb, fp.getLine(), fp.getColumn())) {
-                final RobotToken t = rec.next();
-                t.setStartColumn(t.getStartColumn() + fp.getColumn());
-                possibleRobotTokens.add(t);
+            if (rec.hasNext(text, fp.getLine(), fp.getColumn())) {
+                final RobotToken token = rec.next();
+                token.setStartColumn(token.getStartColumn() + fp.getColumn());
+                possibleRobotTokens.add(token);
             }
         }
-
         if (possibleRobotTokens.isEmpty()) {
-            final RobotToken rt = new RobotToken();
-            rt.setLineNumber(fp.getLine());
-            rt.setText(text);
-            rt.setStartColumn(fp.getColumn());
-
-            possibleRobotTokens.add(rt);
+            possibleRobotTokens.add(RobotToken.create(text, fp.getLine(), fp.getColumn()));
         }
-
         return possibleRobotTokens;
     }
-
 }
