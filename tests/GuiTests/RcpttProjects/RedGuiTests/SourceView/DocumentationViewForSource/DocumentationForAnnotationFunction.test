@@ -6,13 +6,21 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HYGA8NFSEei8hricfexH0g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/16/18 6:03 PM
+Save-Time: 10/22/18 5:00 PM
+Tags: notTestable
 Testcase-Type: ecl
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Run this test for Python 3.0 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+//open prefernece and change to Python 3.
 get-preferences-menu | click
 with [get-window Preferences] {
     with [get-tree] {
@@ -20,44 +28,86 @@ with [get-window Preferences] {
         select "Robot Framework/Installed frameworks"
     }
     with [get-table] {
-        select "Robot Framework .* \\(Python 3.7.*\\)"
-        get-item -path "Robot Framework 3.1a2 \\(Python 3.7.0 on win32\\)" | check
+        get-item -path "Robot Framework .*\(Python 3.*\)"| check
     }
     get-button "Apply and Close" | click
     get-window "Rebuild required" | get-button OK | click
 }
+
+//add kw from CA
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 5
     key-type "NUMPAD_ENTER" "\\u000D"
     set-caret-pos 8 5
+    
+    //add DIV with 2 args
     type-text DI
     key-type "M1+SPACE"
-    key-type Enter -times 2
+    key-type Enter
+    wait 100
+    key-type Enter
     key-type End
+    
+    // add Div
     set-caret-pos 8 18
     key-type Enter
     type-text div
     key-type "M1+SPACE"
     key-type Down
-    key-type Enter -times 2
+    key-type Enter
+    wait 100
+    key-type Enter
     key-type End
+    
+    //add Example - prefix will be added
     set-caret-pos 9 36
     key-type Enter
     type-text EX
     key-type "M1+SPACE"
-    key-type Enter -times 2
+      key-type Enter
+    wait 100
+    key-type Enter
     key-type End
     key-type Enter
+    
+    //add second Example lib
     type-text Exa
     key-type "M1+SPACE"
     key-type Down
     key-type Enter
     key-type End
-    key-type Enter -times 2
+      key-type Enter
+    wait 100
+    key-type Enter
+    
+    //add Sum with prefix
     type-text sum
     key-type "M1+SPACE"
     key-type Enter
     key-type "M1+s"
-    set-caret-pos 7 5
 }
+
+
+get-view "Project Explorer" | get-tree 
+    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs \\(8\\)/Div With Return Annot" 
+    | double-click
+    
+    
+check-documentation-view -kw_name "Div With Return Annot"  -project_name "Annotation" -library "many_functions"  
+	-arguments "\[a: the dividend, b: the divisor \(must be different than 0\)\]"  -spec   "Divide a by b"
+	
+get-view "Project Explorer" | get-tree 
+    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs \\(8\\)/Fun With Arg2" 
+    | double-click
+    
+check-documentation-view -kw_name "Fun With Arg2"  -project_name "Annotation" -library "many_functions"  
+	-arguments "\[\*args: list of unnamed arguments, \*\*kwargs: dict of named arguments\]"  -spec  "args and kwargs" 	
+	
+get-view "Project Explorer" | get-tree 
+    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs \\(8\\)/Div" | double-click
+
+check-documentation-view -kw_name "Div"  -project_name "Annotation" -library "many_functions"  
+	-arguments "\[a: \{.*type.*class .*float.*help.*the dividend.*\}, b: \{.*type.*class .*float.*help.*the divisor \(must be different than 0\).*\}\]"  
+	-spec  "Divide a by b"
+	    	
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
