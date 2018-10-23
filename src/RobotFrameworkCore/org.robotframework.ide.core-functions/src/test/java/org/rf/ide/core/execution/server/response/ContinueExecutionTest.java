@@ -10,11 +10,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ContinueExecutionTest {
 
@@ -24,9 +24,9 @@ public class ContinueExecutionTest {
     }
 
     @Test(expected = ResponseException.class)
-    public void mapperIOExceptionIsWrappedAsResponseException() throws Exception {
+    public void mapperJsonProcessingExceptionIsWrappedAsResponseException() throws JsonProcessingException {
         final ObjectMapper mapper = mock(ObjectMapper.class);
-        when(mapper.writeValueAsString(any(Object.class))).thenThrow(IOException.class);
+        when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
 
         final ContinueExecution response = new ContinueExecution(mapper);
 

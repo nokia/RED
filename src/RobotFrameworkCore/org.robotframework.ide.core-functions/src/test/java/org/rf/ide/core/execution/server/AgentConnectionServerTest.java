@@ -23,16 +23,14 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-@Ignore("see RED-976")
 public class AgentConnectionServerTest {
 
     @Test
@@ -68,17 +66,13 @@ public class AgentConnectionServerTest {
         final Thread serverThread = new Thread(() -> {
             try {
                 server.start(robotEventListener);
-            } catch (final IOException e1) {
+            } catch (final IOException e) {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(host, port);) {
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    final Object msgObject = ImmutableMap.of("ready_to_start", 0);
-                    writer.write(new ObjectMapper().writeValueAsString(msgObject));
-                }
-            } catch (final Exception e) {
+            try {
+                writeToSocket(host, port, ImmutableMap.of("ready_to_start", 0));
+            } catch (final IOException e) {
             }
         });
         serverThread.start();
@@ -108,16 +102,13 @@ public class AgentConnectionServerTest {
         final Thread serverThread = new Thread(() -> {
             try {
                 server.start(robotEventListener);
-            } catch (final IOException e1) {
+            } catch (final IOException e) {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(host, port);) {
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    writer.write("invalid_messge_not_a_json_mapping");
-                }
-            } catch (final Exception e) {
+            try {
+                writeToSocket(host, port, "invalid_messge_not_a_json_mapping");
+            } catch (final IOException e) {
             }
         });
         serverThread.start();
@@ -147,17 +138,13 @@ public class AgentConnectionServerTest {
         final Thread serverThread = new Thread(() -> {
             try {
                 server.start(robotEventListener);
-            } catch (final IOException e1) {
+            } catch (final IOException e) {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(host, port);) {
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    final Object msgObject = ImmutableMap.of("ready_to_start", 0);
-                    writer.write(new ObjectMapper().writeValueAsString(msgObject));
-                }
-            } catch (final Exception e) {
+            try {
+                writeToSocket(host, port, ImmutableMap.of("ready_to_start", 0));
+            } catch (final IOException e) {
             }
         });
         serverThread.start();
@@ -208,16 +195,11 @@ public class AgentConnectionServerTest {
         final AgentConnectionServer server = new AgentConnectionServer(host, port, 100, TimeUnit.MILLISECONDS);
         server.addStatusListener(serverStatusListener);
 
-        final Thread serverThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    server.start();
-                } catch (final Exception e) {
-                }
+        final Thread serverThread = new Thread(() -> {
+            try {
+                server.start();
+            } catch (final Exception e) {
             }
-
         });
 
         serverThread.start();
@@ -231,6 +213,14 @@ public class AgentConnectionServerTest {
     private static int findFreePort() throws IOException {
         try (ServerSocket socket = new ServerSocket(0)) {
             return socket.getLocalPort();
+        }
+    }
+
+    private static void writeToSocket(final String host, final int port, final Object message) throws IOException {
+        try (final Socket clientSocket = new Socket(host, port);) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))) {
+                writer.write(new ObjectMapper().writeValueAsString(message));
+            }
         }
     }
 }
