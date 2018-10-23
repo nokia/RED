@@ -52,6 +52,7 @@
       * [Running tests using Gradle](/user_guide/tools_integration/gradle.md)
       * [Robot Framework Lint](/user_guide/tools_integration/rflint.md)
     * [Known issues and problems](/user_guide/known_issues.md)
+    * [Diagnostics](/user_guide/diagnostics.md)
 
 ### About
 
