@@ -14,8 +14,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IStringVariableManager;
@@ -182,12 +180,12 @@ public class LocalProcessCommandLineBuilderTest {
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        final Path temp = RedTemporaryDirectory.createTemporaryDirectoryIfNotExists();
         assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("--listener", Paths.get(temp.toString(), "TestRunnerAgent.py") + ":12345",
+                .containsSequence("--listener", RedTemporaryDirectory.getTemporaryFile("TestRunnerAgent.py") + ":12345",
                         "--argumentfile")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
-        assertThat(commandLine.getCommandLine()[6]).startsWith(temp.toString());
+        assertThat(commandLine.getCommandLine()[6])
+                .startsWith(RedTemporaryDirectory.createTemporaryDirectoryIfNotExists().toString());
         assertThat(commandLine.getArgumentFile()).hasValueSatisfying(
                 argumentFile -> assertThat(argumentFile.generateContent()).contains("--suite " + PROJECT_NAME));
     }
@@ -689,8 +687,7 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(5).startsWith(executablePath, "-a", "-b", "-c");
-        assertThat(commandLine.getCommandLine()[4])
-                .containsSequence("/path/to/executable", "-m", "robot.run", "--listener")
+        assertThat(commandLine.getCommandLine()[4]).startsWith("/path/to/executable -m robot.run --listener")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }

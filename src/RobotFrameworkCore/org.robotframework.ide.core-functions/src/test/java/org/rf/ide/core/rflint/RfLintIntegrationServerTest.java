@@ -22,13 +22,11 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-@Ignore("see RED-976")
 public class RfLintIntegrationServerTest {
 
     @Test
@@ -82,14 +80,11 @@ public class RfLintIntegrationServerTest {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(server.getHost(), server.getPort())) {
+            try {
                 server.waitForServerToSetup();
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    final Object msgObject = ImmutableMap.of("files_to_process", newArrayList(42));
-                    writer.write(new ObjectMapper().writeValueAsString(msgObject));
-                }
-            } catch (final Exception e) {
+                writeToSocket(server.getHost(), server.getPort(),
+                        ImmutableMap.of("files_to_process", newArrayList(42)));
+            } catch (final InterruptedException | IOException e) {
             }
         });
 
@@ -115,15 +110,11 @@ public class RfLintIntegrationServerTest {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(server.getHost(), server.getPort())) {
+            try {
                 server.waitForServerToSetup();
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    final Object msgObject = ImmutableMap.of("file_processing_started",
-                            newArrayList("/path/to/file.robot"));
-                    writer.write(new ObjectMapper().writeValueAsString(msgObject));
-                }
-            } catch (final Exception e) {
+                writeToSocket(server.getHost(), server.getPort(),
+                        ImmutableMap.of("file_processing_started", newArrayList("/path/to/file.robot")));
+            } catch (final InterruptedException | IOException e) {
             }
         });
 
@@ -149,15 +140,11 @@ public class RfLintIntegrationServerTest {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(server.getHost(), server.getPort())) {
+            try {
                 server.waitForServerToSetup();
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    final Object msgObject = ImmutableMap.of("file_processing_ended",
-                            newArrayList("/path/to/file.robot"));
-                    writer.write(new ObjectMapper().writeValueAsString(msgObject));
-                }
-            } catch (final Exception e) {
+                writeToSocket(server.getHost(), server.getPort(),
+                        ImmutableMap.of("file_processing_ended", newArrayList("/path/to/file.robot")));
+            } catch (final InterruptedException | IOException e) {
             }
         });
 
@@ -183,22 +170,19 @@ public class RfLintIntegrationServerTest {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(server.getHost(), server.getPort())) {
+            try {
                 server.waitForServerToSetup();
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    final Object msgObject = ImmutableMap.of("violation_found",
-                            newArrayList(ImmutableMap.builder()
-                                    .put("filepath", "/path/to/file.robot")
-                                    .put("line", 42)
-                                    .put("character", 5)
-                                    .put("rule_name", "Rule")
-                                    .put("severity", "E")
-                                    .put("message", "msg")
-                                    .build()));
-                    writer.write(new ObjectMapper().writeValueAsString(msgObject));
-                }
-            } catch (final Exception e) {
+                writeToSocket(server.getHost(), server.getPort(),
+                        ImmutableMap.of("violation_found",
+                                newArrayList(ImmutableMap.builder()
+                                        .put("filepath", "/path/to/file.robot")
+                                        .put("line", 42)
+                                        .put("character", 5)
+                                        .put("rule_name", "Rule")
+                                        .put("severity", "E")
+                                        .put("message", "msg")
+                                        .build())));
+            } catch (final InterruptedException | IOException e) {
             }
         });
 
@@ -225,14 +209,10 @@ public class RfLintIntegrationServerTest {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(server.getHost(), server.getPort())) {
+            try {
                 server.waitForServerToSetup();
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    final Object msgObject = ImmutableMap.of("analysis_finished", newArrayList());
-                    writer.write(new ObjectMapper().writeValueAsString(msgObject));
-                }
-            } catch (final Exception e) {
+                writeToSocket(server.getHost(), server.getPort(), ImmutableMap.of("analysis_finished", newArrayList()));
+            } catch (final InterruptedException | IOException e) {
             }
         });
 
@@ -258,14 +238,11 @@ public class RfLintIntegrationServerTest {
             }
         });
         final Thread clientThread = new Thread(() -> {
-            try (final Socket clientSocket = new Socket(server.getHost(), server.getPort())) {
+            try {
                 server.waitForServerToSetup();
-                try (BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(clientSocket.getOutputStream()))) {
-                    final Object msgObject = ImmutableMap.of("analysis_finished", newArrayList("error"));
-                    writer.write(new ObjectMapper().writeValueAsString(msgObject));
-                }
-            } catch (final Exception e) {
+                writeToSocket(server.getHost(), server.getPort(),
+                        ImmutableMap.of("analysis_finished", newArrayList("error")));
+            } catch (final InterruptedException | IOException e) {
             }
         });
 
@@ -277,5 +254,13 @@ public class RfLintIntegrationServerTest {
 
         verify(listener).analysisFinished("error");
         verifyNoMoreInteractions(listener);
+    }
+
+    private static void writeToSocket(final String host, final int port, final Object message) throws IOException {
+        try (final Socket clientSocket = new Socket(host, port);) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))) {
+                writer.write(new ObjectMapper().writeValueAsString(message));
+            }
+        }
     }
 }

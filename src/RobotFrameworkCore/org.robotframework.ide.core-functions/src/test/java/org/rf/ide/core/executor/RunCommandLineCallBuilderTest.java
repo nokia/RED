@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Test;
@@ -47,10 +46,9 @@ public class RunCommandLineCallBuilderTest {
                 .useArgumentFile(true)
                 .build();
 
-        final Path temp = RedTemporaryDirectory.createTemporaryDirectoryIfNotExists();
         assertThat(cmdLine.getCommandLine()).hasSize(7)
                 .containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                        Paths.get(temp.toString(), "TestRunnerAgent.py") + ":12345", "--argumentfile");
+                        RedTemporaryDirectory.getTemporaryFile("TestRunnerAgent.py") + ":12345", "--argumentfile");
         assertThat(cmdLine.getArgumentFile()).isPresent();
     }
 
@@ -62,10 +60,9 @@ public class RunCommandLineCallBuilderTest {
                 .useArgumentFile(false)
                 .build();
 
-        final Path temp = RedTemporaryDirectory.createTemporaryDirectoryIfNotExists();
         assertThat(cmdLine.getCommandLine()).hasSize(5)
                 .containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                        Paths.get(temp.toString(), "TestRunnerAgent.py") + ":12345");
+                        RedTemporaryDirectory.getTemporaryFile("TestRunnerAgent.py") + ":12345");
         assertThat(cmdLine.getArgumentFile()).isNotPresent();
     }
 
@@ -225,7 +222,7 @@ public class RunCommandLineCallBuilderTest {
 
         assertThat(cmdLine.getCommandLine()).hasSize(3).containsSubsequence("args");
         assertThat(cmdLine.getCommandLine()[0]).endsWith("exec");
-        assertThat(cmdLine.getCommandLine()[2]).containsSequence("/x/y/z/python", "-m", "robot.run", "--listener");
+        assertThat(cmdLine.getCommandLine()[2]).startsWith("/x/y/z/python -m robot.run --listener");
         assertThat(cmdLine.getArgumentFile()).isNotPresent();
     }
 

@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -15,7 +14,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -37,7 +35,7 @@ public class RobotConsoleParticipantTest {
     @Test
     public void nothingChangesInPage_whenTheConsoleComesFromNonRobotProcess() {
         final RobotConsoleParticipant participant = new RobotConsoleParticipant();
-        
+
         final IDebugConsole console = mock(IDebugConsole.class);
         when(console.getProcess()).thenReturn(mock(IProcess.class));
         final IPageBookViewPage page = mock(IPageBookViewPage.class);
@@ -94,28 +92,6 @@ public class RobotConsoleParticipantTest {
     }
 
     @Test
-    public void pauseActionPausesProcess_whenPausingDebugTargetThrowsAnException() throws Exception {
-        final DebugPlugin debugPlugin = mock(DebugPlugin.class);
-        final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
-
-        final IRobotProcess process = mock(IRobotProcess.class);
-        final PauseTestsAction pauseAction = participant.new PauseTestsAction(process);
-
-        final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
-        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
-        when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
-        when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
-        when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
-        when(debugTarget2.getProcess()).thenReturn(process);
-        doThrow(DebugException.class).when(debugTarget2).suspend();
-
-        pauseAction.run();
-
-        verify(process).suspend();
-    }
-
-    @Test
     public void pauseActionPausesProcess_whenThereIsNoDebugTargetAvailableForGivenProcess() throws Exception {
         final DebugPlugin debugPlugin = mock(DebugPlugin.class);
         final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
@@ -159,28 +135,6 @@ public class RobotConsoleParticipantTest {
     }
 
     @Test
-    public void resumeActionResumesProcess_whenResumingDebugTargetThrowsAnException() throws Exception {
-        final DebugPlugin debugPlugin = mock(DebugPlugin.class);
-        final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
-
-        final IRobotProcess process = mock(IRobotProcess.class);
-        final ResumeTestsAction resumeAction = participant.new ResumeTestsAction(process);
-
-        final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final IDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
-        final IDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
-        when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
-        when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
-        when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
-        when(debugTarget2.getProcess()).thenReturn(process);
-        doThrow(DebugException.class).when(debugTarget2).resume();
-
-        resumeAction.run();
-
-        verify(process).resume();
-    }
-
-    @Test
     public void resumeActionResumesProcess_whenThereIsNoDebugTargetAvailableForGivenProcess() throws Exception {
         final DebugPlugin debugPlugin = mock(DebugPlugin.class);
         final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
@@ -221,28 +175,6 @@ public class RobotConsoleParticipantTest {
 
         verify(debugTarget2).interrupt();
         verifyZeroInteractions(process);
-    }
-
-    @Test
-    public void interruptActionInterruptProcess_whenInterruptingDebugTargetThrowsAnException() throws Exception {
-        final DebugPlugin debugPlugin = mock(DebugPlugin.class);
-        final RobotConsoleParticipant participant = new RobotConsoleParticipant(debugPlugin);
-
-        final IRobotProcess process = mock(IRobotProcess.class);
-        final InterruptTestsAction interruptAction = participant.new InterruptTestsAction(process);
-
-        final ILaunchManager launchManager = mock(ILaunchManager.class);
-        final RobotDebugTarget debugTarget1 = mock(RobotDebugTarget.class);
-        final RobotDebugTarget debugTarget2 = mock(RobotDebugTarget.class);
-        when(debugPlugin.getLaunchManager()).thenReturn(launchManager);
-        when(launchManager.getDebugTargets()).thenReturn(new IDebugTarget[] { debugTarget1, debugTarget2 });
-        when(debugTarget1.getProcess()).thenReturn(mock(IRobotProcess.class));
-        when(debugTarget2.getProcess()).thenReturn(process);
-        doThrow(DebugException.class).when(debugTarget2).interrupt();
-
-        interruptAction.run();
-
-        verify(process).interrupt();
     }
 
     @Test

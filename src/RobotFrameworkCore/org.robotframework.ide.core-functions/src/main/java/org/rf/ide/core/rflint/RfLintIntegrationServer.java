@@ -22,9 +22,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
 
@@ -117,13 +116,12 @@ public class RfLintIntegrationServer {
     private void runEventsLoop(final BufferedReader eventReader, final RfLintClientEventsListener... listeners)
             throws IOException {
         final List<RfLintClientEventsListener> eventsListeners = synchronizedList(newArrayList(listeners));
+        final ObjectMapper mapper = new ObjectMapper();
+        final TypeReference<Map<String, Object>> stringToObjectMapType = new TypeReference<Map<String, Object>>() {
+        };
 
         String event = eventReader.readLine();
-        final ObjectMapper mapper = new ObjectMapper();
         while (event != null) {
-
-            final TypeReference<Map<String, Object>> stringToObjectMapType = new TypeReference<Map<String, Object>>() {
-            };
             final Map<String, Object> eventMap = mapper.readValue(event, stringToObjectMapType);
             final String eventType = getEventType(eventMap);
             if (eventType == null) {
