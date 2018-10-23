@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _wdMmkIk5EeWHhtZu19MBKw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/2/18 11:53 AM
+Save-Time: 10/23/18 4:23 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -24,6 +24,7 @@ proc "add-init-content" [val file_name] [val is_tsv]{
 	//add keyword
 	with [get-editor $file_name| get-text-viewer] {
 	    key-type "M1+SPACE"
+	    key-type Down -times [$MainSections | get "Keywords"]  
 	    key-type Enter
 	    type-text kw1
 	    key-type Enter
@@ -67,7 +68,7 @@ proc "add-init-content" [val file_name] [val is_tsv]{
 	        
 	        //add Variables
 	        key-type "M1+SPACE"
-	        key-type Down -times 4
+	        key-type Down -times [$MainSections | get "Variables"]
 	        key-type Enter
 	        key-type "M1+SPACE"
 	}
@@ -78,7 +79,7 @@ proc "add-init-content" [val file_name] [val is_tsv]{
 	//check proposal fo Settings
 	with [get-editor $file_name | get-text-viewer] {
 	    key-type "M1+SPACE"
-	    key-type Down -times 4
+	   key-type Down -times [$MainSectionsAfterVariables | get "Settings"]
 	    key-type Enter
 	    key-type "M1+SPACE"
 	}
@@ -120,9 +121,10 @@ proc "add-resource-content" [val file_name]{
 	//add Keywords and Settings
 	with [get-editor $file_name | get-text-viewer] {
 	    key-type "M1+SPACE"
+	    key-type Down -times [$MainSections | get "Keywords"] 
 	    key-type Enter
 	    key-type "M1+SPACE"
-	    key-type Down
+	    key-type Down -times [$MainSections | get "Settings"] 
 	    key-type Enter
 	    key-type "M1+SPACE"
 	}
@@ -133,7 +135,7 @@ proc "add-resource-content" [val file_name]{
 	//check proposal for Variables
 	with [get-editor $file_name| get-text-viewer] {
 	    key-type "M1+SPACE"
-	    key-type Down -times 4
+	    key-type Down -times [$MainSections | get "Variables"]
 	    key-type Enter
 	    key-type "M1+SPACE"
 	}
@@ -191,7 +193,7 @@ proc "add-content-to-test" [val file_name]{
 	with [get-editor $file_name | get-text-viewer] {
 	    set-caret-pos 4 1
 	    key-type "M1+SPACE"
-	    key-type Down -times 4
+	    key-type Down -times [$MainSections | get "Variables"]
 	    key-type Enter
 	    key-type "M1+SPACE"
 	}

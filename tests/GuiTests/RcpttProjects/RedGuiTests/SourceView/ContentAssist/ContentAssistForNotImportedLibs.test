@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _fiIZ4HIAEeeOFuKpK9KgAg,_2rVvIENaEeaEVfxTnoQ14g
+Contexts: _fiIZ4HIAEeeOFuKpK9KgAg,_2rVvIENaEeaEVfxTnoQ14g,_9Bte8NYSEeijg6yKwqEQmw
 Element-Name: ContentAssistForNotImportedLibs
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _YK-bkHH_EeeOFuKpK9KgAg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/5/18 12:00 PM
+Save-Time: 10/23/18 4:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -143,13 +143,13 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 1 17
     key-type "NUMPAD_ENTER" "\\u000D"
-    type-text "#comment hew"
-    key-type BackSpace
-    type-text re
+    type-text "#comment here"
     key-type Enter
+    
+    //add settings
     set-caret-pos 13 1
     key-type "M1+SPACE"
-    key-type Down
+    key-type Down -times [$MainSections | get "Settings"]
     key-type Enter
     key-type "M1+s"
     set-caret-pos 12 41
@@ -235,6 +235,7 @@ with [get-editor "TestFile.robot"] {
         set-caret-pos 17 17
         key-type "NUMPAD_ENTER" "\\u000D"
         key-type "M1+SPACE"
+        key-type Down -times [$MainSections | get "Keywords"] 
         key-type Enter
         type-text "my kw"
         key-type "M1+s"
@@ -269,6 +270,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "#comment here\n\n"
     + "Library    DateTime\n"
     + "Library    Collections\n"
+    
     + "Library    simple_lib\n\n"
     + "Library    Screenshot\n"
     + "Library    OperatingSystem\n"

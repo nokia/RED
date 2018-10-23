@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _oF-W4KzGEea8FqgKy4fLvA
+Contexts: _oF-W4KzGEea8FqgKy4fLvA,_9Bte8NYSEeijg6yKwqEQmw
 Element-Name: VariablesFilesFromLinkedFolder
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _wEuMwKzfEea8FqgKy4fLvA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/16/18 12:57 PM
+Save-Time: 10/23/18 3:26 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -32,10 +32,11 @@ replace -input $user_folder -old "\\" -new "/" | let [val user_folder_unix_style
 	//add this folder to test
 	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 	with [get-editor "TestFile.robot" | get-text-viewer] {
+		// add settings
 	    key-type Enter
 	    key-type Up
 	    key-type "M1+SPACE"
-	    key-type Down
+	    key-type Down -times [$MainSections | get "Settings"]
 	    key-type Enter
 	    type-text [concat "Variables    " $user_folder_unix_style "/external_variables/external/file_in_linked_folder/linked_vars.py"]
 	    

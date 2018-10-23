@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _cBDNYMN4Eeat3OoBX2X2jQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/2/18 10:51 AM
+Save-Time: 10/23/18 3:35 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -14,25 +14,26 @@ Entry-Name: .ecl.context
 
 proc "check-content-assist-for-settings"{
 	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
-	    get-property itemCount | equals 18 | verify-true
-	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "*** Tasks ***" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "*** Test Cases ***" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "*** Variables ***" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "Default Tags" | verify-true
-	    get-property "getItems().TableItem[6].getText()" | equals Documentation | verify-true
-	    get-property "getItems().TableItem[7].getText()" | equals "Force Tags" | verify-true
-	    get-property "getItems().TableItem[8].getText()" | equals Library | verify-true
-	    get-property "getItems().TableItem[9].getText()" | equals Metadata | verify-true
-	    get-property "getItems().TableItem[10].getText()" | equals Resource | verify-true
-	    get-property "getItems().TableItem[11].getText()" | equals "Suite Setup" | verify-true
-	    get-property "getItems().TableItem[12].getText()" | equals "Suite Teardown" | verify-true
-	    get-property "getItems().TableItem[13].getText()" | equals "Test Setup" | verify-true
-	    get-property "getItems().TableItem[14].getText()" | equals "Test Teardown" | verify-true
-	    get-property "getItems().TableItem[15].getText()" | equals "Test Template" | verify-true
-	    get-property "getItems().TableItem[16].getText()" | equals "Test Timeout" | verify-true
-	    get-property "getItems().TableItem[17].getText()" | equals Variables | verify-true
+	    get-property itemCount | equals 19 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "*** Comments ***" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Tasks ***" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "*** Test Cases ***" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "Default Tags" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals Documentation | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "Force Tags" | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals Library | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals Metadata | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals Resource | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals "Suite Setup" | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals "Suite Teardown" | verify-true
+	    get-property "getItems().TableItem[14].getText()" | equals "Test Setup" | verify-true
+	    get-property "getItems().TableItem[15].getText()" | equals "Test Teardown" | verify-true
+	    get-property "getItems().TableItem[16].getText()" | equals "Test Template" | verify-true
+	    get-property "getItems().TableItem[17].getText()" | equals "Test Timeout" | verify-true
+	    get-property "getItems().TableItem[18].getText()" | equals Variables | verify-true
 	}
 
 }
@@ -40,26 +41,28 @@ proc "check-content-assist-for-settings"{
 
 proc "check-content-assist-for-variables"{
 	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
-	    get-property itemCount | equals 8 | verify-true
+	    get-property itemCount | equals 9 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
 	    get-property "getItems().TableItem[2].getText()" | equals "Fresh dictionary" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "*** Keywords ***" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "*** Settings ***" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "*** Tasks ***" | verify-true
-	    get-property "getItems().TableItem[6].getText()" | equals "*** Test Cases ***" | verify-true
-	    get-property "getItems().TableItem[7].getText()" | equals "*** Variables ***" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Comments ***" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "*** Tasks ***" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals "*** Test Cases ***" | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "*** Variables ***" | verify-true
 	}
 }
 
 proc "check-content-assist-for-empty-file"{
 	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
-	    get-property itemCount | equals 5 | verify-true
-	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "*** Tasks ***" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "*** Test Cases ***" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "*** Variables ***" | verify-true
+	    get-property itemCount | equals 6 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "*** Comments ***" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "*** Keywords ***" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "*** Settings ***" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "*** Tasks ***" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "*** Test Cases ***" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
 	}
 }
 

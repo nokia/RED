@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _cBDNYMN4Eeat3OoBX2X2jQ,_9Bte8NYSEeijg6yKwqEQmw
 Element-Name: CreateResourceFile
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _bsSM8McMEei8MYxPdH4l7Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/3/18 6:51 PM
+Save-Time: 10/23/18 5:40 PM
 Testcase-Type: ecl
 Verifications: _ipfpIMcsEei8MYxPdH4l7Q
 
@@ -24,14 +25,7 @@ with [get-window "New Robot Resource file"] {
 
 //check if it has all sections
 get-editor "res.resource" | get-text-viewer | key-type "M1+SPACE"
-with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property itemCount | equals 5 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "*** Tasks ***" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "*** Test Cases ***" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "*** Variables ***" | verify-true
-}
+check-content-assist-for-empty-file
 
 //add KW section
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
@@ -66,7 +60,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter
     key-type Up
     key-type "M1+SPACE"
-    key-type Down
+    key-type Down -times [$MainSections | get "Settings"]  
     key-type Enter
     
     //add resource
@@ -106,7 +100,7 @@ with [get-editor "res.resource"] {
     with [get-text-viewer] {
         set-caret-pos 4 1
         key-type "M1+SPACE"
-        key-type Down -times 3
+        key-type Down -times [$MainSections | get "Test Cases"]
         key-type Enter
         key-type "M1+s"
     }

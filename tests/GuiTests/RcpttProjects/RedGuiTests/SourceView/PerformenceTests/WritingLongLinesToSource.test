@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _9Bte8NYSEeijg6yKwqEQmw
 Element-Name: WritingLongLinesToSource
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9Tqr0GCXEeaRBaqqj0N1Gg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/12/16 4:25 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/23/18 4:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -66,7 +67,10 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     type-text "catenate  2  55  6"
     key-type "NUMPAD_ENTER" "\\u000D" -times 2
     key-type Left -times 4
+    
+    //add KW section
     key-type "M1+SPACE"
+    key-type Down -times [$MainSections | get "Keywords"]  
     key-type Enter
     type-text "my_kw"
     key-type Enter
