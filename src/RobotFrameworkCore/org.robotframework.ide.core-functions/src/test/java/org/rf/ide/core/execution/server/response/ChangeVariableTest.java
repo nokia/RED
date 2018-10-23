@@ -11,12 +11,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ChangeVariableTest {
 
@@ -33,13 +33,13 @@ public class ChangeVariableTest {
     }
 
     @Test(expected = ResponseException.class)
-    public void mapperIOExceptionIsWrappedAsResponseException() throws Exception {
+    public void mapperJsonProcessingExceptionIsWrappedAsResponseException() throws Exception {
         final ObjectMapper mapper = mock(ObjectMapper.class);
-        when(mapper.writeValueAsString(any(Object.class))).thenThrow(IOException.class);
-        
+        when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
+
         final ChangeVariable response = new ChangeVariable(mapper, "a", VariableScope.GLOBAL, 1, newArrayList("a"),
                 newArrayList("1"));
-        
+
         response.toMessage();
     }
 }

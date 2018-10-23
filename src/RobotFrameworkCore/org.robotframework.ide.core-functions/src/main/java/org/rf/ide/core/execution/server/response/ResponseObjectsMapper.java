@@ -5,7 +5,7 @@
 */
 package org.rf.ide.core.execution.server.response;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 interface ResponseObjectsMapper {
 

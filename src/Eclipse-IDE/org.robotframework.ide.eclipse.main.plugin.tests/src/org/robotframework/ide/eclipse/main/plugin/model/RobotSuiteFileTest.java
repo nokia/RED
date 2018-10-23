@@ -79,7 +79,6 @@ public class RobotSuiteFileTest {
         assertThat(imported.keySet().stream().map(LibrarySpecification::getName)).containsOnly("Collections", "myLib");
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void librarySpecsAreReturned_whenSuiteImportsMultipleDifferentRemoteLibraries() throws Exception {
         final IFile file = projectProvider.createFile("suite.robot",

@@ -31,17 +31,20 @@ public final class RedTemporaryDirectory {
         return RedTemporaryDirectory.class.getResourceAsStream("/scripts/" + filename);
     }
 
-    public static File createTemporaryFile(final String filename) throws IOException {
+    public static File getTemporaryFile(final String filename) throws IOException {
         final Path tempDir = createTemporaryDirectoryIfNotExists();
-        final File tempFile = new File(tempDir.toString() + File.separator + filename);
+        return new File(tempDir.toString() + File.separator + filename);
+    }
+
+    public static File createTemporaryFile(final String filename) throws IOException {
+        final File tempFile = getTemporaryFile(filename);
         tempFile.delete();
         tempFile.createNewFile();
         return tempFile;
     }
 
     public static File replaceTemporaryFile(final String filename, final InputStream source) throws IOException {
-        final Path tempDir = createTemporaryDirectoryIfNotExists();
-        final File tempFile = new File(tempDir.toString() + File.separator + filename);
+        final File tempFile = getTemporaryFile(filename);
         Files.copy(source, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         return tempFile;
     }
