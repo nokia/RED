@@ -1,0 +1,30 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: ContentAssist
+Element-Type: context
+Element-Version: 2.0
+Id: _9Bte8NYSEeijg6yKwqEQmw
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/23/18 11:54 AM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+global [val MainSections [map 
+   [entry "Comment" 0]
+   [entry "Keywords" 1] 
+   [entry "Settings" 2] 
+   [entry "Tasks" 3]
+   [entry "Test Cases" 4]
+   [entry "Variables" 5]]] 
+   
+global [val MainSectionsAfterVariables [map 
+   [entry "Comment" 3]
+   [entry "Keywords" 4] 
+   [entry "Settings" 5] 
+   [entry "Tasks" 6]
+   [entry "Test Cases" 7]
+   [entry "Variables" 8]]]    
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
