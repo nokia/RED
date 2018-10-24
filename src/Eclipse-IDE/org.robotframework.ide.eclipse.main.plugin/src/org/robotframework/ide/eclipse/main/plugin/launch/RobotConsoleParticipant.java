@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -58,7 +57,7 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
             final PauseTestsAction pauseAction = new PauseTestsAction(robotProcess);
             final ResumeTestsAction resumeAction = new ResumeTestsAction(robotProcess);
             resumeAction.setEnabled(false);
-            
+
             final String groupName = "testsSuspsensions";
             final IActionBars actionBars = page.getSite().getActionBars();
             final IToolBarManager toolbarManager = actionBars.getToolBarManager();
@@ -67,7 +66,7 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
             toolbarManager.appendToGroup(groupName, resumeAction);
             toolbarManager.appendToGroup(groupName, pauseAction);
             toolbarManager.appendToGroup(groupName, interruptAction);
-            
+
             debugPlugin.addDebugEventListener(
                     new DebugEventsListener(robotProcess, interruptAction, pauseAction, resumeAction));
         }
@@ -140,11 +139,7 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
         public void run() {
             final Optional<IDebugTarget> target = findDebugTargetFor(process);
             if (target.isPresent()) {
-                try {
-                    runOn((RobotDebugTarget) target.get());
-                } catch (final DebugException e) {
-                    runOn(process);
-                }
+                runOn((RobotDebugTarget) target.get());
             } else {
                 runOn(process);
             }
@@ -155,7 +150,7 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
             return Stream.of(targets).filter(target -> target.getProcess() == process).findFirst();
         }
 
-        protected abstract void runOn(final RobotDebugTarget debugTarget) throws DebugException;
+        protected abstract void runOn(final RobotDebugTarget debugTarget);
 
         protected abstract void runOn(final IRobotProcess process);
     }
@@ -169,7 +164,7 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
         }
 
         @Override
-        protected void runOn(final RobotDebugTarget debugTarget) throws DebugException {
+        protected void runOn(final RobotDebugTarget debugTarget) {
             debugTarget.suspend();
         }
 
@@ -188,7 +183,7 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
         }
 
         @Override
-        protected void runOn(final RobotDebugTarget debugTarget) throws DebugException {
+        protected void runOn(final RobotDebugTarget debugTarget) {
             debugTarget.resume();
         }
 
@@ -208,7 +203,7 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
         }
 
         @Override
-        protected void runOn(final RobotDebugTarget debugTarget) throws DebugException {
+        protected void runOn(final RobotDebugTarget debugTarget) {
             debugTarget.interrupt();
         }
 

@@ -10,9 +10,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.dryrun.JsonMessageMapper.JsonMessageMapperException;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * @author bembenek
