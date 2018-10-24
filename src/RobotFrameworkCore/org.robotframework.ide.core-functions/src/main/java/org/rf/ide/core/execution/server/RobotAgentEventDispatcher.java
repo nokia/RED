@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
@@ -35,6 +33,8 @@ import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.rf.ide.core.execution.agent.event.VariablesEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 
 class RobotAgentEventDispatcher {
@@ -62,12 +62,12 @@ class RobotAgentEventDispatcher {
     }
 
     private void eventsLoop(final BufferedReader eventReader) throws IOException, RobotAgentEventsListenerException {
-        String event = eventReader.readLine();
         final ObjectMapper mapper = new ObjectMapper();
-        while (event != null && anyListenerIsHandlingEvents()) {
+        final TypeReference<Map<String, Object>> stringToObjectMapType = new TypeReference<Map<String, Object>>() {
+        };
 
-            final TypeReference<Map<String, Object>> stringToObjectMapType = new TypeReference<Map<String, Object>>() {
-            };
+        String event = eventReader.readLine();
+        while (event != null && anyListenerIsHandlingEvents()) {
             final Map<String, Object> eventMap = mapper.readValue(event, stringToObjectMapType);
             final String eventType = getEventType(eventMap);
             if (eventType == null) {

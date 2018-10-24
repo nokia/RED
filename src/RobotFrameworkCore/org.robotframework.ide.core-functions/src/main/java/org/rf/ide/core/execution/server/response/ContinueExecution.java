@@ -5,13 +5,12 @@
  */
 package org.rf.ide.core.execution.server.response;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
@@ -35,7 +34,7 @@ public final class ContinueExecution implements ServerResponseOnShouldContinue {
             final Map<String, Object> value = ImmutableMap.of("continue", arguments);
 
             return mapper.writeValueAsString(value);
-        } catch (final IOException e) {
+        } catch (final JsonProcessingException e) {
             throw new ResponseException("Unable to serialize continue response arguments to json", e);
         }
     }

@@ -9,9 +9,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class JsonMessageMapper {
 

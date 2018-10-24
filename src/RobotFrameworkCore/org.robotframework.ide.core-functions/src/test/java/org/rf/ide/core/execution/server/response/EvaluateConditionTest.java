@@ -11,11 +11,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EvaluateConditionTest {
 
@@ -30,9 +30,9 @@ public class EvaluateConditionTest {
     }
 
     @Test(expected = ResponseException.class)
-    public void mapperIOExceptionIsWrappedAsResponseException() throws Exception {
+    public void mapperJsonProcessingExceptionIsWrappedAsResponseException() throws Exception {
         final ObjectMapper mapper = mock(ObjectMapper.class);
-        when(mapper.writeValueAsString(any(Object.class))).thenThrow(IOException.class);
+        when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
 
         final EvaluateCondition response = new EvaluateCondition(mapper, newArrayList("a", "b"));
 
