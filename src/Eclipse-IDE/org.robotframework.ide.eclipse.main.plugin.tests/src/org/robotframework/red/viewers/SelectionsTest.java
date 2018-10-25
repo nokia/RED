@@ -6,9 +6,9 @@
 package org.robotframework.red.viewers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -19,69 +19,69 @@ public class SelectionsTest {
     @Test
     public void emptyListIsReturned_whenGettingObjectsFromEmptySelection() {
         final IStructuredSelection selection = StructuredSelection.EMPTY;
-        final List<Object> elements = Selections.getElements(selection, Object.class);
 
-        assertThat(elements).isEmpty();
+        assertThat(Selections.getElements(selection, Object.class)).isEmpty();
     }
 
     @Test
     public void emptyListIsReturned_whenSelectionHasObjectsOfNonMatchingTypes() {
         final IStructuredSelection selection = new StructuredSelection(
                 Arrays.asList(new Object(), new String(""), new Object()));
-        final List<Integer> elements = Selections.getElements(selection, Integer.class);
 
-        assertThat(elements).isEmpty();
+        assertThat(Selections.getElements(selection, Integer.class)).isEmpty();
     }
 
     @Test
     public void onlyObjectsOfMatchingTypesAreReturned_whenSelectionContainsMatchingAndNonMatchingTypes() {
         final IStructuredSelection selection = new StructuredSelection(
-                Arrays.asList(new Object(), new String(""), new Integer(5)));
-        final List<Integer> elements = Selections.getElements(selection, Integer.class);
+                Arrays.asList(new Object(), new String(""), Integer.valueOf(5)));
 
-        assertThat(elements).contains(Integer.valueOf(5));
+        assertThat(Selections.getElements(selection, Integer.class)).containsExactly(Integer.valueOf(5));
     }
 
     @Test
     public void allObjectsAreReturned_whenSelectionContainsOnlyMatchingTypes() {
         final IStructuredSelection selection = new StructuredSelection(
-                Arrays.asList(new Short((short) 1), new Integer(7), new Long(42)));
-        final List<Number> elements = Selections.getElements(selection, Number.class);
+                Arrays.asList(Short.valueOf((short) 1), Integer.valueOf(7), Long.valueOf(42)));
 
-        assertThat(elements).contains(Short.valueOf((short) 1));
-        assertThat(elements).contains(Integer.valueOf(7));
-        assertThat(elements).contains(Long.valueOf(42));
+        assertThat(Selections.getElements(selection, Number.class)).containsExactly(Short.valueOf((short) 1),
+                Integer.valueOf(7), Long.valueOf(42));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToGetSingleElementFromEmptySelection() {
         final IStructuredSelection selection = StructuredSelection.EMPTY;
 
-        Selections.getSingleElement(selection, Object.class);
+        assertThatIllegalArgumentException().isThrownBy(() -> Selections.getSingleElement(selection, Object.class))
+                .withMessage("Given selection should contain only one element of class " + Object.class.getName()
+                        + ", but have 0 elements instead")
+                .withNoCause();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToGetSingleElementFromMultiselection() {
-        final IStructuredSelection selection = new StructuredSelection(Arrays.asList(new Integer(7), new Long(42)));
+        final IStructuredSelection selection = new StructuredSelection(
+                Arrays.asList(Integer.valueOf(7), Long.valueOf(42)));
 
-        Selections.getSingleElement(selection, Object.class);
+        assertThatIllegalArgumentException().isThrownBy(() -> Selections.getSingleElement(selection, Object.class))
+                .withMessage("Given selection should contain only one element of class " + Object.class.getName()
+                        + ", but have 2 elements instead")
+                .withNoCause();
     }
 
     @Test
     public void selectedObjectIsReturned_whenTryingToGetSingleElementFromSingleSelection() {
-        final IStructuredSelection selection = new StructuredSelection(new Integer(7));
+        final IStructuredSelection selection = new StructuredSelection(Integer.valueOf(7));
 
-        final Integer element = Selections.getSingleElement(selection, Integer.class);
-        assertThat(element).isEqualTo(Integer.valueOf(7));
+        assertThat(Selections.getSingleElement(selection, Integer.class)).isEqualTo(Integer.valueOf(7));
     }
 
     @Test
     public void selectedObjectIsReturned_whenTryingToGetSingleElementFromMultiselectionButWithOnlyOneMatchingObject() {
         final IStructuredSelection selection = new StructuredSelection(
-                Arrays.asList(new Integer(7), new String(""), new Object()));
+                Arrays.asList(Integer.valueOf(7), new String(""), new Object()));
 
-        final Integer element = Selections.getSingleElement(selection, Integer.class);
-        assertThat(element).isEqualTo(Integer.valueOf(7));
+        assertThat(Selections.getSingleElement(selection, Integer.class)).isEqualTo(Integer.valueOf(7));
     }
 
     @Test
@@ -93,7 +93,8 @@ public class SelectionsTest {
 
     @Test
     public void elementIsAbsent_whenTryingToGetOptionalFirstFromSelectionWithNonMatchingTypes() {
-        final IStructuredSelection selection = new StructuredSelection(Arrays.asList(new Integer(7), new Long(42)));
+        final IStructuredSelection selection = new StructuredSelection(
+                Arrays.asList(Integer.valueOf(7), Long.valueOf(42)));
 
         assertThat(Selections.getOptionalFirstElement(selection, String.class)).isNotPresent();
     }
@@ -101,7 +102,7 @@ public class SelectionsTest {
     @Test
     public void firstMatchingElementIsReturned_whenTryingToGetOptionalFirstFromSelectionWithMatchingTypes() {
         final IStructuredSelection selection = new StructuredSelection(
-                Arrays.asList(new Integer(7), new String("1"), new Long(42), new String("2")));
+                Arrays.asList(Integer.valueOf(7), new String("1"), Long.valueOf(42), new String("2")));
 
         assertThat(Selections.getOptionalFirstElement(selection, String.class)).isPresent().hasValue("1");
     }
