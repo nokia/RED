@@ -55,7 +55,7 @@ public class RobotPathsNamingTest {
             softly.assertThat(RobotPathsNaming.createTopLevelSuiteName(newArrayList())).isEmpty();
 
             softly.assertThat(RobotPathsNaming.createTopLevelSuiteName(newArrayList(projectProvider.getProject())))
-                    .isEmpty();
+                    .isEqualTo(PROJECT_NAME);
 
             softly.assertThat(RobotPathsNaming.createTopLevelSuiteName(
                     newArrayList(projectProvider.getProject(), projectProvider.getDir("Some Folder"))))
@@ -80,6 +80,10 @@ public class RobotPathsNamingTest {
     public void testCreatingSuiteNames() throws Exception {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(RobotPathsNaming.createSuiteNames(ImmutableMap.of(), "", LAST_SEGMENT)).isEmpty();
+
+            softly.assertThat(RobotPathsNaming
+                    .createSuiteNames(ImmutableMap.of(projectProvider.getProject(), newArrayList()), "", LAST_SEGMENT))
+                    .containsExactly(PROJECT_NAME);
 
             softly.assertThat(RobotPathsNaming.createSuiteNames(
                     ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList()), "", LAST_SEGMENT))
