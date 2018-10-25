@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/2/18 6:37 PM
+Save-Time: 10/24/18 5:32 PM
 Tags: Quick
 Testcase-Type: ecl
 Verifications: _Xbz7EJUqEeaXOtocAkFx_w
@@ -565,11 +565,8 @@ with [get-tab-folder -index 1] {
     get-property tabCount | equals 11 | verify-true
 }
 
-get-view "Project Explorer" | get-tree | select New | key-type F5
-wait 1000
 
-
-
+//-------------------------------------- task file -----------------------------------------------------
 
 get-menu -path "File/New/Robot Task Suite" | click
 get-window "New Robot Task Suite" | get-editbox -after [get-label "File name:"] | set-text task
@@ -611,5 +608,11 @@ with [get-editor "task.robot"] {
     }
 }
 get-editor "task.robot" | get-text-viewer | get-property text | equals "*** Tasks ***" | verify-true
+
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
+
+get-view "Project Explorer" | get-tree | select New | key-type F5
+wait 1000
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

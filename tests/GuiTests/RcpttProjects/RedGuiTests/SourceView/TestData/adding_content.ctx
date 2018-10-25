@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _wdMmkIk5EeWHhtZu19MBKw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/18 4:23 PM
+Save-Time: 10/24/18 11:27 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -135,7 +135,7 @@ proc "add-resource-content" [val file_name]{
 	//check proposal for Variables
 	with [get-editor $file_name| get-text-viewer] {
 	    key-type "M1+SPACE"
-	    key-type Down -times [$MainSections | get "Variables"]
+	    key-type Down -times [$MainSectionsAfterSettings | get "Variables"]
 	    key-type Enter
 	    key-type "M1+SPACE"
 	}
@@ -193,7 +193,7 @@ proc "add-content-to-test" [val file_name]{
 	with [get-editor $file_name | get-text-viewer] {
 	    set-caret-pos 4 1
 	    key-type "M1+SPACE"
-	    key-type Down -times [$MainSections | get "Variables"]
+	    key-type Down -times [$MainSectionsAfterSettings | get "Variables"]
 	    key-type Enter
 	    key-type "M1+SPACE"
 	}

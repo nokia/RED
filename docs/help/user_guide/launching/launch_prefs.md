@@ -8,8 +8,8 @@ Window->Preferences->Robot Framework->Launching
 preference page. Following settings can be changed:
 
   * **Pass Robot arguments using arguments file** \- when enabled RED will put all the Robot arguments inside arguments file (temporary file) and call Robot using `--argumentfile` argument; when disabled all the Robot arguments are passed directly in command line call. 
-  * **Run single suite using suite path** \- when enabled RED will use path to suite during single suite test execution (Robot `__init__` files will not be used then); when disabled path to project is used as data source, even for single suite run. 
-  * **Use single argument to pass robot execution command line** \- when tests are [launched using script](local_launch_scripting.md) the actual command line call is either passed as a single argument (when preference is enabled) or simply as a sequence of arguments (when disabled). 
+  * **Pass selected suite as data source** \- when enabled RED will use path to suite during single suite execution (Robot `__init__` files from outside that data source will not be run); when disabled path to project is used as data source, even for single suite run. 
+  * **Pass Robot execution command line as single argument** \- when tests are [launched using custom executable file](local_launch_scripting.md) the actual command line call is either passed as a single argument (when preference is enabled) or simply as a sequence of arguments (when disabled). 
   * **Limit Message Log output** \- when enabled RED will apply provided characters limit in Message Log view. 
 
 ### Default launch configurations

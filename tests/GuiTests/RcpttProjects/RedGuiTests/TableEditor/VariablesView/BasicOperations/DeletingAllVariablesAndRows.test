@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Mx0E8D6jEeaMlbNjowJCaw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/18 3:55 PM
+Save-Time: 10/24/18 5:41 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -76,7 +76,7 @@ with [get-editor "TestFile.robot"] {
         key-type Down -times [$MainSections | get "Settings"]  
         key-type Enter
         key-type "M1+SPACE"
-        key-type Down -times [$MainSections | get "Variables"]
+        key-type Down -times [$MainSectionsAfterSettings | get "Variables"]
         key-type Enter
         type-text "${a}"
         key-type Tab
