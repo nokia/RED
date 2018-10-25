@@ -13,7 +13,6 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -116,18 +115,28 @@ class LocalProcessCommandLineBuilder {
 
     private void addDataSources(final IRunCommandLineBuilder builder, final RedPreferences preferences)
             throws CoreException {
-        final Map<IResource, List<String>> resources = findResources(robotProject.getProject(),
+        final Map<IResource, List<String>> selectedResources = findResources(robotProject.getProject(),
                 robotConfig.getSuitePaths());
-        if (shouldUseSingleTestPathInCommandLine(resources.keySet(), preferences)) {
-            builder.withDataSources(newArrayList(getOnlyElement(resources.keySet()).getLocation().toFile()));
+        final Map<IResource, List<String>> linkedResources = findLinkedResources(selectedResources);
+        final Map<IResource, List<String>> notLinkedResources = Maps.filterKeys(selectedResources,
+                resource -> !resource.isVirtual() && !resource.isLinked(IResource.CHECK_ANCESTORS));
+        final Map<IResource, List<String>> allResources = new LinkedHashMap<>(notLinkedResources);
+        allResources.putAll(linkedResources);
+
+        if (preferences.shouldUseSingleFileDataSource() && allResources.size() == 1) {
+            builder.withDataSources(newArrayList(getOnlyElement(allResources.keySet()).getLocation().toFile()));
+
             final Function<IResource, List<String>> mapper = r -> newArrayList(
                     r.getLocation().removeFileExtension().lastSegment());
-            builder.testsToRun(RobotPathsNaming.createTestNames(resources, "", mapper));
-        } else {
-            final Map<IResource, List<String>> linkedResources = findLinkedResources(resources);
-            final Map<IResource, List<String>> notLinkedResources = Maps.filterKeys(resources,
-                    resource -> !resource.isVirtual() && !resource.isLinked(IResource.CHECK_ANCESTORS));
+            builder.testsToRun(RobotPathsNaming.createTestNames(allResources, "", mapper));
+        } else if (linkedResources.isEmpty()) {
+            builder.withDataSources(newArrayList(robotProject.getProject().getLocation().toFile()));
 
+            final Function<IResource, List<String>> mapper = r -> newArrayList(
+                    r.getProjectRelativePath().removeFileExtension().segments());
+            builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, "", mapper));
+            builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, "", mapper));
+        } else {
             final List<IResource> dataSources = new ArrayList<>();
             dataSources.add(robotProject.getProject());
             dataSources.addAll(linkedResources.keySet());
@@ -135,9 +144,12 @@ class LocalProcessCommandLineBuilder {
                     dataSources.stream().map(IResource::getLocation).map(IPath::toFile).collect(toList()));
 
             final String topLevelSuiteName = RobotPathsNaming.createTopLevelSuiteName(dataSources);
-            final Function<IResource, List<String>> mapper = r -> r.isLinked(IResource.CHECK_ANCESTORS)
-                    ? newArrayList(r.getLocation().removeFileExtension().lastSegment())
-                    : newArrayList(r.getFullPath().removeFileExtension().segments());
+            final Function<IResource, List<String>> mapper = r -> r
+                    .isLinked(IResource.CHECK_ANCESTORS)
+                            ? newArrayList(r.getLocation().removeFileExtension().lastSegment())
+                            : Stream.concat(Stream.of(robotProject.getProject().getLocation().lastSegment()),
+                                    Stream.of(r.getProjectRelativePath().removeFileExtension().segments()))
+                                    .collect(toList());
             builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, topLevelSuiteName, mapper));
             builder.suitesToRun(RobotPathsNaming.createSuiteNames(linkedResources, topLevelSuiteName, mapper));
             builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, topLevelSuiteName, mapper));
@@ -194,11 +206,11 @@ class LocalProcessCommandLineBuilder {
         return result;
     }
 
-    private static Map<IResource, List<String>> findLinkedResources(final Map<IResource, List<String>> resourcesMapping)
+    private static Map<IResource, List<String>> findLinkedResources(final Map<IResource, List<String>> resources)
             throws CoreException {
         final Map<IResource, List<String>> result = new LinkedHashMap<>();
 
-        for (final Entry<IResource, List<String>> entry : resourcesMapping.entrySet()) {
+        for (final Entry<IResource, List<String>> entry : resources.entrySet()) {
             entry.getKey().accept(r -> {
                 if (r.isLinked(IResource.CHECK_ANCESTORS) && isNotIncluded(r, result.keySet()) && isDataSource(r)) {
                     result.put(r, entry.getValue());
@@ -208,12 +220,6 @@ class LocalProcessCommandLineBuilder {
         }
 
         return result;
-    }
-
-    private static boolean shouldUseSingleTestPathInCommandLine(final Collection<IResource> resources,
-            final RedPreferences preferences) throws CoreException {
-        return preferences.shouldUseSingleFileDataSource() && resources.size() == 1
-                && getOnlyElement(resources) instanceof IFile;
     }
 
     private static boolean isDataSource(final IResource resource) {
