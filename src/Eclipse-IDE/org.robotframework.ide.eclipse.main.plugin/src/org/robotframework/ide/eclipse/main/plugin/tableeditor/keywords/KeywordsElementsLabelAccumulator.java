@@ -35,7 +35,6 @@ public class KeywordsElementsLabelAccumulator implements IConfigLabelAccumulator
                 configLabels.addLabel(KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
             } else if (rowObject instanceof RobotKeywordDefinition) {
                 configLabels.addLabel(KEYWORD_DEFINITION_CONFIG_LABEL);
-            } else {
             }
         } else if (columnPosition > 0) {
             if (columnPosition > 1 && rowObject instanceof RobotDefinitionSetting

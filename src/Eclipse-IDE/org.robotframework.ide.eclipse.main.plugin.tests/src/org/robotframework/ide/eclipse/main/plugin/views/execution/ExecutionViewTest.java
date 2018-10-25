@@ -111,7 +111,7 @@ public class ExecutionViewTest {
 
     private void execAllAwaitingMessages() {
         while (Display.getDefault().readAndDispatch()) {
-            // nothing to do
+            // handle all events coming to UI
         }
     }
 

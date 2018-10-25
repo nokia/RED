@@ -46,7 +46,7 @@ public class VariableMappingDialogTest {
         while (!finished.get()) {
             Thread.sleep(100);
             while (shell.getShell().getDisplay().readAndDispatch()) {
-                // wait for events
+                // handle all events coming to UI
             }
         }
 

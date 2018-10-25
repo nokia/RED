@@ -36,7 +36,7 @@ public class RedSessionProcessListenerTest {
         listener.processEnded(process);
 
         while (Display.getCurrent().readAndDispatch()) {
-            // handle all the events which came to UI thread after the job has finished
+            // handle all events coming to UI
         }
 
         assertThat(listener.getCurrentProcesses()).isEmpty();

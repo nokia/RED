@@ -822,6 +822,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 documentationChangeJob = createDocumentationChangeJob(documentation.getText());
                 documentationChangeJob.schedule();
                 while (documentationChangeJob.getState() != Job.RUNNING) {
+                    // wait for job
                 }
                 documentationChangeJob.join();
                 documentationChangeJob = null;

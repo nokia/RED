@@ -673,7 +673,6 @@ public class LocalProcessCommandLineBuilderTest {
 
         final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Jython);
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
-        ;
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 

@@ -265,7 +265,7 @@ public enum ProblemCategory {
 
     public static Map<ProblemCategoryType, List<ProblemCategory>> getNonValidationCategories() {
         return Stream.of(ProblemCategory.values())
-                .filter(((Predicate<ProblemCategory>)ProblemCategory::isValidationCategory).negate())
+                .filter(((Predicate<ProblemCategory>) ProblemCategory::isValidationCategory).negate())
                 .collect(Collectors.groupingBy(category -> category.type, TreeMap::new, Collectors.toList()));
     }
 
