@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _9Bte8NYSEeijg6yKwqEQmw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/18 11:54 AM
+Save-Time: 10/24/18 4:58 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -26,5 +26,33 @@ global [val MainSectionsAfterVariables [map
    [entry "Settings" 5] 
    [entry "Tasks" 6]
    [entry "Test Cases" 7]
-   [entry "Variables" 8]]]    
+   [entry "Variables" 8]]]   
+   
+global [val MainSectionsAfterSettings[map 
+   [entry "Comment" 13]
+   [entry "Keywords" 14] 
+   [entry "Settings" 15] 
+   [entry "Tasks" 16]
+   [entry "Test Cases" 17]
+   [entry "Variables" 18]]]
+   
+   
+global [val SettingsItems [map 
+   [entry "Default Tags" 0]
+   [entry "Documentation" 1] 
+   [entry "Force Tags" 2] 
+   [entry "Library" 3]
+   [entry "Metadata" 4]
+   [entry "Resource" 5]     
+   [entry "Suite Setup" 6]        
+   [entry "Suite Teardown" 7]      
+   [entry "Test Setup" 8]      
+   [entry "Test Teardown" 9]      
+   [entry "Test Template" 10]      
+   [entry "Test Timeout" 11]           
+   [entry "Variables" 12]]]        
+   
+   
+   
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
