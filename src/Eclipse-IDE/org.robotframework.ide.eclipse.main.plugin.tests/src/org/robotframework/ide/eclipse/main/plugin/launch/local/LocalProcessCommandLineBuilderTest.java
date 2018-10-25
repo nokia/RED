@@ -206,8 +206,8 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(10)
-                .containsSequence("-s", "Suites A.S1")
-                .containsSequence("-s", "Suites B")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
+                .containsSequence("-s", PROJECT_NAME + ".Suites B")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -223,11 +223,11 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(16)
-                .containsSequence("-s", "Suites A.S1")
-                .containsSequence("-s", "Suites A.S2")
-                .containsSequence("-t", "Suites A.S1.001__case1")
-                .containsSequence("-t", "Suites A.S1.001__case2")
-                .containsSequence("-t", "Suites A.S2.001__case3")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A.S2")
+                .containsSequence("-t", PROJECT_NAME + ".Suites A.S1.001__case1")
+                .containsSequence("-t", PROJECT_NAME + ".Suites A.S1.001__case2")
+                .containsSequence("-t", PROJECT_NAME + ".Suites A.S2.001__case3")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
@@ -243,8 +243,8 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(10)
-                .containsSequence("-s", "Suites A")
-                .containsSequence("-s", "Suites B")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A")
+                .containsSequence("-s", PROJECT_NAME + ".Suites B")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -269,7 +269,7 @@ public class LocalProcessCommandLineBuilderTest {
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(8).containsSequence("-s", "Suites A");
+        assertThat(commandLine.getCommandLine()).hasSize(8).containsSequence("-s", PROJECT_NAME + ".Suites A");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
@@ -282,9 +282,9 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(12)
-                .containsSequence("-s", "Suites A.S1")
-                .containsSequence("-t", "Suites A.S1.001__case1")
-                .containsSequence("-t", "Suites A.S1.001__case2");
+                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
+                .containsSequence("-t", PROJECT_NAME + ".Suites A.S1.001__case1")
+                .containsSequence("-t", PROJECT_NAME + ".Suites A.S1.001__case2");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
@@ -305,8 +305,8 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(10)
-                .containsSequence("-s", "Suites.S1")
-                .containsSequence("-s", "Suites.S2")
+                .containsSequence("-s", "Project Outside.Suites.S1")
+                .containsSequence("-s", "Project Outside.Suites.S2")
                 .doesNotContain("-t")
                 .endsWith(nonWorkspaceDir.getPath());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -330,12 +330,12 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(18)
-                .containsSequence("-s", "Suites.S1")
-                .containsSequence("-s", "Suites.S2")
-                .containsSequence("-t", "Suites.S1.c11")
-                .containsSequence("-t", "Suites.S1.c12")
-                .containsSequence("-t", "Suites.S2.c21")
-                .containsSequence("-t", "Suites.S2.c22")
+                .containsSequence("-s", "Project Outside With Tests.Suites.S1")
+                .containsSequence("-s", "Project Outside With Tests.Suites.S2")
+                .containsSequence("-t", "Project Outside With Tests.Suites.S1.c11")
+                .containsSequence("-t", "Project Outside With Tests.Suites.S1.c12")
+                .containsSequence("-t", "Project Outside With Tests.Suites.S2.c21")
+                .containsSequence("-t", "Project Outside With Tests.Suites.S2.c22")
                 .endsWith(nonWorkspaceDir.getPath());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
@@ -438,7 +438,7 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("-s", "Suites A")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -457,7 +457,7 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("-s", "Suites A")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -904,8 +904,8 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(10)
-                .containsSequence("-s", "Suites A.S1")
-                .containsSequence("-s", "Suites A.S2")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A.S2")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -943,7 +943,7 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("-s", "Suites A.S1")
+                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();

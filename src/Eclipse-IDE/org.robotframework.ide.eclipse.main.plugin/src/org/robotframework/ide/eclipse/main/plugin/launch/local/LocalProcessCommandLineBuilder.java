@@ -129,13 +129,6 @@ class LocalProcessCommandLineBuilder {
             final Function<IResource, List<String>> mapper = r -> newArrayList(
                     r.getLocation().removeFileExtension().lastSegment());
             builder.testsToRun(RobotPathsNaming.createTestNames(allResources, "", mapper));
-        } else if (linkedResources.isEmpty()) {
-            builder.withDataSources(newArrayList(robotProject.getProject().getLocation().toFile()));
-
-            final Function<IResource, List<String>> mapper = r -> newArrayList(
-                    r.getProjectRelativePath().removeFileExtension().segments());
-            builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, "", mapper));
-            builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, "", mapper));
         } else {
             final List<IResource> dataSources = new ArrayList<>();
             dataSources.add(robotProject.getProject());
@@ -144,12 +137,15 @@ class LocalProcessCommandLineBuilder {
                     dataSources.stream().map(IResource::getLocation).map(IPath::toFile).collect(toList()));
 
             final String topLevelSuiteName = RobotPathsNaming.createTopLevelSuiteName(dataSources);
-            final Function<IResource, List<String>> mapper = r -> r
-                    .isLinked(IResource.CHECK_ANCESTORS)
-                            ? newArrayList(r.getLocation().removeFileExtension().lastSegment())
-                            : Stream.concat(Stream.of(robotProject.getProject().getLocation().lastSegment()),
-                                    Stream.of(r.getProjectRelativePath().removeFileExtension().segments()))
-                                    .collect(toList());
+            final Function<IResource, List<String>> mapper = r -> {
+                if (r.isLinked(IResource.CHECK_ANCESTORS)) {
+                    return newArrayList(r.getLocation().removeFileExtension().lastSegment());
+                } else {
+                    final List<String> segments = newArrayList(robotProject.getProject().getLocation().lastSegment());
+                    segments.addAll(newArrayList(r.getProjectRelativePath().removeFileExtension().segments()));
+                    return segments.size() > 1 ? segments : new ArrayList<>();
+                }
+            };
             builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, topLevelSuiteName, mapper));
             builder.suitesToRun(RobotPathsNaming.createSuiteNames(linkedResources, topLevelSuiteName, mapper));
             builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, topLevelSuiteName, mapper));
