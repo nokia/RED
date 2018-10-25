@@ -309,7 +309,7 @@ public class CycledContentAssistProcessorTest {
 
     private static void execAllAwaitingMessages() {
         while (Display.getDefault().readAndDispatch()) {
-            // nothing to do
+            // handle all events coming to UI
         }
 
         // injecting empty operation, so that all the events awaiting in queue for SWT thread

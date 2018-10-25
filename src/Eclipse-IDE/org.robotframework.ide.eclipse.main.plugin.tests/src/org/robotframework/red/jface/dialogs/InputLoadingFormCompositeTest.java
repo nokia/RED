@@ -35,7 +35,7 @@ public class InputLoadingFormCompositeTest {
     @After
     public void afterTest() {
         while (Display.getCurrent().readAndDispatch()) {
-            // handle all the events which came to UI thread after the job has finished
+            // handle all events coming to UI
         }
     }
 
@@ -49,7 +49,7 @@ public class InputLoadingFormCompositeTest {
         assertThat(composite.getForm().isBusy()).isTrue();
         final Composite internalComposite = (Composite) composite.getForm().getBody().getChildren()[0];
         final StackLayout layout = (StackLayout) internalComposite.getLayout();
-        
+
         assertThat(layout.topControl).isInstanceOf(Label.class);
         assertThat(layout.topControl.isVisible()).isTrue();
         assertThat(((Label) layout.topControl).getText()).isEqualTo("loading...");

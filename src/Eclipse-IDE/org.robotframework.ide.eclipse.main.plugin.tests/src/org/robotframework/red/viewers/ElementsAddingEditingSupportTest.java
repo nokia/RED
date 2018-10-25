@@ -91,7 +91,9 @@ public class ElementsAddingEditingSupportTest {
 
         verify(creator, times(1)).get();
 
-        Display.getCurrent().readAndDispatch(); // drain all events waiting for GUI thread
+        while (Display.getDefault().readAndDispatch()) {
+            // handle all events coming to UI
+        }
     }
 
     @Test
