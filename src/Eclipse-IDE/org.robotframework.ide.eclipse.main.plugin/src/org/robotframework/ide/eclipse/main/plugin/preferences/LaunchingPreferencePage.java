@@ -59,27 +59,27 @@ public class LaunchingPreferencePage extends RedFieldEditorPreferencePage {
     }
 
     private void createLaunchingGroup(final Composite parent) {
-        final Group robotGroup = new Group(parent, SWT.NONE);
-        robotGroup.setText("Robot");
-        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(robotGroup);
-        GridLayoutFactory.fillDefaults().applyTo(robotGroup);
+        final Group group = new Group(parent, SWT.NONE);
+        group.setText("Robot");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(group);
+        GridLayoutFactory.fillDefaults().applyTo(group);
 
         final BooleanFieldEditor agentFileEditor = new BooleanFieldEditor(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
-                "Pass Robot arguments using arguments file", robotGroup);
-        final Button button = (Button) agentFileEditor.getDescriptionControl(robotGroup);
+                "Pass Robot arguments using arguments file", group);
+        final Button button = (Button) agentFileEditor.getDescriptionControl(group);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
         addField(agentFileEditor);
 
         final BooleanFieldEditor singleFileDataSourceEditor = new BooleanFieldEditor(
-                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, "Run single suite using suite path", robotGroup);
-        final Button singleFileDataSourceButton = (Button) singleFileDataSourceEditor.getDescriptionControl(robotGroup);
+                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, "Pass selected suite as data source", group);
+        final Button singleFileDataSourceButton = (Button) singleFileDataSourceEditor.getDescriptionControl(group);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(singleFileDataSourceButton);
         addField(singleFileDataSourceEditor);
 
-        final Label singleFileDataSourceDescription = new Label(robotGroup, SWT.WRAP);
+        final Label singleFileDataSourceDescription = new Label(group, SWT.WRAP);
         singleFileDataSourceDescription.setText(
-                "When single suite or test cases from one suite are run, path to test suite will be used instead of path to project. "
-                        + "Robot __init__ files will not be used then.");
+                "When single suite or test cases from one suite are run, path to suite instead of path to project will be used as data source. "
+                        + "Robot __init__ files from outside that data source will not be run.");
         GridDataFactory.fillDefaults()
                 .hint(150, SWT.DEFAULT)
                 .indent(5, 2)
@@ -88,38 +88,48 @@ public class LaunchingPreferencePage extends RedFieldEditorPreferencePage {
     }
 
     private void createExecutorGroup(final Composite parent) {
-        final Group executableGroup = new Group(parent, SWT.NONE);
-        executableGroup.setText("Executor");
-        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(executableGroup);
-        GridLayoutFactory.fillDefaults().applyTo(executableGroup);
+        final Group group = new Group(parent, SWT.NONE);
+        group.setText("Executor");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(group);
+        GridLayoutFactory.fillDefaults().applyTo(group);
 
-        final BooleanFieldEditor editor = new BooleanFieldEditor(RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT,
-                "Use single argument to pass robot execution command line", executableGroup);
-        final Button button = (Button) editor.getDescriptionControl(executableGroup);
+        final BooleanFieldEditor singleCommandLineArgumentEditor = new BooleanFieldEditor(
+                RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT,
+                "Pass Robot execution command line as single argument", group);
+        final Button button = (Button) singleCommandLineArgumentEditor.getDescriptionControl(group);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
-        addField(editor);
+        addField(singleCommandLineArgumentEditor);
+
+        final Label singleCommandLineArgumentDescription = new Label(group, SWT.WRAP);
+        singleCommandLineArgumentDescription.setText(
+                "When tests are launched using custom executable file the actual command line call will be passed to it as a single argument.");
+        GridDataFactory.fillDefaults()
+                .hint(150, SWT.DEFAULT)
+                .indent(5, 2)
+                .grab(true, false)
+                .applyTo(singleCommandLineArgumentDescription);
     }
 
     private void createViewsGroup(final Composite parent) {
-        final Group viewsGroup = new Group(parent, SWT.NONE);
-        viewsGroup.setText("Views");
-        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(viewsGroup);
-        GridLayoutFactory.fillDefaults().applyTo(viewsGroup);
+        final Group group = new Group(parent, SWT.NONE);
+        group.setText("Views");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(group);
+        GridLayoutFactory.fillDefaults().applyTo(group);
 
-        final BooleanFieldEditor editor = new BooleanFieldEditor(RedPreferences.LIMIT_MSG_LOG_OUTPUT,
-                "Limit Message Log output", viewsGroup);
-        final Button button = (Button) editor.getDescriptionControl(viewsGroup);
+        final BooleanFieldEditor limitEditor = new BooleanFieldEditor(RedPreferences.LIMIT_MSG_LOG_OUTPUT,
+                "Limit Message Log output", group);
+        final Button button = (Button) limitEditor.getDescriptionControl(group);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
-        addField(editor);
-
-        final IntegerFieldEditor limitEditor = new IntegerFieldEditor(RedPreferences.LIMIT_MSG_LOG_LENGTH,
-                "Buffer size (characters)", viewsGroup, 7);
-        button.addSelectionListener(
-                widgetSelectedAdapter(e -> limitEditor.setEnabled(button.getSelection(), viewsGroup)));
-        final Label limitLabel = limitEditor.getLabelControl(viewsGroup);
-        GridDataFactory.fillDefaults().indent(5, 5).applyTo(limitLabel);
-        limitEditor.setValidRange(0, 9_999_999);
-        limitEditor.setEnabled(getPreferenceStore().getBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT), viewsGroup);
         addField(limitEditor);
+
+        final IntegerFieldEditor limitLengthEditor = new IntegerFieldEditor(RedPreferences.LIMIT_MSG_LOG_LENGTH,
+                "Buffer size (characters)", group, 7);
+        button.addSelectionListener(
+                widgetSelectedAdapter(e -> limitLengthEditor.setEnabled(button.getSelection(), group)));
+        final Label limitLabel = limitLengthEditor.getLabelControl(group);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(limitLabel);
+        limitLengthEditor.setValidRange(0, 9_999_999);
+        limitLengthEditor.setEnabled(getPreferenceStore().getBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT), group);
+        addField(limitLengthEditor);
     }
 }
