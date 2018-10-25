@@ -22,9 +22,6 @@ import com.google.common.base.CaseFormat;
 class RobotPathsNaming {
 
     static String createTopLevelSuiteName(final Collection<IResource> dataSources) {
-        if (dataSources.size() < 2) {
-            return "";
-        }
         return dataSources.stream()
                 .map(IResource::getLocation)
                 .map(IPath::removeFileExtension)
@@ -39,6 +36,7 @@ class RobotPathsNaming {
                 .stream()
                 .map(pathSegmentsMapper::apply)
                 .map(pathSegments -> RobotPathsNaming.createSuiteName(topLevelSuiteName, pathSegments))
+                .filter(name -> !name.isEmpty())
                 .collect(toList());
     }
 
@@ -49,7 +47,7 @@ class RobotPathsNaming {
             return e.getValue()
                     .stream()
                     .map(testName -> RobotPathsNaming.createTestName(topLevelSuiteName, pathSegments, testName));
-        }).collect(toList());
+        }).filter(name -> !name.isEmpty()).collect(toList());
     }
 
     static String createSuiteName(final String topLevelSuiteName, final List<String> pathSegments) {

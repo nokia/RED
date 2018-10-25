@@ -15,7 +15,10 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.internal.resources.ProjectDescription;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
 import org.eclipse.core.variables.VariablesPlugin;
@@ -68,6 +71,9 @@ public class LocalProcessCommandLineBuilderTest {
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Rule
+    public ProjectProvider movedProjectProvider = new ProjectProvider(PROJECT_NAME + "Moved");
+
+    @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Rule
@@ -117,12 +123,12 @@ public class LocalProcessCommandLineBuilderTest {
     public void commandLineIsCreated_whenProjectDoesNotContainConfigurationFile() throws Exception {
         projectProvider.deconfigure();
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Jython);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Jython);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(8)
+        assertThat(commandLine.getCommandLine()).hasSize(6)
                 .startsWith("/path/to/executable", "-m", "robot.run")
                 .doesNotContain("-J-cp", "-P", "-V")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
@@ -131,42 +137,42 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineStartsWithInterpreterPath_whenActiveRuntimeEnvironmentIsUsed() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setInterpreterArguments("-a1 -a2");
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .startsWith("/path/to/executable", "-a1", "-a2", "-m", "robot.run");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
     public void commandLineStartsWithInterpreterName_whenProjectInterpreterIsNotUsed() throws Exception {
-        final RobotProject robotProject = createRobotProject();
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setInterpreterArguments("-a1 -a2");
         robotConfig.setUsingInterpreterFromProject(false);
         robotConfig.setInterpreter(SuiteExecutor.PyPy);
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .startsWith(SuiteExecutor.PyPy.executableName(), "-a1", "-a2", "-m", "robot.run");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
     public void commandLineStartsWithDefaultInterpreterName_whenThereIsNoActiveRuntimeEnvironment() throws Exception {
-        final RobotProject robotProject = spy(createRobotProject());
+        final RobotProject robotProject = spy(createRobotProject(projectProvider.getProject(), SuiteExecutor.Python));
         when(robotProject.getRuntimeEnvironment()).thenReturn(null);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setInterpreterArguments("-a1 -a2");
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .startsWith(SuiteExecutor.Python.executableName(), "-a1", "-a2", "-m", "robot.run");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
@@ -175,8 +181,8 @@ public class LocalProcessCommandLineBuilderTest {
     public void commandLineContainsPathToListenerAndArgumentFile_whenPreferenceIsSet() throws Exception {
         when(preferences.shouldLaunchUsingArgumentsFile()).thenReturn(true);
 
-        final RobotProject robotProject = createRobotProject();
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
@@ -186,21 +192,22 @@ public class LocalProcessCommandLineBuilderTest {
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getCommandLine()[6])
                 .startsWith(RedTemporaryDirectory.createTemporaryDirectoryIfNotExists().toString());
-        assertThat(commandLine.getArgumentFile()).hasValueSatisfying(
-                argumentFile -> assertThat(argumentFile.generateContent()).contains("--suite " + PROJECT_NAME));
+        assertThat(commandLine.getArgumentFile())
+                .hasValueSatisfying(argumentFile -> assertThat(argumentFile.generateContent())
+                        .isEqualTo("# arguments automatically generated"));
     }
 
     @Test
     public void commandLineContainsSuitesToRun() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", emptyList(), "002__suites_b", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(10)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
-                .containsSequence("-s", PROJECT_NAME + ".Suites B")
+                .containsSequence("-s", "Suites A.S1")
+                .containsSequence("-s", "Suites B")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -208,27 +215,27 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineContainsTestsToRun() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", asList("001__case1", "001__case2"),
                 "001__suites_a/s2.robot", asList("001__case3")));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(16)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
-                .containsSequence("-s", PROJECT_NAME + ".Suites A.S2")
-                .containsSequence("-t", PROJECT_NAME + ".Suites A.S1.001__case1")
-                .containsSequence("-t", PROJECT_NAME + ".Suites A.S1.001__case2")
-                .containsSequence("-t", PROJECT_NAME + ".Suites A.S2.001__case3")
+                .containsSequence("-s", "Suites A.S1")
+                .containsSequence("-s", "Suites A.S2")
+                .containsSequence("-t", "Suites A.S1.001__case1")
+                .containsSequence("-t", "Suites A.S1.001__case2")
+                .containsSequence("-t", "Suites A.S2.001__case3")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
     public void commandLineDoesNotContainNestedSuitesToRun() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList(), "001__suites_a/s1.robot", emptyList(),
                 "002__suites_b/nested/s4.robot", emptyList(), "002__suites_b/nested", emptyList(), "002__suites_b",
                 emptyList()));
@@ -236,8 +243,8 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(10)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A")
-                .containsSequence("-s", PROJECT_NAME + ".Suites B")
+                .containsSequence("-s", "Suites A")
+                .containsSequence("-s", "Suites B")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -245,8 +252,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void coreExceptionIsThrown_whenResourceDoesNotExist() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("not_existig_suite", asList("not_existig_case")));
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(() -> createCommandLine(robotProject, robotConfig))
@@ -256,27 +263,105 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineTranslatesSuitesNames_whenNamesContainsDoubleUnderscores() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(8).containsSequence("-s", PROJECT_NAME + ".Suites A");
+        assertThat(commandLine.getCommandLine()).hasSize(8).containsSequence("-s", "Suites A");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
     public void commandLineDoesNotTranslateTestNames_whenNamesContainsDoubleUnderscores() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", asList("001__case1", "001__case2")));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(12)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1", "-t", PROJECT_NAME + ".Suites A.S1.001__case1",
-                        "-t", PROJECT_NAME + ".Suites A.S1.001__case2");
+                .containsSequence("-s", "Suites A.S1")
+                .containsSequence("-t", "Suites A.S1.001__case1")
+                .containsSequence("-t", "Suites A.S1.001__case2");
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
+    public void commandLineContainsSuitesToRun_whenProjectIsOutsideOfWorkspace() throws Exception {
+        movedProjectProvider.createDir("suites");
+        movedProjectProvider.createFile("suites/s1.robot", "*** Test Cases ***", "c1", "  Log  1");
+        movedProjectProvider.createFile("suites/s2.robot", "*** Test Cases ***", "c2", "  Log  1");
+
+        final File nonWorkspaceDir = tempFolder.newFolder("Project_outside");
+
+        moveProject(movedProjectProvider.getProject(), nonWorkspaceDir);
+
+        final RobotProject robotProject = createRobotProject(movedProjectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(movedProjectProvider.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("suites/s1.robot", emptyList(), "suites/s2.robot", emptyList()));
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(10)
+                .containsSequence("-s", "Suites.S1")
+                .containsSequence("-s", "Suites.S2")
+                .doesNotContain("-t")
+                .endsWith(nonWorkspaceDir.getPath());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
+    public void commandLineContainsTestsToRun_whenProjectIsOutsideOfWorkspace() throws Exception {
+        movedProjectProvider.createDir("suites");
+        movedProjectProvider.createFile("suites/s1.robot", "*** Test Cases ***", "c11", "  Log  1", "c12", "  Log  2");
+        movedProjectProvider.createFile("suites/s2.robot", "*** Test Cases ***", "c21", "  Log  1", "c22", "  Log  2");
+
+        final File nonWorkspaceDir = tempFolder.newFolder("Project_outside_with_tests");
+
+        moveProject(movedProjectProvider.getProject(), nonWorkspaceDir);
+
+        final RobotProject robotProject = createRobotProject(movedProjectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(movedProjectProvider.getProject());
+        robotConfig.setSuitePaths(
+                ImmutableMap.of("suites/s1.robot", asList("c11", "c12"), "suites/s2.robot", asList("c21", "c22")));
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(18)
+                .containsSequence("-s", "Suites.S1")
+                .containsSequence("-s", "Suites.S2")
+                .containsSequence("-t", "Suites.S1.c11")
+                .containsSequence("-t", "Suites.S1.c12")
+                .containsSequence("-t", "Suites.S2.c21")
+                .containsSequence("-t", "Suites.S2.c22")
+                .endsWith(nonWorkspaceDir.getPath());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
+    public void commandLineContainsAdditionalDataSource_whenProjectIsOutsideOfWorkspace() throws Exception {
+        final File nonWorkspaceDir = tempFolder.newFolder("Project_outside");
+        final File nonWorkspaceTest = tempFolder.newFile("non_workspace_test.robot");
+        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceTest);
+
+        movedProjectProvider.createDir("suites");
+        movedProjectProvider.createFile("suites/s1.robot", "*** Test Cases ***", "c1", "  Log  1");
+        resourceCreator.createLink(nonWorkspaceTest.toURI(), movedProjectProvider.getFile("suites/LinkedTest.robot"));
+        moveProject(movedProjectProvider.getProject(), nonWorkspaceDir);
+
+        final RobotProject robotProject = createRobotProject(movedProjectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(movedProjectProvider.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("suites", emptyList()));
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(11)
+                .containsSequence("-s", "Project Outside & Non Workspace Test.Project Outside.Suites")
+                .containsSequence("-s", "Project Outside & Non Workspace Test.Non Workspace Test")
+                .doesNotContain("-t")
+                .endsWith(nonWorkspaceDir.getPath(), nonWorkspaceTest.getPath());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
@@ -286,8 +371,8 @@ public class LocalProcessCommandLineBuilderTest {
         Files.write("*** Test Cases ***".getBytes(), nonWorkspaceTest);
         resourceCreator.createLink(nonWorkspaceTest.toURI(), projectProvider.getFile("LinkedTestFile.robot"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList(), "LinkedTestFile.robot", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
@@ -306,8 +391,8 @@ public class LocalProcessCommandLineBuilderTest {
         Files.write("*** Tasks ***".getBytes(), nonWorkspaceTask);
         resourceCreator.createLink(nonWorkspaceTask.toURI(), projectProvider.getFile("LinkedTaskFile.robot"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList(), "LinkedTaskFile.robot", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
@@ -325,8 +410,8 @@ public class LocalProcessCommandLineBuilderTest {
         final File nonWorkspaceDir = tempFolder.newFolder("non_workspace_dir");
         resourceCreator.createLink(nonWorkspaceDir.toURI(), projectProvider.getDir("LinkedFolder"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList(), "LinkedFolder", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
@@ -345,15 +430,15 @@ public class LocalProcessCommandLineBuilderTest {
         Files.write("*** Settings ***".getBytes(), nonWorkspaceResource);
         resourceCreator.createLink(nonWorkspaceResource.toURI(), projectProvider.getFile("LinkedResourceFile.robot"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig
                 .setSuitePaths(ImmutableMap.of("001__suites_a", emptyList(), "LinkedResourceFile.robot", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A")
+                .containsSequence("-s", "Suites A")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -365,14 +450,14 @@ public class LocalProcessCommandLineBuilderTest {
         resourceCreator.createVirtual(projectProvider.getDir("VirtualDir"));
         resourceCreator.createVirtual(projectProvider.getDir("VirtualDir/NestedDir"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList(), "VirtualDir", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A")
+                .containsSequence("-s", "Suites A")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -390,8 +475,8 @@ public class LocalProcessCommandLineBuilderTest {
         resourceCreator.createLink(nonWorkspaceFile.toURI(),
                 projectProvider.getFile("VirtualDir/NestedDir/LinkedFileInsideVirtualDir.robot"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList(), "VirtualDir", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
@@ -420,8 +505,8 @@ public class LocalProcessCommandLineBuilderTest {
                 projectProvider.getFile("100__VirtualDir/NestedDir/LinkedInsideVirtualDir.robot"));
         resourceCreator.createLink(nonWorkspaceFile2.toURI(), projectProvider.getFile("200__Linked.robot"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList(), "100__VirtualDir", emptyList(),
                 "200__Linked.robot", emptyList()));
 
@@ -452,8 +537,8 @@ public class LocalProcessCommandLineBuilderTest {
                 projectProvider.getFile("100__VirtualDir/NestedDir/LinkedInsideVirtualDir.robot"));
         resourceCreator.createLink(nonWorkspaceFile2.toURI(), projectProvider.getFile("200__Linked.robot"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", asList("001__case1", "001__case2"),
                 "100__VirtualDir/NestedDir/LinkedInsideVirtualDir.robot", asList("virt_case_1", "virt_case_2"),
                 "200__Linked.robot", asList("link_case_1", "link_case_2")));
@@ -485,12 +570,12 @@ public class LocalProcessCommandLineBuilderTest {
         config.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
         projectProvider.configure(config);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .containsSequence("-P", String.format("%1$s%2$sfolder1:%1$s%2$sfolder2",
                         projectProvider.getProject().getLocation().toOSString(), File.separator));
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -506,12 +591,12 @@ public class LocalProcessCommandLineBuilderTest {
         config.setRelativityPoint(RelativityPoint.create(RelativeTo.WORKSPACE));
         projectProvider.configure(config);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .containsSequence("-P", String.format("%1$s%2$sfolder1:%1$s%2$sfolder2",
                         projectProvider.getProject().getLocation().toOSString(), File.separator));
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -524,12 +609,12 @@ public class LocalProcessCommandLineBuilderTest {
         config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2"));
         projectProvider.configure(config);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .containsSequence("-P", String.format("%1$s%2$sfolder1:%1$s%2$sfolder2",
                         projectProvider.getProject().getLocation().toOSString(), File.separator));
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -545,12 +630,12 @@ public class LocalProcessCommandLineBuilderTest {
         config.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
         projectProvider.configure(config);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Jython);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Jython);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .containsSequence("-J-cp", String.format(".%1$s%2$s%3$sJavaLib1.jar%1$s%2$s%3$sJavaLib2.jar",
                         File.pathSeparator, projectProvider.getProject().getLocation().toOSString(), File.separator));
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -566,12 +651,12 @@ public class LocalProcessCommandLineBuilderTest {
         config.setRelativityPoint(RelativityPoint.create(RelativeTo.WORKSPACE));
         projectProvider.configure(config);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Jython);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Jython);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .containsSequence("-J-cp", String.format(".%1$s%2$s%3$sJavaLib1.jar%1$s%2$s%3$sJavaLib2.jar",
                         File.pathSeparator, projectProvider.getProject().getLocation().toOSString(), File.separator));
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -586,12 +671,13 @@ public class LocalProcessCommandLineBuilderTest {
                 ReferencedLibrary.create(LibraryType.JAVA, "JavaLib2", PROJECT_NAME + "/JavaLib2.jar"));
         projectProvider.configure(config);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Jython);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Jython);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+        ;
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(10)
+        assertThat(commandLine.getCommandLine()).hasSize(8)
                 .containsSequence("-J-cp", String.format(".%1$s%2$s%3$sJavaLib1.jar%1$s%2$s%3$sJavaLib2.jar",
                         File.pathSeparator, projectProvider.getProject().getLocation().toOSString(), File.separator));
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -604,12 +690,12 @@ public class LocalProcessCommandLineBuilderTest {
         config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars2.py", "a", "b", "c"));
         projectProvider.configure(config);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Jython);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Jython);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(14)
+        assertThat(commandLine.getCommandLine()).hasSize(12)
                 .containsSequence("-V",
                         projectProvider.getProject().getLocation().toOSString() + File.separator + "vars1.py")
                 .containsSequence("-V",
@@ -619,8 +705,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineContainsTags() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setIsExcludeTagsEnabled(true);
         robotConfig.setExcludedTags(asList("EX_1", "EX_2"));
         robotConfig.setIsIncludeTagsEnabled(true);
@@ -628,48 +714,48 @@ public class LocalProcessCommandLineBuilderTest {
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(16)
+        assertThat(commandLine.getCommandLine()).hasSize(14)
                 .containsSequence("-i", "IN_1", "-i", "IN_2", "-e", "EX_1", "-e", "EX_2");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
     public void commandLineStartsWitExecutableFilePath() throws Exception {
-        final RobotProject robotProject = createRobotProject();
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(9).startsWith(executablePath);
+        assertThat(commandLine.getCommandLine()).hasSize(7).startsWith(executablePath);
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
     public void commandLineStartsWithExecutableFilePath_whenPathContainsVariables() throws Exception {
-        final RobotProject robotProject = createRobotProject();
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setExecutableFilePath("${workspace_loc:/" + PROJECT_NAME + "/executable_script.bat}");
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(9)
+        assertThat(commandLine.getCommandLine()).hasSize(7)
                 .startsWith(projectProvider.getFile("executable_script.bat").getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
     public void commandLineContainsExecutableFilePathWithArguments() throws Exception {
-        final RobotProject robotProject = createRobotProject();
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
         robotConfig.setExecutableFileArguments("-arg1 abc -arg2 xyz");
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(13).startsWith(executablePath, "-arg1", "abc", "-arg2", "xyz");
+        assertThat(commandLine.getCommandLine()).hasSize(11).startsWith(executablePath, "-arg1", "abc", "-arg2", "xyz");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
@@ -678,8 +764,8 @@ public class LocalProcessCommandLineBuilderTest {
             throws Exception {
         when(preferences.shouldUseSingleCommandLineArgument()).thenReturn(true);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
         robotConfig.setExecutableFileArguments("-a -b -c");
@@ -696,8 +782,8 @@ public class LocalProcessCommandLineBuilderTest {
     public void coreExceptionIsThrown_whenExecutableFileDoesNotExist() throws Exception {
         final String executablePath = projectProvider.getFile("not_existing.bat").getLocation().toOSString();
 
-        final RobotProject robotProject = createRobotProject();
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setExecutableFilePath(executablePath);
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(() -> createCommandLine(robotProject, robotConfig))
@@ -707,8 +793,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void coreExceptionIsThrown_whenExecutableFileDefinedWithVariableDoesNotExist() throws Exception {
-        final RobotProject robotProject = createRobotProject();
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setExecutableFilePath("${workspace_loc:/" + PROJECT_NAME + "/not_existing.bat}");
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(() -> createCommandLine(robotProject, robotConfig))
@@ -721,8 +807,8 @@ public class LocalProcessCommandLineBuilderTest {
     public void pathToSingleSuiteIsUsed_whenSingleSuiteIsRunAndPreferenceIsSet() throws Exception {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
@@ -738,10 +824,11 @@ public class LocalProcessCommandLineBuilderTest {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
         final File nonWorkspaceFile = tempFolder.newFile("non_workspace_suite.robot");
+        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
         resourceCreator.createLink(nonWorkspaceFile.toURI(), projectProvider.getFile("LinkedSuite.robot"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("LinkedSuite.robot", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
@@ -753,11 +840,27 @@ public class LocalProcessCommandLineBuilderTest {
     }
 
     @Test
+    public void pathToSingleSuiteIsUsed_whenSingleFolderIsRunAndPreferenceIsSet() throws Exception {
+        when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
+
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList()));
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(6)
+                .doesNotContain("-s", "-t")
+                .endsWith(projectProvider.getFile("001__suites_a").getLocation().toOSString());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
     public void pathToSingleSuiteIsUsed_whenTestsFromSingleSuiteAreRunAndPreferenceIsSet() throws Exception {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", asList("001__case1")));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
@@ -774,10 +877,11 @@ public class LocalProcessCommandLineBuilderTest {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
         final File nonWorkspaceFile = tempFolder.newFile("non_workspace_suite.robot");
+        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
         resourceCreator.createLink(nonWorkspaceFile.toURI(), projectProvider.getFile("LinkedSuite.robot"));
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("LinkedSuite.robot", asList("case1", "case2")));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
@@ -793,48 +897,54 @@ public class LocalProcessCommandLineBuilderTest {
     public void pathToSingleSuiteIsNotUsed_whenSeveralResourcesAreRunAndPreferenceIsSet() throws Exception {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(
                 ImmutableMap.of("001__suites_a/s1.robot", emptyList(), "001__suites_a/s2.robot", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(10)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
-                .containsSequence("-s", PROJECT_NAME + ".Suites A.S2")
+                .containsSequence("-s", "Suites A.S1")
+                .containsSequence("-s", "Suites A.S2")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
-    public void pathToSingleSuiteIsNotUsed_whenSingleFolderIsRunAndPreferenceIsSet() throws Exception {
+    public void pathToSingleSuiteIsNotUsed_whenSingleFolderWithLinkedSuiteIsRunAndPreferenceIsSet() throws Exception {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final File nonWorkspaceFile = tempFolder.newFile("non_workspace_suite.robot");
+        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
+        resourceCreator.createLink(nonWorkspaceFile.toURI(),
+                projectProvider.getFile("001__suites_a/LinkedSuite.robot"));
+
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A")
+        assertThat(commandLine.getCommandLine()).hasSize(11)
+                .containsSequence("-s", PROJECT_NAME + " & Non Workspace Suite." + PROJECT_NAME + ".Suites A")
+                .containsSequence("-s", PROJECT_NAME + " & Non Workspace Suite.Non Workspace Suite")
                 .doesNotContain("-t")
-                .endsWith(projectProvider.getProject().getLocation().toOSString());
+                .endsWith(projectProvider.getProject().getLocation().toOSString(), nonWorkspaceFile.getPath());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
     public void pathToSingleSuiteIsNotUsed_whenSingleSuiteIsRunAndPreferenceIsNotSet() throws Exception {
-        final RobotProject robotProject = createRobotProject(SuiteExecutor.Python);
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", emptyList()));
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
+                .containsSequence("-s", "Suites A.S1")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
@@ -842,8 +952,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void knownVariablesAreResolvedInAdditionalArguments() throws Exception {
-        final RobotProject robotProject = createRobotProject();
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration();
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setRobotArguments("a ${a_var} ${a}");
         robotConfig.setInterpreterArguments("${b} b ${b_var}");
         final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toOSString();
@@ -852,7 +962,7 @@ public class LocalProcessCommandLineBuilderTest {
 
         final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(18)
+        assertThat(commandLine.getCommandLine()).hasSize(16)
                 .startsWith(executablePath, "c_value", "${c}", "c")
                 .containsSequence("${b}", "b", "b_value", "-m", "robot.run")
                 .containsSequence("a", "a_value", "${a}")
@@ -865,24 +975,26 @@ public class LocalProcessCommandLineBuilderTest {
         return new LocalProcessCommandLineBuilder(robotConfig, robotProject).createRunCommandLine(12345, preferences);
     }
 
-    private RobotProject createRobotProject() {
-        return new RobotModel().createRobotProject(projectProvider.getProject());
-    }
-
-    private RobotProject createRobotProject(final SuiteExecutor interpreter) {
-        final RobotProject robotProject = spy(createRobotProject());
+    private RobotProject createRobotProject(final IProject project, final SuiteExecutor interpreter) {
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(environment.getInterpreter()).thenReturn(interpreter);
         when(environment.getPythonExecutablePath()).thenReturn("/path/to/executable");
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
         return robotProject;
     }
 
-    private RobotLaunchConfiguration createRobotLaunchConfiguration() throws CoreException {
+    private RobotLaunchConfiguration createRobotLaunchConfiguration(final IProject project) throws CoreException {
         final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.fillDefaults();
-        robotConfig.setProjectName(PROJECT_NAME);
+        robotConfig.setProjectName(project.getName());
         return robotConfig;
     }
 
+    private void moveProject(final IProject project, final File destination) throws CoreException {
+        final ProjectDescription description = new ProjectDescription();
+        description.setName(project.getName());
+        description.setLocation(new Path(destination.getAbsolutePath()));
+        project.move(description, true, null);
+    }
 }
