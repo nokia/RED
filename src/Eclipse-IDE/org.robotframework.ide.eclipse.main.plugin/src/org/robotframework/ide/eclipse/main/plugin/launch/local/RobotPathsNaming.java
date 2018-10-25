@@ -22,6 +22,9 @@ import com.google.common.base.CaseFormat;
 class RobotPathsNaming {
 
     static String createTopLevelSuiteName(final Collection<IResource> dataSources) {
+        if (dataSources.size() < 2) {
+            return "";
+        }
         return dataSources.stream()
                 .map(IResource::getLocation)
                 .map(IPath::removeFileExtension)

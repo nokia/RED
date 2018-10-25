@@ -47,7 +47,7 @@ public class Selections {
             return elements.get(0);
         }
         throw new IllegalArgumentException("Given selection should contain only one element of class "
-                + elementsClass.getName() + ", but have " + elements.size() + " instead");
+                + elementsClass.getName() + ", but have " + elements.size() + " elements instead");
     }
 
     public static <T> Optional<T> getOptionalFirstElement(final IStructuredSelection selection,

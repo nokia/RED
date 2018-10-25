@@ -9,8 +9,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<jdk.version>1.8</jdk.version>
+		<jacoco.version>0.7.6.201602180812</jacoco.version>
+		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<skip.unit.tests>false</skip.unit.tests>
 		<skip.py.unit.tests>false</skip.py.unit.tests>
 		<skip.py3.unit.tests>true</skip.py3.unit.tests>
@@ -75,7 +76,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.6.201602180812</version>
+				<version>${jacoco.version}</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -285,7 +286,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.6.201602180812</version>
+				<version>${jacoco.version}</version>
 				<configuration>
 					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
 					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
