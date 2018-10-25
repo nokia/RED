@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _9l_cgK2nEea8FqgKy4fLvA
+Contexts: _9l_cgK2nEea8FqgKy4fLvA,_9Bte8NYSEeijg6yKwqEQmw
 Element-Name: ResourcesFromPYTHONPATH
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/18 4:54 PM
+Save-Time: 10/24/18 12:14 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -284,7 +284,7 @@ with [get-editor "res.txt" | get-text-viewer] {
     key-type Enter
     key-type Up
     key-type "M1+SPACE"
-    key-type Down
+    key-type Down -times [$MainSections | get "Settings"]  
     key-type Enter
     type-text Res
     key-type "M1+SPACE"
