@@ -30,7 +30,7 @@ public class HyperlinkDialogTest {
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
-    
+
     @Test
     public void afterOpeningDialogPresentsTableWithGivenHyperlinks() {
         final RedHyperlink link1 = mock(RedHyperlink.class);
@@ -88,9 +88,11 @@ public class HyperlinkDialogTest {
         table.notifyListeners(SWT.DefaultSelection, event);
 
         final Display display = Display.getCurrent();
-        while (display.readAndDispatch()) {} // handle all events coming to UI
+        while (display.readAndDispatch()) {
+            // handle all events coming to UI
+        }
         assertThat(display.getShells()).doesNotHave(shellWithText(HyperlinkDialog.POPUP_TEXT));
-        
+
         verify(link1, never()).open();
         verify(link2).open();
     }

@@ -201,7 +201,7 @@ public class SwtThreadTest {
 
     private static void execAllAwaitingMessages() {
         while (Display.getDefault().readAndDispatch()) {
-            // nothing to do
+            // handle all events coming to UI
         }
     }
 

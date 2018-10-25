@@ -122,7 +122,7 @@ public class MessageLogViewTest {
 
         final MessageLogView view = new MessageLogView(executionService);
         view.postConstruct(shellProvider.getShell());
-        
+
         view.toggleWordsWrapping();
 
         assertThat(view.getTextControl().getWordWrap()).isTrue();
@@ -160,7 +160,7 @@ public class MessageLogViewTest {
 
     private void execAllAwaitingMessages() {
         while (Display.getDefault().readAndDispatch()) {
-            // nothing to do
+            // handle all events coming to UI
         }
     }
 }
