@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Fh1mIAFsEeaQD_aaetnnqw
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/24/18 11:11 AM
+Save-Time: 10/26/18 12:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -153,7 +153,7 @@ with [get-editor "jython_simple_project/red.xml" | get-section Paths | get-table
 }
 with [get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1] {
     get-property itemCount | equals 6 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals [format "%s%sTestData%sLibsFromPythonPath [already defined in CLASSPATH variable]" $RCPTT_project_path $sys_sep $sys_sep] | verify-true
+//    get-property "getItems().TableItem[0].getText()" | equals [format "%s%sTestData%sLibsFromPythonPath [already defined in CLASSPATH variable]" $RCPTT_project_path $sys_sep $sys_sep] | verify-true
     get-property "getItems().TableItem[1].getText()" 
         | equals [format "%s/jython_simple_project/RED_TEST_JavaLib.jar" $RED_workspace_path ]| verify-true
     get-property "getItems().TableItem[2].getText()" | equals "changed_folder/new" | verify-true
@@ -200,7 +200,7 @@ set-dialog-result File [get-arg-file-path]
 	
 get-editor "args_.*.arg" | get-text-viewer | get-property text | equals [format "# arguments automatically generated\n"
     + "--pythonpath %s%smy_python_path\n"
-    + "--suite      Jython_simple_project.Test" $RED_workspace_path $sys_sep]| verify-true
+    + "--suite      Jython Simple Project.Test" $RED_workspace_path $sys_sep]| verify-true
 get-editor "args_.*.arg" | close 
 
 replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{
