@@ -15,7 +15,7 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-repository-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tycho.version}</version>
 				<configuration>
 					<finalName>org.robotframework.ide.eclipse.feature_${unqualifiedVersion}.${buildQualifier}</finalName>
 				</configuration>

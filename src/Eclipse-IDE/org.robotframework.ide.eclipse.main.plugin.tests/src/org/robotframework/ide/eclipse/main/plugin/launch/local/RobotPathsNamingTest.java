@@ -55,7 +55,7 @@ public class RobotPathsNamingTest {
             softly.assertThat(RobotPathsNaming.createTopLevelSuiteName(newArrayList())).isEmpty();
 
             softly.assertThat(RobotPathsNaming.createTopLevelSuiteName(newArrayList(projectProvider.getProject())))
-                    .isEqualTo(PROJECT_NAME);
+                    .isEmpty();
 
             softly.assertThat(RobotPathsNaming.createTopLevelSuiteName(
                     newArrayList(projectProvider.getProject(), projectProvider.getDir("Some Folder"))))

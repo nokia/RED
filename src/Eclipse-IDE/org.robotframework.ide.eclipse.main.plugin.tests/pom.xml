@@ -128,7 +128,7 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tycho.version}</version>
 				<configuration>
 					<useUIHarness>true</useUIHarness>
 				</configuration>
@@ -136,7 +136,7 @@
 			<plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.6.201602180812</version>
+                <version>${jacoco.version}</version>
                 <configuration>
                     <destFile>${basedir}/target/coverage-reports/jacoco-it.exec</destFile>
                     <dataFile>${basedir}/target/coverage-reports/jacoco-it.exec</dataFile>
