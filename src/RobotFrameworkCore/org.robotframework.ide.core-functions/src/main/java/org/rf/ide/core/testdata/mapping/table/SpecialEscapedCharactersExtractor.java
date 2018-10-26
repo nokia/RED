@@ -27,32 +27,26 @@ public class SpecialEscapedCharactersExtractor {
         int currentPos = 0;
         final Matcher matcher = PATTERN.matcher(text.toString());
         while (matcher.find()) {
-            final int start_t = matcher.start();
-            final int end_t = matcher.end();
-            if (start_t - currentPos > 0) {
-                extracted.add(new Special(NamedSpecial.UNKNOWN_TEXT, text
-                        .substring(currentPos, start_t)));
+            final int startPos = matcher.start();
+            final int endPos = matcher.end();
+            if (startPos - currentPos > 0) {
+                extracted.add(new Special(NamedSpecial.UNKNOWN_TEXT, text.substring(currentPos, startPos)));
             }
 
-            extracted.add(new Special(getType(SPECIALS, matcher), text
-                    .substring(start_t, end_t)));
-            currentPos = end_t;
+            extracted.add(new Special(getType(SPECIALS, matcher), text.substring(startPos, endPos)));
+            currentPos = endPos;
         }
 
         final int length = text.length();
         if (currentPos < length) {
-            extracted.add(new Special(NamedSpecial.UNKNOWN_TEXT, text
-                    .substring(currentPos, length)));
+            extracted.add(new Special(NamedSpecial.UNKNOWN_TEXT, text.substring(currentPos, length)));
         }
 
         return extracted;
     }
 
-
     @VisibleForTesting
-    protected NamedSpecial getType(final List<NamedSpecial> specials,
-            final Matcher matcher) {
-
+    protected NamedSpecial getType(final List<NamedSpecial> specials, final Matcher matcher) {
         int typeIndex = -1;
         for (int i = 1; i < matcher.groupCount(); i++) {
             if (matcher.group(i) != null) {
@@ -61,24 +55,19 @@ public class SpecialEscapedCharactersExtractor {
             }
         }
 
-        NamedSpecial type;
         if (typeIndex > -1) {
-            type = specials.get(typeIndex - 1);
+            return specials.get(typeIndex - 1);
         } else {
-            type = NamedSpecial.UNKNOWN_TEXT;
+            return NamedSpecial.UNKNOWN_TEXT;
         }
-
-        return type;
     }
-
 
     @VisibleForTesting
     protected static String build(final List<NamedSpecial> specials) {
         final StringBuilder pattern = new StringBuilder();
         final int size = specials.size();
         for (int i = 0; i < size; i++) {
-            pattern.append("([\\\\]")
-                    .append(specials.get(i).getPatternSuffix()).append(")");
+            pattern.append("([\\\\]").append(specials.get(i).getPatternSuffix()).append(")");
             if (i < size - 1) {
                 pattern.append('|');
             }
@@ -90,19 +79,17 @@ public class SpecialEscapedCharactersExtractor {
     public static class Special {
 
         private final NamedSpecial type;
-        private final String text;
 
+        private final String text;
 
         public Special(final NamedSpecial type, final String text) {
             this.type = type;
             this.text = text;
         }
 
-
         public NamedSpecial getType() {
             return type;
         }
-
 
         public String getText() {
             return text;
@@ -149,24 +136,21 @@ public class SpecialEscapedCharactersExtractor {
         ESCAPED_BACKSLASH("{2}", "\\");
 
         private final String patternSuffix;
-        private final String normalized;
 
+        private final String normalized;
 
         private NamedSpecial(final String patternSuffix, final String normalized) {
             this.patternSuffix = patternSuffix;
             this.normalized = normalized;
         }
 
-
         public String getPatternSuffix() {
             return patternSuffix;
         }
 
-
         public String getNormalized() {
             return normalized;
         }
-
 
         public static List<NamedSpecial> expected() {
             final List<NamedSpecial> spec = new ArrayList<>();
