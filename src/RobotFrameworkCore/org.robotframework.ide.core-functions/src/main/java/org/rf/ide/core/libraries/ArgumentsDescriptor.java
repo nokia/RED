@@ -54,14 +54,14 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         final List<Argument> arguments = newArrayList();
         for (final String arg : args) {
             final ArgumentType type;
-            final String possiblyAnnotatedName ;
+            final String possiblyAnnotatedName;
             String value = null;
             if (arg.contains("=")) {
                 type = foundEndOfPositional ? ArgumentType.KEYWORD_ONLY : ArgumentType.DEFAULT;
                 final List<String> splitted = Splitter.on('=').splitToList(arg);
                 possiblyAnnotatedName = splitted.get(0);
                 value = String.join("=", splitted.subList(1, splitted.size()));
-                
+
             } else if (arg.startsWith("**")) {
                 type = ArgumentType.KWARG;
                 possiblyAnnotatedName = arg.substring(2);

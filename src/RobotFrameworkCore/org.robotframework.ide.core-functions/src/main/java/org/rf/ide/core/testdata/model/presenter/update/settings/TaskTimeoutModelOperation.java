@@ -49,10 +49,10 @@ public class TaskTimeoutModelOperation implements ISettingTableElementOperation 
         if (index == 0) {
             testTimeout.setTimeout(value != null ? value : "");
         } else if (index > 0) {
-            if(value != null) {
+            if (value != null) {
                 testTimeout.setMessageArgument(index - 1, value);
             } else {
-                testTimeout.removeElementToken(index-1);
+                testTimeout.removeElementToken(index - 1);
             }
         }
     }

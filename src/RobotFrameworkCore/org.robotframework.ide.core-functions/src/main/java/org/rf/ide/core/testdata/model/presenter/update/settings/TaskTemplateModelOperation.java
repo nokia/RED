@@ -48,14 +48,14 @@ public class TaskTemplateModelOperation implements ISettingTableElementOperation
         if (index == 0) {
             testTemplate.setKeywordName(value != null ? value : "");
         } else if (index > 0) {
-            if(value != null) {
+            if (value != null) {
                 testTemplate.setUnexpectedTrashArgument(index - 1, value);
             } else {
-                testTemplate.removeElementToken(index-1);
+                testTemplate.removeElementToken(index - 1);
             }
         }
     }
-    
+
     @Override
     public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
         settingsTable.addTaskTemplate((TaskTemplate) modelElement);
