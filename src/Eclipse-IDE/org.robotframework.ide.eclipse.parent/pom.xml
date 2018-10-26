@@ -17,7 +17,7 @@
 				</property>
 			</activation>
 			<properties>
-				<tycho-version>0.22.0</tycho-version>
+				<tycho.version>0.22.0</tycho.version>
 			</properties>
 			<repositories>
 				<repository>
@@ -145,10 +145,11 @@
 	</profiles>
 
 	<properties>
-		<tycho-version>1.0.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<eclipse.version>oxygen</eclipse.version>
 		<jdk.version>1.8</jdk.version>
+		<tycho.version>1.0.0</tycho.version>
+		<jacoco.version>0.7.6.201602180812</jacoco.version>
+		<eclipse.version>oxygen</eclipse.version>
 	</properties>
 
 	<reporting>
@@ -182,7 +183,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.6.201602180812</version>
+				<version>${jacoco.version}</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -212,7 +213,7 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tycho.version}</version>
 				<configuration>
 					<pomDependencies>consider</pomDependencies>
 					<resolver>p2</resolver>
@@ -247,13 +248,13 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tycho.version}</version>
 				<extensions>true</extensions>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.6.201602180812</version>
+				<version>${jacoco.version}</version>
 				<executions>
 					<!-- The Executions required by unit tests are omitted. -->
 					<!-- Prepares the property pointing to the JaCoCo runtime agent which 
