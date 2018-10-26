@@ -40,6 +40,7 @@ class RobotPathsNaming {
                 .map(pathSegmentsMapper::apply)
                 .map(pathSegments -> RobotPathsNaming.createSuiteName(topLevelSuiteName, pathSegments))
                 .filter(name -> !name.isEmpty())
+                .distinct()
                 .collect(toList());
     }
 
@@ -50,7 +51,7 @@ class RobotPathsNaming {
             return e.getValue()
                     .stream()
                     .map(testName -> RobotPathsNaming.createTestName(topLevelSuiteName, pathSegments, testName));
-        }).filter(name -> !name.isEmpty()).collect(toList());
+        }).filter(name -> !name.isEmpty()).distinct().collect(toList());
     }
 
     static String createSuiteName(final String topLevelSuiteName, final List<String> pathSegments) {

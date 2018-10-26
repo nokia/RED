@@ -20,13 +20,13 @@ public final class VariablesEvent {
 
     public static VariablesEvent from(final Map<String, Object> eventMap) {
         final Map<?, ?> arguments = (Map<?, ?>) ((List<?>) eventMap.get("variables")).get(0);
-        final List<?> vars_scopes = (List<?>) arguments.get("var_scopes");
+        final List<?> varScopes = (List<?>) arguments.get("var_scopes");
         final String error = (String) arguments.get("error");
 
-        if (vars_scopes == null) {
+        if (varScopes == null) {
             throw new IllegalArgumentException("Variables events should have scopes provided");
         }
-        return new VariablesEvent(extractVariableScopes(vars_scopes), error);
+        return new VariablesEvent(extractVariableScopes(varScopes), error);
     }
 
     private static List<Map<Variable, VariableTypedValue>> extractVariableScopes(final List<?> arguments) {

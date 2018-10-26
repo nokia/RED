@@ -101,6 +101,14 @@ public class RobotPathsNamingTest {
                     ImmutableMap.of(projectProvider.getFile("some/path/to/suite.robot"), newArrayList()), "",
                     ALL_SEGMENTS)).containsExactly(PROJECT_NAME + ".Some.Path.To.Suite");
 
+            softly.assertThat(
+                    RobotPathsNaming.createSuiteNames(
+                            ImmutableMap.of(projectProvider.getFile("001__same_suite.robot"), newArrayList(),
+                                    projectProvider.getFile("002__same_suite.robot"), newArrayList(),
+                                    projectProvider.getFile("003__same_suite.robot"), newArrayList()),
+                            "", ALL_SEGMENTS))
+                    .containsExactly(PROJECT_NAME + ".Same Suite");
+
             softly.assertThat(RobotPathsNaming.createSuiteNames(
                     ImmutableMap.of(projectProvider.getFile("some/path/to/suite.robot"), newArrayList()), "Top",
                     ALL_SEGMENTS)).containsExactly("Top." + PROJECT_NAME + ".Some.Path.To.Suite");
@@ -125,6 +133,13 @@ public class RobotPathsNamingTest {
             softly.assertThat(RobotPathsNaming.createTestNames(
                     ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList("tc1", "tc2")), "",
                     LAST_SEGMENT)).containsExactly("Suite.tc1", "Suite.tc2");
+
+            softly.assertThat(RobotPathsNaming.createTestNames(
+                    ImmutableMap.of(projectProvider.getFile("001__same_suite.robot"), newArrayList("tc1", "tc2"),
+                            projectProvider.getFile("002__same_suite.robot"), newArrayList("tc1", "tc2"),
+                            projectProvider.getFile("003__same_suite.robot"), newArrayList("tc1", "tc2")),
+                    "", ALL_SEGMENTS))
+                    .containsExactly(PROJECT_NAME + ".Same Suite.tc1", PROJECT_NAME + ".Same Suite.tc2");
 
             softly.assertThat(RobotPathsNaming.createTestNames(
                     ImmutableMap.of(projectProvider.getFile("ProjectLink.robot"), newArrayList("tc1", "tc2")), "",
