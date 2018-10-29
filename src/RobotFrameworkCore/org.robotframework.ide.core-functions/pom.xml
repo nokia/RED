@@ -10,7 +10,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<jacoco.version>0.7.6.201602180812</jacoco.version>
+		<jacoco.version>0.8.2</jacoco.version>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<skip.unit.tests>false</skip.unit.tests>
 		<skip.py.unit.tests>false</skip.py.unit.tests>
@@ -23,20 +23,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.9</version>
+				<version>3.0.0</version>
 				<configuration>
 					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>2.5</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.13</version>
+				<version>2.22.1</version>
 				<inherited>true</inherited>
 				<reportSets>
 					<reportSet>
@@ -45,12 +40,16 @@
 						</reports>
 					</reportSet>
 				</reportSets>
+				<configuration>
+					<linkXRef>false</linkXRef>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.8</version>
+				<version>3.10.0</version>
 				<configuration>
+					<linkXRef>false</linkXRef>
 					<targetJdk>${jdk.version}</targetJdk>
 					<rulesets>
 						<ruleset>../../PMD/pegasus-pmd.xml</ruleset>
@@ -62,14 +61,16 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>3.0.0</version>
 				<configuration>
+					<linkXRef>false</linkXRef>
 					<configLocation>../../Checkstyle/checkstyle-configuration.xml</configLocation>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.1.7</version>
 				<configuration>
+					<linkXRef>false</linkXRef>
 					<onlyAnalyze>org.rf.-,org.robotframework.-</onlyAnalyze>
 				</configuration>
 			</plugin>
@@ -101,7 +102,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -138,12 +139,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.1</version>
+				<version>3.8.0</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.codehaus.plexus</groupId>
 						<artifactId>plexus-utils</artifactId>
-						<version>3.0.24</version>
+						<version>3.1.0</version>
 					</dependency>
 				</dependencies>
 				<configuration>
@@ -157,7 +158,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -176,7 +177,7 @@
 								<artifactItem>
 									<groupId>org.slf4j</groupId>
 									<artifactId>slf4j-api</artifactId>
-									<version>1.7.5</version>
+									<version>1.7.25</version>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -186,7 +187,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.14.1</version>
+				<version>2.22.1</version>
 				<inherited>true</inherited>
 				<configuration>
 					<forkMode>once</forkMode>
@@ -197,7 +198,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.0.2</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
@@ -222,7 +223,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.5.0</version>
+				<version>1.6.0</version>
 				<executions>
 					<execution>
 						<configuration>
@@ -313,12 +314,12 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.3</version>
+					<version>3.7.1</version>
 					<dependencies>
 						<dependency>
 							<groupId>org.apache.maven.doxia</groupId>
 							<artifactId>doxia-module-apt</artifactId>
-							<version>1.4</version>
+							<version>1.8</version>
 						</dependency>
 					</dependencies>
 					<configuration>
