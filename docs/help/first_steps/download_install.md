@@ -2,13 +2,12 @@
 
 ### Get Java
 
-RED is compatible with any Oracle Java newer than 1.8.  
+RED is compatible with Oracle Java 1.8+.  
 [Java official website](https://www.java.com)
 
 ### Get Eclipse
 
-Currently RED is tested with Eclipse Mars/Neon (4.4.x/4.5.x) release although
-RED is compatible with Eclipse Luna, Mars and Neon.  
+Currently RED is tested and released with Eclipse Oxygen (4.7.x) platform.  
 [Official Eclipse website](https://www.eclipse.org/)
 
 ### Get RED
