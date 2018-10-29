@@ -67,8 +67,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<tycho.version>1.0.0</tycho.version>
-		<jacoco.version>0.7.6.201602180812</jacoco.version>
+		<tycho.version>1.2.0</tycho.version>
+		<jacoco.version>0.8.2</jacoco.version>
 		<eclipse.version>oxygen</eclipse.version>
 	</properties>
 
@@ -77,20 +77,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.9</version>
+				<version>3.0.0</version>
 				<configuration>
 					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>2.5</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.13</version>
+				<version>2.22.1</version>
 				<inherited>true</inherited>
 				<reportSets>
 					<reportSet>
@@ -99,6 +94,9 @@
 						</reports>
 					</reportSet>
 				</reportSets>
+				<configuration>
+					<linkXRef>false</linkXRef>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -116,7 +114,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.10</version>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<id>copy</id>
@@ -213,6 +211,23 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.7.1</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.doxia</groupId>
+							<artifactId>doxia-module-apt</artifactId>
+							<version>1.8</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<inputEncoding>UTF-8</inputEncoding>
+						<outputEncoding>UTF-8</outputEncoding>
+						<locales>en</locales>
+					</configuration>
+				</plugin>
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.5.3</version>

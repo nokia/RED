@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.robotframework.ide.eclipse.main.plugin.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
-
 
 	<parent>
 		<groupId>org.robotframework.ide.eclipse</groupId>
@@ -19,8 +19,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.8</version>
+				<version>3.10.0</version>
 				<configuration>
+					<linkXRef>false</linkXRef>
 					<targetJdk>${jdk.version}</targetJdk>
 					<rulesets>
 						<ruleset>../../PMD/pegasus-pmd-tests.xml</ruleset>
@@ -32,27 +33,30 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>3.0.0</version>
 				<configuration>
+					<linkXRef>false</linkXRef>
 					<configLocation>../../Checkstyle/checkstyle-configuration-tests.xml</configLocation>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.1.7</version>
 				<configuration>
+					<linkXRef>false</linkXRef>
 					<onlyAnalyze>org.rf.-,org.robotframework.-</onlyAnalyze>
 					<excludeFilterFile>../../SpotBugs/spotbugs-configuration-tests.xml</excludeFilterFile>
 				</configuration>
 			</plugin>
 		</plugins>
 	</reporting>
-	
+
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
@@ -61,51 +65,49 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-						   <includeTypes>jar</includeTypes>
-						   <outputDirectory>lib</outputDirectory>
-						   <overWriteIfNewer>true</overWriteIfNewer>
-						   <overWriteReleases>true</overWriteReleases>
-						   <overWriteSnapshots>true</overWriteSnapshots>
+							<includeTypes>jar</includeTypes>
+							<outputDirectory>lib</outputDirectory>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
-	                <execution>
-	                    <id>unpack-classes</id>
-	                    <phase>generate-sources</phase>
-	                    <configuration>
-	                        <includeArtifactIds>org.robotframework.ide.core-functions,org.robotframework.ide.eclipse.main.plugin</includeArtifactIds>
-	                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
-	                    </configuration>
-	                    <goals>
-	                        <goal>unpack-dependencies</goal>
-	                    </goals>
-	                </execution>					
+					<execution>
+						<id>unpack-classes</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<includeArtifactIds>org.robotframework.ide.core-functions,org.robotframework.ide.eclipse.main.plugin</includeArtifactIds>
+							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+						</configuration>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
-			
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>1.8</version>
-            <executions>
-                <execution>
-                    <id>add-source</id>
-                    <phase>generate-sources</phase>
-                    <goals>
-                        <goal>add-source</goal>
-                    </goals>
-                    <configuration>
-                        <sources>
-                            <source>${project.build.directory}/source</source>
-                        </sources>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-        			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/source</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.5</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>clean-dependencies</id>
@@ -134,44 +136,44 @@
 				</configuration>
 			</plugin>
 			<plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <configuration>
-                    <destFile>${basedir}/target/coverage-reports/jacoco-it.exec</destFile>
-                    <dataFile>${basedir}/target/coverage-reports/jacoco-it.exec</dataFile>
-                    <includes>
-                    	<include>**/*robotframework/**/*</include>
-                    </includes>
-                    <excludes>                    	
-                    	<exclude>**/*Test.class</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>jacoco-initialize</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>jacoco-site</id>
-                        <phase>site</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<configuration>
+					<destFile>${basedir}/target/coverage-reports/jacoco-it.exec</destFile>
+					<dataFile>${basedir}/target/coverage-reports/jacoco-it.exec</dataFile>
+					<includes>
+						<include>**/*robotframework/**/*</include>
+					</includes>
+					<excludes>
+						<exclude>**/*Test.class</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>site</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
 	<dependencies>
-        <dependency>
-           <groupId>org.robotframework.ide.eclipse</groupId>
-           <artifactId>org.robotframework.ide.eclipse.main.plugin</artifactId>
-           <version>1.0.0-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+			<groupId>org.robotframework.ide.eclipse</groupId>
+			<artifactId>org.robotframework.ide.eclipse.main.plugin</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
