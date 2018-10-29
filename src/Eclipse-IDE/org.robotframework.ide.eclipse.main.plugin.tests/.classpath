@@ -3,10 +3,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="output" path="target/classes"/>
 	<classpathentry exported="true" kind="lib" path="lib/assertj-core-3.11.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mockito-core-2.23.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/objenesis-3.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/byte-buddy-1.9.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/byte-buddy-agent-1.9.2.jar"/>
-	<classpathentry kind="output" path="target/classes"/>
 </classpath>
