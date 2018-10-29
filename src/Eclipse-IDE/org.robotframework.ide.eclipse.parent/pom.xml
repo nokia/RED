@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.robotframework.ide.eclipse</groupId>
@@ -8,87 +9,6 @@
 	<name>RobotFramework Eclipse IDE Maven Parent Project</name>
 
 	<profiles>
-		<profile>
-			<id>luna-profile</id>
-			<activation>
-				<property>
-					<name>eclipse.version</name>
-					<value>luna</value>
-				</property>
-			</activation>
-			<properties>
-				<tycho.version>0.22.0</tycho.version>
-			</properties>
-			<repositories>
-				<repository>
-					<id>eclipse-luna</id>
-					<url>http://download.eclipse.org/releases/luna/</url>
-					<layout>p2</layout>
-				</repository>
-				<repository>
-					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
-					<layout>p2</layout>
-				</repository>
-                <repository>
-                    <id>codeaffine</id>
-                    <url>http://fappel.github.io/xiliary/</url>
-                    <layout>p2</layout>
-                </repository>
-			</repositories>
-		</profile>
-		<profile>
-			<id>mars-profile</id>
-			<activation>
-				<property>
-					<name>eclipse.version</name>
-					<value>mars</value>
-				</property>
-			</activation>
-			<repositories>
-				<repository>
-					<id>eclipse-mars</id>
-					<url>http://download.eclipse.org/releases/mars/</url>
-					<layout>p2</layout>
-				</repository>
-				<repository>
-					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
-					<layout>p2</layout>
-				</repository>
-                <repository>
-                    <id>codeaffine</id>
-                    <url>http://fappel.github.io/xiliary/</url>
-                    <layout>p2</layout>
-                </repository>
-			</repositories>
-		</profile>
-		<profile>
-			<id>neon-profile</id>
-			<activation>
-				<property>
-					<name>eclipse.version</name>
-					<value>neon</value>
-				</property>
-			</activation>
-			<repositories>
-				<repository>
-					<id>eclipse-neon</id>
-					<url>http://download.eclipse.org/releases/neon/ </url>
-					<layout>p2</layout>
-				</repository>
-				<repository>
-					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
-					<layout>p2</layout>
-				</repository>
-                <repository>
-                    <id>codeaffine</id>
-                    <url>http://fappel.github.io/xiliary/</url>
-                    <layout>p2</layout>
-                </repository>
-			</repositories>
-		</profile>
 		<profile>
 			<id>oxygen-profile</id>
 			<activation>
@@ -109,11 +29,11 @@
 					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
-                <repository>
-                    <id>codeaffine</id>
-                    <url>http://fappel.github.io/xiliary/</url>
-                    <layout>p2</layout>
-                </repository>
+				<repository>
+					<id>codeaffine</id>
+					<url>http://fappel.github.io/xiliary/</url>
+					<layout>p2</layout>
+				</repository>
 			</repositories>
 		</profile>
 		<profile>
@@ -135,11 +55,11 @@
 					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
-                <repository>
-                    <id>codeaffine</id>
-                    <url>http://fappel.github.io/xiliary/</url>
-                    <layout>p2</layout>
-                </repository>
+				<repository>
+					<id>codeaffine</id>
+					<url>http://fappel.github.io/xiliary/</url>
+					<layout>p2</layout>
+				</repository>
 			</repositories>
 		</profile>
 	</profiles>
@@ -295,7 +215,7 @@
 			<plugins>
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.1</version>
+					<version>2.5.3</version>
 					<configuration>
 						<arguments>-Pjdk17</arguments>
 					</configuration>
