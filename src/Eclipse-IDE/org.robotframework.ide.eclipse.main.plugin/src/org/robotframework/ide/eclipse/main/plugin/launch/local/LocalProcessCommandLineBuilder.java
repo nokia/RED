@@ -115,8 +115,9 @@ class LocalProcessCommandLineBuilder {
 
     private void addDataSources(final IRunCommandLineBuilder builder, final RedPreferences preferences)
             throws CoreException {
-        final Map<IResource, List<String>> selectedResources = findResources(robotProject.getProject(),
-                robotConfig.getSuitePaths());
+        final IProject project = robotProject.getProject();
+        final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
+        final Map<IResource, List<String>> selectedResources = findResources(project, suitePaths);
         final Map<IResource, List<String>> linkedResources = findLinkedResources(selectedResources);
         final Map<IResource, List<String>> notLinkedResources = Maps.filterKeys(selectedResources,
                 resource -> !resource.isVirtual() && !resource.isLinked(IResource.CHECK_ANCESTORS));
@@ -125,31 +126,33 @@ class LocalProcessCommandLineBuilder {
 
         if (preferences.shouldUseSingleFileDataSource() && allResources.size() == 1) {
             builder.withDataSources(newArrayList(getOnlyElement(allResources.keySet()).getLocation().toFile()));
-
-            final Function<IResource, List<String>> mapper = r -> newArrayList(
-                    r.getLocation().removeFileExtension().lastSegment());
-            builder.testsToRun(RobotPathsNaming.createTestNames(allResources, "", mapper));
+            if (!suitePaths.isEmpty()) {
+                final Function<IResource, List<String>> mapper = r -> newArrayList(
+                        r.getLocation().removeFileExtension().lastSegment());
+                builder.testsToRun(RobotPathsNaming.createTestNames(allResources, "", mapper));
+            }
         } else {
             final List<IResource> dataSources = new ArrayList<>();
-            dataSources.add(robotProject.getProject());
+            dataSources.add(project);
             dataSources.addAll(linkedResources.keySet());
             builder.withDataSources(
                     dataSources.stream().map(IResource::getLocation).map(IPath::toFile).collect(toList()));
-
-            final String topLevelSuiteName = RobotPathsNaming.createTopLevelSuiteName(dataSources);
-            final Function<IResource, List<String>> mapper = r -> {
-                if (r.isLinked(IResource.CHECK_ANCESTORS)) {
-                    return newArrayList(r.getLocation().removeFileExtension().lastSegment());
-                } else {
-                    final List<String> segments = newArrayList(robotProject.getProject().getLocation().lastSegment());
-                    segments.addAll(newArrayList(r.getProjectRelativePath().removeFileExtension().segments()));
-                    return segments.size() > 1 ? segments : new ArrayList<>();
-                }
-            };
-            builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, topLevelSuiteName, mapper));
-            builder.suitesToRun(RobotPathsNaming.createSuiteNames(linkedResources, topLevelSuiteName, mapper));
-            builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, topLevelSuiteName, mapper));
-            builder.testsToRun(RobotPathsNaming.createTestNames(linkedResources, topLevelSuiteName, mapper));
+            if (!suitePaths.isEmpty()) {
+                final String topLevelSuiteName = RobotPathsNaming.createTopLevelSuiteName(dataSources);
+                final Function<IResource, List<String>> mapper = r -> {
+                    if (r.isLinked(IResource.CHECK_ANCESTORS)) {
+                        return newArrayList(r.getLocation().removeFileExtension().lastSegment());
+                    } else {
+                        final List<String> segments = newArrayList(project.getLocation().lastSegment());
+                        segments.addAll(newArrayList(r.getProjectRelativePath().removeFileExtension().segments()));
+                        return segments;
+                    }
+                };
+                builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, topLevelSuiteName, mapper));
+                builder.suitesToRun(RobotPathsNaming.createSuiteNames(linkedResources, topLevelSuiteName, mapper));
+                builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, topLevelSuiteName, mapper));
+                builder.testsToRun(RobotPathsNaming.createTestNames(linkedResources, topLevelSuiteName, mapper));
+            }
         }
     }
 
