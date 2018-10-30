@@ -366,6 +366,23 @@ public class LocalProcessCommandLineBuilderTest {
     }
 
     @Test
+    public void commandLineContainsAdditionalDataSource_whenWholeProjectIsSelected() throws Exception {
+        final File nonWorkspaceFile = tempFolder.newFile("non_workspace.robot");
+        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
+        resourceCreator.createLink(nonWorkspaceFile.toURI(), projectProvider.getFile("LinkedFile.robot"));
+
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(7)
+                .doesNotContain("-s", "-t")
+                .endsWith(projectProvider.getProject().getLocation().toOSString(), nonWorkspaceFile.getPath());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
     public void commandLineContainsAdditionalDataSource_whenLinkedSuiteFileIsSelected() throws Exception {
         final File nonWorkspaceTest = tempFolder.newFile("non_workspace_test.robot");
         Files.write("*** Test Cases ***".getBytes(), nonWorkspaceTest);
@@ -800,6 +817,21 @@ public class LocalProcessCommandLineBuilderTest {
                 .withMessage("Variable references non-existent resource : ${workspace_loc:/" + PROJECT_NAME
                         + "/not_existing.bat}")
                 .withNoCause();
+    }
+
+    @Test
+    public void pathToSingleSuiteIsUsed_whenWholeProjectIsRunAndPreferenceIsSet() throws Exception {
+        when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
+
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(6)
+                .doesNotContain("-s", "-t")
+                .endsWith(projectProvider.getProject().getLocation().toOSString());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     @Test
