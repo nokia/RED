@@ -14,3 +14,4 @@ Bundle-ClassPath: .,
  lib/objenesis-3.0.1.jar,
  lib/byte-buddy-1.9.2.jar,
  lib/byte-buddy-agent-1.9.2.jar
+Automatic-Module-Name: org.robotframework.ide.eclipse.main.plugin.tests
