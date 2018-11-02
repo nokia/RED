@@ -19,10 +19,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class LibraryConstructor {
 
     public static LibraryConstructor create(final String documentation, final List<String> arguments) {
-        final LibraryConstructor contructor = new LibraryConstructor();
-        contructor.setDocumentation(documentation);
-        contructor.setArguments(arguments);
-        return contructor;
+        final LibraryConstructor constructor = new LibraryConstructor();
+        constructor.setDocumentation(documentation);
+        constructor.setArguments(arguments);
+        return constructor;
     }
 
     private String documentation;

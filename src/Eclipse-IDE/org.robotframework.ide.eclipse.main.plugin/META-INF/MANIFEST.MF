@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.robotframework.ide.eclipse.main.plugin; singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Nokia Solutions and Networks
 Require-Bundle: org.apache.commons.logging,
+ javax.annotation,
  org.eclipse.e4.core.services,
  org.eclipse.e4.core.di,
  org.eclipse.e4.ui.di,
@@ -38,6 +39,11 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar,
  lib/guava-27.0-jre.jar,
+ lib/javax.annotation-api-1.3.2.jar,
+ lib/jaxb-api-2.3.1.jar,
+ lib/jaxb-core-2.3.0.1.jar,
+ lib/jaxb-impl-2.3.1.jar,
  .
 Bundle-Activator: org.robotframework.ide.eclipse.main.plugin.RedPlugin
 Export-Package: org.robotframework.ide.eclipse.main.plugin.project
+Automatic-Module-Name: org.robotframework.ide.eclipse.main.plugin
