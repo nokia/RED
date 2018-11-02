@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import java.util.Map.Entry;
-import java.util.stream.Stream;
+import java.util.Map;
 
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -21,8 +20,8 @@ class RobotProjectExternalDependencies extends RobotProjectDependencies {
     }
 
     @Override
-    Stream<Entry<LibraryDescriptor, LibrarySpecification>> getLibrariesStream() {
-        return project.getLibraryEntriesStream().filter(entry -> entry.getKey().isReferencedLibrary());
+    Map<LibraryDescriptor, LibrarySpecification> getProjectLibraries() {
+        return project.getReferencedLibraries();
     }
 
     @Override

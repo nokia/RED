@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Streams.concat;
 import static java.util.stream.Collectors.toList;
 
 import java.io.File;
@@ -19,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -41,7 +39,6 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.libraries.LibrarySpecificationReader;
-import org.rf.ide.core.libraries.LibrarySpecificationReader.CannotReadLibrarySpecificationException;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -144,14 +141,16 @@ public class RobotProject extends RobotContainer {
             return new LinkedHashMap<>();
         }
 
-        final Stream<LibraryDescriptor> stdLibsDescriptorsStream = env.getStandardLibrariesNames().stream()
+        final Stream<LibraryDescriptor> stdLibsDescriptorsStream = env.getStandardLibrariesNames()
+                .stream()
                 .map(LibraryDescriptor::ofStandardLibrary);
-        final Stream<LibraryDescriptor> remoteStdLibsDescriptorsStream = configuration.getRemoteLocations().stream()
+        final Stream<LibraryDescriptor> remoteStdLibsDescriptorsStream = configuration.getRemoteLocations()
+                .stream()
                 .map(LibraryDescriptor::ofStandardRemoteLibrary);
 
         stdLibsSpecs = new LinkedHashMap<>();
-        concat(stdLibsDescriptorsStream, remoteStdLibsDescriptorsStream).forEach(descriptor -> {
-            stdLibsSpecs.put(descriptor, libToSpec(this).apply(descriptor));
+        Stream.concat(stdLibsDescriptorsStream, remoteStdLibsDescriptorsStream).forEach(descriptor -> {
+            stdLibsSpecs.put(descriptor, findLibSpec(descriptor));
         });
         return stdLibsSpecs;
     }
@@ -182,7 +181,7 @@ public class RobotProject extends RobotContainer {
         for (final ReferencedLibrary library : configuration.getLibraries()) {
             final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
 
-            final LibrarySpecification spec = libToSpec(this).apply(descriptor);
+            final LibrarySpecification spec = findLibSpec(descriptor);
             refLibsSpecs.put(descriptor, spec);
 
             if (spec != null) {
@@ -198,15 +197,15 @@ public class RobotProject extends RobotContainer {
     }
 
     public Stream<Entry<LibraryDescriptor, LibrarySpecification>> getLibraryEntriesStream() {
-        return concat(getStandardLibraries().entrySet().stream(), getReferencedLibraries().entrySet().stream());
+        return Stream.concat(getStandardLibraries().entrySet().stream(), getReferencedLibraries().entrySet().stream());
     }
 
     public Stream<LibraryDescriptor> getLibraryDescriptorsStream() {
-        return concat(getStandardLibraries().keySet().stream(), getReferencedLibraries().keySet().stream());
+        return Stream.concat(getStandardLibraries().keySet().stream(), getReferencedLibraries().keySet().stream());
     }
 
     public Stream<LibrarySpecification> getLibrarySpecificationsStream() {
-        return concat(getStandardLibraries().values().stream(), getReferencedLibraries().values().stream())
+        return Stream.concat(getStandardLibraries().values().stream(), getReferencedLibraries().values().stream())
                 .filter(notNull());
     }
 
@@ -230,34 +229,23 @@ public class RobotProject extends RobotContainer {
         librariesWatchHandler.removeDirtySpecs(libSpecs);
     }
 
-    private static Function<LibraryDescriptor, LibrarySpecification> libToSpec(final RobotProject robotProject) {
-        return descriptor -> {
-            try {
-                File fileToRead = null;
-                if (descriptor.getLibraryType() == LibraryType.VIRTUAL) {
-                    final IPath path = Path.fromPortableString(descriptor.getPath());
-                    if (!path.isAbsolute()) {
-                        final IFile file = robotProject.getProject().getParent().getFile(path);
-                        fileToRead = RedWorkspace.getLocalFile(file).orElse(null);
-                    }
-                }
-                if (fileToRead == null) {
-                    final LibspecsFolder libspecsFolder = robotProject.getLibspecsFolder();
-
-                    final String fileName = descriptor.generateLibspecFileName();
-                    fileToRead = RedWorkspace.getLocalFile(libspecsFolder.getXmlSpecFile(fileName)).orElse(null);
-                }
-                if (fileToRead == null) {
-                    return null;
-                }
-
-                final LibrarySpecification spec = LibrarySpecificationReader.readSpecification(fileToRead);
-                spec.setDescriptor(descriptor);
-                return spec;
-            } catch (final CannotReadLibrarySpecificationException e) {
-                return null;
+    private LibrarySpecification findLibSpec(final LibraryDescriptor descriptor) {
+        Optional<File> fileToRead = Optional.empty();
+        if (descriptor.getLibraryType() == LibraryType.VIRTUAL) {
+            final IPath path = Path.fromPortableString(descriptor.getPath());
+            if (!path.isAbsolute()) {
+                fileToRead = RedWorkspace.getLocalFile(getProject().getParent().getFile(path));
             }
-        };
+        }
+        if (!fileToRead.isPresent()) {
+            final LibspecsFolder libspecsFolder = getLibspecsFolder();
+            final String fileName = descriptor.generateLibspecFileName();
+            fileToRead = RedWorkspace.getLocalFile(libspecsFolder.getXmlSpecFile(fileName));
+        }
+        return fileToRead.flatMap(LibrarySpecificationReader::readSpecification).map(spec -> {
+            spec.setDescriptor(descriptor);
+            return spec;
+        }).orElse(null);
     }
 
     private synchronized void readProjectConfigurationIfNeeded() {

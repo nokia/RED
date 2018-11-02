@@ -5,13 +5,11 @@
  */
 package org.rf.ide.core.libraries;
 
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -28,10 +26,6 @@ import com.google.common.base.Preconditions;
 @XmlRootElement(name = "keywordspec")
 public class LibrarySpecification {
 
-    public static String getVersion(final File file) {
-        return LibrarySpecificationReader.readSpecification(file).getVersion();
-    }
-
     public static LibrarySpecification create(final String name, final KeywordSpecification... keywords) {
         final LibrarySpecification spec = new LibrarySpecification();
         spec.setName(name);
@@ -43,7 +37,7 @@ public class LibrarySpecification {
 
     @XmlTransient
     private LibraryDescriptor descriptor; // descriptor used to generate this spec
-    
+
     @XmlTransient
     private boolean isModified;
 
@@ -148,7 +142,7 @@ public class LibrarySpecification {
     public boolean isModified() {
         return isModified;
     }
-    
+
     @XmlTransient
     public void setIsModified(final boolean isModified) {
         this.isModified = isModified;
@@ -172,9 +166,9 @@ public class LibrarySpecification {
     }
 
     public Collection<String> getKeywordNames() {
-        return getKeywordsStream().map(KeywordSpecification::getName).collect(toCollection(() -> new HashSet<>()));
+        return getKeywordsStream().map(KeywordSpecification::getName).collect(toSet());
     }
-    
+
     public boolean equalsIgnoreKeywords(final Object obj) {
         if (obj == null) {
             return false;

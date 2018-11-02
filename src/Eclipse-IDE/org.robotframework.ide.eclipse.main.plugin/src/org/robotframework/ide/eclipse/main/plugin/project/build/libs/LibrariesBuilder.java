@@ -27,6 +27,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
+import org.rf.ide.core.libraries.LibrarySpecificationReader;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
@@ -316,6 +317,7 @@ public class LibrariesBuilder {
 
     private static boolean hasSameVersion(final IFile file, final String version) {
         final String fileVersion = RedWorkspace.getLocalFile(file)
+                .flatMap(LibrarySpecificationReader::readSpecification)
                 .map(LibrarySpecification::getVersion)
                 .orElse("unknown");
         return version.startsWith(String.format("Robot Framework %s (", fileVersion));
