@@ -81,7 +81,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
             final List<String> arguments = getArgumentsDescriptor().getRequiredArguments()
                     .stream()
                     .map(Argument::getName)
-                    .collect(Collectors.toCollection(ArrayList::new));
+                    .collect(Collectors.toList());
 
             if (!getArgumentsDescriptor().hasFixedNumberOfArguments()) {
                 arguments.add("");

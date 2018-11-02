@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -514,7 +514,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         final Set<String> keywords = getSuiteFile().getUserDefinedKeywords()
                 .stream()
                 .map(RobotKeywordDefinition::getName)
-                .collect(toCollection(() -> new HashSet<>()));
+                .collect(toSet());
         return new Documentation(DocFormat.ROBOT, getDocumentation(), keywords);
     }
 

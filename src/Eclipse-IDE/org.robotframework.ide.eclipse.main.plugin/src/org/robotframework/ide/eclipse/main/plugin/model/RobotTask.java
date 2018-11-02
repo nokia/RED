@@ -5,11 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 
 import java.io.ObjectStreamException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -97,7 +96,7 @@ public class RobotTask extends RobotCodeHoldingElement<Task> {
         final Set<String> keywords = getSuiteFile().getUserDefinedKeywords()
                 .stream()
                 .map(RobotKeywordDefinition::getName)
-                .collect(toCollection(HashSet::new));
+                .collect(toSet());
         return new Documentation(DocFormat.ROBOT, getDocumentation(), keywords);
     }
 

@@ -7,9 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -28,20 +27,13 @@ public class RobotProjectDependencies {
 
     List<LibrarySpecification> getLibraries() {
         final List<LibrarySpecification> libraries = new ArrayList<>();
-
-        getLibrariesStream().forEach(entry -> {
-            if (entry.getValue() != null) {
-                libraries.add(entry.getValue());
-            } else {
-                final LibraryDescriptor descriptor = entry.getKey();
-                libraries.add(new ErroneousLibrarySpecification(descriptor));
-            }
-        });
+        getProjectLibraries().forEach((descriptor, specification) -> libraries
+                .add(specification != null ? specification : new ErroneousLibrarySpecification(descriptor)));
         return libraries;
     }
 
-    Stream<Entry<LibraryDescriptor, LibrarySpecification>> getLibrariesStream() {
-        return project.getLibraryEntriesStream().filter(entry -> entry.getKey().isStandardLibrary());
+    Map<LibraryDescriptor, LibrarySpecification> getProjectLibraries() {
+        return project.getStandardLibraries();
     }
 
     String getName() {
