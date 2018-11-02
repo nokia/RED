@@ -5,9 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -130,7 +129,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         final Set<IFile> filesToPreserve = project.getLibraryDescriptorsStream()
                 .map(LibraryDescriptor::generateLibspecFileName)
                 .map(libspecsFolder::getXmlSpecFile)
-                .collect(toCollection(HashSet::new));
+                .collect(toSet());
         filesToPreserve.addAll(libspecsFolder.getNewestHtmlSpecFiles());
         try {
             libspecsFolder.preserveOnly(filesToPreserve);
