@@ -37,6 +37,18 @@
 				<target-file-name>photon.target</target-file-name>
 			</properties>
 		</profile>
+		<profile>
+			<id>2018-09-profile</id>
+			<activation>
+				<property>
+					<name>eclipse.version</name>
+					<value>2018-09</value>
+				</property>
+			</activation>
+			<properties>
+				<target-file-name>2018-09.target</target-file-name>
+			</properties>
+		</profile>
 	</profiles>
 
 	<build>
