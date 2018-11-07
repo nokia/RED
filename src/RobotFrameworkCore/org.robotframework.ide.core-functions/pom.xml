@@ -47,12 +47,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.10.0</version>
+				<version>3.11.0</version>
 				<configuration>
 					<linkXRef>false</linkXRef>
 					<targetJdk>${jdk.version}</targetJdk>
 					<rulesets>
-						<ruleset>../../PMD/pegasus-pmd.xml</ruleset>
+						<ruleset>../../PMD/pmd-configuration.xml</ruleset>
 					</rulesets>
 				</configuration>
 			</plugin>
@@ -68,7 +68,7 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>3.1.7</version>
+				<version>3.1.8</version>
 				<configuration>
 					<linkXRef>false</linkXRef>
 					<onlyAnalyze>org.rf.-,org.robotframework.-</onlyAnalyze>
