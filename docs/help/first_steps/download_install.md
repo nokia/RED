@@ -7,7 +7,8 @@ RED is compatible with Oracle Java 1.8+.
 
 ### Get Eclipse
 
-Currently RED is tested and released with Eclipse Oxygen (4.7.x) platform.  
+Currently RED is tested and released with Eclipse Photon (4.8) platform.  
+The oldest supported platform version is Eclipse Oxygen (4.7).  
 [Official Eclipse website](https://www.eclipse.org/)
 
 ### Get RED
