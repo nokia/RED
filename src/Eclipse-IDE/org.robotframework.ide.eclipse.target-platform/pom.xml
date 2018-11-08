@@ -15,7 +15,6 @@
 		<profile>
 			<id>oxygen-profile</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>eclipse.version</name>
 					<value>oxygen</value>
@@ -28,6 +27,7 @@
 		<profile>
 			<id>photon-profile</id>
 			<activation>
+				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>eclipse.version</name>
 					<value>photon</value>
