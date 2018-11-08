@@ -82,8 +82,8 @@ limitations under the License.
 
    <repositories>
       <repository location="http://master.dl.sourceforge.net/project/red-robot-editor/repository" enabled="true" />
-      <repository location="http://download.eclipse.org/eclipse/updates/4.7" enabled="true" />
-      <repository location="http://download.eclipse.org/releases/oxygen" enabled="true" />
+      <repository location="http://download.eclipse.org/eclipse/updates/4.8" enabled="true" />
+      <repository location="http://download.eclipse.org/releases/photon" enabled="true" />
    </repositories>
 
    <preferencesInfo>
