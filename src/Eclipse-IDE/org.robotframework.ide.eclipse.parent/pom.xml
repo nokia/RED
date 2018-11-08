@@ -12,7 +12,6 @@
 		<profile>
 			<id>oxygen-profile</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>eclipse.version</name>
 					<value>oxygen</value>
@@ -39,6 +38,7 @@
 		<profile>
 			<id>photon-profile</id>
 			<activation>
+				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>eclipse.version</name>
 					<value>photon</value>
@@ -95,7 +95,7 @@
 		<jdk.version>1.8</jdk.version>
 		<tycho.version>1.2.0</tycho.version>
 		<jacoco.version>0.8.2</jacoco.version>
-		<eclipse.version>oxygen</eclipse.version>
+		<eclipse.version>photon</eclipse.version>
 	</properties>
 
 	<reporting>
