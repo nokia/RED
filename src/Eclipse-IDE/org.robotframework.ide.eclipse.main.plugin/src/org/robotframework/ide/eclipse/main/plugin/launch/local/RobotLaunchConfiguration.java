@@ -111,7 +111,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,
             final String outputFilePath) throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        robotConfig.setRobotArguments("-R " + outputFilePath);
+        robotConfig.setRobotArguments(String.join(" ", robotConfig.getRobotArguments(), "-R " + outputFilePath).trim());
         robotConfig.setSuitePaths(new HashMap<>());
     }
 

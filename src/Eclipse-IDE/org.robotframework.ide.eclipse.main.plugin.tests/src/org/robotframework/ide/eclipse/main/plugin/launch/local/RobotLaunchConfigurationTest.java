@@ -247,10 +247,19 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void configuredForRerunFailedTests_whenAskedForRerun() throws CoreException {
+    public void filePathIsAddedToRobotArguments_whenAskedForRerunWithoutExistingArguments() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
         assertThat(robotConfig.getRobotArguments()).isEqualTo("-R path");
+        assertThat(robotConfig.getSuitePaths()).isEmpty();
+    }
+
+    @Test
+    public void filePathIsAddedToRobotArguments_whenAskedForRerunWithExistingArguments() throws CoreException {
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        robotConfig.setRobotArguments("-a -b -c");
+        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
+        assertThat(robotConfig.getRobotArguments()).isEqualTo("-a -b -c -R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
     }
 
