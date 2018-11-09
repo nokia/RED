@@ -5,8 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
+
 import java.io.File;
-import java.net.URI;
 import java.util.Optional;
 
 import javax.inject.Named;
@@ -24,10 +25,11 @@ import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunFailedHandler.E4ShowFailedOnlyHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public class RerunFailedHandler extends DIParameterizedHandler<E4ShowFailedOnlyHandler> {
 
@@ -39,37 +41,41 @@ public class RerunFailedHandler extends DIParameterizedHandler<E4ShowFailedOnlyH
 
         @Execute
         public void toggleShowFailedOnly(@Named(ISources.ACTIVE_PART_NAME) final ExecutionViewWrapper view) {
-            @SuppressWarnings("restriction")
-            final ExecutionView executionView = view.getComponent();
-            final Optional<RobotTestsLaunch> launch = executionView.getCurrentlyShownLaunch();
-
-            if (launch.isPresent()) {
+            view.getComponent().getCurrentlyShownLaunch().ifPresent(launch -> {
                 final WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
 
                     @Override
                     public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                        final ILaunchConfiguration launchConfig = launch.get().getLaunchConfiguration();
-                        if (launchConfig != null && launchConfig.exists()) {
-                            // FIXME : do not use -R launching; instead collect failed tests from
-                            // the tree and launch test basing on -s and -t switches
-                            final Optional<URI> outputFile = launch.get()
-                                    .getExecutionData(ExecutionStatusStore.class)
-                                    .map(ExecutionStatusStore::getOutputFilePath);
-                            if (outputFile.isPresent()) {
-                                final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig
-                                        .copy(launchConfig.getName());
-                                RobotLaunchConfiguration.fillForFailedTestsRerun(launchConfigCopy,
-                                        new File(outputFile.get()).getAbsolutePath());
-                                if (launchConfigCopy != null) {
-                                    launchConfigCopy.launch(ILaunchManager.RUN_MODE, monitor);
-                                }
-                            }
-                        }
+                        final ILaunchConfigurationWorkingCopy launchConfigCopy = getConfig(launch);
+                        launchConfigCopy.launch(ILaunchManager.RUN_MODE, monitor);
                         return Status.OK_STATUS;
                     }
                 };
                 job.setUser(false);
                 job.schedule();
+            });
+        }
+
+        @VisibleForTesting
+        static ILaunchConfigurationWorkingCopy getConfig(final RobotTestsLaunch launch) throws CoreException {
+            final ILaunchConfiguration launchConfig = launch.getLaunchConfiguration();
+            if (launchConfig != null && launchConfig.exists()) {
+                // FIXME : do not use -R launching; instead collect failed tests from the
+                // tree and launch test basing on -s and -t switches
+                final Optional<String> outputFilePath = launch.getExecutionData(ExecutionStatusStore.class)
+                        .map(ExecutionStatusStore::getOutputFilePath)
+                        .map(File::new)
+                        .filter(File::exists)
+                        .map(File::getAbsolutePath);
+                if (outputFilePath.isPresent()) {
+                    final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfig.getName());
+                    RobotLaunchConfiguration.fillForFailedTestsRerun(launchConfigCopy, outputFilePath.get());
+                    return launchConfigCopy;
+                } else {
+                    throw newCoreException("Output file does not exist");
+                }
+            } else {
+                throw newCoreException("Launch configuration does not exist");
             }
         }
     }
