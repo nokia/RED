@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _gccY8KdQEeazyPh6f3_hNQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/4/17 11:49 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 11/14/18 4:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -78,8 +78,9 @@ with [get-window "Import Preferences"] {
     with [get-group "" | get-tree] {
         select "Robot Framework"
         get-item "Robot Framework" | check
-    }
+    } 
     get-button Finish | click
+    get-window "Preference Import" | get-button Cancel | click
 }
 
 //check if prefernce were overwritten for the same items
