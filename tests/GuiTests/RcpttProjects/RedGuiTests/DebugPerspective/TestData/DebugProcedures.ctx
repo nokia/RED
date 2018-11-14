@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 7/17/18 6:44 PM
+Save-Time: 11/14/18 3:17 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -36,7 +36,7 @@ proc "wait-for-remote-connection"{
 }
 
 proc "check-debug-marker-on-ruler" [val line] [val script_name]{
-	get-tab-folder -index 2 | get-property activePage | equals $script_name | verify-true
+	get-tab-folder -index 1 | get-property activePage | equals $script_name | verify-true
  	loop [val index 0]{
 	 	try -times 1 -command{
 			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].Type" $line $index] -raw
