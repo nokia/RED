@@ -18,9 +18,9 @@ import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotSpecialTokens;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.rf.ide.core.testdata.text.read.recognizer.executables.RobotSpecialTokens;
 
 public class TaskExecutableRowArgumentMapper implements IParsingMapper {
 
@@ -32,6 +32,7 @@ public class TaskExecutableRowArgumentMapper implements IParsingMapper {
 
     @Override
     public final boolean isApplicableFor(final RobotVersion robotVersion) {
+        specialTokensRecognizer.initializeFor(robotVersion);
         return robotVersion.isNewerOrEqualTo(new RobotVersion(3, 1));
     }
 
