@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _acbKcATKEeeYtJSRkZkJgQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/15/18 4:37 PM
+Save-Time: 11/15/18 4:45 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -197,8 +197,7 @@ get-view Console | get-text-viewer | get-property text
     + "Report:  .*report.html" | verify-true
     
 // check if in run config are args from run config and from rereun (-r)    
-get-button "Run test_with_fail.robot" | click -arrow
-get-menu -path "Run Configurations..." | click
+get-menu -path "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | select "Robot/test_with_fail.robot"
 get-window "Run Configurations" | get-group Arguments | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
