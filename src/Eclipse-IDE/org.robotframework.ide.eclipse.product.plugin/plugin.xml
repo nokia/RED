@@ -11,6 +11,7 @@
             <property name="startupProgressRect" value="35,285,415,15" />
             <property name="aboutImage" value="icons/about.bmp" />
             <property name="aboutText" value="RED - Robot Editor&#x0D;
+&#x0D;Version: 0.0.0&#x0D;
 &#x0D;Development environment for Robot Framework http://www.robotframework.org/&#x0D;
 &#x0D;(c) Copyright 2015-2018 Nokia Solutions and Networks.&#x0D;
 &#x0D;
