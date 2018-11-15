@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRo
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.SimpleRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 /**
  * @author wypych
@@ -43,10 +44,7 @@ public class ForLoopDeclarationRowDescriptorBuilderTest {
         userKeyword.addElement(forExec);
         userKeyword.addElement(forContinueOneExec);
 
-        final RobotToken forAction = RobotToken.create(":FOR");
-        forAction.setLineNumber(1);
-
-        forExec.setAction(forAction);
+        forExec.setAction(RobotToken.create(":FOR", 1, 2, RobotTokenType.FOR_TOKEN));
         forExec.addArgument(RobotToken.create("${i}"));
         forExec.addArgument(RobotToken.create("in range"));
         forExec.addArgument(RobotToken.create("${c}"));
@@ -84,7 +82,7 @@ public class ForLoopDeclarationRowDescriptorBuilderTest {
 
     private List<RobotToken> line(final IExecutableRowDescriptor<?> desc) {
         if (desc instanceof SimpleRowDescriptor) {
-            return line((SimpleRowDescriptor<?>) desc);
+            throw new UnsupportedOperationException("Not implemented for current test.");
         } else if (desc instanceof ForLoopDeclarationRowDescriptor) {
             return line((ForLoopDeclarationRowDescriptor<?>) desc);
         } else if (desc instanceof ForLoopContinueRowDescriptor) {
@@ -92,10 +90,6 @@ public class ForLoopDeclarationRowDescriptorBuilderTest {
         }
 
         return null;
-    }
-
-    private List<RobotToken> line(final SimpleRowDescriptor<?> c) {
-        throw new UnsupportedOperationException("Not implemented for current test.");
     }
 
     private List<RobotToken> line(final ForLoopDeclarationRowDescriptor<?> c) {

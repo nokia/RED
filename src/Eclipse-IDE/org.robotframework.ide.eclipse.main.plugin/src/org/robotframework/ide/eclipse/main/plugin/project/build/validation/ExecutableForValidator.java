@@ -11,12 +11,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.Range;
 
@@ -39,6 +42,8 @@ public class ExecutableForValidator implements ExecutableValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
+        reportVersionDependentProblems();
+
         for (final BuildMessage buildMessage : descriptor.getMessages()) {
             final ProblemPosition position = new ProblemPosition(buildMessage.getFileRegion().getStart().getLine(),
                     Range.closed(buildMessage.getFileRegion().getStart().getOffset(),
@@ -53,5 +58,12 @@ public class ExecutableForValidator implements ExecutableValidator {
 
         descriptor.getCreatedVariables()
                 .forEach(var -> additionalVariables.add(VariableNamesSupport.extractUnifiedVariableName(var)));
+    }
+
+    private void reportVersionDependentProblems() {
+        new VersionDependentValidators(validationContext, reporter)
+                .getForLoopValidators((ForLoopDeclarationRowDescriptor<?>) descriptor)
+                .forEach(ModelUnitValidator::validate);
+
     }
 }
