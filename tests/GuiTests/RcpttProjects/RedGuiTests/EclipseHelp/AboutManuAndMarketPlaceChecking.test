@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qlaH4O0SEeWqTNBmS5Gi4w
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/14/18 4:02 PM
+Save-Time: 11/15/18 2:30 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,8 +19,10 @@ if [$is_product]{
 	get-menu "Help/About RED" | get-property index | equals 15 | verify-true
 	get-about-menu | click
 	get-window "About RED" | get-editbox | get-property text 
-	    | equals [format "RED - Robot Editor\r \rDevelopment environment for Robot Framework http://www.robotframework.org/\r \r(c) "
-	    + "Copyright 2015-%s Nokia Solutions and Networks.\r \r \rEclipse and the Eclipse logo are trademarks of the Eclipse Foundation,"
+	    | matches [format "RED - Robot Editor\r \r"
+	    + "Version: \d\.\d\.\d\r \r"
+	    + "Development environment for Robot Framework http://www.robotframework.org/\r \r"
+	    + "\(c\) Copyright 2015-%s Nokia Solutions and Networks.\r \r \rEclipse and the Eclipse logo are trademarks of the Eclipse Foundation,"
 	    + " Inc., https://www.eclipse.org/.  Oracle and Java are trademarks or registered trademarks of Oracle and/or its  affiliates. "
 	    + "Other names may be trademarks of their respective owners.\r \r"
 	    + "This product includes software developed by other open source projects.\r \r"
