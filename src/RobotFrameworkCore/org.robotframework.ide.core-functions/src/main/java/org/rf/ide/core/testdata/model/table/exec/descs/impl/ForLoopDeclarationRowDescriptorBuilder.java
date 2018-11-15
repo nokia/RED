@@ -10,7 +10,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
-import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
@@ -27,12 +26,13 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBuilder {
 
     @Override
     public <T> boolean isAcceptable(final RobotExecutableRow<T> execRowLine) {
-        return ForDescriptorInfo.isForToken(execRowLine.getAction())
+        return execRowLine.getAction().getTypes().contains(RobotTokenType.FOR_TOKEN)
                 && execRowLine.getParent() instanceof IExecutableStepsHolder<?>;
     }
 
@@ -40,10 +40,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
     public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine) {
         final ForLoopDeclarationRowDescriptor<T> loopDescriptor = new ForLoopDeclarationRowDescriptor<>(execRowLine);
 
-        final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine.getParent();
-        final ARobotSectionTable table = (ARobotSectionTable) keywordOrTestcase.getParent();
-        final RobotFile robotFile = table.getParent();
-        final RobotFileOutput rfo = robotFile.getParent();
+        final RobotFileOutput rfo = getFileOutput(execRowLine);
         final String fileName = rfo.getProcessedFile().getAbsolutePath();
 
         final VariableExtractor varExtractor = new VariableExtractor();
@@ -88,11 +85,11 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                     }
                 }
             } else {
-                if (ForDescriptorInfo.isForToken(elem)) {
+                if (elem.getTypes().contains(RobotTokenType.FOR_TOKEN)) {
                     loopDescriptor.setAction(new RobotAction(elem.copy(), mappedElements));
                     wasFor = true;
                 } else {
-                    throw new IllegalStateException("Internal problem - :FOR should be the first token.");
+                    throw new IllegalStateException("Internal problem - FOR should be the first token.");
                 }
             }
         }
@@ -109,5 +106,11 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
         }
 
         return loopDescriptor;
+    }
+
+    private <T> RobotFileOutput getFileOutput(final RobotExecutableRow<T> execRowLine) {
+        final AModelElement<?> execParent = (AModelElement<?>) execRowLine.getParent();
+        final ARobotSectionTable table = (ARobotSectionTable) execParent.getParent();
+        return table.getParent().getParent();
     }
 }

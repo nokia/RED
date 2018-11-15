@@ -12,14 +12,15 @@ import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotSpecialTokens;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.rf.ide.core.testdata.text.read.recognizer.executables.RobotSpecialTokens;
 
 public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
 
@@ -33,6 +34,20 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
         this.stateHelper = new ParsingStateHelper();
         this.keywordFinder = new KeywordFinder();
         this.specialTokensRecognizer = new RobotSpecialTokens();
+    }
+
+    @Override
+    public boolean isApplicableFor(final RobotVersion robotVersion) {
+        specialTokensRecognizer.initializeFor(robotVersion);
+        return IParsingMapper.super.isApplicableFor(robotVersion);
+    }
+
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+
+        final ParsingState state = stateHelper.getCurrentState(processingState);
+        return state == ParsingState.KEYWORD_INSIDE_ACTION || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT;
     }
 
     @Override
@@ -76,15 +91,5 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
 
         processingState.push(ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT);
         return rt;
-    }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine, final RobotToken rt,
-            final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState state = stateHelper.getCurrentState(processingState);
-        result = (state == ParsingState.KEYWORD_INSIDE_ACTION || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT);
-
-        return result;
     }
 }

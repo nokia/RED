@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
@@ -168,6 +169,15 @@ public class VersionDependentValidators {
                 new TimeoutMessageValidator<>(file, keyword::getTimeouts,
                         timeout -> timeout.tokensOf(RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE).collect(toList()),
                         reporter));
+
+        return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
+    }
+
+    public Stream<VersionDependentModelUnitValidator> getForLoopValidators(
+            final ForLoopDeclarationRowDescriptor<?> descriptor) {
+        final IFile file = validationContext.getFile();
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream
+                .<VersionDependentModelUnitValidator> of(new ForLoopInExpressionsValidator(file, descriptor, reporter));
 
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
