@@ -13,7 +13,6 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.TaskTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.testdata.model.table.exec.ExecutableUnitsFixer;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
