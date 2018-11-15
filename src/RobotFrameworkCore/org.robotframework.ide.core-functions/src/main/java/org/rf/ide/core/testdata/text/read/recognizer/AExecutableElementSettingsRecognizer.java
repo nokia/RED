@@ -5,28 +5,22 @@
  */
 package org.rf.ide.core.testdata.text.read.recognizer;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.annotations.VisibleForTesting;
+public abstract class AExecutableElementSettingsRecognizer extends ATokenRecognizer {
 
-
-public abstract class AExecutableElementSettingsRecognizer extends
-        ATokenRecognizer {
-
-    private final static Pattern BRACKET_EXTRACTION = Pattern
-            .compile("(?!\\[)([^\\]])+(?!\\\\])");
-
+    private final static Pattern BRACKET_EXTRACTION = Pattern.compile("(?!\\[)([^\\]])+(?!\\\\])");
 
     protected AExecutableElementSettingsRecognizer(final RobotTokenType type) {
         super(build(buildVariants(type)), type);
     }
 
-
-    @VisibleForTesting
-    protected static List<String> buildVariants(final RobotTokenType type) {
+    private static List<String> buildVariants(final RobotTokenType type) {
         final List<String> variants = new ArrayList<>();
 
         final List<String> representations = type.getRepresentation();
@@ -41,33 +35,20 @@ public abstract class AExecutableElementSettingsRecognizer extends
                     toAdd = r.substring(start, end);
                 }
             }
-
             variants.add(toAdd);
         }
-
         return variants;
     }
 
-
-    @VisibleForTesting
-    protected static Pattern build(final List<String> settingNameVariants) {
+    private static Pattern build(final List<String> settingNameVariants) {
         final StringBuilder patternText = new StringBuilder();
-        final int numOfVariants = settingNameVariants.size();
-        if (numOfVariants > 0) {
+        if (!settingNameVariants.isEmpty()) {
             patternText.append("[ ]?(");
-            for (int i = 0; i < numOfVariants; i++) {
-                patternText.append("(\\[\\s*");
-                patternText.append(createUpperLowerCaseWord(settingNameVariants
-                        .get(i)));
-                patternText.append("\\s*\\])");
-                if (i < numOfVariants - 1) {
-                    patternText.append('|');
-                }
-            }
-
+            patternText.append(settingNameVariants.stream()
+                    .map(variant -> "(\\[\\s*" + createUpperLowerCaseWord(variant) + "\\s*\\])")
+                    .collect(joining("|")));
             patternText.append(')');
         }
-
         return Pattern.compile(patternText.toString());
     }
 }
