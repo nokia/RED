@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _acbKcATKEeeYtJSRkZkJgQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/7/17 2:59 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 11/15/18 4:37 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,22 +18,6 @@ Entry-Name: .content
 get-view "Project Explorer" | get-tree | select "SecondProject/SingleTest.tsv" | get-menu "Run As/1 Robot Test" | click
 
 //add args to interpreter and robot
-get-menu "Run/Run Configurations..." | click
-
-//with [get-window "Run Configurations"] {
-//    get-tree | select "Robot/SingleTest.tsv"
-//    get-tab-folder | get-tab-item Executor | click
-//    with [get-group Executor] {
-//        get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "-d -O -t -W ignore"
-//        with [get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
-//            set-text "-L Debug -e all --output NONE --report NONE --log NONE"
-//        }
-//    }
-//    //run test
-//    get-button Apply | click
-//    get-button Run | click
-//}
-
 get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
     get-tab-folder | get-tab-item Executor | click
@@ -98,5 +82,127 @@ get-window "Run Configurations" | get-group Interpreter | get-editbox
     
 get-window "Run Configurations" | get-button Close | click
 
+
+
+//------------------------- robot arg are taken from defaul run config and rerun --------------------------------
+
+get-preferences-menu | click
+with [get-window Preferences] {
+	//add some robot args
+	get-tree | select "Robot Framework/Launching/Default Launch Configurations"
+    get-group "Robot tab" | get-editbox -after [get-label "Additional Robot Framework arguments:"] 
+        | set-text "-c \"abc\" -n \"def\""
+	
+	///print arg on console
+    get-tree | select "Robot Framework/Launching"
+    get-group Robot | get-button "Pass Robot arguments using arguments file" | uncheck
+    get-button "Apply and Close" | click
+}
+
+//run test
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/test_with_fail.robot" | get-menu 
+    -path "Run As/1 Robot Test" | click
+    
+get-view Console | get-text-viewer | get-object |invoke getLine 0 | matches ".*-c abc -n def .*" | verify-true    
+
+//rerun fail cases
+with [get-view "Execution View"] {
+    click
+    get-button "Rerun Failed Tests" | click
+}
+
+get-view Console | get-text-viewer | get-property text 
+    | equals ".* -c abc -n def -R .*MediumRobotTest[\\\\/]output.xml .*MediumRobotTest\n"
+    + "Suite Executor: Robot Framework.*\n"
+    + "==============================================================================\n"
+    + "MediumRobotTest                                                               \n"
+    + "==============================================================================\n"
+    + "MediumRobotTest.Test With Fail                                                \n"
+    + "==============================================================================\n"
+    + "test b                                                                \| FAIL \|\n"
+    + "\"special fail\"\n"
+    + "------------------------------------------------------------------------------\n"
+    + "MediumRobotTest.Test With Fail                                        \| PASS \|\n"
+    + "0 critical tests, 0 passed, 0 failed\n"
+    + "1 test total, 0 passed, 1 failed\n"
+    + "==============================================================================\n"
+    + "MediumRobotTest                                                       \| PASS \|\n"
+    + "0 critical tests, 0 passed, 0 failed\n"
+    + "1 test total, 0 passed, 1 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true
+    
+//check if args from Default confoig and rerun otpion are together    
+get-menu -path "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | matches "-c \"abc\" -n \"def\" -R .*MediumRobotTest[\\\\/]output.xml" | verify-true
+get-window "Run Configurations" | get-button Close | click
+
+//-------------------------------- robot arg are in run config and rerun ----------------------------------
+
+//remove run config 
+get-menu -path "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/test_with_fail.robot"
+    get-button "Delete selected launch configuration(s)" | click
+    get-window "Confirm Launch Configuration Deletion" | get-button Delete | click
+    get-button Close | click
+}
+
+//restore defult run config
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Launching/Default Launch Configurations"
+    get-button "Restore Defaults" | click
+    get-button "Apply and Close" | click
+}
+
+//run test to create new run config
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/test_with_fail.robot" | get-menu 
+    -path "Run As/1 Robot Test" | click
+    
+//open run config and add excluding arg    
+get-menu -path "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-group Arguments | get-editbox -after [get-label "Additional Robot Framework arguments:"] | set-text "-e abc123"
+    get-button Run | click
+}
+
+//rerun test
+get-view "Execution View" | get-button "Rerun Failed Tests" | click
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* -e abc123 -R .*MediumRobotTest[\\\\/]output.xml .*MediumRobotTest\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "==============================================================================\n"
+    + "MediumRobotTest                                                               \n"
+    + "==============================================================================\n"
+    + "MediumRobotTest.Test With Fail                                                \n"
+    + "==============================================================================\n"
+    + "test b                                                                \| FAIL \|\n"
+    + "\"special fail\"\n"
+    + "------------------------------------------------------------------------------\n"
+    + "MediumRobotTest.Test With Fail                                        \| FAIL \|\n"
+    + "1 critical test, 0 passed, 1 failed\n"
+    + "1 test total, 0 passed, 1 failed\n"
+    + "==============================================================================\n"
+    + "MediumRobotTest                                                       \| FAIL \|\n"
+    + "1 critical test, 0 passed, 1 failed\n"
+    + "1 test total, 0 passed, 1 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true
+    
+// check if in run config are args from run config and from rereun (-r)    
+get-button "Run test_with_fail.robot" | click -arrow
+get-menu -path "Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/test_with_fail.robot"
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | equals "-e abc123 -R .*output.xml" | verify-true
+get-window "Run Configurations" | get-button Close | click
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
