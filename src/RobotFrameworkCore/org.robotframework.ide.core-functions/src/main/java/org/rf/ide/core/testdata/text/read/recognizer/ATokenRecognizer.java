@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.read.recognizer;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +33,14 @@ public abstract class ATokenRecognizer {
         this.type = type;
     }
 
+    public RobotTokenType getProducedType() {
+        return type;
+    }
+
+    public Pattern getPattern() {
+        return pattern;
+    }
+
     public boolean isApplicableFor(@SuppressWarnings("unused") final RobotVersion robotVersion) {
         return true;
     }
@@ -54,19 +64,10 @@ public abstract class ATokenRecognizer {
     }
 
     public RobotToken next() {
-        final RobotToken t = new RobotToken();
-        t.setLineNumber(lineNumber);
         final int start = matcher.start();
-        t.setStartColumn(start);
         final int end = matcher.end();
 
-        t.setText(text.substring(start, end));
-        t.setType(getProducedType());
-        return t;
-    }
-
-    public RobotTokenType getProducedType() {
-        return type;
+        return RobotToken.create(text.substring(start, end), lineNumber, start, type);
     }
 
     public static String createUpperLowerCaseWordWithOptionalSpaceInside(final String text) {
@@ -78,36 +79,20 @@ public abstract class ATokenRecognizer {
     }
 
     public static String createUpperLowerCaseWord(final String text) {
-        return createUpperLowerCaseWordWithPatternBetweenLetters(text, null);
+        return createUpperLowerCaseWordWithPatternBetweenLetters(text, "");
     }
 
     private static String createUpperLowerCaseWordWithPatternBetweenLetters(final String text,
             final String patternBetweenChars) {
-        final StringBuilder str = new StringBuilder();
-        if (text != null && text.length() > 0) {
-
-            final char[] ca = text.toCharArray();
-            final int size = ca.length;
-            for (int i = 0; i < size; i++) {
-
-                str.append('[');
-                final char c = ca[i];
-                if (Character.isLetter(c)) {
-                    str.append(Character.toUpperCase(c)).append('|').append(Character.toLowerCase(c));
-                } else {
-                    str.append(c);
-                }
-                str.append(']');
-
-                if (patternBetweenChars != null && i + 1 < size) {
-                    str.append(patternBetweenChars);
-                }
-            }
+        if (text == null || text.isEmpty()) {
+            return "";
         }
-        return str.toString();
+        return text.chars().mapToObj(c -> createUpperLowerVariant((char) c)).collect(joining(patternBetweenChars));
     }
 
-    public Pattern getPattern() {
-        return this.pattern;
+    private static String createUpperLowerVariant(final char c) {
+        return Character.isLetter(c)
+                ? "[" + Character.toUpperCase(c) + Character.toLowerCase(c) + "]"
+                : Character.toString(c);
     }
 }

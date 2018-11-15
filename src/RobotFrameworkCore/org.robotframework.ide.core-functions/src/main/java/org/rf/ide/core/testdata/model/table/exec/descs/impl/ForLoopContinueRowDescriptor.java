@@ -77,6 +77,7 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
         this.continueAction = continueAction;
     }
 
+    @Override
     public RobotAction getKeywordAction() {
         return keywordAction;
     }
