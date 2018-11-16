@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +21,9 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.widgets.Display;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -31,11 +34,18 @@ import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDi
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.ResourceCreator;
 
 public class LibrariesAutoDiscovererWindowTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(LibrariesAutoDiscovererWindowTest.class);
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Rule
+    public ResourceCreator resourceCreator = new ResourceCreator();
 
     private static IFile suite;
 
@@ -76,6 +86,24 @@ public class LibrariesAutoDiscovererWindowTest {
         assertThat(LibrariesAutoDiscovererWindow.LIBRARY_IMPORT_COMPARATOR.compare(existing, added)).isPositive();
         assertThat(LibrariesAutoDiscovererWindow.LIBRARY_IMPORT_COMPARATOR.compare(notAdded, existing)).isPositive();
         assertThat(LibrariesAutoDiscovererWindow.LIBRARY_IMPORT_COMPARATOR.compare(existing, notAdded)).isNegative();
+    }
+
+    @Test
+    public void testGettingOpenableFile() throws Exception {
+        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
+        final File notLinkedNonWorkspaceFile = tempFolder.newFile("other_non_workspace_test.robot");
+        final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
+        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+
+        assertThat(LibrariesAutoDiscovererWindow.getOpenableFile(lib.getLocation().toFile().getAbsolutePath()))
+                .hasValue(lib);
+        assertThat(LibrariesAutoDiscovererWindow.getOpenableFile(suite.getLocation().toFile().getAbsolutePath()))
+                .hasValue(suite);
+        assertThat(LibrariesAutoDiscovererWindow.getOpenableFile(linkedNonWorkspaceFile.getAbsolutePath()))
+                .hasValue(linkedSuite);
+
+        assertThat(LibrariesAutoDiscovererWindow.getOpenableFile(notLinkedNonWorkspaceFile.getAbsolutePath()))
+                .isNotPresent();
     }
 
     @Test

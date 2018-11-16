@@ -32,7 +32,7 @@ public class ExecutionTreeNode {
         this(parent, kind, name, null);
     }
 
-    ExecutionTreeNode(final ExecutionTreeNode parent, final ElementKind kind, final String name,
+    public ExecutionTreeNode(final ExecutionTreeNode parent, final ElementKind kind, final String name,
             final URI path) {
         this.parent = parent;
         this.children = new ArrayList<>();

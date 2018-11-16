@@ -1,12 +1,9 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
-
-import java.util.Optional;
-
 /*
  * Copyright 2015 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 
 import javax.inject.Named;
 
@@ -43,13 +40,13 @@ public class FindElementUsagesInTextHandler extends DIParameterizedHandler<E4Fin
 
             if (selectedText.isEmpty()) {
 
-                IDocument doc = viewer.getDocument();
-                int offset = selection.getOffset();
+                final IDocument doc = viewer.getDocument();
+                final int offset = selection.getOffset();
 
-                Optional<IRegion> token = DocumentUtilities.findCellRegion(doc, FindUsagesHandler.isTSV(editor),
-                        offset);
+                final boolean isTsv = FindUsagesHandler.isTSV(editor);
+                final IRegion token = DocumentUtilities.findCellRegion(doc, isTsv, offset).get();
 
-                selectedText = doc.get(token.get().getOffset(), token.get().getLength());
+                selectedText = doc.get(token.getOffset(), token.getLength());
 
             }
             if (!selectedText.isEmpty()) {

@@ -1,12 +1,11 @@
 /*
-* Copyright 2017 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2017 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -22,13 +21,14 @@ import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 public class FindUsagesHandler {
 
-    public static void findElements(final String place, RobotFormEditor editor, final String selectedText) {
-        IFile file = getUnderlayingfile(editor);
+    public static void findElements(final String place, final RobotFormEditor editor, final String selectedText) {
+        final IFile file = getUnderlyingFile(editor);
         try {
             final List<IResource> resourcesToLookInto;
             if ("workspace".equals(place)) {
@@ -40,8 +40,8 @@ public class FindUsagesHandler {
                 throw new IllegalStateException("Unknown place for searching: " + place);
             }
 
-            final ISearchQuery query = TextSearchQueryProvider.getPreferred().createQuery(selectedText,
-                    resourcesToLookInto.toArray(new IResource[0]));
+            final ISearchQuery query = TextSearchQueryProvider.getPreferred()
+                    .createQuery(selectedText, resourcesToLookInto.toArray(new IResource[0]));
             NewSearchUI.runQueryInBackground(query);
         } catch (final CoreException e) {
             RedPlugin.logError("Unable to find usages of '" + selectedText + "' in " + place, e);
@@ -49,7 +49,7 @@ public class FindUsagesHandler {
     }
 
     private static List<IResource> getResourcesToQuery(final IWorkspaceRoot workspaceRoot) throws CoreException {
-        final List<IResource> resources = newArrayList();
+        final List<IResource> resources = new ArrayList<>();
         for (final IResource project : workspaceRoot.members()) {
             resources.addAll(getResourcesToQuery((IProject) project));
         }
@@ -58,7 +58,7 @@ public class FindUsagesHandler {
 
     private static List<IResource> getResourcesToQuery(final IProject project) throws CoreException {
         // returns resources from given project excluding libspec folder
-        final List<IResource> resources = newArrayList();
+        final List<IResource> resources = new ArrayList<>();
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
         if (!libspecsFolder.exists()) {
             resources.add(project);
@@ -73,15 +73,15 @@ public class FindUsagesHandler {
         return resources;
     }
 
-    public static boolean isTSV(RobotFormEditor editor) {
-        IFile file = getUnderlayingfile(editor);
+    public static boolean isTSV(final RobotFormEditor editor) {
+        final IFile file = getUnderlyingFile(editor);
         return file.getFileExtension().equals("tsv");
     }
 
-    private static IFile getUnderlayingfile(RobotFormEditor editor) {
+    private static IFile getUnderlyingFile(final RobotFormEditor editor) {
         final IEditorInput input = editor.getEditorInput();
-        final FileEditorInput editorfile = (FileEditorInput) input;
-        final IPath path = editorfile.getPath();
-        return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+        final FileEditorInput editorFile = (FileEditorInput) input;
+        final IPath path = editorFile.getPath();
+        return new RedWorkspace().fileForUri(path.toFile().toURI()).get();
     }
 }
