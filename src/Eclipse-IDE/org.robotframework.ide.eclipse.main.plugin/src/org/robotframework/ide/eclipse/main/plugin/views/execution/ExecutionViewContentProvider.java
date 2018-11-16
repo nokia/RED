@@ -44,6 +44,6 @@ public class ExecutionViewContentProvider extends TreeContentProvider {
 
     @Override
     public boolean hasChildren(final Object element) {
-        return ((ExecutionTreeNode) element).getChildren().size() > 0;
+        return !((ExecutionTreeNode) element).getChildren().isEmpty();
     }
 }
