@@ -6,12 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
 import java.io.File;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -20,6 +21,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
@@ -31,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.GoToFi
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
+import com.google.common.annotations.VisibleForTesting;
 
 public class GoToFileHandler extends DIParameterizedHandler<E4GoToFileHandler> {
 
@@ -46,16 +49,19 @@ public class GoToFileHandler extends DIParameterizedHandler<E4GoToFileHandler> {
         }
 
         public static void openExecutionNodeSourceFile(final ExecutionTreeNode node) {
+            openExecutionNodeSourceFile(node, (file, caseName) -> new CasesDefinitionLocator(file)
+                    .locateCaseDefinition(createDetector(caseName, E4GoToFileHandler::selectElement)));
+        }
+
+        @VisibleForTesting
+        static void openExecutionNodeSourceFile(final ExecutionTreeNode node,
+                final BiConsumer<IFile, String> caseSelectionConsumer) {
             if (node == null || node.getPath() == null) {
                 return;
             }
             final IPath sourcePath = new Path(new File(node.getPath()).getAbsolutePath());
-            final IFile sourceFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(sourcePath);
-            if (sourceFile == null || !sourceFile.exists()) {
-                return;
-            }
-            new CasesDefinitionLocator(sourceFile)
-                    .locateCaseDefinition(createDetector(node.getName(), E4GoToFileHandler::selectElement));
+            final Optional<IFile> sourceFile = new RedWorkspace().fileForUri(sourcePath.toFile().toURI());
+            sourceFile.ifPresent(file -> caseSelectionConsumer.accept(file, node.getName()));
         }
 
         private static void selectElement(final RobotFileInternalElement element) {
@@ -71,9 +77,9 @@ public class GoToFileHandler extends DIParameterizedHandler<E4GoToFileHandler> {
 
         private static CaseDetector createDetector(final String caseName,
                 final Consumer<RobotFileInternalElement> elementSelector) {
-            return (file, testCase) -> {
-                if (testCase.getName().equalsIgnoreCase(caseName)) {
-                    elementSelector.accept(testCase);
+            return (file, taskOrTest) -> {
+                if (taskOrTest.getName().equalsIgnoreCase(caseName)) {
+                    elementSelector.accept(taskOrTest);
                     return ContinueDecision.STOP;
                 } else {
                     return ContinueDecision.CONTINUE;
