@@ -14,15 +14,16 @@ import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotSpecialTokens;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.rf.ide.core.testdata.text.read.recognizer.executables.RobotSpecialTokens;
 
 public class TestCaseExecutableRowActionMapper implements IParsingMapper {
 
@@ -39,6 +40,34 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
         this.stateHelper = new ParsingStateHelper();
         this.testCaseFinder = new TestCaseFinder();
         this.specialTokensRecognizer = new RobotSpecialTokens();
+    }
+
+    @Override
+    public boolean isApplicableFor(final RobotVersion robotVersion) {
+        specialTokensRecognizer.initializeFor(robotVersion);
+        return IParsingMapper.super.isApplicableFor(robotVersion);
+    }
+
+    @Override
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+
+        final ParsingState state = stateHelper.getCurrentState(processingState);
+        if (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION) {
+            if (!RobotEmptyRow.isEmpty(text) || !currentLine.getLineElements().isEmpty()) {
+                if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME, currentLine, rt)) {
+                    return true;
+                } else if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME, currentLine, rt)) {
+                    if (text.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0))) {
+                        if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                            rt.getTypes().add(RobotTokenType.START_HASH_COMMENT);
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -68,28 +97,5 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
 
         processingState.push(ParsingState.TEST_CASE_INSIDE_ACTION);
         return rt;
-    }
-
-    @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine, final RobotToken rt,
-            final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState state = stateHelper.getCurrentState(processingState);
-        if (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION) {
-            if (!RobotEmptyRow.isEmpty(text) || !currentLine.getLineElements().isEmpty()) {
-                if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME, currentLine, rt)) {
-                    result = true;
-                } else if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME, currentLine, rt)) {
-                    if (text.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0))) {
-                        if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                            rt.getTypes().add(RobotTokenType.START_HASH_COMMENT);
-                        }
-                        result = true;
-                    }
-                }
-            }
-        }
-
-        return result;
     }
 }
