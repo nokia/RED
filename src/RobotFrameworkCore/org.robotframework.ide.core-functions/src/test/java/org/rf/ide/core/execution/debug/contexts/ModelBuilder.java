@@ -365,6 +365,9 @@ public class ModelBuilder {
         public TestCaseBuildingStep executable(final String action, final String... arguments) {
             final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
             row.setAction(RobotToken.create(action));
+            if (action.equalsIgnoreCase("for") || action.equalsIgnoreCase(":for")) {
+                row.getAction().getTypes().add(RobotTokenType.FOR_TOKEN);
+            }
             for (final String arg : arguments) {
                 row.addArgument(RobotToken.create(arg));
             }
@@ -478,6 +481,9 @@ public class ModelBuilder {
         public UserKeywordBuildingStep executable(final String action, final String... arguments) {
             final RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<>();
             row.setAction(RobotToken.create(action));
+            if (action.equalsIgnoreCase("for") || action.equalsIgnoreCase(":for")) {
+                row.getAction().getTypes().add(RobotTokenType.FOR_TOKEN);
+            }
             for (final String arg : arguments) {
                 row.addArgument(RobotToken.create(arg));
             }

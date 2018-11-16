@@ -72,28 +72,18 @@ public class ForDescriptorInfo {
         }
     }
 
-    public static boolean isForToken(final RobotToken token) {
-        final String text = trimWhitespaces(token.getText().toString());
-        return ":for".equalsIgnoreCase(text);
+    private static boolean isForToken(final RobotToken token) {
+        return ":for".equalsIgnoreCase(trimWhitespaces(token.getText())) || "FOR".equals(token.getText().trim());
     }
 
     public static boolean isInToken(final RobotToken token) {
-        String text = token.getText().toString();
-        text = text.trim().toLowerCase();
-        return isInToken(text);
+        return isInToken(trimWhitespaces(token.getText()));
     }
 
     private static boolean isInToken(final String text) {
-        boolean isInToken = false;
-        final List<String> inRepresentations = RobotTokenType.IN_TOKEN.getRepresentation();
-        for (final String r : inRepresentations) {
-            if (r.equalsIgnoreCase(text)) {
-                isInToken = true;
-                break;
-            }
-        }
-
-        return isInToken;
+        return RobotTokenType.IN_TOKEN.getRepresentation()
+                .stream()
+                .anyMatch(r -> trimWhitespaces(r).equalsIgnoreCase(text));
     }
 
     private static boolean tryToFindPreviousLineContinue(final ForDescriptorInfo info, final int elementIndex,

@@ -335,6 +335,29 @@ public enum KeywordsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Invalid nested executables syntax. %s";
         }
+    },
+    FOR_IN_EXPR_WRONGLY_TYPED {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_API;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Using '%s' is deprecated. Use '%s' instead";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String canonical = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+            return newArrayList(new ChangeToFixer(canonical));
+        }
     };
 
     @Override

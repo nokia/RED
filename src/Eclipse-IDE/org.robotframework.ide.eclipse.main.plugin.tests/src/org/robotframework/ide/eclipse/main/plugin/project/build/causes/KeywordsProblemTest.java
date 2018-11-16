@@ -1,0 +1,34 @@
+package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.ui.IMarkerResolution;
+import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
+
+public class KeywordsProblemTest {
+
+    @Test
+    public void forInExpressionWronglyTypedIsInDeprecatedApiCategory() {
+        assertThat(KeywordsProblem.FOR_IN_EXPR_WRONGLY_TYPED.getProblemCategory())
+                .isEqualTo(ProblemCategory.DEPRECATED_API);
+    }
+
+    @Test
+    public void forInExpressionWronglyTyped_hasResolutionAndProvidesAFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("IN RANGE");
+        
+        final KeywordsProblem problem = KeywordsProblem.FOR_IN_EXPR_WRONGLY_TYPED;
+        
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to 'IN RANGE'");
+    }
+
+}
