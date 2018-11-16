@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
@@ -54,6 +53,7 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.SourceOpeningSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.graphics.ImagesManager;
@@ -255,13 +255,10 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         return Optional.empty();
     }
 
-    private static Optional<IFile> getOpenableFile(final String filePath) {
+    @VisibleForTesting
+    static Optional<IFile> getOpenableFile(final String filePath) {
         final IPath path = new Path(filePath);
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
-        if (file != null && file.exists()) {
-            return Optional.of(file);
-        }
-        return Optional.empty();
+        return new RedWorkspace().fileForUri(path.toFile().toURI());
     }
 
     private void createDetailsComposite(final Composite mainComposite) {

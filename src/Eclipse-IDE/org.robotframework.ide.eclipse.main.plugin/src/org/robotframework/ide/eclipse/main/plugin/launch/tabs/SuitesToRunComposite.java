@@ -399,7 +399,7 @@ class SuitesToRunComposite extends Composite {
 
         @Override
         public boolean hasChildren(final Object element) {
-            return element instanceof SuiteLaunchElement && ((SuiteLaunchElement) element).getChildren().size() > 0;
+            return element instanceof SuiteLaunchElement && !((SuiteLaunchElement) element).getChildren().isEmpty();
         }
     }
 
