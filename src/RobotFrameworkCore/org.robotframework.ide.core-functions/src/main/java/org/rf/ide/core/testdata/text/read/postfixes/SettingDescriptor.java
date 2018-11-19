@@ -3,21 +3,23 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testdata.model.table.exec.descs;
+package org.rf.ide.core.testdata.text.read.postfixes;
 
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
+class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
 
     final AModelElement<T> line;
 
-    public SettingDescriptor(final AModelElement<T> line) {
+    SettingDescriptor(final AModelElement<T> line) {
         this.line = line;
     }
 

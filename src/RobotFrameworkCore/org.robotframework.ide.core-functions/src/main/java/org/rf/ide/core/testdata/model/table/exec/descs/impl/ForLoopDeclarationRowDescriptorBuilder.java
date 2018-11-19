@@ -15,8 +15,6 @@ import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.exec.CommentedVariablesFilter;
-import org.rf.ide.core.testdata.model.table.exec.CommentedVariablesFilter.FilteredVariables;
 import org.rf.ide.core.testdata.model.table.exec.descs.ForDescriptorInfo;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
@@ -25,6 +23,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
+import org.rf.ide.core.testdata.model.table.exec.descs.impl.CommentedVariablesFilter.FilteredVariables;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 

@@ -69,25 +69,26 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
         this.fileContent.add(line);
     }
 
+    public Optional<RobotLine> getRobotLineBy(final int offset) {
+        return getRobotLineIndexBy(offset).map(i -> fileContent.get(i));
+    }
+
     public Optional<Integer> getRobotLineIndexBy(final int offset) {
-        Optional<Integer> foundLine = Optional.empty();
         if (offset >= 0) {
             final List<RobotLine> robotLines = getFileContent();
-            final int numberOfLines = robotLines.size();
-            for (int lineIndex = 0; lineIndex < numberOfLines; lineIndex++) {
+
+            for (int lineIndex = 0; lineIndex < robotLines.size(); lineIndex++) {
                 final RobotLine line = robotLines.get(lineIndex);
                 final int eolStartOffset = line.getEndOfLine().getStartOffset();
                 final int start = (line.getLineElements().isEmpty()) ? eolStartOffset
                         : line.getLineElements().get(0).getStartOffset();
                 final int end = eolStartOffset + line.getEndOfLine().getText().length();
                 if (start <= offset && offset < end) {
-                    foundLine = Optional.of(lineIndex);
-                    break;
+                    return Optional.of(lineIndex);
                 }
             }
         }
-
-        return foundLine;
+        return Optional.empty();
     }
 
     public SettingTable getSettingTable() {
