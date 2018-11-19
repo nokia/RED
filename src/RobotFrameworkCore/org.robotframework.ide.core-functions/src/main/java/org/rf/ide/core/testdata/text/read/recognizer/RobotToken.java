@@ -201,25 +201,6 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return isDirty;
     }
 
-    public boolean isVariableDeclaration() {
-        boolean result = false;
-        for (final IRobotTokenType type : types) {
-            if (type instanceof RobotTokenType) {
-                final RobotTokenType robotType = (RobotTokenType) type;
-                result = (robotType == RobotTokenType.VARIABLES_SCALAR_DECLARATION)
-                        || (robotType == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION)
-                        || (robotType == RobotTokenType.VARIABLES_LIST_DECLARATION)
-                        || (robotType == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
-
-                if (result) {
-                    break;
-                }
-            }
-        }
-
-        return result;
-    }
-
     @Override
     public VersionAvailabilityInfo getVersionInformation() {
         VersionAvailabilityInfo vai = null;

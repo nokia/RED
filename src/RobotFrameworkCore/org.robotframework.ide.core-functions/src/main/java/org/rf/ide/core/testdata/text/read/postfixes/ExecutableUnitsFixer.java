@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testdata.model.table.exec;
+package org.rf.ide.core.testdata.text.read.postfixes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +18,12 @@ import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.IRowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
-import org.rf.ide.core.testdata.model.table.exec.descs.SettingDescriptor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class ExecutableUnitsFixer {
+class ExecutableUnitsFixer {
 
-    public <T extends AModelElement<? extends ARobotSectionTable>> List<AModelElement<T>> applyFix(
+    <T extends AModelElement<? extends ARobotSectionTable>> List<AModelElement<T>> applyFix(
             final IExecutableStepsHolder<T> execUnit) {
 
         final List<AModelElement<T>> newRows = new ArrayList<>();
@@ -61,7 +60,7 @@ public class ExecutableUnitsFixer {
                         }
                     }
                 } else if (rowType == ERowType.SIMPLE) {
-                    if (containsArtificialContinueAfectingForLoop(currentExecLine)) {
+                    if (containsArtificialContinueAffectingForLoop(currentExecLine)) {
                         lastForExecutableIndex = newRows.size() - 1;
                         if (lastForIndex == -1) {
                             final Optional<Integer> execLine = findLineWithExecAction(newRows);
@@ -71,11 +70,11 @@ public class ExecutableUnitsFixer {
                                         .get(parentLine);
                                 final int numberOfMerges = lastForExecutableIndex - parentLine;
                                 for (int i = 0; i < numberOfMerges; i++) {
-                                    merge(execUnit, toMergeLine, newRows.get(parentLine + 1));
+                                    merge(toMergeLine, newRows.get(parentLine + 1));
                                     newRows.remove(parentLine + 1);
                                 }
 
-                                merge(execUnit, toMergeLine, row);
+                                merge(toMergeLine, row);
                             } else {
                                 newRows.add(row);
                             }
@@ -216,8 +215,8 @@ public class ExecutableUnitsFixer {
         return Optional.empty();
     }
 
-    private <T extends AModelElement<? extends ARobotSectionTable>> void merge(final IExecutableStepsHolder<T> execUnit,
-            final RobotExecutableRow<T> outputLine, final AModelElement<T> lineToMerge) {
+    private <T extends AModelElement<? extends ARobotSectionTable>> void merge(final RobotExecutableRow<T> outputLine,
+            final AModelElement<T> lineToMerge) {
         if (!(lineToMerge instanceof RobotExecutableRow)) {
             return;
         }
@@ -301,7 +300,7 @@ public class ExecutableUnitsFixer {
             if (text != null) {
                 text = text.trim();
             }
-            if (rt.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE) && "...".equals(rt.getText().trim())) {
+            if (rt.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE) && "...".equals(text.trim())) {
                 token = Optional.of(rt);
             } else if (text != null) {
                 if (text.equals("\\") || text.isEmpty()) {
@@ -311,7 +310,6 @@ public class ExecutableUnitsFixer {
                 }
             }
         }
-
         return token;
     }
 
@@ -326,13 +324,11 @@ public class ExecutableUnitsFixer {
                 descs.add(new SettingDescriptor<>(p));
             }
         }
-
         return descs;
     }
 
-    private <T extends AModelElement<? extends ARobotSectionTable>> boolean containsArtificialContinueAfectingForLoop(
+    private <T extends AModelElement<? extends ARobotSectionTable>> boolean containsArtificialContinueAffectingForLoop(
             final IExecutableRowDescriptor<T> execRow) {
-        boolean result = false;
 
         if (execRow.getRowType() == ERowType.SIMPLE) {
             final RobotAction action = execRow.getAction();
@@ -342,17 +338,14 @@ public class ExecutableUnitsFixer {
                 final List<RobotToken> elementTokens = execRow.getRow().getElementTokens();
                 if (!actionTokenPos.isNotSet()) {
                     for (final RobotToken rt : elementTokens) {
-                        if (rt != actionToken) {
-                            if (rt.getLineNumber() < actionToken.getLineNumber()) {
-                                result = true;
-                                break;
-                            }
+                        if (rt != actionToken && rt.getLineNumber() < actionToken.getLineNumber()) {
+                            return rt.getLineNumber() < actionToken.getLineNumber();
                         }
                     }
                 }
             }
         }
 
-        return result;
+        return false;
     }
 }
