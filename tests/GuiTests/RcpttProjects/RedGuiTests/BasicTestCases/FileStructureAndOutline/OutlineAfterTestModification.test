@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _9Bte8NYSEeijg6yKwqEQmw
 Element-Name: OutlineAfterTestModification
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ByY7YPrdEeSnR8gxEs97XQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/12/17 4:46 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 11/19/18 1:26 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -21,13 +22,19 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 1 19
     key-type Enter
+    
+    //add KW
     key-type "M1+SPACE"
+    key-type  -times [$MainSectionsAfterVariables | get "Keyword"]
+    
+    //Sett
+    key-type "M1+SPACE"
+    key-type Down  -times [$MainSectionsAfterVariables | get "Settings"]
     key-type Enter
+    
+    //variables
     key-type "M1+SPACE"
-    key-type Down
-    key-type Enter
-    key-type "M1+SPACE"
-    key-type Down -times 3
+    key-type Down  -times [$MainSectionsAfterVariables | get "Variables"]
     key-type Enter
     key-type "M1+s"
 }
