@@ -210,6 +210,28 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(new ChangeToFixer(keywordDefinition));
         }
     },
+    FOR_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Given for loop defining name '%s' is not consistent with definition ':FOR'";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new ChangeToFixer(":FOR"));
+        }
+    },
     KEYWORD_NAME_WITH_DOTS {
 
         @Override

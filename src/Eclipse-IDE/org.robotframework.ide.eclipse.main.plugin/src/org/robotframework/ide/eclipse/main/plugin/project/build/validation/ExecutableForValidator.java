@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -43,18 +44,9 @@ public class ExecutableForValidator implements ExecutableValidator {
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         reportVersionDependentProblems();
-
-        for (final BuildMessage buildMessage : descriptor.getMessages()) {
-            final ProblemPosition position = new ProblemPosition(buildMessage.getFileRegion().getStart().getLine(),
-                    Range.closed(buildMessage.getFileRegion().getStart().getOffset(),
-                            buildMessage.getFileRegion().getEnd().getOffset()));
-            final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_FOR_KEYWORD)
-                    .formatMessageWith(buildMessage.getMessage());
-            reporter.handleProblem(problem, validationContext.getFile(), position);
-        }
-        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext,
-                AttributesAugmentingReportingStrategy.withLocalVarFixer(reporter));
-        unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, descriptor.getUsedVariables());
+        reportInconsistentName();
+        reportForLoopBuildMessages();
+        reportUnknownVariables();
 
         descriptor.getCreatedVariables()
                 .forEach(var -> additionalVariables.add(VariableNamesSupport.extractUnifiedVariableName(var)));
@@ -65,5 +57,33 @@ public class ExecutableForValidator implements ExecutableValidator {
                 .getForLoopValidators((ForLoopDeclarationRowDescriptor<?>) descriptor)
                 .forEach(ModelUnitValidator::validate);
 
+    }
+
+    private void reportInconsistentName() {
+        final RobotToken forToken = descriptor.getAction().getToken();
+        final String actualText = forToken.getText();
+        if (!actualText.equals(":FOR") && !actualText.equals("FOR")) {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(KeywordsProblem.FOR_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
+                    .formatMessageWith(actualText);
+            reporter.handleProblem(problem, validationContext.getFile(), forToken);
+        }
+    }
+
+    private void reportForLoopBuildMessages() {
+        for (final BuildMessage buildMessage : descriptor.getMessages()) {
+            final ProblemPosition position = new ProblemPosition(buildMessage.getFileRegion().getStart().getLine(),
+                    Range.closed(buildMessage.getFileRegion().getStart().getOffset(),
+                            buildMessage.getFileRegion().getEnd().getOffset()));
+            final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_FOR_KEYWORD)
+                    .formatMessageWith(buildMessage.getMessage());
+            reporter.handleProblem(problem, validationContext.getFile(), position);
+        }
+    }
+
+    private void reportUnknownVariables() {
+        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext,
+                AttributesAugmentingReportingStrategy.withLocalVarFixer(reporter));
+        unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, descriptor.getUsedVariables());
     }
 }

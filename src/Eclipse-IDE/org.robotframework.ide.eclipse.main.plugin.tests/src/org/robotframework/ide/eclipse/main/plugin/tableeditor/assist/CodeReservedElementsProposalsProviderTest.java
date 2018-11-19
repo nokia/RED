@@ -24,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -194,7 +195,7 @@ public class CodeReservedElementsProposalsProviderTest {
     @Test
     public void thereAreInProposalProvided_whenInAtLeastThirdColumnAndCurrentKeywordIsForLoop() {
         final RobotExecutableRow<?> executableRow = new RobotExecutableRow<>();
-        executableRow.setAction(RobotToken.create(":FOR"));
+        executableRow.setAction(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN));
         final RobotKeywordCall forExecutable = new RobotKeywordCall(null, executableRow);
 
         @SuppressWarnings("unchecked")

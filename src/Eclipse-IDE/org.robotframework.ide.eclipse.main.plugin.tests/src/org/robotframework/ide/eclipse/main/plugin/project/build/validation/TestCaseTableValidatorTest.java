@@ -167,6 +167,32 @@ public class TestCaseTableValidatorTest {
     }
 
     @Test
+    public void forWithInconsistentNameIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  : FOR    ${x}    IN RANGE    1")
+                .appendLine("  \\  kw")
+                .appendLine("  :for    ${y}    IN RANGE    1")
+                .appendLine("  \\  kw")
+                .appendLine("  :F O R    ${z}    IN RANGE    1")
+                .appendLine("  \\  kw")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newStdLibraryKeyword("BuiltIn", "kw", new Path("/suite.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.FOR_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION,
+                        new ProblemPosition(3, Range.closed(26, 31))),
+                new Problem(KeywordsProblem.FOR_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION,
+                        new ProblemPosition(5, Range.closed(67, 71))),
+                new Problem(KeywordsProblem.FOR_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION,
+                        new ProblemPosition(7, Range.closed(107, 113))));
+    }
+
+    @Test
     public void keywordWithAmbiguousNameIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")

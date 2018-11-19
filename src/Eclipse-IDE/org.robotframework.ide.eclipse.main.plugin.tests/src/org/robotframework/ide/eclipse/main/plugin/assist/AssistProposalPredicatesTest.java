@@ -18,6 +18,7 @@ import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -175,11 +176,11 @@ public class AssistProposalPredicatesTest {
     @Test
     public void whenThereIsTokenGivenWithFORAndCellIsAtLeastThird_theReservedWordPredicateIsSatisfied() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(3,
-                Optional.of(RobotToken.create(":FOR")));
+                Optional.of(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN)));
         final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(4,
-                Optional.of(RobotToken.create(":FOR")));
+                Optional.of(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN)));
         final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.codeReservedWordsPredicate(10,
-                Optional.of(RobotToken.create(": FOR")));
+                Optional.of(RobotToken.create(": FOR", RobotTokenType.FOR_TOKEN)));
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
             assertThat(predicate.test(null)).isTrue();

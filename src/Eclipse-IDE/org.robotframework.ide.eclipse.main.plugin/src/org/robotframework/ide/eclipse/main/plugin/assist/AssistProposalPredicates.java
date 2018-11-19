@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -69,9 +70,7 @@ public class AssistProposalPredicates {
             } else {
                 // line starts with :FOR and we're in at least 4th cell
                 return cellIndex >= 3 && firstTokenInLine.isPresent()
-                        && (RedCodeReservedWordProposals.FOR_LOOP_1.equalsIgnoreCase(firstTokenInLine.get().getText())
-                                || RedCodeReservedWordProposals.FOR_LOOP_2
-                                        .equalsIgnoreCase(firstTokenInLine.get().getText()));
+                        && firstTokenInLine.get().getTypes().contains(RobotTokenType.FOR_TOKEN);
             }
         };
     }
