@@ -1,3 +1,32 @@
+RED 0.8.9 - 2018/11/20
+Feature
+
+    [RED-1198] - [github #257] use default launch configuration preferences for failed tests rerun
+
+Enhancement
+
+    [RED-1078] - When running tests from linked folders, ask user to change to "run single suite using suite path" in launching method
+    [RED-1166] - RF 3.1 new section COMMENTS - provide common actions
+    [RED-1196] - [github #251] add version info to About RED window
+
+Bug
+
+    [RED-733] - Validation for :FOR kw with space inside
+    [RED-1094] - Coloring embedded kw name in table
+
+Task
+
+    [RED-1018] - Update platform to Photon (4.8)
+    [RED-1096] - Github #200 - Planned changes in RF 3.1, which affects RED
+    [RED-1101] - GitHub #200 - 5 - For Loop using FOR
+    [RED-1099] - GitHub #200 - 3 - Robotic Process Automation - new Task table
+    [RED-1102] - GitHub #200 - 6 - deprecated syntax for RF 3.1
+    [RED-1103] - GitHub #200 - 7 - remove Pyt2.6 and Pyt3.3 support from RF
+    [RED-1167] - RF 3.1 - robot will support only .robot and .resource extensions (depreciated txt html tsv extensions)
+    [RED-1188] - Function annotations are visible in libdoc specification file
+    [RED-1189] - Support for keyword-only arguments
+    [RED-1192] - Investigate RED on Java 11
+
 RED 0.8.8 - 2018/09/28
 Enhancement
 
@@ -6,7 +35,7 @@ Enhancement
     [RED-1036] - Too many problems are reported when duplicated settings are combined
     [RED-1074] - Gherkin prefixes used in setting calls
     [RED-1163] - [GitHub #237] Provide QuickFix of suggestion for cases when Keywords are not found if the resource with this Keywords is outside the project
-	[RED-1168] - [GitHub #239] Add editor color setting for strings
+    [RED-1168] - [GitHub #239] Add editor color setting for strings
     [RED-1171] - Remote library autodiscovering on save trigger
 
 Bug
@@ -16,7 +45,7 @@ Bug
     [RED-777] - Double errors after saving suite with problematic imported file
     [RED-1051] - Coloring kw name if is in the same line as test case name
     [RED-1058] - How to color special cases for variables?
-	[RED-1105] - GitHub #201 handle URI other than "file- "Validation not working when project is connected to Jazz source control
+    [RED-1105] - GitHub #201 handle URI other than "file- "Validation not working when project is connected to Jazz source control
     [RED-1135] - In table view number of arguments is shown as is in preference
     [RED-1181] - QuckFix for resources located outside of workspace is not working for PYTHONPATH
     [RED-1186] - [GitHub #243] imported variables are always lower cased
@@ -25,11 +54,8 @@ Bug
 Task
 
     [RED-943] - Remove unused compatibility Java properties
-    [RED-1099] - GitHub #200 - 3 - Robotic Process Automation - new Task table
-    [RED-1102] - GitHub #200 - 6 - deprecated syntax for RF 3.1
-    [RED-1103] - GitHub #200 - 7 - remove Pyt2.6 and Pyt3.3 support from RF
 
-	
+
 RED 0.8.7 - 2018/08/06
 Enhancement
 

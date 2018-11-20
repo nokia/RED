@@ -1,3 +1,39 @@
+# RED - Robot Editor v0.8.9
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- RED product is now based on Eclipse Photon (v 4.8) platform. The feature may be still installed in Oxygen (v 4.7) as well as newer 2018-09 (v 4.9)
+- Supports all the features of upcoming Robot Framework 3.1
+- RED should now works without any problems on all Java version 8 up to 11
+
+## GitHub issues updates
+ - #137 - Unable to launch RED on Java 9
+ - #200 - Planned changes in RF 3.1, which affects RED - Robotic Process Automation - new Task table
+ - #200 - Planned changes in RF 3.1, which affects RED - For Loop using FOR
+ - #200 - Planned changes in RF 3.1, which affects RED - deprecated syntax for RF 3.1
+ - #200 - Planned changes in RF 3.1, which affects RED - remove Pyt2.6 and Pyt3.3 support from RF
+ - #200 - Planned changes in RF 3.1, which affects RED - Function annotations are visible in libdoc
+ - #200 - Planned changes in RF 3.1, which affects RED - Support for keyword-only arguments
+ - #200 - Planned changes in RF 3.1, which affects RED - User-defined tables are forbidden - only Comments section can be used for that purpose
+ - #248 - Planned changes in RF 3.1, which affects RED - support .resource file extension for resources
+ - #251 - Add version info to Help - About RED
+ - #253 - Execution order based on directory name is ignored in argument file
+ - #257 - Rerun Test and Rerun Failed Test actions not using the default launch config values
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.8
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
@@ -22,9 +58,6 @@ For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform:
  - #237 - Provide QuickFix of suggestion for cases when Keywords are not found if the resource with this Keywords is outside the project
  - #243 - imported variables are always lower cased
  - #242 - classes as variables are filtered out from proposals
- - #200 - Planned changes in RF 3.1, which affects RED - 3 - Robotic Process Automation - new Task table
- - #200 - Planned changes in RF 3.1, which affects RED - 6 - deprecated syntax for RF 3.1
- - #200 - Planned changes in RF 3.1, which affects RED - 7 - remove Pyt2.6 and Pyt3.3 support from RF
  - #239 - Add editor color setting for strings
  - #201 - handle URI other than "file- "Validation not working when project is connected to Jazz source control
 
