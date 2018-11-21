@@ -28,7 +28,7 @@ public class InsertNewTaskHandler extends DIParameterizedHandler<E4InsertNewTask
     public static class E4InsertNewTaskHandler extends E4InsertNewCodeHolderHandler {
 
         @Execute
-        public void addNewTestCase(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
+        public void addNewTask(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
                 @Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RobotEditorCommandsStack stack) {
 

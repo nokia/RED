@@ -26,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 
 public class RedClipboardTest {
 
@@ -415,10 +415,10 @@ public class RedClipboardTest {
     }
 
     private static Object createPositionCoordinates() {
-        return new PositionCoordinateSerializer[] {
-                new PositionCoordinateSerializer(new PositionCoordinate(null, 1, 2)),
-                new PositionCoordinateSerializer(new PositionCoordinate(null, 3, 4)),
-                new PositionCoordinateSerializer(new PositionCoordinate(null, 5, 6)),
+        return new SerializablePositionCoordinate[] {
+                new SerializablePositionCoordinate(new PositionCoordinate(null, 1, 2)),
+                new SerializablePositionCoordinate(new PositionCoordinate(null, 3, 4)),
+                new SerializablePositionCoordinate(new PositionCoordinate(null, 5, 6)),
         };
     }
 

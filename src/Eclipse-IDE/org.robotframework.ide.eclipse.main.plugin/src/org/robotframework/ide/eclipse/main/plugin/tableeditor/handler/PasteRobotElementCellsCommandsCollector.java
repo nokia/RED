@@ -13,7 +13,7 @@ import java.util.List;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
 /**
@@ -38,7 +38,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
                 && hasPositionsCoordinatesInClipboard(clipboard)) {
 
             final RobotElement[] robotElementsFromClipboard = getRobotElementsFromClipboard(clipboard);
-            final PositionCoordinateSerializer[] cellPositionsFromClipboard = getPositionsCoordinatesFromClipboard(
+            final SerializablePositionCoordinate[] cellPositionsFromClipboard = getPositionsCoordinatesFromClipboard(
                     clipboard);
 
             if (robotElementsFromClipboard != null && robotElementsFromClipboard.length > 0
@@ -88,7 +88,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
         return clipboard.hasPositionsCoordinates();
     }
 
-    protected PositionCoordinateSerializer[] getPositionsCoordinatesFromClipboard(final RedClipboard clipboard) {
+    protected SerializablePositionCoordinate[] getPositionsCoordinatesFromClipboard(final RedClipboard clipboard) {
         return clipboard.getPositionsCoordinates();
     }
 
@@ -103,7 +103,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
             final List<String> valuesToPaste, final int selectedElementColumnIndex, final int tableColumnsCount);
 
     private List<Integer> findCurrentClipboardElementColumnsIndexes(final int currentClipboardElementRowIndex,
-            final PositionCoordinateSerializer[] positionsCoordinates) {
+            final SerializablePositionCoordinate[] positionsCoordinates) {
 
         final List<Integer> clipboardElementColumnsIndexes = new ArrayList<>();
         for (int i = 0; i < positionsCoordinates.length; i++) {
@@ -115,7 +115,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
     }
 
     private int calculateNextClipboardElementRowIndex(final int currentRowIndex,
-            final PositionCoordinateSerializer[] positionsCoordinates) {
+            final SerializablePositionCoordinate[] positionsCoordinates) {
 
         final int nextRowIndex = currentRowIndex;
         for (int i = 0; i < positionsCoordinates.length; i++) {
