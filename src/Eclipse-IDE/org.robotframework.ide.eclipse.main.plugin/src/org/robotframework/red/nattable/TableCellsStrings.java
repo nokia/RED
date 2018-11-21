@@ -8,21 +8,21 @@ package org.robotframework.red.nattable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 
 import com.google.common.annotations.VisibleForTesting;
 
 public class TableCellsStrings {
 
-    private final Map<PositionCoordinateSerializer, TableCellStringData> tableStrings = new HashMap<>();
+    private final Map<SerializablePositionCoordinate, TableCellStringData> tableStrings = new HashMap<>();
     
     @VisibleForTesting
-    Map<PositionCoordinateSerializer, TableCellStringData> getStringsMapping() {
+    Map<SerializablePositionCoordinate, TableCellStringData> getStringsMapping() {
         return tableStrings;
     }
 
     public void put(final int columnPosition, final int rowPosition, final TableCellStringData data) {
-        final PositionCoordinateSerializer position = new PositionCoordinateSerializer(columnPosition, rowPosition);
+        final SerializablePositionCoordinate position = new SerializablePositionCoordinate(columnPosition, rowPosition);
         final TableCellStringData textData = tableStrings.get(position);
         if (textData != null) {
             textData.rewriteFrom(data);
@@ -32,6 +32,6 @@ public class TableCellsStrings {
     }
 
     public TableCellStringData get(final int columnPosition, final int rowPosition) {
-        return tableStrings.get(new PositionCoordinateSerializer(columnPosition, rowPosition));
+        return tableStrings.get(new SerializablePositionCoordinate(columnPosition, rowPosition));
     }
 }

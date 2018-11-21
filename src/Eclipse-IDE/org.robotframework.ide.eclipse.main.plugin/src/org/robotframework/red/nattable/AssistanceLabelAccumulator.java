@@ -11,18 +11,18 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 
 public class AssistanceLabelAccumulator implements IConfigLabelAccumulator {
 
     private final IRowDataProvider<?> provider;
 
-    private final Predicate<PositionCoordinateSerializer> positionPredicate;
+    private final Predicate<SerializablePositionCoordinate> positionPredicate;
 
     private final Predicate<Object> rowObjectPredicate;
 
     public AssistanceLabelAccumulator(final IRowDataProvider<?> provider,
-            final Predicate<PositionCoordinateSerializer> positionPredicate,
+            final Predicate<SerializablePositionCoordinate> positionPredicate,
             final Predicate<Object> rowObjectPredicate) {
         this.provider = provider;
         this.positionPredicate = positionPredicate;
@@ -31,7 +31,7 @@ public class AssistanceLabelAccumulator implements IConfigLabelAccumulator {
 
     @Override
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
-        if (positionPredicate.test(new PositionCoordinateSerializer(columnPosition, rowPosition))
+        if (positionPredicate.test(new SerializablePositionCoordinate(columnPosition, rowPosition))
                 && rowObjectPredicate.test(provider.getRowObject(rowPosition))) {
             configLabels.addLabel(TableConfigurationLabels.ASSIST_REQUIRED);
         }

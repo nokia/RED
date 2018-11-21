@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -19,6 +17,7 @@ import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.Diction
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.mockeclipse.RedClipboardMock;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetDictItemsCommand;
@@ -35,9 +34,7 @@ public class PasteVariablesCellsCommandsCollectorTest {
     public void collectorHasNoElements_whenClipboardHasNoVariables() {
         final PasteVariablesCellsCommandsCollector collector = new PasteVariablesCellsCommandsCollector();
 
-        final RedClipboard clipboard = mock(RedClipboard.class);
-        when(clipboard.hasVariables()).thenReturn(false);
-        when(clipboard.getVariables()).thenReturn(null);
+        final RedClipboard clipboard = new RedClipboardMock();
 
         assertThat(collector.hasRobotElementsInClipboard(clipboard)).isFalse();
         assertThat(collector.getRobotElementsFromClipboard(clipboard)).isNull();
@@ -47,11 +44,10 @@ public class PasteVariablesCellsCommandsCollectorTest {
     public void collectorHasElements_whenClipboardHasVariables() {
         final PasteVariablesCellsCommandsCollector collector = new PasteVariablesCellsCommandsCollector();
 
-        final RobotVariable[] vars = new RobotVariable[] { new RobotVariable(null, null) };
+        final Object vars = new RobotVariable[] { new RobotVariable(null, null) };
 
-        final RedClipboard clipboard = mock(RedClipboard.class);
-        when(clipboard.hasVariables()).thenReturn(true);
-        when(clipboard.getVariables()).thenReturn(vars);
+        final RedClipboard clipboard = new RedClipboardMock();
+        clipboard.insertContent(vars);
 
         assertThat(collector.hasRobotElementsInClipboard(clipboard)).isTrue();
         assertThat(collector.getRobotElementsFromClipboard(clipboard)).isSameAs(vars);

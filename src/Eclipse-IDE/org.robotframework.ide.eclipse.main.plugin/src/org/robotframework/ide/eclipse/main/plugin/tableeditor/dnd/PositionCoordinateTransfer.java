@@ -10,9 +10,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 
-public class PositionCoordinateTransfer extends RedTransfer<PositionCoordinateSerializer> {
+public class PositionCoordinateTransfer extends RedTransfer<SerializablePositionCoordinate> {
 
     private static final String TYPE_NAME = "red-position-coordinate-data-transfer-format";
     private static final PositionCoordinateTransfer INSTANCE = new PositionCoordinateTransfer(TYPE_NAME);
@@ -27,26 +27,26 @@ public class PositionCoordinateTransfer extends RedTransfer<PositionCoordinateSe
 
     @Override
     protected boolean canHandleSerialization(final Object data) {
-        return data instanceof PositionCoordinateSerializer[];
+        return data instanceof SerializablePositionCoordinate[];
     }
 
     @Override
     protected byte[] javaToBytes(final Object data) throws IOException {
-        return ArraysSerializerDeserializer.serialize((PositionCoordinateSerializer[]) data);
+        return ArraysSerializerDeserializer.serialize((SerializablePositionCoordinate[]) data);
     }
 
     @Override
-    protected PositionCoordinateSerializer[] bytesToJava(final byte[] bytes)
+    protected SerializablePositionCoordinate[] bytesToJava(final byte[] bytes)
             throws ClassNotFoundException, IOException {
-        return ArraysSerializerDeserializer.deserialize(PositionCoordinateSerializer.class, bytes);
+        return ArraysSerializerDeserializer.deserialize(SerializablePositionCoordinate.class, bytes);
     }
 
-    public static class PositionCoordinateSerializer implements Serializable {
+    public static class SerializablePositionCoordinate implements Serializable {
 
-        public static PositionCoordinateSerializer[] createFrom(final PositionCoordinate[] coordinates) {
-            final PositionCoordinateSerializer[] serializableCoordinates = new PositionCoordinateSerializer[coordinates.length];
+        public static SerializablePositionCoordinate[] createFrom(final PositionCoordinate[] coordinates) {
+            final SerializablePositionCoordinate[] serializableCoordinates = new SerializablePositionCoordinate[coordinates.length];
             for (int i = 0; i < coordinates.length; i++) {
-                serializableCoordinates[i] = new PositionCoordinateSerializer(coordinates[i]);
+                serializableCoordinates[i] = new SerializablePositionCoordinate(coordinates[i]);
             }
             return serializableCoordinates;
         }
@@ -57,11 +57,11 @@ public class PositionCoordinateTransfer extends RedTransfer<PositionCoordinateSe
 
         private final int rowPosition;
 
-        public PositionCoordinateSerializer(final PositionCoordinate positionCoordinate) {
+        public SerializablePositionCoordinate(final PositionCoordinate positionCoordinate) {
             this(positionCoordinate.columnPosition, positionCoordinate.rowPosition);
         }
 
-        public PositionCoordinateSerializer(final int columnPosition, final int rowPosition) {
+        public SerializablePositionCoordinate(final int columnPosition, final int rowPosition) {
             this.columnPosition = columnPosition;
             this.rowPosition = rowPosition;
         }
@@ -79,7 +79,7 @@ public class PositionCoordinateTransfer extends RedTransfer<PositionCoordinateSe
             if (obj == null) {
                 return false;
             } else if (obj.getClass() == getClass()) {
-                final PositionCoordinateSerializer other = (PositionCoordinateSerializer) obj;
+                final SerializablePositionCoordinate other = (SerializablePositionCoordinate) obj;
                 return Objects.equals(rowPosition, other.rowPosition) && Objects.equals(columnPosition, other.columnPosition);
             }
             return false;
