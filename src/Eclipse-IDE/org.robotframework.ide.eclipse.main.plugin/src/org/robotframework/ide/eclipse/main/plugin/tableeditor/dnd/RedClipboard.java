@@ -23,15 +23,16 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 
 public class RedClipboard {
 
     private static Map<Class<?>, Transfer> transfers = new HashMap<>();
     static {
         transfers.put(String.class, TextTransfer.getInstance());
-        transfers.put(PositionCoordinateSerializer[].class, PositionCoordinateTransfer.getInstance());
+        transfers.put(SerializablePositionCoordinate[].class, PositionCoordinateTransfer.getInstance());
         transfers.put(RobotCase[].class, CasesTransfer.getInstance());
+        transfers.put(RobotTask[].class, TasksTransfer.getInstance());
         transfers.put(RobotKeywordDefinition[].class, KeywordDefinitionsTransfer.getInstance());
         transfers.put(RobotKeywordCall[].class, KeywordCallsTransfer.getInstance());
         transfers.put(RobotSetting[].class, KeywordCallsTransfer.getInstance());
@@ -56,10 +57,10 @@ public class RedClipboard {
         return isValid() && clipboardContainSupportedData(PositionCoordinateTransfer.getInstance());
     }
 
-    public PositionCoordinateSerializer[] getPositionsCoordinates() {
+    public SerializablePositionCoordinate[] getPositionsCoordinates() {
         final Object probablyPositions = clipboard.getContents(PositionCoordinateTransfer.getInstance());
-        return probablyPositions instanceof PositionCoordinateSerializer[]
-                ? (PositionCoordinateSerializer[]) probablyPositions
+        return probablyPositions instanceof SerializablePositionCoordinate[]
+                ? (SerializablePositionCoordinate[]) probablyPositions
                 : null;
     }
 

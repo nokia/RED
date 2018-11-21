@@ -31,7 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken.TokenState;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyInKeywordTableHandler.E4CopyInKeywordTableHandler;
 
 public class CopyInKeywordTableHandlerTest {
@@ -86,8 +86,8 @@ public class CopyInKeywordTableHandlerTest {
         assertThat(clipboard.getKeywordCalls()[1]).has(nullParent()).has(noFilePositions()).has(name("b"));
 
         assertThat(clipboard.getPositionsCoordinates()).containsExactly(
-                new PositionCoordinateSerializer(1, 1),
-                new PositionCoordinateSerializer(3, 3));
+                new SerializablePositionCoordinate(1, 1),
+                new SerializablePositionCoordinate(3, 3));
     }
 
     @Test
@@ -117,8 +117,8 @@ public class CopyInKeywordTableHandlerTest {
         assertThat(clipboard.hasKeywordCalls()).isFalse();
 
         assertThat(clipboard.getPositionsCoordinates()).containsExactly(
-                new PositionCoordinateSerializer(0, 0),
-                new PositionCoordinateSerializer(2, 5));
+                new SerializablePositionCoordinate(0, 0),
+                new SerializablePositionCoordinate(2, 5));
     }
 
     @Test
@@ -148,8 +148,8 @@ public class CopyInKeywordTableHandlerTest {
         assertThat(clipboard.getKeywordCalls()[0]).has(nullParent()).has(noFilePositions()).has(name("a"));
 
         assertThat(clipboard.getPositionsCoordinates()).containsExactly(
-                new PositionCoordinateSerializer(0, 0),
-                new PositionCoordinateSerializer(1, 2));
+                new SerializablePositionCoordinate(0, 0),
+                new SerializablePositionCoordinate(1, 2));
     }
 
     @Test
@@ -200,8 +200,8 @@ public class CopyInKeywordTableHandlerTest {
         assertThat(clipboard.getKeywordCalls()[0]).has(nullParent()).has(noFilePositions()).has(name("tags"));
 
         assertThat(clipboard.getPositionsCoordinates()).containsExactly(
-                new PositionCoordinateSerializer(0, 0),
-                new PositionCoordinateSerializer(1, 1));
+                new SerializablePositionCoordinate(0, 0),
+                new SerializablePositionCoordinate(1, 1));
     }
 
     private static List<RobotKeywordDefinition> createKeywords() {

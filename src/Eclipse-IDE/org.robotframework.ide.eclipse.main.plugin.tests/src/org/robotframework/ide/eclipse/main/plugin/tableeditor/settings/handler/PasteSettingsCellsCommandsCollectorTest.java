@@ -24,7 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
 public class PasteSettingsCellsCommandsCollectorTest {
@@ -45,7 +45,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final RobotSetting[] settingsFromClipboard = getSettingsByRowNumbers(metadataSettings, rowsToCopy)
                 .toArray(new RobotSetting[0]);
-        final PositionCoordinateSerializer[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
+        final SerializablePositionCoordinate[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
                 rowsToCopy);
 
         final int[] columnsToPaste = new int[] { 0, 1, 2 };
@@ -86,7 +86,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final RobotSetting[] settingsFromClipboard = getSettingsByRowNumbers(metadataSettings, rowsToCopy)
                 .toArray(new RobotSetting[0]);
-        final PositionCoordinateSerializer[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
+        final SerializablePositionCoordinate[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
                 rowsToCopy);
 
         final int[] columnsToPaste = new int[] { 0, 1 };
@@ -124,7 +124,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final RobotSetting[] settingsFromClipboard = getSettingsByRowNumbers(metadataSettings, rowsToCopy)
                 .toArray(new RobotSetting[0]);
-        final PositionCoordinateSerializer[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
+        final SerializablePositionCoordinate[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
                 rowsToCopy);
 
         final int[] columnsToPaste = new int[] { 0, 1 };
@@ -162,7 +162,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final RobotSetting[] settingsFromClipboard = getSettingsByRowNumbers(metadataSettings, rowsToCopy)
                 .toArray(new RobotSetting[0]);
-        final PositionCoordinateSerializer[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
+        final SerializablePositionCoordinate[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
                 rowsToCopy);
 
         final int[] columnsToPaste = new int[] { 0, 1 };
@@ -200,7 +200,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final RobotSetting[] settingsFromClipboard = getSettingsByRowNumbers(metadataSettings, rowsToCopy)
                 .toArray(new RobotSetting[0]);
-        final PositionCoordinateSerializer[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
+        final SerializablePositionCoordinate[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
                 rowsToCopy);
 
         final int[] columnsToPaste = new int[] { 1 };
@@ -294,13 +294,13 @@ public class PasteSettingsCellsCommandsCollectorTest {
         return new SelectionLayerAccessor(null, selectionLayer, null);
     }
 
-    private PositionCoordinateSerializer[] createPositionsToCopy(final int[] columnsToCopy, final int[] rowsToCopy) {
-        final PositionCoordinateSerializer[] cellPositionsToCopy = new PositionCoordinateSerializer[columnsToCopy.length
+    private SerializablePositionCoordinate[] createPositionsToCopy(final int[] columnsToCopy, final int[] rowsToCopy) {
+        final SerializablePositionCoordinate[] cellPositionsToCopy = new SerializablePositionCoordinate[columnsToCopy.length
                 * rowsToCopy.length];
         int positionCounter = 0;
         for (int i = 0; i < columnsToCopy.length; i++) {
             for (int j = 0; j < rowsToCopy.length; j++) {
-                cellPositionsToCopy[positionCounter] = new PositionCoordinateSerializer(
+                cellPositionsToCopy[positionCounter] = new SerializablePositionCoordinate(
                         new PositionCoordinate(null, columnsToCopy[i], rowsToCopy[j]));
                 positionCounter++;
             }
@@ -310,7 +310,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
     private DummyPasteSettingsCellsCommandsCollector createDummyCommandsCollector(
             final RobotSetting[] settingsFromClipboard,
-            final PositionCoordinateSerializer[] cellPositionsFromClipboard) {
+            final SerializablePositionCoordinate[] cellPositionsFromClipboard) {
         final DummyPasteSettingsCellsCommandsCollector commandsCollector = new DummyPasteSettingsCellsCommandsCollector();
         commandsCollector.setSettingsFromClipboard(settingsFromClipboard);
         commandsCollector.setCellPositionsFromClipboard(cellPositionsFromClipboard);
@@ -321,7 +321,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         private RobotSetting[] settingsFromClipboard;
 
-        private PositionCoordinateSerializer[] cellPositionsFromClipboard;
+        private SerializablePositionCoordinate[] cellPositionsFromClipboard;
 
         private final List<PasteCommandsInput> pasteCommandsInputs = newArrayList();
 
@@ -331,7 +331,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         }
 
         @Override
-        protected PositionCoordinateSerializer[] getPositionsCoordinatesFromClipboard(final RedClipboard clipboard) {
+        protected SerializablePositionCoordinate[] getPositionsCoordinatesFromClipboard(final RedClipboard clipboard) {
             return cellPositionsFromClipboard;
         }
 
@@ -356,7 +356,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
             this.settingsFromClipboard = settingsFromClipboard;
         }
 
-        public void setCellPositionsFromClipboard(final PositionCoordinateSerializer[] cellPositionsFromClipboard) {
+        public void setCellPositionsFromClipboard(final SerializablePositionCoordinate[] cellPositionsFromClipboard) {
             this.cellPositionsFromClipboard = cellPositionsFromClipboard;
         }
 

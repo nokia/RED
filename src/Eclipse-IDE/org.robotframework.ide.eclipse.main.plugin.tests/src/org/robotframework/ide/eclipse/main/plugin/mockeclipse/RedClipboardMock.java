@@ -11,26 +11,28 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
 public class RedClipboardMock extends RedClipboard {
 
     private String text;
     private RobotCase[] cases;
+    private RobotTask[] tasks;
     private RobotKeywordDefinition[] keywordDefinitions;
     private RobotKeywordCall[] calls;
     private RobotVariable[] variables;
-    private PositionCoordinateSerializer[] positions;
+    private SerializablePositionCoordinate[] positions;
 
     public RedClipboardMock() {
         super();
     }
 
     public boolean isEmpty() {
-        return !hasText() && !hasCases() && !hasKeywordDefinitions() && !hasKeywordCalls() && !hasVariables()
-                && !hasPositionsCoordinates();
+        return !hasText() && !hasCases() && !hasTasks() && !hasKeywordDefinitions() && !hasKeywordCalls()
+                && !hasVariables() && !hasPositionsCoordinates();
     }
 
     @Override
@@ -39,7 +41,7 @@ public class RedClipboardMock extends RedClipboard {
     }
 
     @Override
-    public PositionCoordinateSerializer[] getPositionsCoordinates() {
+    public SerializablePositionCoordinate[] getPositionsCoordinates() {
         return positions;
     }
 
@@ -71,6 +73,16 @@ public class RedClipboardMock extends RedClipboard {
     @Override
     public RobotCase[] getCases() {
         return cases;
+    }
+
+    @Override
+    public boolean hasTasks() {
+        return tasks != null;
+    }
+
+    @Override
+    public RobotTask[] getTasks() {
+        return tasks;
     }
 
     @Override
@@ -117,6 +129,7 @@ public class RedClipboardMock extends RedClipboard {
     public RedClipboard insertContent(final Object... dataToInsert) {
         text = null;
         cases = null;
+        tasks = null;
         keywordDefinitions = null;
         calls = null;
         variables = null;
@@ -127,14 +140,16 @@ public class RedClipboardMock extends RedClipboard {
                 text = (String) data;
             } else if (data instanceof RobotCase[]) {
                 cases = (RobotCase[]) data;
+            } else if (data instanceof RobotTask[]) {
+                tasks = (RobotTask[]) data;
             } else if (data instanceof RobotKeywordDefinition[]) {
                 keywordDefinitions = (RobotKeywordDefinition[]) data;
             } else if (data instanceof RobotKeywordCall[]) {
                 calls = (RobotKeywordCall[]) data;
             } else if (data instanceof RobotVariable[]) {
                 variables = (RobotVariable[]) data;
-            } else if (data instanceof PositionCoordinateSerializer[]) {
-                positions = (PositionCoordinateSerializer[]) data;
+            } else if (data instanceof SerializablePositionCoordinate[]) {
+                positions = (SerializablePositionCoordinate[]) data;
             }
         }
         return this;
@@ -144,6 +159,7 @@ public class RedClipboardMock extends RedClipboard {
     public void clear() {
         text = null;
         cases = null;
+        tasks = null;
         keywordDefinitions = null;
         calls = null;
         variables = null;

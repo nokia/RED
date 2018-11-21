@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.ArraysSerializerDeserializer;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.SerializablePositionCoordinate;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.viewers.Selections;
 
@@ -39,7 +39,7 @@ public abstract class E4CopyInCodeHoldersTableHandler {
             final RobotCodeHoldingElement<?>[] codeHoldersCopy = ArraysSerializerDeserializer.copy(holderClass,
                     codeHolders);
 
-            final PositionCoordinateSerializer[] serializablePositions = createPositionCoordinates(
+            final SerializablePositionCoordinate[] serializablePositions = createPositionCoordinates(
                     selectionLayerAccessor, selectedCellPositions);
 
             if (keywordCallsCopy.length == 0 && codeHoldersCopy.length == 0) {
@@ -56,7 +56,7 @@ public abstract class E4CopyInCodeHoldersTableHandler {
         return false;
     }
 
-    private PositionCoordinateSerializer[] createPositionCoordinates(
+    private SerializablePositionCoordinate[] createPositionCoordinates(
             final SelectionLayerAccessor selectionLayerAccessor, final PositionCoordinate[] selectedCellPositions) {
 
         // we're filtering out positions where non-robot elements are selected (e.g. AddingToken)
@@ -65,6 +65,6 @@ public abstract class E4CopyInCodeHoldersTableHandler {
                         .getElementSelectedAt(coord.getRowPosition()) instanceof RobotElement)
                 .collect(toList());
 
-        return PositionCoordinateSerializer.createFrom(selectedCellsOnRobotElements.toArray(new PositionCoordinate[0]));
+        return SerializablePositionCoordinate.createFrom(selectedCellsOnRobotElements.toArray(new PositionCoordinate[0]));
     }
 }
