@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.execution;
 
 import static com.google.common.base.Predicates.not;
 import static java.util.stream.Collectors.joining;
@@ -20,6 +20,9 @@ import java.util.Optional;
 
 import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.SystemVariableAccessor;
+import org.rf.ide.core.executor.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 import com.google.common.base.Strings;

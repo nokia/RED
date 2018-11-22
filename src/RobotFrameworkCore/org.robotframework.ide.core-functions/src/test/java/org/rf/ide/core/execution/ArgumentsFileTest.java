@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.rf.ide.core.execution.ArgumentsFile;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
