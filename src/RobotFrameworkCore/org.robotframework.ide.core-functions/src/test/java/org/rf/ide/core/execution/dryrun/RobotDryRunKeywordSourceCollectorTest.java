@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.dryrun;
+package org.rf.ide.core.execution.dryrun;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -11,6 +11,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
+import org.rf.ide.core.execution.dryrun.JsonMessageMapper;
+import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
+import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSourceCollector;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

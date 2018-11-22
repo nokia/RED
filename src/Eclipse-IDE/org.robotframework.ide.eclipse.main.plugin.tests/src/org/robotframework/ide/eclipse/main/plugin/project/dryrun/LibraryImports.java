@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
 import org.mockito.ArgumentMatcher;
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
+import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
+import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 
 import com.google.common.base.Equivalence;
 import com.google.common.base.Equivalence.Wrapper;

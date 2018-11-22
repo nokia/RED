@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.dryrun;
+package org.rf.ide.core.execution.dryrun;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
@@ -22,6 +22,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
+import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordEventListener;
+import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSourceCollector;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RobotDryRunKeywordEventListenerTest {

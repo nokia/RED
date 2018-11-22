@@ -33,7 +33,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.EnvironmentVariableReplacer;
-import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
+import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.libraries.LibraryDescriptor;

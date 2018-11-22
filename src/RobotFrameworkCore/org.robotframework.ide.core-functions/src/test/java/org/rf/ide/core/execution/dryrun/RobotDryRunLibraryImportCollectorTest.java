@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.dryrun;
+package org.rf.ide.core.execution.dryrun;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.emptyList;
@@ -19,6 +19,9 @@ import org.junit.Test;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
+import org.rf.ide.core.execution.dryrun.JsonMessageMapper;
+import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
+import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImportCollector;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

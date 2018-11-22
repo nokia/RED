@@ -3,7 +3,7 @@
 * Licensed under the Apache License, Version 2.0,
 * see license.txt file for details.
 */
-package org.rf.ide.core.dryrun;
+package org.rf.ide.core.execution.dryrun;
 
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.event.ShouldContinueEvent;
 import org.rf.ide.core.execution.agent.event.ShouldContinueEvent.ShouldContinueEventResponder;
+import org.rf.ide.core.execution.dryrun.RobotDryRunAlwaysContinueEventListener;
 import org.rf.ide.core.execution.server.response.ContinueExecution;
 
 public class RobotDryRunAlwaysContinueEventListenerTest {
