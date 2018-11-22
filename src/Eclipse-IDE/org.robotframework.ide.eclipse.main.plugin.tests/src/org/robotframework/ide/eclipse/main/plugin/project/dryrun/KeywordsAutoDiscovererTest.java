@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
+import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;

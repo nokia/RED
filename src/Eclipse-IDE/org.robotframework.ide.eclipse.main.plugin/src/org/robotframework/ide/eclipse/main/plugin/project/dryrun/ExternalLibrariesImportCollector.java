@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.RedURI;
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
+import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;

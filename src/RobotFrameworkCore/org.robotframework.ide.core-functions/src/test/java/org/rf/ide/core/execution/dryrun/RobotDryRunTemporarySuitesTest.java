@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.dryrun;
+package org.rf.ide.core.execution.dryrun;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.junit.Test;
+import org.rf.ide.core.execution.dryrun.RobotDryRunTemporarySuites;
 
 public class RobotDryRunTemporarySuitesTest {
 
