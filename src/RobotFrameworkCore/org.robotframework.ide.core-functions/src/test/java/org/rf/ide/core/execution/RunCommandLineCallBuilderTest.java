@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.execution;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +16,10 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.rf.ide.core.RedTemporaryDirectory;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.execution.RunCommandLineCallBuilder;
+import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
 
 public class RunCommandLineCallBuilderTest {
 
