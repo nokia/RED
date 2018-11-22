@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.execution;
 
 import static com.google.common.collect.Streams.zip;
 import static java.util.stream.Collectors.joining;
