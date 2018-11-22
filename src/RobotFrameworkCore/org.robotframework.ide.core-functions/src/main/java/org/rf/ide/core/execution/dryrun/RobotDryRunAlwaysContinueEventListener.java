@@ -3,7 +3,7 @@
 * Licensed under the Apache License, Version 2.0,
 * see license.txt file for details.
 */
-package org.rf.ide.core.dryrun;
+package org.rf.ide.core.execution.dryrun;
 
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.agent.event.ShouldContinueEvent;
