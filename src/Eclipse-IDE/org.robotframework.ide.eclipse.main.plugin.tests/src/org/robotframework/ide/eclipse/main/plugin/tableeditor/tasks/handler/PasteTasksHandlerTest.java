@@ -49,7 +49,7 @@ public class PasteTasksHandlerTest {
     }
 
     @Test
-    public void whenNoTasksSectionExist_itIsCreatedForPastedTasks() {
+    public void whenNoTasksSectionExists_itIsCreatedForPastedTasks() {
         final RobotTask[] tasks = createTasksToPaste();
         clipboard.insertContent((Object) tasks);
 
@@ -150,7 +150,7 @@ public class PasteTasksHandlerTest {
     }
 
     @Test
-    public void whenNoTasksSectionExist_noCallsArePastedAndNothingChanges() {
+    public void whenNoTasksSectionExists_noCallsArePastedAndNothingChanges() {
         final RobotKeywordCall[] calls = createCallsToPaste();
         clipboard.insertContent((Object) calls);
 
@@ -292,7 +292,7 @@ public class PasteTasksHandlerTest {
     }
 
     @Test
-    public void whenThereAreTestTasksAndCallInClipboard_onlyTasksAreInserted() {
+    public void whenThereAreTestTasksAndCallsInClipboard_onlyTasksAreInserted() {
         final RobotTask[] tasks = createTasksToPaste();
         final RobotKeywordCall[] calls = createCallsToPaste();
         clipboard.insertContent(tasks, calls);

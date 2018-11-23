@@ -450,7 +450,7 @@ public class TaskTest {
     }
 
     @Test
-    public void templateKeywordIsNotReturned_whenGlobalIsDefinedButLocalCancellsIt() {
+    public void templateKeywordIsNotReturned_whenGlobalIsDefinedButLocalCancelsIt() {
         final TaskTemplate globalTemplate = new TaskTemplate(RobotToken.create("Task Template"));
         globalTemplate.setKeywordName("global kw");
 
