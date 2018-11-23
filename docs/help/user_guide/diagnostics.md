@@ -4,9 +4,9 @@
 
 RED is using small python script `robot_session_server.py` as a bridge between
 the IDE itself and your **Robot Framework** installation. This is needed for
-various reasons: checking RF version so that files are accordingly, generating
-library documentations, running **RfLint** , providing variables from python
-files and so on.
+various reasons: checking RF version so that files are validated accordingly,
+generating library documentations, running **RfLint** , providing variables
+from python files and so on.
 
 Sometimes when diagnosing problems with RED it may be desirable to take a look
 at operations performed by `robot_session_server.py` process. By default this
