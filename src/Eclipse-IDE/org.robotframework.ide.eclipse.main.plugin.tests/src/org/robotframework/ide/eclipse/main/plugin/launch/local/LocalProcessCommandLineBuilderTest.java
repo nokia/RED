@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,8 +16,9 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.core.internal.resources.ProjectDescription;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.variables.IStringVariableManager;
@@ -105,6 +107,10 @@ public class LocalProcessCommandLineBuilderTest {
                 "002__case6", "  Log  20");
         projectProvider.createFile("002__suites_b/nested/s4.robot", "*** Test Cases ***", "002__case7", "  Log  10",
                 "002__case8", "  Log  20");
+
+        projectProvider.createDir("dir.with.dots");
+        projectProvider.createFile("dir.with.dots/s.5.robot", "*** Test Cases ***", "case9", "  Log  10", "case10",
+                "  Log  20");
 
         projectProvider.createFile("executable_script.bat");
     }
@@ -214,6 +220,36 @@ public class LocalProcessCommandLineBuilderTest {
     }
 
     @Test
+    public void commandLineContainsSuitesToRun_whenThereAreDotsInSuiteNames1() throws Exception {
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("dir.with.dots", emptyList()));
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(8)
+                .containsSequence("-s", PROJECT_NAME + ".Dir.with.dots")
+                .doesNotContain("-t")
+                .endsWith(projectProvider.getProject().getLocation().toOSString());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
+    public void commandLineContainsSuitesToRun_whenThereAreDotsInSuiteNames2() throws Exception {
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("dir.with.dots/s.5.robot", emptyList()));
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(8)
+                .containsSequence("-s", PROJECT_NAME + ".Dir.with.dots.S.5")
+                .doesNotContain("-t")
+                .endsWith(projectProvider.getProject().getLocation().toOSString());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
     public void commandLineContainsTestsToRun() throws Exception {
         final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
@@ -228,6 +264,21 @@ public class LocalProcessCommandLineBuilderTest {
                 .containsSequence("-t", PROJECT_NAME + ".Suites A.S1.001__case1")
                 .containsSequence("-t", PROJECT_NAME + ".Suites A.S1.001__case2")
                 .containsSequence("-t", PROJECT_NAME + ".Suites A.S2.001__case3")
+                .endsWith(projectProvider.getProject().getLocation().toOSString());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
+    public void commandLineContainsTestsToRun_whenThereAreDotsInSuiteNames() throws Exception {
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("dir.with.dots/s.5.robot", newArrayList("test 9")));
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(10)
+                .containsSequence("-s", PROJECT_NAME + ".Dir.with.dots.S.5")
+                .containsSequence("-t", PROJECT_NAME + ".Dir.with.dots.S.5.test 9")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
@@ -1023,8 +1074,7 @@ public class LocalProcessCommandLineBuilderTest {
     }
 
     private void moveProject(final IProject project, final File destination) throws CoreException {
-        final ProjectDescription description = new ProjectDescription();
-        description.setName(project.getName());
+        final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(project.getName());
         description.setLocation(new Path(destination.getAbsolutePath()));
         project.move(description, true, null);
     }
