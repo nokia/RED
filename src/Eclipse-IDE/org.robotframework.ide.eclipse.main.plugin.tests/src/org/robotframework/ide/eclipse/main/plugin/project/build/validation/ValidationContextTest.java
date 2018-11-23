@@ -11,9 +11,9 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IProject;
 import org.junit.Test;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;

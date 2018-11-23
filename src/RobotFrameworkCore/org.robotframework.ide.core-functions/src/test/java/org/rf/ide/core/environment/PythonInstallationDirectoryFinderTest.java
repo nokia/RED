@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.environment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +13,9 @@ import java.util.EnumSet;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.environment.SuiteExecutor;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 public class PythonInstallationDirectoryFinderTest {
 

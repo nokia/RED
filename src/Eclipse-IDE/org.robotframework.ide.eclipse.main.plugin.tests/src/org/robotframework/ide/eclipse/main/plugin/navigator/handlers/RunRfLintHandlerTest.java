@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IFile;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.rflint.RfLintIntegrationServer;
 import org.rf.ide.core.rflint.RfLintRule;

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.environment;
 
 import static java.util.stream.Collectors.toList;
 
@@ -17,8 +17,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.rf.ide.core.rflint.RfLintRule;
 

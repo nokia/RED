@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;

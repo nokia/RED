@@ -8,7 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import java.net.URI;
 import java.util.Collection;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+
 
 public interface ILibraryStructureBuilder {
 

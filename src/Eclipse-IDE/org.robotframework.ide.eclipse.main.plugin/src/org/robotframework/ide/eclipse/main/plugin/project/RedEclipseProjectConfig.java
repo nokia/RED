@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.RedURI;
 import org.rf.ide.core.SystemVariableAccessor;
-import org.rf.ide.core.executor.EnvironmentSearchPaths;
+import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;

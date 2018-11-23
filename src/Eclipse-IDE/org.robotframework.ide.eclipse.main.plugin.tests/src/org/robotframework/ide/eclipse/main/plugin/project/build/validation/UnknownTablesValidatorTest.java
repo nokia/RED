@@ -13,7 +13,7 @@ import java.util.Collection;
 
 import org.assertj.core.groups.Tuple;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;

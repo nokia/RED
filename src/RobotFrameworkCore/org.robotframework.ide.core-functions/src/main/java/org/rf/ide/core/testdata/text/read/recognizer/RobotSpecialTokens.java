@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.model.RobotVersion;
 
 public class RobotSpecialTokens {
 

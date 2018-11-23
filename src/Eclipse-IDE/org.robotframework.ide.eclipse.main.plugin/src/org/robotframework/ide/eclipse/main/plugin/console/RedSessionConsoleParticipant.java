@@ -11,8 +11,8 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.IConsolePageParticipant;
 import org.eclipse.ui.part.IPageBookViewPage;
-import org.rf.ide.core.executor.PythonProcessListener;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.PythonProcessListener;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 
@@ -30,7 +30,7 @@ public class RedSessionConsoleParticipant implements IConsolePageParticipant {
     private ActionsUpdater actionsUpdater;
 
     @Override
-    public <T> T getAdapter(Class<T> adapter) {
+    public <T> T getAdapter(final Class<T> adapter) {
         return null;
     }
 

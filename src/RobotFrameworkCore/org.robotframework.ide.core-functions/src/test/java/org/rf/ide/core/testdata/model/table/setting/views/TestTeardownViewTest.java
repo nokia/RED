@@ -12,9 +12,9 @@ import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestH
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 

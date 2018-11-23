@@ -15,13 +15,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.IRegionCacheable;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.CommonCase;
 import org.rf.ide.core.testdata.model.table.LocalSetting;

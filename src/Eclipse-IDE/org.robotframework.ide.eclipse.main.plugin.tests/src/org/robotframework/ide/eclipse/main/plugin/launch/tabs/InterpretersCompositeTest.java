@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.InterpretersComposite.InterpreterListener;
 import org.robotframework.red.junit.ShellProvider;
 

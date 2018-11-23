@@ -3,13 +3,13 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.environment;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
 
