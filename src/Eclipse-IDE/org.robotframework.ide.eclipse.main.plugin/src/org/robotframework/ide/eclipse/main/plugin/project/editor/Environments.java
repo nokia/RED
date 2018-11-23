@@ -7,7 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import java.util.List;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+
 
 /**
  * @author Michal Anglart

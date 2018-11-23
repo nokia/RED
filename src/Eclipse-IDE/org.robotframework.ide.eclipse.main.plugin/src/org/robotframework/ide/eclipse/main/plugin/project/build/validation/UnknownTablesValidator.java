@@ -9,8 +9,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;

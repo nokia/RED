@@ -9,11 +9,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
 
 public class NewRobotFileTestHelper {

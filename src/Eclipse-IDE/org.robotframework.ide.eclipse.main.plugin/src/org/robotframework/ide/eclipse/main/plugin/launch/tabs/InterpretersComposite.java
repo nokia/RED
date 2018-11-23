@@ -22,8 +22,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 /**

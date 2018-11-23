@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;

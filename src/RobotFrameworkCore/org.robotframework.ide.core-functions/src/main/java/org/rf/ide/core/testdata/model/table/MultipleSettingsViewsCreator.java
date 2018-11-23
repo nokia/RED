@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.RobotVersion;
 
 public class MultipleSettingsViewsCreator {
 

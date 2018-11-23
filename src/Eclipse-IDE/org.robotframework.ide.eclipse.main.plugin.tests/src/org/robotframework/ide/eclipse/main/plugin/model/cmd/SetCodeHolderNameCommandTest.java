@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;

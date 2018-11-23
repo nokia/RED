@@ -7,7 +7,7 @@ package org.rf.ide.core.execution.server;
 
 import java.util.Optional;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 
 public class AgentServerVersionsDebugChecker extends AgentServerVersionsChecker {
 

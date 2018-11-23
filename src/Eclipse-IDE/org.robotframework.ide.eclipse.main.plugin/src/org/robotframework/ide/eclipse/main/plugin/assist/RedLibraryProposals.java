@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;

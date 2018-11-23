@@ -19,7 +19,7 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsoleView;
-import org.rf.ide.core.executor.PythonProcessListener;
+import org.rf.ide.core.environment.PythonProcessListener;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 

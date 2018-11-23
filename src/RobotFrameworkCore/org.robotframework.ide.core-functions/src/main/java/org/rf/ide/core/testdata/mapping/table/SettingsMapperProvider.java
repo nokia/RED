@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.HashCommentMapper;
 import org.rf.ide.core.testdata.mapping.setting.DefaultTagsMapper;
 import org.rf.ide.core.testdata.mapping.setting.DefaultTagsTagNameMapper;
@@ -68,7 +69,6 @@ import org.rf.ide.core.testdata.mapping.setting.test.TestTemplateTrashDataMapper
 import org.rf.ide.core.testdata.mapping.setting.test.TestTimeoutMapper;
 import org.rf.ide.core.testdata.mapping.setting.test.TestTimeoutMessageMapper;
 import org.rf.ide.core.testdata.mapping.setting.test.TestTimeoutValueMapper;
-import org.rf.ide.core.testdata.model.RobotVersion;
 
 
 public class SettingsMapperProvider {

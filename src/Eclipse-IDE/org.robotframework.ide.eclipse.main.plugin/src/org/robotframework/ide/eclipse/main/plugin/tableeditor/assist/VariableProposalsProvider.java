@@ -14,7 +14,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;

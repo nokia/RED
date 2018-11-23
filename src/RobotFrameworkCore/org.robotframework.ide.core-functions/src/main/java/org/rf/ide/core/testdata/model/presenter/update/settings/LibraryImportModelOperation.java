@@ -8,9 +8,9 @@ package org.rf.ide.core.testdata.model.presenter.update.settings;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.presenter.update.ISettingTableElementOperation;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
