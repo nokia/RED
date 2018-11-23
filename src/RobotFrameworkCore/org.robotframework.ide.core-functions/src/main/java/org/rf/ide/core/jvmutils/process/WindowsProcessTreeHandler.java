@@ -15,9 +15,9 @@ import java.util.Optional;
 
 import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.RedTemporaryDirectory;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.environment.SuiteExecutor;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;

@@ -10,8 +10,9 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.SuiteExecutor;
+
 
 /**
  * @author Michal Anglart

@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.EnvironmentSearchPaths;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;

@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.testdata.imported.ARobotInternalVariable;

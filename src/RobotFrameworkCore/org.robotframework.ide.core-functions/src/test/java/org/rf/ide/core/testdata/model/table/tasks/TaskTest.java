@@ -6,11 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TaskTable;
@@ -450,7 +450,7 @@ public class TaskTest {
     }
 
     @Test
-    public void templateKeywordIsNotReturned_whenGlobalIsDefinedButLocalCancellsIt() {
+    public void templateKeywordIsNotReturned_whenGlobalIsDefinedButLocalCancelsIt() {
         final TaskTemplate globalTemplate = new TaskTemplate(RobotToken.create("Task Template"));
         globalTemplate.setKeywordName("global kw");
 
