@@ -19,10 +19,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 

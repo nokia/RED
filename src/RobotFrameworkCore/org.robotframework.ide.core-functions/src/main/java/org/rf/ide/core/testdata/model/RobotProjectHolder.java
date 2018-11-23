@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.testdata.imported.ARobotInternalVariable;

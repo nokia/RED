@@ -20,10 +20,10 @@ import java.util.Optional;
 
 import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.SystemVariableAccessor;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.SuiteExecutor;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.SuiteExecutor;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Streams;

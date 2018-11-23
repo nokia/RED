@@ -8,13 +8,13 @@ package org.rf.ide.core.testdata.mapping.keywords;
 import java.util.List;
 import java.util.Stack;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;

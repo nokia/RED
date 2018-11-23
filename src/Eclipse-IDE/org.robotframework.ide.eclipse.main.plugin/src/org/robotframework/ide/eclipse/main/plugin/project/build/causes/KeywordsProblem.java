@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordPostconditionRecognizer;

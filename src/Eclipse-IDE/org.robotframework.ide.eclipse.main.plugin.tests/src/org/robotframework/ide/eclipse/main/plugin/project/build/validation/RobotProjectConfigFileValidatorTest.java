@@ -24,7 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rf.ide.core.SystemVariableAccessor;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;

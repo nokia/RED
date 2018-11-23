@@ -7,7 +7,7 @@ package org.rf.ide.core.testdata.mapping.setting.suite;
 
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 
 public class SuiteSetupKeywordArgumentMapperOld extends SuiteSetupKeywordArgumentMapper {

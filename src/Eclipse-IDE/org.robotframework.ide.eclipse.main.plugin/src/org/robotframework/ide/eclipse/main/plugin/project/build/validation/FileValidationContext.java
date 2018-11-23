@@ -20,11 +20,11 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;

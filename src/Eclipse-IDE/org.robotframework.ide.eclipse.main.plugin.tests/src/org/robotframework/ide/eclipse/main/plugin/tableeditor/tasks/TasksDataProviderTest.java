@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.core.resources.IFile;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;

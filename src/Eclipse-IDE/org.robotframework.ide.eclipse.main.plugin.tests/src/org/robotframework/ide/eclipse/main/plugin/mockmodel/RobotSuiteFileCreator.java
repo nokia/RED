@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.mockmodel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 

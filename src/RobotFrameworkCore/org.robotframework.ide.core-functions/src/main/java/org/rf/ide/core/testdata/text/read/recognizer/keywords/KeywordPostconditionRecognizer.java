@@ -7,7 +7,7 @@ package org.rf.ide.core.testdata.text.read.recognizer.keywords;
 
 import java.util.regex.Pattern;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 

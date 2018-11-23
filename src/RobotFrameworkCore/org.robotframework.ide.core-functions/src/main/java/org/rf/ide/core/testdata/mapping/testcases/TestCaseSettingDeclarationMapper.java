@@ -8,12 +8,12 @@ package org.rf.ide.core.testdata.mapping.testcases;
 import java.util.List;
 import java.util.Stack;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;

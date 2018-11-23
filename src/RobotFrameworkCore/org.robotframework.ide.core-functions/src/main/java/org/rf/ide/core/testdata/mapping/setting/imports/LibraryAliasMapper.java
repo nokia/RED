@@ -7,12 +7,12 @@ package org.rf.ide.core.testdata.mapping.setting.imports;
 
 import java.util.Stack;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.ParsingState;

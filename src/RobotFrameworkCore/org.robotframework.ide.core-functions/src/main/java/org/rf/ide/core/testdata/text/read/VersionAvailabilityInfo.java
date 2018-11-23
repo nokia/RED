@@ -5,7 +5,7 @@
  */
 package org.rf.ide.core.testdata.text.read;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 
 public class VersionAvailabilityInfo {
 

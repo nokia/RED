@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import java.util.List;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;

@@ -10,7 +10,7 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;

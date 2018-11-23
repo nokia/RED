@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.DefaultTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ForceTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizer;

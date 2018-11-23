@@ -3,12 +3,13 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.environment;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
+import org.rf.ide.core.environment.PythonVersion;
 
 public class PythonVersionTest {
 

@@ -17,12 +17,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.IRobotFileParser;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;

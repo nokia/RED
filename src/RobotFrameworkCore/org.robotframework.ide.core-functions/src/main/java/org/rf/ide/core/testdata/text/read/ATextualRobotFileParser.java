@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.IRobotFileParser;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler.LineContinueType;
@@ -44,7 +45,6 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.TableHeader;

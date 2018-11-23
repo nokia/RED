@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.environment;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,8 +37,8 @@ import org.apache.xmlrpc.serializer.NullSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializerImpl;
 import org.rf.ide.core.RedSystemProperties;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.rf.ide.core.libraries.Documentation.DocFormat;

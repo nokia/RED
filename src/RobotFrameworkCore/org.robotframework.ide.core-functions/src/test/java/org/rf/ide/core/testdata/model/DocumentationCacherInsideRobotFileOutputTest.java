@@ -17,8 +17,9 @@ import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.table.KeywordTable;

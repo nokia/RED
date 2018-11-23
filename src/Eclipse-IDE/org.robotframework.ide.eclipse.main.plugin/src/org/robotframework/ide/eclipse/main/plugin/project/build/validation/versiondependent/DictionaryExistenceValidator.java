@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;

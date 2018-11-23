@@ -15,10 +15,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.EnvironmentSearchPaths;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 import com.google.common.io.Files;
 

@@ -15,7 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -23,7 +24,6 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;

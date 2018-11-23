@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.SystemVariableAccessor;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ConfigVersion;

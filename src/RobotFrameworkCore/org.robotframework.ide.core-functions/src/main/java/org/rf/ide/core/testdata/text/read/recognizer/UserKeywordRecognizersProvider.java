@@ -8,7 +8,7 @@ package org.rf.ide.core.testdata.text.read.recognizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordArgumentsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordDocumentationRecognizer;

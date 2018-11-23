@@ -8,11 +8,11 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import java.io.File;
 import java.util.List;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
