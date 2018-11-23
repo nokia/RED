@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.swt.graphics.RGB;
 import org.rf.ide.core.RedURI;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;

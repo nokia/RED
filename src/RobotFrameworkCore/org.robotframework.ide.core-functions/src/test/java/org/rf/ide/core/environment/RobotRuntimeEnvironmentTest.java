@@ -3,7 +3,7 @@
 * Licensed under the Apache License, Version 2.0,
 * see license.txt file for details.
 */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.environment;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +22,12 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rf.ide.core.RedSystemProperties;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
+import org.rf.ide.core.environment.EnvironmentSearchPaths;
+import org.rf.ide.core.environment.RobotCommandExecutor;
+import org.rf.ide.core.environment.RobotCommandsExecutors;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.SuiteExecutor;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 public class RobotRuntimeEnvironmentTest {
 

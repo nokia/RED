@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.executor;
+package org.rf.ide.core.environment;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.rf.ide.core.RedTemporaryDirectory;
-import org.rf.ide.core.executor.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
-import org.rf.ide.core.executor.RobotCommandRpcExecutor.RobotCommandExecutorException;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
+import org.rf.ide.core.environment.RobotCommandRpcExecutor.RobotCommandExecutorException;
 
 /**
  * @author Michal Anglart

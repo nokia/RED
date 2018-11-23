@@ -7,7 +7,7 @@ package org.rf.ide.core.testdata.mapping.setting.test;
 
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 
 public class TestTeardownKeywordArgumentMapperOld extends TestTeardownKeywordArgumentMapper {

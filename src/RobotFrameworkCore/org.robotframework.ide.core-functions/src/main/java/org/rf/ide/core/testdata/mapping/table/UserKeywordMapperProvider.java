@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.mapping.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordArgumentsValueMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordDocumentationTextMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordEmptyLineMapper;
@@ -22,7 +23,6 @@ import org.rf.ide.core.testdata.mapping.keywords.KeywordTeardownNameMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordTimeoutMessageMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordTimeoutValueMapper;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 

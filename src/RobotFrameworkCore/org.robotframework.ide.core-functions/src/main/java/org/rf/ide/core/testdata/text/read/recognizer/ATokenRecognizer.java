@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.joining;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 
 import com.google.common.annotations.VisibleForTesting;
 

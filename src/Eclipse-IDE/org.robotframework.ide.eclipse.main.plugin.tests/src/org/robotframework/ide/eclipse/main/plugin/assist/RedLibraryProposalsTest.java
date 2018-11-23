@@ -21,7 +21,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;

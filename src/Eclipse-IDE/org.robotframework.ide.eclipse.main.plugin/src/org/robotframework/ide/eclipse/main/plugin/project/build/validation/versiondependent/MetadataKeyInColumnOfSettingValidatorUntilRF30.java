@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation.vers
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;

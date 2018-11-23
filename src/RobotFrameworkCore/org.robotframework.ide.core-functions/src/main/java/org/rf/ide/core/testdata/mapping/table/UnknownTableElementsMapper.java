@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.mapping.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordExecutableRowActionMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordExecutableRowArgumentMapper;
 import org.rf.ide.core.testdata.mapping.setting.UnknownSettingArgumentMapper;
@@ -18,7 +19,6 @@ import org.rf.ide.core.testdata.mapping.testcases.TestCaseExecutableRowActionMap
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseExecutableRowArgumentMapper;
 import org.rf.ide.core.testdata.mapping.variables.UnknownVariableMapper;
 import org.rf.ide.core.testdata.mapping.variables.UnknownVariableValueMapper;
-import org.rf.ide.core.testdata.model.RobotVersion;
 
 public class UnknownTableElementsMapper {
 

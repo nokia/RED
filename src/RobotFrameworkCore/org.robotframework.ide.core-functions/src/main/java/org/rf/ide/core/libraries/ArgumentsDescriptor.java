@@ -15,8 +15,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
-import org.rf.ide.core.testdata.model.RobotVersion;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;

@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.mapping.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseDocumentationTextMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseEmptyLineMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseNameMapper;
@@ -23,7 +24,6 @@ import org.rf.ide.core.testdata.mapping.testcases.TestCaseTemplateKeywordTrashAr
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseTimeoutMessageMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseTimeoutValueMapper;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 

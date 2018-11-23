@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.ui.IWorkbenchPage;
 import org.junit.Test;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 
 

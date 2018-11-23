@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 

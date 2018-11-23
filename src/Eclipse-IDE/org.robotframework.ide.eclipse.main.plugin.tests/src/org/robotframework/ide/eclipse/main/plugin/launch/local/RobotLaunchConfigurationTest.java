@@ -25,7 +25,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.RunConfigurationProvider;

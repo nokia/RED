@@ -16,8 +16,8 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.rf.ide.core.RedTemporaryDirectory;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
 

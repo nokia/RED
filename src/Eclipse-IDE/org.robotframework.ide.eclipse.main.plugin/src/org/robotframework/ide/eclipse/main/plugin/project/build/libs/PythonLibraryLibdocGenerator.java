@@ -9,10 +9,10 @@ import java.io.File;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.LibdocFormat;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.EnvironmentSearchPaths;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
