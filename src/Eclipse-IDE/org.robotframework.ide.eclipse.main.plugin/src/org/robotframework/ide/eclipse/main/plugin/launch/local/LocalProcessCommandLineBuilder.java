@@ -128,7 +128,7 @@ class LocalProcessCommandLineBuilder {
             builder.withDataSources(newArrayList(getOnlyElement(allResources.keySet()).getLocation().toFile()));
             if (!suitePaths.isEmpty()) {
                 final Function<IResource, List<String>> mapper = r -> newArrayList(
-                        r.getLocation().removeFileExtension().lastSegment());
+                        removeFileExtensionIfNeeded(r, r.getLocation()).lastSegment());
                 builder.testsToRun(RobotPathsNaming.createTestNames(allResources, "", mapper));
             }
         } else {
@@ -141,10 +141,11 @@ class LocalProcessCommandLineBuilder {
                 final String topLevelSuiteName = RobotPathsNaming.createTopLevelSuiteName(dataSources);
                 final Function<IResource, List<String>> mapper = r -> {
                     if (r.isLinked(IResource.CHECK_ANCESTORS)) {
-                        return newArrayList(r.getLocation().removeFileExtension().lastSegment());
+                        return newArrayList(removeFileExtensionIfNeeded(r, r.getLocation()).lastSegment());
                     } else {
                         final List<String> segments = newArrayList(project.getLocation().lastSegment());
-                        segments.addAll(newArrayList(r.getProjectRelativePath().removeFileExtension().segments()));
+                        segments.addAll(
+                                newArrayList(removeFileExtensionIfNeeded(r, r.getProjectRelativePath()).segments()));
                         return segments;
                     }
                 };
@@ -154,6 +155,10 @@ class LocalProcessCommandLineBuilder {
                 builder.testsToRun(RobotPathsNaming.createTestNames(linkedResources, topLevelSuiteName, mapper));
             }
         }
+    }
+
+    private static IPath removeFileExtensionIfNeeded(final IResource resource, final IPath path) {
+        return resource.getType() == IResource.FILE ? path.removeFileExtension() : path;
     }
 
     private static File resolveExecutableFile(final String path) throws CoreException {
