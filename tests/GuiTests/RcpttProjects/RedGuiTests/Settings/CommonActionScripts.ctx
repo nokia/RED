@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/14/18 3:21 PM
+Save-Time: 11/28/18 5:15 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -94,6 +94,7 @@ global [val RED_workspace_path_double_slaches [replace $RED_workspace_path -old 
 global [val user_folder [get-java-property "user.home"]]
 
 global [val sys_sep [os-specific "\\" "/"]]
+global [val regex_sys_sep [os-specific "\\\\" "/"]]
 
 if [$is_eclipse_oxygen]{
 	global [val doc_editbox_selector "-after [get-label \"Provide test suite documentation and general settings\"]"]
