@@ -21,9 +21,9 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TaskFinder {
+class TaskFinder {
 
-    public Task findOrCreateNearestTask(final RobotLine currentLine, final RobotFileOutput robotFileOutput) {
+    Task findOrCreateNearestTask(final RobotLine currentLine, final RobotFileOutput robotFileOutput) {
         final RobotFile fileModel = robotFileOutput.getFileModel();
         final TaskTable taskTable = fileModel.getTasksTable();
 

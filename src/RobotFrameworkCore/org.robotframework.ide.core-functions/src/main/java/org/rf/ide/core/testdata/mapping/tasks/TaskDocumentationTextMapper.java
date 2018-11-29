@@ -46,9 +46,7 @@ public class TaskDocumentationTextMapper implements IParsingMapper {
         final List<Task> tasks = robotFileOutput.getFileModel().getTasksTable().getTasks();
         final Task task = tasks.get(tasks.size() - 1);
         final List<LocalSetting<Task>> documentations = task.getDocumentation();
-        if (!documentations.isEmpty()) {
-            documentations.get(documentations.size() - 1).addToken(rt);
-        }
+        documentations.get(documentations.size() - 1).addToken(rt);
 
         processingState.push(ParsingState.TASK_SETTING_DOCUMENTATION_TEXT);
         return rt;

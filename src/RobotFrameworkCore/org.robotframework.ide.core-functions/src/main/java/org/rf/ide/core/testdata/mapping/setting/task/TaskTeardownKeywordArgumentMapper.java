@@ -55,9 +55,7 @@ public class TaskTeardownKeywordArgumentMapper implements IParsingMapper {
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TaskTeardown> teardowns = settings.getTaskTeardowns();
-        if (!teardowns.isEmpty()) {
-            teardowns.get(teardowns.size() - 1).addArgument(rt);
-        }
+        teardowns.get(teardowns.size() - 1).addArgument(rt);
 
         processingState.push(ParsingState.SETTING_TASK_TEARDOWN_KEYWORD_ARGUMENT);
         return rt;

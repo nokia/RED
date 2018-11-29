@@ -19,7 +19,7 @@ import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
 public class NewRobotFileTestHelper {
 
     public static RobotFile getModelFileToModify(final String version) {
-        return new RobotFileOutput(RobotVersion.from("2.9")).getFileModel();
+        return new RobotFileOutput(RobotVersion.from(version)).getFileModel();
     }
 
     public static void assertNewModelTheSameAsInFile(final String fileName, final RobotFile modelFile,
