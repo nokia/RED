@@ -43,7 +43,7 @@ public class TaskTimeoutMessageMapper implements IParsingMapper {
     }
 
     private boolean checkIfHasAlreadyValue(final List<TaskTimeout> taskTimeouts) {
-        return !taskTimeouts.isEmpty() && taskTimeouts.get(taskTimeouts.size() - 1).getTimeout() != null;
+        return taskTimeouts.get(taskTimeouts.size() - 1).getTimeout() != null;
     }
 
     @Override
@@ -55,9 +55,7 @@ public class TaskTimeoutMessageMapper implements IParsingMapper {
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TaskTimeout> timeouts = settings.getTaskTimeouts();
-        if (!timeouts.isEmpty()) {
-            timeouts.get(timeouts.size() - 1).addMessageArgument(rt);
-        }
+        timeouts.get(timeouts.size() - 1).addMessageArgument(rt);
 
         processingState.push(ParsingState.SETTING_TASK_TIMEOUT_MESSAGE_ARGUMENTS);
         return rt;

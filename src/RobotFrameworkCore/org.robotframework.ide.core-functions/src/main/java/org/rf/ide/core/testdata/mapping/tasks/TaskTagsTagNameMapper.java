@@ -47,9 +47,7 @@ public class TaskTagsTagNameMapper implements IParsingMapper {
         final List<Task> tasks = taskTable.getTasks();
         final Task task = tasks.get(tasks.size() - 1);
         final List<LocalSetting<Task>> tags = task.getTags();
-        if (!tags.isEmpty()) {
-            tags.get(tags.size() - 1).addToken(rt);
-        }
+        tags.get(tags.size() - 1).addToken(rt);
 
         processingState.push(ParsingState.TASK_SETTING_TAGS_TAG_NAME);
         return rt;

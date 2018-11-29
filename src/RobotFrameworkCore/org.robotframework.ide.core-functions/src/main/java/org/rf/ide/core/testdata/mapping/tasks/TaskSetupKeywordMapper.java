@@ -42,8 +42,7 @@ public class TaskSetupKeywordMapper implements IParsingMapper {
     }
 
     static boolean hasKeywordNameAlready(final List<LocalSetting<Task>> setups) {
-        return !setups.isEmpty()
-                && setups.get(setups.size() - 1).getToken(RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME) != null;
+        return setups.get(setups.size() - 1).getToken(RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME) != null;
     }
 
     @Override

@@ -52,9 +52,7 @@ public class TaskSetupKeywordMapper implements IParsingMapper {
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TaskSetup> setups = settings.getTaskSetups();
-        if (!setups.isEmpty()) {
-            setups.get(setups.size() - 1).setKeywordName(rt);
-        }
+        setups.get(setups.size() - 1).setKeywordName(rt);
 
         processingState.push(ParsingState.SETTING_TASK_SETUP_KEYWORD);
         return rt;

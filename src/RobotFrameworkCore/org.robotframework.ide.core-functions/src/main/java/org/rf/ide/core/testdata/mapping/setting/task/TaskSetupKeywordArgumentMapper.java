@@ -54,9 +54,7 @@ public class TaskSetupKeywordArgumentMapper implements IParsingMapper {
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TaskSetup> setups = settings.getTaskSetups();
-        if (!setups.isEmpty()) {
-            setups.get(setups.size() - 1).addArgument(rt);
-        }
+        setups.get(setups.size() - 1).addArgument(rt);
 
         processingState.push(ParsingState.SETTING_TASK_SETUP_KEYWORD_ARGUMENT);
         return rt;

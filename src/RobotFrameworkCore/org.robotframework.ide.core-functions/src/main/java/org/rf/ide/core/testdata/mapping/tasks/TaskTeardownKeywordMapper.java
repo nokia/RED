@@ -42,8 +42,7 @@ public class TaskTeardownKeywordMapper implements IParsingMapper {
     }
 
     static boolean hasKeywordNameAlready(final List<LocalSetting<Task>> teardowns) {
-        return !teardowns.isEmpty() && teardowns.get(teardowns.size() - 1)
-                .getToken(RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME) != null;
+        return teardowns.get(teardowns.size() - 1).getToken(RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME) != null;
     }
 
     @Override
