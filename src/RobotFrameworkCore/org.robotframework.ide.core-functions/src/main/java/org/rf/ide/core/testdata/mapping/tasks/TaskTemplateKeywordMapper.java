@@ -42,8 +42,7 @@ public class TaskTemplateKeywordMapper implements IParsingMapper {
     }
 
     private static boolean hasKeywordNameAlready(final List<LocalSetting<Task>> templates) {
-        return !templates.isEmpty() && templates.get(templates.size() - 1)
-                .getToken(RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_NAME) != null;
+        return templates.get(templates.size() - 1).getToken(RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_NAME) != null;
     }
 
     @Override
@@ -55,9 +54,7 @@ public class TaskTemplateKeywordMapper implements IParsingMapper {
         final List<Task> tasks = robotFileOutput.getFileModel().getTasksTable().getTasks();
         final Task task = tasks.get(tasks.size() - 1);
         final List<LocalSetting<Task>> templates = task.getTemplates();
-        if (!templates.isEmpty()) {
-            templates.get(templates.size() - 1).addToken(rt);
-        }
+        templates.get(templates.size() - 1).addToken(rt);
 
         processingState.push(ParsingState.TASK_SETTING_TASK_TEMPLATE_KEYWORD);
         return rt;

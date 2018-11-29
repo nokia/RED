@@ -46,7 +46,7 @@ public class TaskTemplateTrashDataMapper implements IParsingMapper {
     }
 
     protected boolean checkIfHasAlreadyKeywordName(final List<TaskTemplate> taskTemplates) {
-        return !taskTemplates.isEmpty() && taskTemplates.get(taskTemplates.size() - 1).getKeywordName() != null;
+        return taskTemplates.get(taskTemplates.size() - 1).getKeywordName() != null;
     }
 
     @Override
@@ -58,9 +58,7 @@ public class TaskTemplateTrashDataMapper implements IParsingMapper {
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TaskTemplate> templates = settings.getTaskTemplates();
-        if (!templates.isEmpty()) {
-            templates.get(templates.size() - 1).addUnexpectedTrashArgument(rt);
-        }
+        templates.get(templates.size() - 1).addUnexpectedTrashArgument(rt);
 
         processingState.push(ParsingState.SETTING_TASK_TEMPLATE_KEYWORD_UNWANTED_ARGUMENTS);
         return rt;

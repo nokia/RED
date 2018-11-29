@@ -42,8 +42,7 @@ public class TaskTimeoutValueMapper implements IParsingMapper {
     }
 
     static boolean hasTimeoutAlready(final List<LocalSetting<Task>> timeouts) {
-        return !timeouts.isEmpty()
-                && timeouts.get(timeouts.size() - 1).getToken(RobotTokenType.TASK_SETTING_TIMEOUT_VALUE) != null;
+        return timeouts.get(timeouts.size() - 1).getToken(RobotTokenType.TASK_SETTING_TIMEOUT_VALUE) != null;
     }
 
     @Override
@@ -55,9 +54,7 @@ public class TaskTimeoutValueMapper implements IParsingMapper {
         final List<Task> tasks = robotFileOutput.getFileModel().getTasksTable().getTasks();
         final Task task = tasks.get(tasks.size() - 1);
         final List<LocalSetting<Task>> timeouts = task.getTimeouts();
-        if (!timeouts.isEmpty()) {
-            timeouts.get(timeouts.size() - 1).addToken(rt);
-        }
+        timeouts.get(timeouts.size() - 1).addToken(rt);
 
         processingState.push(ParsingState.TASK_SETTING_TASK_TIMEOUT_VALUE);
         return rt;

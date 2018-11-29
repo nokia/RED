@@ -22,7 +22,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TaskTimeoutValueMapper implements IParsingMapper {
 
-    private final ParsingStateHelper utility = new ParsingStateHelper();
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
     @Override
     public boolean isApplicableFor(final RobotVersion robotVersion) {
@@ -33,7 +33,7 @@ public class TaskTimeoutValueMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
-        if (utility.getCurrentState(processingState) == ParsingState.SETTING_TASK_TIMEOUT) {
+        if (stateHelper.getCurrentState(processingState) == ParsingState.SETTING_TASK_TIMEOUT) {
             final List<TaskTimeout> taskTimeouts = robotFileOutput.getFileModel().getSettingTable().getTaskTimeouts();
             return !checkIfHasAlreadyValue(taskTimeouts);
         }
@@ -41,7 +41,7 @@ public class TaskTimeoutValueMapper implements IParsingMapper {
     }
 
     private boolean checkIfHasAlreadyValue(final List<TaskTimeout> taskTimeouts) {
-        return !taskTimeouts.isEmpty() && taskTimeouts.get(taskTimeouts.size() - 1).getTimeout() != null;
+        return taskTimeouts.get(taskTimeouts.size() - 1).getTimeout() != null;
     }
 
     @Override
@@ -53,9 +53,7 @@ public class TaskTimeoutValueMapper implements IParsingMapper {
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TaskTimeout> timeouts = settings.getTaskTimeouts();
-        if (!timeouts.isEmpty()) {
-            timeouts.get(timeouts.size() - 1).setTimeout(rt);
-        }
+        timeouts.get(timeouts.size() - 1).setTimeout(rt);
 
         processingState.push(ParsingState.SETTING_TASK_TIMEOUT_VALUE);
         return rt;

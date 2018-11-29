@@ -43,7 +43,7 @@ public class TaskTemplateKeywordMapper implements IParsingMapper {
     }
 
     private boolean checkIfHasAlreadyKeywordName(final List<TaskTemplate> taskTemplates) {
-        return !taskTemplates.isEmpty() && taskTemplates.get(taskTemplates.size() - 1).getKeywordName() != null;
+        return taskTemplates.get(taskTemplates.size() - 1).getKeywordName() != null;
     }
 
     @Override
@@ -55,9 +55,7 @@ public class TaskTemplateKeywordMapper implements IParsingMapper {
 
         final SettingTable settings = robotFileOutput.getFileModel().getSettingTable();
         final List<TaskTemplate> templates = settings.getTaskTemplates();
-        if (!templates.isEmpty()) {
-            templates.get(templates.size() - 1).setKeywordName(rt);
-        }
+        templates.get(templates.size() - 1).setKeywordName(rt);
 
         processingState.push(ParsingState.SETTING_TASK_TEMPLATE_KEYWORD);
         return rt;
