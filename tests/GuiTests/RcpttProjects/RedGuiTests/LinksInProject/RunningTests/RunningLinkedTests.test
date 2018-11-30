@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _NFAlcOmFEeibRqo1Bs_dDA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/30/18 2:57 PM
+Save-Time: 11/30/18 5:37 PM
 Testcase-Type: ecl
 Verifications: _OFT48OmSEeibRqo1Bs_dDA
 
@@ -42,6 +42,7 @@ get-view "Project Explorer" | get-tree | select "LinkedFiles/new_test.robot" | g
 
 //check console
 wait-for-console
+get-view Console | get-text-viewer | get-object |invoke getLine 0 | log
 get-view Console | get-text-viewer | get-object |invoke getLine 0 
 	| matches 
 	[format "Command: .* -m robot.run --listener .*TestRunnerAgent\.py:\d{1,5} -s \"LinkedFiles & File.File\" %s[\\\\/]LinkedFiles %s[\\\\/]files_for_links[\\\\/]file.robot" $RED_workspace_path_double_slaches  
