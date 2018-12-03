@@ -221,6 +221,11 @@ public class TokensSource {
         }
 
         @Override
+        public int getEndOffset() {
+            return getStartOffset() + getEndColumn() - getStartColumn();
+        }
+
+        @Override
         public FilePosition getFilePosition() {
             return filePosition;
         }

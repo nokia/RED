@@ -10,6 +10,7 @@ import static com.google.common.collect.Iterables.filter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.IChildElement;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -58,8 +59,16 @@ public class RobotLine implements IChildElement<RobotFile> {
         return lineElements;
     }
 
+    public Stream<IRobotLineElement> elementsStream() {
+        return lineElements.stream();
+    }
+
     public List<RobotToken> getLineTokens() {
         return ImmutableList.copyOf(filter(lineElements, RobotToken.class));
+    }
+
+    public Stream<RobotToken> tokensStream() {
+        return lineElements.stream().filter(RobotToken.class::isInstance).map(RobotToken.class::cast);
     }
 
     public void setLineElements(final List<IRobotLineElement> lineElements) {
