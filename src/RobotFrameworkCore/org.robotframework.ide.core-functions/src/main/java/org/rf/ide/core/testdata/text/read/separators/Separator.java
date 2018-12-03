@@ -119,6 +119,11 @@ public class Separator implements IRobotLineElement {
     }
 
     @Override
+    public int getEndOffset() {
+        return getStartOffset() + getEndColumn() - getStartColumn();
+    }
+
+    @Override
     public String getText() {
         return text;
     }
