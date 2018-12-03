@@ -124,6 +124,7 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return endColumn;
     }
 
+    @Override
     public int getEndOffset() {
         return getStartOffset() + getEndColumn() - getStartColumn();
     }
