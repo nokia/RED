@@ -8,14 +8,15 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -62,8 +63,6 @@ public class RobotSuiteFileCollectorTest {
         robotFile = model.createSuiteFile(projectProvider.createFile("dir1/dir2/file4.robot", "*** Test Cases ***"));
 
         notRobotFile = projectProvider.createFile("lib.py", "def kw():", "  pass");
-
-        projectProvider.configure();
     }
 
     @AfterClass
@@ -71,83 +70,69 @@ public class RobotSuiteFileCollectorTest {
         RedPlugin.getModelManager().dispose();
     }
 
+    @Before
+    public void before() throws Exception {
+        projectProvider.configure();
+    }
+
     @Test
     public void onlySelectedFileShouldBeCollected() throws Exception {
-        final List<IResource> selectedResources = newArrayList(topLevelFile.getFile(), initFile.getFile());
+        final List<RobotSuiteFile> suites = collectSuites(topLevelFile.getFile(), initFile.getFile());
 
-        final Set<RobotSuiteFile> files = RobotSuiteFileCollector.collectFiles(selectedResources,
-                new NullProgressMonitor());
-        assertThat(files).containsOnly(topLevelFile, initFile);
+        assertThat(suites).containsExactly(topLevelFile, initFile);
     }
 
     @Test
     public void allFilesFromDirectoryShouldBeCollected() throws Exception {
-        final List<IResource> selectedResources = newArrayList(topLevelDirectory);
+        final List<RobotSuiteFile> suites = collectSuites(topLevelDirectory);
 
-        final Set<RobotSuiteFile> files = RobotSuiteFileCollector.collectFiles(selectedResources,
-                new NullProgressMonitor());
-        assertThat(files).containsOnly(initFile, tsvFile, txtFile, robotFile);
+        assertThat(suites).containsExactly(initFile, robotFile, tsvFile, txtFile);
     }
 
     @Test
     public void allFilesFromProjectShouldBeCollected() throws Exception {
-        final List<IResource> selectedResources = newArrayList(projectProvider.getProject());
+        final List<RobotSuiteFile> suites = collectSuites(projectProvider.getProject());
 
-        final Set<RobotSuiteFile> files = RobotSuiteFileCollector.collectFiles(selectedResources,
-                new NullProgressMonitor());
-        assertThat(files).containsOnly(topLevelFile, initFile, tsvFile, txtFile, robotFile);
+        assertThat(suites).containsExactly(initFile, robotFile, tsvFile, txtFile, topLevelFile);
     }
 
     @Test
     public void filesShouldBeCollectedOnlyOnce() throws Exception {
-        final List<IResource> selectedResources = newArrayList(topLevelDirectory, tsvFile.getFile(),
-                robotFile.getFile());
+        final List<RobotSuiteFile> suites = collectSuites(topLevelDirectory, tsvFile.getFile(), robotFile.getFile());
 
-        final Set<RobotSuiteFile> files = RobotSuiteFileCollector.collectFiles(selectedResources,
-                new NullProgressMonitor());
-        assertThat(files).containsOnly(initFile, tsvFile, txtFile, robotFile);
+        assertThat(suites).containsExactly(initFile, robotFile, tsvFile, txtFile);
     }
 
     @Test
     public void filesAndDirectoriesCanBeMixed() throws Exception {
-        final List<IResource> selectedResources = newArrayList(nestedDirectory, topLevelFile.getFile());
+        final List<RobotSuiteFile> suites = collectSuites(nestedDirectory, topLevelFile.getFile());
 
-        final Set<RobotSuiteFile> files = RobotSuiteFileCollector.collectFiles(selectedResources,
-                new NullProgressMonitor());
-        assertThat(files).containsOnly(topLevelFile, robotFile);
+        assertThat(suites).containsExactly(robotFile, topLevelFile);
     }
 
     @Test
     public void notRobotFilesShouldBeIgnored() throws Exception {
-        final List<IResource> selectedResources = newArrayList(notRobotFile, topLevelFile.getFile());
+        final List<RobotSuiteFile> suites = collectSuites(notRobotFile, topLevelFile.getFile());
 
-        final Set<RobotSuiteFile> files = RobotSuiteFileCollector.collectFiles(selectedResources,
-                new NullProgressMonitor());
-        assertThat(files).containsOnly(topLevelFile);
+        assertThat(suites).containsExactly(topLevelFile);
     }
 
     @Test
     public void excludedFilesShouldBeIgnored() throws Exception {
-        excludePathInProjectConfig("dir1");
-
-        final List<IResource> selectedResources = newArrayList(topLevelDirectory, topLevelFile.getFile());
-
-        final Set<RobotSuiteFile> files = RobotSuiteFileCollector.collectFiles(selectedResources,
-                new NullProgressMonitor());
-        assertThat(files).containsOnly(topLevelFile);
-
-        includePathInProjectConfig("dir1");
-    }
-
-    private void excludePathInProjectConfig(final String path) throws Exception {
         final RobotProjectConfig config = model.createRobotProject(projectProvider.getProject())
                 .getRobotProjectConfig();
-        config.addExcludedPath(path);
+        config.addExcludedPath("dir1");
+
+        final List<RobotSuiteFile> suites = collectSuites(topLevelDirectory, topLevelFile.getFile());
+
+        assertThat(suites).containsExactly(topLevelFile);
     }
 
-    private void includePathInProjectConfig(final String path) {
-        final RobotProjectConfig config = model.createRobotProject(projectProvider.getProject())
-                .getRobotProjectConfig();
-        config.removeExcludedPath(path);
+    private List<RobotSuiteFile> collectSuites(final IResource... resources) throws InterruptedException {
+        final List<RobotSuiteFile> result = new ArrayList<>();
+        final WorkspaceJob job = RobotSuiteFileCollector.createCollectingJob(newArrayList(resources), result::addAll);
+        job.schedule();
+        job.join();
+        return result;
     }
 }

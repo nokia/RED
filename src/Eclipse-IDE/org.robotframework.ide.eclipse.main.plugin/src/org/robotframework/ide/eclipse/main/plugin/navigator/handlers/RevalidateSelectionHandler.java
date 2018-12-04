@@ -5,18 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -45,28 +41,18 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
     }
 
     static void revalidate(final List<IResource> selectedResources, final long delay) {
-        final WorkspaceJob suiteCollectingJob = new WorkspaceJob("Collecting robot suites") {
-
-            @Override
-            public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
-                        .collectGroupedByProject(selectedResources, monitor);
-
-                if (monitor.isCanceled()) {
-                    return Status.CANCEL_STATUS;
-                }
-
-                filesGroupedByProject.forEach((robotProject, suiteModels) -> {
-                    final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory
-                            .create(suiteModels);
-                    final Job validationJob = RobotArtifactsValidator.createValidationJob(robotProject.getProject(),
-                            validatorConfig);
-                    validationJob.schedule();
+        final WorkspaceJob suiteCollectingJob = RobotSuiteFileCollector.createCollectingJob(selectedResources,
+                suites -> {
+                    final Map<RobotProject, List<RobotSuiteFile>> suitesGroupedByProject = suites.stream()
+                            .collect(Collectors.groupingBy(RobotSuiteFile::getProject));
+                    suitesGroupedByProject.forEach((robotProject, suiteModels) -> {
+                        final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory
+                                .create(suiteModels);
+                        final Job validationJob = RobotArtifactsValidator.createValidationJob(robotProject.getProject(),
+                                validatorConfig);
+                        validationJob.schedule();
+                    });
                 });
-
-                return Status.OK_STATUS;
-            }
-        };
         suiteCollectingJob.schedule(delay);
     }
 

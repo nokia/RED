@@ -8,12 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -22,11 +19,9 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.validation.ProblemPosition;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ExcludedResources;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
@@ -39,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.GeneralSettingsLibrariesImportValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscovererWindow;
 
@@ -56,10 +52,8 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         this((robotProject, suites) -> {
             final boolean showSummary = robotProject.getRobotProjectConfig()
                     .isLibrariesAutoDiscoveringSummaryWindowEnabled();
-            final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler = showSummary
-                    ? LibrariesAutoDiscovererWindow.openSummary()
-                    : libraryImports -> {};
-            return new CombinedLibrariesAutoDiscoverer(robotProject, suites, summaryHandler);
+            return new CombinedLibrariesAutoDiscoverer(robotProject, suites,
+                    showSummary ? LibrariesAutoDiscovererWindow.openSummary() : libraryImports -> {});
         });
     }
 
@@ -96,7 +90,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
             globalBatchSaveResponsibleTrigger = null;
 
             if (!SUITES_FOR_DISCOVER.isEmpty()) {
-                startAutoDiscovering(SUITES_FOR_DISCOVER);
+                LibrariesAutoDiscoverer.start(SUITES_FOR_DISCOVER, discovererFactory);
             }
             SUITES_FOR_DISCOVER.clear();
         }
@@ -106,19 +100,11 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         if (shouldStartAutoDiscovering(suite)) {
 
             if (globalBatchSaveResponsibleTrigger == null) {
-                startAutoDiscovering(newArrayList(suite));
+                LibrariesAutoDiscoverer.start(newArrayList(suite), discovererFactory);
             } else {
                 SUITES_FOR_DISCOVER.add(suite);
             }
         }
-    }
-
-    private void startAutoDiscovering(final Collection<RobotSuiteFile> suites) {
-        final Map<RobotProject, List<RobotSuiteFile>> filesGroupedByProject = suites.stream()
-                .collect(Collectors.groupingBy(RobotSuiteFile::getProject));
-        // TODO: for now we want to start autodiscovering only for one project, see RED-1004
-        filesGroupedByProject.entrySet().stream().findFirst().ifPresent(
-                entry -> discovererFactory.create(entry.getKey(), entry.getValue()).start());
     }
 
     private boolean shouldStartAutoDiscovering(final RobotSuiteFile suite) {
