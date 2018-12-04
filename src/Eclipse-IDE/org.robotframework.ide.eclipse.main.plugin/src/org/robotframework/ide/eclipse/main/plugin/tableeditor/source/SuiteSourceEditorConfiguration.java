@@ -73,23 +73,22 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.C
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallInSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.InTokenRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.NestedExecsSpecialTokensRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedCachingScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokenScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokensStore;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsTemplateRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensInNestedExecsRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.WithNameRule;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -426,29 +425,29 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new SettingsTemplateRule(call),
                 ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin, quote, variable),
                 ExecutableCallRule.forExecutableInTestCase(call, gherkin, quote, variable),
-                new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new InTokenRule(special) };
+                new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] tasksRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new TaskNameRule(definition), new TaskSettingsRule(setting), new SettingsTemplateRule(call),
                 ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin, quote, variable),
                 ExecutableCallRule.forExecutableInTask(call, gherkin, quote, variable),
-                new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new InTokenRule(special) };
+                new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
                 ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, quote, variable),
                 ExecutableCallRule.forExecutableInKeyword(call, gherkin, quote, variable),
-                new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new InTokenRule(special) };
+                new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsTemplateRule(call),
                 ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, gherkin, quote,
                         variable),
-                new NestedExecsSpecialTokensRule(special), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new WithNameRule(special) };
+                new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
+                new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new VariableDefinitionRule(variable), new CommentRule(comment, tasks),
