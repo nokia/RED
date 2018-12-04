@@ -368,29 +368,31 @@ public class RobotProject extends RobotContainer {
             return referencedVariableFiles;
         }
         readProjectConfigurationIfNeeded();
-        if (configuration != null) {
-            referencedVariableFiles = new ArrayList<>();
-            for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
-                IPath path = new Path(variableFile.getPath());
-                if (!path.isAbsolute()) {
-                    final IResource targetFile = getProject().getWorkspace().getRoot().findMember(path);
-                    if (targetFile != null && targetFile.exists()) {
-                        path = targetFile.getLocation();
-                    }
-                }
+        final RobotRuntimeEnvironment env = getRuntimeEnvironment();
+        if (env == null || configuration == null) {
+            return new ArrayList<>();
+        }
 
-                try {
-                    final Map<String, Object> varsMap = getRuntimeEnvironment()
-                            .getVariablesFromFile(path.toPortableString(), variableFile.getArguments());
-                    variableFile.setVariables(varsMap);
-                    referencedVariableFiles.add(variableFile);
-                } catch (final RobotEnvironmentException e) {
-                    // unable to import the variables file
+        referencedVariableFiles = new ArrayList<>();
+        for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
+            IPath path = new Path(variableFile.getPath());
+            if (!path.isAbsolute()) {
+                final IResource targetFile = getProject().getWorkspace().getRoot().findMember(path);
+                if (targetFile != null && targetFile.exists()) {
+                    path = targetFile.getLocation();
                 }
             }
-            return referencedVariableFiles;
+
+            try {
+                final Map<String, Object> varsMap = env.getVariablesFromFile(path.toPortableString(),
+                        variableFile.getArguments());
+                variableFile.setVariables(varsMap);
+                referencedVariableFiles.add(variableFile);
+            } catch (final RobotEnvironmentException e) {
+                // unable to import the variables file
+            }
         }
-        return new ArrayList<>();
+        return referencedVariableFiles;
     }
 
     public void addKeywordSource(final RobotDryRunKeywordSource keywordSource) {
