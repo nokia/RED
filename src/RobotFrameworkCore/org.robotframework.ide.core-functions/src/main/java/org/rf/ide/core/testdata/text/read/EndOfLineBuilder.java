@@ -181,6 +181,11 @@ public class EndOfLineBuilder {
         }
 
         @Override
+        public int getEndOffset() {
+            return getStartOffset() + getEndColumn() - getStartColumn();
+        }
+
+        @Override
         public FilePosition getFilePosition() {
             return new FilePosition(lineNumber, getStartColumn(), getStartOffset());
         }

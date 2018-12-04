@@ -17,9 +17,11 @@ public interface IRobotLineElement {
 
     int getStartColumn();
 
+    int getStartOffset();
+
     int getEndColumn();
 
-    int getStartOffset();
+    int getEndOffset();
 
     FilePosition getFilePosition();
 

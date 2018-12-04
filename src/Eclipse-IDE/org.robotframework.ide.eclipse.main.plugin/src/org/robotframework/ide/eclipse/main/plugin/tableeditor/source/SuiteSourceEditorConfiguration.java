@@ -144,17 +144,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IAutoEditStrategy[] getAutoEditStrategies(final ISourceViewer sourceViewer, final String contentType) {
-        final boolean isTsv = "tsv".equals(editor.fileModel.getFileExtension());
-        final List<IAutoEditStrategy> strategies = newArrayList();
-        strategies.add(new SuiteSourceIndentLineEditStrategy(isTsv));
-        strategies.add(new SuiteSourceInsertLineContinuationStrategy(isTsv));
-        if (contentType.equals(SuiteSourcePartitionScanner.KEYWORDS_SECTION)
-                || contentType.equals(SuiteSourcePartitionScanner.TEST_CASES_SECTION)
-                || contentType.equals(SuiteSourcePartitionScanner.TASKS_SECTION)
-                || contentType.equals(IDocument.DEFAULT_CONTENT_TYPE)) {
-            strategies.add(new SuiteSourceIndentLineAfterDefinitionStrategy(isTsv));
-        }
-        return strategies.toArray(new IAutoEditStrategy[0]);
+        return new IAutoEditStrategy[] { new RobotSuiteAutoEditStrategy(
+                () -> RedPlugin.getDefault().getPreferences().getSeparatorToUse(editor.fileModel.isTsvFile())) };
     }
 
     @Override
