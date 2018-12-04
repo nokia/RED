@@ -45,10 +45,6 @@ public abstract class AbstractAutoDiscoverer {
 
     AbstractAutoDiscoverer(final RobotProject robotProject) {
         this.robotProject = robotProject;
-        if (robotProject.getRuntimeEnvironment() == null) {
-            throw new AutoDiscovererException(
-                    "There is no active runtime environment for project '" + robotProject.getName() + "'");
-        }
     }
 
     public abstract Job start();
@@ -138,10 +134,6 @@ public abstract class AbstractAutoDiscoverer {
     public static class AutoDiscovererException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
-
-        public AutoDiscovererException(final String message) {
-            super(message);
-        }
 
         public AutoDiscovererException(final String message, final Throwable cause) {
             super(message, cause);
