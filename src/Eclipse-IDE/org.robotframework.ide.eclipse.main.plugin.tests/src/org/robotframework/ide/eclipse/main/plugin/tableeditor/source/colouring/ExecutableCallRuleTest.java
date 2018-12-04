@@ -73,7 +73,7 @@ public class ExecutableCallRuleTest {
             for (final IRobotLineElement token : line.getLineElements()) {
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, lines);
 
-                if (token.getText().equals("call") || token.getText().equals(":FOR")) {
+                if (token.getText().equals("call")) {
                     thereWasName = true;
 
                     assertThat(evaluatedToken).isPresent();
@@ -99,7 +99,7 @@ public class ExecutableCallRuleTest {
                 final int positionInsideToken = new Random().nextInt(token.getText().length());
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken, lines);
 
-                if (token.getText().equals("call") || token.getText().equals(":FOR")) {
+                if (token.getText().equals("call")) {
                     thereWasName = true;
 
                     assertThat(evaluatedToken).isPresent();
