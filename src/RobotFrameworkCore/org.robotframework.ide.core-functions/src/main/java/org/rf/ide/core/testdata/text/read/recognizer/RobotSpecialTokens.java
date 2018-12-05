@@ -20,9 +20,10 @@ public class RobotSpecialTokens {
 
     private static final List<ATokenRecognizer> SPECIAL_RECOGNIZERS = newArrayList(
             new ForActionLiteral(),
-            new ForActionInRF31Literal(),
             new ForInActionLiteral(),
-            new ForContinueToken());
+            new ForContinueToken(),
+            new EndTerminatedForLoopActionLiteral(),
+            new EndTerminatedForLoopEndLiteral());
 
     private List<ATokenRecognizer> recognizersToUse;
 
@@ -49,7 +50,7 @@ public class RobotSpecialTokens {
     private static class ForActionLiteral extends ATokenRecognizer {
 
         protected ForActionLiteral() {
-            super(Pattern.compile("^(\\s)*[:](\\s)*" + "[f|F](\\s)*[o|O](\\s)*[r|R]" + "(\\s)*$"),
+            super(Pattern.compile("^(\\s)*[:](\\s)*" + "[fF](\\s)*[oO](\\s)*[rR]" + "(\\s)*$"),
                     RobotTokenType.FOR_TOKEN);
         }
 
@@ -59,9 +60,9 @@ public class RobotSpecialTokens {
         }
     }
 
-    private static class ForActionInRF31Literal extends ATokenRecognizer {
+    private static class EndTerminatedForLoopActionLiteral extends ATokenRecognizer {
 
-        protected ForActionInRF31Literal() {
+        protected EndTerminatedForLoopActionLiteral() {
             super(Pattern.compile("^(\\s)*" + "FOR" + "(\\s)*$"), RobotTokenType.FOR_TOKEN);
         }
 
@@ -72,7 +73,24 @@ public class RobotSpecialTokens {
 
         @Override
         public ATokenRecognizer newInstance() {
-            return new ForActionInRF31Literal();
+            return new EndTerminatedForLoopActionLiteral();
+        }
+    }
+
+    private static class EndTerminatedForLoopEndLiteral extends ATokenRecognizer {
+
+        protected EndTerminatedForLoopEndLiteral() {
+            super(Pattern.compile("^(\\s)*" + "END" + "(\\s)*$"), RobotTokenType.FOR_END_TOKEN);
+        }
+
+        @Override
+        public boolean isApplicableFor(final RobotVersion robotVersion) {
+            return robotVersion.isNewerOrEqualTo(new RobotVersion(3, 1));
+        }
+
+        @Override
+        public ATokenRecognizer newInstance() {
+            return new EndTerminatedForLoopEndLiteral();
         }
     }
 

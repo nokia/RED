@@ -155,7 +155,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 return true;
             }
             final RobotToken firstToken = line.tokensStream().findFirst().orElseGet(() -> RobotToken.create(""));
-            if (firstToken.getText().equals("END")) {
+            if (firstToken.getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
                 return false;
             }
         }

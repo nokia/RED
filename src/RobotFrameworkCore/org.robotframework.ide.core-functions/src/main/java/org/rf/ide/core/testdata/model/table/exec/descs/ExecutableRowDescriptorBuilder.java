@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptorBuilder;
+import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopEndRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.SimpleRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.SimpleRowDescriptorBuilder;
 
@@ -31,8 +32,9 @@ public class ExecutableRowDescriptorBuilder {
 
     private Stream<IRowDescriptorBuilder> getBuilders() {
         return Stream.of(
-                new ForLoopDeclarationRowDescriptorBuilder(), 
+                new ForLoopDeclarationRowDescriptorBuilder(),
                 new ForLoopContinueRowDescriptorBuilder(),
+                new ForLoopEndRowDescriptorBuilder(),
                 new SimpleRowDescriptorBuilder());
     }
 }

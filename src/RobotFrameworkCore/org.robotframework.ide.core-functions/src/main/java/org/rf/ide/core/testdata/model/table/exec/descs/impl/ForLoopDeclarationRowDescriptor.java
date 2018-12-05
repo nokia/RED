@@ -34,8 +34,6 @@ public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescrip
 
     private final List<IElementDeclaration> textParameters = new ArrayList<>();
 
-    private final IRowType type = ERowType.FOR;
-
     private final List<BuildMessage> messages = new ArrayList<>();
 
     private final RobotExecutableRow<T> row;
@@ -142,8 +140,8 @@ public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescrip
     }
 
     @Override
-    public IRowType getRowType() {
-        return type;
+    public RowType getRowType() {
+        return RowType.FOR;
     }
 
     @Override

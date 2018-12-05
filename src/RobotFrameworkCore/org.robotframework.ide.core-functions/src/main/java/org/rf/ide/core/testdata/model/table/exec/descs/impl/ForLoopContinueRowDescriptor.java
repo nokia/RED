@@ -35,8 +35,6 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
 
     private int forLoopStartRowIndex = -1;
 
-    private final IRowType type = ERowType.FOR_CONTINUE;
-
     private final List<BuildMessage> messages = new ArrayList<>();
 
     private final RobotExecutableRow<T> row;
@@ -162,8 +160,8 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
     }
 
     @Override
-    public IRowType getRowType() {
-        return type;
+    public RowType getRowType() {
+        return RowType.FOR_CONTINUE;
     }
 
     @Override

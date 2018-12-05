@@ -120,6 +120,8 @@ public class ModelBuilder {
 
         TestCaseBuildingStep executable(String action, String... arguments);
 
+        TestCaseBuildingStep executableEndTerminatedLoop(String action, String... arguments);
+
         SettingsTableBuildingStep withSettingsTable();
 
         VariablesTableBuildingStep withVariablesTable();
@@ -365,9 +367,26 @@ public class ModelBuilder {
         public TestCaseBuildingStep executable(final String action, final String... arguments) {
             final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
             row.setAction(RobotToken.create(action));
-            if (action.equalsIgnoreCase("for") || action.equalsIgnoreCase(":for")) {
+            if (action.equals("FOR") || action.equalsIgnoreCase(":for")) {
                 row.getAction().getTypes().add(RobotTokenType.FOR_TOKEN);
             }
+            if (action.equals("END")) {
+                row.getAction().getTypes().add(RobotTokenType.FOR_END_TOKEN);
+            }
+            for (final String arg : arguments) {
+                row.addArgument(RobotToken.create(arg));
+            }
+            test.addElement(row);
+            return this;
+        }
+
+        @Override
+        public TestCaseBuildingStep executableEndTerminatedLoop(final String action, final String... arguments) {
+            final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
+            row.setAction(RobotToken.create(""));
+            row.getAction().getTypes().add(RobotTokenType.FOR_WITH_END_CONTINUATION);
+
+            row.addArgument(RobotToken.create(action));
             for (final String arg : arguments) {
                 row.addArgument(RobotToken.create(arg));
             }
@@ -439,8 +458,16 @@ public class ModelBuilder {
         return modelForFile("file.robot");
     }
 
+    public static TablesBuildingStep modelForFile(final RobotVersion version) {
+        return modelForFile("file.robot", version);
+    }
+
     public static TablesBuildingStep modelForFile(final String filename) {
-        final RobotFileOutput rfo = new RobotFileOutput(RobotVersion.from("3.0.0"));
+        return modelForFile(filename, RobotVersion.from("3.0.0"));
+    }
+
+    public static TablesBuildingStep modelForFile(final String filename, final RobotVersion version) {
+        final RobotFileOutput rfo = new RobotFileOutput(version);
         rfo.setProcessedFile(new File(filename));
         final RobotFile robotFile = rfo.getFileModel();
         robotFile.excludeTable(RobotTokenType.KEYWORDS_TABLE_HEADER);
