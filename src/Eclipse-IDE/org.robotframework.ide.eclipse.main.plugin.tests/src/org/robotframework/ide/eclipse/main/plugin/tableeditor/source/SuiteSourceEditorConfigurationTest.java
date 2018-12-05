@@ -17,20 +17,19 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.C
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallInSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.InTokenRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.NestedExecsSpecialTokensRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsTemplateRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensInNestedExecsRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.WithNameRule;
 
 public class SuiteSourceEditorConfigurationTest {
 
@@ -49,24 +48,24 @@ public class SuiteSourceEditorConfigurationTest {
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, CaseNameRule.class,
                                 TestCaseSettingsRule.class, SettingsTemplateRule.class,
                                 ExecutableCallInSettingsRule.class, ExecutableCallRule.class,
-                                NestedExecsSpecialTokensRule.class, CommentRule.class, VariableUsageRule.class,
-                                InTokenRule.class))
+                                SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
+                                SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.TASKS_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, TaskNameRule.class,
                                 TaskSettingsRule.class, SettingsTemplateRule.class,
                                 ExecutableCallInSettingsRule.class, ExecutableCallRule.class,
-                                NestedExecsSpecialTokensRule.class, CommentRule.class, VariableUsageRule.class,
-                                InTokenRule.class))
+                                SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
+                                SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, KeywordNameRule.class,
                                 KeywordSettingsRule.class, ExecutableCallInSettingsRule.class, ExecutableCallRule.class,
-                                NestedExecsSpecialTokensRule.class, CommentRule.class, VariableUsageRule.class,
-                                InTokenRule.class))
+                                SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
+                                SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.SETTINGS_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, SettingRule.class,
                                 SettingsTemplateRule.class, ExecutableCallInSettingsRule.class,
-                                NestedExecsSpecialTokensRule.class, CommentRule.class, VariableUsageRule.class,
-                                WithNameRule.class))
+                                SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
+                                SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.VARIABLES_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, VariableDefinitionRule.class,
                                 CommentRule.class, VariableUsageRule.class));
