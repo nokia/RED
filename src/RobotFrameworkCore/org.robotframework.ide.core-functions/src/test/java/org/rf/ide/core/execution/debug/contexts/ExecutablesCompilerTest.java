@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -112,5 +113,42 @@ public class ExecutablesCompilerTest {
         assertThat(descriptors.get(1).getLoopExecutable().getInnerExecutables()).hasSize(1);
         assertThat(descriptors.get(1).getLoopExecutable().getInnerExecutables().get(0).getCalledKeywordName())
                 .isEqualTo("write");
+    }
+
+    @Test
+    public void executablesCompilationTest_whenEndTerminatedLoopIsUsedInside() {
+        final RobotFile model = ModelBuilder.modelForFile(new RobotVersion(3,1))
+                .withTestCasesTable()
+                    .withTestCase("test")
+                        .executable("log", "10")
+                        .executable("FOR", "${x}", "IN", "1", "2", "3")
+                        .executableEndTerminatedLoop("write", "${x}")
+                        .executable("END")
+                        .executable("log", "end")
+                .build();
+
+        final List<RobotExecutableRow<TestCase>> rows = model.getTestCaseTable()
+                .getTestCases()
+                .get(0)
+                .getExecutionContext();
+
+        final List<ExecutableWithDescriptor> descriptors = ExecutablesCompiler.compileExecutables(rows, null);
+
+        assertThat(descriptors).hasSize(3);
+        assertThat(descriptors.get(0).getCalledKeywordName()).isEqualTo("log");
+        assertThat(descriptors.get(0).isLoopExecutable()).isFalse();
+        assertThat(descriptors.get(0).isLastExecutable()).isFalse();
+
+        assertThat(descriptors.get(1).getCalledKeywordName()).isEqualTo("FOR");
+        assertThat(descriptors.get(1).isLoopExecutable()).isTrue();
+        assertThat(descriptors.get(1).isLastExecutable()).isFalse();
+        assertThat(descriptors.get(1).getLoopExecutable()).isNotNull();
+        assertThat(descriptors.get(1).getLoopExecutable().getInnerExecutables()).hasSize(1);
+        assertThat(descriptors.get(1).getLoopExecutable().getInnerExecutables().get(0).getCalledKeywordName())
+                .isEqualTo("write");
+
+        assertThat(descriptors.get(2).getCalledKeywordName()).isEqualTo("log");
+        assertThat(descriptors.get(2).isLoopExecutable()).isFalse();
+        assertThat(descriptors.get(2).isLastExecutable()).isTrue();
     }
 }

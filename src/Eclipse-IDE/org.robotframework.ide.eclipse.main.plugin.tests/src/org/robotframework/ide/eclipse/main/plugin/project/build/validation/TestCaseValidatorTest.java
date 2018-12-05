@@ -438,9 +438,11 @@ public class TestCaseValidatorTest {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
                 .appendLine("  :FOR  ${x}  IN RANGE  1  ${var}")
+                .appendLine("  \\  kw   1")
                 .build();
 
-        final FileValidationContext context = prepareContext();
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot"), "arg"));
+        final FileValidationContext context = prepareContext(accessibleKws);
         final Collection<Problem> problems = validate(context, fileModel);
 
         assertThat(problems).containsOnly(
@@ -452,6 +454,7 @@ public class TestCaseValidatorTest {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
                 .appendLine("  :FOR  ${x}")
+                .appendLine("  \\  kw   1")
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot"), "arg"));

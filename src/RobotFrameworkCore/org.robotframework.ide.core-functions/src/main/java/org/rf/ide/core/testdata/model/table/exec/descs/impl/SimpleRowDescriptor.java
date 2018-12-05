@@ -31,8 +31,6 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
     private final List<RobotToken> keywordArguments = new ArrayList<>(0);
 
-    private final IRowType type = ERowType.UNKONWN;
-
     private final List<BuildMessage> messages = new ArrayList<>();
 
     private final RobotExecutableRow<T> row;
@@ -145,17 +143,8 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public IRowType getRowType() {
-        IRowType correctType = type;
-        if (correctType == ERowType.UNKONWN) {
-            if (row.isExecutable()) {
-                correctType = ERowType.SIMPLE;
-            } else {
-                correctType = ERowType.COMMENTED_HASH;
-            }
-        }
-
-        return correctType;
+    public RowType getRowType() {
+        return row.isExecutable() ? RowType.SIMPLE : RowType.COMMENTED_HASH;
     }
 
     @Override
@@ -167,6 +156,6 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     public String toString() {
         return String.format(
                 "SimpleRowDescriptor [createdVariables=%s, action=%s, rowType=%s, usedVariables=%s, textParameters=%s, messages=%s, row=%s]",
-                createdVariables, action, type, usedVariables, textParameters, messages, row);
+                createdVariables, action, getRowType(), usedVariables, textParameters, messages, row);
     }
 }

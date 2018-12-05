@@ -69,7 +69,8 @@ public class ExecutableCallRule extends VariableUsageRule {
     public boolean isApplicable(final IRobotLineElement token) {
         return super.isApplicable(token) && acceptableTypes.contains(token.getTypes().get(0))
                 && !token.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
-                && !token.getTypes().contains(RobotTokenType.FOR_TOKEN);
+                && !token.getTypes().contains(RobotTokenType.FOR_TOKEN)
+                && !token.getTypes().contains(RobotTokenType.FOR_END_TOKEN);
     }
 
     @Override

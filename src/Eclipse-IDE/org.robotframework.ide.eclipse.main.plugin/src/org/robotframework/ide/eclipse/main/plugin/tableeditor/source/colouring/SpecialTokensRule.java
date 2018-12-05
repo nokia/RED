@@ -41,6 +41,6 @@ public class SpecialTokensRule implements ISyntaxColouringRule {
 
     private boolean isSpecialTokenType(final IRobotTokenType type) {
         return type == RobotTokenType.SETTING_LIBRARY_ALIAS || type == RobotTokenType.FOR_TOKEN
-                || type == RobotTokenType.IN_TOKEN;
+                || type == RobotTokenType.IN_TOKEN || type == RobotTokenType.FOR_END_TOKEN;
     }
 }

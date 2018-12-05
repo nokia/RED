@@ -58,12 +58,17 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
             // don't worry about comments with artificial action token, it will be served by
             // another case
             final RobotToken actual = tokens.get(columnPosition);
+
+            if (actual.getTypes().contains(RobotTokenType.FOR_TOKEN)
+                    || actual.getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
+                return;
+            }
+
             if (actual.getText().equals(action.getText()) && actual.getStartOffset() == action.getStartOffset()
-                    && !actual.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
-                    && !actual.getTypes().contains(RobotTokenType.FOR_TOKEN)) {
+                    && !actual.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
-            } else if (!actual.getTypes().contains(RobotTokenType.FOR_TOKEN)) {
+            } else {
                 for (int i = columnPosition - 1; i >= 0; i--) {
                     final QualifiedKeywordName qualifiedKwName = QualifiedKeywordName
                             .fromOccurrence(tokens.get(i).getText());
