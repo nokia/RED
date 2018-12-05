@@ -31,26 +31,17 @@ public interface IExecutableRowDescriptor<T> {
 
     List<RobotToken> getKeywordArguments();
 
-    IRowType getRowType();
+    RowType getRowType();
 
     AModelElement<T> getRow();
 
-    public enum ERowType implements IRowType {
+    public enum RowType {
         UNKONWN,
         SETTING,
         COMMENTED_HASH,
         SIMPLE,
         FOR,
-        FOR_CONTINUE;
-
-        @Override
-        public IRowType getParentType() {
-            return null;
-        }
-    }
-
-    public interface IRowType {
-
-        IRowType getParentType();
+        FOR_CONTINUE,
+        FOR_END;
     }
 }

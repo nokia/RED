@@ -244,40 +244,38 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public boolean isExecutable() {
-        boolean result = false;
-        if (action != null) {
-            if (getParent() instanceof IExecutableStepsHolder) {
-                @SuppressWarnings("unchecked")
-                final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
-                final FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
-
-                if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                    final String text = action.getText().trim();
-                    final List<RobotToken> elementTokens = getElementTokens();
-                    if (text.equals("\\")) {
-                        if (elementTokens.size() > 1) {
-                            if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                                result = true;
-                            }
-                        }
-                    } else if ("".equals(text)) {
-                        if (fileFormat == FileFormat.TSV) {
-                            if (elementTokens.size() > 1) {
-                                if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                                    result = true;
-                                }
-                            }
-                        }
-                    } else {
-                        result = true;
-                    }
-                }
-            } else {
-                result = !action.getTypes().contains(RobotTokenType.START_HASH_COMMENT);
-            }
+        if (action == null) {
+            return false;
         }
+        if (getParent() instanceof IExecutableStepsHolder) {
+            @SuppressWarnings("unchecked")
+            final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
+            final FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
 
-        return result;
+            if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                final String text = action.getText().trim();
+                final List<RobotToken> elementTokens = getElementTokens();
+                if (text.equals("\\")) {
+                    return elementTokens.size() > 1
+                            && !elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+
+                } else if ("".equals(text)) {
+                    if (fileFormat == FileFormat.TSV) {
+                        return elementTokens.size() > 1
+                                && !elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+
+                    } else if (action.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
+                        return true;
+                    }
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return !action.getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+        }
     }
 
     public static boolean isTsvComment(final String text, final FileFormat format) {
@@ -341,6 +339,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
             for (int i = 0; i < getArguments().size(); i++) {
                 final RobotToken token = getArguments().get(i);
                 token.getTypes().remove(RobotTokenType.UNKNOWN);
+                token.getTypes().remove(getActionType());
                 fixForTheType(token, getArgumentType(), true);
             }
         }

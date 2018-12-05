@@ -14,7 +14,7 @@ import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
@@ -49,6 +49,6 @@ public class SettingsTableAsExecutableRowDescriptorBuilderTest {
         IExecutableRowDescriptor<SettingTable> lineDesc = s.asExecutableRow().buildLineDescription();
 
         // verify
-        assertThat(lineDesc.getRowType()).isEqualTo(ERowType.SIMPLE);
+        assertThat(lineDesc.getRowType()).isEqualTo(RowType.SIMPLE);
     }
 }

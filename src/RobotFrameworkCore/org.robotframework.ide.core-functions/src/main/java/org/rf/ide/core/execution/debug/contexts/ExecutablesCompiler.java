@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
 
 public class ExecutablesCompiler {
 
@@ -30,10 +30,10 @@ public class ExecutablesCompiler {
         for (final RobotExecutableRow<?> executableRow : executables) {
             final IExecutableRowDescriptor<?> descriptor = executableRow.buildLineDescription();
 
-            if (descriptor.getRowType() == ERowType.FOR) {
+            if (descriptor.getRowType() == RowType.FOR) {
                 loopHeader = new ExecutableWithDescriptor(executableRow, descriptor, template);
 
-            } else if (descriptor.getRowType() == ERowType.FOR_CONTINUE && loopHeader != null) {
+            } else if (descriptor.getRowType() == RowType.FOR_CONTINUE && loopHeader != null) {
                 loopElements.add(new ExecutableWithDescriptor(executableRow, descriptor, template));
 
             } else {
@@ -41,7 +41,9 @@ public class ExecutablesCompiler {
                     elements.add(new ExecutableWithDescriptor(new ForLoop(loopHeader, newArrayList(loopElements)),
                             template));
                 }
-                elements.add(new ExecutableWithDescriptor(executableRow, descriptor, template));
+                if (descriptor.getRowType() != RowType.FOR_END) {
+                    elements.add(new ExecutableWithDescriptor(executableRow, descriptor, template));
+                }
                 loopElements.clear();
                 loopHeader = null;
             }

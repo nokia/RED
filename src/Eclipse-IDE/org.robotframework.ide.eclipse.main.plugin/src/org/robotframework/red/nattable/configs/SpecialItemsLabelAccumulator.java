@@ -37,9 +37,8 @@ public class SpecialItemsLabelAccumulator implements IConfigLabelAccumulator {
             final List<RobotToken> tokens = ((RobotKeywordCall) rowObject).getLinkedElement().getElementTokens();
             if (tokens.size() > columnPosition) {
                 final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
-                if (types.contains(RobotTokenType.IN_TOKEN)) {
-                    configLabels.addLabel(SPECIAL_ITEM_CONFIG_LABEL);
-                } else if (types.contains(RobotTokenType.FOR_TOKEN)) {
+                if (types.contains(RobotTokenType.IN_TOKEN) || types.contains(RobotTokenType.FOR_TOKEN)
+                        || types.contains(RobotTokenType.FOR_END_TOKEN)) {
                     configLabels.addLabel(SPECIAL_ITEM_CONFIG_LABEL);
                 }
             }

@@ -15,6 +15,7 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.junit.Before;
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -92,6 +93,15 @@ public class CasesElementsLabelAccumulatorTest {
         }
     }
 
+    @Test
+    public void firstCellInElementsOfEndTerminatedForLoopIsNotEditable() {
+        final RobotCase testWithLoop = createCaseWithEndTerminatedForLoop();
+        final RobotKeywordCall innerRow = testWithLoop.getChildren().get(1);
+
+        labelIsAccumulatedAt(innerRow, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL, 0);
+
+    }
+
     private void thereIsNoSuchLabel(final Object objectToLabel, final String labelToCheck) {
         labelIsAccumulatedAt(objectToLabel, labelToCheck);
     }
@@ -138,6 +148,17 @@ public class CasesElementsLabelAccumulatorTest {
                 .appendLine("  1    2    3")
                 .appendLine("  5    6    7")
                 .appendLine("  8    9    0")
+                .build();
+        final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
+        return section.getChildren().get(0);
+    }
+
+    private static RobotCase createCaseWithEndTerminatedForLoop() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator(new RobotVersion(3, 1)).appendLine("*** Test Cases ***")
+                .appendLine("case 1")
+                .appendLine("  FOR  ${x}  IN  1  2  3")
+                .appendLine("    Log  ${x}")
+                .appendLine("  END")
                 .build();
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
         return section.getChildren().get(0);
