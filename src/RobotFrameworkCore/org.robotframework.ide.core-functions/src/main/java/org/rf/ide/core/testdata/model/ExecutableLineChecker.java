@@ -60,7 +60,7 @@ public class ExecutableLineChecker {
         return !hasSeparator(types) && hasExecutableType(types);
     }
 
-    public static boolean hasExecutableType(final List<IRobotTokenType> types) {
+    private static boolean hasExecutableType(final List<IRobotTokenType> types) {
         return types.stream().anyMatch(executableTypes::contains);
     }
 

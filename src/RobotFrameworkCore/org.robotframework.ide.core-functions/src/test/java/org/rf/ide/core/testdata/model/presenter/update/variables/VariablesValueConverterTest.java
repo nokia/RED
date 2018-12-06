@@ -6,11 +6,11 @@
 package org.rf.ide.core.testdata.model.presenter.update.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -94,7 +94,7 @@ public class VariablesValueConverterTest {
     }
 
     @Test
-    public void test_converstion_convertAll_to_DictionaryKeyValuePair_allTypes() {
+    public void test_conversion_convertAll_to_DictionaryKeyValuePair_allTypes() {
         // prepare
         final List<Object> objs = new ArrayList<>();
         final DictionaryKeyValuePair pair = DictionaryKeyValuePair.createFromRaw("key=value");
@@ -103,7 +103,7 @@ public class VariablesValueConverterTest {
         objs.add(pair);
 
         // execute
-        List<DictionaryKeyValuePair> converted = VariablesValueConverter.convert(objs, DictionaryKeyValuePair.class);
+        final List<DictionaryKeyValuePair> converted = VariablesValueConverter.convert(objs, DictionaryKeyValuePair.class);
 
         // verify
         assertThat(converted).hasSize(3);
@@ -112,17 +112,15 @@ public class VariablesValueConverterTest {
         assertThat(converted.get(2)).isSameAs(pair);
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void test_wrongClassToConvert() {
         // prepare
         final List<Object> objs = new ArrayList<>();
         objs.add(new String("xyz"));
 
-        // execute
-        VariablesValueConverter.convert(objs, Double.class);
-
-        // verify
-        Assert.fail("Shouldn't reach here.");
+        // execute & verify
+        assertThatExceptionOfType(ClassCastException.class)
+                .isThrownBy(() -> VariablesValueConverter.convert(objs, Double.class));
     }
 
     private void assertKeyValuePair(final DictionaryKeyValuePair pair, final String key, final String value) {
