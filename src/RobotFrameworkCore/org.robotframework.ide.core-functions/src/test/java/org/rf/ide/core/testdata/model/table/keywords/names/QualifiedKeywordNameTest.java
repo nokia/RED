@@ -5,86 +5,73 @@
  */
 package org.rf.ide.core.testdata.model.table.keywords.names;
 
-import org.junit.Assert;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 public class QualifiedKeywordNameTest {
 
     @Test
     public void testFromOccurrence() {
-
-        String keywordName = "Log Many";
-        QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
-        Assert.assertEquals("logmany", qualifiedName.getKeywordName());
-        Assert.assertEquals("", qualifiedName.getKeywordSource());
-
-        keywordName = "BuiltIn.Log Many";
-        qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
-        Assert.assertEquals("logmany", qualifiedName.getKeywordName());
-        Assert.assertEquals("BuiltIn", qualifiedName.getKeywordSource());
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence("Log Many");
+        assertThat(qualifiedName.getKeywordName()).isEqualTo("logmany");
+        assertThat(qualifiedName.getKeywordSource()).isEmpty();
     }
-    
+
+    @Test
+    public void testFromOccurrenceWithPrefix() {
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence("BuiltIn.Log Many");
+        assertThat(qualifiedName.getKeywordName()).isEqualTo("logmany");
+        assertThat(qualifiedName.getKeywordSource()).isEqualTo("BuiltIn");
+    }
+
     @Test
     public void testFromEmbeddedOccurrence() {
-
-        String keywordName = "I _Execute \"ls\"";
-        QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
-        Assert.assertEquals("i _execute \"ls\"", qualifiedName.getEmbeddedKeywordName());
-        Assert.assertEquals("", qualifiedName.getKeywordSource());
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence("I _Execute \"ls\"");
+        assertThat(qualifiedName.getEmbeddedKeywordName()).isEqualTo("i _execute \"ls\"");
+        assertThat(qualifiedName.getKeywordSource()).isEmpty();
     }
-    
+
     @Test
     public void testFrom_withDotsInSource() {
-
-        String keywordName = "Bu.ilt.In.Log Many";
-        QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
-        Assert.assertEquals("logmany", qualifiedName.getKeywordName());
-        Assert.assertEquals("Bu.ilt.In", qualifiedName.getKeywordSource());
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence("Bu.ilt.In.Log Many");
+        assertThat(qualifiedName.getKeywordName()).isEqualTo("logmany");
+        assertThat(qualifiedName.getKeywordSource()).isEqualTo("Bu.ilt.In");
     }
 
     @Test
     public void testFrom_withSpaces() {
-
-        String keywordName = "Built In . Log Many";
-        QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
-        Assert.assertEquals("logmany", qualifiedName.getKeywordName());
-        Assert.assertEquals("Built In", qualifiedName.getKeywordSource());
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence("Built In . Log Many");
+        assertThat(qualifiedName.getKeywordName()).isEqualTo("logmany");
+        assertThat(qualifiedName.getKeywordSource()).isEqualTo("Built In");
     }
-    
+
     @Test
     public void testFrom_withUnderscores() {
-
-        String keywordName = "Built In._Log_Many_";
-        QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
-        Assert.assertEquals("logmany", qualifiedName.getKeywordName());
-        Assert.assertEquals("Built In", qualifiedName.getKeywordSource());
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence("Built In._Log_Many_");
+        assertThat(qualifiedName.getKeywordName()).isEqualTo("logmany");
+        assertThat(qualifiedName.getKeywordSource()).isEqualTo("Built In");
     }
 
     @Test
     public void testFrom_emptyKeyword() {
-
-        String keywordName = "";
-        QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
-        Assert.assertEquals("", qualifiedName.getKeywordName());
-        Assert.assertEquals("", qualifiedName.getKeywordSource());
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence("");
+        assertThat(qualifiedName.getKeywordName()).isEmpty();
+        assertThat(qualifiedName.getKeywordSource()).isEmpty();
     }
 
     @Test
     public void testUnifyDefinition() {
-
-        String keywordName = "_L og M_an y";
-        Assert.assertEquals("logmany", QualifiedKeywordName.unifyDefinition(keywordName));
-
-        keywordName = "I_Execute \"${cmd:(\\w+\\s*)+}\"";
-        Assert.assertEquals("i_execute \"${cmd:(\\w+\\s*)+}\"", QualifiedKeywordName.unifyDefinition(keywordName));
+        assertThat(QualifiedKeywordName.unifyDefinition("_L og M_an y")).isEqualTo("logmany");
+        assertThat(QualifiedKeywordName.unifyDefinition("I_Execute \"${cmd:(\\w+\\s*)+}\""))
+                .isEqualTo("i_execute \"${cmd:(\\w+\\s*)+}\"");
     }
-    
+
     @Test
     public void testIsOccurrenceEqualToDefinition() {
-        Assert.assertTrue(QualifiedKeywordName.isOccurrenceEqualToDefinition("BuiltIn.log many", "Log Many"));
-        Assert.assertTrue(QualifiedKeywordName.isOccurrenceEqualToDefinition("log many", "Log Many"));
-        Assert.assertFalse(QualifiedKeywordName.isOccurrenceEqualToDefinition("BuiltIn.Log_Many", "Log Many"));
-        
-        Assert.assertTrue(QualifiedKeywordName.isOccurrenceEqualToDefinition("", "I_Execute \"${cmd:(\\w+\\s*)+}\""));
+        assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("BuiltIn.log many", "Log Many")).isTrue();
+        assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("log many", "Log Many")).isTrue();
+        assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("BuiltIn.Log_Many", "Log Many")).isFalse();
+        assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("", "I_Execute \"${cmd:(\\w+\\s*)+}\"")).isTrue();
     }
 }
