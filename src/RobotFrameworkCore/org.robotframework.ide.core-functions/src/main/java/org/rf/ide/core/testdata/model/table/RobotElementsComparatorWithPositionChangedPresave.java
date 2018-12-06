@@ -27,7 +27,7 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
 
     private final Multimap<IRobotTokenType, IRobotLineElement> typeToTokens = ArrayListMultimap.create();
 
-    private final RobotTokenPositionComparator posComperator = new RobotTokenPositionComparator();
+    private final RobotTokenPositionComparator posComparator = new RobotTokenPositionComparator();
 
     public void addPresaveSequenceForType(final IRobotTokenType type, final int hierarchyPoint,
             final List<? extends IRobotLineElement> elems) {
@@ -77,7 +77,7 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
         final Optional<IRobotTokenType> o1TypeOP = findType(o1);
         final Optional<IRobotTokenType> o2TypeOP = findType(o2);
 
-        final int posComperatorResult = posComperator.compare(o1, o2);
+        final int posComparatorResult = posComparator.compare(o1, o2);
         if (o1TypeOP.isPresent() && o2TypeOP.isPresent()) {
             if (o1TypeOP.get() == o2TypeOP.get()) {
                 final Multimap<IRobotLineElement, Integer> indexes = indexesOf(typeToTokens.get(o1TypeOP.get()), o1, o2);
@@ -93,14 +93,14 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
                 final Integer typeO2hierarchy = typesToHierarchy.get(o2TypeOP.get());
 
                 result = Integer.compare(typeO1hierarchy, typeO2hierarchy);
-                if (posComperatorResult != ECompareResult.EQUAL_TO.getValue()) {
+                if (posComparatorResult != ECompareResult.EQUAL_TO.getValue()) {
                     if (isBothWithPositionSet(o1, o2)) {
-                        result = posComperatorResult;
+                        result = posComparatorResult;
                     }
                 }
             }
         } else if (!o1TypeOP.isPresent() && !o2TypeOP.isPresent()) {
-            result = posComperatorResult;
+            result = posComparatorResult;
         } else if (!o1TypeOP.isPresent()) {
             result = ECompareResult.LESS_THAN.getValue();
         } else if (!o2TypeOP.isPresent()) {

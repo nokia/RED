@@ -59,6 +59,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         return newLines(model, new DumpedResultBuilder());
     }
 
+    @SuppressWarnings("unchecked")
     private DumpedResult newLines(final RobotFile model, final DumpedResultBuilder builder) {
         final List<RobotLine> lines = new ArrayList<>(0);
         builder.producedLines(lines);
@@ -94,7 +95,6 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
             if (th.getModelType() == ModelType.SETTINGS_TABLE_HEADER) {
                 final List<AModelElement<SettingTable>> copy = new ArrayList<>(sortedSettings);
-                @SuppressWarnings("unchecked")
                 final TableHeader<SettingTable> header = (TableHeader<SettingTable>) th;
                 final SettingsSectionTableDumper dumper = new SettingsSectionTableDumper(dumpHelper);
                 dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
@@ -103,7 +103,6 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
             } else if (th.getModelType() == ModelType.VARIABLES_TABLE_HEADER) {
                 final List<AModelElement<VariableTable>> copy = copyVariables(variables);
-                @SuppressWarnings("unchecked")
                 final TableHeader<VariableTable> header = (TableHeader<VariableTable>) th;
                 final VariablesSectionTableDumper dumper = new VariablesSectionTableDumper(dumpHelper);
                 dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
@@ -112,7 +111,6 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
             } else if (th.getModelType() == ModelType.KEYWORDS_TABLE_HEADER) {
                 final List<AModelElement<KeywordTable>> copy = new ArrayList<>(keywords);
-                @SuppressWarnings("unchecked")
                 final TableHeader<KeywordTable> header = (TableHeader<KeywordTable>) th;
                 final KeywordsSectionTableDumper dumper = new KeywordsSectionTableDumper(dumpHelper);
                 dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
@@ -121,7 +119,6 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
             } else if (th.getModelType() == ModelType.TEST_CASE_TABLE_HEADER) {
                 final List<AModelElement<TestCaseTable>> copy = new ArrayList<>(testCases);
-                @SuppressWarnings("unchecked")
                 final TableHeader<TestCaseTable> header = (TableHeader<TestCaseTable>) th;
                 final TestCasesSectionTableDumper dumper = new TestCasesSectionTableDumper(dumpHelper);
                 dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
@@ -130,7 +127,6 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
             } else if (th.getModelType() == ModelType.TASKS_TABLE_HEADER) {
                 final List<AModelElement<TaskTable>> copy = new ArrayList<>(tasks);
-                @SuppressWarnings("unchecked")
                 final TableHeader<TaskTable> header = (TableHeader<TaskTable>) th;
                 final TasksSectionTableDumper dumper = new TasksSectionTableDumper(dumpHelper);
                 dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
@@ -239,9 +235,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @VisibleForTesting
-    boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src,
-            final AModelElement<SettingTable> m, final int currentIndex) {
-        return (currentIndex + 1 < src.size() && m == src.get(currentIndex + 1));
+    boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src, final AModelElement<SettingTable> m,
+            final int currentIndex) {
+        return currentIndex + 1 < src.size() && m == src.get(currentIndex + 1);
     }
 
     private List<Section> filterUserTableHeadersOnly(final List<Section> sections) {
@@ -309,20 +305,17 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         }
     }
 
-    private int getSectionWithHeader(final List<Section> sections,
-            final TableHeader<? extends ARobotSectionTable> theader) {
-        int section = -1;
+    private int getSectionWithHeader(final List<Section> sections, final TableHeader<? extends ARobotSectionTable> th) {
         final int sectionsSize = sections.size();
         for (int sectionId = 0; sectionId < sectionsSize; sectionId++) {
             final Section s = sections.get(sectionId);
-            final FilePosition thPos = theader.getDeclaration().getFilePosition();
+            final FilePosition thPos = th.getDeclaration().getFilePosition();
             if (thPos.isSamePlace(s.getStart()) || (thPos.isAfter(s.getStart()) && thPos.isBefore(s.getEnd()))) {
-                section = sectionId;
-                break;
+                return sectionId;
             }
         }
 
-        return section;
+        return -1;
     }
 
     public Separator getSeparator(final RobotFile model, final List<RobotLine> lines, final IRobotLineElement lastToken,
@@ -391,10 +384,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                             if (seps.size() > 1) {
                                 sep = seps.get(seps.size() - 1);
                             } else {
-                                sep = new Separator();
-                                sep.setRaw(" | ");
-                                sep.setText(" | ");
-                                sep.setType(SeparatorType.PIPE);
+                                sep = getPipeSeparator();
                             }
                         }
                     }
@@ -407,7 +397,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         }
 
         if (sep == null || !isAcceptableForDefault(sep)) {
-            sep = getSeparatorDefault();
+            sep = getTabSeparator();
         }
 
         if (sep != null) {
@@ -415,15 +405,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
             if (sepInLine.isPresent()) {
                 if (sepInLine.get() != sep.getTypes().get(0)) {
                     if (sepInLine.get() == SeparatorType.PIPE) {
-                        sep = new Separator();
-                        sep.setRaw(" | ");
-                        sep.setText(" | ");
-                        sep.setType(SeparatorType.PIPE);
+                        sep = getPipeSeparator();
                     } else {
-                        sep = new Separator();
-                        sep.setRaw("\t");
-                        sep.setText("\t");
-                        sep.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
+                        sep = getTabSeparator();
                     }
                 }
             }
@@ -436,7 +420,21 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         return this.dumpContext.isDirty();
     }
 
-    protected abstract Separator getSeparatorDefault();
+    private Separator getPipeSeparator() {
+        final Separator sep = new Separator();
+        sep.setRaw(" | ");
+        sep.setText(" | ");
+        sep.setType(SeparatorType.PIPE);
+        return sep;
+    }
+
+    private Separator getTabSeparator() {
+        final Separator sep = new Separator();
+        sep.setRaw("\t");
+        sep.setText("\t");
+        sep.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
+        return sep;
+    }
 
     protected abstract boolean isAcceptableForDefault(final Separator separator);
 

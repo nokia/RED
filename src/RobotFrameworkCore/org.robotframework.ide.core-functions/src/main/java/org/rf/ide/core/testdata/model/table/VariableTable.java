@@ -155,22 +155,19 @@ public class VariableTable extends ARobotSectionTable {
     }
 
     public boolean isEmpty() {
-        return (variables.isEmpty());
+        return variables.isEmpty();
     }
 
     public Optional<AVariable> findVariable(final IRobotLineElement partOfVariable) {
-        Optional<AVariable> res = Optional.empty();
-
         for (final AVariable var : variables) {
             final List<RobotToken> elems = var.getElementTokens();
             for (final IRobotLineElement e : elems) {
                 if (e == partOfVariable) {
-                    res = Optional.of(var);
-                    break;
+                    return Optional.of(var);
                 }
             }
         }
 
-        return res;
+        return Optional.empty();
     }
 }

@@ -16,67 +16,55 @@ import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
-import org.rf.ide.core.testdata.text.write.EmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 
 public abstract class ANotExecutableTableDumper<T extends ARobotSectionTable> implements ISectionTableDumper<T> {
 
-    private final DumperHelper aDumpHelper;
+    private final DumperHelper helper;
 
     private final List<ISectionElementDumper<T>> dumpers;
 
     private final boolean shouldDumpHashCommentAfterHeader;
 
-    public ANotExecutableTableDumper(final DumperHelper aDumpHelper, final List<ISectionElementDumper<T>> dumpers,
+    public ANotExecutableTableDumper(final DumperHelper helper, final List<ISectionElementDumper<T>> dumpers,
             final boolean shouldDumpHashCommentAfterHeader) {
-        this.aDumpHelper = aDumpHelper;
+        this.helper = helper;
         this.dumpers = dumpers;
         this.shouldDumpHashCommentAfterHeader = shouldDumpHashCommentAfterHeader;
-    }
-
-    protected DumperHelper getDumperHelper() {
-        return this.aDumpHelper;
-    }
-
-    protected EmptyLineDumper getEmptyDumperHelper() {
-        return getDumperHelper().getEmptyLineDumper();
     }
 
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
             final TableHeader<T> th, final List<? extends AModelElement<T>> sorted, final List<RobotLine> lines) {
 
-        getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
+        helper.getHeaderDumpHelper().dumpHeader(model, th, lines);
 
-        if (this.shouldDumpHashCommentAfterHeader) {
-            getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
+        if (shouldDumpHashCommentAfterHeader) {
+            helper.getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
         }
 
         if (!sorted.isEmpty()) {
-            final List<Section> settingSections = SectionType.filterByType(sections, sectionWithHeaderPos,
+            final List<Section> filteredSections = SectionType.filterByType(sections, sectionWithHeaderPos,
                     getSectionType());
-            final int lastIndexToDump = getDumperHelper().getLastSortedToDump(model, settingSections,
-                    new ArrayList<>(sorted));
+            final int lastIndexToDump = helper.getLastSortedToDump(model, filteredSections, new ArrayList<>(sorted));
 
-            for (int settingIndex = 0; settingIndex <= lastIndexToDump; settingIndex++) {
+            for (int currentIndex = 0; currentIndex <= lastIndexToDump; currentIndex++) {
                 addLineSeparatorIfIsRequired(model, lines);
 
-                final AModelElement<T> setting = sorted.get(settingIndex);
+                final AModelElement<T> currentElement = sorted.get(currentIndex);
 
                 final ISectionElementDumper<T> elemDumper = dumpers.stream()
-                        .filter(dumper -> dumper.isServedType(setting))
+                        .filter(dumper -> dumper.isServedType(currentElement))
                         .findFirst()
                         .orElse(null);
-                elemDumper.dump(model, settingSections, sectionWithHeaderPos, th, sorted, setting, lines);
+                elemDumper.dump(model, filteredSections, sectionWithHeaderPos, th, sorted, currentElement, lines);
 
-                if (settingIndex < lastIndexToDump) {
-                    getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(setting,
-                            sorted.get(settingIndex + 1), model, lines);
-                } else {
-                    getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(setting, null, model, lines);
-                }
-
+                final AModelElement<T> nextElementToBeDumped = currentIndex < lastIndexToDump
+                        ? sorted.get(currentIndex + 1)
+                        : null;
+                helper.getHashCommentDumper()
+                        .dumpHashCommentsIfTheyExists(currentElement, nextElementToBeDumped, model, lines);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {
@@ -97,10 +85,9 @@ public abstract class ANotExecutableTableDumper<T extends ARobotSectionTable> im
             final IRobotLineElement endOfLine = lastLine.getEndOfLine();
             if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
                     || endOfLine.getTypes().contains(EndOfLineTypes.NON)
-                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
-                    && !lastLine.getLineElements().isEmpty()) {
-                final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, lineSeparator);
+                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF)) && !lastLine.getLineElements().isEmpty()) {
+                final IRobotLineElement lineSeparator = helper.getLineSeparator(model);
+                helper.getDumpLineUpdater().updateLine(model, lines, lineSeparator);
             }
         }
     }
