@@ -122,21 +122,13 @@ class PageActivatingOpeningStrategy extends OpenStrategy {
         if (editor instanceof RobotFormEditor) {
             final RobotFormEditor robotEditor = (RobotFormEditor) editor;
 
-            final ISectionEditorPart activatedPage = robotEditor.activatePage(getSection(elementToReveal));
+            final ISectionEditorPart activatedPage = robotEditor.activatePage(elementToReveal.getSection());
             activatedPage.revealElementAndFocus(elementToReveal);
 
             if (labelWhichShouldBeInSelectedCell != null) {
                 robotEditor.getSelectionLayerAccessor().selectCellContaining(labelWhichShouldBeInSelectedCell);
             }
         }
-    }
-
-    private RobotSuiteFileSection getSection(final RobotElement element) {
-        RobotElement current = element;
-        while (current != null && !(current instanceof RobotSuiteFileSection)) {
-            current = current.getParent();
-        }
-        return (RobotSuiteFileSection) current;
     }
 
     private void openInSourcePage(final IWorkbenchPage page, final IEditorDescriptor robotEditorDescriptor)
