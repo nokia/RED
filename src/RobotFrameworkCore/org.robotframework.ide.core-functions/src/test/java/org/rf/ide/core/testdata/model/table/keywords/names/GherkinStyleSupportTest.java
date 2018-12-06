@@ -5,57 +5,58 @@
  */
 package org.rf.ide.core.testdata.model.table.keywords.names;
 
-import org.junit.Assert;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 public class GherkinStyleSupportTest {
 
     @Test
     public void testEmptyName() {
-        String originalName = "";
-        Assert.assertEquals(originalName, GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName));
-        Assert.assertEquals(originalName, GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName));
+        final String originalName = "";
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName)).isEqualTo(originalName);
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName)).isEqualTo(originalName);
     }
 
     @Test
     public void testNameWithoutPrefixes_shouldReturnSameName() {
-        String originalName = "Keyword";
-        Assert.assertEquals(originalName, GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName));
-        Assert.assertEquals(originalName, GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName));
+        final String originalName = "Keyword";
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName)).isEqualTo(originalName);
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName)).isEqualTo(originalName);
     }
 
     @Test
     public void testNameWithOnlyPrefix_shouldReturnSameName() {
-        String originalName = "And";
-        Assert.assertEquals(originalName, GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName));
-        Assert.assertEquals(originalName, GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName));
+        final String originalName = "And";
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName)).isEqualTo(originalName);
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName)).isEqualTo(originalName);
     }
 
     @Test
     public void testNameWithOnePrefix() {
-        String originalName = "Given Suffix";
-        Assert.assertEquals("Suffix", GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName));
-        Assert.assertEquals("Suffix", GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName));
+        final String originalName = "Given Suffix";
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName)).isEqualTo("Suffix");
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName)).isEqualTo("Suffix");
     }
 
     @Test
     public void testNameWithSeveralPrefixes() {
-        String originalName = "When Then Assertion";
-        Assert.assertEquals("Then Assertion", GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName));
-        Assert.assertEquals("Assertion", GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName));
+        final String originalName = "When Then Assertion";
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName)).isEqualTo("Then Assertion");
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName)).isEqualTo("Assertion");
     }
 
     @Test
     public void testNameWithSeveralPrefixes_andCaseInsensitive() {
-        String originalName = "when And But Condition";
-        Assert.assertEquals("And But Condition", GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName));
-        Assert.assertEquals("Condition", GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName));
+        final String originalName = "when And But Condition";
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName)).isEqualTo("And But Condition");
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName)).isEqualTo("Condition");
     }
 
     @Test
     public void testNameWithPrefixWithoutSeparator() {
-        String originalName = "WhenAction";
-        Assert.assertEquals("WhenAction", GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName));
-        Assert.assertEquals("WhenAction", GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName));
+        final String originalName = "WhenAction";
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName)).isEqualTo(originalName);
+        assertThat(GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(originalName)).isEqualTo(originalName);
     }
 }
