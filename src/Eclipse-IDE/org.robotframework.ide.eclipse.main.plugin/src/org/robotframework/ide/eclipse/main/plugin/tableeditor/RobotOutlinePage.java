@@ -24,14 +24,12 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
@@ -47,7 +45,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
@@ -59,11 +56,13 @@ class RobotOutlinePage extends ContentOutlinePage {
     public static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.outline.context";
 
     private final RobotFormEditor editor;
+
     private final RobotSuiteFile suiteModel;
 
     private RobotOutlineContentProvider contentProvider;
 
     private ISelectionChangedListener outlineSelectionListener;
+
     private ISelectionChangedListener editorSelectionListener;
 
     private CaretListener caretListener;
@@ -84,10 +83,7 @@ class RobotOutlinePage extends ContentOutlinePage {
         contentProvider = new RobotOutlineContentProvider();
         getTreeViewer().setContentProvider(contentProvider);
         final NavigatorLabelProvider labelProvider = new NavigatorLabelProvider();
-        ViewerColumnsFactory.newColumn("")
-            .withWidth(400)
-            .labelsProvidedBy(labelProvider)
-            .createFor(getTreeViewer());
+        ViewerColumnsFactory.newColumn("").withWidth(400).labelsProvidedBy(labelProvider).createFor(getTreeViewer());
 
         getTreeViewer().setInput(new Object[] { suiteModel });
         getTreeViewer().expandToLevel(3);
@@ -104,8 +100,9 @@ class RobotOutlinePage extends ContentOutlinePage {
         caretListener = createCaretListener();
         editorSourceWidget.addCaretListener(caretListener);
 
-        getSite().getActionBars().getToolBarManager().add(
-                new LinkWithEditorAction(editorSelectionProvider, editorSourceWidget));
+        getSite().getActionBars()
+                .getToolBarManager()
+                .add(new LinkWithEditorAction(editorSelectionProvider, editorSourceWidget));
         getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
         getSite().getActionBars().getToolBarManager().add(new ExpandAllAction());
 
@@ -117,29 +114,31 @@ class RobotOutlinePage extends ContentOutlinePage {
     }
 
     private CaretListener createCaretListener() {
-        return new CaretListener() {
-            @Override
-            public void caretMoved(final CaretEvent event) {
-                if (modelQueryJob != null && modelQueryJob.getState() == Job.SLEEPING) {
-                    modelQueryJob.cancel();
-                }
-                modelQueryJob = createModelQueryJob(event.display, event.caretOffset);
-                modelQueryJob.schedule(300);
+        return event -> {
+            if (modelQueryJob != null && modelQueryJob.getState() == Job.SLEEPING) {
+                modelQueryJob.cancel();
             }
+            modelQueryJob = createModelQueryJob(event.display, event.caretOffset);
+            modelQueryJob.schedule(300);
         };
     }
 
     private Job createModelQueryJob(final Display display, final int caretOffset) {
         final Job job = new Job("Looking for model element") {
+
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                final Optional<? extends RobotElement> element = suiteModel.findElement(caretOffset);
-                if (element.isPresent() && !display.isDisposed()) {
-                    display.asyncExec(() -> {
-                        shouldUpdateEditorSelection.set(false);
-                        setSelectionInOutline(element.filter(e -> e != suiteModel));
-                    });
-                }
+                final Optional<RobotFileInternalElement> selected = suiteModel.findElement(caretOffset)
+                        .filter(RobotFileInternalElement.class::isInstance)
+                        .map(RobotFileInternalElement.class::cast);
+                selected.ifPresent(element -> {
+                    if (!display.isDisposed()) {
+                        display.asyncExec(() -> {
+                            shouldUpdateEditorSelection.set(false);
+                            setSelectionInOutline(element);
+                        });
+                    }
+                });
                 return Status.OK_STATUS;
             }
         };
@@ -148,74 +147,52 @@ class RobotOutlinePage extends ContentOutlinePage {
     }
 
     private ISelectionChangedListener createEditorSelectionListener() {
-        return new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-                if (event.getSelection() instanceof IStructuredSelection) {
-                    final Optional<RobotElement> element = Selections
-                            .getOptionalFirstElement((IStructuredSelection) event.getSelection(), RobotElement.class);
-                    if (element.isPresent()) {
-                        shouldUpdateEditorSelection.set(false);
-                        setSelectionInOutline(element);
-                    }
-                }
+        return event -> {
+            if (event.getSelection() instanceof IStructuredSelection) {
+                final Optional<RobotFileInternalElement> selected = Selections.getOptionalFirstElement(
+                        (IStructuredSelection) event.getSelection(), RobotFileInternalElement.class);
+                selected.ifPresent(element -> {
+                    shouldUpdateEditorSelection.set(false);
+                    setSelectionInOutline(element);
+                });
             }
         };
     }
 
     private ISelectionChangedListener createOutlineSelectionListener() {
-        return new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-                if (!shouldUpdateEditorSelection.getAndSet(true)) {
-                    return;
-                }
-                final Optional<RobotFileInternalElement> element = Selections.getOptionalFirstElement(
-                        (IStructuredSelection) event.getSelection(), RobotFileInternalElement.class);
-                if (!element.isPresent()) {
-                    return;
-                }
-                final RobotFileInternalElement robotElement = element.get();
-                if (editor.getActiveEditor() instanceof SuiteSourceEditor) {
-                    final ISelectionProvider selectionProvider = editor.getActiveEditor()
-                            .getSite()
-                            .getSelectionProvider();
-                    final DefinitionPosition position = robotElement.getDefinitionPosition();
-                    selectionProvider.setSelection(new TextSelection(position.getOffset(), position.getLength()));
-                } else {
-                    final ISectionEditorPart activatedPage = editor.activatePage(getSection(element.get()));
-                    if (activatedPage != null) {
-                        activatedPage.revealElement(element.get());
-                    }
-                }
+        return event -> {
+            if (!shouldUpdateEditorSelection.getAndSet(true)) {
+                return;
             }
-
-            private RobotSuiteFileSection getSection(final RobotFileInternalElement element) {
-                RobotElement current = element;
-                while (current != null && !(current instanceof RobotSuiteFileSection)) {
-                    current = current.getParent();
-                }
-                return (RobotSuiteFileSection) current;
-            }
+            final Optional<RobotFileInternalElement> selected = Selections.getOptionalFirstElement(
+                    (IStructuredSelection) event.getSelection(), RobotFileInternalElement.class);
+            selected.ifPresent(element -> setSelectionInEditor(element));
         };
     }
 
-    private void setSelectionInOutline(final Optional<? extends RobotElement> element) {
-        if (!element.isPresent()) {
-            return;
-        }
-        if (element.get() instanceof RobotSetting
-                && ((RobotSetting) element.get()).getGroup() != SettingsGroup.NO_GROUP) {
-            getTreeViewer().setSelection(createSelectionForGroupedSetting((RobotSetting) element.get()));
+    private void setSelectionInEditor(final RobotFileInternalElement element) {
+        if (editor.getActiveEditor() instanceof SuiteSourceEditor) {
+            final ISelectionProvider selectionProvider = editor.getActiveEditor().getSite().getSelectionProvider();
+            final DefinitionPosition position = element.getDefinitionPosition();
+            selectionProvider.setSelection(new TextSelection(position.getOffset(), position.getLength()));
         } else {
-            getTreeViewer().setSelection(new StructuredSelection(new Object[] { element.get() }));
+            final ISectionEditorPart activatedPage = editor.activatePage(element.getSection());
+            if (activatedPage != null) {
+                activatedPage.revealElement(element);
+            }
+        }
+    }
+
+    private void setSelectionInOutline(final RobotFileInternalElement element) {
+        if (element instanceof RobotSetting && ((RobotSetting) element).getGroup() != SettingsGroup.NO_GROUP) {
+            getTreeViewer().setSelection(createSelectionForGroupedSetting((RobotSetting) element));
+        } else {
+            getTreeViewer().setSelection(new StructuredSelection(new Object[] { element }));
         }
     }
 
     private ISelection createSelectionForGroupedSetting(final RobotSetting setting) {
-        final List<Object> pathElements = newArrayList((Object) setting);
+        final List<Object> pathElements = newArrayList(setting);
         final ArtificialGroupingRobotElement groupingElement = contentProvider.getGroupingElement(setting.getGroup());
         if (groupingElement != null) {
             pathElements.add(groupingElement);
@@ -256,8 +233,7 @@ class RobotOutlinePage extends ContentOutlinePage {
 
         private final StyledText editorSourceWidget;
 
-        LinkWithEditorAction(final ISelectionProvider editorSelectionProvider,
-                final StyledText editorSourceWidget) {
+        LinkWithEditorAction(final ISelectionProvider editorSelectionProvider, final StyledText editorSourceWidget) {
             super("Link with Editor", IAction.AS_CHECK_BOX);
             setImageDescriptor(RedImages.getSyncedImage());
             this.editorSelectionProvider = editorSelectionProvider;

@@ -30,8 +30,6 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.swt.custom.CaretEvent;
-import org.eclipse.swt.custom.CaretListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -62,13 +60,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
 
     void install(final SourceViewer viewer) {
         annotationModel = viewer.getAnnotationModel();
-        viewer.getTextWidget().addCaretListener(new CaretListener() {
-
-            @Override
-            public void caretMoved(final CaretEvent event) {
-                scheduleRefresh(event.caretOffset);
-            }
-        });
+        viewer.getTextWidget().addCaretListener(event -> scheduleRefresh(event.caretOffset));
     }
 
     private void scheduleRefresh(final int offset) {

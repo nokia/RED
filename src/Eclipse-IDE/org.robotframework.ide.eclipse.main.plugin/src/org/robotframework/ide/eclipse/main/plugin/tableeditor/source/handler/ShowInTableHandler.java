@@ -14,7 +14,6 @@ import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -38,23 +37,15 @@ public class ShowInTableHandler extends DIParameterizedHandler<E4ShowInTableHand
             final int offset = sourceEditor.getViewer().getTextWidget().getCaretOffset();
 
             final Optional<? extends RobotElement> element = suiteModel.findElement(offset);
-            
+
             if (element.isPresent()) {
                 final RobotFileInternalElement e = (RobotFileInternalElement) element.get();
-                final ISectionEditorPart activatedPage = editor.activatePage(getSection(e));
+                final ISectionEditorPart activatedPage = editor.activatePage(e.getSection());
                 if (activatedPage != null) {
                     activatedPage.setFocus();
                     activatedPage.revealElement(e);
                 }
             }
-        }
-
-        private RobotSuiteFileSection getSection(final RobotFileInternalElement element) {
-            RobotElement current = element;
-            while (current != null && !(current instanceof RobotSuiteFileSection)) {
-                current = current.getParent();
-            }
-            return (RobotSuiteFileSection) current;
         }
     }
 }
