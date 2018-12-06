@@ -36,8 +36,6 @@ import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.swt.custom.CaretEvent;
-import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -165,13 +163,9 @@ public class SuiteSourceEditor extends TextEditor {
     }
 
     private void installStatusBarUpdater(final ProjectionViewer viewer) {
-        viewer.getTextWidget().addCaretListener(new CaretListener() {
-
-            @Override
-            public void caretMoved(final CaretEvent event) {
-                updateLineLocationStatusBar(event.caretOffset);
-                updateLineDelimitersStatus();
-            }
+        viewer.getTextWidget().addCaretListener(event -> {
+            updateLineLocationStatusBar(event.caretOffset);
+            updateLineDelimitersStatus();
         });
     }
 

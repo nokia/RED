@@ -58,7 +58,7 @@ public interface RobotFileInternalElement extends RobotElement {
      */
     String getComment();
 
-    public Object getLinkedElement();
+    Object getLinkedElement();
 
     /**
      * Returns open strategy capable of opening and selecting this element in
@@ -67,6 +67,14 @@ public interface RobotFileInternalElement extends RobotElement {
      * @return
      */
     OpenStrategy getOpenRobotEditorStrategy();
+
+    default RobotSuiteFileSection getSection() {
+        RobotElement current = this;
+        while (current != null && !(current instanceof RobotSuiteFileSection)) {
+            current = current.getParent();
+        }
+        return (RobotSuiteFileSection) current;
+    }
 
     public enum ElementOpenMode {
         OPEN_IN_TABLES,
