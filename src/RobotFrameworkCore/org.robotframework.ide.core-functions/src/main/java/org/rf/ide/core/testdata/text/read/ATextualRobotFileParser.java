@@ -109,7 +109,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     @Override
     public void parse(final RobotFileOutput parsingOutput, final InputStream inputStream, final File robotFile) {
-        initalizeRecognizersAndMappers(parsingOutput.getRobotVersion());
+        initializeRecognizersAndMappers(parsingOutput.getRobotVersion());
 
         boolean wasProcessingError = false;
         try {
@@ -134,7 +134,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     @Override
     public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
-        initalizeRecognizersAndMappers(parsingOutput.getRobotVersion());
+        initializeRecognizersAndMappers(parsingOutput.getRobotVersion());
 
         boolean wasProcessingError = false;
         try {
@@ -163,7 +163,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         parsingOutput.setProcessedFile(robotFile);
     }
 
-    private void initalizeRecognizersAndMappers(final RobotVersion robotVersion) {
+    private void initializeRecognizersAndMappers(final RobotVersion robotVersion) {
         libraryFixer = new LibraryAliasFixer(robotVersion, utility, parsingStateHelper);
 
         recognizers.clear();

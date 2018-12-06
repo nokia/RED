@@ -338,12 +338,6 @@ public class RepositionElementsBaseOnListMethodTest {
         }
 
         @Override
-        protected Separator getSeparatorDefault() {
-            // Irrelevant for this test
-            return null;
-        }
-
-        @Override
         public void repositionElementsBaseOnList(final List<AModelElement<SettingTable>> src,
                 final List<? extends AModelElement<SettingTable>> correctors) {
             super.repositionElementsBaseOnList(src, correctors);

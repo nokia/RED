@@ -115,6 +115,28 @@ public abstract class AVariable extends AModelElement<VariableTable>
         return declaration;
     }
 
+    @Override
+    public FilePosition getBeginPosition() {
+        return getDeclaration() != null ? getDeclaration().getFilePosition() : FilePosition.createNotSet();
+    }
+
+    @Override
+    public ModelType getModelType() {
+        switch (type) {
+            case SCALAR:
+            case SCALAR_AS_LIST:
+                return ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE;
+            case LIST:
+                return ModelType.LIST_VARIABLE_DECLARATION_IN_TABLE;
+            case DICTIONARY:
+                return ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE;
+            case INVALID:
+                return ModelType.UNKNOWN_VARIABLE_DECLARATION_IN_TABLE;
+            default:
+                return ModelType.UNKNOWN;
+        }
+    }
+
     public enum VariableScope {
         GLOBAL("Global Variables"),
         TEST_SUITE("Test Suite Variables"),
@@ -148,29 +170,11 @@ public abstract class AVariable extends AModelElement<VariableTable>
     }
 
     public enum VariableType {
-        /**
-         * 
-         */
         SCALAR("$", RobotTokenType.VARIABLES_SCALAR_DECLARATION),
-        /**
-         * Deprecated
-         */
         SCALAR_AS_LIST("$", RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION),
-        /**
-         * 
-         */
         LIST("@", RobotTokenType.VARIABLES_LIST_DECLARATION),
-        /**
-         * 
-         */
         DICTIONARY("&", RobotTokenType.VARIABLES_DICTIONARY_DECLARATION),
-        /**
-         * 
-         */
         ENVIRONMENT("%", RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION),
-        /**
-         * 
-         */
         INVALID("\\s", RobotTokenType.VARIABLES_UNKNOWN_DECLARATION);
 
         private final String identificator;
@@ -191,48 +195,22 @@ public abstract class AVariable extends AModelElement<VariableTable>
         }
 
         public static VariableType getTypeByTokenType(final IRobotTokenType type) {
-            VariableType varType = null;
             for (final VariableType vt : values()) {
                 if (vt.getType() == type) {
-                    varType = vt;
-                    break;
+                    return vt;
                 }
             }
-            return varType;
+            return null;
         }
 
         public static VariableType getTypeByChar(final char varId) {
-            VariableType varType = null;
             final String varIdText = "" + varId;
             for (final VariableType vt : values()) {
                 if (vt.getIdentificator().equals(varIdText)) {
-                    varType = vt;
-                    break;
+                    return vt;
                 }
             }
-            return varType;
+            return null;
         }
-    }
-
-    @Override
-    public ModelType getModelType() {
-        ModelType modelType = ModelType.UNKNOWN;
-
-        if (type == VariableType.DICTIONARY) {
-            modelType = ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE;
-        } else if (type == VariableType.INVALID) {
-            modelType = ModelType.UNKNOWN_VARIABLE_DECLARATION_IN_TABLE;
-        } else if (type == VariableType.LIST) {
-            modelType = ModelType.LIST_VARIABLE_DECLARATION_IN_TABLE;
-        } else if (type == VariableType.SCALAR || type == VariableType.SCALAR_AS_LIST) {
-            modelType = ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE;
-        }
-
-        return modelType;
-    }
-
-    @Override
-    public FilePosition getBeginPosition() {
-        return (getDeclaration() != null) ? getDeclaration().getFilePosition() : FilePosition.createNotSet();
     }
 }
