@@ -17,16 +17,6 @@ public class TxtRobotFileDumper extends ARobotFileDumper {
     }
 
     @Override
-    protected Separator getSeparatorDefault() {
-        final Separator sep = new Separator();
-        sep.setRaw("\t");
-        sep.setText("\t");
-        sep.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
-
-        return sep;
-    }
-
-    @Override
     protected boolean isAcceptableForDefault(final Separator separator) {
         return separator.getTypes().contains(SeparatorType.PIPE)
                 || separator.getTypes().contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);

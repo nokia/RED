@@ -57,31 +57,31 @@ public class DumperHelper {
     }
 
     public DumpLineUpdater getDumpLineUpdater() {
-        return this.aDumpLineUpdater;
+        return aDumpLineUpdater;
     }
 
     public EmptyLineDumper getEmptyLineDumper() {
-        return this.anEmptyLineDumper;
+        return anEmptyLineDumper;
     }
 
     public HeaderDumperHelper getHeaderDumpHelper() {
-        return this.aHeaderDumper;
+        return aHeaderDumper;
     }
 
     public SeparatorsDumpHelper getSeparatorDumpHelper() {
-        return this.aSeparatorDumper;
+        return aSeparatorDumper;
     }
 
     public NotModelRelatedHashCommentedLineDumper getHashCommentDumper() {
-        return this.aCommentHashDumper;
+        return aCommentHashDumper;
     }
 
     public boolean isCurrentFileDirty() {
-        return this.currentDumper.isFileDirty();
+        return currentDumper.isFileDirty();
     }
 
     public void setTokenDumpListener(final ILineDumpTokenListener listener) {
-        this.dumpTokenListeners = Optional.ofNullable(listener);
+        dumpTokenListeners = Optional.ofNullable(listener);
     }
 
     public void notifyTokenDumpListener(final RobotToken oldToken, final RobotToken newToken) {
@@ -89,8 +89,7 @@ public class DumperHelper {
     }
 
     public void addEOFinCaseIsMissing(final RobotFile model, final List<RobotLine> lines) {
-        final IRobotLineElement buildEOL = new EndOfLineBuilder()
-                .setEndOfLines(Arrays.asList(new Constant[] { Constant.EOF })).buildEOL();
+        final IRobotLineElement buildEOL = new EndOfLineBuilder().setEndOfLines(Arrays.asList(Constant.EOF)).buildEOL();
 
         if (lines.isEmpty()) {
             getDumpLineUpdater().updateLine(model, lines, buildEOL);
@@ -255,16 +254,7 @@ public class DumperHelper {
 
     public <T extends ARobotSectionTable> boolean containsOneOfElementOffset(final AModelElement<T> e,
             final Set<Integer> startPositions) {
-        boolean result = false;
-        final List<RobotToken> elementTokens = e.getElementTokens();
-        for (final RobotToken rt : elementTokens) {
-            if (startPositions.contains(rt.getFilePosition().getOffset())) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
+        return e.getElementTokens().stream().anyMatch(rt -> startPositions.contains(rt.getFilePosition().getOffset()));
     }
 
     public void dumpLineDirectly(final RobotFile model, final List<RobotLine> outLines, final RobotLine currentLine) {

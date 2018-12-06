@@ -24,62 +24,48 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.write.DumpLineUpdater;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
-import org.rf.ide.core.testdata.text.write.EmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 
 public abstract class AExecutableTableDumper<T extends ARobotSectionTable> implements ISectionTableDumper<T> {
 
-    private final DumperHelper aDumpHelper;
+    private final DumperHelper helper;
 
     private final DumpLineUpdater lineUpdater;
 
     private final List<IExecutableSectionElementDumper> dumpers;
 
-    public AExecutableTableDumper(final DumperHelper aDumpHelper, final List<IExecutableSectionElementDumper> dumpers) {
-        this.aDumpHelper = aDumpHelper;
-        this.lineUpdater = new DumpLineUpdater(aDumpHelper);
+    public AExecutableTableDumper(final DumperHelper helper, final List<IExecutableSectionElementDumper> dumpers) {
+        this.helper = helper;
+        this.lineUpdater = new DumpLineUpdater(helper);
         this.dumpers = dumpers;
-    }
-
-    protected DumperHelper getDumperHelper() {
-        return this.aDumpHelper;
-    }
-
-    protected EmptyLineDumper getEmptyDumperHelper() {
-        return getDumperHelper().getEmptyLineDumper();
-    }
-
-    protected DumpLineUpdater getLineDumperHelper() {
-        return this.lineUpdater;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
-            final TableHeader<T> th, final List<? extends AModelElement<T>> sorted,
-            final List<RobotLine> lines) {
-        getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
+            final TableHeader<T> th, final List<? extends AModelElement<T>> sorted, final List<RobotLine> lines) {
+        helper.getHeaderDumpHelper().dumpHeader(model, th, lines);
 
-        getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
+        helper.getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
 
         if (!sorted.isEmpty()) {
-            final List<Section> execUnits = SectionType.filterByType(sections, sectionWithHeaderPos, getSectionType());
-            final int lastIndexToDump = getDumperHelper().getLastSortedToDump(model, execUnits,
-                    new ArrayList<>(sorted));
+            final List<Section> filteredSections = SectionType.filterByType(sections, sectionWithHeaderPos,
+                    getSectionType());
+            final int lastIndexToDump = helper.getLastSortedToDump(model, filteredSections, new ArrayList<>(sorted));
 
             AModelElement<?> last = null;
-            for (int execUnitIndex = 0; execUnitIndex <= lastIndexToDump; execUnitIndex++) {
+            for (int currentIndex = 0; currentIndex <= lastIndexToDump; currentIndex++) {
                 addLineSeparatorIfIsRequired(model, lines);
 
-                final AModelElement<T> execUnit = sorted.get(execUnitIndex);
-                if (execUnitIndex > 0) {
-                    getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(sorted.get(execUnitIndex - 1),
-                            execUnit, model, lines);
+                final AModelElement<T> currentElement = sorted.get(currentIndex);
+                if (currentIndex > 0) {
+                    helper.getHashCommentDumper()
+                            .dumpHashCommentsIfTheyExists(sorted.get(currentIndex - 1), currentElement, model, lines);
                 }
 
                 @SuppressWarnings("rawtypes")
-                final IExecutableStepsHolder execHolder = (IExecutableStepsHolder) execUnit;
+                final IExecutableStepsHolder execHolder = (IExecutableStepsHolder) currentElement;
 
                 final RobotToken elemDeclaration = execHolder.getHolder().getDeclaration();
                 final FilePosition filePosition = elemDeclaration.getFilePosition();
@@ -93,42 +79,34 @@ public abstract class AExecutableTableDumper<T extends ARobotSectionTable> imple
                 addSeparatorInTheBeginning(model, lines, elemDeclaration, currentLine);
 
                 if (!elemDeclaration.isDirty() && currentLine != null) {
-                    getLineDumperHelper().updateLine(model, lines, elemDeclaration);
+                    lineUpdater.updateLine(model, lines, elemDeclaration);
                     addSuffixAfterTokenDeclaration(model, lines, elemDeclaration, currentLine);
                 } else {
-                    getLineDumperHelper().updateLine(model, lines, elemDeclaration);
+                    lineUpdater.updateLine(model, lines, elemDeclaration);
                 }
 
-                final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedUnits = execHolder
+                final List<AModelElement<? extends IExecutableStepsHolder<?>>> nestedElements = execHolder
                         .getElements();
-                final int sortedUnitsSize = sortedUnits.size();
-                for (int sortedUnitId = 0; sortedUnitId < sortedUnitsSize; sortedUnitId++) {
-                    final AModelElement<? extends IExecutableStepsHolder<?>> execElement = sortedUnits
-                            .get(sortedUnitId);
+                for (final AModelElement<? extends IExecutableStepsHolder<?>> nestedElement : nestedElements) {
+                    addLineSeparatorIfIsRequiredAfterExecElement(model, lines, execHolder, nestedElement);
 
-                    addLineSeparatorIfIsRequiredAfterExecElement(model, lines, execHolder, execElement);
+                    final IExecutableSectionElementDumper elemDumper = dumpers.stream()
+                            .filter(dumper -> dumper.isServedType(nestedElement))
+                            .findFirst()
+                            .orElse(null);
+                    elemDumper.dump(model, sections, sectionWithHeaderPos, th, nestedElements, nestedElement, lines);
 
-                    IExecutableSectionElementDumper elemDumper = null;
-                    for (final IExecutableSectionElementDumper dumper : dumpers) {
-                        if (dumper.isServedType(execElement)) {
-                            elemDumper = dumper;
-                            break;
-                        }
-                    }
-
-                    elemDumper.dump(model, sections, sectionWithHeaderPos, th, sortedUnits, execElement, lines);
-
-                    last = execElement;
+                    last = nestedElement;
                 }
 
-                if (sortedUnits.isEmpty()) {
+                if (nestedElements.isEmpty()) {
                     last = null;
                 }
-                getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit);
+                helper.getEmptyLineDumper().dumpEmptyLines(model, lines, currentElement);
             }
 
             if (last != null) {
-                getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(last, null, model, lines);
+                helper.getHashCommentDumper().dumpHashCommentsIfTheyExists(last, null, model, lines);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {
@@ -155,8 +133,8 @@ public abstract class AExecutableTableDumper<T extends ARobotSectionTable> imple
                 final boolean shouldSeparateLine = shouldSeparateLine(execHolder, execElement);
 
                 if (shouldSeparateLine) {
-                    final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                    getLineDumperHelper().updateLine(model, lines, lineSeparator);
+                    final IRobotLineElement lineSeparator = helper.getLineSeparator(model);
+                    lineUpdater.updateLine(model, lines, lineSeparator);
                 }
             }
         }
@@ -170,9 +148,8 @@ public abstract class AExecutableTableDumper<T extends ARobotSectionTable> imple
             for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
                 final IRobotLineElement nextElem = lineElements.get(index);
                 final List<IRobotTokenType> types = nextElem.getTypes();
-                if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
-                        || types.contains(RobotTokenType.ASSIGNMENT)) {
-                    getLineDumperHelper().updateLine(model, lines, nextElem);
+                if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE) || types.contains(RobotTokenType.ASSIGNMENT)) {
+                    lineUpdater.updateLine(model, lines, nextElem);
                 } else {
                     break;
                 }
@@ -183,17 +160,16 @@ public abstract class AExecutableTableDumper<T extends ARobotSectionTable> imple
     private void addSeparatorInTheBeginning(final RobotFile model, final List<RobotLine> lines,
             final RobotToken elemDeclaration, final RobotLine currentLine) {
         if (currentLine != null) {
-            getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine,
-                    elemDeclaration, lines);
-        } else if (getDumperHelper().isSeparatorForExecutableUnitName(
-                getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration))) {
-            if (!getDumperHelper().wasSeparatorBefore(lines)) {
-                final Separator sep = getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration);
+            helper.getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine, elemDeclaration, lines);
+        } else if (helper.isSeparatorForExecutableUnitName(
+                helper.getSeparator(model, lines, elemDeclaration, elemDeclaration))) {
+            if (!helper.wasSeparatorBefore(lines)) {
+                final Separator sep = helper.getSeparator(model, lines, elemDeclaration, elemDeclaration);
                 if (sep.getText().equals(" | ")) {
                     sep.setText("| ");
                     sep.setRaw("| ");
                 }
-                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, sep);
+                helper.getDumpLineUpdater().updateLine(model, lines, sep);
             }
         }
     }
@@ -215,10 +191,9 @@ public abstract class AExecutableTableDumper<T extends ARobotSectionTable> imple
             final IRobotLineElement endOfLine = lastLine.getEndOfLine();
             if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
                     || endOfLine.getTypes().contains(EndOfLineTypes.NON)
-                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
-                    && !lastLine.getLineElements().isEmpty()) {
-                final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                getLineDumperHelper().updateLine(model, lines, lineSeparator);
+                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF)) && !lastLine.getLineElements().isEmpty()) {
+                final IRobotLineElement lineSeparator = helper.getLineSeparator(model);
+                lineUpdater.updateLine(model, lines, lineSeparator);
             }
         }
     }

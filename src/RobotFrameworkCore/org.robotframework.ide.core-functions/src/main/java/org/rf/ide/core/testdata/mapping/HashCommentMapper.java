@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.testdata.mapping.hash.comment.SettingCommentMapper;
-import org.rf.ide.core.testdata.mapping.hash.comment.TableHeaderCommentMapper;
-import org.rf.ide.core.testdata.mapping.hash.comment.TaskSettingCommentMapper;
-import org.rf.ide.core.testdata.mapping.hash.comment.TestCaseSettingCommentMapper;
-import org.rf.ide.core.testdata.mapping.hash.comment.UserKeywordSettingCommentMapper;
-import org.rf.ide.core.testdata.mapping.hash.comment.VariablesDeclarationCommentMapper;
+import org.rf.ide.core.testdata.mapping.comment.SettingCommentMapper;
+import org.rf.ide.core.testdata.mapping.comment.TableHeaderCommentMapper;
+import org.rf.ide.core.testdata.mapping.comment.TaskSettingCommentMapper;
+import org.rf.ide.core.testdata.mapping.comment.TestCaseSettingCommentMapper;
+import org.rf.ide.core.testdata.mapping.comment.UserKeywordSettingCommentMapper;
+import org.rf.ide.core.testdata.mapping.comment.VariablesDeclarationCommentMapper;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;

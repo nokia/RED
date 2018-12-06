@@ -31,8 +31,8 @@ public class EmptyLineDumper {
     }
 
     public <T extends ARobotSectionTable> void dumpEmptyLines(final RobotFile model, final List<RobotLine> lines,
-            final AModelElement<T> setting) {
-        final FilePosition fPosEnd = setting.getEndPosition();
+            final AModelElement<T> element) {
+        final FilePosition fPosEnd = element.getEndPosition();
         if (!fPosEnd.isNotSet()) {
             if (!lines.isEmpty()) {
                 final RobotLine lastLine = lines.get(lines.size() - 1);

@@ -28,26 +28,26 @@ import org.rf.ide.core.testdata.text.write.tables.settings.VariablesImportDumper
 
 public class SettingsSectionTableDumper extends ANotExecutableTableDumper<SettingTable> {
 
-    public SettingsSectionTableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, getDumpers(aDumpHelper), true);
+    public SettingsSectionTableDumper(final DumperHelper helper) {
+        super(helper, getDumpers(helper), true);
     }
 
-    private static List<ISectionElementDumper<SettingTable>> getDumpers(final DumperHelper aDumpHelper) {
+    private static List<ISectionElementDumper<SettingTable>> getDumpers(final DumperHelper helper) {
         final List<ISectionElementDumper<SettingTable>> dumpers = new ArrayList<>();
-        dumpers.add(new SuiteDocumentationDumper(aDumpHelper));
-        dumpers.add(new SuiteSetupDumper(aDumpHelper));
-        dumpers.add(new SuiteTeardownDumper(aDumpHelper));
-        dumpers.add(new TestSetupDumper(aDumpHelper));
-        dumpers.add(new TestTeardownDumper(aDumpHelper));
-        dumpers.add(new ForceTagsDumper(aDumpHelper));
-        dumpers.add(new DefaultTagsDumper(aDumpHelper));
-        dumpers.add(new SuiteTestTemplateDumper(aDumpHelper));
-        dumpers.add(new SuiteTestTimeoutDumper(aDumpHelper));
-        dumpers.add(new MetadataDumper(aDumpHelper));
-        dumpers.add(new LibraryImportDumper(aDumpHelper));
-        dumpers.add(new ResourceImportDumper(aDumpHelper));
-        dumpers.add(new VariablesImportDumper(aDumpHelper));
-        dumpers.add(new UnknownSettingDumper(aDumpHelper));
+        dumpers.add(new SuiteDocumentationDumper(helper));
+        dumpers.add(new SuiteSetupDumper(helper));
+        dumpers.add(new SuiteTeardownDumper(helper));
+        dumpers.add(new TestSetupDumper(helper));
+        dumpers.add(new TestTeardownDumper(helper));
+        dumpers.add(new ForceTagsDumper(helper));
+        dumpers.add(new DefaultTagsDumper(helper));
+        dumpers.add(new SuiteTestTemplateDumper(helper));
+        dumpers.add(new SuiteTestTimeoutDumper(helper));
+        dumpers.add(new MetadataDumper(helper));
+        dumpers.add(new LibraryImportDumper(helper));
+        dumpers.add(new ResourceImportDumper(helper));
+        dumpers.add(new VariablesImportDumper(helper));
+        dumpers.add(new UnknownSettingDumper(helper));
 
         return dumpers;
     }
