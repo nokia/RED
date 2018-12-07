@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder;
@@ -27,7 +28,6 @@ import org.rf.ide.core.testdata.model.table.TableHeaderComparator;
 import org.rf.ide.core.testdata.model.table.TaskTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
-import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -102,7 +102,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                 sortedSettings.addAll(copy);
 
             } else if (th.getModelType() == ModelType.VARIABLES_TABLE_HEADER) {
-                final List<AModelElement<VariableTable>> copy = copyVariables(variables);
+                final List<AModelElement<VariableTable>> copy = new ArrayList<>(variables);
                 final TableHeader<VariableTable> header = (TableHeader<VariableTable>) th;
                 final VariablesSectionTableDumper dumper = new VariablesSectionTableDumper(dumpHelper);
                 dumper.dump(model, sections, sectionWithHeader, header, copy, lines);
@@ -139,33 +139,12 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
             }
         }
 
-        final List<Section> userSections = filterUserTableHeadersOnly(sections);
+        final List<Section> userSections = sections.stream().filter(this::hasUserType).collect(Collectors.toList());
         dumpUntilRobotHeaderSection(model, userSections, 0, lines);
 
         dumpHelper.addEOFinCaseIsMissing(model, lines);
 
         return builder.build();
-    }
-
-    private List<AModelElement<VariableTable>> copyVariables(final List<AModelElement<VariableTable>> elems) {
-        final List<AModelElement<VariableTable>> copied = new ArrayList<>(elems);
-        copied.forEach(elem -> fixVariableDeclarationToName((AVariable) elem));
-        return copied;
-    }
-
-    private void fixVariableDeclarationToName(final AVariable var) {
-        final String varName = var.getName();
-        if (varName != null && !varName.isEmpty()) {
-            String varDeclaration = varName;
-            final String correctBeginOfVariable = var.getType().getIdentificator() + "{";
-            if (!varName.startsWith(correctBeginOfVariable)) {
-                varDeclaration = correctBeginOfVariable + varName;
-            }
-            if (!varDeclaration.endsWith("}")) {
-                varDeclaration += "}";
-            }
-            var.getDeclaration().setText(varDeclaration);
-        }
     }
 
     private List<AModelElement<SettingTable>> sortSettings(final SettingTable settingTable) {
@@ -240,16 +219,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         return currentIndex + 1 < src.size() && m == src.get(currentIndex + 1);
     }
 
-    private List<Section> filterUserTableHeadersOnly(final List<Section> sections) {
-        final List<Section> userSections = new ArrayList<>(0);
-        for (final Section section : sections) {
-            final SectionType type = section.getType();
-            if (type == SectionType.TRASH || type == SectionType.USER_TABLE) {
-                userSections.add(section);
-            }
-        }
-
-        return userSections;
+    private boolean hasUserType(final Section section) {
+        final SectionType type = section.getType();
+        return type == SectionType.TRASH || type == SectionType.USER_TABLE;
     }
 
     private void dumpUntilRobotHeaderSection(final RobotFile model, final List<Section> sections,
@@ -259,8 +231,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         final int sectionSize = sections.size();
         for (int sectionId = currentSection; sectionId < sectionSize; sectionId++) {
             final Section section = sections.get(sectionId);
-            final SectionType type = section.getType();
-            if (type == SectionType.TRASH || type == SectionType.USER_TABLE) {
+            if (hasUserType(section)) {
                 dumpFromTo(model, section.getStart(), section.getEnd(), outLines);
                 removedIndex++;
             } else {

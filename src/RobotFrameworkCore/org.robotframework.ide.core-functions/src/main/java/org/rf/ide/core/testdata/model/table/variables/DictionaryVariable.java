@@ -5,8 +5,6 @@
  */
 package org.rf.ide.core.testdata.model.table.variables;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,10 +105,9 @@ public class DictionaryVariable extends AVariable {
             final String key = splitted.get(0);
             final String value = Joiner.on('=').join(splitted.subList(1, splitted.size()));
 
-            final RobotToken rawToken = RobotToken.create(raw, newArrayList(RobotTokenType.VARIABLES_VARIABLE_VALUE));
-            final RobotToken keyToken = RobotToken.create(key, newArrayList(RobotTokenType.VARIABLES_DICTIONARY_KEY));
-            final RobotToken valueToken = RobotToken.create(value,
-                    newArrayList(RobotTokenType.VARIABLES_DICTIONARY_VALUE));
+            final RobotToken rawToken = RobotToken.create(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE);
+            final RobotToken keyToken = RobotToken.create(key, RobotTokenType.VARIABLES_DICTIONARY_KEY);
+            final RobotToken valueToken = RobotToken.create(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE);
 
             return new DictionaryKeyValuePair(rawToken, keyToken, valueToken);
         }
