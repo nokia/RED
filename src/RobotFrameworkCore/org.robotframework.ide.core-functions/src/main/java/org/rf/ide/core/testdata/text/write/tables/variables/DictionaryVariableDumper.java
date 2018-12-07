@@ -21,8 +21,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class DictionaryVariableDumper extends ANotExecutableTableElementDumper<VariableTable> {
 
-    public DictionaryVariableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE);
+    public DictionaryVariableDumper(final DumperHelper helper) {
+        super(helper, ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE);
     }
 
     @Override
@@ -51,9 +51,9 @@ public class DictionaryVariableDumper extends ANotExecutableTableElementDumper<V
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.VARIABLES_VARIABLE_VALUE, 1, itemsAsValue);
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                getElementHelper().filter(var.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(var.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
-                getElementHelper().filter(var.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(var.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

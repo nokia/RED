@@ -18,16 +18,16 @@ import org.rf.ide.core.testdata.text.write.tables.variables.UnknownVariableDumpe
 
 public class VariablesSectionTableDumper extends ANotExecutableTableDumper<VariableTable> {
 
-    public VariablesSectionTableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, getDumpers(aDumpHelper), false);
+    public VariablesSectionTableDumper(final DumperHelper helper) {
+        super(helper, getDumpers(helper));
     }
 
-    private static List<ISectionElementDumper<VariableTable>> getDumpers(final DumperHelper aDumpHelper) {
+    private static List<ISectionElementDumper<VariableTable>> getDumpers(final DumperHelper helper) {
         final List<ISectionElementDumper<VariableTable>> dumpers = new ArrayList<>();
-        dumpers.add(new ScalarVariableDumper(aDumpHelper));
-        dumpers.add(new ListVariableDumper(aDumpHelper));
-        dumpers.add(new DictionaryVariableDumper(aDumpHelper));
-        dumpers.add(new UnknownVariableDumper(aDumpHelper));
+        dumpers.add(new ScalarVariableDumper(helper));
+        dumpers.add(new ListVariableDumper(helper));
+        dumpers.add(new DictionaryVariableDumper(helper));
+        dumpers.add(new UnknownVariableDumper(helper));
 
         return dumpers;
     }

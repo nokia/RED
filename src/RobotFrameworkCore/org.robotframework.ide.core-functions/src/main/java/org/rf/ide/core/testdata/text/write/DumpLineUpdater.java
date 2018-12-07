@@ -24,14 +24,14 @@ import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
  */
 public class DumpLineUpdater {
 
-    private final DumperHelper aDumperHelper;
+    private final DumperHelper helper;
 
-    public DumpLineUpdater(final DumperHelper aDumperHelper) {
-        this.aDumperHelper = aDumperHelper;
+    public DumpLineUpdater(final DumperHelper helper) {
+        this.helper = helper;
     }
 
     public void updateLine(final RobotFile model, final List<RobotLine> outLines, final IRobotLineElement elem) {
-        if (aDumperHelper.isEndOfLine(elem)) {
+        if (helper.isEndOfLine(elem)) {
             if (outLines.isEmpty()) {
                 final RobotLine line = new RobotLine(1, model);
                 line.setEndOfLine(Constant.get(elem), 0, 0);
@@ -80,7 +80,7 @@ public class DumpLineUpdater {
                     final RobotToken rt = (RobotToken) artToken;
                     if (rt.isDirty()) {
                         if (rt.getText().isEmpty()) {
-                            rt.setText(aDumperHelper.getEmpty());
+                            rt.setText(helper.getEmpty());
                         } else {
                             final String text = formatWhiteSpace(rt.getText());
                             rt.setText(text);
@@ -88,7 +88,7 @@ public class DumpLineUpdater {
                     } else {
                         if (rt.getText().isEmpty() && isTokenToEmptyEscape(rt)
                                 && (elem.isDirty() || elem.getFilePosition().isNotSet())) {
-                            rt.setText(aDumperHelper.getEmpty());
+                            rt.setText(helper.getEmpty());
                         }
                     }
                 }
@@ -96,14 +96,14 @@ public class DumpLineUpdater {
 
             final IRobotLineElement recalculated = cloneWithPositionRecalculate(artToken, line, outLines);
             if (isRobotToken) {
-                aDumperHelper.notifyTokenDumpListener((RobotToken) elem, (RobotToken) recalculated);
+                helper.notifyTokenDumpListener((RobotToken) elem, (RobotToken) recalculated);
             }
             line.addLineElement(recalculated);
         }
     }
 
     private void replaceEOFbyEOL(final RobotFile model, final List<RobotLine> outLines) {
-        if (!aDumperHelper.isCurrentFileDirty() || outLines.isEmpty()) {
+        if (!helper.isCurrentFileDirty() || outLines.isEmpty()) {
             return;
         }
 
@@ -117,7 +117,7 @@ public class DumpLineUpdater {
         final RobotLine previousLine = outLines.get(toCheck);
         final IRobotLineElement previousEol = previousLine.getEndOfLine();
         if (previousEol != null && previousEol.getTypes().contains(EndOfLineTypes.EOF)) {
-            final IRobotLineElement lineSeparator = aDumperHelper.getLineSeparator(model);
+            final IRobotLineElement lineSeparator = helper.getLineSeparator(model);
             previousLine.setEndOfLine(Constant.get(lineSeparator), previousEol.getStartOffset(),
                     previousEol.getStartColumn());
             if (toCheck == outLines.size() - 1) {

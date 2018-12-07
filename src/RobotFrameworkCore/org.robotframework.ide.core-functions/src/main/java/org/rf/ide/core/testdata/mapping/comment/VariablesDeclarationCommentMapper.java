@@ -14,16 +14,11 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
-import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
-import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.ParsingState.TableType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.annotations.VisibleForTesting;
 
 public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
 
@@ -42,18 +37,12 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
     public void map(final RobotLine currentLine, final RobotToken rt, final ParsingState currentState,
             final RobotFile fileModel) {
         final VariableTable variableTable = fileModel.getVariableTable();
-        if (variableTable.isEmpty()) {
-            final ListVariable newVar = createArtifactalListVariable(rt);
-            variableTable.addVariable(newVar);
-        } else {
+        if (!variableTable.isEmpty()) {
             final List<AVariable> variables = variableTable.getVariables();
             final IVariableHolder var = variables.get(variables.size() - 1);
             if (isInTheSameLine(rt, var) || resolver.buildPositionDescription(currentLine, rt)
                     .isContinuePreviousLineTheFirstToken(TableType.VARIABLES)) {
                 var.addCommentPart(rt);
-            } else {
-                final ListVariable newVar = createArtifactalListVariable(rt);
-                variableTable.addVariable(newVar);
             }
         }
     }
@@ -75,15 +64,5 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
         }
 
         return result;
-    }
-
-    @VisibleForTesting
-    protected ListVariable createArtifactalListVariable(final RobotToken rt) {
-        final RobotToken declaration = RobotToken.create("", rt.getLineNumber(), rt.getStartColumn(),
-                RobotTokenType.VARIABLES_LIST_DECLARATION);
-
-        final ListVariable var = new ListVariable(null, declaration, VariableScope.TEST_SUITE);
-        var.addCommentPart(rt);
-        return var;
     }
 }
