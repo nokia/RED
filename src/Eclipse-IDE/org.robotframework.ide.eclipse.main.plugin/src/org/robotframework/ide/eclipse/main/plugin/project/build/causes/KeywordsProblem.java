@@ -380,6 +380,13 @@ public enum KeywordsProblem implements IProblemCause {
             final String canonical = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
             return newArrayList(new ChangeToFixer(canonical));
         }
+    },
+    FOR_IS_EMPTY {
+
+        @Override
+        public String getProblemDescription() {
+            return "For loop contains no keywords";
+        }
     };
 
     @Override

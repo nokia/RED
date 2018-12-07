@@ -15,8 +15,7 @@ import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
-import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.IRowType;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -35,10 +34,10 @@ class ExecutableUnitsFixer {
         final int lineNumbers = preBuildDescriptors.size();
         for (int lineId = 0; lineId < lineNumbers; lineId++) {
             final IExecutableRowDescriptor<T> currentExecLine = preBuildDescriptors.get(lineId);
-            final IRowType rowType = currentExecLine.getRowType();
+            final RowType rowType = currentExecLine.getRowType();
 
             final AModelElement<T> row = currentExecLine.getRow();
-            if (rowType == ERowType.FOR) {
+            if (rowType == RowType.FOR) {
                 if (lastForIndex > -1 && lastForExecutableIndex > -1) {
                     applyArtificialForLineContinue(newRows, lastForIndex, lastForExecutableIndex);
                 }
@@ -46,7 +45,7 @@ class ExecutableUnitsFixer {
                 newRows.add(row);
                 lastForExecutableIndex = -1;
             } else {
-                if (rowType == ERowType.FOR_CONTINUE) {
+                if (rowType == RowType.FOR_CONTINUE) {
                     final Optional<RobotToken> previousLineContinue = getPreviousLineContinueToken(
                             row.getElementTokens());
                     if (previousLineContinue.isPresent()) {
@@ -59,7 +58,7 @@ class ExecutableUnitsFixer {
                             applyArtificialForLineContinue(newRows, lastForIndex, lastForExecutableIndex);
                         }
                     }
-                } else if (rowType == ERowType.SIMPLE) {
+                } else if (rowType == RowType.SIMPLE) {
                     if (containsArtificialContinueAffectingForLoop(currentExecLine)) {
                         lastForExecutableIndex = newRows.size() - 1;
                         if (lastForIndex == -1) {
@@ -102,7 +101,8 @@ class ExecutableUnitsFixer {
                         lastForIndex = -1;
                         lastForExecutableIndex = -1;
                     }
-                } else if (rowType == ERowType.COMMENTED_HASH || rowType == ERowType.SETTING) {
+                } else if (rowType == RowType.COMMENTED_HASH || rowType == RowType.SETTING
+                        || rowType == RowType.FOR_END) {
                     newRows.add(row);
                 } else {
                     throw new IllegalStateException("Unsupported executable row type " + rowType + ". In file "
@@ -126,8 +126,8 @@ class ExecutableUnitsFixer {
             }
             final RobotExecutableRow<T> execLine = (RobotExecutableRow<T>) newRows.get(i);
             final IExecutableRowDescriptor<T> lineDescription = execLine.buildLineDescription();
-            final IRowType rowType = lineDescription.getRowType();
-            if (rowType == ERowType.FOR_CONTINUE) {
+            final RowType rowType = lineDescription.getRowType();
+            if (rowType == RowType.FOR_CONTINUE) {
                 if (execLine.getAction().getText().isEmpty()) {
                     if (execLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)) {
                         if (isActionNotTheFirstElement(execLine.getAction(), execLine.getElementTokens())) {
@@ -140,7 +140,7 @@ class ExecutableUnitsFixer {
                             execLine.addArgument(0, actionToBeArgument);
                         }
                         execLine.getAction().setText("\\");
-                    } else {
+                    } else if (!execLine.getAction().getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
                         execLine.getAction().setText("\\");
                         execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                     }
@@ -157,7 +157,7 @@ class ExecutableUnitsFixer {
                     execLine.getAction().getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                 }
                 isContinue = true;
-            } else if (rowType == ERowType.COMMENTED_HASH) {
+            } else if (rowType == RowType.COMMENTED_HASH) {
                 if (isContinue) {
                     if (!execLine.getAction().getText().equals("\\")) {
                         execLine.getAction().setText("\\");
@@ -168,7 +168,7 @@ class ExecutableUnitsFixer {
                 } else {
                     execLine.getAction().getTypes().remove(RobotTokenType.FOR_CONTINUE_TOKEN);
                 }
-            } else if (rowType == ERowType.FOR || rowType == ERowType.SIMPLE) {
+            } else if (rowType == RowType.FOR || rowType == RowType.SIMPLE) {
                 isContinue = false;
             }
         }
@@ -248,7 +248,7 @@ class ExecutableUnitsFixer {
             toUpdate = new RobotExecutableRow<>();
             toUpdate.setParent((T) execUnit);
             newExecutionContext.add(toUpdate);
-        } else if (rowDesc.getRowType() == ERowType.SETTING) {
+        } else if (rowDesc.getRowType() == RowType.SETTING) {
             return;
         } else {
             toUpdate = (RobotExecutableRow<T>) newExecutionContext.get(newExecutionContext.size() - 1);
@@ -260,7 +260,7 @@ class ExecutableUnitsFixer {
         final int size = elementTokens.size();
         for (int i = 0; i < size; i++) {
             final RobotToken rt = elementTokens.get(i);
-            if (rowDesc.getRowType() == ERowType.FOR_CONTINUE && toUpdate.getAction().getFilePosition().isNotSet()
+            if (rowDesc.getRowType() == RowType.FOR_CONTINUE && toUpdate.getAction().getFilePosition().isNotSet()
                     && "\\".equals(rt.getText())) {
                 toUpdate.setAction(rt);
             }
@@ -330,7 +330,7 @@ class ExecutableUnitsFixer {
     private <T extends AModelElement<? extends ARobotSectionTable>> boolean containsArtificialContinueAffectingForLoop(
             final IExecutableRowDescriptor<T> execRow) {
 
-        if (execRow.getRowType() == ERowType.SIMPLE) {
+        if (execRow.getRowType() == RowType.SIMPLE) {
             final RobotAction action = execRow.getAction();
             if (action.isPresent() || !action.getToken().getFilePosition().isNotSet()) {
                 final RobotToken actionToken = action.getToken();

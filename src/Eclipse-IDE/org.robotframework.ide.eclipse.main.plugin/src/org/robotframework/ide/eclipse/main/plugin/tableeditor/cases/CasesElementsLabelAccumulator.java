@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
@@ -37,8 +39,20 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
         if (columnPosition == 0) {
             if (rowObject instanceof RobotDefinitionSetting) {
                 configLabels.addLabel(CASE_SETTING_CONFIG_LABEL);
+
             } else if (rowObject instanceof RobotKeywordCall) {
                 configLabels.addLabel(CASE_CALL_CONFIG_LABEL);
+
+                final AModelElement<?> linkedElement = ((RobotKeywordCall) rowObject).getLinkedElement();
+                final boolean isForLoopContinuation = linkedElement.getElementTokens()
+                        .stream()
+                        .findFirst()
+                        .filter(token -> token.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION))
+                        .isPresent();
+                if (isForLoopContinuation) {
+                    configLabels.addLabel(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
+                }
+
             } else if (rowObject instanceof RobotCodeHoldingElement<?>) {
                 final RobotCodeHoldingElement<?> holder = (RobotCodeHoldingElement<?>) rowObject;
                 if (holder.getTemplateInUse().isPresent()) {
@@ -52,6 +66,7 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
                     && ((RobotDefinitionSetting) rowObject).isDocumentation()) {
 
                 configLabels.addLabel(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
+
             } else if (rowObject instanceof RobotCase) {
                 configLabels.addLabel(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
             }

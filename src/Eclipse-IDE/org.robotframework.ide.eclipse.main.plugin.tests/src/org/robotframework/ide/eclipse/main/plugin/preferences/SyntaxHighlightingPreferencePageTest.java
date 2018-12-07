@@ -34,7 +34,7 @@ public class SyntaxHighlightingPreferencePageTest {
     public void styleRangesAreCreated() {
         final SyntaxHighlightingPreferencePage page = new SyntaxHighlightingPreferencePage();
 
-        assertThat(page.createStyleRanges()).hasSize(73);
+        assertThat(page.createStyleRanges()).hasSize(70);
     }
 
     @Test

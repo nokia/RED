@@ -31,6 +31,7 @@ import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
@@ -42,6 +43,7 @@ import org.rf.ide.core.testdata.text.write.tables.TestCasesSectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.VariablesSectionTableDumper;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 
 public abstract class ARobotFileDumper implements IRobotFileDumper {
 
@@ -384,6 +386,16 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                     } else {
                         sep = getTabSeparator();
                     }
+                }
+            }
+
+            if (tokenToSearch.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
+                if (sep.getTypes().contains(SeparatorType.PIPE)) {
+                    sep.setRaw(sep.getRaw() + "    ");
+                    sep.setText(sep.getText() + "    ");
+                } else {
+                    sep.setRaw(Strings.repeat(sep.getRaw(), 2));
+                    sep.setText(Strings.repeat(sep.getText(), 2));
                 }
             }
         }
