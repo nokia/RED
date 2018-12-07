@@ -21,8 +21,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class LibraryImportDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public LibraryImportDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.LIBRARY_IMPORT_SETTING);
+    public LibraryImportDumper(final DumperHelper helper) {
+        super(helper, ModelType.LIBRARY_IMPORT_SETTING);
     }
 
     @Override
@@ -53,9 +53,9 @@ public class LibraryImportDumper extends ANotExecutableTableElementDumper<Settin
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_LIBRARY_ALIAS, 3, libAliasDec);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE, 4, libAliasNames);
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 5,
-                getElementHelper().filter(library.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(library.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 6,
-                getElementHelper().filter(library.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(library.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

@@ -20,8 +20,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class MetadataDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public MetadataDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.METADATA_SETTING);
+    public MetadataDumper(final DumperHelper helper) {
+        super(helper, ModelType.METADATA_SETTING);
     }
 
     @Override
@@ -37,9 +37,9 @@ public class MetadataDumper extends ANotExecutableTableElementDumper<SettingTabl
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_METADATA_KEY, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_METADATA_VALUE, 2, metadata.getValues());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                getElementHelper().filter(metadata.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(metadata.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                getElementHelper().filter(metadata.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(metadata.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

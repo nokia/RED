@@ -31,8 +31,6 @@ public class DumperHelper {
 
     private static final int NUMBER_OF_AFTER_UNIT_ELEMENTS_TO_TREAT_AS_NEW_UNIT_START = 3;
 
-    private Optional<ILineDumpTokenListener> dumpTokenListeners = Optional.empty();
-
     private static final String EMPTY = "\\";
 
     private final ARobotFileDumper currentDumper;
@@ -46,6 +44,8 @@ public class DumperHelper {
     private final SeparatorsDumpHelper aSeparatorDumper;
 
     private final NotModelRelatedHashCommentedLineDumper aCommentHashDumper;
+
+    private Optional<ILineDumpTokenListener> dumpTokenListeners = Optional.empty();
 
     public DumperHelper(final ARobotFileDumper currentDumper) {
         this.currentDumper = currentDumper;

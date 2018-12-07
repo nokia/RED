@@ -16,8 +16,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class DefaultTagsDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public DefaultTagsDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.DEFAULT_TAGS_SETTING);
+    public DefaultTagsDumper(final DumperHelper helper) {
+        super(helper, ModelType.DEFAULT_TAGS_SETTING);
     }
 
     @Override
@@ -27,9 +27,9 @@ public class DefaultTagsDumper extends ANotExecutableTableElementDumper<SettingT
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_DEFAULT_TAG, 1, defaultTags.getTags());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                getElementHelper().filter(defaultTags.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(defaultTags.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
-                getElementHelper().filter(defaultTags.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(defaultTags.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

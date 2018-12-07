@@ -16,8 +16,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class UnknownSettingDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public UnknownSettingDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.SETTINGS_UNKNOWN);
+    public UnknownSettingDumper(final DumperHelper helper) {
+        super(helper, ModelType.SETTINGS_UNKNOWN);
     }
 
     @Override

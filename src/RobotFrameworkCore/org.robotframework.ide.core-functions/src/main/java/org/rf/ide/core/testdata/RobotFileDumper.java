@@ -20,7 +20,9 @@ public class RobotFileDumper {
             new TsvRobotFileDumper());
 
     public DumpedResult dump(final DumpContext context, final RobotFileOutput output) {
-        return getDumper(output).dump(context, output.getFileModel());
+        final IRobotFileDumper dumper = getDumper(output);
+        dumper.setContext(context);
+        return dumper.dump(output.getFileModel());
     }
 
     private IRobotFileDumper getDumper(final RobotFileOutput output) {

@@ -25,13 +25,9 @@ public abstract class ANotExecutableTableDumper<T extends ARobotSectionTable> im
 
     private final List<ISectionElementDumper<T>> dumpers;
 
-    private final boolean shouldDumpHashCommentAfterHeader;
-
-    public ANotExecutableTableDumper(final DumperHelper helper, final List<ISectionElementDumper<T>> dumpers,
-            final boolean shouldDumpHashCommentAfterHeader) {
+    public ANotExecutableTableDumper(final DumperHelper helper, final List<ISectionElementDumper<T>> dumpers) {
         this.helper = helper;
         this.dumpers = dumpers;
-        this.shouldDumpHashCommentAfterHeader = shouldDumpHashCommentAfterHeader;
     }
 
     @Override
@@ -40,9 +36,7 @@ public abstract class ANotExecutableTableDumper<T extends ARobotSectionTable> im
 
         helper.getHeaderDumpHelper().dumpHeader(model, th, lines);
 
-        if (shouldDumpHashCommentAfterHeader) {
-            helper.getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
-        }
+        helper.getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
 
         if (!sorted.isEmpty()) {
             final List<Section> filteredSections = SectionType.filterByType(sections, sectionWithHeaderPos,

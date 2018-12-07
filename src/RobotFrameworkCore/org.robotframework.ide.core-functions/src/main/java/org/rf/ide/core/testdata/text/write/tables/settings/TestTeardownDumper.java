@@ -20,8 +20,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class TestTeardownDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public TestTeardownDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.SUITE_TEST_TEARDOWN);
+    public TestTeardownDumper(final DumperHelper helper) {
+        super(helper, ModelType.SUITE_TEST_TEARDOWN);
     }
 
     @Override
@@ -38,9 +38,9 @@ public class TestTeardownDumper extends ANotExecutableTableElementDumper<Setting
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT, 2,
                 testTeardown.getArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                getElementHelper().filter(testTeardown.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(testTeardown.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                getElementHelper().filter(testTeardown.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(testTeardown.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

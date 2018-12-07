@@ -16,8 +16,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class SuiteDocumentationDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public SuiteDocumentationDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.SUITE_DOCUMENTATION);
+    public SuiteDocumentationDumper(final DumperHelper helper) {
+        super(helper, ModelType.SUITE_DOCUMENTATION);
     }
 
     @Override
@@ -27,9 +27,9 @@ public class SuiteDocumentationDumper extends ANotExecutableTableElementDumper<S
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_DOCUMENTATION_TEXT, 1, suiteDoc.getDocumentationText());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                getElementHelper().filter(suiteDoc.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(suiteDoc.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
-                getElementHelper().filter(suiteDoc.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(suiteDoc.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

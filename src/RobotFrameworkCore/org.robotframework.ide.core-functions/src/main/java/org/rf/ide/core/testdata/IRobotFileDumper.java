@@ -13,5 +13,7 @@ public interface IRobotFileDumper {
 
     boolean isApplicableFor(final FileFormat format);
 
-    DumpedResult dump(final DumpContext ctx, final RobotFile model);
+    void setContext(final DumpContext ctx);
+
+    DumpedResult dump(final RobotFile model);
 }

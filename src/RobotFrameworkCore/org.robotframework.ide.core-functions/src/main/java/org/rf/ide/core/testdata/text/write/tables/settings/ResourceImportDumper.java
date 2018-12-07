@@ -20,8 +20,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class ResourceImportDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public ResourceImportDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.RESOURCE_IMPORT_SETTING);
+    public ResourceImportDumper(final DumperHelper helper) {
+        super(helper, ModelType.RESOURCE_IMPORT_SETTING);
     }
 
     @Override
@@ -39,9 +39,9 @@ public class ResourceImportDumper extends ANotExecutableTableElementDumper<Setti
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT, 2,
                 resource.getUnexpectedTrashArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                getElementHelper().filter(resource.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(resource.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                getElementHelper().filter(resource.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(resource.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }
