@@ -29,7 +29,7 @@ import org.rf.ide.core.testdata.text.write.tables.settings.VariablesImportDumper
 public class SettingsSectionTableDumper extends ANotExecutableTableDumper<SettingTable> {
 
     public SettingsSectionTableDumper(final DumperHelper helper) {
-        super(helper, getDumpers(helper), true);
+        super(helper, getDumpers(helper));
     }
 
     private static List<ISectionElementDumper<SettingTable>> getDumpers(final DumperHelper helper) {

@@ -20,8 +20,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class VariablesImportDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public VariablesImportDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.VARIABLES_IMPORT_SETTING);
+    public VariablesImportDumper(final DumperHelper helper) {
+        super(helper, ModelType.VARIABLES_IMPORT_SETTING);
     }
 
     @Override
@@ -38,9 +38,9 @@ public class VariablesImportDumper extends ANotExecutableTableElementDumper<Sett
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_VARIABLES_FILE_NAME, 1, varsPaths);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_VARIABLES_ARGUMENT, 2, variables.getArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                getElementHelper().filter(variables.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(variables.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                getElementHelper().filter(variables.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(variables.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

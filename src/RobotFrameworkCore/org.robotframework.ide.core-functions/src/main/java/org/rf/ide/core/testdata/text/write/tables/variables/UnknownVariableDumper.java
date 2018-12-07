@@ -16,8 +16,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class UnknownVariableDumper extends ANotExecutableTableElementDumper<VariableTable> {
 
-    public UnknownVariableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.UNKNOWN_VARIABLE_DECLARATION_IN_TABLE);
+    public UnknownVariableDumper(final DumperHelper helper) {
+        super(helper, ModelType.UNKNOWN_VARIABLE_DECLARATION_IN_TABLE);
     }
 
     @Override
@@ -28,9 +28,9 @@ public class UnknownVariableDumper extends ANotExecutableTableElementDumper<Vari
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.VARIABLES_VARIABLE_VALUE, 1, var.getItems());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                getElementHelper().filter(var.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(var.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
-                getElementHelper().filter(var.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(var.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

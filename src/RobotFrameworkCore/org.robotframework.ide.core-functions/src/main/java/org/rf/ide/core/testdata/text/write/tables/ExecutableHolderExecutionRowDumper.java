@@ -36,9 +36,8 @@ class ExecutableHolderExecutionRowDumper extends AExecutableTableElementDumper {
                         RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE));
     }
 
-    ExecutableHolderExecutionRowDumper(final DumperHelper aDumpHelper, final ModelType modelType) {
-        super(aDumpHelper, modelType);
-        addAfterSortTask(new ForContinueStartWithCommentFixer());
+    ExecutableHolderExecutionRowDumper(final DumperHelper helper, final ModelType modelType) {
+        super(helper, modelType, newArrayList(new ForContinueStartWithCommentFixer()));
     }
 
     @Override
@@ -52,9 +51,9 @@ class ExecutableHolderExecutionRowDumper extends AExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(tokenTypes.get(0), 1, getAction(userKeyword));
         sorter.addPresaveSequenceForType(tokenTypes.get(1), 2, userKeyword.getArguments());
         sorter.addPresaveSequenceForType(tokenTypes.get(2), 3,
-                getElementHelper().filter(userKeyword.getComment(), tokenTypes.get(2)));
+                elemUtility.filter(userKeyword.getComment(), tokenTypes.get(2)));
         sorter.addPresaveSequenceForType(tokenTypes.get(3), 4,
-                getElementHelper().filter(userKeyword.getComment(), tokenTypes.get(3)));
+                elemUtility.filter(userKeyword.getComment(), tokenTypes.get(3)));
 
         return sorter;
     }

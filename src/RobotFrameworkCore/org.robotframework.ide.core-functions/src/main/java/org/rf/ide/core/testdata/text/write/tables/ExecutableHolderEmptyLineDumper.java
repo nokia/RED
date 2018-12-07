@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
@@ -14,8 +16,7 @@ import org.rf.ide.core.testdata.text.write.DumperHelper;
 class ExecutableHolderEmptyLineDumper extends AExecutableTableElementDumper {
 
     ExecutableHolderEmptyLineDumper(final DumperHelper helper, final ModelType modelType) {
-        super(helper, modelType);
-        addAfterSortTask(new ForContinueStartWithCommentFixer());
+        super(helper, modelType, newArrayList(new ForContinueStartWithCommentFixer()));
     }
 
     @Override

@@ -20,8 +20,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class SuiteTestTimeoutDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public SuiteTestTimeoutDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.SUITE_TEST_TIMEOUT);
+    public SuiteTestTimeoutDumper(final DumperHelper helper) {
+        super(helper, ModelType.SUITE_TEST_TIMEOUT);
     }
 
     @Override
@@ -38,9 +38,9 @@ public class SuiteTestTimeoutDumper extends ANotExecutableTableElementDumper<Set
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE, 2,
                 testTimeout.getMessageArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                getElementHelper().filter(testTimeout.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(testTimeout.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                getElementHelper().filter(testTimeout.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(testTimeout.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

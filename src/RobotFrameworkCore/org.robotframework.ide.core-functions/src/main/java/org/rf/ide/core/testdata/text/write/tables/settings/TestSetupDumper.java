@@ -20,8 +20,8 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 
 public class TestSetupDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public TestSetupDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.SUITE_TEST_SETUP);
+    public TestSetupDumper(final DumperHelper helper) {
+        super(helper, ModelType.SUITE_TEST_SETUP);
     }
 
     @Override
@@ -38,9 +38,9 @@ public class TestSetupDumper extends ANotExecutableTableElementDumper<SettingTab
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_SETUP_KEYWORD_ARGUMENT, 2,
                 testSetup.getArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                getElementHelper().filter(testSetup.getComment(), RobotTokenType.START_HASH_COMMENT));
+                elemUtility.filter(testSetup.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                getElementHelper().filter(testSetup.getComment(), RobotTokenType.COMMENT_CONTINUE));
+                elemUtility.filter(testSetup.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

@@ -109,6 +109,26 @@ public class UpdateVariableTablesWithVariablesOnlyWithCommentTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
+    @Test
+    public void test_givenVariableTableWithAllTypesAndWithHashComments_whenAddNewVariable_thenCheckIfTableIsCorrectlyDumped()
+            throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
+                + "Input_DifferentTypesAndComments_addNewVariable.robot";
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
+                + "Output_DifferentTypesAndComments_addNewVariable.robot";
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final VariableTable variableTable = modelFile.getVariableTable();
+        variableTable.addVariable(
+                new ScalarVariable("${var_new}", RobotToken.create("${var_new}"), VariableScope.TEST_SUITE));
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
     @SuppressWarnings("unchecked")
     private <T extends AVariable> List<T> findVariables(final VariableTable variableTable, final String variableName) {
         return variableTable.getVariables()
