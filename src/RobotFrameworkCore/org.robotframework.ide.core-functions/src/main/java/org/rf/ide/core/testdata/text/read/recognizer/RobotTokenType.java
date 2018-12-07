@@ -631,26 +631,26 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     KEYWORD_EMPTY_LINE(TableType.KEYWORDS),
-    /**
-     */
+
     FOR_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation(": FOR").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation(":FOR").build()),
-    /**
-     */
+            VersionAvailabilityInfoBuilder.create().addRepresentation(":FOR").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("FOR").availableFrom("3.1").build()),
     IN_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("IN").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("IN RANGE").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("IN ENUMERATE").availableFrom("2.9").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("IN ZIP").availableFrom("2.9").build()),
-    /**
-     */
     FOR_CONTINUE_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()), FOR_CONTINUE_ARTIFICIAL_TOKEN(
-            TableType.NOT_STRICTLY_BELONGS);
+            TableType.NOT_STRICTLY_BELONGS),
+    FOR_END_TOKEN(
+            TableType.NOT_STRICTLY_BELONGS,
+            VersionAvailabilityInfoBuilder.create().addRepresentation("END").availableFrom("3.1").build()),
+    FOR_WITH_END_CONTINUATION(TableType.NOT_STRICTLY_BELONGS);
 
     private final List<String> text = new ArrayList<>(0);
 

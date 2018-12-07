@@ -25,7 +25,8 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -129,7 +130,12 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
                 if (linkedElement != null && linkedElement instanceof RobotExecutableRow<?>) {
                     final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
                     // TODO: checking row type should be done without building line description
-                    return row.isExecutable() && row.buildLineDescription().getRowType() != ERowType.FOR_CONTINUE;
+                    if (row.isExecutable()) {
+                        final IExecutableRowDescriptor<?> descriptor = row.buildLineDescription();
+                        return descriptor.getRowType() != RowType.FOR_CONTINUE
+                                && descriptor.getRowType() != RowType.FOR_END;
+                    }
+                    return false;
                 }
             }
             return false;

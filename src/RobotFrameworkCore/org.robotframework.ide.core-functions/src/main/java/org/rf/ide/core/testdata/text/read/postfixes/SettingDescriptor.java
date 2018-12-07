@@ -64,8 +64,8 @@ class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public IRowType getRowType() {
-        return ERowType.SETTING;
+    public RowType getRowType() {
+        return RowType.SETTING;
     }
 
     @Override

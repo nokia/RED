@@ -17,7 +17,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.SpecialKeywords;
 
-public class NestedExecsSpecialTokensRule implements ISyntaxColouringRule {
+public class SpecialTokensInNestedExecsRule implements ISyntaxColouringRule {
 
     private final IToken textToken;
 
@@ -25,7 +25,7 @@ public class NestedExecsSpecialTokensRule implements ISyntaxColouringRule {
 
     private final EnumSet<RobotTokenType> readStoppingTypes;
 
-    public NestedExecsSpecialTokensRule(final IToken textToken) {
+    public SpecialTokensInNestedExecsRule(final IToken textToken) {
         this.textToken = textToken;
         this.applicableTypes = EnumSet.of(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT,

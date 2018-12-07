@@ -30,14 +30,15 @@ public class SpecialItemsLabelAccumulator implements IConfigLabelAccumulator {
     }
 
     @Override
-    public void accumulateConfigLabels(LabelStack configLabels, int columnPosition, int rowPosition) {
+    public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         final Object rowObject = dataProvider.getRowObject(rowPosition);
 
         if (rowObject instanceof RobotKeywordCall) {
             final List<RobotToken> tokens = ((RobotKeywordCall) rowObject).getLinkedElement().getElementTokens();
             if (tokens.size() > columnPosition) {
                 final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
-                if (types.contains(RobotTokenType.IN_TOKEN)) {
+                if (types.contains(RobotTokenType.IN_TOKEN) || types.contains(RobotTokenType.FOR_TOKEN)
+                        || types.contains(RobotTokenType.FOR_END_TOKEN)) {
                     configLabels.addLabel(SPECIAL_ITEM_CONFIG_LABEL);
                 }
             }

@@ -1,8 +1,8 @@
 /*
-* Copyright 2017 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2018 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,9 +20,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
 
-public class WithNameRuleTest {
+public class SpecialTokensRuleTest {
 
-    private final WithNameRule testedRule = new WithNameRule(new Token("token"));
+    private final SpecialTokensRule testedRule = new SpecialTokensRule(new Token("token"));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
@@ -32,12 +32,13 @@ public class WithNameRuleTest {
     }
 
     @Test
-    public void inTokenIsRecognized() {
+    public void specialTokensAreRecognized() {
         boolean thereWasName = false;
         for (final RobotToken token : TokensSource.createTokens()) {
             final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0, new ArrayList<>());
 
-            if (token.getText().equals("WITH NAME")) {
+            if (token.getText().equals("WITH NAME") || token.getText().equals(":FOR")
+                    || token.getText().equals("IN RANGE")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();
@@ -53,14 +54,15 @@ public class WithNameRuleTest {
     }
 
     @Test
-    public void withNameIsRecognized_evenWhenPositionIsInsideToken() {
+    public void specialTokensAreRecognized_evenWhenPositionIsInsideToken() {
         boolean thereWasName = false;
         for (final RobotToken token : TokensSource.createTokens()) {
             final int positionInsideToken = new Random().nextInt(token.getText().length());
             final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, positionInsideToken,
                     new ArrayList<>());
 
-            if (token.getText().equals("WITH NAME")) {
+            if (token.getText().equals("WITH NAME") || token.getText().equals(":FOR")
+                    || token.getText().equals("IN RANGE")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).isPresent();

@@ -19,7 +19,7 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
 
 
-public class NestedExecsSpecialTokensRuleTest {
+public class SpecialTokensInNestedExecsRuleTest {
 
     @Test
     public void specialWordsInOrdinaryKeywordsAreNotRecognized() {
@@ -69,7 +69,7 @@ public class NestedExecsSpecialTokensRuleTest {
 
     private Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int position,
             final List<RobotLine> lines) {
-        final NestedExecsSpecialTokensRule rule = new NestedExecsSpecialTokensRule(new Token("special_token"));
+        final SpecialTokensInNestedExecsRule rule = new SpecialTokensInNestedExecsRule(new Token("special_token"));
         return rule.isApplicable(token) ? rule.evaluate(token, position, lines) : Optional.empty();
     }
 }
