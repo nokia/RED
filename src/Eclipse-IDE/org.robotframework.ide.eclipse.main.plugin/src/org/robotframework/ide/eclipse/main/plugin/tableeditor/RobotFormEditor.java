@@ -38,6 +38,7 @@ import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -259,7 +260,7 @@ public class RobotFormEditor extends FormEditor {
 
         final String contentTypeId = ASuiteFileDescriber.getContentType(suiteModel.getFile().getName(),
                 getSourceEditor().getDocument().get());
-        final boolean contentTypeMismatchDetected = 
+        final boolean contentTypeMismatchDetected =
                 currentModel.isSuiteFile() && !ASuiteFileDescriber.isSuiteFile(contentTypeId)
                 || currentModel.isRpaSuiteFile() && !ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)
                 || currentModel.isResourceFile() && !suiteModel.getFileExtension().equals("resource")
@@ -350,9 +351,9 @@ public class RobotFormEditor extends FormEditor {
 
     private void reopenEditor() {
         close(false);
-        getSite().getShell()
-                .getDisplay()
-                .asyncExec(() -> tryToOpen(suiteModel.getFile(), RobotFormEditor.this.getSite().getPage()));
+        final IWorkbenchPartSite site = getSite();
+        final IWorkbenchPage page = site.getPage();
+        site.getShell().getDisplay().asyncExec(() -> tryToOpen(suiteModel.getFile(), page));
     }
 
     public static void tryToOpen(final IFile file, final IWorkbenchPage page) {
