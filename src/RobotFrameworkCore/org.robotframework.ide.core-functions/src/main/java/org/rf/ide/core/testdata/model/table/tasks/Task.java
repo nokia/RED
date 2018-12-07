@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.testdata.model.table.tasks;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -142,8 +141,7 @@ public class Task extends CommonCase<TaskTable, Task> implements Serializable {
     }
 
     public LocalSetting<Task> newUnknownSetting(final int index, final String representation) {
-        final RobotToken dec = RobotToken.create(representation,
-                newArrayList(RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION));
+        final RobotToken dec = RobotToken.create(representation, RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION);
         return (LocalSetting<Task>) addElement(index, new LocalSetting<>(ModelType.TASK_SETTING_UNKNOWN, dec));
     }
 

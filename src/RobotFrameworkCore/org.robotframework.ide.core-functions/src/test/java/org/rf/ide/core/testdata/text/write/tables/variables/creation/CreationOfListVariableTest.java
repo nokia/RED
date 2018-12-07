@@ -32,7 +32,7 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        variableTable.createListVariable(0, "list", new ArrayList<String>());
+        variableTable.createListVariable(0, "list", new ArrayList<>());
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -47,17 +47,10 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        final AVariable aVariable = variableTable.createListVariable(0, "list", new ArrayList<String>());
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        aVariable.addCommentPart(cmTok1);
-        aVariable.addCommentPart(cmTok2);
-        aVariable.addCommentPart(cmTok3);
+        final AVariable aVariable = variableTable.createListVariable(0, "list", new ArrayList<>());
+        aVariable.addCommentPart(RobotToken.create("cm1"));
+        aVariable.addCommentPart(RobotToken.create("cm2"));
+        aVariable.addCommentPart(RobotToken.create("cm3"));
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -94,17 +87,9 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         values.add("value1");
 
         final AVariable aVariable = variableTable.createListVariable(0, "list", values);
-
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        aVariable.addCommentPart(cmTok1);
-        aVariable.addCommentPart(cmTok2);
-        aVariable.addCommentPart(cmTok3);
+        aVariable.addCommentPart(RobotToken.create("cm1"));
+        aVariable.addCommentPart(RobotToken.create("cm2"));
+        aVariable.addCommentPart(RobotToken.create("cm3"));
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -145,16 +130,9 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         values.add("value3");
 
         final AVariable aVariable = variableTable.createListVariable(0, "list", values);
-        final RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        final RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        final RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        aVariable.addCommentPart(cmTok1);
-        aVariable.addCommentPart(cmTok2);
-        aVariable.addCommentPart(cmTok3);
+        aVariable.addCommentPart(RobotToken.create("cm1"));
+        aVariable.addCommentPart(RobotToken.create("cm2"));
+        aVariable.addCommentPart(RobotToken.create("cm3"));
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);

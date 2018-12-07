@@ -15,7 +15,6 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
-import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
@@ -31,38 +30,39 @@ public class ListVariablesUpdateTest extends RobotFormatParameterizedTest {
     }
 
     @Test
-    public void test_givenTestCaseAndSettingsAndVariableTablesWithOneScalarVariableAndOneCommentAsList_whenAddCorrectNameForList_thenCheckIfTableIsCorrectlyDumped()
+    public void test_givenTestCaseAndVariableTablesWithOneVariable_whenAddItems_thenCheckIfTableIsCorrectlyDumped()
             throws Exception {
         // prepare
-        final String inFileName = convert("Input_SingleListVarAndComment_updateNameToBeCorrect");
-        final String outputFileName = convert("Output_SingleListVarAndComment_updateNameToBeCorrect");
+        final String inFileName = convert("Input_SingleListVar_addItems");
+        final String outputFileName = convert("Output_SingleListVar_addItems");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test data prepare
         final VariableTable variableTable = modelFile.getVariableTable();
         final List<AVariable> variables = variableTable.getVariables();
-        ((ListVariable) variables.get(1)).setName("list");
+        final ListVariable listVariable = (ListVariable) variables.get(0);
+        listVariable.addItem(RobotToken.create("v1"));
+        listVariable.addItem(RobotToken.create("v2"));
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
     @Test
-    public void test_givenTestCaseAndSettingsAndVariableTablesWithOneScalarVariableAndOneCommentAsList_whenAddCorrectNameForList_andAddValueForFirstScalar_thenCheckIfTableIsCorrectlyDumped()
+    public void test_givenTestCaseAndVariableTablesWithOneVariable_whenRenaming_thenCheckIfTableIsCorrectlyDumped()
             throws Exception {
         // prepare
-        final String inFileName = convert("Input_SingleListVarAndComment_updateNameToBeCorrect_andPutValueToScalar");
-        final String outputFileName = convert(
-                "Output_SingleListVarAndComment_updateNameToBeCorrect_andPutValueToScalar");
+        final String inFileName = convert("Input_SingleListVar_rename");
+        final String outputFileName = convert("Output_SingleListVar_rename");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test data prepare
         final VariableTable variableTable = modelFile.getVariableTable();
         final List<AVariable> variables = variableTable.getVariables();
-        ((ScalarVariable) variables.get(0)).addValue(RobotToken.create("ok"));
-        ((ListVariable) variables.get(1)).setName("list");
+        final ListVariable listVariable = (ListVariable) variables.get(0);
+        listVariable.getDeclaration().setText("@{updated}");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);

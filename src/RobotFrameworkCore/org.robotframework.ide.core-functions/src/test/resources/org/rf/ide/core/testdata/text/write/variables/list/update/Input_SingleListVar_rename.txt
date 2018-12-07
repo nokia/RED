@@ -1,0 +1,3 @@
+*** Variable ***
+@{var1}
+*** Test Cases ***

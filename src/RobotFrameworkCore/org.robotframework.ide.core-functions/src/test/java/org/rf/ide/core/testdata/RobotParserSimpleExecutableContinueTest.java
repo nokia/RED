@@ -63,7 +63,7 @@ public class RobotParserSimpleExecutableContinueTest {
     }
 
     @Test
-    public void test_givenMultipleRobotExecutableLines_withCommentsJoinedByPreviouseLineContinue_shouldGives_4RobotExecutableLines()
+    public void test_givenMultipleRobotExecutableLines_withCommentsJoinedByPreviousLineContinue_shouldGives_4RobotExecutableLines()
             throws Exception {
         // prepare
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);

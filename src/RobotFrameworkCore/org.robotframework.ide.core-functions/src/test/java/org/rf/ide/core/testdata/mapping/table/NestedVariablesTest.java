@@ -53,14 +53,8 @@ public class NestedVariablesTest {
         final String text = symbol + "{${var_name}}";
 
         final List<RobotToken> robotTokens = new ArrayList<>();
-        final List<IRobotTokenType> scalarType = new ArrayList<>();
-        scalarType.add(RobotTokenType.VARIABLES_SCALAR_DECLARATION);
-        robotTokens.add(RobotToken.create("${var_name}}", scalarType));
-        final List<IRobotTokenType> dictionaryType = new ArrayList<>();
-        dictionaryType.add(type);
-        robotTokens.add(RobotToken.create(text, dictionaryType));
-        robotTokens.get(0).setFilePosition(fpInside);
-        robotTokens.get(1).setFilePosition(fp);
+        robotTokens.add(RobotToken.create("${var_name}}", fpInside, RobotTokenType.VARIABLES_SCALAR_DECLARATION));
+        robotTokens.add(RobotToken.create(text, fp, type));
         final List<IRobotTokenType> wantedResults = new ArrayList<>();
         wantedResults.add(type);
         wantedResults.add(RobotTokenType.VARIABLE_USAGE);
