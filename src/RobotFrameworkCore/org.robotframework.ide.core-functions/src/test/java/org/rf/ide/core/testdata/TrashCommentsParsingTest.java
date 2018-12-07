@@ -10,7 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -33,7 +32,7 @@ import org.rf.ide.core.testdata.text.read.separators.Separator;
 public class TrashCommentsParsingTest {
 
     @Test
-    public void test_givenMultipleRobotExecutableLines_withCommentsJoinedByPreviouseLineContinue_shouldGives_4RobotExecutableLines()
+    public void test_givenMultipleRobotExecutableLines_withCommentsJoinedByPreviousLineContinue_shouldGives_4RobotExecutableLines()
             throws Exception {
         // prepare
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
@@ -60,19 +59,17 @@ public class TrashCommentsParsingTest {
 
         final List<RobotLine> fileContent = fileModel.getFileContent();
         assertThat(fileContent).hasSize(6);
-        assertLine(fileContent.get(0),
-                RobotToken.create("# comment", Arrays.asList(RobotTokenType.START_HASH_COMMENT)));
-        assertLine(fileContent.get(1), RobotToken.create("#", Arrays.asList(RobotTokenType.START_HASH_COMMENT)),
-                separator("\t"), RobotToken.create("*** Settings ***",
-                        Arrays.asList(RobotTokenType.COMMENT_CONTINUE, RobotTokenType.SETTINGS_TABLE_HEADER)));
-        assertLine(fileContent.get(2), RobotToken.create("#d", Arrays.asList(RobotTokenType.START_HASH_COMMENT)),
-                separator("\t"),
-                RobotToken.create("ok", Arrays.asList(RobotTokenType.COMMENT_CONTINUE, RobotTokenType.UNKNOWN)));
+        assertLine(fileContent.get(0), RobotToken.create("# comment", RobotTokenType.START_HASH_COMMENT));
+        assertLine(fileContent.get(1), RobotToken.create("#", RobotTokenType.START_HASH_COMMENT), separator("\t"),
+                RobotToken.create("*** Settings ***", RobotTokenType.COMMENT_CONTINUE,
+                        RobotTokenType.SETTINGS_TABLE_HEADER));
+        assertLine(fileContent.get(2), RobotToken.create("#d", RobotTokenType.START_HASH_COMMENT), separator("\t"),
+                RobotToken.create("ok", RobotTokenType.COMMENT_CONTINUE, RobotTokenType.UNKNOWN));
         assertLine(fileContent.get(3),
-                RobotToken.create("*** unknown header ***", Arrays.asList(RobotTokenType.USER_OWN_TABLE_HEADER)));
-        assertLine(fileContent.get(4), RobotToken.create("d", Arrays.asList(RobotTokenType.UNKNOWN)), separator("\t"),
-                RobotToken.create("#start", Arrays.asList(RobotTokenType.START_HASH_COMMENT)), separator("\t"),
-                RobotToken.create("continue", Arrays.asList(RobotTokenType.COMMENT_CONTINUE, RobotTokenType.UNKNOWN)));
+                RobotToken.create("*** unknown header ***", RobotTokenType.USER_OWN_TABLE_HEADER));
+        assertLine(fileContent.get(4), RobotToken.create("d", RobotTokenType.UNKNOWN), separator("\t"),
+                RobotToken.create("#start", RobotTokenType.START_HASH_COMMENT), separator("\t"),
+                RobotToken.create("continue", RobotTokenType.COMMENT_CONTINUE, RobotTokenType.UNKNOWN));
     }
 
     private void assertLine(final RobotLine toTest, final IRobotLineElement... toks) {

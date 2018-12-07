@@ -1,5 +1,0 @@
-*** Setting ***
-*** Variable ***
-${var1}	ok
-@{list}	#comment
-*** Test Cases ***

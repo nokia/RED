@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.testdata.model.table.testcases;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -115,8 +114,7 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
     }
 
     public LocalSetting<TestCase> newUnknownSetting(final int index, final String representation) {
-        final RobotToken dec = RobotToken.create(representation,
-                newArrayList(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION));
+        final RobotToken dec = RobotToken.create(representation, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION);
         return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN, dec));
     }
 

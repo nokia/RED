@@ -98,7 +98,7 @@ public class ParsingStateHelperTest {
             final Collection<RobotTokenType> types = EnumSet.allOf(RobotTokenType.class);
             types.removeAll(TABLE_HEADER_TYPES);
             final List<ParsingState> states = types.stream()
-                    .map(type -> RobotToken.create("", asList(type)))
+                    .map(type -> RobotToken.create("", type))
                     .map(helper::getState)
                     .collect(toList());
             assertThat(states).containsOnly(ParsingState.UNKNOWN);
@@ -108,7 +108,7 @@ public class ParsingStateHelperTest {
         public void tableHeaderStateIsReturned_whenTokenContainsTableHeaderTypes() {
             final Collection<RobotTokenType> types = TABLE_HEADER_TYPES;
             final List<ParsingState> states = types.stream()
-                    .map(type -> RobotToken.create("", asList(type)))
+                    .map(type -> RobotToken.create("", type))
                     .map(helper::getState)
                     .collect(toList());
             assertThat(states).containsExactly(ParsingState.KEYWORD_TABLE_HEADER, ParsingState.SETTING_TABLE_HEADER,

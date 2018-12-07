@@ -22,9 +22,9 @@ import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 /**
  * @author wypych
  */
-public class MixedTablesUpdateTest extends RobotFormatParameterizedTest {
+public class ScalarVariablesUpdateTest extends RobotFormatParameterizedTest {
 
-    public MixedTablesUpdateTest(final String extension, final FileFormat format) {
+    public ScalarVariablesUpdateTest(final String extension, final FileFormat format) {
         super(extension, format);
     }
 
