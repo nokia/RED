@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/18 5:24 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 12/10/18 2:37 PM
 Testcase-Type: ecl
 Verifications: _h9dwwETtEeaEVfxTnoQ14g
 
@@ -25,34 +25,24 @@ get-view Outline | get-tree | select "TestFile.robot/Variables/var1" | double-cl
 wait 200
 is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 1
 
-get-view Outline | get-tree | select [get-item "TestFile.robot/Variables" | get-item "" -index 1]
-wait 200
-is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 8
-
 get-view Outline | get-tree | select "TestFile.robot/Variables/multiline" | click
 wait 200
-is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 15
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 13
 
 get-view Outline | get-tree | select "TestFile.robot/Variables/list" | click
 wait 200
-is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 7
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 6
 
 //select var from Project explorer
-
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot/Variables/var" | double-click
 }
 is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 0
 
 with [get-view "Project Explorer" | get-tree] {
-    select [get-item "RobotProject/TestFile.robot/Variables" | get-item "" -index 1] | double-click
-}
-is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 8
-
-with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot/Variables/list with equals sign" | double-click
 }
-is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 13
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 11
 
 //select focus on newDict
 get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1 | key-type Up -times 4
@@ -67,13 +57,13 @@ get-eclipse-window | key-type Right
 get-eclipse-window | key-type Left
 
 with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
-    key-type Down -times 10
+    key-type Down -times 8
     get-menu "Add new dictionary" | click
 }
 
 
 //check outline
-get-view Outline | get-tree | get-item "TestFile.robot/Variables" | get-property childCount | equals 19 | verify-true
+get-view Outline | get-tree | get-item "TestFile.robot/Variables" | get-property childCount | equals 17 | verify-true
 
 with [get-view Outline | get-tree] {
     get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
@@ -83,31 +73,29 @@ with [get-view Outline | get-tree] {
     get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[4].getText()" | equals ref | verify-true
     get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[5].getText()" | equals a | verify-true
     get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[6].getText()" | equals B | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[7].getText()" | equals "" | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[8].getText()" | equals list | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[9].getText()" | equals "" | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[10].getText()" | equals newDict 
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[7].getText()" | equals list | verify-true
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[8].getText()" | equals newDict 
         | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[11].getText()" | equals "plus_one" 
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[9].getText()" | equals "plus_one" 
         | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[12].getText()" | equals "EMPTY LIST" 
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[10].getText()" | equals "EMPTY LIST" 
         | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[13].getText()" | equals var3 | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[14].getText()" | equals "this is param" 
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[11].getText()" | equals var3 | verify-true
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[12].getText()" | equals "this is param" 
         | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[15].getText()" 
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[13].getText()" 
         | equals "list with equals sign" | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[16].getText()" | equals "" | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[17].getText()" | equals multiline 
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[14].getText()" | equals "" | verify-true
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[15].getText()" | equals multiline 
         | verify-true
-    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[18].getText()" 
+    get-item "TestFile.robot/Variables" | get-property "getItems().TreeItem[16].getText()" 
         | equals "very long param name with vary long value and commnet" | verify-true
 }
 
 
 //check PE
 get-view "Project Explorer" | get-tree | get-item "RobotProject/TestFile.robot/Variables" | get-property childCount 
-    | equals 19 | verify-true
+    | equals 17 | verify-true
     
     
 with [get-view "Project Explorer" | get-tree] {
@@ -125,29 +113,25 @@ with [get-view "Project Explorer" | get-tree] {
         | verify-true
     get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[6].getText()" | equals B 
         | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[7].getText()" | equals "" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[7].getText()" | equals list 
         | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[8].getText()" | equals list 
-        | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[9].getText()" | equals "" 
-        | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[10].getText()" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[8].getText()" 
         | equals newDict | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[11].getText()" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[9].getText()" 
         | equals "plus_one" | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[12].getText()" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[10].getText()" 
         | equals "EMPTY LIST" | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[13].getText()" | equals var3 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[11].getText()" | equals var3 
         | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[14].getText()" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[12].getText()" 
         | equals "this is param" | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[15].getText()" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[13].getText()" 
         | equals "list with equals sign" | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[16].getText()" | equals "" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[14].getText()" | equals "" 
         | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[17].getText()" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[15].getText()" 
         | equals multiline | verify-true
-    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[18].getText()" 
+    get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[16].getText()" 
         | equals "very long param name with vary long value and commnet" | verify-true
 }
 
