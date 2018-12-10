@@ -63,7 +63,8 @@ public class AssistProposalPredicates {
             final Optional<RobotToken> firstTokenInLine) {
         return reservedWord -> {
             if (RedCodeReservedWordProposals.FOR_LOOP_1.equals(reservedWord)
-                    || RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(reservedWord)) {
+                    || RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(reservedWord)
+                    || RedCodeReservedWordProposals.NEW_FOR_LOOP_LITERALS.contains(reservedWord)) {
                 // we're in 2nd cell
                 return cellIndex == 1;
 

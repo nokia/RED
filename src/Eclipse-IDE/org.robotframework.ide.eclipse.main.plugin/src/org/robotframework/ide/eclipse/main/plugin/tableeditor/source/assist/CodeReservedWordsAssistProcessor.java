@@ -14,6 +14,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
@@ -59,8 +60,8 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
         final int line = DocumentUtilities.getLine(document, offset);
 
         final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent, line);
-        final List<? extends AssistProposal> wordsProposals = new RedCodeReservedWordProposals(wordsPredicate)
-                .getReservedWordProposals(userContent);
+        final List<? extends AssistProposal> wordsProposals = new RedCodeReservedWordProposals(getVersion(),
+                wordsPredicate).getReservedWordProposals(userContent);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : wordsProposals) {
@@ -92,5 +93,9 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
                 : Optional.of(lineTokens.get(0));
 
         return AssistProposalPredicates.codeReservedWordsPredicate(separators, firstToken);
+    }
+
+    private RobotVersion getVersion() {
+        return assist.getModel().getProject().getRobotParserComplianceVersion();
     }
 }
