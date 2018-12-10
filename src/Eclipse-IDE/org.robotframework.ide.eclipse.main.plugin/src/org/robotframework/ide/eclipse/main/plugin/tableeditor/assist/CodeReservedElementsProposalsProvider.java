@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
@@ -40,7 +41,7 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
 
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = createWordPredicate(
                 (NatTableAssistantContext) context);
-        final List<? extends AssistProposal> reservedWordProposals = new RedCodeReservedWordProposals(
+        final List<? extends AssistProposal> reservedWordProposals = new RedCodeReservedWordProposals(getVersion(),
                 predicateWordHasToSatisfy).getReservedWordProposals(prefix);
 
         return reservedWordProposals.stream()
@@ -48,6 +49,13 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
                         ? new AssistProposalAdapter(environment, proposal, " ")
                         : new AssistProposalAdapter(environment, proposal, p -> true))
                 .toArray(RedContentProposal[]::new);
+    }
+
+    private RobotVersion getVersion() {
+        return Optional.ofNullable(environment)
+                .map(RobotRuntimeEnvironment::getVersion)
+                .map(RobotVersion::from)
+                .orElse(RobotVersion.UNKNOWN);
     }
 
     private AssistProposalPredicate<String> createWordPredicate(final NatTableAssistantContext context) {

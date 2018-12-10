@@ -19,9 +19,7 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-import org.robotframework.red.nattable.painter.InactiveCellPainter;
 
 public class CasesElementsStyleConfigurationTest {
 
@@ -55,9 +53,5 @@ public class CasesElementsStyleConfigurationTest {
                 eq(DisplayMode.NORMAL), eq(CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL));
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
                 eq(DisplayMode.SELECT), eq(CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL));
-
-        verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class),
-                isA(InactiveCellPainter.class), eq(DisplayMode.NORMAL),
-                eq(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL));
     }
 }
