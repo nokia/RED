@@ -27,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfiguration
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.nattable.painter.InactiveCellPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
 public class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
@@ -51,6 +50,7 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
 
         final Style caseStyle = createStyle(preferences, SyntaxHighlightingCategory.DEFINITION);
         final Style settingStyle = createStyle(preferences, SyntaxHighlightingCategory.SETTING);
+        final Style notEditableStyle = createNonEditableStyle();
         
         Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
             configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, mode,
@@ -59,6 +59,8 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
                     CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
             configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, mode,
                     CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, notEditableStyle, mode,
+                    TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
         });
 
         final ImageDescriptor caseImage = isEditable ? RedImages.getTestCaseImage()
@@ -75,10 +77,7 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, templatedCaseCellPainter,
                 DisplayMode.NORMAL, CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
-        
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
-                new InactiveCellPainter(theme.getBodyInactiveCellBackground()), DisplayMode.NORMAL,
-                TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
+
     }
 
     private Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {
@@ -88,5 +87,11 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
                 FontsManager.transformFontWithStyle(theme.getFont(), syntaxColoring.getFontStyle()));
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, syntaxColoring.getColor());
         return style;
+    }
+
+    private Style createNonEditableStyle() {
+        final Style notEditableStyle = new Style();
+        notEditableStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, theme.getBodyInactiveCellBackground());
+        return notEditableStyle;
     }
 }

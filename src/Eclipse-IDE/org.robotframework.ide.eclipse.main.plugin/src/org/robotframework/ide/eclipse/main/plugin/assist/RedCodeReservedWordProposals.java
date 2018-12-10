@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.rf.ide.core.environment.RobotVersion;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
@@ -24,20 +26,26 @@ public class RedCodeReservedWordProposals {
 
     public static final List<String> GHERKIN_ELEMENTS = ImmutableList.of("Given", "When", "And", "But", "Then");
 
+    static final List<String> NEW_FOR_LOOP_LITERALS = ImmutableList.of("FOR", "END");
+
     private static final List<String> LOOP_ELEMENTS = ImmutableList.of("IN", "IN ENUMERATE", "IN RANGE", "IN ZIP");
 
     private final ProposalMatcher matcher;
 
+    private final RobotVersion version;
+
     private final AssistProposalPredicate<String> predicateWordHasToSatisfy;
 
-    public RedCodeReservedWordProposals(final AssistProposalPredicate<String> predicateWordHasToSatisfy) {
-        this(ProposalMatchers.substringMatcher(), predicateWordHasToSatisfy);
+    public RedCodeReservedWordProposals(final RobotVersion version,
+            final AssistProposalPredicate<String> predicateWordHasToSatisfy) {
+        this(ProposalMatchers.substringMatcher(), version, predicateWordHasToSatisfy);
     }
 
     @VisibleForTesting
     RedCodeReservedWordProposals(final ProposalMatcher matcher,
-            final AssistProposalPredicate<String> predicateWordHasToSatisfy) {
+            final RobotVersion version, final AssistProposalPredicate<String> predicateWordHasToSatisfy) {
         this.matcher = matcher;
+        this.version = version;
         this.predicateWordHasToSatisfy = predicateWordHasToSatisfy;
     }
 
@@ -53,16 +61,16 @@ public class RedCodeReservedWordProposals {
         proposals.addAll(generateProposalsFrom(GHERKIN_ELEMENTS, userContent));
         // match against both variants, but add only one proposal
         if (predicateWordHasToSatisfy.test(FOR_LOOP_1)) {
-
-            final Optional<ProposalMatch> forLoopMatch = Stream.of(FOR_LOOP_1, FOR_LOOP_2)
+            Stream.of(FOR_LOOP_1, FOR_LOOP_2)
                     .map(variant -> matcher.matches(userContent, variant))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .findFirst();
-
-            if (forLoopMatch.isPresent()) {
-                proposals.add(AssistProposals.createCodeReservedWordProposal(FOR_LOOP_1, forLoopMatch.get()));
-            }
+                    .findFirst()
+                    .ifPresent(
+                            match -> proposals.add(AssistProposals.createCodeReservedWordProposal(FOR_LOOP_1, match)));
+        }
+        if (version.isNewerOrEqualTo(new RobotVersion(3, 1))) {
+            proposals.addAll(generateProposalsFrom(NEW_FOR_LOOP_LITERALS, userContent));
         }
         proposals.addAll(generateProposalsFrom(LOOP_ELEMENTS, userContent));
 
