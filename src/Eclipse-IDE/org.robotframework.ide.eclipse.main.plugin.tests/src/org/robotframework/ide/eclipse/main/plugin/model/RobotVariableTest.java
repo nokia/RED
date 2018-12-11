@@ -33,6 +33,14 @@ public class RobotVariableTest {
         }
     }
 
+    @Test
+    public void testGettingActualVariableName() {
+        assertThat(createVariableForTest("invalid").getActualName()).isEqualTo("invalid");
+        assertThat(createVariableForTest("${scalar}").getActualName()).isEqualTo("${scalar}");
+        assertThat(createVariableForTest("@{list}").getActualName()).isEqualTo("@{list}");
+        assertThat(createVariableForTest("&{dict}").getActualName()).isEqualTo("&{dict}");
+    }
+
     private static List<RobotVariable> createVariablesForTest() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
                 .appendLine("#comment")
@@ -67,5 +75,13 @@ public class RobotVariableTest {
                 .build();
         final RobotVariablesSection varSection = model.findSection(RobotVariablesSection.class).get();
         return varSection.getChildren();
+    }
+
+    private static RobotVariable createVariableForTest(final String varLine) {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
+                .appendLine(varLine)
+                .build();
+        final RobotVariablesSection varSection = model.findSection(RobotVariablesSection.class).get();
+        return varSection.getChildren().get(0);
     }
 }

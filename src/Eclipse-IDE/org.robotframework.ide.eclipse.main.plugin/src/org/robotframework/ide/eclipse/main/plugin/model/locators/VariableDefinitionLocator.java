@@ -216,7 +216,7 @@ public class VariableDefinitionLocator {
         }
         return ContinueDecision.CONTINUE;
     }
-    
+
     private ContinueDecision locateInLocalVariableFiles(final RobotSuiteFile file, final VariableDetector detector) {
         for (final VariablesFileImportReference varFileImportRef : file.getVariablesFromLocalReferencedFiles()) {
             final String path = varFileImportRef.getImportDeclaration()
@@ -260,9 +260,9 @@ public class VariableDefinitionLocator {
     }
 
     private ContinueDecision locateInVariableFiles(final VariableDetector detector) {
-        final List<ReferencedVariableFile> knownParamFiles = model.createRobotProject(file.getProject())
+        final List<ReferencedVariableFile> knownVariableFiles = model.createRobotProject(file.getProject())
                 .getVariablesFromReferencedFiles();
-        for (final ReferencedVariableFile knownFile : knownParamFiles) {
+        for (final ReferencedVariableFile knownFile : knownVariableFiles) {
             for (final Entry<String, Object> var : knownFile.getVariablesWithProperPrefixes().entrySet()) {
                 final ContinueDecision shouldContinue = detector.varFileVariableDetected(knownFile, var.getKey(),
                         var.getValue());

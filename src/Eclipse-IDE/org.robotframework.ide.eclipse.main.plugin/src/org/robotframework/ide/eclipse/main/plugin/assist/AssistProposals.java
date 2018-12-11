@@ -152,7 +152,7 @@ public class AssistProposals {
 
     static RedVariableProposal createUserVariableProposal(final RobotVariable robotVariable,
             final ProposalMatch match) {
-        final String varName = robotVariable.getPrefix() + robotVariable.getName() + robotVariable.getSuffix();
+        final String varName = robotVariable.getActualName();
         final IFile file = robotVariable.getSuiteFile().getFile();
         final String sourceName = file != null ? file.getFullPath().toString() : robotVariable.getSuiteFile().getName();
         final String value = robotVariable.getValue();
@@ -177,102 +177,73 @@ public class AssistProposals {
     }
 
     public static Comparator<AssistProposal> sortedByLabels() {
-        return new Comparator<AssistProposal>() {
-
-            @Override
-            public int compare(final AssistProposal proposal1, final AssistProposal proposal2) {
-                return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
-            }
-        };
+        return (proposal1, proposal2) -> proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
     }
 
     public static Comparator<AssistProposal> sortedByLabelsPrefixedFirst(final String prefix) {
-        return new Comparator<AssistProposal>() {
-
-            @Override
-            public int compare(final AssistProposal proposal1, final AssistProposal proposal2) {
-                final String lowerCasePrefix = prefix.toLowerCase();
-                final boolean isPrefixed1 = proposal1.getLabel().toLowerCase().startsWith(lowerCasePrefix);
-                final boolean isPrefixed2 = proposal2.getLabel().toLowerCase().startsWith(lowerCasePrefix);
-                final int result = Boolean.compare(isPrefixed2, isPrefixed1);
-                if (result != 0) {
-                    return result;
-                }
-                return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+        return (proposal1, proposal2) -> {
+            final String lowerCasePrefix = prefix.toLowerCase();
+            final boolean isPrefixed1 = proposal1.getLabel().toLowerCase().startsWith(lowerCasePrefix);
+            final boolean isPrefixed2 = proposal2.getLabel().toLowerCase().startsWith(lowerCasePrefix);
+            final int result = Boolean.compare(isPrefixed2, isPrefixed1);
+            if (result != 0) {
+                return result;
             }
+            return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
         };
     }
 
     public static Comparator<RedKeywordProposal> sortedByLabelsCamelCaseAndPrefixedFirst(final String input) {
-        return new Comparator<RedKeywordProposal>() {
-
-            @Override
-            public int compare(final RedKeywordProposal proposal1, final RedKeywordProposal proposal2) {
-                final boolean isCamelCase1 = !CamelCaseKeywordNamesSupport.matches(proposal1.getLabel(), input)
-                        .isEmpty();
-                final boolean isCamelCase2 = !CamelCaseKeywordNamesSupport.matches(proposal2.getLabel(), input)
-                        .isEmpty();
-                final int result = Boolean.compare(isCamelCase2, isCamelCase1);
-                if (result != 0) {
-                    return result;
-                }
-                final Comparator<AssistProposal> prefixedComparator = sortedByLabelsPrefixedFirst(input);
-                return prefixedComparator.compare(proposal1, proposal2);
+        return (proposal1, proposal2) -> {
+            final boolean isCamelCase1 = !CamelCaseKeywordNamesSupport.matches(proposal1.getLabel(), input).isEmpty();
+            final boolean isCamelCase2 = !CamelCaseKeywordNamesSupport.matches(proposal2.getLabel(), input).isEmpty();
+            final int result = Boolean.compare(isCamelCase2, isCamelCase1);
+            if (result != 0) {
+                return result;
             }
+            final Comparator<AssistProposal> prefixedComparator = sortedByLabelsPrefixedFirst(input);
+            return prefixedComparator.compare(proposal1, proposal2);
         };
     }
 
     public static Comparator<RedVariableProposal> sortedByTypesAndOrigin() {
         final List<Character> typesOrder = newArrayList('$', '@', '&');
-        return new Comparator<RedVariableProposal>() {
+        return (proposal1, proposal2) -> {
+            final char type1 = proposal1.getContent().charAt(0);
+            final char type2 = proposal2.getContent().charAt(0);
 
-            @Override
-            public int compare(final RedVariableProposal proposal1, final RedVariableProposal proposal2) {
-                final char type1 = proposal1.getContent().charAt(0);
-                final char type2 = proposal2.getContent().charAt(0);
-
-                if (type1 == type2) {
-                    final boolean isBuiltIn1 = proposal1.getOrigin() == VariableOrigin.BUILTIN;
-                    final boolean isBuiltIn2 = proposal2.getOrigin() == VariableOrigin.BUILTIN;
-                    final int result = Boolean.compare(isBuiltIn1, isBuiltIn2);
-                    if (result != 0) {
-                        return result;
-                    }
-                    return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
-
-                } else {
-                    return Integer.compare(typesOrder.indexOf(type1), typesOrder.indexOf(type2));
+            if (type1 == type2) {
+                final boolean isBuiltIn1 = proposal1.getOrigin() == VariableOrigin.BUILTIN;
+                final boolean isBuiltIn2 = proposal2.getOrigin() == VariableOrigin.BUILTIN;
+                final int result = Boolean.compare(isBuiltIn1, isBuiltIn2);
+                if (result != 0) {
+                    return result;
                 }
+                return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+
+            } else {
+                return Integer.compare(typesOrder.indexOf(type1), typesOrder.indexOf(type2));
             }
         };
     }
 
     public static Comparator<RedLibraryProposal> sortedByLabelsNotImportedFirst() {
-        return new Comparator<RedLibraryProposal>() {
-
-            @Override
-            public int compare(final RedLibraryProposal proposal1, final RedLibraryProposal proposal2) {
-                final int result = Boolean.compare(proposal1.isImported(), proposal2.isImported());
-                if (result != 0) {
-                    return result;
-                }
-                return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+        return (proposal1, proposal2) -> {
+            final int result = Boolean.compare(proposal1.isImported(), proposal2.isImported());
+            if (result != 0) {
+                return result;
             }
+            return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
         };
     }
 
     public static Comparator<RedSitePackagesLibraryProposal> sortedByLabelsNotImportedFirstForSitePackagesLibraries() {
-        return new Comparator<RedSitePackagesLibraryProposal>() {
-
-            @Override
-            public int compare(final RedSitePackagesLibraryProposal proposal1,
-                    final RedSitePackagesLibraryProposal proposal2) {
-                final int result = Boolean.compare(proposal1.isImported(), proposal2.isImported());
-                if (result != 0) {
-                    return result;
-                }
-                return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+        return (proposal1, proposal2) -> {
+            final int result = Boolean.compare(proposal1.isImported(), proposal2.isImported());
+            if (result != 0) {
+                return result;
             }
+            return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
         };
     }
 }
