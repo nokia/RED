@@ -27,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfiguration
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.nattable.painter.InactiveCellPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
 public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfiguration {
@@ -52,6 +51,7 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
         final Style keywordStyle = createStyle(preferences, SyntaxHighlightingCategory.DEFINITION);
         final Style argumentStyle = createStyle(preferences, SyntaxHighlightingCategory.VARIABLE);
         final Style settingStyle = createStyle(preferences, SyntaxHighlightingCategory.SETTING);
+        final Style notEditableStyle = createNonEditableStyle();
 
         Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
             configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, keywordStyle, mode,
@@ -60,6 +60,8 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
                     KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
             configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, mode,
                     KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, notEditableStyle, mode,
+                    TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
         });
 
         final ImageDescriptor keywordImage = isEditable ? RedImages.getUserKeywordImage()
@@ -68,10 +70,6 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
                 CellEdgeEnum.LEFT, new ImagePainter(ImagesManager.getImage(keywordImage)));
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
                 KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
-
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
-                new InactiveCellPainter(theme.getBodyInactiveCellBackground()), DisplayMode.NORMAL,
-                TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
     }
 
     private Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {
@@ -81,5 +79,11 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
                 FontsManager.transformFontWithStyle(theme.getFont(), syntaxColoring.getFontStyle()));
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, syntaxColoring.getColor());
         return style;
+    }
+
+    private Style createNonEditableStyle() {
+        final Style notEditableStyle = new Style();
+        notEditableStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, theme.getBodyInactiveCellBackground());
+        return notEditableStyle;
     }
 }
