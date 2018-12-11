@@ -14,6 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 
 public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
@@ -50,7 +51,7 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
                         .filter(token -> token.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION))
                         .isPresent();
                 if (isForLoopContinuation) {
-                    configLabels.addLabel(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
+                    configLabels.addLabelOnTop(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
                 }
 
             } else if (rowObject instanceof RobotCodeHoldingElement<?>) {
@@ -65,10 +66,10 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
             if (columnPosition > 1 && rowObject instanceof RobotDefinitionSetting
                     && ((RobotDefinitionSetting) rowObject).isDocumentation()) {
 
-                configLabels.addLabel(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
+                configLabels.addLabelOnTop(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
 
-            } else if (rowObject instanceof RobotCase) {
-                configLabels.addLabel(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
+            } else if (rowObject instanceof RobotCase || rowObject instanceof RobotTask) {
+                configLabels.addLabelOnTop(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
             }
         }
     }

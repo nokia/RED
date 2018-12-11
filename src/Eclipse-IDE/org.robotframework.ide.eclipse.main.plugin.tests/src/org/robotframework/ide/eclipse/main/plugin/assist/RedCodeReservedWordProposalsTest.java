@@ -13,13 +13,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 
 public class RedCodeReservedWordProposalsTest {
 
     @Test
     public void noProposalsAreProvided_whenPredicateIsAlwaysFalse() {
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = AssistProposalPredicates.alwaysFalse();
-        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
+        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(new RobotVersion(3, 0),
                 predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
@@ -29,7 +30,7 @@ public class RedCodeReservedWordProposalsTest {
     @Test
     public void allProposalsAreProvided_whenPredicateIsAlwaysTrue() {
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = AssistProposalPredicates.alwaysTrue();
-        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
+        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(new RobotVersion(3, 0),
                 predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
@@ -41,7 +42,7 @@ public class RedCodeReservedWordProposalsTest {
     @Test
     public void onlyProposalsMatchingPredicateAreProvided_whenPredicateSelectsThem() {
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = word -> word.length() < 4;
-        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
+        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(new RobotVersion(3, 0),
                 predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
@@ -50,7 +51,7 @@ public class RedCodeReservedWordProposalsTest {
 
     @Test
     public void onlyProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
-        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
+        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(new RobotVersion(3, 0),
                 AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("En");
@@ -61,7 +62,7 @@ public class RedCodeReservedWordProposalsTest {
     @Test
     public void onlyProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
         final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(prefixesMatcher(),
-                AssistProposalPredicates.alwaysTrue());
+                new RobotVersion(3, 0), AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("iN");
         assertThat(proposals).extracting(AssistProposal::getLabel)
@@ -70,7 +71,7 @@ public class RedCodeReservedWordProposalsTest {
 
     @Test
     public void proposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
-        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
+        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(new RobotVersion(3, 0),
                 AssistProposalPredicates.alwaysTrue());
 
         final Comparator<AssistProposal> comparator = reverseComparator(AssistProposals.sortedByLabels());
