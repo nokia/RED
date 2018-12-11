@@ -284,15 +284,27 @@ public class AssistProposalsTest {
     }
 
     @Test
-    public void verifyReservedWordsProposalProperties() {
-        final RedCodeReservedWordProposal proposal = AssistProposals.createCodeReservedWordProposal("word",
+    public void verifyForLoopsReservedWordsProposalProperties() {
+        final ForLoopReservedWordProposal proposal = AssistProposals.createForLoopReservedWordProposal("word",
                 ProposalMatch.EMPTY);
         assertThat(proposal.getContent()).isEqualTo("word");
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("word");
-        assertThat(proposal.isDocumented()).isFalse();
+        assertThat(proposal.isDocumented()).isTrue();
         assertThat(proposal.getDescription()).isEmpty();
+    }
+
+    @Test
+    public void verifyGherkinReservedWordsProposalProperties() {
+        final GherkinReservedWordProposal proposal = AssistProposals.createGherkinReservedWordProposal("word",
+                ProposalMatch.EMPTY);
+        assertThat(proposal.getContent()).isEqualTo("word");
+        assertThat(proposal.getArguments()).isEmpty();
+        assertThat(proposal.getImage()).isNull();
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("word");
+        assertThat(proposal.isDocumented()).isTrue();
+        assertThat(proposal.getDescription()).isNotEmpty();
     }
 
     @Test

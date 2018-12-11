@@ -96,11 +96,9 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenInSecondCellAndForOrGherkinWordIsGiven_theReservedWordPredicateIsSatisfied() {
-        final AssistProposalPredicate<String> predicate = AssistProposalPredicates.codeReservedWordsPredicate(1,
-                Optional.empty());
+    public void whenInSecondCellAndGherkinWordIsGiven_theGherkinWordPredicateIsSatisfied() {
+        final AssistProposalPredicate<String> predicate = AssistProposalPredicates.gherkinReservedWordsPredicate(1);
 
-        assertThat(predicate.test(":FOR")).isTrue();
         assertThat(predicate.test("Given")).isTrue();
         assertThat(predicate.test("When")).isTrue();
         assertThat(predicate.test("And")).isTrue();
@@ -109,10 +107,45 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenInNonSecondCellAndForOrGherkinWordIsGiven_theReservedWordPredicateIsNotSatisfied() {
-        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
+    public void whenInNonSecondCellAndGherkinWordIsGiven_theGherkinWordPredicateIsNotSatisfied() {
+        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.gherkinReservedWordsPredicate(0);
+        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.gherkinReservedWordsPredicate(3);
+
+        for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2)) {
+            assertThat(predicate.test("Given")).isFalse();
+            assertThat(predicate.test("When")).isFalse();
+            assertThat(predicate.test("And")).isFalse();
+            assertThat(predicate.test("But")).isFalse();
+            assertThat(predicate.test("Then")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsArbitraryWord_theGherkinWordPredicateIsNotSatisfied() {
+        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.gherkinReservedWordsPredicate(0);
+        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.gherkinReservedWordsPredicate(1);
+        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.gherkinReservedWordsPredicate(5);
+
+        for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
+            assertThat(predicate.test(null)).isFalse();
+            assertThat(predicate.test("")).isFalse();
+            assertThat(predicate.test("word")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenInSecondCellAndForWordIsGiven_theReservedWordPredicateIsSatisfied() {
+        final AssistProposalPredicate<String> predicate = AssistProposalPredicates.forLoopReservedWordsPredicate(1,
                 Optional.empty());
-        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(3,
+
+        assertThat(predicate.test(":FOR")).isTrue();
+    }
+
+    @Test
+    public void whenInNonSecondCellAndForWordIsGiven_theReservedWordPredicateIsNotSatisfied() {
+        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.forLoopReservedWordsPredicate(0,
+                Optional.empty());
+        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.forLoopReservedWordsPredicate(3,
                 Optional.empty());
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2)) {
@@ -127,11 +160,11 @@ public class AssistProposalPredicatesTest {
 
     @Test
     public void whenThereIsNoTokenGiven_theReservedWordPredicateIsNotSatisfiedForArbitraryWords() {
-        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
+        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.forLoopReservedWordsPredicate(0,
                 Optional.empty());
-        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(1,
+        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.forLoopReservedWordsPredicate(1,
                 Optional.empty());
-        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.codeReservedWordsPredicate(5,
+        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.forLoopReservedWordsPredicate(5,
                 Optional.empty());
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
@@ -143,11 +176,11 @@ public class AssistProposalPredicatesTest {
 
     @Test
     public void whenThereIsTokenGivenWithoutFOR_theReservedWordPredicateIsNotSatisfied() {
-        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
+        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.forLoopReservedWordsPredicate(0,
                 Optional.of(RobotToken.create("foo")));
-        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(1,
+        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.forLoopReservedWordsPredicate(1,
                 Optional.of(RobotToken.create("foo")));
-        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.codeReservedWordsPredicate(5,
+        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.forLoopReservedWordsPredicate(5,
                 Optional.of(RobotToken.create("foo")));
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
@@ -159,11 +192,11 @@ public class AssistProposalPredicatesTest {
 
     @Test
     public void whenThereIsTokenGivenWithFORButCellIsAtMostSecond_theReservedWordPredicateIsNotSatisfied() {
-        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
+        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.forLoopReservedWordsPredicate(0,
                 Optional.of(RobotToken.create(":FOR")));
-        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(1,
+        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.forLoopReservedWordsPredicate(1,
                 Optional.of(RobotToken.create(":FOR")));
-        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.codeReservedWordsPredicate(2,
+        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.forLoopReservedWordsPredicate(2,
                 Optional.of(RobotToken.create(": FOR")));
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
@@ -175,11 +208,11 @@ public class AssistProposalPredicatesTest {
 
     @Test
     public void whenThereIsTokenGivenWithFORAndCellIsAtLeastThird_theReservedWordPredicateIsSatisfied() {
-        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(3,
+        final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.forLoopReservedWordsPredicate(3,
                 Optional.of(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN)));
-        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(4,
+        final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.forLoopReservedWordsPredicate(4,
                 Optional.of(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN)));
-        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.codeReservedWordsPredicate(10,
+        final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.forLoopReservedWordsPredicate(10,
                 Optional.of(RobotToken.create(": FOR", RobotTokenType.FOR_TOKEN)));
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
@@ -188,6 +221,7 @@ public class AssistProposalPredicatesTest {
             assertThat(predicate.test("word")).isTrue();
         }
     }
+
 
     @Test
     public void whenNoParticularVariableIsTested_theGlobalVarsPredicateIsSatisfied() {

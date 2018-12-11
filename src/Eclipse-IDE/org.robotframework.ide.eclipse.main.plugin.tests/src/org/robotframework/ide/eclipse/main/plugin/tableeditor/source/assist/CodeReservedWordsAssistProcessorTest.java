@@ -110,10 +110,12 @@ public class CodeReservedWordsAssistProcessorTest {
                 createAssistant(projectProvider.getFile("suite.robot")));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 27);
 
-        assertThat(proposals).hasSize(6).are(proposalWithImage(null));
+        assertThat(proposals).hasSize(8).are(proposalWithImage(null));
 
         assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  :FOR  ", "  cell1  cell2", "  Giv"),
+                new Document("*** Keywords ***", "keyword", "  END  ", "  cell1  cell2", "  Giv"),
+                new Document("*** Keywords ***", "keyword", "  FOR  ", "  cell1  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  Given ", "  cell1  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  When ", "  cell1  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  Then ", "  cell1  cell2", "  Giv"),
@@ -151,10 +153,12 @@ public class CodeReservedWordsAssistProcessorTest {
                 createAssistant(projectProvider.getFile("suite.robot")));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 30);
 
-        assertThat(proposals).hasSize(6).are(proposalWithImage(null));
+        assertThat(proposals).hasSize(8).are(proposalWithImage(null));
 
         assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
                 new Document("*** Keywords ***", "keyword", "  ", "  :FOR  cell2", "  Giv"),
+                new Document("*** Keywords ***", "keyword", "  ", "  END  cell2", "  Giv"),
+                new Document("*** Keywords ***", "keyword", "  ", "  FOR  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  ", "  Given  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  ", "  When  cell2", "  Giv"),
                 new Document("*** Keywords ***", "keyword", "  ", "  Then  cell2", "  Giv"),
