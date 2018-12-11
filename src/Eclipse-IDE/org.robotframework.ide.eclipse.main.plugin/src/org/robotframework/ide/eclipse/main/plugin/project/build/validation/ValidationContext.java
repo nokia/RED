@@ -5,11 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newHashSet;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +83,7 @@ public class ValidationContext {
         this.executorInUse = runtimeEnvironment != null ? runtimeEnvironment.getInterpreter() : null;
 
         this.accessibleLibraries = collectLibraries(robotProject);
-        this.referencedAccessibleLibraries = newHashMap(robotProject.getReferencedLibraries());
+        this.referencedAccessibleLibraries = new HashMap<>(robotProject.getReferencedLibraries());
     }
 
     @VisibleForTesting
@@ -186,14 +186,12 @@ public class ValidationContext {
     }
 
     public Set<String> collectAccessibleVariables(final IFile file) {
-        final Set<String> variables = newHashSet();
+        final Set<String> variables = new HashSet<>();
         new VariableDefinitionLocator(file, model).locateVariableDefinition(new VariableDetector() {
 
             @Override
             public ContinueDecision variableDetected(final RobotVariable variable) {
-                final String name = variable.getPrefix()
-                        + VariableNamesSupport.extractUnifiedVariableName(variable.getName()) + variable.getSuffix();
-                variables.add(name.toLowerCase());
+                variables.add(VariableNamesSupport.extractUnifiedVariableName(variable.getActualName()));
                 return ContinueDecision.CONTINUE;
             }
 
@@ -221,7 +219,7 @@ public class ValidationContext {
     }
 
     public Map<String, Collection<KeywordEntity>> collectAccessibleKeywords(final IFile file) {
-        final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
+        final Map<String, Collection<KeywordEntity>> accessibleKeywords = new HashMap<>();
         new KeywordDefinitionLocator(file, model).locateKeywordDefinition(new KeywordDetector() {
 
             @Override

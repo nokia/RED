@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,7 +63,7 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
 
     @Override
     public List<RobotElement> getChildren() {
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override
@@ -71,12 +71,9 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
         return parent == null ? -1 : parent.getChildren().indexOf(this);
     }
 
-    public String getPrefix() {
-        return holder.getType().getIdentificator() + "{";
-    }
-
-    public String getSuffix() {
-        return "}";
+    public String getActualName() {
+        final VariableType type = getType();
+        return type == VariableType.INVALID ? getName() : type.getIdentificator() + "{" + getName() + "}";
     }
 
     public VariableType getType() {
@@ -188,6 +185,6 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
     @Override
     public String toString() {
         // for debugging purposes only
-        return getPrefix() + getName() + getSuffix() + "= " + getValue() + "# " + getComment();
+        return getActualName() + "= " + getValue() + "# " + getComment();
     }
 }

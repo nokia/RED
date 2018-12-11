@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableBiMap;
  */
 public class VariableColumnsPropertyAccessor implements IColumnPropertyAccessor<RobotVariable> {
 
-    private final ImmutableBiMap<Integer, String> properties = 
+    private final ImmutableBiMap<Integer, String> properties =
             ImmutableBiMap.of(0, "name", 1, "value", 2, "comment");
 
     private final RobotEditorCommandsStack commandsStack;
@@ -39,8 +39,7 @@ public class VariableColumnsPropertyAccessor implements IColumnPropertyAccessor<
     @Override
     public Object getDataValue(final RobotVariable variable, final int column) {
         if (column == 0) {
-            return variable.getType() == VariableType.INVALID ? variable.getName()
-                    : variable.getPrefix() + variable.getName() + variable.getSuffix();
+            return variable.getActualName();
         } else if (column == 1) {
             return variable.getValue();
         } else if (column == 2) {

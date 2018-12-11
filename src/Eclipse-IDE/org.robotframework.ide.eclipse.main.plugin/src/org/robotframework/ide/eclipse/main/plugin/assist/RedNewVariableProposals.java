@@ -5,21 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 public class RedNewVariableProposals {
 
     public List<RedNewVariableProposal> getNewVariableProposals() {
-        final List<RedNewVariableProposal> proposals = new ArrayList<>();
-
-        for (final VariableType type : newArrayList(VariableType.SCALAR, VariableType.LIST, VariableType.DICTIONARY)) {
-            proposals.add(AssistProposals.createNewVariableProposal(type));
-        }
-        return proposals;
+        return Stream.of(VariableType.SCALAR, VariableType.LIST, VariableType.DICTIONARY)
+                .map(AssistProposals::createNewVariableProposal)
+                .collect(Collectors.toList());
     }
 }

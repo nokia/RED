@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -38,10 +37,7 @@ class VariablesMatchesCollection extends HeaderFilterMatchesCollection {
     }
 
     private static String constructNameToSearch(final RobotVariable variable) {
-        if (variable.getType() == VariableType.INVALID) {
-            return variable.getName();
-        }
-        return variable.getPrefix() + variable.getName() + variable.getSuffix();
+        return variable.getActualName();
     }
 
     private static String constructValueToSearch(final RobotVariable variable) {
