@@ -5,11 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -91,7 +90,7 @@ public class RobotFormEditor extends FormEditor {
 
     private static IPartListener robotFormEditorPartListener;
 
-    private final List<IEditorPart> parts = newArrayList();
+    private final List<IEditorPart> parts = new ArrayList<>();
 
     private RedClipboard clipboard;
 
@@ -339,7 +338,7 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private List<? extends IEditorPart> getDirtyEditors() {
-        final List<IEditorPart> dirtyEditors = newArrayList();
+        final List<IEditorPart> dirtyEditors = new ArrayList<>();
         for (int i = 0; i < getPageCount(); i++) {
             final IEditorPart editorPart = getEditor(i);
             if (editorPart != null && editorPart.isDirty()) {

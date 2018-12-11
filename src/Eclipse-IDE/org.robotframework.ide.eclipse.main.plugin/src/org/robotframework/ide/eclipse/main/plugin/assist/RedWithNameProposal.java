@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 class RedWithNameProposal extends BaseAssistProposal {
 
-    private final static List<String> ARGUMENTS = newArrayList("alias");
+    private final static List<String> ARGUMENTS = ImmutableList.of("alias");
 
     RedWithNameProposal(final String word, final ProposalMatch match) {
         super(word, match);

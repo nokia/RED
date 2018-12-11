@@ -867,6 +867,23 @@ public class RedVariableProposalsTest {
                 .containsExactly("${b_arg}", "${b_local}", "${a_arg}", "${a_local}");
     }
 
+    @Test
+    public void onlyValidLocalVariablesAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        createGlobalVariables(robotProject);
+        createGlobalVarFilesVariables(robotProject);
+
+        final IFile file = projectProvider.createFile("file.robot", "*** Settings ***", "*** Variables ***",
+                "${scalar}  1", "@{list}  1  2  3", "&{dict}  k=v", "^{invalid}  abc", "other", "*** Test Cases ***");
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
+
+        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
+                AssistProposalPredicates.alwaysTrue());
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
+
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("${scalar}", "@{list}", "&{dict}");
+    }
+
     private static void createGlobalVariables(final RobotProject robotProject, final String... vars) {
         final List<ARobotInternalVariable<?>> variables = new ArrayList<>();
         for (final String varName : vars) {

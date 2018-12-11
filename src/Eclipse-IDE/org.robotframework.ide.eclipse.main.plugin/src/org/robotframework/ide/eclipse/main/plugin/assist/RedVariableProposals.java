@@ -5,17 +5,18 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newLinkedHashSet;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByTypesAndOrigin;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
@@ -62,12 +63,12 @@ public class RedVariableProposals {
 
     public List<? extends AssistProposal> getVariableProposals(final String userContent,
             final Comparator<? super RedVariableProposal> comparator, final RobotFileInternalElement element) {
-        final Set<RedVariableProposal> proposals = newLinkedHashSet();
+        final Set<RedVariableProposal> proposals = new LinkedHashSet<>();
 
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile.getFile(), model);
         locator.locateVariableDefinitionWithLocalScope(createDetector(userContent, proposals), element);
 
-        final List<RedVariableProposal> resultProposals = newArrayList(proposals);
+        final List<RedVariableProposal> resultProposals = new ArrayList<>(proposals);
         Collections.sort(resultProposals, comparator);
         return resultProposals;
     }
@@ -78,12 +79,12 @@ public class RedVariableProposals {
 
     public List<? extends AssistProposal> getVariableProposals(final String userContent,
             final Comparator<? super RedVariableProposal> comparator, final int offset) {
-        final Set<RedVariableProposal> proposals = newLinkedHashSet();
+        final Set<RedVariableProposal> proposals = new LinkedHashSet<>();
 
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile.getFile(), model);
         locator.locateVariableDefinitionWithLocalScope(createDetector(userContent, proposals), offset);
 
-        final List<RedVariableProposal> resultProposals = newArrayList(proposals);
+        final List<RedVariableProposal> resultProposals = new ArrayList<>(proposals);
         Collections.sort(resultProposals, comparator);
         return resultProposals;
     }
@@ -92,8 +93,10 @@ public class RedVariableProposals {
         return new VariableDetector() {
             @Override
             public ContinueDecision variableDetected(final RobotVariable variable) {
-                final Optional<ProposalMatch> match = matcher.matches(userContent,
-                        variable.getPrefix() + variable.getName() + variable.getSuffix());
+                if (variable.getType() == VariableType.INVALID) {
+                    return ContinueDecision.CONTINUE;
+                }
+                final Optional<ProposalMatch> match = matcher.matches(userContent, variable.getActualName());
                 if (match.isPresent()) {
                     proposals.add(AssistProposals.createUserVariableProposal(variable, match.get()));
                 }

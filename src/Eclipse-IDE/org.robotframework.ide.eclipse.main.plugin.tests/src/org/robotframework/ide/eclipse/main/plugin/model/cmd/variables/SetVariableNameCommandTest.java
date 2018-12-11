@@ -30,7 +30,7 @@ public class SetVariableNameCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotVariable variable = createVariables().get(0);
-        
+
         final SetVariableNameCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar}"));
@@ -456,15 +456,10 @@ public class SetVariableNameCommandTest {
             // the command changes name to already defined one
             final SetVariableNameCommand command = ContextInjector.prepareContext()
                     .inWhich(eventBroker)
-                    .isInjectedInto(new SetVariableNameCommand(variable, getActualName(variable)));
+                    .isInjectedInto(new SetVariableNameCommand(variable, variable.getActualName()));
             command.execute();
         }
         verifyZeroInteractions(eventBroker);
-    }
-
-    private String getActualName(final RobotVariable variable) {
-        return variable.getType() == VariableType.INVALID ? variable.getName()
-                : variable.getPrefix() + variable.getName() + variable.getSuffix();
     }
 
     private static List<RobotVariable> createVariables() {
