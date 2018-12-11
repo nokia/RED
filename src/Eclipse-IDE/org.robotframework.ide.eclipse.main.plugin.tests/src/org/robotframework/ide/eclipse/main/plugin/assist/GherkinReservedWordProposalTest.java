@@ -14,24 +14,24 @@ import org.junit.Test;
 
 import com.google.common.collect.Range;
 
-public class RedCodeReservedWordProposalTest {
+public class GherkinReservedWordProposalTest {
 
     @Test
     public void testProposalWithEmptyContentAndEmptyMatch() {
-        final RedCodeReservedWordProposal proposal = new RedCodeReservedWordProposal("", ProposalMatch.EMPTY);
+        final GherkinReservedWordProposal proposal = new GherkinReservedWordProposal("", ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEmpty();
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getLabel()).isEmpty();
         assertThat(proposal.getStyledLabel().length()).isEqualTo(0);
-        assertThat(proposal.isDocumented()).isFalse();
-        assertThat(proposal.getDescription()).isEmpty();
+        assertThat(proposal.isDocumented()).isTrue();
+        assertThat(proposal.getDescription()).isNotEmpty();
     }
 
     @Test
     public void testProposalWithNonEmptyContentAndEmptyMatch() {
-        final RedCodeReservedWordProposal proposal = new RedCodeReservedWordProposal("content", ProposalMatch.EMPTY);
+        final GherkinReservedWordProposal proposal = new GherkinReservedWordProposal("content", ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("content");
         assertThat(proposal.getArguments()).isEmpty();
@@ -39,13 +39,13 @@ public class RedCodeReservedWordProposalTest {
         assertThat(proposal.getLabel()).isEqualTo("content");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("content");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
-        assertThat(proposal.isDocumented()).isFalse();
-        assertThat(proposal.getDescription()).isEmpty();
+        assertThat(proposal.isDocumented()).isTrue();
+        assertThat(proposal.getDescription()).isNotEmpty();
     }
 
     @Test
     public void testProposalWithNonEmptyContentAndNonEmptyMatch() {
-        final RedCodeReservedWordProposal proposal = new RedCodeReservedWordProposal("content",
+        final GherkinReservedWordProposal proposal = new GherkinReservedWordProposal("content",
                 new ProposalMatch(Range.closedOpen(1, 3), Range.closedOpen(4, 7)));
 
         assertThat(proposal.getContent()).isEqualTo("content");
@@ -76,7 +76,7 @@ public class RedCodeReservedWordProposalTest {
         assertThat(ranges[1].start).isEqualTo(4);
         assertThat(ranges[1].length).isEqualTo(3);
 
-        assertThat(proposal.isDocumented()).isFalse();
-        assertThat(proposal.getDescription()).isEmpty();
+        assertThat(proposal.isDocumented()).isTrue();
+        assertThat(proposal.getDescription()).isNotEmpty();
     }
 }

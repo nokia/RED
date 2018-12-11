@@ -9,18 +9,19 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedCodeReservedWordProposals;
+import org.robotframework.ide.eclipse.main.plugin.assist.ForLoopReservedWordsProposals;
+import org.robotframework.ide.eclipse.main.plugin.assist.GherkinReservedWordProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
@@ -59,43 +60,46 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
         final int line = DocumentUtilities.getLine(document, offset);
 
-        final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent, line);
-        final List<? extends AssistProposal> wordsProposals = new RedCodeReservedWordProposals(getVersion(),
-                wordsPredicate).getReservedWordProposals(userContent);
+        final List<? extends AssistProposal> loopsProposals = new ForLoopReservedWordsProposals(
+                createForLoopsPredicate(lineContent, line)).getReservedWordProposals(userContent);
+        final List<? extends AssistProposal> gherkinProposals = new GherkinReservedWordProposals(
+                createGherkinPredicate(lineContent)).getReservedWordProposals(userContent);
 
         final List<ICompletionProposal> proposals = newArrayList();
-        for (final AssistProposal proposal : wordsProposals) {
+        Stream.concat(loopsProposals.stream(), gherkinProposals.stream()).forEach(proposal -> {
             final String contentSuffix = getContentSuffix(atTheEndOfLine, proposal);
 
             final DocumentModification modification = new DocumentModification(contentSuffix,
                     new Position(offset - userContent.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(assist, proposal, modification));
-        }
+        });
         return proposals;
     }
 
-    private String getContentSuffix(final boolean atTheEndOfLine, final AssistProposal proposal) {
-        if (!atTheEndOfLine) {
-            return "";
-        } else if (RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())) {
-            return " ";
-        } else {
-            return assist.getSeparatorToFollow();
-        }
-    }
-
-    private AssistProposalPredicate<String> createPredicate(final String lineContentTillOffset, final int line) {
+    private AssistProposalPredicate<String> createForLoopsPredicate(final String lineContentTillOffset,
+            final int line) {
         final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOffset, assist.isTsvFile());
         final RobotLine lineModel = assist.getModel().getLinkedElement().getFileContent().get(line);
         final List<RobotToken> lineTokens = lineModel.getLineTokens();
         final Optional<RobotToken> firstToken = lineTokens.isEmpty() ? Optional.empty()
                 : Optional.of(lineTokens.get(0));
 
-        return AssistProposalPredicates.codeReservedWordsPredicate(separators, firstToken);
+        return AssistProposalPredicates.forLoopReservedWordsPredicate(separators, firstToken);
     }
 
-    private RobotVersion getVersion() {
-        return assist.getModel().getProject().getRobotParserComplianceVersion();
+    private AssistProposalPredicate<String> createGherkinPredicate(final String lineContentTillOffset) {
+        final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOffset, assist.isTsvFile());
+        return AssistProposalPredicates.gherkinReservedWordsPredicate(separators);
+    }
+
+    private String getContentSuffix(final boolean atTheEndOfLine, final AssistProposal proposal) {
+        if (!atTheEndOfLine) {
+            return "";
+        } else if (GherkinReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())) {
+            return " ";
+        } else {
+            return assist.getSeparatorToFollow();
+        }
     }
 }

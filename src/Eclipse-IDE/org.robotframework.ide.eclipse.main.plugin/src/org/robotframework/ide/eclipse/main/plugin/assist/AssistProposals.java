@@ -110,8 +110,12 @@ public class AssistProposals {
                 file.getFile().getFullPath(), shouldUseQualified, match);
     }
 
-    static RedCodeReservedWordProposal createCodeReservedWordProposal(final String word, final ProposalMatch match) {
-        return new RedCodeReservedWordProposal(word, match);
+    static GherkinReservedWordProposal createGherkinReservedWordProposal(final String word, final ProposalMatch match) {
+        return new GherkinReservedWordProposal(word, match);
+    }
+
+    static ForLoopReservedWordProposal createForLoopReservedWordProposal(final String word, final ProposalMatch match) {
+        return new ForLoopReservedWordProposal(word, match);
     }
 
     static RedWithNameProposal createWithNameProposal(final String word, final ProposalMatch match) {

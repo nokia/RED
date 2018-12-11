@@ -59,12 +59,15 @@ public class AssistProposalPredicates {
         return spec -> spec.getDescriptor().isReferencedLibrary() || !spec.getName().equalsIgnoreCase("reserved");
     }
 
-    public static AssistProposalPredicate<String> codeReservedWordsPredicate(final int cellIndex,
+    public static AssistProposalPredicate<String> gherkinReservedWordsPredicate(final int cellIndex) {
+        return reservedWord -> cellIndex == 1 && GherkinReservedWordProposals.GHERKIN_ELEMENTS.contains(reservedWord);
+    }
+
+    public static AssistProposalPredicate<String> forLoopReservedWordsPredicate(final int cellIndex,
             final Optional<RobotToken> firstTokenInLine) {
         return reservedWord -> {
-            if (RedCodeReservedWordProposals.FOR_LOOP_1.equals(reservedWord)
-                    || RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(reservedWord)
-                    || RedCodeReservedWordProposals.NEW_FOR_LOOP_LITERALS.contains(reservedWord)) {
+            if (ForLoopReservedWordsProposals.FOR_LOOP_1.equals(reservedWord)
+                    || ForLoopReservedWordsProposals.NEW_FOR_LOOP_LITERALS.contains(reservedWord)) {
                 // we're in 2nd cell
                 return cellIndex == 1;
 
