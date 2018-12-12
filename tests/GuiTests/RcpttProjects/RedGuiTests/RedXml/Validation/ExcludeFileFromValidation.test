@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ErbYMPglEea7hL0QdGOb6w
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 10:23 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 12/12/18 4:46 PM
 Testcase-Type: ecl
 Verifications: _kIYBEPhCEea7hL0QdGOb6w
 
@@ -158,8 +158,13 @@ get-window Clean | get-button $OK_Clean_button | click
 
 //check warnings
 with [get-view Problems | get-tree] {
-    get-item "Warnings \\(1 item\\)" | get-property childCount | equals 1 | verify-true
-    get-item "Warnings \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "The '*.tsv' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
+    get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "The '*.txt' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
+    get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "The '*.txt' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
+    get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals "The path 'RobotProject/folder_to_remove/file_to_remove.robot' is already excluded by 'RobotProject/folder_to_remove'" 
         | verify-true
 }
