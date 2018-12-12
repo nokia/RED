@@ -80,7 +80,7 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
 
     private Optional<String> prepareNewName(final RobotKeywordCall keywordCall) {
         if (index >= keywordCall.getArguments().size() && !(value == null || value.isEmpty())
-                && keywordCall.getName().isEmpty()) {
+                && (keywordCall.getName().isEmpty() && !keywordCall.isExecutableInsideForWithEndLoop())) {
             return Optional.of("\\");
         }
         return Optional.empty();
