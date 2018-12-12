@@ -23,11 +23,11 @@ public class ForLoopReservedWordsProposals {
     static final Map<String, String> DESCRIPTIONS = new LinkedHashMap<>();
     static {
         DESCRIPTIONS.put(":FOR",
-                "Defines loop used to repeat keywords. The actions to be repeated has to be written in next lines "
-                        + "and has to bo indented.\n\n*Important:* This is an old syntax which is going to be deprecated"
-                        + " in Robot Framework 3.2 and eventually removed. Use FOR-END syntax instead.");
+                "Defines loop used to repeat keywords. The actions to be repeated have to be written in next lines "
+                        + "and have to bo indented.\n\n*Important:* This is an old syntax which is going to be "
+                        + "deprecated in Robot Framework 3.2 and eventually removed. Use FOR-END syntax instead.");
         DESCRIPTIONS.put("FOR",
-                "Defines loop used to repeat keywords. The actions to be repeated has to be written in next lines "
+                "Defines loop used to repeat keywords. The actions to be repeated have to be written in next lines "
                         + "and matched by following END line after last action in loop body.\n\nAvailable from Robot "
                         + "Framework 3.1");
         DESCRIPTIONS.put("END", "Marks end of FOR loop construct.\n\nAvailable from Robot Framework 3.1");

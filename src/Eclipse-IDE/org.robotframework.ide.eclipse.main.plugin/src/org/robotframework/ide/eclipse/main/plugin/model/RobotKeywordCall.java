@@ -115,6 +115,10 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
                 || type == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
     }
 
+    public boolean isExecutableInsideForWithEndLoop() {
+        return getLinkedElement().getDeclaration().getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION);
+    }
+
     @Override
     public ImageDescriptor getImage() {
         return RedImages.getKeywordImage();
