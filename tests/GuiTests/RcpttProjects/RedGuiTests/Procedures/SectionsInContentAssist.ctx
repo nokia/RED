@@ -5,8 +5,8 @@ Element-Name: SectionsInContentAssist
 Element-Type: context
 Element-Version: 2.0
 Id: _cBDNYMN4Eeat3OoBX2X2jQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/24/18 11:22 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 12/12/18 2:38 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -78,12 +78,14 @@ proc "check-content-assist-for-keywords" [val source Source]{
 	    get-property "getItems().TableItem[4].getText()" | equals "[Teardown]" | verify-true
 	    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
 	    get-property "getItems().TableItem[6].getText()" | equals ":FOR" | verify-true
-	    get-property "getItems().TableItem[7].getText()" | equals And | verify-true
-	    get-property "getItems().TableItem[8].getText()" | equals But | verify-true
-	    get-property "getItems().TableItem[9].getText()" | equals Given | verify-true
-	    get-property "getItems().TableItem[10].getText()" | equals Then | verify-true
-	    get-property "getItems().TableItem[11].getText()" | equals When | verify-true
-	    get-property "getItems().TableItem[12].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals "END" | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "FOR" | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals And | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals But | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals Given | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals Then | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals When | verify-true
+	    get-property "getItems().TableItem[14].getText()" | equals "Call Method - BuiltIn" | verify-true
 	}
 }	
 
@@ -97,12 +99,14 @@ proc "check-content-assist-for-keywords-for-table" [val source Source]{
 	    get-property "getItems().TableItem[4].getText()" | equals "[Teardown]" | verify-true
 	    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
 	    get-property "getItems().TableItem[6].getText()" | equals ":FOR" | verify-true
-	    get-property "getItems().TableItem[7].getText()" | equals And | verify-true
-	    get-property "getItems().TableItem[8].getText()" | equals But | verify-true
-	    get-property "getItems().TableItem[9].getText()" | equals Given | verify-true
-	    get-property "getItems().TableItem[10].getText()" | equals Then | verify-true
-	    get-property "getItems().TableItem[11].getText()" | equals When | verify-true
-	    get-property "getItems().TableItem[12].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals END | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals FOR | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals And | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals But | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals Given | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals Then | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals When | verify-true
+	    get-property "getItems().TableItem[14].getText()" | equals "Call Method - BuiltIn" | verify-true
 	}
 }	
 
@@ -115,13 +119,15 @@ proc "check-content-assist-for-test-cases"{
 	    get-property "getItems().TableItem[4].getText()" | equals "[Template]" | verify-true
 	    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
 	    get-property "getItems().TableItem[6].getText()" | equals ":FOR" | verify-true
-	    get-property "getItems().TableItem[7].getText()" | equals And | verify-true
-	    get-property "getItems().TableItem[8].getText()" | equals But | verify-true
-	    get-property "getItems().TableItem[9].getText()" | equals Given | verify-true
-	    get-property "getItems().TableItem[10].getText()" | equals Then | verify-true
-	    get-property "getItems().TableItem[11].getText()" | equals When | verify-true
-	    get-property "getItems().TableItem[12].getText()" | equals "Call Method - BuiltIn" | verify-true
-	    get-property "getItems().TableItem[13].getText()" | equals "Catenate - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals END | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals FOR | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals And | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals But | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals Given | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals Then | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals When | verify-true
+	    get-property "getItems().TableItem[14].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[15].getText()" | equals "Catenate - BuiltIn" | verify-true
 	}  
 }
 
@@ -135,13 +141,15 @@ proc "check-content-assist-for-test-cases-for-table"{
 	    get-property "getItems().TableItem[4].getText()" | equals "[Template]" | verify-true
 	    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
 	    get-property "getItems().TableItem[6].getText()" | equals ":FOR" | verify-true
-	    get-property "getItems().TableItem[7].getText()" | equals And | verify-true
-	    get-property "getItems().TableItem[8].getText()" | equals But | verify-true
-	    get-property "getItems().TableItem[9].getText()" | equals Given | verify-true
-	    get-property "getItems().TableItem[10].getText()" | equals Then | verify-true
-	    get-property "getItems().TableItem[11].getText()" | equals When | verify-true
-	    get-property "getItems().TableItem[12].getText()" | equals "Call Method - BuiltIn" | verify-true
-	    get-property "getItems().TableItem[13].getText()" | equals "Catenate - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals END | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals FOR | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals And | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals But | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals Given | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals Then | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals When | verify-true
+	    get-property "getItems().TableItem[14].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[15].getText()" | equals "Catenate - BuiltIn" | verify-true
 	}  
 }
 

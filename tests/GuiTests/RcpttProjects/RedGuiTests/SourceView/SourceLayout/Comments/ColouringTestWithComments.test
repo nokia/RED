@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _LssiYIPXEeWImNPXuPy_LQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/20/18 2:52 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 12/12/18 2:32 PM
 Testcase-Type: ecl
 Verifications: _Z93QAIPZEeWImNPXuPy_LQ,_YOOasI7XEeWetPU-dn-gxQ,_lf2sEPncEea7hL0QdGOb6w
 
@@ -83,7 +83,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
     + "\t\n"
     + "loop with comment\n"
     + "    Comment    This is built in comment\n"
-    + "\t:FOR  ${item}  in range  3\n"
+    + "\t:FOR  ${item}  IN RANGE  3\n"
     + "\t\\\n"
     + "\t\\ \tLog  ${item}\n"
     + "\t...  #no error &{test}\n"
