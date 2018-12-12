@@ -128,17 +128,25 @@ class RobotOutlinePage extends ContentOutlinePage {
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                final Optional<RobotFileInternalElement> selected = suiteModel.findElement(caretOffset)
-                        .filter(RobotFileInternalElement.class::isInstance)
-                        .map(RobotFileInternalElement.class::cast);
-                selected.ifPresent(element -> {
-                    if (!display.isDisposed()) {
-                        display.asyncExec(() -> {
-                            shouldUpdateEditorSelection.set(false);
-                            setSelectionInOutline(element);
-                        });
+                if (display.isDisposed()) {
+                    return Status.CANCEL_STATUS;
+                }
+
+                display.asyncExec(() -> {
+                    final Optional<RobotFileInternalElement> selectableElement = suiteModel.findElement(caretOffset)
+                            .filter(RobotFileInternalElement.class::isInstance)
+                            .map(RobotFileInternalElement.class::cast)
+                            .filter(e -> e != suiteModel);
+
+                    shouldUpdateEditorSelection.set(false);
+
+                    if (selectableElement.isPresent()) {
+                        setSelectionInOutline(selectableElement.get());
+                    } else {
+                        clearSelectionInOutline();
                     }
                 });
+
                 return Status.OK_STATUS;
             }
         };
@@ -149,25 +157,50 @@ class RobotOutlinePage extends ContentOutlinePage {
     private ISelectionChangedListener createEditorSelectionListener() {
         return event -> {
             if (event.getSelection() instanceof IStructuredSelection) {
-                final Optional<RobotFileInternalElement> selected = Selections.getOptionalFirstElement(
-                        (IStructuredSelection) event.getSelection(), RobotFileInternalElement.class);
-                selected.ifPresent(element -> {
-                    shouldUpdateEditorSelection.set(false);
-                    setSelectionInOutline(element);
-                });
+                final Optional<RobotFileInternalElement> selectableElement = Selections
+                        .getOptionalFirstElement((IStructuredSelection) event.getSelection(),
+                                RobotFileInternalElement.class)
+                        .filter(e -> e != suiteModel);
+
+                shouldUpdateEditorSelection.set(false);
+
+                if (selectableElement.isPresent()) {
+                    setSelectionInOutline(selectableElement.get());
+                } else {
+                    clearSelectionInOutline();
+                }
             }
         };
     }
 
     private ISelectionChangedListener createOutlineSelectionListener() {
         return event -> {
-            if (!shouldUpdateEditorSelection.getAndSet(true)) {
+            final Optional<RobotFileInternalElement> element = Selections.getOptionalFirstElement(
+                    (IStructuredSelection) event.getSelection(), RobotFileInternalElement.class);
+            final Optional<RobotFileInternalElement> selectableElement = element.filter(e -> e != suiteModel);
+
+            if (!shouldUpdateEditorSelection.getAndSet(true) || !element.isPresent()) {
                 return;
             }
-            final Optional<RobotFileInternalElement> selected = Selections.getOptionalFirstElement(
-                    (IStructuredSelection) event.getSelection(), RobotFileInternalElement.class);
-            selected.ifPresent(element -> setSelectionInEditor(element));
+
+            if (selectableElement.isPresent()) {
+                setSelectionInEditor(selectableElement.get());
+            } else {
+                clearSelectionInEditor();
+            }
         };
+    }
+
+    private void clearSelectionInEditor() {
+        if (editor.getActiveEditor() instanceof SuiteSourceEditor) {
+            final ISelectionProvider selectionProvider = editor.getActiveEditor().getSite().getSelectionProvider();
+            selectionProvider.setSelection(new TextSelection(0, 0));
+        } else {
+            final SelectionLayerAccessor accessor = editor.getSelectionLayerAccessor();
+            if (accessor != null) {
+                accessor.clear();
+            }
+        }
     }
 
     private void setSelectionInEditor(final RobotFileInternalElement element) {
@@ -181,6 +214,10 @@ class RobotOutlinePage extends ContentOutlinePage {
                 activatedPage.revealElement(element);
             }
         }
+    }
+
+    private void clearSelectionInOutline() {
+        getTreeViewer().setSelection(StructuredSelection.EMPTY);
     }
 
     private void setSelectionInOutline(final RobotFileInternalElement element) {
