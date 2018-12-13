@@ -21,25 +21,21 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class UnknownVariableValueMapper implements IParsingMapper {
 
-    private final ParsingStateHelper utility;
+    private final ParsingStateHelper stateHelper;
 
     public UnknownVariableValueMapper() {
-        this.utility = new ParsingStateHelper();
+        this.stateHelper = new ParsingStateHelper();
     }
 
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         rt.setText(text);
         rt.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
-        final List<AVariable> variables = robotFileOutput.getFileModel()
-                .getVariableTable().getVariables();
+        final List<AVariable> variables = robotFileOutput.getFileModel().getVariableTable().getVariables();
         if (!variables.isEmpty()) {
-            final UnknownVariable var = (UnknownVariable) variables.get(variables
-                    .size() - 1);
+            final UnknownVariable var = (UnknownVariable) variables.get(variables.size() - 1);
             var.addItem(rt);
         } else {
             // FIXME: internal error
@@ -50,12 +46,10 @@ public class UnknownVariableValueMapper implements IParsingMapper {
     }
 
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
-        final ParsingState currentState = utility.getCurrentState(processingState);
-
-        return (currentState == ParsingState.VARIABLE_UNKNOWN || currentState == ParsingState.VARIABLE_UNKNOWN_VALUE);
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+        final ParsingState currentState = stateHelper.getCurrentState(processingState);
+        return currentState == ParsingState.VARIABLE_UNKNOWN || currentState == ParsingState.VARIABLE_UNKNOWN_VALUE;
     }
 
 }

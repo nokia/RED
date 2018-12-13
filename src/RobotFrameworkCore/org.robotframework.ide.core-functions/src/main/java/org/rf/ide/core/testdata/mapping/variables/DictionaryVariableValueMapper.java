@@ -30,6 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class DictionaryVariableValueMapper implements IParsingMapper {
 
     private final ParsingStateHelper stateHelper;
+
     private final SpecialEscapedCharactersExtractor escapedExtractor;
 
     public DictionaryVariableValueMapper() {
@@ -38,23 +39,19 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
     }
 
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
-        final VariableTable variableTable = robotFileOutput.getFileModel()
-                .getVariableTable();
+        final VariableTable variableTable = robotFileOutput.getFileModel().getVariableTable();
         final List<AVariable> variables = variableTable.getVariables();
         if (!variables.isEmpty()) {
             final IVariableHolder var = variables.get(variables.size() - 1);
             final KeyValuePair keyValPair = splitKeyNameFromValue(rt);
 
-            ((DictionaryVariable) var).put(rt, keyValPair.getKey(),
-                    keyValPair.getValue());
+            ((DictionaryVariable) var).put(rt, keyValPair.getKey(), keyValPair.getValue());
         } else {
             // FIXME: some error
         }
@@ -79,10 +76,8 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
                 } else {
                     final int equalsIndex = specialText.indexOf('=');
                     if (equalsIndex > -1) {
-                        final String keyPart = specialText.substring(0,
-                                equalsIndex);
-                        final String valuePart = specialText
-                                .substring(equalsIndex + 1);
+                        final String keyPart = specialText.substring(0, equalsIndex);
+                        final String valuePart = specialText.substring(equalsIndex + 1);
                         keyText.append(keyPart);
                         valueText.append(valuePart);
 
@@ -122,6 +117,7 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
     protected class KeyValuePair {
 
         private final RobotToken key;
+
         private final RobotToken value;
 
         public KeyValuePair(final RobotToken key, final RobotToken value) {
@@ -139,11 +135,9 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
     }
 
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         final ParsingState state = stateHelper.getCurrentState(processingState);
-        return (state == ParsingState.DICTIONARY_VARIABLE_DECLARATION
-                || state == ParsingState.DICTIONARY_VARIABLE_VALUE);
+        return state == ParsingState.DICTIONARY_VARIABLE_DECLARATION || state == ParsingState.DICTIONARY_VARIABLE_VALUE;
     }
 }

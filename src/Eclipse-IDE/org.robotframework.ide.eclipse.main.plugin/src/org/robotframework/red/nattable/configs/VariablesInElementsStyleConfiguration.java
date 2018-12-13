@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
-import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -47,8 +46,8 @@ public class VariablesInElementsStyleConfiguration extends RobotElementsStyleCon
     Style createElementStyle() {
         final Style style = new Style();
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
-        style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES, findVariables(variableStyler,
-                label -> createVariableExtractor().extract(FilePosition.createNotSet(), label).getMappedElements()));
+        style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
+                findVariables(variableStyler, label -> createVariableExtractor().extract(label).getMappedElements()));
         return style;
     }
 
