@@ -129,12 +129,15 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     private RobotTokenType getRobotTokenType() {
         final AModelElement<?> parent = (AModelElement<?>) getParent();
-        if (parent != null && parent.getModelType() == ModelType.TEST_CASE) {
-            return RobotTokenType.TEST_CASE_EMPTY_CELL;
-        } else if (parent != null && parent.getModelType() == ModelType.TASK) {
-            return RobotTokenType.TASK_EMPTY_CELL;
-        } else if (parent != null && parent.getModelType() == ModelType.USER_KEYWORD) {
-            return RobotTokenType.KEYWORD_EMPTY_CELL;
+        if (parent != null) {
+            final ModelType parentType = parent.getModelType();
+            if (parentType == ModelType.TEST_CASE) {
+                return RobotTokenType.TEST_CASE_EMPTY_CELL;
+            } else if (parentType == ModelType.TASK) {
+                return RobotTokenType.TASK_EMPTY_CELL;
+            } else if (parentType == ModelType.USER_KEYWORD) {
+                return RobotTokenType.KEYWORD_EMPTY_CELL;
+            }
         }
         return RobotTokenType.UNKNOWN;
     }

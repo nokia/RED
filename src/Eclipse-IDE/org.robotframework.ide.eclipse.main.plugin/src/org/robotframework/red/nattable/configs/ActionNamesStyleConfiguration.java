@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
-import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
@@ -52,8 +51,7 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
         final Styler quoteStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES, findStyleRanges(gherkinStyler,
-                variableStyler, quoteStyler,
-                label -> createVariableExtractor().extract(FilePosition.createNotSet(), label).getMappedElements()));
+                variableStyler, quoteStyler, label -> createVariableExtractor().extract(label).getMappedElements()));
         return style;
     }
 

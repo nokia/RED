@@ -5,11 +5,10 @@
  */
 package org.rf.ide.core.testdata.text.read;
 
-import static com.google.common.collect.Iterables.filter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.IChildElement;
@@ -18,13 +17,11 @@ import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
-import com.google.common.collect.ImmutableList;
-
 public class RobotLine implements IChildElement<RobotFile> {
 
     private final RobotFile parent;
 
-    private int lineNumber = -1;
+    private final int lineNumber;
 
     private List<IRobotLineElement> lineElements = new ArrayList<>(0);
 
@@ -64,7 +61,7 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public List<RobotToken> getLineTokens() {
-        return ImmutableList.copyOf(filter(lineElements, RobotToken.class));
+        return tokensStream().collect(Collectors.toList());
     }
 
     public Stream<RobotToken> tokensStream() {
@@ -88,17 +85,15 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public Optional<Integer> getElementPositionInLine(final int offset, final PositionCheck posCheckStrategy) {
-        Optional<Integer> pos = Optional.empty();
         final int size = lineElements.size();
         for (int i = 0; i < size; i++) {
             final IRobotLineElement e = lineElements.get(i);
             if (posCheckStrategy.meets(e, offset)) {
-                pos = Optional.of(i);
-                break;
+                return Optional.of(i);
             }
         }
 
-        return pos;
+        return Optional.empty();
     }
 
     public static enum PositionCheck {
@@ -129,16 +124,14 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public Optional<Integer> getElementPositionInLine(final IRobotLineElement elem) {
-        Optional<Integer> pos = Optional.empty();
         final int size = lineElements.size();
         for (int i = 0; i < size; i++) {
             if (lineElements.get(i) == elem) {
-                pos = Optional.of(i);
-                break;
+                return Optional.of(i);
             }
         }
 
-        return pos;
+        return Optional.empty();
     }
 
     public int getLineNumber() {

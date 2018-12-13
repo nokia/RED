@@ -108,10 +108,8 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         final ForLoopContinueRowDescriptor<T> forContinueDesc = new ForLoopContinueRowDescriptor<>(execRowLine);
         forContinueDesc.setForLoopStartRowIndex(forLoopDeclarationLine.get());
 
-        final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine.getParent();
-        final ARobotSectionTable table = (ARobotSectionTable) keywordOrTestcase.getParent();
-        final RobotFile robotFile = table.getParent();
-        final String fileName = robotFile.getParent().getProcessedFile().getAbsolutePath();
+        final RobotFileOutput rfo = getFileOutput(execRowLine);
+        final String fileName = rfo.getProcessedFile().getAbsolutePath();
 
         final VariableExtractor varExtractor = new VariableExtractor();
         final List<RobotToken> lineElements = execRowLine.getElementTokens();
@@ -163,5 +161,11 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         forContinueDesc.addCommentedVariables(buildDescription.getCommentedVariables());
         forContinueDesc.addUsedVariables(buildDescription.getUsedVariables());
         forContinueDesc.addKeywordArguments(buildDescription.getKeywordArguments());
+    }
+
+    private <T> RobotFileOutput getFileOutput(final RobotExecutableRow<T> execRowLine) {
+        final AModelElement<?> execParent = (AModelElement<?>) execRowLine.getParent();
+        final ARobotSectionTable table = (ARobotSectionTable) execParent.getParent();
+        return table.getParent().getParent();
     }
 }
