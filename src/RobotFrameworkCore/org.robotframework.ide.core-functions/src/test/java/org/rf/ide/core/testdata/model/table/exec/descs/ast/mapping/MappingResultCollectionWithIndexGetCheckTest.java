@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -68,15 +67,12 @@ public class MappingResultCollectionWithIndexGetCheckTest {
         return o;
     }
 
-    private final String testName;
-
     private final String text;
 
     private final boolean shouldMarkAsVariableIndex;
 
     public MappingResultCollectionWithIndexGetCheckTest(final String testName, final String text,
             final boolean shouldMarkAsVariableIndex) {
-        this.testName = testName;
         this.text = text;
         this.shouldMarkAsVariableIndex = shouldMarkAsVariableIndex;
     }
@@ -87,9 +83,7 @@ public class MappingResultCollectionWithIndexGetCheckTest {
     }
 
     private void assertForText(final String text, final boolean shouldMarkAsVariableIndex) {
-        final Optional<MappingResult> result = performOperationsFor(text);
-        assertThat(result.isPresent()).isTrue();
-        final MappingResult mappingResult = result.get();
+        final MappingResult mappingResult = performOperationsFor(text);
         if (shouldMarkAsVariableIndex) {
             assertThat(mappingResult.isCollectionVariableElementGet()).isTrue();
         } else {
@@ -97,14 +91,12 @@ public class MappingResultCollectionWithIndexGetCheckTest {
         }
     }
 
-    private Optional<MappingResult> performOperationsFor(final String text) {
+    private MappingResult performOperationsFor(final String text) {
         final RobotToken token = new RobotToken();
         token.setStartOffset(0);
         token.setLineNumber(1);
         token.setStartColumn(0);
         token.setText(text);
-        final VariableExtractor varExtractor = new VariableExtractor();
-
-        return Optional.of(varExtractor.extract(token, "fileName_" + testName));
+        return new VariableExtractor().extract(token);
     }
 }

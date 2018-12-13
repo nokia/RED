@@ -25,7 +25,7 @@ public interface RobotFileInternalElement extends RobotElement {
      * Gets the suite file in which this element is contained or null if it is
      * not inside the suite file.
      *
-     * @return Model object representing containg file.
+     * @return Model object representing containing file.
      */
     RobotSuiteFile getSuiteFile();
 

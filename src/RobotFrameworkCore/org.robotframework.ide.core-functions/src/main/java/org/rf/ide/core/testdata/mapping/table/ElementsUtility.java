@@ -67,9 +67,7 @@ public class ElementsUtility {
         final ParsingState state = parsingStateHelper.getCurrentState(processingState);
         RobotToken correct = null;
 
-        final List<VariableDeclaration> correctVariables = varExtractor
-                .extract(FilePosition.createNotSet(), text, "fake")
-                .getCorrectVariables();
+        final List<VariableDeclaration> correctVariables = varExtractor.extract(text).getCorrectVariables();
 
         if (robotTokens.size() > 1) {
             final List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(robotTokens, fp);
@@ -109,27 +107,7 @@ public class ElementsUtility {
                         }
                         if (meetsState(state, expected) && tokensExactlyOnPosition.size() == 1) {
                             final RobotToken exactlyOne = tokensExactlyOnPosition.get(0);
-                            final List<RobotTokenType> typesForVariablesTable = RobotTokenType
-                                    .getTypesForVariablesTable();
-                            boolean isVarDec = false;
-                            for (final IRobotTokenType type : exactlyOne.getTypes()) {
-                                if (type instanceof RobotTokenType) {
-                                    final RobotTokenType tokenType = (RobotTokenType) type;
-                                    if (typesForVariablesTable.contains(tokenType)
-                                            && tokenType.isSettingDeclaration()) {
-                                        if (!correctVariables.isEmpty()) {
-                                            final VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
-                                            if (correctVariables.stream().anyMatch(c -> typeByTokenType
-                                                    .getIdentificator().equals(c.getTypeIdentificator().getText()))) {
-                                                isVarDec = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (isVarDec) {
+                            if (isVariableDeclaration(exactlyOne, correctVariables)) {
                                 correct = exactlyOne;
                             }
                         }
@@ -251,11 +229,31 @@ public class ElementsUtility {
         return correct;
     }
 
+    private boolean isVariableDeclaration(final RobotToken robotToken,
+            final List<VariableDeclaration> correctVariables) {
+        final List<RobotTokenType> typesForVariablesTable = RobotTokenType.getTypesForVariablesTable();
+        for (final IRobotTokenType type : robotToken.getTypes()) {
+            if (type instanceof RobotTokenType) {
+                final RobotTokenType tokenType = (RobotTokenType) type;
+                if (typesForVariablesTable.contains(tokenType) && tokenType.isSettingDeclaration()) {
+                    if (!correctVariables.isEmpty()) {
+                        final VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
+                        if (correctVariables.stream()
+                                .anyMatch(c -> typeByTokenType.getIdentificator()
+                                        .equals(c.getTypeIdentificator().getText()))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private static boolean hasAnyVariableProposalInside(final List<RobotToken> robotTokens,
             final List<VariableDeclaration> correctVariables) {
         for (final RobotToken rt : robotTokens) {
-            final List<IRobotTokenType> types = rt.getTypes();
-            for (final IRobotTokenType type : types) {
+            for (final IRobotTokenType type : rt.getTypes()) {
                 if (type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION
                         || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
                         || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
@@ -431,7 +429,7 @@ public class ElementsUtility {
         } else if (separator.getProducedType() == SeparatorType.PIPE
                 || separator instanceof StrictTsvTabulatorSeparator) {
             final LineTokenInfo lineTokenInfo = LineTokenInfo.build(splittedLine);
-            if (!lineTokenInfo.getPositionsOfLineContinoue().isEmpty()
+            if (!lineTokenInfo.getPositionsOfLineContinue().isEmpty()
                     || !lineTokenInfo.getPositionsOfNotEmptyElements().isEmpty()) {
                 // Logic: Grant valid to process empty elements in case:
                 // SETTINGS or VARIABLES: always read empty the exclusion is
@@ -469,16 +467,17 @@ public class ElementsUtility {
                                  * <pre>
                                  *  *** Test Cases ***
                                  *  | x | | ... | Log | ... |
-                                 * 
+                                 *
                                  *  is not inline:
-                                 * 
+                                 *
                                  * ** Test Cases ***
                                  * | | x | | ... | Log | ... |
                                  * </pre>
                                  */
                                 if (shouldTreatAsInlineContinue(lineTokenInfo)) {
                                     result = separator.getCurrentElementIndex() > lineTokenInfo
-                                            .getPositionsOfLineContinoue().get(0)
+                                            .getPositionsOfLineContinue()
+                                            .get(0)
                                             || separator.getCurrentElementIndex() < lineTokenInfo.getDataStartIndex();
                                 } else {
                                     result = true;
@@ -532,15 +531,15 @@ public class ElementsUtility {
     private boolean shouldTreatAsInlineContinue(final LineTokenInfo lineTokenInfo) {
         boolean result = false;
 
-        if (!lineTokenInfo.getPositionsOfLineContinoue().isEmpty()
+        if (!lineTokenInfo.getPositionsOfLineContinue().isEmpty()
                 && !lineTokenInfo.getPositionsOfNotEmptyElements().isEmpty()) {
             final int theFirstToken = lineTokenInfo.getPositionsOfNotEmptyElements().get(0);
-            final int theFirstContinoue = lineTokenInfo.getPositionsOfLineContinoue().get(0);
+            final int theFirstContinue = lineTokenInfo.getPositionsOfLineContinue().get(0);
             if (lineTokenInfo.getPositionsOfNotEmptyElements().size() > 1) {
                 final int theSecondToken = lineTokenInfo.getPositionsOfNotEmptyElements().get(1);
-                result = theFirstToken < theFirstContinoue && theFirstContinoue < theSecondToken;
+                result = theFirstToken < theFirstContinue && theFirstContinue < theSecondToken;
             } else {
-                result = theFirstToken < theFirstContinoue;
+                result = theFirstToken < theFirstContinue;
             }
         }
 
@@ -566,9 +565,9 @@ public class ElementsUtility {
 
         private final List<Integer> positionsOfNotEmptyElements = new ArrayList<>();
 
-        private final List<Integer> positionsOfLineContinoue = new ArrayList<>();
+        private final List<Integer> positionsOfLineContinue = new ArrayList<>();
 
-        private boolean isLineContinoue;
+        private boolean isLineContinue;
 
         private int dataStartIndex = -1;
 
@@ -583,9 +582,9 @@ public class ElementsUtility {
                     final RobotToken token = (RobotToken) elem;
                     final String tokenText = token.getText();
                     if (RobotTokenType.PREVIOUS_LINE_CONTINUE.getRepresentation().get(0).equals(tokenText)) {
-                        lti.positionsOfLineContinoue.add(elemIndex);
+                        lti.positionsOfLineContinue.add(elemIndex);
                         if (lti.positionsOfNotEmptyElements.isEmpty()) {
-                            lti.isLineContinoue = true;
+                            lti.isLineContinue = true;
                         }
 
                         if (lti.dataStartIndex == -1) {
@@ -610,12 +609,12 @@ public class ElementsUtility {
             return positionsOfNotEmptyElements;
         }
 
-        public List<Integer> getPositionsOfLineContinoue() {
-            return positionsOfLineContinoue;
+        public List<Integer> getPositionsOfLineContinue() {
+            return positionsOfLineContinue;
         }
 
         public boolean isLineContinueTheFirst() {
-            return isLineContinoue;
+            return isLineContinue;
         }
 
         public int getDataStartIndex() {

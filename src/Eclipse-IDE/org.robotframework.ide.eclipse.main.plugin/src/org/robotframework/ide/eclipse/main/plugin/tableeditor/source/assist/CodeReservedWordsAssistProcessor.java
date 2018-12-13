@@ -88,9 +88,7 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
     private AssistProposalPredicate<String> createPredicate(final String lineContentTillOffset, final int line) {
         final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOffset, assist.isTsvFile());
         final RobotLine lineModel = assist.getModel().getLinkedElement().getFileContent().get(line);
-        final List<RobotToken> lineTokens = lineModel.getLineTokens();
-        final Optional<RobotToken> firstToken = lineTokens.isEmpty() ? Optional.empty()
-                : Optional.of(lineTokens.get(0));
+        final Optional<RobotToken> firstToken = lineModel.tokensStream().findFirst();
 
         return AssistProposalPredicates.codeReservedWordsPredicate(separators, firstToken);
     }
