@@ -315,7 +315,10 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                  * </pre>
                  */
                 if (utility.isNotOnlySeparatorOrEmptyLine(line)) {
-                    variableHelper.extractVariableAssignmentPart(line, processingState);
+                    final ParsingState currentState = parsingStateHelper.getCurrentState(processingState);
+                    if (currentState != ParsingState.KEYWORD_SETTING_ARGUMENTS_ARGUMENT_VALUE) {
+                        variableHelper.extractVariableAssignmentPart(line);
+                    }
                     previousLineHandler.flushNew(processingState);
                 }
                 fileModel.addNewLine(line);

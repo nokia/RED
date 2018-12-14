@@ -6,11 +6,19 @@
 package org.rf.ide.core.testdata.model.table.exec.descs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.Container;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.DeclarationMapper;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IndexDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.JoinedTextDeclarations;
@@ -401,5 +409,81 @@ public class VariableExtractorTest {
         assertThat(mapResult.getMappedElements().get(1).getStart().getText()).isEqualTo("[");
         assertThat(mapResult.getMappedElements().get(2)).isNotInstanceOf(IndexDeclaration.class);
         assertThat(mapResult.getMappedElements().get(2).getStart().getText()).isEqualTo("id");
+    }
+
+    @Test
+    public void test_extractionOf_ScalarVariable_fromToken_withoutFileNameSet() {
+        // prepare
+        final VariableExtractor extractor = new VariableExtractor();
+
+        final RobotToken varToken = new RobotToken();
+        varToken.setLineNumber(0);
+        varToken.setStartColumn(1);
+        varToken.setStartOffset(2);
+        varToken.setText("${new_var}");
+
+        // execute
+        final MappingResult mapResult = extractor.extract(varToken);
+
+        // verify
+        assertThat(mapResult.getMessages()).isEmpty();
+        assertThat(mapResult.getFileName()).isEmpty();
+
+        assertThat(mapResult.getMappedElements()).hasSize(1);
+        assertThat(mapResult.getTextElements()).isEmpty();
+        assertThat(mapResult.getCorrectVariables()).hasSize(1);
+        final VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
+        assertThat(variableDeclaration.getRobotType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variableDeclaration.getVariableText().getText()).isEqualTo("${new_var}");
+        assertThat(variableDeclaration.getVariableName().getText()).isEqualTo("new_var");
+        final RobotToken asToken = variableDeclaration.asToken();
+        assertThat(asToken.getStartColumn()).isEqualTo(1);
+        assertThat(asToken.getEndColumn()).isEqualTo("${new_var}".length() + 1);
+    }
+
+    @Test
+    public void test_extractionOf_ScalarVariable_fromText_withoutFileNameSet() {
+        // prepare
+        final VariableExtractor extractor = new VariableExtractor();
+
+        // execute
+        final MappingResult mapResult = extractor.extract("${new_var}");
+
+        // verify
+        assertThat(mapResult.getMessages()).isEmpty();
+        assertThat(mapResult.getFileName()).isEmpty();
+
+        assertThat(mapResult.getMappedElements()).hasSize(1);
+        assertThat(mapResult.getTextElements()).isEmpty();
+        assertThat(mapResult.getCorrectVariables()).hasSize(1);
+        final VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
+        assertThat(variableDeclaration.getRobotType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variableDeclaration.getVariableText().getText()).isEqualTo("${new_var}");
+        assertThat(variableDeclaration.getVariableName().getText()).isEqualTo("new_var");
+        final RobotToken asToken = variableDeclaration.asToken();
+        assertThat(asToken.getStartColumn()).isEqualTo(-1);
+        assertThat(asToken.getEndColumn()).isEqualTo(-1);
+    }
+
+    @Test
+    public void test_extractionOf_ScalarVariable_withException() {
+        // prepare
+        final DeclarationMapper mapper = mock(DeclarationMapper.class);
+        final RuntimeException cause = new RuntimeException("message");
+        when(mapper.map(any(FilePosition.class), any(Container.class), anyString())).thenThrow(cause);
+        final VariableExtractor extractor = new VariableExtractor(mapper);
+
+        final RobotToken varToken = new RobotToken();
+        varToken.setLineNumber(0);
+        varToken.setStartColumn(1);
+        varToken.setStartOffset(2);
+        varToken.setText("${new_var}");
+
+        // execute & verify
+        assertThatExceptionOfType(VariableExtractor.VariableExtractionException.class)
+                .isThrownBy(() -> extractor.extract(varToken, "file.robot"))
+                .withMessage("An exception occurs during variable extraction in file file.robot at position "
+                        + new FilePosition(0, 1, 2) + " for text ${new_var}")
+                .withCause(cause);
     }
 }

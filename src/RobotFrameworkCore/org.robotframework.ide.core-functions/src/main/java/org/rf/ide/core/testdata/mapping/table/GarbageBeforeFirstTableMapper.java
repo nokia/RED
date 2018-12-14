@@ -22,10 +22,9 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
     @Override
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
-        // nothing to do
         rt.setText(text);
         final List<IRobotTokenType> types = rt.getTypes();
-        if (containsInLineOnlyComment(currentLine) || isPreviousLineContinueOrStartComment(currentLine)) {
+        if (isComment(currentLine) || isPreviousLineContinueOrStartComment(currentLine)) {
             types.add(0, RobotTokenType.COMMENT_CONTINUE);
         }
         if (!types.contains(RobotTokenType.START_HASH_COMMENT) && !types.contains(RobotTokenType.COMMENT_CONTINUE)) {
@@ -36,7 +35,7 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
 
     private boolean isPreviousLineContinueOrStartComment(final RobotLine currentLine) {
         final List<IRobotLineElement> lineElements = currentLine.getLineElements();
-        int size = lineElements.size();
+        final int size = lineElements.size();
         if (size > 0) {
             for (int i = size - 1; i >= 0; i--) {
                 final IRobotLineElement elem = lineElements.get(i);
@@ -54,8 +53,8 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || containsInLineOnlyComment(currentLine)
-                || isCurrentLineTrash(currentLine)) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || isComment(currentLine)
+                || isTrash(currentLine)) {
             if (processingState.isEmpty()) {
                 result = true;
             } else {
@@ -67,27 +66,18 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
         return result;
     }
 
-    private boolean isCurrentLineTrash(final RobotLine currentLine) {
-        for (final IRobotLineElement e : currentLine.getLineElements()) {
-            if (e.getClass() == RobotToken.class) {
-                if (e.getTypes().contains(RobotTokenType.UNKNOWN)) {
-                    return true;
-                } else if (e.getTypes().contains(RobotTokenType.ASSIGNMENT)
-                        || e.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
-                    continue;
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        return false;
+    private boolean isTrash(final RobotLine currentLine) {
+        return firstRobotTokenContains(currentLine, RobotTokenType.UNKNOWN);
     }
 
-    private boolean containsInLineOnlyComment(final RobotLine currentLine) {
+    private boolean isComment(final RobotLine currentLine) {
+        return firstRobotTokenContains(currentLine, RobotTokenType.START_HASH_COMMENT);
+    }
+
+    private boolean firstRobotTokenContains(final RobotLine currentLine, final RobotTokenType type) {
         for (final IRobotLineElement e : currentLine.getLineElements()) {
             if (e.getClass() == RobotToken.class) {
-                if (e.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                if (e.getTypes().contains(type)) {
                     return true;
                 } else if (e.getTypes().contains(RobotTokenType.ASSIGNMENT)
                         || e.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {

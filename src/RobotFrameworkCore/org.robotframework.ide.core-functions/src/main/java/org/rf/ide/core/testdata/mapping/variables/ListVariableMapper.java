@@ -11,6 +11,7 @@ import java.util.Stack;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
+import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.VariableTable;
@@ -28,9 +29,12 @@ public class ListVariableMapper implements IParsingMapper {
 
     private final CommonVariableHelper varHelper;
 
+    private final ParsingStateHelper stateHelper;
+
     public ListVariableMapper() {
         this.positionResolver = new ElementPositionResolver();
         this.varHelper = new CommonVariableHelper();
+        this.stateHelper = new ParsingStateHelper();
     }
 
     @Override
@@ -54,17 +58,16 @@ public class ListVariableMapper implements IParsingMapper {
         boolean result = false;
         final List<IRobotTokenType> types = rt.getTypes();
         if (types.size() == 1 && types.get(0) == RobotTokenType.VARIABLES_LIST_DECLARATION) {
-            if (positionResolver.isCorrectPosition(PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE,
-                    currentLine, rt)) {
-                if (varHelper.isIncludedInVariableTable(currentLine, processingState)) {
+            if (positionResolver.isCorrectPosition(PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE, currentLine,
+                    rt)) {
+                if (stateHelper.getCurrentState(processingState) == ParsingState.VARIABLE_TABLE_INSIDE) {
                     if (varHelper.matchesBracketsConditionsForCorrectVariable(text)) {
                         result = true;
                     } else {
                         // FIXME: error here or in validation
                     }
                 } else {
-                    // FIXME: it is in wrong place means no variable table
-                    // declaration
+                    // FIXME: it is in wrong place means no variable table declaration
                 }
             } else {
                 // FIXME: wrong place case.
