@@ -13,6 +13,8 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class VariableExtractor {
 
     private final VariableStructureExtractor structureExtractor;
@@ -29,7 +31,19 @@ public class VariableExtractor {
         this.mapper = mapper;
     }
 
-    public MappingResult extract(final FilePosition fp, final String text, final String fileName) {
+    public MappingResult extract(final RobotToken token, final String fileName) {
+        return extract(token.getFilePosition(), token.getText(), fileName);
+    }
+
+    public MappingResult extract(final RobotToken token) {
+        return extract(token.getFilePosition(), token.getText(), "");
+    }
+
+    public MappingResult extract(final String text) {
+        return extract(FilePosition.createNotSet(), text, "");
+    }
+
+    private MappingResult extract(final FilePosition fp, final String text, final String fileName) {
         try {
             final Container mainContainer = structureExtractor.buildStructureTree(text);
 
@@ -45,23 +59,12 @@ public class VariableExtractor {
         }
     }
 
-    public MappingResult extract(final FilePosition fp, final String text) {
-        return extract(fp, text, "<NOT_SET>");
-    }
-
-    public MappingResult extract(final RobotToken token, final String fileName) {
-        return extract(token.getFilePosition(), token.getText(), fileName);
-    }
-
-    public MappingResult extract(final RobotToken token) {
-        return extract(token.getFilePosition(), token.getText());
-    }
-
-    private static class VariableExtractionException extends RuntimeException {
+    @VisibleForTesting
+    static class VariableExtractionException extends RuntimeException {
 
         private static final long serialVersionUID = -8666114255629013896L;
 
-        public VariableExtractionException(final String message, final Throwable cause) {
+        VariableExtractionException(final String message, final Throwable cause) {
             super(message, cause);
         }
     }

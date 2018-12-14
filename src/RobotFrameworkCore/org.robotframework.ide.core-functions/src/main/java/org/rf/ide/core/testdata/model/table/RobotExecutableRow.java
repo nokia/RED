@@ -53,11 +53,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public void setAction(final RobotToken action) {
-        IRobotTokenType actType = getActionType();
-        if (actType == null) {
-            actType = RobotTokenType.UNKNOWN;
-        }
-        this.action = updateOrCreate(this.action, action, actType);
+        this.action = updateOrCreate(this.action, action, getActionType());
 
         fixMissingTypes();
     }
@@ -104,20 +100,14 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public void addArgument(final int index, final RobotToken argument) {
-        final IRobotTokenType argType = getArgumentType();
-        if (argType != null) {
-            fixForTheType(argument, argType, true);
-        }
+        fixForTheType(argument, getArgumentType(), true);
         arguments.add(index, argument);
 
         fixMissingTypes();
     }
 
     public void addArgument(final RobotToken argument) {
-        final IRobotTokenType argType = getArgumentType();
-        if (argType != null) {
-            fixForTheType(argument, argType, true);
-        }
+        fixForTheType(argument, getArgumentType(), true);
         arguments.add(argument);
 
         fixMissingTypes();
@@ -173,32 +163,28 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     @Override
     public ModelType getModelType() {
-        ModelType type = ModelType.UNKNOWN;
-
         final List<IRobotTokenType> types = getAction().getTypes();
         if (types.contains(RobotTokenType.TEST_CASE_ACTION_NAME)) {
-            type = ModelType.TEST_CASE_EXECUTABLE_ROW;
+            return ModelType.TEST_CASE_EXECUTABLE_ROW;
         } else if (types.contains(RobotTokenType.TASK_ACTION_NAME)) {
-            type = ModelType.TASK_EXECUTABLE_ROW;
+            return ModelType.TASK_EXECUTABLE_ROW;
         } else if (types.contains(RobotTokenType.KEYWORD_ACTION_NAME)) {
-            type = ModelType.USER_KEYWORD_EXECUTABLE_ROW;
-        }
-
-        if (types.contains(RobotTokenType.UNKNOWN) && type == ModelType.UNKNOWN) {
-            final T parent = getParent();
+            return ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+        } else if (types.contains(RobotTokenType.UNKNOWN)) {
+            final AModelElement<?> parent = (AModelElement<?>) getParent();
             if (parent != null) {
-                final AModelElement<?> parentModel = (AModelElement<?>) parent;
-                if (parentModel.getModelType() == ModelType.TEST_CASE) {
-                    type = ModelType.TEST_CASE_EXECUTABLE_ROW;
-                } else if (parentModel.getModelType() == ModelType.TASK) {
-                    type = ModelType.TASK_EXECUTABLE_ROW;
-                } else if (parentModel.getModelType() == ModelType.USER_KEYWORD) {
-                    type = ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+                final ModelType parentType = parent.getModelType();
+                if (parentType == ModelType.TEST_CASE) {
+                    return ModelType.TEST_CASE_EXECUTABLE_ROW;
+                } else if (parentType == ModelType.TASK) {
+                    return ModelType.TASK_EXECUTABLE_ROW;
+                } else if (parentType == ModelType.USER_KEYWORD) {
+                    return ModelType.USER_KEYWORD_EXECUTABLE_ROW;
                 }
             }
         }
 
-        return type;
+        return ModelType.UNKNOWN;
     }
 
     @Override
@@ -279,7 +265,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public static boolean isTsvComment(final String text, final FileFormat format) {
-        return (format == FileFormat.TSV && TSV_COMMENT.matcher(text).matches());
+        return format == FileFormat.TSV && TSV_COMMENT.matcher(text).matches();
     }
 
     public IExecutableRowDescriptor<T> buildLineDescription() {

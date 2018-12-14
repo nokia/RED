@@ -55,16 +55,10 @@ public class UnknownVariableMapper implements IParsingMapper {
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
-        boolean result = false;
-        final ParsingState currentState = stateHelper.getCurrentState(processingState);
-
-        if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {
-            if (text != null) {
-                result = positionResolver.isCorrectPosition(PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE,
-                        currentLine, rt);
-            }
+        if (stateHelper.getCurrentState(processingState) == ParsingState.VARIABLE_TABLE_INSIDE && text != null) {
+            return positionResolver.isCorrectPosition(PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE,
+                    currentLine, rt);
         }
-
-        return result;
+        return false;
     }
 }

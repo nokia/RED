@@ -105,9 +105,7 @@ public class VariableNamesSupportTest {
         rt.setStartColumn(0);
         rt.setText(text);
         rt.setType(RobotTokenType.VARIABLE_USAGE);
-        final VariableExtractor varExt = new VariableExtractor();
-        final MappingResult extract = varExt.extract(rt, "fake.txt");
-
+        final MappingResult extract = new VariableExtractor().extract(rt);
         return extract.getCorrectVariables().get(0);
     }
 }

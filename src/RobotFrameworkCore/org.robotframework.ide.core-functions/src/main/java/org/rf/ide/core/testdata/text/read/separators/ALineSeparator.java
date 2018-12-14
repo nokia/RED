@@ -42,33 +42,19 @@ public abstract class ALineSeparator {
                         if (hasNextSeparator()) {
                             final Separator currentSeparator = nextSeparator();
                             final int startColumn = currentSeparator.getStartColumn();
-                            final int remainingData = startColumn
-                                    - lastColumnProcessed;
-                            final String rawText = line.substring(
-                                    lastColumnProcessed, startColumn);
+                            final int remainingData = startColumn - lastColumnProcessed;
+                            final String rawText = line.substring(lastColumnProcessed, startColumn);
                             if (remainingData > 0 || !lineElements.isEmpty()) {
-                                final RobotToken token = new RobotToken();
-                                token.setLineNumber(lineNumber);
-                                token.setText(rawText);
-                                token.setStartColumn(lastColumnProcessed);
-                                token.setType(RobotTokenType.UNKNOWN);
-
-                                lineElements.add(token);
+                                lineElements.add(RobotToken.create(rawText, lineNumber, lastColumnProcessed,
+                                        RobotTokenType.UNKNOWN));
                             }
 
                             lineElements.add(currentSeparator);
-                            lastColumnProcessed = currentSeparator
-                                    .getEndColumn();
+                            lastColumnProcessed = currentSeparator.getEndColumn();
                         } else {
-                            final String rawText = line
-                                    .substring(lastColumnProcessed);
-                            final RobotToken token = new RobotToken();
-                            token.setLineNumber(lineNumber);
-                            token.setText(rawText);
-                            token.setStartColumn(lastColumnProcessed);
-                            token.setType(RobotTokenType.UNKNOWN);
-
-                            lineElements.add(token);
+                            final String rawText = line.substring(lastColumnProcessed);
+                            lineElements.add(RobotToken.create(rawText, lineNumber, lastColumnProcessed,
+                                    RobotTokenType.UNKNOWN));
 
                             lastColumnProcessed = textLength;
                         }
@@ -118,8 +104,7 @@ public abstract class ALineSeparator {
         boolean result = false;
         final List<IRobotTokenType> types = elem.getTypes();
         for (final IRobotTokenType type : types) {
-            if (type == SeparatorType.PIPE
-                    || type == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
+            if (type == SeparatorType.PIPE || type == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
                 result = true;
                 break;
             }

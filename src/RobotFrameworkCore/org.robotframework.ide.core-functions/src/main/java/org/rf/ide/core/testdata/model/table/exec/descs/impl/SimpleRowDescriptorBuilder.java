@@ -8,7 +8,6 @@ package org.rf.ide.core.testdata.model.table.exec.descs.impl;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -33,17 +32,9 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
 
     @Override
     public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine) {
-        final SimpleRowDescriptor<T> simple = new SimpleRowDescriptor<>(execRowLine);
-        final ARobotSectionTable table;
-        if (execRowLine.getParent() instanceof AModelElement) {
-            final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine.getParent();
-            table = (ARobotSectionTable) keywordOrTestcase.getParent();
-        } else {
-            table = (ARobotSectionTable) execRowLine.getParent();
-        }
+        final SimpleRowDescriptor<T> simpleDesc = new SimpleRowDescriptor<>(execRowLine);
 
-        final RobotFile robotFile = table.getParent();
-        final RobotFileOutput rfo = robotFile.getParent();
+        final RobotFileOutput rfo = getFileOutput(execRowLine);
         final String fileName = rfo.getProcessedFile().getAbsolutePath();
 
         final VariableExtractor varExtractor = new VariableExtractor();
@@ -52,42 +43,49 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
         final CommentedVariablesFilter filter = new CommentedVariablesFilter();
         for (final RobotToken elem : lineElements) {
             final MappingResult mappingResult = varExtractor.extract(elem, fileName);
-            simple.addMessages(mappingResult.getMessages());
+            simpleDesc.addMessages(mappingResult.getMessages());
 
             // value is a keyword if is on the first place and is not just a variable or
             // variable with equal sign. Keyword can be defined as a ${var}=, however must
             // be called with a plain text in the place of an embedded variable
             final FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
-            simple.addCommentedVariables(filteredVars.getCommented());
+            simpleDesc.addCommentedVariables(filteredVars.getCommented());
             final List<VariableDeclaration> correctVariables = filteredVars.getUsed();
             final List<IElementDeclaration> mappedElements = mappingResult.getMappedElements();
             if (isAfterFirstAction) {
-                simple.addUsedVariables(correctVariables);
-                simple.addTextParameters(mappingResult.getTextElements());
+                simpleDesc.addUsedVariables(correctVariables);
+                simpleDesc.addTextParameters(mappingResult.getTextElements());
                 if (!execRowLine.getComment().contains(elem)) {
-                    simple.addKeywordArgument(elem.copy());
+                    simpleDesc.addKeywordArgument(elem.copy());
                 }
             } else {
-                if (correctVariables.size() == 1 && (mappedElements.size() == 1
-                        || (mappedElements.size() == 2
-                                && mappedElements.get(1) instanceof JoinedTextDeclarations
-                                && "=".equals(((JoinedTextDeclarations) (mappedElements.get(1))).getText().trim())))) {
-                    // definition variable
-                    simple.addCreatedVariable(correctVariables.get(0));
+                if (correctVariables.size() == 1 && isVariableDefinition(mappedElements)) {
+                    simpleDesc.addCreatedVariable(correctVariables.get(0));
                 } else {
                     if (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                        simple.addTextParameters(mappingResult.getTextElements());
+                        simpleDesc.addTextParameters(mappingResult.getTextElements());
                     } else {
-                        simple.setAction(new RobotAction(elem.copy(), mappedElements));
-                        simple.addUsedVariables(correctVariables);
+                        simpleDesc.setAction(new RobotAction(elem.copy(), mappedElements));
+                        simpleDesc.addUsedVariables(correctVariables);
                         isAfterFirstAction = true;
                     }
                 }
             }
         }
 
-        moveCreatedToUsedInCaseNoKeywords(simple);
-        return simple;
+        moveCreatedToUsedInCaseNoKeywords(simpleDesc);
+        return simpleDesc;
+    }
+
+    private boolean isVariableDefinition(final List<IElementDeclaration> mappedElements) {
+        if (mappedElements.size() == 1) {
+            return true;
+        } else if (mappedElements.size() == 2) {
+            final IElementDeclaration lastElement = mappedElements.get(1);
+            return lastElement instanceof JoinedTextDeclarations
+                    && "=".equals(((JoinedTextDeclarations) lastElement).getText().trim());
+        }
+        return false;
     }
 
     private <T> void moveCreatedToUsedInCaseNoKeywords(final SimpleRowDescriptor<T> simple) {
@@ -95,5 +93,16 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                 && simple.getKeywordArguments().isEmpty()) {
             simple.moveCreatedVariablesToUsedVariables();
         }
+    }
+
+    private <T> RobotFileOutput getFileOutput(final RobotExecutableRow<T> execRowLine) {
+        final ARobotSectionTable table;
+        if (execRowLine.getParent() instanceof AModelElement) {
+            final AModelElement<?> execParent = (AModelElement<?>) execRowLine.getParent();
+            table = (ARobotSectionTable) execParent.getParent();
+        } else {
+            table = (ARobotSectionTable) execRowLine.getParent();
+        }
+        return table.getParent().getParent();
     }
 }

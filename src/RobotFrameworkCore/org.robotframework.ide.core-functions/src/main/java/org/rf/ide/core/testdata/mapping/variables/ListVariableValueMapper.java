@@ -22,28 +22,22 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class ListVariableValueMapper implements IParsingMapper {
 
-    private final ParsingStateHelper utility;
-
+    private final ParsingStateHelper stateHelper;
 
     public ListVariableValueMapper() {
-        this.utility = new ParsingStateHelper();
+        this.stateHelper = new ParsingStateHelper();
     }
 
-
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
-        final VariableTable variableTable = robotFileOutput.getFileModel()
-                .getVariableTable();
+        final VariableTable variableTable = robotFileOutput.getFileModel().getVariableTable();
         final List<AVariable> variables = variableTable.getVariables();
         if (!variables.isEmpty()) {
             final IVariableHolder var = variables.get(variables.size() - 1);
@@ -56,12 +50,10 @@ public class ListVariableValueMapper implements IParsingMapper {
         return rt;
     }
 
-
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
-        final ParsingState state = utility.getCurrentState(processingState);
-        return (state == ParsingState.LIST_VARIABLE_DECLARATION || state == ParsingState.LIST_VARIABLE_VALUE);
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
+        final ParsingState state = stateHelper.getCurrentState(processingState);
+        return state == ParsingState.LIST_VARIABLE_DECLARATION || state == ParsingState.LIST_VARIABLE_VALUE;
     }
 }
