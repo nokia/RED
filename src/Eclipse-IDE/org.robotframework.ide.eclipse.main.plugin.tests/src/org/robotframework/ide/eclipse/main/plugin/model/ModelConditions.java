@@ -1,8 +1,8 @@
 /*
-* Copyright 2016 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2016 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.base.Predicates.not;
@@ -85,7 +85,7 @@ public class ModelConditions {
     }
 
     public static Condition<RobotElement> children(final int expectedChildren) {
-        return new Condition<RobotElement>("exectly " + expectedChildren + " children") {
+        return new Condition<RobotElement>("exactly " + expectedChildren + " children") {
 
             @Override
             public boolean matches(final RobotElement element) {
