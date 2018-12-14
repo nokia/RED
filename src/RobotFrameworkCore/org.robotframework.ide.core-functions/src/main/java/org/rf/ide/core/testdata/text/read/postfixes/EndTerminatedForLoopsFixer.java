@@ -60,36 +60,68 @@ public class EndTerminatedForLoopsFixer implements IPostProcessFixAction {
         final List<RobotExecutableRow<T>> executionContext = execUnit.getExecutionContext();
         
         final List<RobotExecutableRow<T>> toMark = new ArrayList<>();
-        boolean forDetected = false;
-        for (int i = 0; i < executionContext.size();i++) {
-            final RobotExecutableRow<T> row = executionContext.get(i);
-            if (row.getAction().getTypes().contains(RobotTokenType.FOR_TOKEN) && "FOR".equals(row.getAction().getText())) {
-                if (forDetected) {
+        RobotExecutableRow<T> forDeclarationRow = null;
+
+        for (final RobotExecutableRow<T> row : executionContext) {
+            if (isForDeclarationRow(row)) {
+                if (forDeclarationRow != null) {
                     toMark.clear();
                 }
-                forDetected = true;
+                forDeclarationRow = row;
 
-            } else if (row.getAction().getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
-                if (!forDetected) {
-                    row.getAction().getTypes().remove(RobotTokenType.FOR_END_TOKEN);
+            } else if (isForEndRow(row)) {
+                if (forDeclarationRow == null) {
+                    removeType(row, RobotTokenType.FOR_END_TOKEN);
+
                 } else {
                     if (row.getArguments().isEmpty()) {
+                        addType(forDeclarationRow, RobotTokenType.FOR_WITH_END);
                         for (final RobotExecutableRow<T> r : toMark) {
                             final FilePosition fp = r.getAction().getFilePosition().copy();
                             r.insertValueAt("", 0);
                             r.getAction().setFilePosition(fp);
-                            r.getAction().getTypes().add(RobotTokenType.FOR_WITH_END_CONTINUATION);
+                            addType(r, RobotTokenType.FOR_WITH_END_CONTINUATION);
                         }
-                        forDetected = false;
                     } else {
-                        row.getAction().getTypes().remove(RobotTokenType.FOR_END_TOKEN);
+                        removeType(row, RobotTokenType.FOR_END_TOKEN);
                     }
                 }
-
                 toMark.clear();
-            } else if (forDetected) {
+                forDeclarationRow = null;
+
+            } else if (forDeclarationRow != null && isIndentedForContinuationRow(row)) {
+                forDeclarationRow = null;
+                toMark.clear();
+
+            } else if (forDeclarationRow != null && !isIndentedForContinuationRow(row)) {
                 toMark.add(row);
             }
         }
+        
+        if (forDeclarationRow != null && executionContext.get(executionContext.size() - 1) == forDeclarationRow
+                && forDeclarationRow.getAction().getText().equals("FOR")) {
+            addType(forDeclarationRow, RobotTokenType.FOR_WITH_END);
+        }
+    }
+
+    private static <T> boolean isForDeclarationRow(final RobotExecutableRow<T> row) {
+        return row.getAction().getTypes().contains(RobotTokenType.FOR_TOKEN);
+    }
+
+    private static <T> boolean isIndentedForContinuationRow(final RobotExecutableRow<T> row) {
+        return row.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
+                || row.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
+    }
+
+    private static <T> boolean isForEndRow(final RobotExecutableRow<T> row) {
+        return row.getAction().getTypes().contains(RobotTokenType.FOR_END_TOKEN);
+    }
+
+    private static <T> boolean addType(final RobotExecutableRow<T> row, final RobotTokenType type) {
+        return row.getAction().getTypes().add(type);
+    }
+
+    private static <T> boolean removeType(final RobotExecutableRow<T> row, final RobotTokenType type) {
+        return row.getAction().getTypes().remove(type);
     }
 }

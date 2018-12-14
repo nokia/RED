@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
@@ -20,6 +21,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AttributesAugmentingReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -83,13 +85,18 @@ public class ExecutableForValidator implements ExecutableValidator {
         final List<?> children = holder.getElements();
         final int index = children.indexOf(row);
 
-        if (index >= 0 && !isFollowedByForContinuationRow(children, index)) {
+        if (index >= 0 && !isFollowedByForContinuationRow(children, index, shouldSettingBreakRule(row))) {
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.FOR_IS_EMPTY);
             reporter.handleProblem(problem, validationContext.getFile(), descriptor.getAction().getToken());
         }
     }
 
-    private boolean isFollowedByForContinuationRow(final List<?> children, final int index) {
+    private boolean shouldSettingBreakRule(final AModelElement<?> row) {
+        return !row.getDeclaration().getTypes().contains(RobotTokenType.FOR_WITH_END);
+    }
+
+    private boolean isFollowedByForContinuationRow(final List<?> children, final int index,
+            final boolean settingEndsLoop) {
         for (int i = index + 1; i < children.size(); i++) {
             if (children.get(i) instanceof RobotExecutableRow<?>) {
                 final RobotExecutableRow<?> nextRow = (RobotExecutableRow<?>) children.get(i);
@@ -102,6 +109,12 @@ public class ExecutableForValidator implements ExecutableValidator {
                 break;
             } else if (children.get(i) instanceof RobotEmptyRow<?>) {
                 continue;
+            } else if (children.get(i) instanceof LocalSetting<?>) {
+                if (settingEndsLoop) {
+                    return false;
+                } else {
+                    continue;
+                }
             } else {
                 return false;
             }
