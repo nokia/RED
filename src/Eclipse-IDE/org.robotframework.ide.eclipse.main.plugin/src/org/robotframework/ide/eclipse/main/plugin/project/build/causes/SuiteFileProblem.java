@@ -68,6 +68,14 @@ public enum SuiteFileProblem implements IProblemCause {
                     .map(name -> "*** " + name + " ***")
                     .map(ChangeToFixer::new)
                     .forEach(fixers::add);
+
+            final String canonicalWrongName = wrongName.replaceAll("\\s", "").toLowerCase();
+            if (canonicalWrongName.contains("metadata")) {
+                fixers.add(new ChangeToFixer("*** Settings ***"));
+
+            } else if (canonicalWrongName.contains("userkeyword")) {
+                fixers.add(new ChangeToFixer("*** Keywords ***"));
+            }
             fixers.add(new ChangeToFixer("*** Comments ***"));
             return fixers;
         }
