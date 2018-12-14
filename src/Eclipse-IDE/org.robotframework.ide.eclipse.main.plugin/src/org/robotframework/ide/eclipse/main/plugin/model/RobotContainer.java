@@ -6,14 +6,17 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
@@ -154,10 +157,10 @@ public abstract class RobotContainer implements RobotElement {
     }
 
     public Optional<RobotSuiteFile> getInitFileModel() {
-        // FIXME: it should be case insensitive, see RED-1012
+        final Map<String, IFile> initFiles = collectInitFiles();
         for (final String initName : RobotFile.INIT_NAMES) {
-            final IFile file = container.getFile(new Path(initName));
-            if (file.exists() && ASuiteFileDescriber.isInitializationFile(file)) {
+            final IFile file = initFiles.get(initName.toLowerCase());
+            if (file != null && file.exists() && ASuiteFileDescriber.isInitializationFile(file)) {
                 final RobotSuiteFile suiteFile = createSuiteFile(file);
                 if (suiteFile.getLinkedElement() == null) {
                     suiteFile.parse();
@@ -166,5 +169,20 @@ public abstract class RobotContainer implements RobotElement {
             }
         }
         return Optional.empty();
+    }
+
+    private Map<String, IFile> collectInitFiles() {
+        final Map<String, IFile> initFiles = new HashMap<>();
+        try {
+            for (final IResource resource : container.members()) {
+                if (resource.getType() == IResource.FILE
+                        && RobotFile.INIT_NAMES.stream().anyMatch(resource.getName()::equalsIgnoreCase)) {
+                    initFiles.put(resource.getName().toLowerCase(), (IFile) resource);
+                }
+            }
+        } catch (final CoreException e) {
+            // return all what is collected so far
+        }
+        return initFiles;
     }
 }
