@@ -61,8 +61,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         for (int i = index - 1; i >= 0; i--) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) executionContext.get(i);
 
-            if (row.getAction().getTypes().contains(RobotTokenType.FOR_TOKEN)
-                    && row.getAction().getText().equals("FOR")) {
+            if (row.getAction().getTypes().contains(RobotTokenType.FOR_TOKEN)) {
                 return i;
             }
         }
