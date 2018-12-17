@@ -16,6 +16,9 @@ import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.CheckStateProvider;
@@ -24,8 +27,130 @@ import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposi
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuiteLaunchElement;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.TestCaseLaunchElement;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.ShellProvider;
+
+import com.google.common.collect.ImmutableMap;
 
 public class SuitesToRunCompositeTest {
+
+    private static final String PROJECT_NAME = SuitesToRunCompositeTest.class.getSimpleName();
+
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+
+    @Rule
+    public ShellProvider shellProvider = new ShellProvider();
+
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
+        projectProvider.createFile("tests1.robot", "*** Test Cases ***", "test1", "test2", "test3");
+        projectProvider.createFile("tests2.robot", "*** Test Cases ***", "test4", "test5", "test6");
+        projectProvider.createFile("tasks.robot", "*** Tasks ***", "task1", "task2", "task3");
+        projectProvider.createFile("res.robot", "*** Keywords ***", "kw1", "kw2", "kw3");
+        projectProvider.createDir("nested");
+    }
+
+    @Test
+    public void emptyResultIsReturned_whenNoInputIsSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        assertThat(composite.extractSuitesToRun()).isEmpty();
+    }
+
+    @Test
+    public void singleSuiteWithNoTestsIsReturned_whenAllTestsAreSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("tests1.robot", newArrayList("test1", "test2", "test3")));
+        assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("tests1.robot", newArrayList());
+    }
+
+    @Test
+    public void singleSuiteWithSelectedTestsIsReturned_whenNotAllTestsAreSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("tests1.robot", newArrayList("test1", "test2")));
+        assertThat(composite.extractSuitesToRun()).hasSize(1)
+                .containsEntry("tests1.robot", newArrayList("test1", "test2"));
+    }
+
+    @Test
+    public void singleSuiteWithNoTasksIsReturned_whenAllTasksAreSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("tasks.robot", newArrayList("task1", "task2", "task3")));
+        assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("tasks.robot", newArrayList());
+    }
+
+    @Test
+    public void singleSuiteWithSelectedTasksIsReturned_whenNotAllTasksAreSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("tasks.robot", newArrayList("task1", "task2")));
+        assertThat(composite.extractSuitesToRun()).hasSize(1)
+                .containsEntry("tasks.robot", newArrayList("task1", "task2"));
+    }
+
+    @Test
+    public void singleResourceFileIsReturned_whenResourceIsSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("res.robot", newArrayList()));
+        assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("res.robot", newArrayList());
+    }
+
+    @Test
+    public void suiteFolderIsReturned_whenFolderIsSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("nested", newArrayList()));
+        assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("nested", newArrayList());
+    }
+
+    @Test
+    public void suiteFolderAndSuiteWithNoTestsAreReturned_whenFolderAndSuiteWithAllTestsAreSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME,
+                ImmutableMap.of("nested", newArrayList(), "tests1.robot", newArrayList("test1", "test2", "test3")));
+        assertThat(composite.extractSuitesToRun()).hasSize(2)
+                .containsEntry("nested", newArrayList())
+                .containsEntry("tests1.robot", newArrayList());
+    }
+
+    @Test
+    public void emptyResultIsReturned_whenEmptyProjectNameIsSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput("", ImmutableMap.of("tests1.robot", newArrayList()));
+        assertThat(composite.extractSuitesToRun()).isEmpty();
+    }
+
+    @Test
+    public void singleSuiteWithNotExistingTestIsReturned_whenNotExistingTestIsSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("tests1.robot", newArrayList("other")));
+        assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("tests1.robot", newArrayList("other"));
+    }
+
+    @Test
+    public void singleNotExistingSuiteIsReturned_whenNotExistingSuiteIsSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("other.robot", newArrayList()));
+        assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("other.robot", newArrayList());
+    }
+
+    @Test
+    public void twoSuitesWithSelectedTestsAreReturned_whenNotAllTestsAreSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME,
+                ImmutableMap.of("tests1.robot", newArrayList("test1", "test2"), "tests2.robot", newArrayList("test3")));
+        assertThat(composite.extractSuitesToRun()).hasSize(2)
+                .containsEntry("tests1.robot", newArrayList("test1", "test2"))
+                .containsEntry("tests2.robot", newArrayList("test3"));
+    }
+
+    @Test
+    public void twoSuitesWithNoTestsAreReturned_whenAllTestsAreSelected() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME, ImmutableMap.of("tests1.robot", newArrayList("test1", "test2", "test3"),
+                "tests2.robot", newArrayList("test4", "test5", "test6")));
+        assertThat(composite.extractSuitesToRun()).hasSize(2)
+                .containsEntry("tests1.robot", newArrayList())
+                .containsEntry("tests2.robot", newArrayList());
+    }
 
     @Test
     public void whenContentProviderIsAskedForElements_itReturnsArrayConvertedFromList() {
@@ -51,7 +176,7 @@ public class SuitesToRunCompositeTest {
         final TestCaseLaunchElement test2 = new TestCaseLaunchElement(suiteElement, "test2", true, false);
         suiteElement.addChild(test1);
         suiteElement.addChild(test2);
-        
+
         final Object[] children = provider.getChildren(suiteElement);
         assertThat(children).isEqualTo(new Object[] { test1, test2 });
     }
@@ -94,7 +219,7 @@ public class SuitesToRunCompositeTest {
         final SuiteLaunchElement suiteElement = new SuiteLaunchElement(mock(IResource.class));
         final TestCaseLaunchElement test1 = new TestCaseLaunchElement(suiteElement, "test2", true, false);
         suiteElement.addChild(test1);
-        
+
         assertThat(provider.hasChildren(test1)).isFalse();
     }
 
