@@ -18,6 +18,7 @@ import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
@@ -127,6 +128,11 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     @Override
     public ITextHover getTextHover(final ISourceViewer sourceViewer, final String contentType) {
         return new SuiteSourceHoverSupport(editor.getFileModel());
+    }
+
+    @Override
+    public ITextDoubleClickStrategy getDoubleClickStrategy(final ISourceViewer sourceViewer, final String contentType) {
+        return new RedSourceDoubleClickStrategy(editor.fileModel.isTsvFile());
     }
 
     @Override
