@@ -89,16 +89,16 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 return;
             }
 
-            if (isNewStyleForLoop(firstMeaningfulToken)) {
+            if (isEndTerminatedForLoopStyle(firstMeaningfulToken)) {
                 command.text += addedIndent;
 
-                if (newStyleForLoopRequiresEnd(currentLine)) {
+                if (endTerminatedForLoopRequiresEnd(currentLine)) {
                     command.shiftsCaret = false;
                     command.caretOffset = command.offset + command.text.length();
                     command.text += lineDelimiter + addedIndent + "END";
                 }
 
-            } else if (isOldStyleForLoop(firstMeaningfulToken)) {
+            } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
                 command.text += "\\" + getSeparator();
 
             } else if (isRequiringContinuation(firstMeaningfulToken)) {
@@ -142,11 +142,11 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 || types.contains(RobotTokenType.KEYWORD_EMPTY_CELL);
     }
 
-    private boolean isNewStyleForLoop(final RobotToken token) {
-        return token.getTypes().contains(RobotTokenType.FOR_TOKEN) && token.getText().trim().equals("FOR");
+    private boolean isEndTerminatedForLoopStyle(final RobotToken token) {
+        return token.getTypes().contains(RobotTokenType.FOR_WITH_END);
     }
 
-    private boolean newStyleForLoopRequiresEnd(final RobotLine currentLine) {
+    private boolean endTerminatedForLoopRequiresEnd(final RobotLine currentLine) {
         final List<RobotLine> allLines = currentLine.getParent().getFileContent();
         for (int i = allLines.indexOf(currentLine) + 1; i < allLines.size(); i++) {
             final RobotLine line = allLines.get(i);
@@ -162,8 +162,8 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         return true;
     }
 
-    private boolean isOldStyleForLoop(final RobotToken token) {
-        return token.getTypes().contains(RobotTokenType.FOR_TOKEN) && !token.getText().trim().equals("FOR")
+    private boolean isIndentedForLoopStyle(final RobotToken token) {
+        return token.getTypes().contains(RobotTokenType.FOR_TOKEN) && !isEndTerminatedForLoopStyle(token)
                 || token.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN);
     }
 
