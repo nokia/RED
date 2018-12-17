@@ -1,3 +1,30 @@
+# RED - Robot Editor v0.8.10
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7) or newer  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.10 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- Running suites with dots in names uses correct arguments
+- Supports FOR loops with END syntax added in Robot Framework 3.1
+- Allows to save file without interpreter specified
+- Removed commented variables from Outline
+- Other minor fixes
+
+## GitHub issues updates
+ - #262 - Wrong arguments when running suites with dots in name
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.9
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
@@ -10,7 +37,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
-Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.9 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates
@@ -46,7 +73,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
-Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.8 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates
@@ -75,7 +102,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
-Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.7 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates
@@ -105,7 +132,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
-Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.6 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates
@@ -136,7 +163,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
-Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.5 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates
@@ -170,7 +197,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
-Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.4 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates
@@ -200,7 +227,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
-Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.3 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates
