@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -23,16 +23,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.IDecoration;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.Viewer;
@@ -94,48 +90,39 @@ class SuitesToRunComposite extends Composite {
         viewer.setCheckStateProvider(new CheckStateProvider());
         viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new CheckboxTreeViewerLabelProvider()));
         viewer.setContentProvider(new CheckboxTreeViewerContentProvider());
-        viewer.addCheckStateListener(new ICheckStateListener() {
+        viewer.addCheckStateListener(event -> {
+            final Object element = event.getElement();
+            final boolean isElementChecked = event.getChecked();
 
-            @Override
-            public void checkStateChanged(final CheckStateChangedEvent event) {
-                final Object element = event.getElement();
-                final boolean isElementChecked = event.getChecked();
-
-                if (element instanceof SuiteLaunchElement) {
-                    ((SuiteLaunchElement) element).updateChecked(isElementChecked);
-                } else if (element instanceof TestCaseLaunchElement) {
-                    ((TestCaseLaunchElement) element).updateChecked(isElementChecked);
-                }
-                listener.suitesChanged();
+            if (element instanceof SuiteLaunchElement) {
+                ((SuiteLaunchElement) element).updateChecked(isElementChecked);
+            } else if (element instanceof TestCaseLaunchElement) {
+                ((TestCaseLaunchElement) element).updateChecked(isElementChecked);
             }
+            listener.suitesChanged();
         });
-        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-                final Button removeButton = buttons.get(EButton.REMOVE);
-                final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-                if (selection.isEmpty()) {
-                    removeButton.setEnabled(false);
-                    return;
-                }
-                final List<SuiteLaunchElement> suites = Selections.getElements(selection, SuiteLaunchElement.class);
-                final List<TestCaseLaunchElement> tests = Selections.getElements(selection,
-                        TestCaseLaunchElement.class);
-                if (!suites.isEmpty() && tests.isEmpty()) {
-                    removeButton.setEnabled(true);
-                } else if (suites.isEmpty() && !tests.isEmpty()) {
-                    boolean allAreMissing = true;
-                    for (final TestCaseLaunchElement test : tests) {
-                        if (!test.isMissing) {
-                            allAreMissing = false;
-                            break;
-                        }
+        viewer.addSelectionChangedListener(event -> {
+            final Button removeButton = buttons.get(EButton.REMOVE);
+            final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+            if (selection.isEmpty()) {
+                removeButton.setEnabled(false);
+                return;
+            }
+            final List<SuiteLaunchElement> suites = Selections.getElements(selection, SuiteLaunchElement.class);
+            final List<TestCaseLaunchElement> tests = Selections.getElements(selection, TestCaseLaunchElement.class);
+            if (!suites.isEmpty() && tests.isEmpty()) {
+                removeButton.setEnabled(true);
+            } else if (suites.isEmpty() && !tests.isEmpty()) {
+                boolean allAreMissing = true;
+                for (final TestCaseLaunchElement test : tests) {
+                    if (!test.isMissing) {
+                        allAreMissing = false;
+                        break;
                     }
-                    removeButton.setEnabled(allAreMissing);
-                } else {
-                    removeButton.setEnabled(false);
                 }
+                removeButton.setEnabled(allAreMissing);
+            } else {
+                removeButton.setEnabled(false);
             }
         });
     }
@@ -176,11 +163,8 @@ class SuitesToRunComposite extends Composite {
                             continue;
                         }
                         final SuiteLaunchElement suite = new SuiteLaunchElement(chosenResource);
-                        for (final RobotCodeHoldingElement<?> theCase : getCases(chosenResource)) {
-                            final TestCaseLaunchElement child = new TestCaseLaunchElement(suite, theCase.getName(),
-                                    false,
-                                    false);
-                            suite.addChild(child);
+                        for (final String caseName : getCaseNames(chosenResource)) {
+                            suite.addChild(new TestCaseLaunchElement(suite, caseName, true, false));
                         }
                         if (!suitesToLaunch.contains(suite)) {
                             suitesToLaunch.add(suite);
@@ -290,7 +274,7 @@ class SuitesToRunComposite extends Composite {
         }
     }
 
-    void setInput(final String projectName, final Map<String, List<String>> map) {
+    void setInput(final String projectName, final Map<String, List<String>> suitesToRun) {
         this.projectName = projectName;
         suitesToLaunch.clear();
         viewer.setInput(suitesToLaunch);
@@ -302,9 +286,9 @@ class SuitesToRunComposite extends Composite {
                 return;
             }
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-            for (final Entry<String, List<String>> entry : map.entrySet()) {
-                suitesToLaunch.add(extractSuite(project, entry));
-            }
+            suitesToRun.forEach((pathString, caseNames) -> {
+                suitesToLaunch.add(extractSuite(project, Path.fromPortableString(pathString), caseNames));
+            });
         } finally {
             viewer.refresh();
             viewer.setExpandedElements(checked);
@@ -312,27 +296,24 @@ class SuitesToRunComposite extends Composite {
         }
     }
 
-    private SuiteLaunchElement extractSuite(final IProject project, final Entry<String, List<String>> entry) {
-        final IPath path = Path.fromPortableString(entry.getKey());
-        final IResource resource = path.getFileExtension() == null ? project.getFolder(path)
-                : project.getFile(path);
+    private SuiteLaunchElement extractSuite(final IProject project, final IPath path, final List<String> caseNames) {
+        final IResource resource = path.getFileExtension() == null ? project.getFolder(path) : project.getFile(path);
         final SuiteLaunchElement suite = new SuiteLaunchElement(resource);
 
-        final List<String> allCases = new ArrayList<>(entry.getValue());
+        final List<String> missingCaseNames = new ArrayList<>(caseNames);
 
-        for (final RobotCodeHoldingElement<?> theCase : getCases(resource)) {
-            final String name = theCase.getName();
-            suite.addChild(new TestCaseLaunchElement(suite, name,
-                    entry.getValue().isEmpty() || entry.getValue().contains(name.toLowerCase()), false));
-            allCases.remove(name.toLowerCase());
+        for (final String caseName : getCaseNames(resource)) {
+            final boolean isChecked = caseNames.isEmpty() || caseNames.contains(caseName.toLowerCase());
+            suite.addChild(new TestCaseLaunchElement(suite, caseName, isChecked, false));
+            missingCaseNames.remove(caseName.toLowerCase());
         }
-        for (final String missingSuite : allCases) {
-            suite.addChild(new TestCaseLaunchElement(suite, missingSuite, true, true));
+        for (final String missingCaseName : missingCaseNames) {
+            suite.addChild(new TestCaseLaunchElement(suite, missingCaseName, true, true));
         }
         return suite;
     }
 
-    private static List<RobotCodeHoldingElement<?>> getCases(final IResource resource) {
+    private static List<String> getCaseNames(final IResource resource) {
         final List<RobotCodeHoldingElement<?>> cases = new ArrayList<>();
 
         if (resource.exists() && resource.getType() == IResource.FILE) {
@@ -350,25 +331,29 @@ class SuitesToRunComposite extends Composite {
                 }
             }
         }
-        return cases;
+        return cases.stream().map(RobotCodeHoldingElement::getName).collect(Collectors.toList());
     }
 
     Map<String, List<String>> extractSuitesToRun() {
         final Map<String, List<String>> suitesToRun = new LinkedHashMap<>();
 
+        boolean allTestsSelected = true;
         for (final SuiteLaunchElement suite : suitesToLaunch) {
             if (suite.isChecked()) {
+                allTestsSelected = allTestsSelected && suite.hasCheckedAllChildren();
                 final List<String> tests = new ArrayList<>();
-                if (!suite.hasCheckedAllChildren()) {
-                    for (final TestCaseLaunchElement test : suite.getChildren()) {
-                        if (test.isChecked()) {
-                            tests.add(test.getName().toLowerCase());
-                        }
+                for (final TestCaseLaunchElement test : suite.getChildren()) {
+                    if (test.isChecked()) {
+                        tests.add(test.getName().toLowerCase());
                     }
                 }
                 suitesToRun.put(suite.getPath(), tests);
             }
         }
+        if (allTestsSelected) {
+            suitesToRun.values().forEach(List::clear);
+        }
+
         return suitesToRun;
     }
 
