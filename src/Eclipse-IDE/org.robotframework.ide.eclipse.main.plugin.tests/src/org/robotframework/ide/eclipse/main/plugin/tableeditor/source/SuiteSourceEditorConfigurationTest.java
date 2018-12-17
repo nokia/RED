@@ -6,12 +6,17 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.Map;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
+import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallInSettingsRule;
@@ -75,6 +80,27 @@ public class SuiteSourceEditorConfigurationTest {
         assertThat(rules).hasSameSizeAs(types);
         for (int i = 0; i < rules.length; i++) {
             assertThat(rules[i]).isExactlyInstanceOf(types[i]);
+        }
+    }
+
+    @Test
+    public void redSourceDoubleClickStrategyIsProvided_independentlyOfContentType() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().build();
+        final SuiteSourceEditor editor = ContextInjector.prepareContext()
+                .inWhich(fileModel)
+                .isInjectedInto(new SuiteSourceEditor());
+
+        final SuiteSourceEditorConfiguration config = new SuiteSourceEditorConfiguration(editor,
+                KeySequence.getInstance());
+        final ISourceViewer sourceViewer = mock(ISourceViewer.class);
+
+        assertThat(config.getDoubleClickStrategy(sourceViewer, null)).isInstanceOf(RedSourceDoubleClickStrategy.class);
+        assertThat(config.getDoubleClickStrategy(sourceViewer, "")).isInstanceOf(RedSourceDoubleClickStrategy.class);
+        assertThat(config.getDoubleClickStrategy(sourceViewer, "type"))
+                .isInstanceOf(RedSourceDoubleClickStrategy.class);
+        for (final String type : SuiteSourcePartitionScanner.LEGAL_CONTENT_TYPES) {
+            assertThat(config.getDoubleClickStrategy(sourceViewer, type))
+                    .isInstanceOf(RedSourceDoubleClickStrategy.class);
         }
     }
 }
