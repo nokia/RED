@@ -1,3 +1,17 @@
+RED 0.8.10 - 2018/12/17
+Enhancement
+
+	[RED-1207] - RF3.1 - Support for FOR loops END
+
+Bug
+
+	[RED-531] - \s is added to variable name after pasting cell from variable value
+	[RED-1012] - Debugger enters erroneous state when breakpoint is set in robot init file and init file name is not in lower case
+	[RED-1089] - Removing commented variables from Outline
+	[RED-1095] - Marker disappears when writing and saving file
+	[RED-1117] - Error after saving file when there is no intrerpreter
+	[RED-1206] - [Github #262] Wrong arguments when running suites with dots in name
+
 RED 0.8.9 - 2018/11/20
 Feature
 
