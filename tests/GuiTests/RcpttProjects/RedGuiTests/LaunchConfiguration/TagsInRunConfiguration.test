@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kgXUQPwQEeW7_PzjO98BIw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/1/18 3:03 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 12/18/18 1:35 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -90,21 +90,21 @@ with [get-window "Run Configurations"] {
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-item "SingleTest.tsv" | get-property childCount | equals 9 | verify-true
     get-item "SingleTest.tsv" | get-property "getItems().TreeItem[0].getText()" | equals test1 | verify-true
-    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[0].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[0].getChecked()" | equals true | verify-true
     get-item "SingleTest.tsv" | get-property "getItems().TreeItem[1].getText()" | equals test2 | verify-true
-    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[1].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[1].getChecked()" | equals true | verify-true
     get-item "SingleTest.tsv" | get-property "getItems().TreeItem[2].getText()" | equals test3 | verify-true
-    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[2].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[2].getChecked()" | equals true | verify-true
     get-item "SingleTest.tsv" | get-property "getItems().TreeItem[3].getText()" | equals test4 | verify-true
-    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[3].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[3].getChecked()" | equals true | verify-true
     get-item "SingleTest.tsv" | get-property "getItems().TreeItem[4].getText()" | equals test5 | verify-true
-    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[4].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[4].getChecked()" | equals true | verify-true
     get-item "SingleTest.tsv" | get-property "getItems().TreeItem[5].getText()" | equals test6 | verify-true
-    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[5].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[5].getChecked()" | equals true | verify-true
     get-item "SingleTest.tsv" | get-property "getItems().TreeItem[6].getText()" | equals test7 | verify-true
-    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[6].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[6].getChecked()" | equals true | verify-true
     get-item "SingleTest.tsv" | get-property "getItems().TreeItem[7].getText()" | equals test8 | verify-true
-    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[7].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[7].getChecked()" | equals true | verify-true
 }
 //check content assist in Tag "Only run tests.."
 with [get-window "Run Configurations" | get-group Tags | get-editbox] {
@@ -145,6 +145,7 @@ with [get-window "Run Configurations" | get-window -class ContentProposalPopup |
     
 }
 //select 2 test and check content assist
+get-window "Run Configurations" | get-group "Suite(s)" | get-tree | get-item -path "SingleTest.tsv" | uncheck
 with [get-window "Run Configurations"]{
     with [get-group "Suite(s)" | get-tree] {
         get-item "SingleTest.tsv/test1" | check
