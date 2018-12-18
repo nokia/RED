@@ -7,10 +7,18 @@ Element-Version: 3.0
 External-Reference: 
 Id: _NFAlcOmFEeibRqo1Bs_dDA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/30/18 5:37 PM
+Save-Time: 12/18/18 11:50 AM
+Tags: notTestable
 Testcase-Type: ecl
 Verifications: _OFT48OmSEeibRqo1Bs_dDA
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+This doesn't work due to problem in Robot
+https://github.com/robotframework/robotframework/issues/3029
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
