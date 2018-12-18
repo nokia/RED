@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9aBo4JQ7EeWNpL9oeriwCw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/2/18 11:09 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 12/18/18 1:38 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -209,8 +209,8 @@ get-window "Run Configurations" | get-window "Select suite" | get-tree | select 
 //check that 2 tests are shown to be selected    
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-item "SingleTest.tsv" | get-property checked | equals true | verify-true
-    get-item "SingleTest.tsv/test1" | get-property checked | equals false | verify-true
-    get-item "SingleTest.tsv/test2" | get-property checked | equals false | verify-true
+    get-item "SingleTest.tsv/test1" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test2" | get-property checked | equals true | verify-true
 }
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-property "getItems().TreeItem[0].getText()" | equals "SingleTest.tsv" | verify-true
@@ -220,7 +220,7 @@ with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
 }
 //select only on test (test1) and run 
 with [get-window "Run Configurations"] {
-    get-group "Suite(s)" | get-tree | get-item "SingleTest.tsv/test1" | check
+    get-group "Suite(s)" | get-tree | get-item "SingleTest.tsv/test2" | uncheck
     get-button Apply | click
     get-button Run | click
 }
