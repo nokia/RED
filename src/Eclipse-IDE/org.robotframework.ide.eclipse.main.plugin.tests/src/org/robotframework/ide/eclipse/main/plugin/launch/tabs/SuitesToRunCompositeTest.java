@@ -20,7 +20,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.CheckStateProvider;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.CheckboxTreeViewerContentProvider;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.CheckboxTreeViewerLabelProvider;
@@ -49,6 +51,10 @@ public class SuitesToRunCompositeTest {
         projectProvider.createFile("tasks.robot", "*** Tasks ***", "task1", "task2", "task3");
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw1", "kw2", "kw3");
         projectProvider.createDir("nested");
+
+        RedPlugin.getModelManager()
+                .createProject(projectProvider.getProject())
+                .setRobotParserComplianceVersion(new RobotVersion(3, 1));
     }
 
     @Test
