@@ -367,7 +367,9 @@ class SuitesToRunComposite extends Composite {
     private static List<String> getCaseNames(final IResource resource) {
         final List<RobotCodeHoldingElement<?>> cases = new ArrayList<>();
 
-        if (resource.exists() && resource.getType() == IResource.FILE) {
+        if (resource.exists() && resource.getType() == IResource.FILE
+                && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                        || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
             final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
             if (suiteModel.isSuiteFile()) {
                 final Optional<RobotCasesSection> section = suiteModel.findSection(RobotCasesSection.class);
