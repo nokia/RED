@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -88,19 +90,18 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
         for (final TreePath path : selection.getPaths()) {
             final Object element = path.getLastSegment();
             if (element instanceof LibrarySpecification) {
-                final IProject project = findProject(path);
-                groupedSpecifications.put(project, (LibrarySpecification) element);
+                findProject(path)
+                        .ifPresent(project -> groupedSpecifications.put(project, (LibrarySpecification) element));
             }
         }
         return groupedSpecifications;
     }
 
-    private IProject findProject(final TreePath path) {
-        for (int i = 0; i < path.getSegmentCount(); i++) {
-            if (path.getSegment(i) instanceof IProject) {
-                return (IProject) path.getSegment(i);
-            }
-        }
-        return null;
+    private Optional<IProject> findProject(final TreePath path) {
+        return IntStream.range(0, path.getSegmentCount())
+                .mapToObj(path::getSegment)
+                .map(s -> RedPlugin.getAdapter(s, IProject.class))
+                .filter(project -> project != null)
+                .findFirst();
     }
 }
