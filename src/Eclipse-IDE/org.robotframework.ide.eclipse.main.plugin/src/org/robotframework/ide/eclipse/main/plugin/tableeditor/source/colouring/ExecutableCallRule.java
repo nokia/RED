@@ -146,7 +146,8 @@ public class ExecutableCallRule extends VariableUsageRule {
                         && !types.contains(RobotTokenType.VARIABLE_USAGE)
                         && !types.contains(RobotTokenType.ASSIGNMENT)
                         && !types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
-                        && !types.contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
+                        && !types.contains(RobotTokenType.FOR_CONTINUE_TOKEN)
+                        && !types.contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)) {
                     return false;
                 }
             }
