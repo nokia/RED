@@ -8,10 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -89,11 +88,11 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
 
     private void createAndLaunchConfigurationForSelectedTestCases(final IStructuredSelection selection,
             final String mode) {
-        final Optional<Map<IResource, List<String>>> resourcesToTests = mapResourcesToTestCases(selection);
-        if (resourcesToTests.isPresent()) {
+        final Map<IResource, List<String>> resourcesToTests = mapResourcesToTestCases(selection);
+        if (!resourcesToTests.isEmpty()) {
             try {
                 final ILaunchConfiguration config = RobotLaunchConfiguration
-                        .prepareForSelectedTestCases(resourcesToTests.get());
+                        .prepareForSelectedTestCases(resourcesToTests);
                 final ILaunchConfiguration sameConfig = RobotLaunchConfigurationFinder.findSameAs(config);
                 if (sameConfig != null) {
                     doLaunchConfiguration(sameConfig, mode);
@@ -119,11 +118,11 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
                         config = RobotLaunchConfigurationFinder
                                 .getLaunchConfigurationExceptSelectedTestCases(resources);
                     } else {
-                        final Optional<Map<IResource, List<String>>> resourcesToTests = mapResourcesToTestCases(ss);
-                        if (resourcesToTests.isPresent()) {
+                        final Map<IResource, List<String>> resourcesToTests = mapResourcesToTestCases(ss);
+                        if (!resourcesToTests.isEmpty()) {
                             config = RobotLaunchConfigurationFinder
-                                    .getLaunchConfigurationForSelectedTestCases(resourcesToTests.get());
-                            new RobotLaunchConfiguration(config).updateTestCases(resourcesToTests.get());
+                                    .getLaunchConfigurationForSelectedTestCases(resourcesToTests);
+                            new RobotLaunchConfiguration(config).updateTestCases(resourcesToTests);
                         }
                     }
                 }
@@ -134,28 +133,15 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
         return config == null ? null : new ILaunchConfiguration[] { config };
     }
 
-    private static Optional<Map<IResource, List<String>>> mapResourcesToTestCases(
-            final IStructuredSelection selection) {
-        final Iterator<?> selectedElements = selection.iterator();
-        final Map<IResource, List<String>> resourcesToTests = new HashMap<>();
-        while (selectedElements.hasNext()) {
-            final Object o = selectedElements.next();
-            if (o instanceof RobotCase) {
-                addRobotCaseToMap(resourcesToTests, (RobotCase) o);
-            } else {
-                // There is a selection element that should not be launched with others
-                return Optional.empty();
-            }
-        }
-        return Optional.of(resourcesToTests);
-    }
-
-    private static void addRobotCaseToMap(final Map<IResource, List<String>> map, final RobotCase robotCase) {
-        final IResource res = robotCase.getSuiteFile().getFile();
-        if (map.containsKey(res)) {
-            map.get(res).add(robotCase.getName());
+    private static Map<IResource, List<String>> mapResourcesToTestCases(final IStructuredSelection selection) {
+        final List<RobotCase> cases = Selections.getAdaptableElements(selection, RobotCase.class);
+        if (cases.size() == selection.size()) {
+            return cases.stream()
+                    .collect(Collectors.groupingBy(robotCase -> (IResource) robotCase.getSuiteFile().getFile(),
+                            Collectors.mapping(robotCase -> robotCase.getName(), Collectors.toList())));
         } else {
-            map.put(res, newArrayList(robotCase.getName()));
+            // There is a selection element that should not be launched with others
+            return new HashMap<>();
         }
     }
 
