@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -26,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.CheckStateProvider;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.CheckboxTreeViewerContentProvider;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.CheckboxTreeViewerLabelProvider;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.CheckboxTreeViewerSorter;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuiteLaunchElement;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.TestCaseLaunchElement;
 import org.robotframework.red.graphics.ImagesManager;
@@ -156,6 +158,24 @@ public class SuitesToRunCompositeTest {
         assertThat(composite.extractSuitesToRun()).hasSize(2)
                 .containsEntry("tests1.robot", newArrayList())
                 .containsEntry("tests2.robot", newArrayList());
+    }
+
+    @Test
+    public void allSuitesAndTestsAreSelectedAndDeselectedCorrectly() throws Exception {
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        composite.setInput(PROJECT_NAME,
+                ImmutableMap.of("tests1.robot", newArrayList("test1"), "tests2.robot", newArrayList("test4", "test5")));
+        assertThat(composite.extractSuitesToRun()).hasSize(2)
+                .containsEntry("tests1.robot", newArrayList("test1"))
+                .containsEntry("tests2.robot", newArrayList("test4", "test5"));
+
+        composite.setLaunchElementsChecked(true);
+        assertThat(composite.extractSuitesToRun()).hasSize(2)
+                .containsEntry("tests1.robot", newArrayList())
+                .containsEntry("tests2.robot", newArrayList());
+
+        composite.setLaunchElementsChecked(false);
+        assertThat(composite.extractSuitesToRun()).isEmpty();
     }
 
     @Test
@@ -427,5 +447,81 @@ public class SuitesToRunCompositeTest {
 
         assertThat(provider.isChecked(testElement)).isFalse();
         assertThat(provider.isGrayed(testElement)).isFalse();
+    }
+
+    @Test
+    public void whenCheckSorterIsAskedForCategory_ZeroIsReturnedForFolders() throws Exception {
+        final CheckboxTreeViewerSorter sorter = new CheckboxTreeViewerSorter();
+
+        final IResource resource = mock(IResource.class);
+        when(resource.getType()).thenReturn(IResource.FOLDER);
+        final SuiteLaunchElement suiteElement = new SuiteLaunchElement(resource);
+
+        assertThat(sorter.category(suiteElement)).isEqualTo(0);
+    }
+
+    @Test
+    public void whenCheckSorterIsAskedForCategory_OneIsReturnedForFiles() throws Exception {
+        final CheckboxTreeViewerSorter sorter = new CheckboxTreeViewerSorter();
+
+        final IResource resource = mock(IResource.class);
+        when(resource.getType()).thenReturn(IResource.FILE);
+        final SuiteLaunchElement suiteElement = new SuiteLaunchElement(resource);
+
+        assertThat(sorter.category(suiteElement)).isEqualTo(1);
+    }
+
+    @Test
+    public void whenCheckSorterIsAskedForCategory_ZeroIsReturnedForCases() throws Exception {
+        final CheckboxTreeViewerSorter sorter = new CheckboxTreeViewerSorter();
+
+        final SuiteLaunchElement suiteElement = new SuiteLaunchElement(mock(IResource.class));
+        final TestCaseLaunchElement test = new TestCaseLaunchElement(suiteElement, "test", true, false);
+
+        assertThat(sorter.category(test)).isEqualTo(0);
+    }
+
+    @Test
+    public void whenCheckSorterIsAskedForCompare_folderIsBeforeFile() throws Exception {
+        final CheckboxTreeViewerSorter sorter = new CheckboxTreeViewerSorter();
+
+        final IResource folder = mock(IResource.class);
+        when(folder.getType()).thenReturn(IResource.FOLDER);
+        final IResource file = mock(IResource.class);
+        when(file.getType()).thenReturn(IResource.FILE);
+        final SuiteLaunchElement folderElement = new SuiteLaunchElement(folder);
+        final SuiteLaunchElement fileElement = new SuiteLaunchElement(file);
+
+        assertThat(sorter.compare(mock(Viewer.class), folderElement, fileElement)).isNegative();
+        assertThat(sorter.compare(mock(Viewer.class), fileElement, folderElement)).isPositive();
+    }
+
+    @Test
+    public void whenCheckSorterIsAskedForCompare_filesAreInNaturalOrder() throws Exception {
+        final CheckboxTreeViewerSorter sorter = new CheckboxTreeViewerSorter();
+
+        final IResource file1 = mock(IResource.class);
+        when(file1.getType()).thenReturn(IResource.FILE);
+        when(file1.getFullPath()).thenReturn(Path.fromPortableString("abc.robot"));
+        final IResource file2 = mock(IResource.class);
+        when(file2.getType()).thenReturn(IResource.FILE);
+        when(file2.getFullPath()).thenReturn(Path.fromPortableString("def.robot"));
+        final SuiteLaunchElement fileElement1 = new SuiteLaunchElement(file1);
+        final SuiteLaunchElement fileElement2 = new SuiteLaunchElement(file2);
+
+        assertThat(sorter.compare(mock(Viewer.class), fileElement1, fileElement2)).isNegative();
+        assertThat(sorter.compare(mock(Viewer.class), fileElement2, fileElement1)).isPositive();
+    }
+
+    @Test
+    public void whenCheckSorterIsAskedForCompare_testCasesAreInNaturalOrder() throws Exception {
+        final CheckboxTreeViewerSorter sorter = new CheckboxTreeViewerSorter();
+
+        final SuiteLaunchElement suiteElement = new SuiteLaunchElement(mock(IResource.class));
+        final TestCaseLaunchElement testElement1 = new TestCaseLaunchElement(suiteElement, "abc", true, false);
+        final TestCaseLaunchElement testElement2 = new TestCaseLaunchElement(suiteElement, "def", true, false);
+
+        assertThat(sorter.compare(mock(Viewer.class), testElement1, testElement2)).isNegative();
+        assertThat(sorter.compare(mock(Viewer.class), testElement2, testElement1)).isPositive();
     }
 }

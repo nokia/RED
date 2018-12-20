@@ -13,9 +13,12 @@ import static org.mockito.Mockito.when;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationException;
@@ -44,6 +47,13 @@ public class LaunchConfigurationTabValidatorTest {
     @Rule
     public RunConfigurationProvider remoteRobotRunConfigurationProvider = new RunConfigurationProvider(
             RemoteRobotLaunchConfiguration.TYPE_ID);
+
+    @Before
+    public void beforeTest() throws Exception {
+        RedPlugin.getModelManager()
+                .createProject(projectProvider.getProject())
+                .setRobotParserComplianceVersion(new RobotVersion(3, 1));
+    }
 
     @Test
     public void whenProjectNameIsEmpty_fatalExceptionIsThrown() throws Exception {
@@ -124,7 +134,24 @@ public class LaunchConfigurationTabValidatorTest {
 
         assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
                 .isThrownBy(() -> validator.validateRobotTab(launchConfig))
-                .withMessage("Following tests do not exist: case4, case5")
+                .withMessage("Following cases do not exist: case4, case5")
+                .withNoCause();
+    }
+
+    @Test
+    public void whenTasksSpecifiedInSuiteDoNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
+        projectProvider.createFile("tasks.robot", "*** Tasks ***", "task1", "  Log  10", "task2", "  Log  20", "task3",
+                "  Log  30");
+
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.1"));
+
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setSuitePaths(ImmutableMap.of("tasks.robot", newArrayList("task3", "task4", "task5")));
+
+        assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
+                .isThrownBy(() -> validator.validateRobotTab(launchConfig))
+                .withMessage("Following cases do not exist: task4, task5")
                 .withNoCause();
     }
 
