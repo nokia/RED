@@ -38,6 +38,9 @@ interface RobotCommandExecutor {
 
     void createLibdoc(String libName, File outputFile, LibdocFormat format, EnvironmentSearchPaths additionalPaths);
 
+    void createLibdocInSeparateProcess(String libName, File outputFile, LibdocFormat format,
+            EnvironmentSearchPaths additionalPaths);
+
     String createHtmlDoc(String doc, DocFormat format);
 
     void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean recursiveInVirtualenv,
