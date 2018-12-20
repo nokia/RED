@@ -11,8 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -47,11 +45,8 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
@@ -93,31 +88,7 @@ class SuitesToRunComposite extends Composite {
         viewer.setCheckStateProvider(new CheckStateProvider());
         viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new CheckboxTreeViewerLabelProvider()));
         viewer.setContentProvider(new CheckboxTreeViewerContentProvider());
-        viewer.setComparator(new ViewerComparator() {
-
-            @Override
-            public int category(final Object element) {
-                return ((SuiteLaunchElement) element).resource.getType() == IResource.FOLDER ? 0 : 1;
-            }
-
-            @Override
-            public int compare(final Viewer viewer, final Object e1, final Object e2) {
-                final int cat1 = category(e1);
-                final int cat2 = category(e2);
-
-                if (cat1 != cat2) {
-                    return cat1 - cat2;
-                }
-
-                final IResource resource1 = ((SuiteLaunchElement) e1).resource;
-                final IResource resource2 = ((SuiteLaunchElement) e2).resource;
-
-                final String path1 = resource1.getFullPath().toString();
-                final String path2 = resource2.getFullPath().toString();
-
-                return path1.compareToIgnoreCase(path2);
-            }
-        });
+        viewer.setComparator(new CheckboxTreeViewerSorter());
         viewer.addCheckStateListener(event -> {
             final Object element = event.getElement();
             final boolean isElementChecked = event.getChecked();
@@ -213,10 +184,7 @@ class SuitesToRunComposite extends Composite {
                         if (chosenResource.getType() == IResource.PROJECT) {
                             continue;
                         }
-                        final SuiteLaunchElement suite = new SuiteLaunchElement(chosenResource);
-                        for (final String caseName : getCaseNames(chosenResource)) {
-                            suite.addChild(new TestCaseLaunchElement(suite, caseName, true, false));
-                        }
+                        final SuiteLaunchElement suite = SuiteLaunchElement.create(chosenResource, new ArrayList<>());
                         if (!suitesToLaunch.contains(suite)) {
                             suitesToLaunch.add(suite);
                         }
@@ -305,7 +273,8 @@ class SuitesToRunComposite extends Composite {
         viewer.refresh();
     }
 
-    private void setLaunchElementsChecked(final boolean isChecked) {
+    @VisibleForTesting
+    void setLaunchElementsChecked(final boolean isChecked) {
         final List<TestCaseLaunchElement> testsToCheck = new ArrayList<>();
         final List<SuiteLaunchElement> suitesToCheck = new ArrayList<>();
 
@@ -338,53 +307,17 @@ class SuitesToRunComposite extends Composite {
             }
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
             suitesToRun.forEach((pathString, caseNames) -> {
-                suitesToLaunch.add(extractSuite(project, Path.fromPortableString(pathString), caseNames));
+                final IPath path = Path.fromPortableString(pathString);
+                final IResource resource = path.getFileExtension() == null ? project.getFolder(path)
+                        : project.getFile(path);
+                final SuiteLaunchElement suite = SuiteLaunchElement.create(resource, caseNames);
+                suitesToLaunch.add(suite);
             });
         } finally {
             viewer.refresh();
             viewer.setExpandedElements(checked);
             viewer.getTree().setRedraw(true);
         }
-    }
-
-    private SuiteLaunchElement extractSuite(final IProject project, final IPath path, final List<String> caseNames) {
-        final IResource resource = path.getFileExtension() == null ? project.getFolder(path) : project.getFile(path);
-        final SuiteLaunchElement suite = new SuiteLaunchElement(resource);
-
-        final List<String> missingCaseNames = new ArrayList<>(caseNames);
-
-        for (final String caseName : getCaseNames(resource)) {
-            final boolean isChecked = caseNames.isEmpty() || caseNames.contains(caseName.toLowerCase());
-            suite.addChild(new TestCaseLaunchElement(suite, caseName, isChecked, false));
-            missingCaseNames.remove(caseName.toLowerCase());
-        }
-        for (final String missingCaseName : missingCaseNames) {
-            suite.addChild(new TestCaseLaunchElement(suite, missingCaseName, true, true));
-        }
-        return suite;
-    }
-
-    private static List<String> getCaseNames(final IResource resource) {
-        final List<RobotCodeHoldingElement<?>> cases = new ArrayList<>();
-
-        if (resource.exists() && resource.getType() == IResource.FILE
-                && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
-                        || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
-            final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
-            if (suiteModel.isSuiteFile()) {
-                final Optional<RobotCasesSection> section = suiteModel.findSection(RobotCasesSection.class);
-                if (section.isPresent()) {
-                    cases.addAll(section.get().getChildren());
-                }
-
-            } else if (suiteModel.isRpaSuiteFile()) {
-                final Optional<RobotTasksSection> section = suiteModel.findSection(RobotTasksSection.class);
-                if (section.isPresent()) {
-                    cases.addAll(section.get().getChildren());
-                }
-            }
-        }
-        return cases.stream().map(RobotCodeHoldingElement::getName).collect(Collectors.toList());
     }
 
     Map<String, List<String>> extractSuitesToRun() {
@@ -394,13 +327,13 @@ class SuitesToRunComposite extends Composite {
         for (final SuiteLaunchElement suite : suitesToLaunch) {
             if (suite.isChecked()) {
                 allTestsSelected = allTestsSelected && suite.hasCheckedAllChildren();
-                final List<String> tests = new ArrayList<>();
+                final List<String> cases = new ArrayList<>();
                 for (final TestCaseLaunchElement test : suite.getChildren()) {
                     if (test.isChecked()) {
-                        tests.add(test.getName().toLowerCase());
+                        cases.add(test.getName().toLowerCase());
                     }
                 }
-                suitesToRun.put(suite.getPath(), tests);
+                suitesToRun.put(suite.getPath(), cases);
             }
         }
         if (allTestsSelected) {
@@ -486,6 +419,46 @@ class SuitesToRunComposite extends Composite {
     }
 
     @VisibleForTesting
+    static class CheckboxTreeViewerSorter extends ViewerComparator {
+
+        @Override
+        public int category(final Object element) {
+            if (element instanceof SuiteLaunchElement) {
+                return ((SuiteLaunchElement) element).resource.getType() == IResource.FOLDER ? 0 : 1;
+            }
+
+            return 0;
+        }
+
+        @Override
+        public int compare(final Viewer viewer, final Object e1, final Object e2) {
+            final int cat1 = category(e1);
+            final int cat2 = category(e2);
+
+            if (cat1 != cat2) {
+                return cat1 - cat2;
+            }
+
+            if (e1 instanceof SuiteLaunchElement && e2 instanceof SuiteLaunchElement) {
+                final IResource resource1 = ((SuiteLaunchElement) e1).resource;
+                final IResource resource2 = ((SuiteLaunchElement) e2).resource;
+
+                final String path1 = resource1.getFullPath().toString();
+                final String path2 = resource2.getFullPath().toString();
+
+                return path1.compareToIgnoreCase(path2);
+            } else if (e1 instanceof TestCaseLaunchElement && e2 instanceof TestCaseLaunchElement) {
+                final String case1 = ((TestCaseLaunchElement) e1).name;
+                final String case2 = ((TestCaseLaunchElement) e2).name;
+
+                return case1.compareToIgnoreCase(case2);
+            }
+
+            return 0;
+        }
+    }
+
+    @VisibleForTesting
     static final class SuiteLaunchElement {
 
         private IResource resource;
@@ -493,6 +466,28 @@ class SuitesToRunComposite extends Composite {
         private final List<TestCaseLaunchElement> children;
 
         private boolean isChecked = true;
+
+        static SuiteLaunchElement create(final IResource resource, final List<String> caseNames) {
+            final SuiteLaunchElement suite = new SuiteLaunchElement(resource);
+
+            if (resource.exists() && resource.getType() == IResource.FILE
+                    && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                            || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
+                final List<String> missingCaseNames = new ArrayList<>(caseNames);
+
+                final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
+                for (final String caseName : SuiteCasesCollector.collectCaseNames(suiteModel)) {
+                    final boolean isCaseChecked = caseNames.isEmpty() || caseNames.contains(caseName.toLowerCase());
+                    suite.addChild(new TestCaseLaunchElement(suite, caseName, isCaseChecked, false));
+                    missingCaseNames.remove(caseName.toLowerCase());
+                }
+                for (final String missingCaseName : missingCaseNames) {
+                    suite.addChild(new TestCaseLaunchElement(suite, missingCaseName, true, true));
+                }
+            }
+
+            return suite;
+        }
 
         SuiteLaunchElement(final IResource resource) {
             this.resource = resource;
