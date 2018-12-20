@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -94,6 +95,7 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getName()).isEqualTo("Resource");
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         assertThat(robotConfig.getSuitePaths().keySet()).containsExactly("Resource");
+        assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
         assertThat(robotConfig.getRobotArguments()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
@@ -121,7 +123,8 @@ public class RobotLaunchConfigurationTest {
 
         robotConfig.setRobotArguments("arguments");
         robotConfig.setProjectName(PROJECT_NAME);
-        robotConfig.setSuitePaths(ImmutableMap.of("key", asList("value")));
+        robotConfig.setSuitePaths(ImmutableMap.of("selected", asList("value"), "unselected", asList()));
+        robotConfig.setUnselectedSuitePaths(newHashSet("unselected"));
         robotConfig.setIsIncludeTagsEnabled(true);
         robotConfig.setIsExcludeTagsEnabled(true);
         robotConfig.setExcludedTags(asList("excluded"));
@@ -140,6 +143,7 @@ public class RobotLaunchConfigurationTest {
 
         assertThat(robotConfig.getProjectName()).isEqualTo("");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
+        assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
         assertThat(robotConfig.getRobotArguments()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
@@ -174,6 +178,7 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         assertThat(robotConfig.getSuitePaths())
                 .isEqualTo(ImmutableMap.of("Resource1", casesForRes1, "Resource2", casesForRes2));
+        assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
         assertThat(robotConfig.getRobotArguments()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
@@ -207,6 +212,25 @@ public class RobotLaunchConfigurationTest {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName("");
         assertThat(robotConfig.collectSuitesToRun()).isEmpty();
+    }
+
+    @Test
+    public void selectedSuitesAreReturned() throws CoreException {
+        final IResource res1 = projectProvider.getFile("Resource1");
+        final IResource res2 = projectProvider.getFile("Resource2");
+        final IResource unselected1 = projectProvider.getFile("Unselected1");
+        final IResource unselected2 = projectProvider.getFile("Unselected2");
+
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareForSelectedTestCases(
+                ImmutableMap.of(res1, asList(), res2, asList(), unselected1, asList(), unselected2, asList()));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.setUnselectedSuitePaths(newHashSet("Unselected1", "Unselected2"));
+
+        assertThat(robotConfig.getSuitePaths()).isEqualTo(ImmutableMap.of("Resource1", asList(), "Resource2", asList(),
+                "Unselected1", asList(), "Unselected2", asList()));
+        assertThat(robotConfig.getSelectedSuitePaths())
+                .isEqualTo(ImmutableMap.of("Resource1", asList(), "Resource2", asList()));
+        assertThat(robotConfig.getUnselectedSuitePaths()).containsOnly("Unselected1", "Unselected2");
     }
 
     @Test
@@ -250,8 +274,10 @@ public class RobotLaunchConfigurationTest {
     public void filePathIsAddedToRobotArguments_whenAskedForRerunWithoutExistingArguments() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
+
         assertThat(robotConfig.getRobotArguments()).isEqualTo("-R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
+        assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
     }
 
     @Test
@@ -259,8 +285,10 @@ public class RobotLaunchConfigurationTest {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setRobotArguments("-a -b -c");
         RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
+
         assertThat(robotConfig.getRobotArguments()).isEqualTo("-a -b -c -R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
+        assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {

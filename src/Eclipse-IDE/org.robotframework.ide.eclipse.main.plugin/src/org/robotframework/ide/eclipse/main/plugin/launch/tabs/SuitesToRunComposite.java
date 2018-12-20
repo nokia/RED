@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -112,14 +114,7 @@ class SuitesToRunComposite extends Composite {
             if (!suites.isEmpty() && tests.isEmpty()) {
                 removeButton.setEnabled(true);
             } else if (suites.isEmpty() && !tests.isEmpty()) {
-                boolean allAreMissing = true;
-                for (final TestCaseLaunchElement test : tests) {
-                    if (!test.isMissing) {
-                        allAreMissing = false;
-                        break;
-                    }
-                }
-                removeButton.setEnabled(allAreMissing);
+                removeButton.setEnabled(tests.stream().noneMatch(test -> !test.hasError));
             } else {
                 removeButton.setEnabled(false);
             }
@@ -146,37 +141,8 @@ class SuitesToRunComposite extends Composite {
                 dialog.setAllowMultiple(true);
                 dialog.setTitle("Select suite");
                 dialog.setMessage("Select suite to execute:");
-                dialog.setComparator(new ViewerComparator() {
-
-                    @Override
-                    public int category(final Object element) {
-                        return ((IResource) element).getType() == IResource.FOLDER ? 0 : 1;
-                    }
-                });
-                dialog.addFilter(new ViewerFilter() {
-
-                    @Override
-                    public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-                        return element instanceof IResource && shouldShow((IResource) element);
-                    }
-
-                    private boolean shouldShow(final IResource resource) {
-                        if (!resource.getProject().getName().equals(projectName)) {
-                            return false;
-                        } else if (resource.getType() == IResource.PROJECT) {
-                            return true;
-                        } else if (resource.getType() == IResource.FOLDER) {
-                            return !resource.equals(LibspecsFolder.get(resource.getProject()).getResource());
-                        } else if (resource.getType() == IResource.FILE
-                                && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
-                                        || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
-                            final RobotSuiteFile suiteModel = RobotModelManager.getInstance()
-                                    .createSuiteFile((IFile) resource);
-                            return suiteModel.isSuiteFile() || suiteModel.isRpaSuiteFile();
-                        }
-                        return false;
-                    }
-                });
+                dialog.setComparator(new BrowseSuitesViewerSorter());
+                dialog.addFilter(new BrowseSuitesViewerFilter(projectName));
                 dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
                 if (dialog.open() == Window.OK) {
                     for (final Object obj : dialog.getResult()) {
@@ -184,7 +150,8 @@ class SuitesToRunComposite extends Composite {
                         if (chosenResource.getType() == IResource.PROJECT) {
                             continue;
                         }
-                        final SuiteLaunchElement suite = SuiteLaunchElement.create(chosenResource, new ArrayList<>());
+                        final SuiteLaunchElement suite = SuiteLaunchElement.create(chosenResource, new ArrayList<>(),
+                                true);
                         if (!suitesToLaunch.contains(suite)) {
                             suitesToLaunch.add(suite);
                         }
@@ -281,10 +248,9 @@ class SuitesToRunComposite extends Composite {
         if (viewer.getTree().getSelectionCount() == 0) {
             suitesToCheck.addAll(suitesToLaunch);
         } else {
-            suitesToCheck
-                    .addAll(Selections.getElements((TreeSelection) viewer.getSelection(), SuiteLaunchElement.class));
-            testsToCheck
-                    .addAll(Selections.getElements((TreeSelection) viewer.getSelection(), TestCaseLaunchElement.class));
+            final TreeSelection selection = (TreeSelection) viewer.getSelection();
+            suitesToCheck.addAll(Selections.getElements(selection, SuiteLaunchElement.class));
+            testsToCheck.addAll(Selections.getElements(selection, TestCaseLaunchElement.class));
         }
         for (final TestCaseLaunchElement test : testsToCheck) {
             test.updateChecked(isChecked);
@@ -294,7 +260,8 @@ class SuitesToRunComposite extends Composite {
         }
     }
 
-    void setInput(final String projectName, final Map<String, List<String>> suitesToRun) {
+    void setInput(final String projectName, final Map<String, List<String>> suitesToRun,
+            final Set<String> unselectedSuites) {
         this.projectName = projectName;
         suitesToLaunch.clear();
         viewer.setInput(suitesToLaunch);
@@ -310,7 +277,8 @@ class SuitesToRunComposite extends Composite {
                 final IPath path = Path.fromPortableString(pathString);
                 final IResource resource = path.getFileExtension() == null ? project.getFolder(path)
                         : project.getFile(path);
-                final SuiteLaunchElement suite = SuiteLaunchElement.create(resource, caseNames);
+                final boolean isChecked = !unselectedSuites.contains(pathString);
+                final SuiteLaunchElement suite = SuiteLaunchElement.create(resource, caseNames, isChecked);
                 suitesToLaunch.add(suite);
             });
         } finally {
@@ -334,6 +302,8 @@ class SuitesToRunComposite extends Composite {
                     }
                 }
                 suitesToRun.put(suite.getPath(), cases);
+            } else {
+                suitesToRun.put(suite.getPath(), new ArrayList<>());
             }
         }
         if (allTestsSelected) {
@@ -341,6 +311,13 @@ class SuitesToRunComposite extends Composite {
         }
 
         return suitesToRun;
+    }
+
+    Set<String> extractUnselectedSuites() {
+        return suitesToLaunch.stream()
+                .filter(suite -> !suite.isChecked())
+                .map(SuiteLaunchElement::getPath)
+                .collect(Collectors.toSet());
     }
 
     @VisibleForTesting
@@ -465,43 +442,50 @@ class SuitesToRunComposite extends Composite {
 
         private final List<TestCaseLaunchElement> children;
 
-        private boolean isChecked = true;
+        private boolean isChecked;
 
-        static SuiteLaunchElement create(final IResource resource, final List<String> caseNames) {
-            final SuiteLaunchElement suite = new SuiteLaunchElement(resource);
+        private final boolean hasError;
 
+        static SuiteLaunchElement create(final IResource resource, final List<String> caseNames,
+                final boolean isChecked) {
             if (resource.exists() && resource.getType() == IResource.FILE
                     && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
                             || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
                 final List<String> missingCaseNames = new ArrayList<>(caseNames);
-
                 final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
-                for (final String caseName : SuiteCasesCollector.collectCaseNames(suiteModel)) {
-                    final boolean isCaseChecked = caseNames.isEmpty() || caseNames.contains(caseName.toLowerCase());
+                final List<String> collectedCaseNames = SuiteCasesCollector.collectCaseNames(suiteModel);
+                final SuiteLaunchElement suite = new SuiteLaunchElement(resource, isChecked,
+                        collectedCaseNames.isEmpty());
+                for (final String caseName : collectedCaseNames) {
+                    final boolean isCaseChecked = isChecked
+                            && (caseNames.isEmpty() || caseNames.contains(caseName.toLowerCase()));
                     suite.addChild(new TestCaseLaunchElement(suite, caseName, isCaseChecked, false));
                     missingCaseNames.remove(caseName.toLowerCase());
                 }
                 for (final String missingCaseName : missingCaseNames) {
-                    suite.addChild(new TestCaseLaunchElement(suite, missingCaseName, true, true));
+                    suite.addChild(new TestCaseLaunchElement(suite, missingCaseName, isChecked, true));
                 }
+                return suite;
             }
 
-            return suite;
+            return new SuiteLaunchElement(resource, isChecked, !resource.exists());
         }
 
-        SuiteLaunchElement(final IResource resource) {
+        SuiteLaunchElement(final IResource resource, final boolean isChecked, final boolean hasError) {
             this.resource = resource;
             this.children = new ArrayList<>();
+            this.isChecked = isChecked;
+            this.hasError = hasError;
         }
 
         Image getImage() {
             final ImageDescriptor baseImage = resource.getType() == IResource.FILE ? RedImages.getRobotFileImage()
                     : RedImages.getFolderImage();
-            if (resource.exists()) {
-                return ImagesManager.getImage(baseImage);
-            } else {
+            if (hasError) {
                 return ImagesManager.getImage(new DecorationOverlayIcon(ImagesManager.getImage(baseImage),
                         RedImages.getErrorImage(), IDecoration.BOTTOM_LEFT));
+            } else {
+                return ImagesManager.getImage(baseImage);
             }
         }
 
@@ -572,19 +556,19 @@ class SuitesToRunComposite extends Composite {
 
         private boolean isChecked;
 
-        private final boolean isMissing;
+        private final boolean hasError;
 
         TestCaseLaunchElement(final SuiteLaunchElement parent, final String name, final boolean isChecked,
-                final boolean isMissing) {
+                final boolean hasError) {
             this.name = name;
             this.parent = parent;
             this.isChecked = isChecked;
-            this.isMissing = isMissing;
+            this.hasError = hasError;
         }
 
         Image getImage() {
             final ImageDescriptor baseImage = RedImages.getTestCaseImage();
-            if (isMissing) {
+            if (hasError) {
                 return ImagesManager.getImage(new DecorationOverlayIcon(ImagesManager.getImage(baseImage),
                         RedImages.getErrorImage(), IDecoration.BOTTOM_LEFT));
             } else {
@@ -615,6 +599,48 @@ class SuitesToRunComposite extends Composite {
             } else if (!parent.hasCheckedChild()) {
                 parent.setChecked(false);
             }
+        }
+    }
+
+    @VisibleForTesting
+    static class BrowseSuitesViewerSorter extends ViewerComparator {
+
+        @Override
+        public int category(final Object element) {
+            if (element instanceof IResource) {
+                return ((IResource) element).getType() == IResource.FOLDER ? 0 : 1;
+            }
+            return 0;
+        }
+    }
+
+    @VisibleForTesting
+    static class BrowseSuitesViewerFilter extends ViewerFilter {
+
+        private final String projectName;
+
+        BrowseSuitesViewerFilter(final String projectName) {
+            this.projectName = projectName;
+        }
+
+        @Override
+        public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+            return element instanceof IResource && shouldShow((IResource) element);
+        }
+
+        private boolean shouldShow(final IResource resource) {
+            if (!resource.getProject().getName().equals(projectName)) {
+                return false;
+            } else if (resource.getType() == IResource.PROJECT) {
+                return true;
+            } else if (resource.getType() == IResource.FOLDER) {
+                return !resource.equals(LibspecsFolder.get(resource.getProject()).getResource());
+            } else if (resource.getType() == IResource.FILE && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                    || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
+                final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
+                return suiteModel.isSuiteFile() || suiteModel.isRpaSuiteFile();
+            }
+            return false;
         }
     }
 

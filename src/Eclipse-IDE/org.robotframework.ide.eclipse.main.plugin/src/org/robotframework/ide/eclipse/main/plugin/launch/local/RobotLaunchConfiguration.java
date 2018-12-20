@@ -11,9 +11,11 @@ import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -48,6 +50,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     private static final String INTERPRETER_ARGUMENTS_ATTRIBUTE = "Interpreter arguments";
 
     private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
+
+    private static final String TEST_SUITES_UNSELECTED_ATTRIBUTE = "Test suites unselected";
 
     private static final String INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Include option enabled";
 
@@ -129,6 +133,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         setExecutableFileArguments(preferences.getLaunchAdditionalExecutableFileArguments());
         setRobotArguments(preferences.getLaunchAdditionalRobotArguments());
         setSuitePaths(new HashMap<>());
+        setUnselectedSuitePaths(new HashSet<>());
         setIsIncludeTagsEnabled(false);
         setIsExcludeTagsEnabled(false);
         setIncludedTags(new ArrayList<>());
@@ -240,21 +245,33 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     private String joinTestCases(final List<String> testCases) {
         // test case names should be always in lower case
-        return testCases.stream()
-                .filter(Predicates.notNull())
-                .map(String::toLowerCase)
-                .collect(joining("::"));
+        return testCases.stream().filter(Predicates.notNull()).map(String::toLowerCase).collect(joining("::"));
+    }
+
+    public void setUnselectedSuitePaths(final Set<String> suites) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(TEST_SUITES_UNSELECTED_ATTRIBUTE, suites);
     }
 
     public Map<String, List<String>> getSuitePaths() throws CoreException {
         final Map<String, String> testSuites = configuration.getAttribute(TEST_SUITES_ATTRIBUTE, new HashMap<>());
-        return testSuites.entrySet()
-                .stream()
-                .collect(toMap(e -> e.getKey(), e -> splitTestCases(e.getValue())));
+        return testSuites.entrySet().stream().collect(toMap(e -> e.getKey(), e -> splitTestCases(e.getValue())));
     }
 
     private List<String> splitTestCases(final String testCases) {
         return Splitter.on("::").omitEmptyStrings().splitToList(testCases);
+    }
+
+    public Set<String> getUnselectedSuitePaths() throws CoreException {
+        return configuration.getAttribute(TEST_SUITES_UNSELECTED_ATTRIBUTE, new HashSet<>());
+    }
+
+    public Map<String, List<String>> getSelectedSuitePaths() throws CoreException {
+        final Map<String, List<String>> suitePaths = new HashMap<>(getSuitePaths());
+        for (final String unselected : getUnselectedSuitePaths()) {
+            suitePaths.remove(unselected);
+        }
+        return suitePaths;
     }
 
     public void updateTestCases(final Map<IResource, List<String>> suitesMapping) throws CoreException {
@@ -270,8 +287,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         final String projectName = getProjectName();
         if (!projectName.isEmpty()) {
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-            if (project.exists()) {
-                final Map<String, List<String>> suitePaths = getSuitePaths();
+            if (project.exists() && project.isOpen()) {
+                final Map<String, List<String>> suitePaths = getSelectedSuitePaths();
                 for (final Entry<String, List<String>> entry : suitePaths.entrySet()) {
                     final IPath path = Path.fromPortableString(entry.getKey());
                     final IResource resource = path.getFileExtension() == null ? project.getFolder(path)

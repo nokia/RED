@@ -165,7 +165,8 @@ public class RobotLaunchConfigurationFinder {
                 && rConfig1.isGeneralPurposeConfiguration() == rConfig2.isGeneralPurposeConfiguration()
                 && rConfig1.getExcludedTags().equals(rConfig2.getExcludedTags())
                 && rConfig1.getIncludedTags().equals(rConfig2.getIncludedTags())
-                && rConfig1.getSuitePaths().equals(rConfig2.getSuitePaths());
+                && rConfig1.getSuitePaths().equals(rConfig2.getSuitePaths())
+                && rConfig1.getUnselectedSuitePaths().equals(rConfig2.getUnselectedSuitePaths());
     }
 
     private static ILaunchConfigurationWorkingCopy asWorkingCopy(final ILaunchConfiguration config) {

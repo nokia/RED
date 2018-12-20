@@ -103,7 +103,27 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     @Test
-    public void whenSuitesSpecifiedToRunDoesNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
+    public void whenThereAreFolderSuitesSpecifiedTogetherWithSelectedCases_warningExceptionIsThrown() throws Exception {
+        projectProvider.createFile("fileWithCases.robot", "*** Test Cases ***", "case1", " Log 10", "case2", " Log 20");
+        projectProvider.createDir("suiteFolder");
+        projectProvider.createFile("suiteFolder/nested.robot", "*** Test Cases ***", "case", " Log 30");
+
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
+
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setSuitePaths(
+                ImmutableMap.of("suiteFolder", newArrayList(), "fileWithCases.robot", newArrayList("case1")));
+
+        assertThatExceptionOfType(LaunchConfigurationValidationException.class)
+                .isThrownBy(() -> validator.validateRobotTab(launchConfig))
+                .withMessage("There are suite folders and single cases from suite files specified. "
+                        + "Only single cases will be executed.")
+                .withNoCause();
+    }
+
+    @Test
+    public void whenSuitesSpecifiedToRunDoNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
         projectProvider.createFile("file.robot", "*** Test Cases ***", "case1", " Log 10");
 
         final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
@@ -123,14 +143,14 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenTestsSpecifiedInSuiteDoNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
-        projectProvider.createFile("file.robot", "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20",
+        projectProvider.createFile("testSuite.robot", "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20",
                 "case3", "  Log  30");
 
         final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setSuitePaths(ImmutableMap.of("file.robot", newArrayList("case3", "case4", "case5")));
+        launchConfig.setSuitePaths(ImmutableMap.of("testSuite.robot", newArrayList("case3", "case4", "case5")));
 
         assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
                 .isThrownBy(() -> validator.validateRobotTab(launchConfig))
@@ -140,14 +160,14 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenTasksSpecifiedInSuiteDoNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
-        projectProvider.createFile("tasks.robot", "*** Tasks ***", "task1", "  Log  10", "task2", "  Log  20", "task3",
-                "  Log  30");
+        projectProvider.createFile("taskSuite.robot", "*** Tasks ***", "task1", "  Log  10", "task2", "  Log  20",
+                "task3", "  Log  30");
 
         final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.1"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setSuitePaths(ImmutableMap.of("tasks.robot", newArrayList("task3", "task4", "task5")));
+        launchConfig.setSuitePaths(ImmutableMap.of("taskSuite.robot", newArrayList("task3", "task4", "task5")));
 
         assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
                 .isThrownBy(() -> validator.validateRobotTab(launchConfig))
@@ -156,15 +176,36 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     @Test
-    public void nothingIsThrown_whenEverythingIsOkWithRobotTab() throws Exception, CoreException {
-        projectProvider.createFile("file.robot", "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20",
-                "case3", "  Log  30");
+    public void whenSuitesSpecifiedToRunDoNotContainCases_fatalExceptionIsThrown() throws Exception, CoreException {
+        projectProvider.createFile("notEmpty.robot", "*** Test Cases ***", "case1", " Log 10");
+        projectProvider.createFile("noCases.robot", "*** Test Cases ***");
+        projectProvider.createFile("resource.robot", "*** Keywords ***", "keyword");
 
         final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setSuitePaths(ImmutableMap.of("file.robot", newArrayList("case2", "case3")));
+        launchConfig.setSuitePaths(ImmutableMap.of("notEmpty.robot", newArrayList(), "noCases.robot", newArrayList(),
+                "resource.robot", newArrayList()));
+
+        assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
+                .isThrownBy(() -> validator.validateRobotTab(launchConfig))
+                .withMessageStartingWith("Following suites do not contain cases: ")
+                .withMessageContaining(PROJECT_NAME + "/noCases.robot")
+                .withMessageContaining(PROJECT_NAME + "/resource.robot")
+                .withNoCause();
+    }
+
+    @Test
+    public void nothingIsThrown_whenEverythingIsOkWithRobotTab() throws Exception, CoreException {
+        projectProvider.createFile("correctSuite.robot", "*** Test Cases ***", "case1", "  Log  10", "case2",
+                "  Log  20", "case3", "  Log  30");
+
+        final RobotModel model = createRobotModel(RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0"));
+
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setSuitePaths(ImmutableMap.of("correctSuite.robot", newArrayList("case2", "case3")));
         validator.validateRobotTab(launchConfig);
     }
 

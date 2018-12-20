@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -214,6 +215,23 @@ public class LocalProcessCommandLineBuilderTest {
         assertThat(commandLine.getCommandLine()).hasSize(10)
                 .containsSequence("-s", PROJECT_NAME + ".Suites A.S1")
                 .containsSequence("-s", PROJECT_NAME + ".Suites B")
+                .doesNotContain("-t")
+                .endsWith(projectProvider.getProject().getLocation().toOSString());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
+    public void commandLineContainsOnlySelectedSuitesToRun() throws Exception {
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject(), SuiteExecutor.Python);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", emptyList(), "001__suites_a/s2.robot",
+                emptyList(), "002__suites_b", emptyList()));
+        robotConfig.setUnselectedSuitePaths(newHashSet("001__suites_a/s1.robot", "002__suites_b"));
+
+        final RunCommandLine commandLine = createCommandLine(robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(8)
+                .containsSequence("-s", PROJECT_NAME + ".Suites A.S2")
                 .doesNotContain("-t")
                 .endsWith(projectProvider.getProject().getLocation().toOSString());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
