@@ -270,15 +270,15 @@ public class DeclarationMapper {
                     if (idText.length() == 1) {
                         return true;
                     } else {
-                        final BuildMessage warnMessage = BuildMessage.createWarnMessage(
-                                "Incorrect variable id with space between " + idText.charAt(0) + " and '{'.",
-                                mappingResult.getFileName());
-                        warnMessage.setFileRegion(new FileRegion(
+                        final FileRegion region = new FileRegion(
                                 new FilePosition(currentPosition.getLine(), currentPosition.getColumn(),
                                         currentPosition.getOffset()),
                                 new FilePosition(currentPosition.getLine(),
                                         currentPosition.getColumn() + variableDec.getEnd().getEnd(),
-                                        currentPosition.getOffset() + variableDec.getEnd().getEnd())));
+                                        currentPosition.getOffset() + variableDec.getEnd().getEnd()));
+                        final BuildMessage warnMessage = BuildMessage.createWarnMessage(
+                                "Incorrect variable id with space between " + idText.charAt(0) + " and '{'.",
+                                mappingResult.getFileName(), region);
                         mappingResult.addBuildMessage(warnMessage);
                     }
                 }

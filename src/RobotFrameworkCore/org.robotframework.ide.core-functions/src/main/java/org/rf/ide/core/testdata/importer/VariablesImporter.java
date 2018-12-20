@@ -214,15 +214,15 @@ public class VariablesImporter {
 
     private static void reportError(final String message, final File currentRobotFile, final VariablesImport varImport,
             final RobotFileOutput robotFile) {
-        final BuildMessage buildMsg = BuildMessage.createErrorMessage(message, currentRobotFile.getPath());
-        buildMsg.setFileRegion(new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
+        final BuildMessage buildMsg = BuildMessage.createErrorMessage(message, currentRobotFile.getPath(),
+                new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
         addBuildMessageIfNotExists(robotFile, buildMsg);
     }
 
     private static void reportWarning(final String message, final File currentRobotFile,
             final VariablesImport varImport, final RobotFileOutput robotFile) {
-        final BuildMessage buildMsg = BuildMessage.createWarnMessage(message, currentRobotFile.getPath());
-        buildMsg.setFileRegion(new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
+        final BuildMessage buildMsg = BuildMessage.createWarnMessage(message, currentRobotFile.getPath(),
+                new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
         addBuildMessageIfNotExists(robotFile, buildMsg);
     }
 

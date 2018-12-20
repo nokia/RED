@@ -73,12 +73,12 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                         loopDescriptor.addCreatedVariables(correctVariables);
 
                         if (!mappingResult.getTextElements().isEmpty() || variablesSize > 1) {
-                            final BuildMessage errorMessage = BuildMessage.createErrorMessage(
-                                    "Invalid FOR loop variable \'" + elem.getText().toString() + "\'", fileName);
                             final FilePosition startFilePosition = elem.getFilePosition();
                             final FilePosition end = new FilePosition(startFilePosition.getLine(), elem.getEndColumn(),
                                     elem.getStartOffset() + elem.getText().length());
-                            errorMessage.setFileRegion(new FileRegion(startFilePosition, end));
+                            final BuildMessage errorMessage = BuildMessage.createErrorMessage(
+                                    "Invalid FOR loop variable \'" + elem.getText().toString() + "\'", fileName,
+                                    new FileRegion(startFilePosition, end));
                             loopDescriptor.addMessage(errorMessage);
                         }
                     }
@@ -95,12 +95,12 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
 
         if (!wasIn || !wasElementsToIterate) {
             final RobotToken forToken = loopDescriptor.getAction().getToken();
-            final BuildMessage errorMessage = BuildMessage
-                    .createErrorMessage("Invalid FOR loop - missing values to iterate", fileName);
             final FilePosition startFilePosition = forToken.getFilePosition();
             final FilePosition endFilePosition = new FilePosition(startFilePosition.getLine(), forToken.getEndColumn(),
                     forToken.getStartOffset() + forToken.getText().length());
-            errorMessage.setFileRegion(new FileRegion(startFilePosition, endFilePosition));
+            final BuildMessage errorMessage = BuildMessage.createErrorMessage(
+                    "Invalid FOR loop - missing values to iterate", fileName,
+                    new FileRegion(startFilePosition, endFilePosition));
             loopDescriptor.addMessage(errorMessage);
         }
 

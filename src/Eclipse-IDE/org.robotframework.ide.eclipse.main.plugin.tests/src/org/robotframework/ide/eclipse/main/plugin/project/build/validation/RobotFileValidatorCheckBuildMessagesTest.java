@@ -49,19 +49,12 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @Test
     public void test_validateForParsingPassed_oneInfo_oneWarn_oneError() {
-        final Collection<Problem> problems = validate(Status.PASSED, createBuildInfoMessage(), createBuildWarnMessage(),
+        final Collection<Problem> problems = validate(Status.PASSED, createBuildWarnMessage(),
                 createBuildErrorMessage());
 
         assertThat(problems).containsOnly(
                 new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))),
                 new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))));
-    }
-
-    @Test
-    public void test_validateForParsingPassed_oneInfo() {
-        final Collection<Problem> problems = validate(Status.PASSED, createBuildInfoMessage());
-
-        assertThat(problems).isEmpty();
     }
 
     @Test
@@ -89,20 +82,13 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @Test
     public void test_validateForParsingFailed_oneInfo_oneWarn_oneError() {
-        final Collection<Problem> problems = validate(Status.FAILED, createBuildInfoMessage(), createBuildWarnMessage(),
+        final Collection<Problem> problems = validate(Status.FAILED, createBuildWarnMessage(),
                 createBuildErrorMessage());
 
         assertThat(problems).containsOnly(
                 new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
                 new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))),
                 new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))));
-    }
-
-    @Test
-    public void test_validateForParsingFailed_oneInfo() {
-        final Collection<Problem> problems = validate(Status.FAILED, createBuildInfoMessage());
-
-        assertThat(problems).containsOnly(new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)));
     }
 
     @Test
@@ -152,25 +138,14 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         return new ValidationContext(model.createRobotProject(projectProvider.getProject()), logger);
     }
 
-    private static BuildMessage createBuildInfoMessage() {
-        final FileRegion region = new FileRegion(new FilePosition(0, 0, 0), new FilePosition(0, 0, 0));
-        final BuildMessage msg = BuildMessage.createInfoMessage("info", "file");
-        msg.setFileRegion(region);
-        return msg;
-    }
-
     private static BuildMessage createBuildWarnMessage() {
         final FileRegion region = new FileRegion(new FilePosition(0, 0, 0), new FilePosition(0, 0, 0));
-        final BuildMessage msg = BuildMessage.createWarnMessage("warn", "file");
-        msg.setFileRegion(region);
-        return msg;
+        return BuildMessage.createWarnMessage("warn", "file", region);
     }
 
     private static BuildMessage createBuildErrorMessage() {
         final FileRegion region = new FileRegion(new FilePosition(0, 0, 0), new FilePosition(0, 0, 0));
-        final BuildMessage msg = BuildMessage.createErrorMessage("error", "file");
-        msg.setFileRegion(region);
-        return msg;
+        return BuildMessage.createErrorMessage("error", "file", region);
     }
 
     private static class MockRobotFileValidator extends RobotFileValidator {
