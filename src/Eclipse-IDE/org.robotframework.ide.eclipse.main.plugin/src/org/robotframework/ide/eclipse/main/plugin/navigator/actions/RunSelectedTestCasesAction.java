@@ -62,65 +62,59 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
 
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                final List<RobotCase> selectedTestCases = Selections.getElements(selection, RobotCase.class);
-                final Map<IResource, List<String>> resourcesToTestCases = groupTestCasesByResource(selectedTestCases);
-
-                if (!resourcesToTestCases.isEmpty()) {
-                    final ILaunchConfigurationWorkingCopy config = RobotLaunchConfigurationFinder
-                            .getLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
-
-                    final RobotLaunchConfiguration robotconfig = new RobotLaunchConfiguration(config);
-                    robotconfig.updateTestCases(resourcesToTestCases);
-
+                final ILaunchConfigurationWorkingCopy config = createLaunchConfigurationForSelection();
+                if (config != null) {
                     config.launch(mode.launchMgrName, monitor);
-                    return Status.OK_STATUS;
-                }
-
-                final List<RobotTask> selectedTasks = Selections.getElements(selection, RobotTask.class);
-                final Map<IResource, List<String>> resourcesToTasks = groupTestCasesByResource(selectedTasks);
-                if (!resourcesToTasks.isEmpty()) {
-                    final ILaunchConfigurationWorkingCopy config = RobotLaunchConfigurationFinder
-                            .getLaunchConfigurationForSelectedTestCases(resourcesToTasks);
-
-                    final RobotLaunchConfiguration robotconfig = new RobotLaunchConfiguration(config);
-                    robotconfig.updateTestCases(resourcesToTasks);
-
-                    config.launch(mode.launchMgrName, monitor);
-                    return Status.OK_STATUS;
-                }
-
-                final List<RobotCasesSection> selectedTestSuites = Selections.getElements(selection,
-                        RobotCasesSection.class);
-                final List<IResource> resources1 = findResourcesForSections(selectedTestSuites);
-                if (!resources1.isEmpty()) {
-                    RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(resources1)
-                            .launch(mode.launchMgrName, monitor);
-                    return Status.OK_STATUS;
-                }
-
-                final List<RobotTasksSection> selectedTaskSuites = Selections.getElements(selection,
-                        RobotTasksSection.class);
-                final List<IResource> resources2 = findResourcesForSections(selectedTaskSuites);
-                if (!resources2.isEmpty()) {
-                    RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(resources2)
-                            .launch(mode.launchMgrName, monitor);
-                    return Status.OK_STATUS;
                 }
                 return Status.OK_STATUS;
             }
 
-            private Map<IResource, List<String>> groupTestCasesByResource(
-                    final List<? extends RobotCodeHoldingElement<?>> robotCases) {
+            private ILaunchConfigurationWorkingCopy createLaunchConfigurationForSelection() throws CoreException {
+                final Map<IResource, List<String>> resourcesToTestCases = findNamesGroupedByResources(RobotCase.class);
+                if (!resourcesToTestCases.isEmpty()) {
+                    final ILaunchConfigurationWorkingCopy config = RobotLaunchConfigurationFinder
+                            .getLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+                    final RobotLaunchConfiguration robotconfig = new RobotLaunchConfiguration(config);
+                    robotconfig.updateTestCases(resourcesToTestCases);
+                    return config;
+                }
 
-                return robotCases.stream()
+                final Map<IResource, List<String>> resourcesToTasks = findNamesGroupedByResources(RobotTask.class);
+                if (!resourcesToTasks.isEmpty()) {
+                    final ILaunchConfigurationWorkingCopy config = RobotLaunchConfigurationFinder
+                            .getLaunchConfigurationForSelectedTestCases(resourcesToTasks);
+                    final RobotLaunchConfiguration robotconfig = new RobotLaunchConfiguration(config);
+                    robotconfig.updateTestCases(resourcesToTasks);
+                    return config;
+                }
+
+                final List<IResource> testResources = findResourcesForSections(RobotCasesSection.class);
+                if (!testResources.isEmpty()) {
+                    return RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(testResources);
+                }
+
+                final List<IResource> taskResources = findResourcesForSections(RobotTasksSection.class);
+                if (!taskResources.isEmpty()) {
+                    return RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(taskResources);
+                }
+
+                return null;
+            }
+
+            private Map<IResource, List<String>> findNamesGroupedByResources(
+                    final Class<? extends RobotCodeHoldingElement<?>> elementsClass) {
+
+                return Selections.getElements(selection, elementsClass)
+                        .stream()
                         .collect(groupingBy(testCase -> testCase.getSuiteFile().getFile(), LinkedHashMap::new,
                                 mapping(RobotCodeHoldingElement::getName, toList())));
             }
 
             private List<IResource> findResourcesForSections(
-                    final List<? extends RobotSuiteFileSection> robotCasesSections) {
+                    final Class<? extends RobotSuiteFileSection> elementsClass) {
 
-                return robotCasesSections.stream()
+                return Selections.getElements(selection, elementsClass)
+                        .stream()
                         .map(RobotFileInternalElement::getSuiteFile)
                         .map(RobotSuiteFile::getFile)
                         .distinct()
