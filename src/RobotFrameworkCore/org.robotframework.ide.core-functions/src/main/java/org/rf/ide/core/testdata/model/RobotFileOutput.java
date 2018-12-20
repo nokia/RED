@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.rf.ide.core.environment.RobotVersion;
@@ -208,132 +209,12 @@ public class RobotFileOutput {
         return Collections.unmodifiableList(variablesReferenced);
     }
 
-    public static class BuildMessage {
-
-        private final LogLevel type;
-
-        private final String message;
-
-        private String fileName;
-
-        private FileRegion fileRegion;
-
-        public BuildMessage(final LogLevel level, final String message, final String fileName) {
-            this.type = level;
-            this.message = message;
-            this.fileName = fileName.intern();
-        }
-
-        public static BuildMessage createInfoMessage(final String message, final String fileName) {
-            return new BuildMessage(LogLevel.INFO, message, fileName);
-        }
-
-        public static BuildMessage createWarnMessage(final String message, final String fileName) {
-            return new BuildMessage(LogLevel.WARN, message, fileName);
-        }
-
-        public static BuildMessage createErrorMessage(final String message, final String fileName) {
-            return new BuildMessage(LogLevel.ERROR, message, fileName);
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public void setFileName(final String fileName) {
-            this.fileName = fileName;
-        }
-
-        public FileRegion getFileRegion() {
-            return fileRegion;
-        }
-
-        public void setFileRegion(final FileRegion fileRegion) {
-            this.fileRegion = fileRegion;
-        }
-
-        public LogLevel getType() {
-            return type;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public static enum LogLevel {
-            INFO,
-            WARN,
-            ERROR;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("BuildMessage [type=%s, message=%s, fileName=%s, fileRegion=%s]", type, message,
-                    fileName, fileRegion);
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-            result = prime * result + ((fileRegion == null) ? 0 : fileRegion.hashCode());
-            result = prime * result + ((message == null) ? 0 : message.hashCode());
-            result = prime * result + ((type == null) ? 0 : type.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final BuildMessage other = (BuildMessage) obj;
-            if (fileName == null) {
-                if (other.fileName != null) {
-                    return false;
-                }
-            } else if (!fileName.equals(other.fileName)) {
-                return false;
-            }
-            if (fileRegion == null) {
-                if (other.fileRegion != null) {
-                    return false;
-                }
-            } else if (!fileRegion.equals(other.fileRegion)) {
-                return false;
-            }
-            if (message == null) {
-                if (other.message != null) {
-                    return false;
-                }
-            } else if (!message.equals(other.message)) {
-                return false;
-            }
-            if (type != other.type) {
-                return false;
-            }
-            return true;
-        }
-    }
-
     public Status getStatus() {
         return status;
     }
 
     public void setStatus(final Status status) {
         this.status = status;
-    }
-
-    public static enum Status {
-        FAILED,
-        PASSED
     }
 
     public RobotFileType getType() {
@@ -356,11 +237,93 @@ public class RobotFileOutput {
         return RobotFileType.UNKNOWN;
     }
 
+    public static enum Status {
+        FAILED,
+        PASSED
+    }
+
     public enum RobotFileType {
         UNKNOWN,
         RESOURCE,
         TEST_SUITE,
         TEST_SUITE_DIR,
         TEST_SUITE_INIT;
+    }
+
+    public static class BuildMessage {
+
+        public static BuildMessage createWarnMessage(final String message, final String fileName,
+                final FileRegion fileRegion) {
+            return new BuildMessage(LogLevel.WARN, message, fileName, fileRegion);
+        }
+
+        public static BuildMessage createErrorMessage(final String message, final String fileName) {
+            return createErrorMessage(message, fileName, null);
+        }
+
+        public static BuildMessage createErrorMessage(final String message, final String fileName,
+                final FileRegion fileRegion) {
+            return new BuildMessage(LogLevel.ERROR, message, fileName, fileRegion);
+        }
+
+        private final LogLevel type;
+
+        private final String message;
+
+        private final String fileName;
+
+        private final FileRegion fileRegion;
+
+        private BuildMessage(final LogLevel level, final String message, final String fileName,
+                final FileRegion fileRegion) {
+            this.type = level;
+            this.message = message;
+            this.fileName = fileName == null ? null : fileName.intern();
+            this.fileRegion = fileRegion;
+        }
+
+        public LogLevel getType() {
+            return type;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public FileRegion getFileRegion() {
+            return fileRegion;
+        }
+
+        public static enum LogLevel {
+            INFO,
+            WARN,
+            ERROR;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("BuildMessage [type=%s, message=%s, fileName=%s, fileRegion=%s]", type, message,
+                    fileName, fileRegion);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, message, fileName, fileRegion);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == BuildMessage.class) {
+                final BuildMessage that = (BuildMessage) obj;
+                return this.type == that.type && Objects.equals(this.message, that.message)
+                        && Objects.equals(this.fileName, that.fileName)
+                        && Objects.equals(this.fileRegion, that.fileRegion);
+            }
+            return false;
+        }
     }
 }

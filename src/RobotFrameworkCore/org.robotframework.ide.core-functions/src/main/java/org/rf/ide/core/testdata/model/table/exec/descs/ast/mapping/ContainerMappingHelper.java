@@ -79,8 +79,7 @@ public class ContainerMappingHelper {
                     if (container.getParent() != null) {
                         final BuildMessage warn = BuildMessage.createWarnMessage(
                                 createWarningAboutMissingClose(containerType, startElement),
-                                mappingResult.getFileName());
-                        warn.setFileRegion(new FileRegion(currentPosition, newPosition));
+                                mappingResult.getFileName(), new FileRegion(currentPosition, newPosition));
                         mappingResult.addBuildMessage(warn);
                     }
                     contentEnd = elements.size();
