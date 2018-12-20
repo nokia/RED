@@ -26,9 +26,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
 
 /**
  * @author Michal Anglart
@@ -58,9 +58,14 @@ class LaunchConfigurationTabValidator {
             }
 
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
-            if (suitesToRun.isEmpty()) {
+            if (Sets.difference(suitesToRun.keySet(), robotConfig.getUnselectedSuitePaths()).isEmpty()) {
                 warnings.add("There are no suites specified. All suites in '" + robotConfig.getProjectName()
                         + "' will be executed.");
+            }
+            if (suitesToRun.keySet().stream().anyMatch(resorce -> resorce.getType() == IResource.FOLDER)
+                    && suitesToRun.values().stream().anyMatch(cases -> !cases.isEmpty())) {
+                warnings.add("There are suite folders and single cases from suite files specified. "
+                        + "Only single cases will be executed.");
             }
             validateSuitesToRun(suitesToRun);
 
@@ -146,13 +151,16 @@ class LaunchConfigurationTabValidator {
     private void validateSuitesToRun(final Map<IResource, List<String>> suitesToRun) {
         final List<String> missingSuites = new ArrayList<>();
         final List<String> missingCases = new ArrayList<>();
+        final List<String> suitesWithoutCases = new ArrayList<>();
         suitesToRun.forEach((resource, caseNames) -> {
             if (!resource.exists()) {
                 missingSuites.add(resource.getFullPath().toString());
-            } else if (resource.getType() == IResource.FILE && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
-                    || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
+            } else if (resource.getType() == IResource.FILE) {
                 final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
                 final List<String> collectedCaseNames = SuiteCasesCollector.collectCaseNames(suiteModel);
+                if (collectedCaseNames.isEmpty()) {
+                    suitesWithoutCases.add(resource.getFullPath().toString());
+                }
                 for (final String caseName : caseNames) {
                     if (collectedCaseNames.stream().noneMatch(name -> name.equalsIgnoreCase(caseName))) {
                         missingCases.add(caseName);
@@ -167,6 +175,10 @@ class LaunchConfigurationTabValidator {
         if (!missingCases.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
                     "Following cases do not exist: " + String.join(", ", missingCases));
+        }
+        if (!suitesWithoutCases.isEmpty()) {
+            throw new LaunchConfigurationValidationFatalException(
+                    "Following suites do not contain cases: " + String.join(", ", suitesWithoutCases));
         }
     }
 

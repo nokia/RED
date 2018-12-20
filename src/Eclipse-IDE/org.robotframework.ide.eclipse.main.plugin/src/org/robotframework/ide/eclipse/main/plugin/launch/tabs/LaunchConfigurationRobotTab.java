@@ -59,7 +59,8 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
 
         try {
             projectComposite.setInput(robotConfig.getProjectName());
-            suitesToRunComposite.setInput(robotConfig.getProjectName(), robotConfig.getSuitePaths());
+            suitesToRunComposite.setInput(robotConfig.getProjectName(), robotConfig.getSuitePaths(),
+                    robotConfig.getUnselectedSuitePaths());
             includeExcludeTagsComposite.setInput(robotConfig.isIncludeTagsEnabled(), robotConfig.getIncludedTags(),
                     robotConfig.isExcludeTagsEnabled(), robotConfig.getExcludedTags());
             includeExcludeTagsComposite.switchTo(robotConfig.getProjectName(), robotConfig.collectSuitesToRun());
@@ -77,6 +78,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
         try {
             robotConfig.setProjectName(projectComposite.getSelectedProjectName());
             robotConfig.setSuitePaths(suitesToRunComposite.extractSuitesToRun());
+            robotConfig.setUnselectedSuitePaths(suitesToRunComposite.extractUnselectedSuites());
             robotConfig.setIsIncludeTagsEnabled(includeExcludeTagsComposite.isIncludeTagsEnabled());
             robotConfig.setIncludedTags(includeExcludeTagsComposite.getIncludedTags());
             robotConfig.setIsExcludeTagsEnabled(includeExcludeTagsComposite.isExcludeTagsEnabled());

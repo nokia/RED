@@ -116,7 +116,7 @@ class LocalProcessCommandLineBuilder {
     private void addDataSources(final IRunCommandLineBuilder builder, final RedPreferences preferences)
             throws CoreException {
         final IProject project = robotProject.getProject();
-        final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
+        final Map<String, List<String>> suitePaths = robotConfig.getSelectedSuitePaths();
         final Map<IResource, List<String>> selectedResources = findResources(project, suitePaths);
         final Map<IResource, List<String>> linkedResources = findLinkedResources(selectedResources);
         final Map<IResource, List<String>> notLinkedResources = Maps.filterKeys(selectedResources,
