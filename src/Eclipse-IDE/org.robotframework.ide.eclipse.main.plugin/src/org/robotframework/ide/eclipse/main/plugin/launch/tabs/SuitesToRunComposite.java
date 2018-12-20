@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
@@ -45,11 +46,13 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.Selections;
@@ -90,6 +93,31 @@ class SuitesToRunComposite extends Composite {
         viewer.setCheckStateProvider(new CheckStateProvider());
         viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new CheckboxTreeViewerLabelProvider()));
         viewer.setContentProvider(new CheckboxTreeViewerContentProvider());
+        viewer.setComparator(new ViewerComparator() {
+
+            @Override
+            public int category(final Object element) {
+                return ((SuiteLaunchElement) element).resource.getType() == IResource.FOLDER ? 0 : 1;
+            }
+
+            @Override
+            public int compare(final Viewer viewer, final Object e1, final Object e2) {
+                final int cat1 = category(e1);
+                final int cat2 = category(e2);
+
+                if (cat1 != cat2) {
+                    return cat1 - cat2;
+                }
+
+                final IResource resource1 = ((SuiteLaunchElement) e1).resource;
+                final IResource resource2 = ((SuiteLaunchElement) e2).resource;
+
+                final String path1 = resource1.getFullPath().toString();
+                final String path2 = resource2.getFullPath().toString();
+
+                return path1.compareToIgnoreCase(path2);
+            }
+        });
         viewer.addCheckStateListener(event -> {
             final Object element = event.getElement();
             final boolean isElementChecked = event.getChecked();
@@ -147,12 +175,35 @@ class SuitesToRunComposite extends Composite {
                 dialog.setAllowMultiple(true);
                 dialog.setTitle("Select suite");
                 dialog.setMessage("Select suite to execute:");
+                dialog.setComparator(new ViewerComparator() {
+
+                    @Override
+                    public int category(final Object element) {
+                        return ((IResource) element).getType() == IResource.FOLDER ? 0 : 1;
+                    }
+                });
                 dialog.addFilter(new ViewerFilter() {
 
                     @Override
                     public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-                        return element instanceof IResource
-                                && ((IResource) element).getProject().getName().equals(projectName);
+                        return element instanceof IResource && shouldShow((IResource) element);
+                    }
+
+                    private boolean shouldShow(final IResource resource) {
+                        if (!resource.getProject().getName().equals(projectName)) {
+                            return false;
+                        } else if (resource.getType() == IResource.PROJECT) {
+                            return true;
+                        } else if (resource.getType() == IResource.FOLDER) {
+                            return !resource.equals(LibspecsFolder.get(resource.getProject()).getResource());
+                        } else if (resource.getType() == IResource.FILE
+                                && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                                        || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
+                            final RobotSuiteFile suiteModel = RobotModelManager.getInstance()
+                                    .createSuiteFile((IFile) resource);
+                            return suiteModel.isSuiteFile() || suiteModel.isRpaSuiteFile();
+                        }
+                        return false;
                     }
                 });
                 dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
@@ -316,7 +367,9 @@ class SuitesToRunComposite extends Composite {
     private static List<String> getCaseNames(final IResource resource) {
         final List<RobotCodeHoldingElement<?>> cases = new ArrayList<>();
 
-        if (resource.exists() && resource.getType() == IResource.FILE) {
+        if (resource.exists() && resource.getType() == IResource.FILE
+                && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                        || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
             final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
             if (suiteModel.isSuiteFile()) {
                 final Optional<RobotCasesSection> section = suiteModel.findSection(RobotCasesSection.class);
