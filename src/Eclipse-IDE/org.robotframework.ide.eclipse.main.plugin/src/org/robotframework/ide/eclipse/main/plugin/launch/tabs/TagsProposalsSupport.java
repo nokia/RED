@@ -34,13 +34,11 @@ import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.swt.widgets.Control;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -194,17 +192,9 @@ class TagsProposalsSupport {
         }
 
         private Collection<SourcedTag> extractTagsFromCases(final RobotSuiteFile suiteModel) {
-            return collectCases(suiteModel).flatMap(this::extractTagProposalsFromCase).collect(toList());
-        }
-
-        private Stream<RobotCodeHoldingElement<?>> collectCases(final RobotSuiteFile suiteModel) {
-            return Stream
-                    .of(suiteModel.findSection(RobotCasesSection.class),
-                            suiteModel.findSection(RobotTasksSection.class))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .flatMap(section -> section.getChildren().stream())
-                    .map(RobotCodeHoldingElement.class::cast);
+            return SuiteCasesCollector.collectCases(suiteModel)
+                    .flatMap(this::extractTagProposalsFromCase)
+                    .collect(toList());
         }
 
         private Stream<SourcedTag> extractTagProposalsFromCase(final RobotCodeHoldingElement<?> theCase) {
