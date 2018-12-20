@@ -30,8 +30,10 @@ STD_ARGS_LOGGER.addHandler(args_handler)
 
 RED_DRYRUN_PROCESSES = []
 
+
 def encode_result_or_exception(func):
     import traceback
+
     def inner(*args, **kwargs):
         result = {'result': None, 'exception': None}
         try:
@@ -47,6 +49,7 @@ def encode_result_or_exception(func):
 
 
 def logargs(func):
+
     def inner(*args, **kwargs):
         try:
             if args == None or len(args) == 0:
@@ -62,6 +65,7 @@ def logargs(func):
 
 
 def logresult(func):
+
     def inner(*args, **kwargs):
         ret = func(*args, **kwargs)
         try:
@@ -78,6 +82,7 @@ def logresult(func):
 
 # decorator which cleans up all modules that were loaded during decorated call
 def cleanup_modules(to_call):
+
     def inner(*args, **kwargs):
         old_modules = sys.modules.copy()
         try:
@@ -92,11 +97,11 @@ def cleanup_modules(to_call):
             to_remove = [m for m in current_modules if
                          m not in builtin_modules and not __has_to_be_preserved(m, to_preserve_with_submodules) and
                          not (m in old_modules and old_modules[m] is current_modules[m])]
- 
+
             for m in to_remove:
                 del sys.modules[m]
                 del m
- 
+
     return inner
 
 
@@ -109,6 +114,7 @@ def __has_to_be_preserved(module_name, modules_to_preserve):
 
 # decorator which cleans system path changed during decorated call
 def cleanup_sys_path(to_call):
+
     def inner(*args, **kwargs):
         old_sys_path = list(sys.path)
 
@@ -198,6 +204,7 @@ def get_site_packages_libraries_names():
     import red_libraries
     return red_libraries.get_site_packages_libraries_names()
 
+
 @logresult
 @encode_result_or_exception
 @logargs
@@ -279,6 +286,7 @@ def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, add
 
     subprocess.Popen(command, stdin=subprocess.PIPE)
 
+
 @logresult
 @encode_result_or_exception
 @logargs
@@ -294,6 +302,7 @@ def convert_robot_data_file(original_filepath):
     else:
         return str(b64encode(bytes(converted_content, 'utf-8')), 'utf-8')
 
+
 @logresult
 @encode_result_or_exception
 @cleanup_modules
@@ -303,6 +312,54 @@ def create_libdoc(libname, format, python_paths, class_paths):
     import red_libraries
     __extend_paths(python_paths, class_paths)
     return red_libraries.create_libdoc(libname, format)
+
+
+@logresult
+@encode_result_or_exception
+@cleanup_modules
+@cleanup_sys_path
+@logargs
+def create_libdoc_in_separate_process(libname, format, python_paths, class_paths, timeout_duration=10):
+    import os
+    import subprocess
+    import threading
+    import time
+    try:
+        import Queue as queue
+    except:
+        import queue
+
+    command = [sys.executable]
+    command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_libraries.py'))
+    command.append(__encode_unicode_if_needed(libname))
+    command.append(format)
+    command.append(';'.join(__encode_unicode_if_needed(python_paths)))
+    if class_paths:
+        command.append(';'.join(__encode_unicode_if_needed(class_paths)))
+
+    def get_output(process, q_stdout, q_stderr):
+        out, err = process.communicate()
+        q_stdout.put(out)
+        q_stderr.put(err)
+
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    q_stdout = queue.Queue()
+    q_stderr = queue.Queue()
+    thread = threading.Thread(target=get_output, args=(process, q_stdout, q_stderr))
+    thread.daemon = True
+    thread.start()
+
+    try:
+        out = q_stdout.get(timeout=timeout_duration)
+        err = q_stderr.get()
+
+        if out:
+            return out.rstrip().decode('UTF-8')
+        else:
+            raise Exception(err.decode('UTF-8'))
+    except queue.Empty:
+        process.kill()
+        raise queue.Empty("Libdoc not generated due to timeout")
 
 
 @logresult
@@ -389,6 +446,7 @@ if __name__ == '__main__':
     server.register_function(convert_robot_data_file, "convertRobotDataFile")
     server.register_function(run_rf_lint, "runRfLint")
     server.register_function(create_libdoc, 'createLibdoc')
+    server.register_function(create_libdoc_in_separate_process, 'createLibdocInSeparateProcess')
     server.register_function(create_html_doc, 'createHtmlDoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
 
