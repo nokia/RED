@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -23,12 +22,11 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -146,32 +144,29 @@ class LaunchConfigurationTabValidator {
     }
 
     private void validateSuitesToRun(final Map<IResource, List<String>> suitesToRun) {
-        final List<String> problematicSuites = new ArrayList<>();
-        final List<String> problematicTests = new ArrayList<>();
+        final List<String> missingSuites = new ArrayList<>();
+        final List<String> missingCases = new ArrayList<>();
         suitesToRun.forEach((resource, caseNames) -> {
             if (!resource.exists()) {
-                problematicSuites.add(resource.getFullPath().toString());
-            } else if (resource.getType() == IResource.FILE) {
+                missingSuites.add(resource.getFullPath().toString());
+            } else if (resource.getType() == IResource.FILE && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                    || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
                 final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
-                final List<RobotCase> cases = new ArrayList<>();
-                final Optional<RobotCasesSection> section = suiteModel.findSection(RobotCasesSection.class);
-                if (section.isPresent()) {
-                    cases.addAll(section.get().getChildren());
-                }
+                final List<String> collectedCaseNames = SuiteCasesCollector.collectCaseNames(suiteModel);
                 for (final String caseName : caseNames) {
-                    if (cases.stream().noneMatch(test -> test.getName().equalsIgnoreCase(caseName))) {
-                        problematicTests.add(caseName);
+                    if (collectedCaseNames.stream().noneMatch(name -> name.equalsIgnoreCase(caseName))) {
+                        missingCases.add(caseName);
                     }
                 }
             }
         });
-        if (!problematicSuites.isEmpty()) {
+        if (!missingSuites.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Following suites do not exist: " + String.join(", ", problematicSuites));
+                    "Following suites do not exist: " + String.join(", ", missingSuites));
         }
-        if (!problematicTests.isEmpty()) {
+        if (!missingCases.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Following tests do not exist: " + String.join(", ", problematicTests));
+                    "Following cases do not exist: " + String.join(", ", missingCases));
         }
     }
 
