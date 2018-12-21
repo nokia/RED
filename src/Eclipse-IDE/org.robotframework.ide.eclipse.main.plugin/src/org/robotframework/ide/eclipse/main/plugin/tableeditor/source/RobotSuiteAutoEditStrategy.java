@@ -50,8 +50,11 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         try {
             final RobotFileOutput rfo = ((RobotDocument) document).getNewestFileOutput();
             final int lineNumber = document.getLineOfOffset(command.offset);
-            final RobotLine currentLine = rfo.getFileModel().getFileContent().get(lineNumber);
-            autoIndentAfterNewLine(currentLine, DocumentUtilities.getDelimiter(document), command);
+            final List<RobotLine> contents = rfo.getFileModel().getFileContent();
+            if (lineNumber < contents.size()) {
+                final RobotLine currentLine = contents.get(lineNumber);
+                autoIndentAfterNewLine(currentLine, DocumentUtilities.getDelimiter(document), command);
+            }
 
         } catch (final InterruptedException | BadLocationException e) {
             // ok, no change in command then
