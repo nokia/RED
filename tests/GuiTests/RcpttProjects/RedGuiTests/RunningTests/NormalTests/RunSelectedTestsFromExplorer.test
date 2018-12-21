@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _7wTjoPUsEeaWpbE3jg39cA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/2/18 11:43 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 12/21/18 3:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -149,15 +149,17 @@ get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests (1)"
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-property itemCount | equals 2 | verify-true
     get-property "getItems().length" | equals 2 | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals "tsv_test/FirstFile.tsv" | verify-true
-    get-property "getItems().TreeItem[1].getText()" | equals "FirstFile.robot" | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "FirstFile.robot" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "tsv_test/FirstFile.tsv" | verify-true
+    
 }
 get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests (Selected Test Cases)"
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
     get-property itemCount | equals 2 | verify-true
     get-property "getItems().length" | equals 2 | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals "SecondTest.robot" | verify-true
-    get-property "getItems().TreeItem[1].getText()" | equals "FirstFile.robot" | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "FirstFile.robot" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "SecondTest.robot" | verify-true
+    
 }
 
 get-window "Run Configurations" | get-button Close | click
