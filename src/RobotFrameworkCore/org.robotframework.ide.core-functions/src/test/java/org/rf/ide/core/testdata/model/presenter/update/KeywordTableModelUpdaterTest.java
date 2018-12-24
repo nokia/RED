@@ -8,9 +8,7 @@ package org.rf.ide.core.testdata.model.presenter.update;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -97,24 +95,17 @@ public class KeywordTableModelUpdaterTest {
             final IExecutablesStepsHolderElementOperation<UserKeyword> handler = modelUpdater
                     .getOperationHandler(tcModelType);
 
-            try {
-                handler.create(keyword, 0, "action", newArrayList("1", "2"), "");
-                fail("Expected exception");
-            } catch (final UnsupportedOperationException e) {
-                // we expected that
-            }
-            try {
-                handler.update(element, 0, "arg");
-                fail("Expected exception");
-            } catch (final UnsupportedOperationException e) {
-                // we expected that
-            }
-            try {
-                handler.update(element, newArrayList("arg1", "arg2"));
-                fail("Expected exception");
-            } catch (final UnsupportedOperationException e) {
-                // we expected that
-            }
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> handler.create(keyword, 0, "action", newArrayList("1", "2"), ""))
+                    .withNoCause();
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> handler.update(element, 0, "arg"))
+                    .withNoCause();
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> handler.update(element, newArrayList("arg1", "arg2")))
+                    .withNoCause();
         }
         verifyZeroInteractions(keyword, element);
     }
@@ -128,7 +119,7 @@ public class KeywordTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.createExecutableRow(userKeyword, 0, keywordName, comment,
                 execArgs);
 
-        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW);
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.USER_KEYWORD_EXECUTABLE_ROW);
         final RobotExecutableRow<?> executable = (RobotExecutableRow<?>) modelElement;
 
         checkSetting(executable.getArguments(), execArgs, executable.getComment(), comment);
@@ -156,7 +147,7 @@ public class KeywordTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Arguments]", "comment",
                 newArrayList("arg1", "arg2"));
 
-        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_ARGUMENTS);
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.USER_KEYWORD_ARGUMENTS);
         final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
         assertThat(cellsOf(setting)).containsExactly("[Arguments]", "arg1", "arg2", "#comment");
@@ -178,7 +169,7 @@ public class KeywordTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Documentation]", "comment",
                 newArrayList("arg1", "arg2"));
 
-        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION);
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.USER_KEYWORD_DOCUMENTATION);
         final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
         assertThat(cellsOf(setting)).containsExactly("[Documentation]", "arg1", "arg2", "#comment");
@@ -198,7 +189,7 @@ public class KeywordTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Tags]", "comment",
                 newArrayList("arg1", "arg2"));
 
-        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TAGS);
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TAGS);
         final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "arg1", "arg2", "#comment");
@@ -219,7 +210,7 @@ public class KeywordTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Timeout]", "comment",
                 newArrayList("2 seconds", "arg1", "arg2"));
 
-        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TIMEOUT);
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TIMEOUT);
         final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
         assertThat(cellsOf(setting)).containsExactly("[Timeout]", "2 seconds", "arg1", "arg2", "#comment");
@@ -243,7 +234,7 @@ public class KeywordTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Teardown]", "comment",
                 args);
 
-        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TEARDOWN);
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.USER_KEYWORD_TEARDOWN);
         final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
         assertThat(cellsOf(setting)).containsExactly("[Teardown]", "teardown", "arg1", "arg2", "#comment");
@@ -265,7 +256,7 @@ public class KeywordTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Return]", "comment",
                 newArrayList("arg1", "arg2"));
 
-        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_RETURN);
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.USER_KEYWORD_RETURN);
         final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
         assertThat(cellsOf(setting)).containsExactly("[Return]", "arg1", "arg2", "#comment");
@@ -303,7 +294,7 @@ public class KeywordTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, "[Unknown]", "comment",
                 newArrayList("arg1", "arg2"));
 
-        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN);
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.USER_KEYWORD_SETTING_UNKNOWN);
         final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
 
         assertThat(cellsOf(setting)).containsExactly("[Unknown]", "arg1", "arg2", "#comment");
@@ -333,12 +324,12 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.insert(userKeyword, 0, teardown);
         modelUpdater.insert(userKeyword, 0, returnValue);
 
-        assertTrue(userKeyword.getArguments().contains(args));
-        assertTrue(userKeyword.getDocumentation().contains(doc));
-        assertTrue(userKeyword.getTags().contains(tags));
-        assertTrue(userKeyword.getTimeouts().contains(timeout));
-        assertTrue(userKeyword.getTeardowns().contains(teardown));
-        assertTrue(userKeyword.getReturns().contains(returnValue));
+        assertThat(userKeyword.getArguments()).contains(args);
+        assertThat(userKeyword.getDocumentation()).contains(doc);
+        assertThat(userKeyword.getTags()).contains(tags);
+        assertThat(userKeyword.getTimeouts()).contains(timeout);
+        assertThat(userKeyword.getTeardowns()).contains(teardown);
+        assertThat(userKeyword.getReturns()).contains(returnValue);
     }
 
     @Test
@@ -613,14 +604,11 @@ public class KeywordTableModelUpdaterTest {
     }
 
     private void checkSettingComment(final List<RobotToken> actualComments, final String expectedComment) {
-        assertTrue(actualComments.get(0).getText().equals("#" + expectedComment));
+        assertThat(actualComments.get(0).getText()).isEqualTo("#" + expectedComment);
     }
 
     private void checkSettingArguments(final List<RobotToken> actualArguments, final List<String> expectedArguments) {
-        assertEquals(expectedArguments.size(), actualArguments.size());
-        for (int i = 0; i < actualArguments.size(); i++) {
-            assertTrue(actualArguments.get(i).getText().equals(expectedArguments.get(i)));
-        }
+        assertThat(actualArguments).extracting(RobotToken::getText).isEqualTo(expectedArguments);
     }
 
     private static TestCase createCase() {

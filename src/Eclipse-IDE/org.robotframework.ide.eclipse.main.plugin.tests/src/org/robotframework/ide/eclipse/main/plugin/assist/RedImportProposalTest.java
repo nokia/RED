@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.EnumSet;
 
@@ -25,12 +25,9 @@ public class RedImportProposalTest {
     public void itIsNotPossibleToCreateProposalForModelTypeDifferentThanLibraryOrResourceImport() {
         for (final ModelType type : EnumSet
                 .complementOf(EnumSet.of(ModelType.RESOURCE_IMPORT_SETTING, ModelType.LIBRARY_IMPORT_SETTING))) {
-            try {
-                new RedImportProposal("content", "bdd", type, ProposalMatch.EMPTY);
-                fail();
-            } catch (final IllegalArgumentException e) {
-                // this is expected
-            }
+            assertThatIllegalArgumentException()
+                    .isThrownBy(() -> new RedImportProposal("content", "bdd", type, ProposalMatch.EMPTY))
+                    .withNoCause();
         }
     }
 

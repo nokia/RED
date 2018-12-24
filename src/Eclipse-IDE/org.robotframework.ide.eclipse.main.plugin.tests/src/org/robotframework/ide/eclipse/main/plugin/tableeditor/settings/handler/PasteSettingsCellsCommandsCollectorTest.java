@@ -6,8 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,8 +63,8 @@ public class PasteSettingsCellsCommandsCollectorTest {
         verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste);
         verifyPasteCommandsInputValues(pasteCommandsInputs, settingsFromClipboard, columnsToCopy.length,
                 columnsToPaste.length - 1, rowsToPaste);
-        assertEquals(settingsFromClipboard[0].getComment(),
-                pasteCommandsInputs.get(pasteCommandsInputs.size() - 1).getValueToPaste());
+        assertThat(pasteCommandsInputs.get(pasteCommandsInputs.size() - 1).getValueToPaste())
+                .isEqualTo(settingsFromClipboard[0].getComment());
     }
 
     @Test
@@ -182,7 +181,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         verifyPasteCommandsInputValues(pasteCommandsInputs, settingsFromClipboard, columnsToCopy.length,
                 columnsToPaste.length, rowsToPaste);
     }
-    
+
     @Test
     public void testCollectPasteCommands_pasteOneColumnFromOneMetadataToOneColumnInTwoMetadatas() {
 
@@ -223,7 +222,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
     private void verifyPasteCommandsInputSize(final int[] columnsToPaste, final int[] rowsToPaste,
             final List<PasteCommandsInput> pasteCommandsInputs) {
-        assertTrue(pasteCommandsInputs.size() == (columnsToPaste.length * rowsToPaste.length));
+        assertThat(pasteCommandsInputs.size() == (columnsToPaste.length * rowsToPaste.length)).isTrue();
     }
 
     private void verifyPasteCommandsInputValues(final List<PasteCommandsInput> pasteCommandsInputs,
@@ -239,8 +238,8 @@ public class PasteSettingsCellsCommandsCollectorTest {
             final List<String> arguments = settingFromClipboard.getArguments();
             int settingFromClipboardColumnIndex = 0;
             for (int j = 0; j < argsToPasteSize; j++) {
-                assertEquals(arguments.get(settingFromClipboardColumnIndex),
-                        pasteCommandsInputs.get(j + pasteCommandInputsShift).getValueToPaste());
+                assertThat(pasteCommandsInputs.get(j + pasteCommandInputsShift).getValueToPaste())
+                        .isEqualTo(arguments.get(settingFromClipboardColumnIndex));
                 if (settingFromClipboardColumnIndex + 1 < argsToCopySize) {
                     settingFromClipboardColumnIndex++;
                 }
@@ -263,8 +262,8 @@ public class PasteSettingsCellsCommandsCollectorTest {
             final RobotElement selectedSetting, final int[] columnsToPaste) {
         for (int i = 0; i < pasteCommandsInputs.size(); i++) {
             final PasteCommandsInput pasteCommandsInput = pasteCommandsInputs.get(i);
-            assertEquals(selectedSetting, pasteCommandsInput.getSelectedElement());
-            assertTrue(columnsToPaste[i] == pasteCommandsInput.getSelectedElementColumnIndex());
+            assertThat(pasteCommandsInput.getSelectedElement()).isEqualTo(selectedSetting);
+            assertThat(columnsToPaste[i] == pasteCommandsInput.getSelectedElementColumnIndex()).isTrue();
         }
     }
 

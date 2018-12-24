@@ -5,8 +5,7 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,10 +25,10 @@ public class GeneralSettingsTableEditableRuleTest {
     @Test
     public void testIsEditable() {
         final ConfigRegistry configRegistry = mock(ConfigRegistry.class);
-        assertFalse(editableRule.isEditable(createCell(0, false), configRegistry));
-        assertTrue(editableRule.isEditable(createCell(0, true), configRegistry));
-        assertTrue(editableRule.isEditable(createCell(1, true), configRegistry));
-        assertTrue(editableRule.isEditable(createCell(1, false), configRegistry));
+        assertThat(editableRule.isEditable(createCell(0, false), configRegistry)).isFalse();
+        assertThat(editableRule.isEditable(createCell(0, true), configRegistry)).isTrue();
+        assertThat(editableRule.isEditable(createCell(1, true), configRegistry)).isTrue();
+        assertThat(editableRule.isEditable(createCell(1, false), configRegistry)).isTrue();
     }
 
     private ILayerCell createCell(final int columnIndex, final boolean hasElementAdderLabel) {

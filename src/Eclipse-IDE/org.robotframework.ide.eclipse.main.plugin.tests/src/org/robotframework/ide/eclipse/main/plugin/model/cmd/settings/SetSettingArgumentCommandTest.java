@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,19 +26,19 @@ public class SetSettingArgumentCommandTest {
 
     @Test
     public void testUndoRedoOnFirstArgumentInNotMovingArgsSetting() {
-        for (RobotKeywordCall call : createSettingWithNotMovingFirstArgument()) {
-            SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 0, null);
+        for (final RobotKeywordCall call : createSettingWithNotMovingFirstArgument()) {
+            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 0, null);
 
             final IEventBroker eventBroker = mock(IEventBroker.class);
             ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
             verifyArguments(call, 3, 0, "");
 
-            EditorCommand undoCommand = command.getUndoCommands().get(0);
+            final EditorCommand undoCommand = command.getUndoCommands().get(0);
             undoCommand.execute();
             verifyArguments(call, 3, 0, "1");
 
-            EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+            final EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
             redoCommand.execute();
             verifyArguments(call, 3, 0, "\\");
 
@@ -49,19 +48,19 @@ public class SetSettingArgumentCommandTest {
 
     @Test
     public void testUndoRedoOnSecondArgumentInNotMovingArgsSetting() {
-        for (RobotKeywordCall call : createSettingWithNotMovingFirstArgument()) {
-            SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 1, null);
+        for (final RobotKeywordCall call : createSettingWithNotMovingFirstArgument()) {
+            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 1, null);
 
             final IEventBroker eventBroker = mock(IEventBroker.class);
             ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
             verifyArguments(call, 2, 1, "3");
 
-            EditorCommand undoCommand = command.getUndoCommands().get(0);
+            final EditorCommand undoCommand = command.getUndoCommands().get(0);
             undoCommand.execute();
             verifyArguments(call, 3, 1, "2");
 
-            EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+            final EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
             redoCommand.execute();
             verifyArguments(call, 2, 1, "3");
 
@@ -71,19 +70,19 @@ public class SetSettingArgumentCommandTest {
 
     @Test
     public void testUndoRedoOnFirstArgumentInMovingArgsSetting() {
-        for (RobotKeywordCall call : createSettingWithMovingFirstArgument()) {
-            SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 0, null);
+        for (final RobotKeywordCall call : createSettingWithMovingFirstArgument()) {
+            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 0, null);
 
             final IEventBroker eventBroker = mock(IEventBroker.class);
             ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
             verifyArguments(call, 2, 0, "2");
 
-            EditorCommand undoCommand = command.getUndoCommands().get(0);
+            final EditorCommand undoCommand = command.getUndoCommands().get(0);
             undoCommand.execute();
             verifyArguments(call, 3, 0, "1");
 
-            EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+            final EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
             redoCommand.execute();
             verifyArguments(call, 2, 0, "2");
 
@@ -91,8 +90,8 @@ public class SetSettingArgumentCommandTest {
         }
     }
 
-    private void verifyArguments(RobotKeywordCall call, int expectedSize, int indexToVerify, String expectedValue) {
-        assertTrue(call.getArguments().size() == expectedSize);
+    private void verifyArguments(final RobotKeywordCall call, final int expectedSize, final int indexToVerify, final String expectedValue) {
+        assertThat(call.getArguments()).hasSize(expectedSize);
         assertThat(call.getArguments().get(indexToVerify)).isEqualTo(expectedValue);
     }
 

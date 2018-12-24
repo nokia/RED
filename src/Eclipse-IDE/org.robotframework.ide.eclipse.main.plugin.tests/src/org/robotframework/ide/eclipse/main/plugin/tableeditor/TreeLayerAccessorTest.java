@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -43,7 +43,7 @@ public class TreeLayerAccessorTest {
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(0));
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(1) + rowCountChange);
     }
-    
+
     @Test
     public void testCollapseRowsAfterRowCountChange_whenOneKeywordDefAddedBetweenExpandedIndexes() {
         final List<Integer> expandedRowIndexes = newArrayList(0, 4, 8);
@@ -56,7 +56,7 @@ public class TreeLayerAccessorTest {
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(1) + rowCountChange);
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(2) + rowCountChange);
     }
-    
+
     @Test
     public void testCollapseRowsAfterRowCountChange_whenOneRowRemovedBetweenExpandedIndexes() {
         final List<Integer> expandedRowIndexes = newArrayList(0, 8);
@@ -68,7 +68,7 @@ public class TreeLayerAccessorTest {
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(0));
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(1) + rowCountChange);
     }
-    
+
     @Test
     public void testCollapseRowsAfterRowCountChange_whenOneKeywordDefRemovedBetweenExpandedIndexes() {
         final List<Integer> expandedRowIndexes = newArrayList(0, 8);
@@ -80,7 +80,7 @@ public class TreeLayerAccessorTest {
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(0));
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(1) + rowCountChange);
     }
-    
+
     @Test
     public void testCollapseRowsAfterRowCountChange_whenFirstKeywordDefRemovedBeforeExpandedIndexes() {
         final List<Integer> expandedRowIndexes = newArrayList(0, 6, 10);
@@ -88,7 +88,7 @@ public class TreeLayerAccessorTest {
         final int rowCountChange = -6;
 
         treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
-        
+
         verify(treeLayer, times(2)).collapseTreeRow(anyInt());
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(1) + rowCountChange);
         verify(treeLayer).collapseTreeRow(expandedRowIndexes.get(2) + rowCountChange);
@@ -107,9 +107,9 @@ public class TreeLayerAccessorTest {
         final int rowCount = 4;
         final List<Integer> expandedRowsIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCount);
 
-        assertTrue(expandedRowsIndexes.size() == 2);
-        assertTrue(expandedRowsIndexes.contains(0));
-        assertTrue(expandedRowsIndexes.contains(3));
+        assertThat(expandedRowsIndexes.size() == 2).isTrue();
+        assertThat(expandedRowsIndexes.contains(0)).isTrue();
+        assertThat(expandedRowsIndexes.contains(3)).isTrue();
         verify(treeLayer).expandTreeRow(0);
         verify(treeLayer).expandTreeRow(3);
     }
