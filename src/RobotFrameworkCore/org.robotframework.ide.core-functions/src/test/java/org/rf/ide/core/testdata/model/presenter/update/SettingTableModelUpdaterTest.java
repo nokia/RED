@@ -6,10 +6,7 @@
 package org.rf.ide.core.testdata.model.presenter.update;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +45,7 @@ public class SettingTableModelUpdaterTest {
 
     @BeforeClass
     public static void setup() {
-        RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
         model.includeSettingTableSection();
         settingTable = model.getSettingTable();
 
@@ -66,8 +63,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.SUITE_SETUP.getName(), comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.SUITE_SETUP);
-        SuiteSetup setting = (SuiteSetup) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.SUITE_SETUP);
+        final SuiteSetup setting = (SuiteSetup) modelElement;
         checkSetting(setting.getKeywordName(), keywordName, setting.getArguments(), settingArgs, setting.getComment(),
                 comment);
 
@@ -83,9 +80,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getKeywordName(), newKeywordName, setting.getArguments(), settingArgs,
                 setting.getComment(), newComment);
 
-        assertFalse(settingTable.getSuiteSetups().isEmpty());
+        assertThat(settingTable.getSuiteSetups()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getSuiteSetups().isEmpty());
+        assertThat(settingTable.getSuiteSetups()).isEmpty();
     }
 
     @Test
@@ -99,8 +96,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.SUITE_TEARDOWN.getName(), comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.SUITE_TEARDOWN);
-        SuiteTeardown setting = (SuiteTeardown) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.SUITE_TEARDOWN);
+        final SuiteTeardown setting = (SuiteTeardown) modelElement;
         checkSetting(setting.getKeywordName(), keywordName, setting.getArguments(), settingArgs, setting.getComment(),
                 comment);
 
@@ -117,9 +114,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getKeywordName(), newKeywordName, setting.getArguments(), settingArgs,
                 setting.getComment(), newComment);
 
-        assertFalse(settingTable.getSuiteTeardowns().isEmpty());
+        assertThat(settingTable.getSuiteTeardowns()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getSuiteTeardowns().isEmpty());
+        assertThat(settingTable.getSuiteTeardowns()).isEmpty();
     }
 
     @Test
@@ -133,8 +130,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX, SettingName.TEST_SETUP.getName(),
                 comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.SUITE_TEST_SETUP);
-        TestSetup setting = (TestSetup) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.SUITE_TEST_SETUP);
+        final TestSetup setting = (TestSetup) modelElement;
         checkSetting(setting.getKeywordName(), keywordName, setting.getArguments(), settingArgs, setting.getComment(),
                 comment);
 
@@ -151,9 +148,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getKeywordName(), newKeywordName, setting.getArguments(), settingArgs,
                 setting.getComment(), newComment);
 
-        assertFalse(settingTable.getTestSetups().isEmpty());
+        assertThat(settingTable.getTestSetups()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getTestSetups().isEmpty());
+        assertThat(settingTable.getTestSetups()).isEmpty();
     }
 
     @Test
@@ -167,8 +164,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.TEST_TEARDOWN.getName(), comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.SUITE_TEST_TEARDOWN);
-        TestTeardown setting = (TestTeardown) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.SUITE_TEST_TEARDOWN);
+        final TestTeardown setting = (TestTeardown) modelElement;
         checkSetting(setting.getKeywordName(), keywordName, setting.getArguments(), settingArgs, setting.getComment(),
                 comment);
 
@@ -187,9 +184,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getKeywordName(), newKeywordName, setting.getArguments(), settingArgs,
                 setting.getComment(), newComment);
 
-        assertFalse(settingTable.getTestTeardowns().isEmpty());
+        assertThat(settingTable.getTestTeardowns()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getTestTeardowns().isEmpty());
+        assertThat(settingTable.getTestTeardowns()).isEmpty();
     }
 
     @Test
@@ -203,8 +200,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.TEST_TEMPLATE.getName(), comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.SUITE_TEST_TEMPLATE);
-        TestTemplate setting = (TestTemplate) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.SUITE_TEST_TEMPLATE);
+        final TestTemplate setting = (TestTemplate) modelElement;
         checkSetting(setting.getKeywordName(), template, setting.getUnexpectedTrashArguments(), settingArgs,
                 setting.getComment(), comment);
 
@@ -221,9 +218,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getKeywordName(), newKeywordName, setting.getUnexpectedTrashArguments(), settingArgs,
                 setting.getComment(), newComment);
 
-        assertFalse(settingTable.getTestTemplates().isEmpty());
+        assertThat(settingTable.getTestTemplates()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getTestTemplates().isEmpty());
+        assertThat(settingTable.getTestTemplates()).isEmpty();
     }
 
     @Test
@@ -237,8 +234,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.TEST_TIMEOUT.getName(), comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.SUITE_TEST_TIMEOUT);
-        TestTimeout setting = (TestTimeout) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.SUITE_TEST_TIMEOUT);
+        final TestTimeout setting = (TestTimeout) modelElement;
         checkSetting(setting.getTimeout(), timeout, setting.getMessageArguments(), settingArgs, setting.getComment(),
                 comment);
 
@@ -255,9 +252,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getTimeout(), newTimeout, setting.getMessageArguments(), settingArgs, setting.getComment(),
                 newComment);
 
-        assertFalse(settingTable.getTestTimeouts().isEmpty());
+        assertThat(settingTable.getTestTimeouts()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getTestTimeouts().isEmpty());
+        assertThat(settingTable.getTestTimeouts()).isEmpty();
     }
 
     @Test
@@ -268,8 +265,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX, SettingName.FORCE_TAGS.getName(),
                 comment, tags);
 
-        assertTrue(modelElement.getModelType() == ModelType.FORCE_TAGS_SETTING);
-        ForceTags setting = (ForceTags) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.FORCE_TAGS_SETTING);
+        final ForceTags setting = (ForceTags) modelElement;
         checkSetting(setting.getTags(), tags, setting.getComment(), comment);
 
         final List<String> newTags = newArrayList("tag3", "tag4", "tag5");
@@ -282,9 +279,9 @@ public class SettingTableModelUpdaterTest {
 
         checkSetting(setting.getTags(), newTags, setting.getComment(), newComment);
 
-        assertFalse(settingTable.getForceTags().isEmpty());
+        assertThat(settingTable.getForceTags()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getForceTags().isEmpty());
+        assertThat(settingTable.getForceTags()).isEmpty();
     }
 
     @Test
@@ -295,8 +292,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.DEFAULT_TAGS.getName(), comment, tags);
 
-        assertTrue(modelElement.getModelType() == ModelType.DEFAULT_TAGS_SETTING);
-        DefaultTags setting = (DefaultTags) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.DEFAULT_TAGS_SETTING);
+        final DefaultTags setting = (DefaultTags) modelElement;
         checkSetting(setting.getTags(), tags, setting.getComment(), comment);
 
         final List<String> newTags = newArrayList("tag1", "tag4");
@@ -307,9 +304,9 @@ public class SettingTableModelUpdaterTest {
 
         checkSetting(setting.getTags(), newTags, setting.getComment(), newComment);
 
-        assertFalse(settingTable.getDefaultTags().isEmpty());
+        assertThat(settingTable.getDefaultTags()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getDefaultTags().isEmpty());
+        assertThat(settingTable.getDefaultTags()).isEmpty();
     }
 
     @Test
@@ -320,8 +317,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.DOCUMENTATION.getName(), comment, documentation);
 
-        assertTrue(modelElement.getModelType() == ModelType.SUITE_DOCUMENTATION);
-        SuiteDocumentation setting = (SuiteDocumentation) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.SUITE_DOCUMENTATION);
+        final SuiteDocumentation setting = (SuiteDocumentation) modelElement;
         checkSetting(setting.getDocumentationText(), new ArrayList<String>(Arrays.asList("docPart1 docPart2")),
                 setting.getComment(), comment);
 
@@ -333,9 +330,9 @@ public class SettingTableModelUpdaterTest {
 
         checkSetting(setting.getDocumentationText(), newDocumentation, setting.getComment(), newComment);
 
-        assertFalse(settingTable.getDocumentation().isEmpty());
+        assertThat(settingTable.getDocumentation()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getDocumentation().isEmpty());
+        assertThat(settingTable.getDocumentation()).isEmpty();
     }
 
     @Test
@@ -349,8 +346,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.LIBRARY_IMPORT.getName(), comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.LIBRARY_IMPORT_SETTING);
-        LibraryImport setting = (LibraryImport) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.LIBRARY_IMPORT_SETTING);
+        final LibraryImport setting = (LibraryImport) modelElement;
         checkSetting(setting.getPathOrName(), libName, setting.getArguments(), settingArgs, setting.getComment(),
                 comment);
 
@@ -366,9 +363,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getPathOrName(), newLibName, setting.getArguments(), newSettingArgs, setting.getComment(),
                 newComment);
 
-        assertTrue(settingTable.getImports().contains(setting));
+        assertThat(settingTable.getImports()).contains(setting);
         modelUpdater.remove(settingTable, setting);
-        assertFalse(settingTable.getImports().contains(setting));
+        assertThat(settingTable.getImports()).doesNotContain(setting);
     }
 
     @Test
@@ -382,8 +379,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.RESOURCE_IMPORT.getName(), comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.RESOURCE_IMPORT_SETTING);
-        ResourceImport setting = (ResourceImport) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.RESOURCE_IMPORT_SETTING);
+        final ResourceImport setting = (ResourceImport) modelElement;
         checkSetting(setting.getPathOrName(), resourceName, setting.getUnexpectedTrashArguments(), settingArgs,
                 setting.getComment(), comment);
 
@@ -399,9 +396,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getPathOrName(), newResourceName, setting.getUnexpectedTrashArguments(), newSettingArgs,
                 setting.getComment(), newComment);
 
-        assertTrue(settingTable.getImports().contains(setting));
+        assertThat(settingTable.getImports()).contains(setting);
         modelUpdater.remove(settingTable, setting);
-        assertFalse(settingTable.getImports().contains(setting));
+        assertThat(settingTable.getImports()).doesNotContain(setting);
     }
 
     @Test
@@ -415,8 +412,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
                 SettingName.VARIABLES_IMPORT.getName(), comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.VARIABLES_IMPORT_SETTING);
-        VariablesImport setting = (VariablesImport) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.VARIABLES_IMPORT_SETTING);
+        final VariablesImport setting = (VariablesImport) modelElement;
         checkSetting(setting.getPathOrName(), varName, setting.getArguments(), settingArgs, setting.getComment(),
                 comment);
 
@@ -432,9 +429,9 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getPathOrName(), newVarName, setting.getArguments(), newSettingArgs, setting.getComment(),
                 newComment);
 
-        assertTrue(settingTable.getImports().contains(setting));
+        assertThat(settingTable.getImports()).contains(setting);
         modelUpdater.remove(settingTable, setting);
-        assertFalse(settingTable.getImports().contains(setting));
+        assertThat(settingTable.getImports()).doesNotContain(setting);
     }
 
     @Test
@@ -448,8 +445,8 @@ public class SettingTableModelUpdaterTest {
         final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX, SettingName.METADATA.getName(),
                 comment, args);
 
-        assertTrue(modelElement.getModelType() == ModelType.METADATA_SETTING);
-        Metadata setting = (Metadata) modelElement;
+        assertThat(modelElement.getModelType()).isEqualTo(ModelType.METADATA_SETTING);
+        final Metadata setting = (Metadata) modelElement;
         checkSetting(setting.getKey(), metadata, setting.getValues(), settingArgs, setting.getComment(), comment);
 
         final String newMetadata = "data";
@@ -465,33 +462,34 @@ public class SettingTableModelUpdaterTest {
         checkSetting(setting.getKey(), newMetadata, setting.getValues(), newSettingArgs, setting.getComment(),
                 newComment);
 
-        assertFalse(settingTable.getMetadatas().isEmpty());
+        assertThat(settingTable.getMetadatas()).isNotEmpty();
         modelUpdater.remove(settingTable, setting);
-        assertTrue(settingTable.getMetadatas().isEmpty());
+        assertThat(settingTable.getMetadatas()).isEmpty();
     }
 
     @Test
     public void testCreateWhenNoTableExists() {
-        assertNull(modelUpdater.create(null, INDEX, SettingName.METADATA.getName(), "", newArrayList("")));
+        assertThat(modelUpdater.create(null, INDEX, SettingName.METADATA.getName(), "", newArrayList(""))).isNull();
     }
 
     @Test
     public void testCreateWithOtherTable() {
-        RobotFile file = NewRobotFileTestHelper.getModelFileToModify("3.0");
+        final RobotFile file = NewRobotFileTestHelper.getModelFileToModify("3.0");
         file.includeSettingTableSection();
-        VariableTable variableTable = file.getVariableTable();
-        assertNull(modelUpdater.create(variableTable, INDEX, SettingName.METADATA.getName(), "", newArrayList("")));
+        final VariableTable variableTable = file.getVariableTable();
+        assertThat(modelUpdater.create(variableTable, INDEX, SettingName.METADATA.getName(), "", newArrayList("")))
+                .isNull();
     }
 
     @Test
     public void testCreateWithUnknownSetting() {
-        assertNull(modelUpdater.create(settingTable, INDEX, "Unknown", "", newArrayList("")));
+        assertThat(modelUpdater.create(settingTable, INDEX, "Unknown", "", newArrayList(""))).isNull();
     }
 
     private void checkSetting(final RobotToken actualKeywordName, final String expectedKeywordName,
             final List<RobotToken> actualArguments, final List<String> expectedArguments,
             final List<RobotToken> actualComments, final String expectedComment) {
-        assertTrue(actualKeywordName.getText().equals(expectedKeywordName));
+        assertThat(actualKeywordName.getText()).isEqualTo(expectedKeywordName);
         checkSettingArguments(actualArguments, expectedArguments);
         checkSettingComment(actualComments, expectedComment);
     }
@@ -503,14 +501,11 @@ public class SettingTableModelUpdaterTest {
     }
 
     private void checkSettingComment(final List<RobotToken> actualComments, final String expectedComment) {
-        assertTrue(actualComments.get(0).getText().equals("#" + expectedComment));
+        assertThat(actualComments.get(0).getText()).isEqualTo("#" + expectedComment);
     }
 
     private void checkSettingArguments(final List<RobotToken> actualArguments, final List<String> expectedArguments) {
-        assertEquals(expectedArguments.size(), actualArguments.size());
-        for (int i = 0; i < actualArguments.size(); i++) {
-            assertTrue(actualArguments.get(i).getText().equals(expectedArguments.get(i)));
-        }
+        assertThat(actualArguments).extracting(RobotToken::getText).isEqualTo(expectedArguments);
     }
 
     enum SettingName {
@@ -530,7 +525,7 @@ public class SettingTableModelUpdaterTest {
 
         METADATA("Metadata");
 
-        private String name;
+        private final String name;
 
         private SettingName(final String name) {
             this.name = name;

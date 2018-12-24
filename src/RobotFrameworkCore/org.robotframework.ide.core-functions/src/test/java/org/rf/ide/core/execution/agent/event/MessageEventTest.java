@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -119,18 +118,15 @@ public class MessageEventTest {
         allKeysCombinations.remove(newHashSet("message", "level", "timestamp"));
 
         for (final Set<String> combination : allKeysCombinations) {
-            try {
-                final Map<String, Object> attributes = new HashMap<>();
-                for (final String key : combination) {
-                    attributes.put(key, template.get(key));
-                }
-                final Map<String, Object> eventMap = ImmutableMap.of("log_message", newArrayList(attributes));
-                MessageEvent.fromLogMessage(eventMap);
-
-                fail();
-            } catch (final IllegalArgumentException e) {
-                // that's what we expect to have
+            final Map<String, Object> attributes = new HashMap<>();
+            for (final String key : combination) {
+                attributes.put(key, template.get(key));
             }
+            final Map<String, Object> eventMap = ImmutableMap.of("log_message", newArrayList(attributes));
+
+            assertThatIllegalArgumentException().isThrownBy(() -> MessageEvent.fromLogMessage(eventMap))
+                    .withMessage("Message event has to have the content, timestamp and level")
+                    .withNoCause();
         }
     }
 

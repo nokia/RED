@@ -7,9 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -41,7 +38,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 
 public class LibrariesWatchHandlerTest {
@@ -94,13 +90,12 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
-        assertFalse(registeredPaths.isEmpty());
-        assertEquals(pythonLibraryFile.getParentFile().getPath(), registeredPaths.get(PYTHON_LIBRARY_FILE_NAME));
-        assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
-                librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary));
-        assertEquals(newArrayList(pythonLibraryFile.getName()),
-                librariesWatchHandler.getLibrarySpecifications().get(libSpec));
+        assertThat(librariesWatchHandler.getRegisteredPaths()).hasSize(1)
+                .containsEntry(PYTHON_LIBRARY_FILE_NAME, pythonLibraryFile.getParentFile().getPath());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).hasSize(1)
+                .containsEntry(referencedLibrary, new Path(pythonLibraryFile.getPath()).toPortableString());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec)).hasSize(1)
+                .containsOnly(pythonLibraryFile.getName());
     }
 
     @Test
@@ -112,13 +107,12 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
-        assertFalse(registeredPaths.isEmpty());
-        assertEquals(pythonLibraryFile.getParentFile().getPath(), registeredPaths.get(PYTHON_LIBRARY_FILE_NAME));
-        assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
-                librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary));
-        assertEquals(newArrayList(pythonLibraryFile.getName()),
-                librariesWatchHandler.getLibrarySpecifications().get(libSpec));
+        assertThat(librariesWatchHandler.getRegisteredPaths()).hasSize(1)
+                .containsEntry(PYTHON_LIBRARY_FILE_NAME, pythonLibraryFile.getParentFile().getPath());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).hasSize(1)
+                .containsEntry(referencedLibrary, new Path(pythonLibraryFile.getPath()).toPortableString());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec)).hasSize(1)
+                .containsOnly(pythonLibraryFile.getName());
     }
 
     @Test
@@ -138,21 +132,20 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
         librariesWatchHandler.registerLibrary(referencedLibrary3, libSpec3);
 
-        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
-        assertFalse(registeredPaths.isEmpty());
-        assertEquals(pythonLibraryFile.getParentFile().getPath(), registeredPaths.get(PYTHON_LIBRARY_FILE_NAME));
-        assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
-                librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary1));
-        assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
-                librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary2));
-        assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
-                librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary3));
-        assertEquals(newArrayList(pythonLibraryFile.getName()),
-                librariesWatchHandler.getLibrarySpecifications().get(libSpec1));
-        assertEquals(newArrayList(pythonLibraryFile.getName()),
-                librariesWatchHandler.getLibrarySpecifications().get(libSpec2));
-        assertEquals(newArrayList(pythonLibraryFile.getName()),
-                librariesWatchHandler.getLibrarySpecifications().get(libSpec3));
+        assertThat(librariesWatchHandler.getRegisteredPaths()).hasSize(1)
+                .containsEntry(PYTHON_LIBRARY_FILE_NAME, pythonLibraryFile.getParentFile().getPath());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary1))
+                .isEqualTo(new Path(pythonLibraryFile.getPath()).toPortableString());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary2))
+                .isEqualTo(new Path(pythonLibraryFile.getPath()).toPortableString());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary3))
+                .isEqualTo(new Path(pythonLibraryFile.getPath()).toPortableString());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec1)).hasSize(1)
+                .containsOnly(pythonLibraryFile.getName());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec2)).hasSize(1)
+                .containsOnly(pythonLibraryFile.getName());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec3)).hasSize(1)
+                .containsOnly(pythonLibraryFile.getName());
     }
 
     @Test
@@ -164,16 +157,13 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
-        assertTrue(registeredPaths.size() == 2);
-        assertEquals(pythonModuleLibraryFolder.getPath(), registeredPaths.get(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME));
-        assertEquals(pythonModuleLibraryFolder.getPath(), registeredPaths.get(PYTHON_MODULE_LIBRARY_FILE_NAME));
-        assertEquals(new Path(pythonModuleLibraryInitFile.getPath()).toPortableString(),
-                librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary));
-        final List<String> moduleFilesNames = librariesWatchHandler.getLibrarySpecifications().get(libSpec);
-        assertTrue(moduleFilesNames.size() == 2);
-        assertTrue(moduleFilesNames.contains(pythonModuleLibraryFile.getName()));
-        assertTrue(moduleFilesNames.contains(pythonModuleLibraryInitFile.getName()));
+        assertThat(librariesWatchHandler.getRegisteredPaths()).hasSize(2)
+                .containsEntry(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME, pythonModuleLibraryFolder.getPath())
+                .containsEntry(PYTHON_MODULE_LIBRARY_FILE_NAME, pythonModuleLibraryFolder.getPath());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).hasSize(1)
+                .containsEntry(referencedLibrary, new Path(pythonModuleLibraryInitFile.getPath()).toPortableString());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec)).hasSize(2)
+                .containsOnly(pythonModuleLibraryFile.getName(), pythonModuleLibraryInitFile.getName());
     }
 
     @Test
@@ -185,25 +175,25 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
-        assertFalse(registeredPaths.isEmpty());
-        assertEquals(javaLibraryFile.getParentFile().getPath(), registeredPaths.get(JAVA_LIBRARY_FILE_NAME));
-        assertEquals(new Path(javaLibraryFile.getPath()).toPortableString(),
-                librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary));
-        assertEquals(newArrayList(javaLibraryFile.getName()),
-                librariesWatchHandler.getLibrarySpecifications().get(libSpec));
+        assertThat(librariesWatchHandler.getRegisteredPaths()).hasSize(1)
+                .containsEntry(JAVA_LIBRARY_FILE_NAME, javaLibraryFile.getParentFile().getPath());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).hasSize(1)
+                .containsEntry(referencedLibrary, new Path(javaLibraryFile.getPath()).toPortableString());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec)).hasSize(1)
+                .containsOnly(javaLibraryFile.getName());
     }
 
     @Test
     public void testRegisterVirtualLibrary() {
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary("virtualLibTest", "", LibraryType.VIRTUAL);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary("virtualLibTest", "",
+                LibraryType.VIRTUAL);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, new LibrarySpecification());
 
-        assertTrue(librariesWatchHandler.getRegisteredPaths().isEmpty());
-        assertTrue(librariesWatchHandler.getRegisteredRefLibraries().isEmpty());
-        assertTrue(librariesWatchHandler.getLibrarySpecifications().isEmpty());
+        assertThat(librariesWatchHandler.getRegisteredPaths()).isEmpty();
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).isEmpty();
+        assertThat(librariesWatchHandler.getLibrarySpecifications().asMap()).isEmpty();
     }
 
     @Test
@@ -214,9 +204,9 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.registerLibrary(referencedLibrary, new LibrarySpecification());
 
-        assertTrue(librariesWatchHandler.getRegisteredPaths().isEmpty());
-        assertTrue(librariesWatchHandler.getRegisteredRefLibraries().isEmpty());
-        assertTrue(librariesWatchHandler.getLibrarySpecifications().isEmpty());
+        assertThat(librariesWatchHandler.getRegisteredPaths()).isEmpty();
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).isEmpty();
+        assertThat(librariesWatchHandler.getLibrarySpecifications().asMap()).isEmpty();
     }
 
     @Test
@@ -236,18 +226,15 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
-        assertFalse(registeredPaths.isEmpty());
-        assertEquals(pythonLibraryFile.getParentFile().getPath(), registeredPaths.get(PYTHON_LIBRARY_FILE_NAME));
-        final Map<ReferencedLibrary, String> registeredRefLibraries = librariesWatchHandler.getRegisteredRefLibraries();
-        assertTrue(registeredRefLibraries.size() == 1);
-        assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
-                registeredRefLibraries.get(referencedLibrary));
-        final ListMultimap<LibrarySpecification, String> librarySpecifications = librariesWatchHandler
-                .getLibrarySpecifications();
-        assertTrue(librarySpecifications.size() == 1);
-        assertEquals(newArrayList(pythonLibraryFile.getName()), librarySpecifications.get(libSpec));
-        assertEquals(kwSpec, librarySpecifications.keySet().iterator().next().getKeywords().get(0));
+        assertThat(librariesWatchHandler.getRegisteredPaths()).hasSize(1)
+                .containsEntry(PYTHON_LIBRARY_FILE_NAME, pythonLibraryFile.getParentFile().getPath());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).hasSize(1)
+                .containsEntry(referencedLibrary, new Path(pythonLibraryFile.getPath()).toPortableString());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().size()).isEqualTo(1);
+        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec)).hasSize(1)
+                .containsOnly(pythonLibraryFile.getName());
+        assertThat(librariesWatchHandler.getLibrarySpecifications().keySet().iterator().next().getKeywords().get(0))
+                .isEqualTo(kwSpec);
     }
 
     @Test
@@ -264,12 +251,10 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.unregisterLibraries(newArrayList(referencedLibrary1, referencedLibrary2));
 
-        final List<String> unregisteredFiles = librariesWatchHandler.getUnregisteredFiles();
-        assertTrue(unregisteredFiles.size() == 2);
-        assertEquals(pythonLibraryFile.getName(), unregisteredFiles.get(0));
-        assertEquals(pythonLibraryFile.getName(), unregisteredFiles.get(1));
-        assertTrue(librariesWatchHandler.getRegisteredRefLibraries().isEmpty());
-        assertTrue(librariesWatchHandler.getLibrarySpecifications().isEmpty());
+        assertThat(librariesWatchHandler.getUnregisteredFiles()).hasSize(2)
+                .containsOnly(pythonLibraryFile.getName(), pythonLibraryFile.getName());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).isEmpty();
+        assertThat(librariesWatchHandler.getLibrarySpecifications().asMap()).isEmpty();
     }
 
     @Test
@@ -282,12 +267,10 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.unregisterLibraries(newArrayList(referencedLibrary));
 
-        final List<String> unregisteredFiles = librariesWatchHandler.getUnregisteredFiles();
-        assertTrue(unregisteredFiles.size() == 2);
-        assertTrue(unregisteredFiles.contains(pythonModuleLibraryFile.getName()));
-        assertTrue(unregisteredFiles.contains(pythonModuleLibraryInitFile.getName()));
-        assertTrue(librariesWatchHandler.getRegisteredRefLibraries().isEmpty());
-        assertTrue(librariesWatchHandler.getLibrarySpecifications().isEmpty());
+        assertThat(librariesWatchHandler.getUnregisteredFiles()).hasSize(2)
+                .containsOnly(pythonModuleLibraryFile.getName(), pythonModuleLibraryInitFile.getName());
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).isEmpty();
+        assertThat(librariesWatchHandler.getLibrarySpecifications().asMap()).isEmpty();
     }
 
     @Test
@@ -308,10 +291,9 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
 
         librariesWatchHandler.execAllAwaitingMessages();
-        assertTrue(librariesWatchHandler.getSpecificationsToRebuild().size() == 2);
-        assertTrue(librariesWatchHandler.getSpecificationsToRebuild().get(project).contains(libSpec1));
-        assertTrue(librariesWatchHandler.getSpecificationsToRebuild().get(project).contains(libSpec2));
-        assertTrue(librariesWatchHandler.getRebuildTasksQueueSize() == 0);
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(2);
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec1, libSpec2);
+        assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
     }
 
     @Test
@@ -329,7 +311,7 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.execAllAwaitingMessages();
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(1);
-        assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsExactly(libSpec);
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSizeAfterEachBuilderInvoke()).containsExactly(1);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
 
@@ -339,7 +321,7 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.execAllAwaitingMessages();
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(1);
-        assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsExactly(libSpec);
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSizeAfterEachBuilderInvoke()).containsExactly(1, 1);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
     }
@@ -365,11 +347,10 @@ public class LibrariesWatchHandlerTest {
         }
 
         librariesWatchHandler.execAllAwaitingMessages();
-        assertTrue(librariesWatchHandler.getSpecificationsToRebuild().size() == 2);
-        assertTrue(librariesWatchHandler.getSpecificationsToRebuild().get(project).contains(libSpec1));
-        assertTrue(librariesWatchHandler.getSpecificationsToRebuild().get(project).contains(libSpec2));
-        assertTrue(librariesWatchHandler.getRebuildTasksQueueSizeAfterEachBuilderInvoke().equals(newArrayList(8, 1)));
-        assertTrue(librariesWatchHandler.getRebuildTasksQueueSize() == 0);
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(2);
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec1, libSpec2);
+        assertThat(librariesWatchHandler.getRebuildTasksQueueSizeAfterEachBuilderInvoke()).containsExactly(8, 1);
+        assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
     }
 
     @Test
@@ -392,10 +373,10 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
 
         librariesWatchHandler.execAllAwaitingMessages();
-        assertTrue(librariesWatchHandler.isLibSpecDirty(libSpec1));
-        assertTrue(librariesWatchHandler.isLibSpecDirty(libSpec2));
-        assertTrue(libSpec1.isModified());
-        assertTrue(libSpec2.isModified());
+        assertThat(librariesWatchHandler.isLibSpecDirty(libSpec1)).isTrue();
+        assertThat(librariesWatchHandler.isLibSpecDirty(libSpec2)).isTrue();
+        assertThat(libSpec1.isModified()).isTrue();
+        assertThat(libSpec2.isModified()).isTrue();
     }
 
     @Test
@@ -420,10 +401,10 @@ public class LibrariesWatchHandlerTest {
         }
 
         librariesWatchHandler.execAllAwaitingMessages();
-        assertTrue(librariesWatchHandler.isLibSpecDirty(libSpec1));
-        assertTrue(librariesWatchHandler.isLibSpecDirty(libSpec2));
-        assertTrue(libSpec1.isModified());
-        assertTrue(libSpec2.isModified());
+        assertThat(librariesWatchHandler.isLibSpecDirty(libSpec1)).isTrue();
+        assertThat(librariesWatchHandler.isLibSpecDirty(libSpec2)).isTrue();
+        assertThat(libSpec1.isModified()).isTrue();
+        assertThat(libSpec2.isModified()).isTrue();
         verify(robotProject, times(1)).getReferencedLibraries();
     }
 
@@ -443,8 +424,8 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_FILE_NAME);
 
         librariesWatchHandler.execAllAwaitingMessages();
-        assertTrue(librariesWatchHandler.isLibSpecDirty(libSpec));
-        assertTrue(libSpec.isModified());
+        assertThat(librariesWatchHandler.isLibSpecDirty(libSpec)).isTrue();
+        assertThat(libSpec.isModified()).isTrue();
         verify(robotProject, times(1)).getReferencedLibraries();
     }
 
@@ -462,12 +443,12 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
 
-        assertTrue(librariesWatchHandler.isLibSpecDirty(libSpec));
-        assertTrue(libSpec.isModified());
+        assertThat(librariesWatchHandler.isLibSpecDirty(libSpec)).isTrue();
+        assertThat(libSpec.isModified()).isTrue();
 
         librariesWatchHandler.removeDirtySpecs(refLibs.values());
 
-        assertFalse(librariesWatchHandler.isLibSpecDirty(libSpec));
+        assertThat(librariesWatchHandler.isLibSpecDirty(libSpec)).isFalse();
     }
 
     @Test
@@ -483,9 +464,9 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
 
-        assertTrue(librariesWatchHandler.getSpecificationsToRebuild().isEmpty());
-        assertTrue(librariesWatchHandler.getLibrarySpecifications().isEmpty());
-        assertTrue(librariesWatchHandler.getRegisteredRefLibraries().isEmpty());
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
+        assertThat(librariesWatchHandler.getLibrarySpecifications().asMap()).isEmpty();
+        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).isEmpty();
     }
 
     private IProject createNewProjectMock(final boolean projectExists) {

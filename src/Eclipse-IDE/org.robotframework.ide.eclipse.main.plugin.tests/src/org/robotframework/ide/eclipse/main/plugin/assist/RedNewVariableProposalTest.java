@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -20,13 +20,10 @@ public class RedNewVariableProposalTest {
     public void itIsNotPossibleToCreateProposalForModelTypeDifferentThanLibraryOrResourceImport() {
         for (final VariableType type : EnumSet
                 .complementOf(EnumSet.of(VariableType.SCALAR, VariableType.LIST, VariableType.DICTIONARY))) {
-            try {
-                new RedNewVariableProposal("content", type, new ArrayList<String>(), null, "label", "desc");
-                fail();
-            } catch (final IllegalArgumentException e) {
-                continue;
-            }
-            fail();
+            assertThatIllegalArgumentException()
+                    .isThrownBy(
+                            () -> new RedNewVariableProposal("content", type, new ArrayList<>(), null, "label", "desc"))
+                    .withNoCause();
         }
     }
 

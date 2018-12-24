@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -39,51 +39,51 @@ public class DeleteSettingCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
         ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
-        assertTrue(createdCalls.size() == 10);
-        assertTrue(createdCalls.get(0).getName().equals("Suite Teardown"));
-        assertTrue(createdCalls.get(3).getName().equals("Metadata"));
-        assertTrue(createdCalls.get(5).getName().equals("Variables"));
-        assertTrue(createdCalls.get(6).getName().equals("Force Tags"));
-        assertTrue(createdCalls.get(7).getName().equals("Library"));
-        assertTrue(createdCalls.get(9).getName().equals("Resource"));
+        assertThat(createdCalls).hasSize(10);
+        assertThat(createdCalls.get(0).getName()).isEqualTo("Suite Teardown");
+        assertThat(createdCalls.get(3).getName()).isEqualTo("Metadata");
+        assertThat(createdCalls.get(5).getName()).isEqualTo("Variables");
+        assertThat(createdCalls.get(6).getName()).isEqualTo("Force Tags");
+        assertThat(createdCalls.get(7).getName()).isEqualTo("Library");
+        assertThat(createdCalls.get(9).getName()).isEqualTo("Resource");
 
         List<EditorCommand> undoCommands = command.getUndoCommands();
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
 
-        assertTrue(createdCalls.size() == 20);
+        assertThat(createdCalls).hasSize(20);
         for (int i = 0; i < indexesToRemove.length; i++) {
-            assertTrue(createdCalls.get(indexesToRemove[i]) == settingsToRemove.get(i));
+            assertThat(createdCalls.get(indexesToRemove[i])).isEqualTo(settingsToRemove.get(i));
         }
 
-        List<EditorCommand> redoCommands = new ArrayList<>();
-        for (EditorCommand undoCommand : undoCommands) {
+        final List<EditorCommand> redoCommands = new ArrayList<>();
+        for (final EditorCommand undoCommand : undoCommands) {
             redoCommands.addAll(0, undoCommand.getUndoCommands());
         }
-        for (EditorCommand redoCommand : redoCommands) {
+        for (final EditorCommand redoCommand : redoCommands) {
             redoCommand.execute();
         }
 
-        assertTrue(createdCalls.size() == 10);
-        assertTrue(createdCalls.get(0).getName().equals("Suite Teardown"));
-        assertTrue(createdCalls.get(3).getName().equals("Metadata"));
-        assertTrue(createdCalls.get(5).getName().equals("Variables"));
-        assertTrue(createdCalls.get(6).getName().equals("Force Tags"));
-        assertTrue(createdCalls.get(7).getName().equals("Library"));
-        assertTrue(createdCalls.get(9).getName().equals("Resource"));
+        assertThat(createdCalls).hasSize(10);
+        assertThat(createdCalls.get(0).getName()).isEqualTo("Suite Teardown");
+        assertThat(createdCalls.get(3).getName()).isEqualTo("Metadata");
+        assertThat(createdCalls.get(5).getName()).isEqualTo("Variables");
+        assertThat(createdCalls.get(6).getName()).isEqualTo("Force Tags");
+        assertThat(createdCalls.get(7).getName()).isEqualTo("Library");
+        assertThat(createdCalls.get(9).getName()).isEqualTo("Resource");
 
         undoCommands = new ArrayList<>();
-        for (EditorCommand redoCommand : redoCommands) {
+        for (final EditorCommand redoCommand : redoCommands) {
             undoCommands.addAll(0, redoCommand.getUndoCommands());
         }
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
 
-        assertTrue(createdCalls.size() == 20);
+        assertThat(createdCalls).hasSize(20);
         for (int i = 0; i < indexesToRemove.length; i++) {
-            assertTrue(createdCalls.get(indexesToRemove[i]) == settingsToRemove.get(i));
+            assertThat(createdCalls.get(indexesToRemove[i])).isEqualTo(settingsToRemove.get(i));
         }
     }
 

@@ -7,7 +7,7 @@ package org.rf.ide.core.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.File;
 import java.io.IOException;
@@ -205,12 +205,9 @@ public class ImportSearchPathsTest {
         assertThat(absMarkedUri.isPresent()).isFalse();
         assertThat(absUri.isPresent()).isFalse();
 
-        try {
-            pathsSupport.getAbsoluteUri(importerUri, importPath);
-            fail();
-        } catch (final NoSuchElementException e) {
-            // expected
-        }
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> pathsSupport.getAbsoluteUri(importerUri, importPath))
+                .withNoCause();
     }
 
     private static File get(final File root, final String... segments) {

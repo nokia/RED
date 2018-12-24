@@ -7,7 +7,7 @@ package org.rf.ide.core.testdata.model.presenter.update;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -71,12 +71,9 @@ public class TestCaseTableModelUpdaterTest {
         for (final ModelType kwModelType : keywordModelTypes) {
             final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
 
-            try {
-                handler.create(testCase, 0, "action", newArrayList("1", "2"), "");
-                fail("Expected exception");
-            } catch (final UnsupportedOperationException e) {
-                // we expected that
-            }
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> handler.create(testCase, 0, "action", newArrayList("1", "2"), ""))
+                    .withNoCause();
         }
         verifyZeroInteractions(testCase);
     }
@@ -87,12 +84,9 @@ public class TestCaseTableModelUpdaterTest {
         for (final ModelType kwModelType : keywordModelTypes) {
             final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
 
-            try {
-                handler.update(element, 1, "value");
-                fail("Expected exception");
-            } catch (final UnsupportedOperationException e) {
-                // we expected that
-            }
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> handler.update(element, 1, "value"))
+                    .withNoCause();
         }
         verifyZeroInteractions(element);
     }
@@ -103,12 +97,9 @@ public class TestCaseTableModelUpdaterTest {
         for (final ModelType kwModelType : keywordModelTypes) {
             final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
 
-            try {
-                handler.update(element, newArrayList("a", "b", "c"));
-                fail("Expected exception");
-            } catch (final UnsupportedOperationException e) {
-                // we expected that
-            }
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> handler.update(element, newArrayList("a", "b", "c")))
+                    .withNoCause();
         }
         verifyZeroInteractions(element);
     }

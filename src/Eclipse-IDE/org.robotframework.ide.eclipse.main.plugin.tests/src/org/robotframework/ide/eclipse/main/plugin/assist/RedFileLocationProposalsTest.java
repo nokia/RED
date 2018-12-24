@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 
 import java.util.Comparator;
@@ -60,12 +60,9 @@ public class RedFileLocationProposalsTest {
                 SettingsGroup.VARIABLES, SettingsGroup.LIBRARIES);
 
         for (final SettingsGroup importType : EnumSet.complementOf(supportedSettingGroups)) {
-            try {
-                RedFileLocationProposals.create(importType, new RobotSuiteFileCreator().build());
-                fail("It should not be possible to create file locations proposals for " + importType);
-            } catch (final IllegalStateException e) {
-                // that's what is expected here
-            }
+            assertThatIllegalStateException()
+                    .isThrownBy(() -> RedFileLocationProposals.create(importType, new RobotSuiteFileCreator().build()))
+                    .withNoCause();
         }
     }
 
