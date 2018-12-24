@@ -8,7 +8,6 @@ package org.rf.ide.core.environment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +16,16 @@ import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.RobotCommandRpcExecutor.RobotCommandExecutorException;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+
 /**
  * @author Michal Anglart
  */
 class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
-    private static final List<String> SCRIPT_FILES = Arrays.asList("robot_session_server.py", "classpath_updater.py",
+    @VisibleForTesting
+    static final List<String> SCRIPT_FILES = ImmutableList.of("robot_session_server.py", "classpath_updater.py",
             "red_keyword_autodiscover.py", "red_libraries.py", "red_library_autodiscover.py", "red_module_classes.py",
             "red_modules.py", "red_variables.py", "rflint_integration.py", "SuiteVisitorImportProxy.py",
             "TestRunnerAgent.py");
