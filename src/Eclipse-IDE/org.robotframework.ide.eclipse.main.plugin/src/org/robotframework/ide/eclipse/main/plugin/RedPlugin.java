@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -94,9 +93,7 @@ public class RedPlugin extends AbstractUIPlugin {
     }
 
     public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
-        final List<RobotRuntimeEnvironment> allRobotInstallation = InstalledRobotEnvironments
-                .getAllRobotInstallation(getPreferences());
-        return allRobotInstallation == null ? new ArrayList<>() : allRobotInstallation;
+        return InstalledRobotEnvironments.getAllRobotInstallation(getPreferences());
     }
 
     public static void logInfo(final String message) {
