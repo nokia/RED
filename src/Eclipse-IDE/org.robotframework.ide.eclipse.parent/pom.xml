@@ -20,7 +20,7 @@
 			<repositories>
 				<repository>
 					<id>eclipse-oxygen</id>
-					<url>http://download.eclipse.org/releases/oxygen/ </url>
+					<url>http://download.eclipse.org/releases/oxygen/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -47,7 +47,7 @@
 			<repositories>
 				<repository>
 					<id>eclipse-photon</id>
-					<url>http://download.eclipse.org/releases/photon/ </url>
+					<url>http://download.eclipse.org/releases/photon/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -73,7 +73,33 @@
 			<repositories>
 				<repository>
 					<id>eclipse-2018-09</id>
-					<url>http://download.eclipse.org/releases/2018-09/ </url>
+					<url>http://download.eclipse.org/releases/2018-09/</url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>nattable</id>
+					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>codeaffine</id>
+					<url>http://fappel.github.io/xiliary/</url>
+					<layout>p2</layout>
+				</repository>
+			</repositories>
+		</profile>
+		<profile>
+			<id>2018-12-profile</id>
+			<activation>
+				<property>
+					<name>eclipse.version</name>
+					<value>2018-12</value>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<id>eclipse-2018-12</id>
+					<url>http://download.eclipse.org/releases/2018-12/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -93,7 +119,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<tycho.version>1.2.0</tycho.version>
+		<tycho.version>1.3.0</tycho.version>
 		<jacoco.version>0.8.2</jacoco.version>
 		<eclipse.version>photon</eclipse.version>
 	</properties>
