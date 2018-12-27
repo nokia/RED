@@ -35,7 +35,7 @@ class SuiteSourceDocumentProvider extends FileDocumentProvider {
         if (document != null) {
             final IDocumentPartitioner partitioner = new FastPartitioner(
                     new SuiteSourcePartitionScanner(supplier.get().isTsvFile()),
-                    SuiteSourcePartitionScanner.LEGAL_CONTENT_TYPES);
+                    SuiteSourcePartitionScanner.LEGAL_CONTENT_TYPES.toArray(new String[0]));
             partitioner.connect(document);
             document.setDocumentPartitioner(partitioner);
         }

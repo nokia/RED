@@ -30,7 +30,8 @@ public class CombinedAssistProcessorTest {
     @Test
     public void combinedProcessorIsApplicableForAllRobotDocumentContentTypes() {
         final CombinedAssistProcessor processor = new CombinedAssistProcessor();
-        assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.LEGAL_CONTENT_TYPES);
+        assertThat(processor.getApplicableContentTypes())
+                .containsOnlyElementsOf(SuiteSourcePartitionScanner.LEGAL_CONTENT_TYPES);
     }
 
     @Test

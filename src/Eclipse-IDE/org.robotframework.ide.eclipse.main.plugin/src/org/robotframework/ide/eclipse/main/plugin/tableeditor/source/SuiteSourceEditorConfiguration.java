@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -387,7 +386,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public String[] getConfiguredContentTypes(final ISourceViewer sourceViewer) {
-        final List<String> legal = newArrayList(SuiteSourcePartitionScanner.LEGAL_CONTENT_TYPES);
+        final List<String> legal = new ArrayList<>(SuiteSourcePartitionScanner.LEGAL_CONTENT_TYPES);
         legal.add(0, IDocument.DEFAULT_CONTENT_TYPE);
         return legal.toArray(new String[0]);
     }
