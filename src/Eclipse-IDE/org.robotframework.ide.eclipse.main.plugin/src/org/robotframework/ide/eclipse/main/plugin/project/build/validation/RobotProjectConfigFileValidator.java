@@ -18,8 +18,6 @@ import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,6 +37,7 @@ import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 import org.rf.ide.core.validation.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
@@ -211,14 +210,9 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final List<RobotProblem> problems = new ArrayList<>();
         if (path.isAbsolute()) {
             problems.add(RobotProblem.causedBy(ConfigFileProblem.ABSOLUTE_PATH).formatMessageWith(path));
-            if (!path.toFile().exists()) {
-                problems.add(RobotProblem.causedBy(missingFileProblem).formatMessageWith(path));
-            }
-        } else {
-            final IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-            if (resource == null || !resource.exists()) {
-                problems.add(RobotProblem.causedBy(missingFileProblem).formatMessageWith(path));
-            }
+        }
+        if (!RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(path).toFile().exists()) {
+            problems.add(RobotProblem.causedBy(missingFileProblem).formatMessageWith(path));
         }
         return problems;
     }
