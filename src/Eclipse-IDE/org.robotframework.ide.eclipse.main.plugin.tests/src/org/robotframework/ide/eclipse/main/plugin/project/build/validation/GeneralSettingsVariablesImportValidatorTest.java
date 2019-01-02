@@ -98,6 +98,14 @@ public class GeneralSettingsVariablesImportValidatorTest {
     }
 
     @Test
+    public void markerIsReported_whenImportingWithInvalidAbsolutePath() {
+        validateVariablesImport("c:path/to/file.py");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                GeneralSettingsProblem.NON_EXISTING_VARIABLES_IMPORT, new ProblemPosition(2, Range.closed(28, 45))));
+    }
+
+    @Test
     public void markerIsReported_whenImportContainsUnknownVariables() {
         validateVariablesImport("${unknown}/file.py");
 
