@@ -65,6 +65,8 @@ public class RedURI {
         // The path is absolute under this operating system, or this is a unix and the path
         // looks like windows absolute path. This is done in order not to create URI with
         // e.g. "C" scheme from paths like "C:/something"
-        return new File(path).isAbsolute() || !isWindows && Pattern.matches("^[a-zA-Z]:.+", path);
+        return new File(path).isAbsolute()
+                || !isWindows && Pattern.matches("^[a-zA-Z]:.+", path)
+                || isWindows && Pattern.matches("^[a-zA-Z]:[^/].*", path);
     }
 }
