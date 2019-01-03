@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -30,12 +29,12 @@ public class CombinedLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
     }
 
     @Override
-    void prepareDiscovering(final IProgressMonitor monitor) throws CoreException {
+    void prepareDiscovering(final IProgressMonitor monitor) {
         libImportCollector.collectFromSuites(suites, monitor);
     }
 
     @Override
-    void startDiscovering(final IProgressMonitor monitor) throws InterruptedException, CoreException {
+    void startDiscovering(final IProgressMonitor monitor) throws InterruptedException {
         final Set<String> libraryNames = libImportCollector.getUnknownLibraryNames().keySet();
         if (!libraryNames.isEmpty()) {
             startDryRunDiscovering(monitor, libraryNames);

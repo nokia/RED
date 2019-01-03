@@ -86,7 +86,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     @VisibleForTesting
-    void validate(final IProgressMonitor monitor, final RobotProjectConfigWithLines config) throws CoreException {
+    void validate(final IProgressMonitor monitor, final RobotProjectConfigWithLines config) {
         final RobotProjectConfig model = config.getConfigurationModel();
 
         final boolean shallContinue = validateConfigVersion(model.getVersion(), config);
@@ -162,7 +162,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     private void validateRemoteLocation(final IProgressMonitor monitor, final RemoteLocation location,
-            final RobotProjectConfigWithLines config) throws CoreException {
+            final RobotProjectConfigWithLines config) {
         if (monitor.isCanceled()) {
             return;
         }

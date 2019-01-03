@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -50,15 +49,13 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                             return;
                         }
                         startAddingKeywordsToProject(monitor, dryRunLKeywordSourceCollector.getKeywordSources());
-                    } catch (final CoreException e) {
-                        throw new InvocationTargetException(e);
                     } finally {
                         monitor.done();
                         unlockDryRun();
                     }
                 });
             } catch (final InvocationTargetException e) {
-                throw new AutoDiscovererException("Problems occurred during discovering keywords.", e);
+                throw new KeywordAutoDiscovererException(e);
             } catch (final InterruptedException e) {
                 stopDiscovering();
             }
@@ -67,7 +64,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    void startDiscovering(final IProgressMonitor monitor) throws InterruptedException, CoreException {
+    void startDiscovering(final IProgressMonitor monitor) throws InterruptedException {
         final Set<String> libraryNames = robotProject.getLibraryDescriptorsStream()
                 .map(LibraryDescriptor::getName)
                 .collect(toSet());
@@ -80,7 +77,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    void startDryRunClient(final int port, final File dataSource) throws CoreException {
+    void startDryRunClient(final int port, final File dataSource) {
         final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getProject(),
                 robotProject.getRobotProjectConfig()).createExecutionEnvironmentSearchPaths();
 
@@ -97,6 +94,15 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                 robotProject.addKeywordSource(keywordSource);
                 subMonitor.worked(1);
             }
+        }
+    }
+
+    private static class KeywordAutoDiscovererException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        private KeywordAutoDiscovererException(final Throwable cause) {
+            super("Problems occurred during discovering keywords.", cause);
         }
     }
 

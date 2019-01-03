@@ -110,8 +110,6 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         final List<RobotDryRunLibraryImport> libraryImports = getImportedLibraries();
                         startAddingLibrariesToProjectConfiguration(monitor, libraryImports);
                         summaryHandler.accept(libraryImports);
-                    } catch (final CoreException e) {
-                        throw new AutoDiscovererException("Problems occurred during discovering libraries.", e);
                     } catch (final InterruptedException e) {
                         // fine, will simply stop dry run
                     } finally {
@@ -134,7 +132,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         return null;
     }
 
-    abstract void prepareDiscovering(IProgressMonitor monitor) throws CoreException;
+    abstract void prepareDiscovering(IProgressMonitor monitor);
 
     List<RobotDryRunLibraryImport> getImportedLibraries() {
         return dryRunLibraryImportCollector.getImportedLibraries();
@@ -146,7 +144,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    void startDryRunClient(final int port, final File dataSource) throws CoreException {
+    void startDryRunClient(final int port, final File dataSource) {
         final File projectLocation = robotProject.getProject().getLocation().toFile();
         final boolean recursiveInVirtualenv = RedPlugin.getDefault()
                 .getPreferences()

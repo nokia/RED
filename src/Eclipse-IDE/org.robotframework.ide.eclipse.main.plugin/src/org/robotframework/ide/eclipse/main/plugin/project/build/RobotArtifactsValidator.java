@@ -199,23 +199,19 @@ public class RobotArtifactsValidator {
 
     private Runnable createValidationRunnable(final IProgressMonitor monitor, final SubMonitor validationSubMonitor,
             final int id, final int total, final ModelUnitValidator validator) {
-        return new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    if (monitor.isCanceled()) {
-                        logger.log("VALIDATING: cancelled (" + id + "/" + total + ")");
-                        return;
-                    }
-                    validator.validate(monitor);
-                    logger.log("VALIDATING: done (" + id + "/" + total + ")");
-                } catch (final Exception e) {
-                    logger.log("VALIDATING: error (" + id + "/" + total + ")");
-                    logger.logError("VALIDATING: error\n" + e.getMessage(), e);
-                } finally {
-                    validationSubMonitor.worked(1);
+        return () -> {
+            try {
+                if (monitor.isCanceled()) {
+                    logger.log("VALIDATING: cancelled (" + id + "/" + total + ")");
+                    return;
                 }
+                validator.validate(monitor);
+                logger.log("VALIDATING: done (" + id + "/" + total + ")");
+            } catch (final Exception e) {
+                logger.log("VALIDATING: error (" + id + "/" + total + ")");
+                logger.logError("VALIDATING: error\n" + e.getMessage(), e);
+            } finally {
+                validationSubMonitor.worked(1);
             }
         };
     }

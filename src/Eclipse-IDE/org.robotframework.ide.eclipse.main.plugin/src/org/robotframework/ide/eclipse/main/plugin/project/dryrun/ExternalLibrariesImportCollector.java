@@ -22,9 +22,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.RedURI;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
@@ -84,13 +82,12 @@ class ExternalLibrariesImportCollector {
                 new DiscoveringLibraryDetector());
     }
 
-    void collectFromSuites(final Collection<RobotSuiteFile> suites, final IProgressMonitor monitor)
-            throws CoreException {
+    void collectFromSuites(final Collection<RobotSuiteFile> suites, final IProgressMonitor monitor) {
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.setWorkRemaining(suites.size());
 
         for (final RobotSuiteFile suite : suites) {
-            subMonitor.subTask("Finding libraries in suite: " + suite.getName());
+            subMonitor.subTask("Finding libraries in suite: " + suite.getFile().getFullPath().toString());
             final Map<RobotSuiteFile, List<LibraryImport>> imports = LibraryImportCollector
                     .collectLibraryImportsIncludingNestedResources(suite);
             for (final Entry<RobotSuiteFile, List<LibraryImport>> entry : imports.entrySet()) {
@@ -103,15 +100,14 @@ class ExternalLibrariesImportCollector {
         }
     }
 
-    private void findLibrariesInSuite(final RobotSuiteFile currentSuite, final List<LibraryImport> imports)
-            throws CoreException {
+    private void findLibrariesInSuite(final RobotSuiteFile currentSuite, final List<LibraryImport> imports) {
         this.currentSuite = currentSuite;
 
         final ValidationContext generalContext = new ValidationContext(currentSuite.getProject(), new BuildLogger());
         final FileValidationContext fileContext = new FileValidationContext(generalContext, currentSuite.getFile());
         final DiscoveringImportValidator importsValidator = new DiscoveringImportValidator(fileContext, imports,
                 new DiscoveringReportingStrategy());
-        importsValidator.validate(new NullProgressMonitor());
+        importsValidator.validate();
     }
 
     Set<RobotDryRunLibraryImport> getLibraryImports() {
@@ -135,7 +131,7 @@ class ExternalLibrariesImportCollector {
 
         @Override
         protected void validateNameImport(final String name, final RobotToken nameToken,
-                final List<RobotToken> arguments) throws CoreException {
+                final List<RobotToken> arguments) {
             if (name.contains(" ")) {
                 reportUnknownLibrary(name, "Extra spaces in library name.");
             } else if (name.equals("Remote")) {
@@ -186,7 +182,7 @@ class ExternalLibrariesImportCollector {
 
         @Override
         protected void validatePathImport(final String path, final RobotToken pathToken, final boolean isParameterized,
-                final List<RobotToken> arguments) throws CoreException {
+                final List<RobotToken> arguments) {
             libraryLocator.locateByPath(currentSuite, path);
         }
 

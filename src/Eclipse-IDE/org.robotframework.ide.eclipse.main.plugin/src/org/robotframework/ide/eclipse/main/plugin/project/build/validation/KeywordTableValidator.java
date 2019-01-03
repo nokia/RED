@@ -62,8 +62,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         validateKeywords(keywords);
     }
 
-    private void reportVersionSpecificProblems(final KeywordTable table)
-            throws CoreException {
+    private void reportVersionSpecificProblems(final KeywordTable table) {
         versionDependentValidators.getKeywordTableValidators(table).forEach(ModelUnitValidator::validate);
     }
 
