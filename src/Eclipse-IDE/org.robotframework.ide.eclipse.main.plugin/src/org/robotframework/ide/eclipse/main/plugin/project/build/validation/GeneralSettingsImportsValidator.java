@@ -74,7 +74,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateImport(final AImported imported) throws CoreException {
+    private void validateImport(final AImported imported) {
         final RobotToken pathOrNameToken = imported.getPathOrName();
         if (pathOrNameToken == null) {
             reportMissingImportArgument(imported.getDeclaration());
@@ -109,7 +109,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     private void validateSpecifiedImport(final AImported imported, final String pathOrName,
-            final RobotToken pathOrNameToken, final boolean isParameterized) throws CoreException {
+            final RobotToken pathOrNameToken, final boolean isParameterized) {
         if (isPathImport(pathOrName)) {
             validatePathImport(pathOrName, pathOrNameToken, isParameterized, imported.getArguments());
         } else {
@@ -120,7 +120,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     protected abstract boolean isPathImport(String pathOrName);
 
     protected void validatePathImport(final String path, final RobotToken pathToken, final boolean isParameterized,
-            final List<RobotToken> arguments) throws CoreException {
+            final List<RobotToken> arguments) {
 
         if (hasNotEscapedWindowsPathSeparator(pathToken.getText())) {
             reportWindowsPathImport(pathToken);
@@ -241,8 +241,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     @SuppressWarnings("unused")
-    protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
-            throws CoreException {
+    protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments) {
         // nothing to do; override if needed
     }
 

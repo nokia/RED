@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -33,12 +32,12 @@ public class SimpleLibrariesAutoDiscoverer extends LibrariesAutoDiscoverer {
     }
 
     @Override
-    void prepareDiscovering(final IProgressMonitor monitor) throws CoreException {
+    void prepareDiscovering(final IProgressMonitor monitor) {
         // nothing to do
     }
 
     @Override
-    void startDiscovering(final IProgressMonitor monitor) throws InterruptedException, CoreException {
+    void startDiscovering(final IProgressMonitor monitor) throws InterruptedException {
         final Set<String> libraryNames = newHashSet(libraryNameToDiscover);
         startDryRunDiscovering(monitor, libraryNames);
     }

@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -96,8 +95,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     }
 
     @Override
-    protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
-            throws CoreException {
+    protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments) {
         if (name.contains(" ")) {
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.LIBRARY_NAME_WITH_SPACES)
                     .formatMessageWith(name, name.replaceAll("\\s", ""));

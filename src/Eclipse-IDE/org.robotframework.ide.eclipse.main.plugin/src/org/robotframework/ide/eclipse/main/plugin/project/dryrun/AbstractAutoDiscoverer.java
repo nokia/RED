@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -49,11 +48,11 @@ public abstract class AbstractAutoDiscoverer {
 
     public abstract Job start();
 
-    abstract void startDiscovering(final IProgressMonitor monitor) throws InterruptedException, CoreException;
+    abstract void startDiscovering(final IProgressMonitor monitor) throws InterruptedException;
 
     abstract RobotAgentEventListener createDryRunCollectorEventListener(Consumer<String> libNameHandler);
 
-    abstract void startDryRunClient(int port, final File dataSource) throws CoreException;
+    abstract void startDryRunClient(int port, final File dataSource);
 
     final boolean lockDryRun() {
         return IS_DRY_RUN_RUNNING.compareAndSet(false, true);
@@ -72,7 +71,7 @@ public abstract class AbstractAutoDiscoverer {
 
     @VisibleForTesting
     public void startDryRunDiscovering(final IProgressMonitor monitor, final Set<String> libraryNames)
-            throws InterruptedException, CoreException {
+            throws InterruptedException {
         final Optional<File> tempSuite = RobotDryRunTemporarySuites.createLibraryImportFile(libraryNames);
         if (tempSuite.isPresent()) {
             final SubMonitor subMonitor = SubMonitor.convert(monitor);
@@ -87,8 +86,7 @@ public abstract class AbstractAutoDiscoverer {
         }
     }
 
-    private void executeDryRun(final File dataSource, final SubMonitor subMonitor)
-            throws InterruptedException, CoreException {
+    private void executeDryRun(final File dataSource, final SubMonitor subMonitor) throws InterruptedException {
         final String host = AgentConnectionServer.DEFAULT_CONNECTION_HOST;
         final int port = AgentConnectionServer.findFreePort();
         final int timeout = CONNECTION_TIMEOUT;
@@ -129,15 +127,6 @@ public abstract class AbstractAutoDiscoverer {
         testsStarter.allowClientTestsStart();
 
         return serverJob;
-    }
-
-    public static class AutoDiscovererException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public AutoDiscovererException(final String message, final Throwable cause) {
-            super(message, cause);
-        }
     }
 
 }
