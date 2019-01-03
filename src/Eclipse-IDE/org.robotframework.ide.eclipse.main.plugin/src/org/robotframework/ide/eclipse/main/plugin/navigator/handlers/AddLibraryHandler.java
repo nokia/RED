@@ -12,10 +12,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -46,8 +50,14 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
 
             for (final IFile file : selectedFiles) {
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(file.getProject());
-                final LibrariesConfigUpdater updater = new LibrariesConfigUpdater(robotProject);
+                final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
+                if (updater.getConfig() instanceof NullRobotProjectConfig) {
+                    final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "Cannot add library to project configuration. The file 'red.xml' is missing or corrupted");
+                    StatusManager.getManager().handle(status, StatusManager.SHOW);
+                    return;
+                }
                 final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(
                         robotProject.getRuntimeEnvironment(), robotProject.getProject(), updater.getConfig(),
                         file.getLocation().toString());

@@ -44,7 +44,7 @@ public class ExcludedResources {
                 try {
                     maxFileSize = Long.parseLong(projectConfig.getValidatedFileMaxSize());
                 } catch (final NumberFormatException e) {
-                    maxFileSize = Long.parseLong(projectConfig.getValidatedFileDefaultMaxSize());
+                    maxFileSize = RobotProjectConfig.getValidatedFileDefaultMaxSize();
                 }
                 return fileSizeInKilobytes <= maxFileSize;
             }

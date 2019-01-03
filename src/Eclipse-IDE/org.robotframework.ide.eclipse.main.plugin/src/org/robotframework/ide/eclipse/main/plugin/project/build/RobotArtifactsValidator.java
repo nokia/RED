@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -295,7 +297,16 @@ public class RobotArtifactsValidator {
                             return true;
                         }
                     });
-                    project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+
+                    // those file could have markers reported by prior build job
+                    final Collection<IResource> filesToOmit = newHashSet(project.getFile(".project"),
+                            project.getFile(RobotProjectConfig.FILENAME));
+                    
+                    for (final IResource child : project.members()) {
+                        if (!filesToOmit.contains(child)) {
+                            child.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+                        }
+                    }
                     project.deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_INFINITE);
                     return validators;
                 }
@@ -342,7 +353,7 @@ public class RobotArtifactsValidator {
 
         private static boolean shouldValidate(final RobotProjectConfig projectConfig, final IResource resource,
                 final boolean isRevalidating) {
-            return projectConfig != null && resource.getType() == IResource.FILE
+            return resource.getType() == IResource.FILE
                     && !ExcludedResources.isHiddenInEclipse(resource)
                     && !ExcludedResources.isInsideExcludedPath(resource, projectConfig)
                     && (isRevalidating || ExcludedResources.hasRequiredSize((IFile) resource, projectConfig));

@@ -28,14 +28,18 @@ public class LibrariesConfigUpdater {
 
     private final List<Object> addedLibraries;
 
-    public LibrariesConfigUpdater(final RobotProject robotProject) {
-        this.robotProject = robotProject;
-        RobotProjectConfig config = robotProject.getOpenedProjectConfig();
-        this.isConfigClosed = config == null;
-        if (config == null) {
-            config = new RedEclipseProjectConfigReader().readConfiguration(robotProject);
-        }
+    public static LibrariesConfigUpdater createFor(final RobotProject project) {
+        final RobotProjectConfig openConfig = project.getOpenedProjectConfig();
+        return openConfig == null
+                ? new LibrariesConfigUpdater(project, project.getRobotProjectConfig(), true)
+                : new LibrariesConfigUpdater(project, openConfig, false);
+    }
+
+    protected LibrariesConfigUpdater(final RobotProject project, final RobotProjectConfig config,
+            final boolean isConfigClosed) {
+        this.robotProject = project;
         this.config = config;
+        this.isConfigClosed = isConfigClosed;
         this.addedLibraries = new ArrayList<>();
     }
 

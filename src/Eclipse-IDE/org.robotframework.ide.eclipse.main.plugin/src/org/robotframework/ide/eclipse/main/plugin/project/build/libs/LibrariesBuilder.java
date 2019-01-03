@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
@@ -196,11 +197,13 @@ public class LibrariesBuilder {
 
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(robotProject.getProject());
         libdocGenerators.addAll(getStandardLibrariesToRecreate(environment, libspecsFolder));
-        libdocGenerators.addAll(getStandardRemoteLibrariesToRecreate(configuration, libspecsFolder));
-        libdocGenerators.addAll(getReferencedVirtualLibrariesToRecreate(configuration, libspecsFolder));
-        libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder));
-        if (environment.getInterpreter() == SuiteExecutor.Jython) {
-            libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
+        if (configuration != null) {
+            libdocGenerators.addAll(getStandardRemoteLibrariesToRecreate(configuration, libspecsFolder));
+            libdocGenerators.addAll(getReferencedVirtualLibrariesToRecreate(configuration, libspecsFolder));
+            libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder));
+            if (environment.getInterpreter() == SuiteExecutor.Jython) {
+                libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
+            }
         }
 
         monitor.setWorkRemaining(libdocGenerators.size());
@@ -213,9 +216,12 @@ public class LibrariesBuilder {
             logger.log("BUILDING: " + generator.getMessage());
             monitor.subTask(generator.getMessage());
             try {
-                generator.generateLibdoc(environment,
-                        new RedEclipseProjectConfig(robotProject.getProject(), configuration)
-                                .createAdditionalEnvironmentSearchPaths());
+                final EnvironmentSearchPaths additionalSearchPaths = configuration == null
+                        ? new EnvironmentSearchPaths()
+                        : new RedEclipseProjectConfig(robotProject.getProject(), configuration)
+                                .createAdditionalEnvironmentSearchPaths();
+                generator.generateLibdoc(environment, additionalSearchPaths);
+
             } catch (final RobotEnvironmentException e) {
                 // the libraries with missing libspec are reported in validation phase
             }
