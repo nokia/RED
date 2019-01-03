@@ -51,7 +51,7 @@ public class LibrariesConfigUpdaterTest {
 
     @Test
     public void testIfNoLibrariesAreAdded() throws Exception {
-        final LibrariesConfigUpdater updater = new LibrariesConfigUpdater(robotProject);
+        final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         updater.finalizeLibrariesAdding(eventBroker);
 
@@ -61,7 +61,7 @@ public class LibrariesConfigUpdaterTest {
 
     @Test
     public void testIfLibrariesAreAdded_whenConfigIsClosed() throws Exception {
-        final LibrariesConfigUpdater updater = new LibrariesConfigUpdater(robotProject);
+        final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         final List<ReferencedLibrary> libs = Arrays.asList(LIB_1, LIB_2);
         updater.addLibraries(libs);
@@ -77,7 +77,7 @@ public class LibrariesConfigUpdaterTest {
     @Test
     public void testIfLibrariesAreAdded_whenConfigIsOpened() throws Exception {
         Editors.openInProjectEditor(robotProject.getConfigurationFile());
-        final LibrariesConfigUpdater updater = new LibrariesConfigUpdater(robotProject);
+        final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         final List<ReferencedLibrary> libs = Arrays.asList(LIB_1, LIB_2);
         updater.addLibraries(libs);
@@ -92,7 +92,7 @@ public class LibrariesConfigUpdaterTest {
 
     @Test
     public void testIfAllLibrariesAreAdded() throws Exception {
-        final LibrariesConfigUpdater updater = new LibrariesConfigUpdater(robotProject);
+        final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         final List<ReferencedLibrary> libs1 = Collections.singletonList(LIB_1);
         final List<ReferencedLibrary> libs2 = Collections.singletonList(LIB_2);
@@ -111,7 +111,7 @@ public class LibrariesConfigUpdaterTest {
 
     @Test
     public void testIfLibrariesAreAddedOnlyOnce() throws Exception {
-        final LibrariesConfigUpdater updater = new LibrariesConfigUpdater(robotProject);
+        final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         final List<ReferencedLibrary> libs = Collections.singletonList(LIB_1);
         updater.addLibraries(libs);

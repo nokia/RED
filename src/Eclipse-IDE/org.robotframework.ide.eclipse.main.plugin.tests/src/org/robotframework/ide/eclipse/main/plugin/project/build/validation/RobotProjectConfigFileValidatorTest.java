@@ -64,6 +64,10 @@ public class RobotProjectConfigFileValidatorTest {
         reporter = new MockReporter();
         model = new RobotModel();
         validator = createValidator(SuiteExecutor.Python, mock(SystemVariableAccessor.class));
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject.setStandardLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(new HashMap<>());
     }
 
     private RobotProjectConfigFileValidator createValidator(final SuiteExecutor executor,

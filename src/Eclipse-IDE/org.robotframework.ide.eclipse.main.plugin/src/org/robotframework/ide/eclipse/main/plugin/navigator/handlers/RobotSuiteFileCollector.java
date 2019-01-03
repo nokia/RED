@@ -77,10 +77,9 @@ class RobotSuiteFileCollector {
     private static boolean shouldBeSkipped(final IResource resource) {
         final RobotProject robotProject = RedPlugin.getModelManager().createProject(resource.getProject());
         final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
-        return projectConfig == null || ExcludedResources.isHiddenInEclipse(resource)
+        return ExcludedResources.isHiddenInEclipse(resource)
                 || ExcludedResources.isInsideExcludedPath(resource, projectConfig)
-                || resource.getType() == IResource.FILE
-                        && !ExcludedResources.hasRequiredSize((IFile) resource, projectConfig);
+                || resource.getType() == IResource.FILE && !ExcludedResources.hasRequiredSize((IFile) resource, projectConfig);
     }
 
     private static List<RobotSuiteFile> collectNestedFiles(final IContainer container, final IProgressMonitor monitor) {

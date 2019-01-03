@@ -61,7 +61,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             final IResourceDelta delta = getDelta(project);
             final boolean rebuildNeeded = libspecsFolder.shouldRegenerateLibspecs(delta, kind);
 
-            final Job buildJob = new RobotArtifactsBuilder(project, logger).createBuildJob(rebuildNeeded,
+            final Job buildJob = new RobotArtifactsBuilder(project, logger).createBuildJob(rebuildNeeded, reporter,
                     fatalReporter);
             Job validationJob = null;
             if (!isValidationTurnedOff) {

@@ -23,6 +23,9 @@ class RedXmlChangesCollector {
     Optional<Change> collect(final IResource refactoredResource, final Optional<IPath> afterRefactorPath) {
         final RobotProject project = RedPlugin.getModelManager().createProject(refactoredResource.getProject());
         final IFile redXmlFile = project.getConfigurationFile();
+        if (redXmlFile == null || !redXmlFile.exists()) {
+            return Optional.empty();
+        }
         final IPath pathBeforeRefactoring = refactoredResource.getFullPath();
 
         final Optional<Change> changesInProjectEditor = new RedXmlInProjectEditorChangesCollector(redXmlFile,

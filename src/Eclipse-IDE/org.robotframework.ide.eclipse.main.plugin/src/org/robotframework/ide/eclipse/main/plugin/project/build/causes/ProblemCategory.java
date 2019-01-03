@@ -28,12 +28,12 @@ public enum ProblemCategory {
 
         @Override
         public Severity getDefaultSeverity() {
-            return Severity.FATAL;
+            return Severity.ERROR;
         }
 
         @Override
         public Severity[] getPossibleSeverities() {
-            return new Severity[] { Severity.FATAL, Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
+            return new Severity[] { Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
         }
     },
     MISSING_ROBOT_ENVIRONMENT(
