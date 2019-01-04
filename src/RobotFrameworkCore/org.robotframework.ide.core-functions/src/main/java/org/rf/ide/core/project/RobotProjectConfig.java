@@ -217,8 +217,8 @@ public class RobotProjectConfig {
         return this.validatedFileMaxSize;
     }
 
-    public String getValidatedFileDefaultMaxSize() {
-        return VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB;
+    public static long getValidatedFileDefaultMaxSize() {
+        return Long.parseLong(VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB);
     }
 
     public void setIsReferencedLibrariesAutoReloadEnabled(final boolean isReferencedLibrariesAutoReloadEnabled) {

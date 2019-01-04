@@ -30,7 +30,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "FATAL: Project configuration file '" + RobotProjectConfig.FILENAME + "' does not exist";
+            return "Project configuration file '" + RobotProjectConfig.FILENAME + "' does not exist";
         }
 
         @Override
@@ -42,7 +42,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "FATAL: Unable to read configuration file. %s Fix this problem to build project.";
+            return "Unable to read configuration file. %s Fix this problem to build project.";
         }
 
         @Override

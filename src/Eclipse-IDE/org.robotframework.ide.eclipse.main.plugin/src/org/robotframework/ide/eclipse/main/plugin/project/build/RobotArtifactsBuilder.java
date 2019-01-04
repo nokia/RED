@@ -26,17 +26,18 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBu
 
 import com.google.common.annotations.VisibleForTesting;
 
-public class RobotArtifactsBuilder {
+class RobotArtifactsBuilder {
 
     private final IProject project;
     private final BuildLogger logger;
 
-    public RobotArtifactsBuilder(final IProject project, final BuildLogger logger) {
+    RobotArtifactsBuilder(final IProject project, final BuildLogger logger) {
         this.project = project;
         this.logger = logger;
     }
 
-    public Job createBuildJob(final boolean rebuildNeeded, final ValidationReportingStrategy fatalReporter) {
+    Job createBuildJob(final boolean rebuildNeeded, final ValidationReportingStrategy reporter,
+            final ValidationReportingStrategy fatalReporter) {
         if (rebuildNeeded) {
             logger.log("BUILDING: refreshing project");
 
@@ -52,7 +53,7 @@ public class RobotArtifactsBuilder {
                         } catch (final CoreException e) {
                             // that's fine, lets try to build project
                         }
-                        buildArtifacts(project, monitor, fatalReporter);
+                        buildArtifacts(project, monitor, reporter, fatalReporter);
 
                         return Status.OK_STATUS;
                     } catch (final ReportingInterruptedException e) {
@@ -75,7 +76,7 @@ public class RobotArtifactsBuilder {
     }
 
     private void buildArtifacts(final IProject project, final IProgressMonitor monitor,
-            final ValidationReportingStrategy fatalReporter) {
+            final ValidationReportingStrategy reporter, final ValidationReportingStrategy fatalReporter) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -86,7 +87,7 @@ public class RobotArtifactsBuilder {
 
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         final SubMonitor configCreationMonitor = subMonitor.newChild(15);
-        final RobotProjectConfig configuration = provideConfiguration(robotProject, fatalReporter);
+        final RobotProjectConfig configuration = provideConfiguration(robotProject, reporter);
         configCreationMonitor.done();
         if (subMonitor.isCanceled()) {
             return;
@@ -112,6 +113,7 @@ public class RobotArtifactsBuilder {
                 final RobotProblem problem = RobotProblem
                         .causedBy(ProjectConfigurationProblem.CONFIG_FILE_MISSING);
                 reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
+                return null;
             }
             return new RedEclipseProjectConfigReader().readConfiguration(robotProject);
         } catch (final CannotReadProjectConfigurationException e) {
@@ -133,14 +135,17 @@ public class RobotArtifactsBuilder {
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_MISSING)
                     .formatMessageWith(location == null ? "" : location);
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
+
         } else if (!runtimeEnvironment.isValidPythonInstallation()) {
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_NOT_A_PYTHON)
                     .formatMessageWith(runtimeEnvironment.getFile());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
+
         } else if (!runtimeEnvironment.hasRobotInstalled()) {
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_HAS_NO_ROBOT)
                     .formatMessageWith(runtimeEnvironment.getFile());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
+
         } else if (!runtimeEnvironment.isCompatibleRobotInstallation()) {
             final RobotProblem problem = RobotProblem
                     .causedBy(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_PYTHON)

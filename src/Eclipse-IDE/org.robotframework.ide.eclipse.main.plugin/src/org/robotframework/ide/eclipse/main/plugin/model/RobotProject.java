@@ -41,6 +41,7 @@ import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.libraries.LibrarySpecificationReader;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -88,7 +89,8 @@ public class RobotProject extends RobotContainer {
         if (projectHolder == null) {
             projectHolder = new RobotProjectHolder(getRuntimeEnvironment());
         }
-        projectHolder.configure(getRobotProjectConfig(), getProject().getLocation().toFile());
+        readProjectConfigurationIfNeeded();
+        projectHolder.configure(configuration, getProject().getLocation().toFile());
         return projectHolder;
     }
 
@@ -123,28 +125,20 @@ public class RobotProject extends RobotContainer {
         return env == null ? null : env.getVersion();
     }
 
-    public synchronized boolean hasStandardLibraries() {
-        readProjectConfigurationIfNeeded();
-        if (stdLibsSpecs != null && !stdLibsSpecs.isEmpty()) {
-            return true;
-        }
-        return configuration != null;
-    }
-
     public synchronized Map<LibraryDescriptor, LibrarySpecification> getStandardLibraries() {
         if (stdLibsSpecs != null) {
             return stdLibsSpecs;
         }
         readProjectConfigurationIfNeeded();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
-        if (env == null || configuration == null) {
+        if (env == null) {
             return new LinkedHashMap<>();
         }
 
         final Stream<LibraryDescriptor> stdLibsDescriptorsStream = env.getStandardLibrariesNames()
                 .stream()
                 .map(LibraryDescriptor::ofStandardLibrary);
-        final Stream<LibraryDescriptor> remoteStdLibsDescriptorsStream = configuration.getRemoteLocations()
+        final Stream<LibraryDescriptor> remoteStdLibsDescriptorsStream = getRobotProjectConfig().getRemoteLocations()
                 .stream()
                 .map(LibraryDescriptor::ofStandardRemoteLibrary);
 
@@ -165,7 +159,7 @@ public class RobotProject extends RobotContainer {
         if (refLibsSpecs != null && !refLibsSpecs.isEmpty()) {
             return true;
         }
-        return configuration != null && configuration.hasReferencedLibraries();
+        return getRobotProjectConfig().hasReferencedLibraries();
     }
 
     public synchronized Map<LibraryDescriptor, LibrarySpecification> getReferencedLibraries() {
@@ -173,12 +167,9 @@ public class RobotProject extends RobotContainer {
             return refLibsSpecs;
         }
         readProjectConfigurationIfNeeded();
-        if (configuration == null) {
-            return new LinkedHashMap<>();
-        }
 
         refLibsSpecs = new LinkedHashMap<>();
-        for (final ReferencedLibrary library : configuration.getLibraries()) {
+        for (final ReferencedLibrary library : getRobotProjectConfig().getLibraries()) {
             final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
 
             final LibrarySpecification spec = findLibSpec(descriptor);
@@ -253,7 +244,7 @@ public class RobotProject extends RobotContainer {
             try {
                 configuration = new RedEclipseProjectConfigReader().readConfiguration(getProject());
             } catch (final CannotReadProjectConfigurationException e) {
-                // oh well...
+                // nothing happens
             }
         }
     }
@@ -261,11 +252,12 @@ public class RobotProject extends RobotContainer {
     /**
      * Returns the configuration model from red.xml
      *
-     * @return configuration from red.xml or null if file does not exist
+     * @return configuration from red.xml or dummy non-editable configuration object if file cannot
+     *         be read
      */
     public synchronized RobotProjectConfig getRobotProjectConfig() {
         readProjectConfigurationIfNeeded();
-        return configuration;
+        return configuration == null ? new NullRobotProjectConfig() : configuration;
     }
 
     @VisibleForTesting
@@ -329,7 +321,7 @@ public class RobotProject extends RobotContainer {
 
     public synchronized RobotRuntimeEnvironment getRuntimeEnvironment() {
         readProjectConfigurationIfNeeded();
-        if (configuration == null || configuration.usesPreferences()) {
+        if (getRobotProjectConfig().usesPreferences()) {
             return RedPlugin.getDefault().getActiveRobotInstallation();
         }
         final File file = RedWorkspace.Paths
