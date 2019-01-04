@@ -71,6 +71,7 @@ public class QualifiedKeywordNameTest {
     public void testIsOccurrenceEqualToDefinition() {
         assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("BuiltIn.log many", "Log Many")).isTrue();
         assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("log many", "Log Many")).isTrue();
+        assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("keyword.with.dots", "Keyword.With.Dots")).isTrue();
         assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("BuiltIn.Log_Many", "Log Many")).isFalse();
         assertThat(QualifiedKeywordName.isOccurrenceEqualToDefinition("", "I_Execute \"${cmd:(\\w+\\s*)+}\"")).isTrue();
     }

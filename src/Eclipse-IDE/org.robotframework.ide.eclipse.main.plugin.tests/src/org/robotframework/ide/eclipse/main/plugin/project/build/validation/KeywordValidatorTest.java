@@ -10,6 +10,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.newBuiltInKeyword;
+import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.newRefLibraryKeyword;
 import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.newResourceKeyword;
 import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.prepareContext;
 
@@ -217,9 +218,11 @@ public class KeywordValidatorTest {
                 .appendLine("    res.k.w")
                 .appendLine("    res1.kw")
                 .appendLine("    res.kw")
+                .appendLine("    kw.with.dots")
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(
+                newRefLibraryKeyword("lib", "kw.with.dots", new Path("/suite.robot")),
                 newResourceKeyword("k.w", new Path("/res.robot")),
                 newResourceKeyword("kw", new Path("/res.robot")));
         final FileValidationContext context = prepareContext(accessibleKws);
