@@ -95,6 +95,10 @@ public class RobotProjectConfig {
         return configuration;
     }
 
+    public boolean isNullConfig() {
+        return false;
+    }
+
     public void setVersion(final String version) {
         this.version = ConfigVersion.create(version);
     }
