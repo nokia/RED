@@ -57,6 +57,9 @@ public final class QualifiedKeywordName {
         if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordDefinition)) { // ignore embedded keyword names
             return true;
         }
+        if (keywordOccurrence.equalsIgnoreCase(keywordDefinition)) {
+            return true;
+        }
         final List<String> splittedOccurrence = Splitter.on('.').splitToList(keywordOccurrence);
         final String nameInOccurrence = splittedOccurrence.get(splittedOccurrence.size() - 1).trim();
         return nameInOccurrence.equalsIgnoreCase(keywordDefinition);
