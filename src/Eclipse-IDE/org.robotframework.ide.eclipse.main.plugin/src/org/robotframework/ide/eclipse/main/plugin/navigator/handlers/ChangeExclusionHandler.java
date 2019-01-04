@@ -22,7 +22,6 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
@@ -33,7 +32,8 @@ import org.robotframework.red.swt.SwtThread;
  */
 abstract class ChangeExclusionHandler {
 
-    protected void changeExclusion(final IEventBroker eventBroker, final List<IResource> selectedResources) {
+    protected void changeExclusion(final IEventBroker eventBroker, final List<IResource> selectedResources)
+            throws UnsupportedOperationException {
         final Map<RobotProject, List<IPath>> pathsGroupedByProject = groupByProject(selectedResources);
         pathsGroupedByProject.forEach((robotProject, paths) -> {
             changeExclusion(robotProject, paths);
@@ -58,7 +58,7 @@ abstract class ChangeExclusionHandler {
 
         final boolean inEditor = config != null;
         if (config == null) {
-            config = new RedEclipseProjectConfigReader().readConfiguration(robotProject);
+            config = robotProject.getRobotProjectConfig();
         }
 
         for (final IPath pathToChange : toChange) {
@@ -82,4 +82,5 @@ abstract class ChangeExclusionHandler {
     }
 
     protected abstract void changeExclusion(RobotProjectConfig config, IPath pathToChange);
+    
 }

@@ -173,7 +173,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor,
             final List<RobotDryRunLibraryImport> libraryImports) {
         if (!libraryImports.isEmpty()) {
-            final ImportedLibrariesConfigUpdater updater = new ImportedLibrariesConfigUpdater(robotProject);
+            final ImportedLibrariesConfigUpdater updater = ImportedLibrariesConfigUpdater.createFor(robotProject);
             final List<RobotDryRunLibraryImport> libraryImportsToAdd = updater.getLibraryImportsToAdd(libraryImports);
 
             final SubMonitor subMonitor = SubMonitor.convert(monitor);
@@ -193,11 +193,20 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private static class ImportedLibrariesConfigUpdater extends LibrariesConfigUpdater {
 
-        ImportedLibrariesConfigUpdater(final RobotProject robotProject) {
-            super(robotProject);
+        public static ImportedLibrariesConfigUpdater createFor(final RobotProject project) {
+            final RobotProjectConfig openConfig = project.getOpenedProjectConfig();
+            return openConfig == null
+                    ? new ImportedLibrariesConfigUpdater(project, project.getRobotProjectConfig(), true)
+                    : new ImportedLibrariesConfigUpdater(project, openConfig, false);
         }
 
-        List<RobotDryRunLibraryImport> getLibraryImportsToAdd(final List<RobotDryRunLibraryImport> libraryImports) {
+        private ImportedLibrariesConfigUpdater(final RobotProject project, final RobotProjectConfig config,
+                final boolean isConfigClosed) {
+            super(project, config, isConfigClosed);
+        }
+
+        private List<RobotDryRunLibraryImport> getLibraryImportsToAdd(
+                final List<RobotDryRunLibraryImport> libraryImports) {
             final Set<String> existingLibraryNames = Streams
                     .concat(config.getLibraries().stream().map(ReferencedLibrary::getName),
                             config.getRemoteLocations().stream().map(RemoteLocation::getRemoteName))
@@ -217,7 +226,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             return result;
         }
 
-        void addLibrary(final RobotDryRunLibraryImport libraryImport) {
+        private void addLibrary(final RobotDryRunLibraryImport libraryImport) {
             if (libraryImport.getType() == DryRunLibraryType.JAVA) {
                 addJavaLibrary(libraryImport);
             } else if (libraryImport.getType() == DryRunLibraryType.PYTHON) {
