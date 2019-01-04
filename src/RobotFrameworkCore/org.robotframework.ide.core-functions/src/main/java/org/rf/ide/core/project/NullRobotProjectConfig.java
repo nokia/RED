@@ -14,6 +14,11 @@ import org.rf.ide.core.environment.SuiteExecutor;
 public class NullRobotProjectConfig extends RobotProjectConfig {
 
     @Override
+    public boolean isNullConfig() {
+        return true;
+    }
+
+    @Override
     public void setVersion(final String version) {
         // nothing to do
     }

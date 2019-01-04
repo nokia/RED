@@ -38,7 +38,6 @@ import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
-import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -95,7 +94,7 @@ class LocalProcessCommandLineBuilder {
 
     private void addProjectConfigEntries(final IRunCommandLineBuilder builder) {
         final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
-        if (!(projectConfig instanceof NullRobotProjectConfig)) {
+        if (!projectConfig.isNullConfig()) {
             final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(),
                     projectConfig);
             final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();

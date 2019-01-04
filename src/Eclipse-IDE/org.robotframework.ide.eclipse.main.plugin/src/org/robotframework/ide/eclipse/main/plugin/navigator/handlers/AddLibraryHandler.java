@@ -19,7 +19,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -52,18 +51,18 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(file.getProject());
                 final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
-                if (updater.getConfig() instanceof NullRobotProjectConfig) {
+                if (updater.getConfig().isNullConfig()) {
                     final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
                             "Cannot add library to project configuration. The file 'red.xml' is missing or corrupted");
                     StatusManager.getManager().handle(status, StatusManager.SHOW);
-                    return;
-                }
-                final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(
-                        robotProject.getRuntimeEnvironment(), robotProject.getProject(), updater.getConfig(),
-                        file.getLocation().toString());
+                } else {
+                    final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(
+                            robotProject.getRuntimeEnvironment(), robotProject.getProject(), updater.getConfig(),
+                            file.getLocation().toString());
 
-                updater.addLibraries(newLibraries);
-                updater.finalizeLibrariesAdding(eventBroker);
+                    updater.addLibraries(newLibraries);
+                    updater.finalizeLibrariesAdding(eventBroker);
+                }
             }
         }
     }
