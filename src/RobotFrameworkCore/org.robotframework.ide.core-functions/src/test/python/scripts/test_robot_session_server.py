@@ -2,6 +2,7 @@
 import unittest
 import sys
 import os
+import platform
 
 from robot_session_server import get_robot_version
 from robot_session_server import create_libdoc
@@ -31,21 +32,21 @@ class RobotSessionServerTests(unittest.TestCase):
 
     def test_encode_exception_when_libdoc_is_generated_in_separate_process(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
+        timeout_duration = 5 if 'Jython' not in platform.python_implementation() else 20
 
-        response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [])
+        response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [], timeout_duration)
 
         self.assertEqual(response['result'], None)
         self.assertTrue('SyntaxError: ' in response['exception'])
 
-    def test_encode_exception_when_libdoc_is_generated_in_separate_process_for_non_ascii_chars_in_library_path_in_python3(self):
-        import platform
-        if platform.python_version_tuple()[0] == '3' and 'Jython' not in platform.python_implementation():
-            parent_path = os.path.dirname(os.path.realpath(__file__))
+    @unittest.skipUnless(platform.python_version_tuple()[0] == '3', "requires Python 3")
+    def test_encode_exception_when_libdoc_is_generated_in_separate_process_for_non_ascii_chars_in_library_path(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
 
-            response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+        response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
 
-            self.assertEqual(response['result'], None)
-            self.assertTrue('SyntaxError: ' in response['exception'])
+        self.assertEqual(response['result'], None)
+        self.assertTrue('SyntaxError: ' in response['exception'])
 
 
 class LibdocGenerationTests(unittest.TestCase):
@@ -72,67 +73,58 @@ class LibdocGenerationTests(unittest.TestCase):
     def test_if_libdoc_is_generated_in_separate_process_for_existing_library(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         python_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'a')]
+        timeout_duration = 5 if 'Jython' not in platform.python_implementation() else 20
 
-        response = create_libdoc_in_separate_process("lib", 'XML', python_paths, [], timeout_duration=5)
+        response = create_libdoc_in_separate_process("lib", 'XML', python_paths, [], timeout_duration)
 
         self.assertNotEqual(response["result"], None)
-        self.assertEqual(response['exception'], None)
-
-    def test_if_libdoc_is_generated_in_separate_process_for_site_packages_library_in_python2(self):
-        import platform
-        if platform.python_version_tuple()[0] == '2' and 'Jython' not in platform.python_implementation():
-            parent_path = os.path.dirname(os.path.realpath(__file__))
-
-            response = create_libdoc_in_separate_process("Selenium2Library", 'XML', [parent_path], [], timeout_duration=5)
-
-            self.assertNotEqual(response["result"], None)
-            self.assertEqual(response['exception'], None)
 
     def test_if_libdoc_is_not_generated_in_separate_process_for_hanging_module_importing(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-
         python_paths = [os.path.join(parent_path, 'res_test_robot_session_server')]
+        timeout_duration = 5 if 'Jython' not in platform.python_implementation() else 20
 
-        response = create_libdoc_in_separate_process("c.HangingInit", 'XML', python_paths, [], timeout_duration=5)
+        response = create_libdoc_in_separate_process("c.HangingInit", 'XML', python_paths, [], timeout_duration)
 
-        self.assertEqual(response["result"], None)
         self.assertTrue('Libdoc not generated due to timeout' in response['exception'])
 
-    def test_if_libdoc_is_generated_in_separate_process_for_non_ascii_chars_in_library_path_in_python3(self):
-        import platform
-        if platform.python_version_tuple()[0] == '3' and 'Jython' not in platform.python_implementation():
-            parent_path = os.path.dirname(os.path.realpath(__file__))
 
-            response = create_libdoc_in_separate_process("lib", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+@unittest.skipUnless(platform.python_version_tuple()[0] == '2', "requires Python 2")
+class LibdocGenerationForPython2Tests(unittest.TestCase):
 
-            self.assertNotEqual(response['result'], None)
-            self.assertEqual(response['exception'], None)
+    def test_if_libdoc_is_not_generated_in_separate_process_for_non_ascii_chars_in_library_path(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        timeout_duration = 5 if 'Jython' not in platform.python_implementation() else 20
+        
+        response = create_libdoc_in_separate_process("żółw", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [], timeout_duration)
 
-    def test_if_libdoc_is_not_generated_in_separate_process_for_non_ascii_chars_in_library_path_in_python2(self):
-        import platform
-        if platform.python_version_tuple()[0] == '2' and 'Jython' not in platform.python_implementation():
-            parent_path = os.path.dirname(os.path.realpath(__file__))
-            response = create_libdoc_in_separate_process("żółw", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+        self.assertTrue('UnicodeDecodeError', response['exception'])
 
-            self.assertTrue('UnicodeDecodeError', response['exception'])
+    def test_if_libdoc_is_not_generated_for_non_ascii_chars_in_library_path(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        timeout_duration = 5 if 'Jython' not in platform.python_implementation() else 20
+        
+        response = create_libdoc("żółw", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [], timeout_duration)
 
-    def test_if_libdoc_is_generated_for_non_ascii_chars_in_library_path_in_python3(self):
-        import platform
-        if platform.python_version_tuple()[0] == '3' and 'Jython' not in platform.python_implementation():
-            parent_path = os.path.dirname(os.path.realpath(__file__))
+        self.assertTrue('UnicodeDecodeError', response['exception'])
 
-            response = create_libdoc("lib", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
 
-            self.assertNotEqual(response['result'], None)
-            self.assertEqual(response['exception'], None)
+@unittest.skipUnless(platform.python_version_tuple()[0] == '3', "requires Python 3")
+class LibdocGenerationForPython3Tests(unittest.TestCase):
 
-    def test_if_libdoc_is_not_generated_for_non_ascii_chars_in_library_path_in_python2(self):
-        import platform
-        if platform.python_version_tuple()[0] == '2' and 'Jython' not in platform.python_implementation():
-            parent_path = os.path.dirname(os.path.realpath(__file__))
-            response = create_libdoc("żółw", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+    def test_if_libdoc_is_generated_in_separate_process_for_non_ascii_chars_in_library_path(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
 
-            self.assertTrue('UnicodeDecodeError', response['exception'])
+        response = create_libdoc_in_separate_process("lib", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+
+        self.assertNotEqual(response['result'], None)
+
+    def test_if_libdoc_is_generated_for_non_ascii_chars_in_library_path(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        response = create_libdoc("lib", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+
+        self.assertNotEqual(response['result'], None)
 
 
 class ClassesRetrievingTests(unittest.TestCase):
