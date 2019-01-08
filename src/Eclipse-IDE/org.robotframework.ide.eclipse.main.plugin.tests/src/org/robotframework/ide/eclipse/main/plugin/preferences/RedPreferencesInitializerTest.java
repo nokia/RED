@@ -100,6 +100,17 @@ public class RedPreferencesInitializerTest {
     }
 
     @Test
+    public void byDefaultLibrariesPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
+                false);
+    }
+
+    @Test
     public void byDefaultAllContentAssistPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 

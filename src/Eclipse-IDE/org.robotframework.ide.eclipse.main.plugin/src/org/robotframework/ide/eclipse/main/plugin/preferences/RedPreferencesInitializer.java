@@ -42,7 +42,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSourceFoldingPreferences(preferences);
         initializeSourceEditorAssistantPreferences(preferences);
         initializeSyntaxColoringPreferences(preferences);
-        initializeAutodiscoveringPreferences(preferences);
+        initializeLibrariesPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
         initializeDefaultLaunchConfigurationPreferences(preferences);
         initializeRfLintPreferences(preferences);
@@ -104,8 +104,9 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         }
     }
 
-    private void initializeAutodiscoveringPreferences(final IEclipsePreferences preferences) {
+    private void initializeLibrariesPreferences(final IEclipsePreferences preferences) {
         preferences.putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
+        preferences.putBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED, false);
     }
 
     private void initializeProblemSeverityPreferences(final IEclipsePreferences preferences) {

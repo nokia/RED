@@ -13,6 +13,7 @@ import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
@@ -35,7 +36,12 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final File libFile = new File(libPath);
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
-        runtimeEnvironment.createLibdoc(libName, targetSpecFile.getLocation().toFile(), format, additionalPaths);
+        final File outputFile = targetSpecFile.getLocation().toFile();
+        if (RedPlugin.getDefault().getPreferences().isPythonLibrariesLibdocGenerationInSeparateProcessEnabled()) {
+            runtimeEnvironment.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths);
+        } else {
+            runtimeEnvironment.createLibdoc(libName, outputFile, format, additionalPaths);
+        }
     }
 
     private String extractLibParent() {

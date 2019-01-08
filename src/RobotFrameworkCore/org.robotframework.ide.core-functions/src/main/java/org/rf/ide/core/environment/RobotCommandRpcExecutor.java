@@ -247,6 +247,24 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         }
     }
 
+    @Override
+    public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format,
+            final EnvironmentSearchPaths additionalPaths) {
+        try {
+            final String base64EncodedLibFileContent = (String) callRpcFunction("createLibdocInSeparateProcess",
+                    libName, format.name().toLowerCase(), additionalPaths.getExtendedPythonPaths(interpreterType),
+                    additionalPaths.getClassPaths());
+            if (!base64EncodedLibFileContent.isEmpty()) {
+                writeBase64EncodedLibdoc(outputFile, base64EncodedLibFileContent);
+            }
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+        } catch (final IOException e) {
+            throw new RobotEnvironmentException(
+                    "Unable to generate library specification file for library '" + libName + "'", e);
+        }
+    }
+
     private static void writeBase64EncodedLibdoc(final File outputFile, final String encodedFileContent)
             throws IOException {
         final File libspecFolder = outputFile.getParentFile();

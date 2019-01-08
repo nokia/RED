@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 import unittest
 import sys
 import os
 
 from robot_session_server import get_robot_version
 from robot_session_server import create_libdoc
+from robot_session_server import create_libdoc_in_separate_process
 from robot_session_server import get_classes_from_module
 from robot_session_server import get_module_path
 from robot_session_server import get_variables
@@ -12,6 +14,7 @@ from base64 import b64encode
 
 
 class RobotSessionServerTests(unittest.TestCase):
+
     def test_encode_result(self):
         response = get_robot_version()
 
@@ -26,8 +29,27 @@ class RobotSessionServerTests(unittest.TestCase):
         self.assertEqual(response['result'], None)
         self.assertTrue('SyntaxError: ' in response['exception'])
 
+    def test_encode_exception_when_libdoc_is_generated_in_separate_process(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [])
+
+        self.assertEqual(response['result'], None)
+        self.assertTrue('SyntaxError: ' in response['exception'])
+
+    def test_encode_exception_when_libdoc_is_generated_in_separate_process_for_non_ascii_chars_in_library_path_in_python3(self):
+        import platform
+        if platform.python_version_tuple()[0] == '3' and 'Jython' not in platform.python_implementation():
+            parent_path = os.path.dirname(os.path.realpath(__file__))
+
+            response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+
+            self.assertEqual(response['result'], None)
+            self.assertTrue('SyntaxError: ' in response['exception'])
+
 
 class LibdocGenerationTests(unittest.TestCase):
+
     def test_subsequent_calls_for_same_lib_name_under_different_paths_return_different_libdocs(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -47,8 +69,74 @@ class LibdocGenerationTests(unittest.TestCase):
 
         self.assertEqual(old_sys_path, sorted(sys.path))
 
+    def test_if_libdoc_is_generated_in_separate_process_for_existing_library(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        python_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'a')]
+
+        response = create_libdoc_in_separate_process("lib", 'XML', python_paths, [], timeout_duration=5)
+
+        self.assertNotEqual(response["result"], None)
+        self.assertEqual(response['exception'], None)
+
+    def test_if_libdoc_is_generated_in_separate_process_for_site_packages_library_in_python2(self):
+        import platform
+        if platform.python_version_tuple()[0] == '2' and 'Jython' not in platform.python_implementation():
+            parent_path = os.path.dirname(os.path.realpath(__file__))
+
+            response = create_libdoc_in_separate_process("Selenium2Library", 'XML', [parent_path], [], timeout_duration=5)
+
+            self.assertNotEqual(response["result"], None)
+            self.assertEqual(response['exception'], None)
+
+    def test_if_libdoc_is_not_generated_in_separate_process_for_hanging_module_importing(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        python_paths = [os.path.join(parent_path, 'res_test_robot_session_server')]
+
+        response = create_libdoc_in_separate_process("c.HangingInit", 'XML', python_paths, [], timeout_duration=5)
+
+        self.assertEqual(response["result"], None)
+        self.assertTrue('Libdoc not generated due to timeout' in response['exception'])
+
+    def test_if_libdoc_is_generated_in_separate_process_for_non_ascii_chars_in_library_path_in_python3(self):
+        import platform
+        if platform.python_version_tuple()[0] == '3' and 'Jython' not in platform.python_implementation():
+            parent_path = os.path.dirname(os.path.realpath(__file__))
+
+            response = create_libdoc_in_separate_process("lib", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+
+            self.assertNotEqual(response['result'], None)
+            self.assertEqual(response['exception'], None)
+
+    def test_if_libdoc_is_not_generated_in_separate_process_for_non_ascii_chars_in_library_path_in_python2(self):
+        import platform
+        if platform.python_version_tuple()[0] == '2' and 'Jython' not in platform.python_implementation():
+            parent_path = os.path.dirname(os.path.realpath(__file__))
+            response = create_libdoc_in_separate_process("żółw", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+
+            self.assertTrue('UnicodeDecodeError', response['exception'])
+
+    def test_if_libdoc_is_generated_for_non_ascii_chars_in_library_path_in_python3(self):
+        import platform
+        if platform.python_version_tuple()[0] == '3' and 'Jython' not in platform.python_implementation():
+            parent_path = os.path.dirname(os.path.realpath(__file__))
+
+            response = create_libdoc("lib", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+
+            self.assertNotEqual(response['result'], None)
+            self.assertEqual(response['exception'], None)
+
+    def test_if_libdoc_is_not_generated_for_non_ascii_chars_in_library_path_in_python2(self):
+        import platform
+        if platform.python_version_tuple()[0] == '2' and 'Jython' not in platform.python_implementation():
+            parent_path = os.path.dirname(os.path.realpath(__file__))
+            response = create_libdoc("żółw", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+
+            self.assertTrue('UnicodeDecodeError', response['exception'])
+
 
 class ClassesRetrievingTests(unittest.TestCase):
+
     def test_subsequent_calls_for_same_class_name_under_different_paths_return_different_class_names(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -70,6 +158,7 @@ class ClassesRetrievingTests(unittest.TestCase):
 
 
 class ModulePathRetrievingTests(unittest.TestCase):
+
     def test_if_sys_path_is_not_extended_after_retrieving_module_path(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -83,6 +172,7 @@ class ModulePathRetrievingTests(unittest.TestCase):
 
 
 class VariablesRetrievingTests(unittest.TestCase):
+
     def test_subsequent_calls_for_same_variable_file_name_under_different_paths_return_different_variables(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -90,33 +180,34 @@ class VariablesRetrievingTests(unittest.TestCase):
         response2 = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'b', 'vars.py'), [])
 
         self.assertNotEqual(response1, response2)
-        
+
+
 class RobotFilesConvertingTests(unittest.TestCase):
-    
+
     def test_txt_file_is_properly_converted_to_robot_format(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert.txt')
 
         from base64 import b64decode
         converted = b64decode(convert_robot_data_file(path)['result'])
-        
+
         golden_file_path = os.path.join(parent_path, 'res_test_robot_session_server', 'converted.robot')
         self.assertEqualToGoldenFileContent(converted, golden_file_path)
-    
+
     def test_tsv_file_is_properly_converted_to_robot_format(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert.tsv')
 
         from base64 import b64decode
         converted = b64decode(convert_robot_data_file(path)['result'])
-        
+
         golden_file_path = os.path.join(parent_path, 'res_test_robot_session_server', 'converted.robot')
         self.assertEqualToGoldenFileContent(converted, golden_file_path)
-    
+
     def test_file_with_unicode_charactes_is_converted_to_robot_format_without_exceptions(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert_unicode.tsv')
-        
+
         from base64 import b64decode
         b64decode(convert_robot_data_file(path)['result'])
 
@@ -129,8 +220,8 @@ class RobotFilesConvertingTests(unittest.TestCase):
             with open(golden_file_path, 'r', encoding='utf-8') as golden_file:
                 content_in_lines = content.decode('utf-8').splitlines()
                 golden_file_lines = golden_file.readlines()
-                
+
         self.assertEqual(len(content_in_lines), len(golden_file_lines))
-        
+
         for i in range(len(content_in_lines)):
             self.assertEqual(content_in_lines[i], golden_file_lines[i].rstrip())
