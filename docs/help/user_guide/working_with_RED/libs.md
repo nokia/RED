@@ -91,6 +91,22 @@ which may affect testcase execution. To verify you can try to execute libdoc
 in console:  
 _python -m robot.libdoc &ltPATH;_TO_LIBNAME> list _
 
+### Preference for generating libdoc
+
+In some cases there are the problems occurring during the libdoc generation
+via session server. It leads to a situation when a server hang due to [Global
+Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) between
+the server code and the library code. To avoid this problem you can use one of
+our preferences located in _Window -> Preferences -> Robot Framework ->
+Libraries_  
+  
+![](libs/libdoc_generation_preference.png)  
+  
+This preference runs the libdoc generation in a separate process and is
+disabled by default. Note that this solution may affect the time of libdoc
+generation, i.e. slowing down the libraries import, especially with jython
+interpreter.
+
 ### Reloading libraries after change
 
 Whenever external library is changed (for instance new keyword is added),
