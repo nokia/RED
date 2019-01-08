@@ -6442,9 +6442,9 @@
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
-            class="org.robotframework.ide.eclipse.main.plugin.preferences.AutoDiscoveringPreferencePage"
-            id="org.robotframework.ide.eclipse.main.plugin.preferences.autodiscovering"
-            name="Autodiscovering">
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.LibrariesPreferencesPage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.libraries"
+            name="Libraries">
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"

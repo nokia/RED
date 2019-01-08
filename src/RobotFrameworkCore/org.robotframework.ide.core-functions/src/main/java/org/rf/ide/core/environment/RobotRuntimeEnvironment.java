@@ -17,8 +17,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
+import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.rf.ide.core.rflint.RfLintRule;
 
@@ -177,6 +177,20 @@ public class RobotRuntimeEnvironment {
             final RobotCommandExecutor executor = executors
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             executor.createLibdoc(libName, outputFile, format, additionalPaths);
+        }
+    }
+
+    public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format)
+            throws RobotEnvironmentException {
+        createLibdocInSeparateProcess(libName, outputFile, format, new EnvironmentSearchPaths());
+    }
+
+    public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format,
+            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = executors
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths);
         }
     }
 

@@ -70,6 +70,7 @@ public class RedPreferences {
     public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
 
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "projectModulesRecursiveAdditionOnVirtualenvEnabled";
+    public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
@@ -200,6 +201,10 @@ public class RedPreferences {
 
     public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {
         return store.getBoolean(PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
+    }
+
+    public boolean isPythonLibrariesLibdocGenerationInSeparateProcessEnabled() {
+        return store.getBoolean(PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED);
     }
 
     public EnumSet<FoldableElements> getFoldableElements() {

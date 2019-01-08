@@ -99,3 +99,25 @@ def create_html_doc(doc, format):
 
     formatter = DocToHtml(format)
     return formatter(doc)
+
+
+def __decode_unicode_if_needed(arg):
+    if sys.version_info < (3, 0, 0) and isinstance(arg, str):
+        return arg.decode('utf-8')
+    elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
+        return [__decode_unicode_if_needed(elem) for elem in arg]
+    else:
+        return arg
+
+
+if __name__ == '__main__':
+    import robot_session_server
+    import sys
+
+    libname = __decode_unicode_if_needed(sys.argv[1])
+    format = sys.argv[2]
+    python_paths = __decode_unicode_if_needed(sys.argv[3].split(";"))
+    class_paths = __decode_unicode_if_needed(sys.argv[4].split(";")) if len(sys.argv) == 5 else []
+
+    robot_session_server.__extend_paths(python_paths, class_paths)
+    print(create_libdoc(libname, format))
