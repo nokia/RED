@@ -87,7 +87,7 @@ def cleanup_modules(to_call):
         finally:
             current_modules = sys.modules
             builtin_modules = set(sys.builtin_module_names)
-            to_preserve_with_submodules = ['robot', 'encodings', 'pkg_resources']
+            to_preserve_with_submodules = ['robot', 'encodings', 'pkg_resources', 'typing']
             # some modules should not be removed because it causes rpc server problems
             to_remove = [m for m in current_modules if
                          m not in builtin_modules and not __has_to_be_preserved(m, to_preserve_with_submodules) and
