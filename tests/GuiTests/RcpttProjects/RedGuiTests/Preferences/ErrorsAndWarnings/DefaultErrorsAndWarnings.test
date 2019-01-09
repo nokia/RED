@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VMj88KTbEeazyPh6f3_hNQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/18 3:49 PM
+Runtime-Version: 2.4.0.201811080014
+Save-Time: 1/8/19 2:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -243,7 +243,7 @@ check-combobox-list-and-selection -section "Runtime" -label "Robot Framework run
 
 get-window Preferences | get-group "Runtime and Building" | get-section "Project configuration" | click
 
-check-combobox-list-and-selection -section "Project configuration" -label "Project configuration file (red.xml) cannot be read"  -selected "Fatal"
+check-combobox-list-and-selection -section "Project configuration" -label "Project configuration file (red.xml) cannot be read"  -selected "Error"
   	-text "Occurs when project has no red.xml configuration file or it cannot be read.\n"
         + "Either there is a problem accessing the file or its structure is broken."
 
