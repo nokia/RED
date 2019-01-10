@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4lAb8OldEea0ALtmCcrmfA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/2/18 11:31 AM
+Save-Time: 1/10/19 2:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -183,5 +183,29 @@ get-window "Run Configurations"| get-button Close | click
 get-button "Run.*" -index 0 | click
 check-message-log-for-all-tests
 
-
+// go to Run Configuration and unselct all test
+get-menu -path "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    with [get-group "Suite(s)" | get-tree] {
+        get-item -path "TestFile.robot/test 3" | uncheck
+        get-item -path "TestFile.robot/TEST 2" | uncheck
+        get-item -path "TestFile.robot/test 1" | uncheck
+    }
+    get-button Apply | click
+    get-button Close | click
+}
+// go to Run Configuration again and verify if TestSuite and all test are visible and unchecked on the list
+get-menu -path "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-editbox | set-text ""
+with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
+    get-item -path "TestFile.robot" | get-property caption | equals "TestFile.robot" | verify-true
+    get-item -path "TestFile.robot" | get-property selected | equals false | verify-true
+    get-item -path "TestFile.robot/test 1" | get-property caption | equals "test 1" | verify-true
+    get-item -path "TestFile.robot/test 1" | get-property selected | equals false | verify-true
+    get-item -path "TestFile.robot/TEST 2" | get-property caption | equals "TEST 2" | verify-true
+    get-item -path "TestFile.robot/TEST 2" | get-property selected | equals false | verify-true
+    get-item -path "TestFile.robot/test 3" | get-property caption | equals "test 3" | verify-true
+    get-item -path "TestFile.robot/test 3" | get-property selected | equals false | verify-true
+}
+get-window "Run Configurations" | get-button Close | click
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
