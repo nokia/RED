@@ -155,17 +155,15 @@ class LibItem(object):
 
 
 class PythonKeywordSource(object):
+
     def __init__(self, keyword):
         self.name = keyword.name
         self.libraryName = keyword.library.name
-        source = self._find_source(keyword)
-        self.filePath = source[0]
-        self.line = source[1]
-        self.offset = source[2]
-        self.length = source[3]
+        self.filePath, self.line, self.offset, self.length = PythonKeywordSource._find_source(keyword)
 
-    def _find_source(self, keyword):
-        function = self._resolve_function(keyword)
+    @staticmethod
+    def _find_source(keyword):
+        function = PythonKeywordSource._find_function(keyword)
         path = inspect.getfile(function)
         source = inspect.getsourcelines(function)
         for lineIdx, line in enumerate(source[0]):
@@ -178,10 +176,12 @@ class PythonKeywordSource(object):
         return path, 0, 0, 0
 
     @staticmethod
-    def _resolve_function(keyword):
+    def _find_function(keyword):
         if isinstance(keyword, _DynamicHandler):
-            return keyword.library._libcode.__dict__[keyword._run_keyword_method_name]
+            function = keyword.library._libcode.__dict__[keyword._run_keyword_method_name]
         elif keyword._method:
-            return keyword._method
+            function = keyword._method
         else:
-            return keyword._get_handler(keyword.library.get_instance(), keyword._handler_name)
+            function = keyword._get_handler(keyword.library.get_instance(), keyword._handler_name)
+
+        return function.__wrapped__ if hasattr(function, '__wrapped__') else function
