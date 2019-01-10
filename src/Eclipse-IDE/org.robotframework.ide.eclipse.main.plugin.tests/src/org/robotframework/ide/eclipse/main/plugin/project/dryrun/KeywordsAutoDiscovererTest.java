@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -63,7 +64,12 @@ public class KeywordsAutoDiscovererTest {
     public void testDifferentKeywordsFromSameLibrary() throws Exception {
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("TestLib",
-                new String[] { "#comment", "def kw_x():", "  return 0", "def   kw_abc ():", "  pass" }));
+                "#comment",
+                "def kw_x():",
+                "  return 0",
+                "def   kw_abc ():",
+                "  pass"
+                ));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -77,8 +83,15 @@ public class KeywordsAutoDiscovererTest {
     @Test
     public void testSameKeywordsFromDifferentLibraries() throws Exception {
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
-        libraries.putAll(createLibrary("First", new String[] { "#comment", "def kw_x():", "  pass" }));
-        libraries.putAll(createLibrary("Second", new String[] { "def kw_x():", "  pass" }));
+        libraries.putAll(createLibrary("First",
+                "#comment",
+                "def kw_x():",
+                "  pass"
+                ));
+        libraries.putAll(createLibrary("Second",
+                "def kw_x():",
+                "  pass"
+                ));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -90,27 +103,66 @@ public class KeywordsAutoDiscovererTest {
     }
 
     @Test
-    public void testKeywordsDefinedWithDecorator() throws Exception {
+    public void testKeywordsDefinedWithSignatureDecorator() throws Exception {
+        try (InputStream inputStream = this.getClass().getResourceAsStream("Decorator.py")) {
+            projectProvider.createFile("libs/Decorator.py", inputStream);
+        }
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
-        libraries.putAll(createLibrary("Decorated",
-                new String[] { "import robot.api.deco", "from robot.api.deco import keyword",
-                        "@robot.api.deco.keyword('Add ${x:\\d+}')", "def add(x):", "  pass", "@keyword(name='Deco')",
-                        "def decorated_method():", "  pass" }));
+        libraries.putAll(createLibrary("SignatureDecorated",
+                "from Decorator import decorator",
+                "",
+                "def precheck(**expected_kwargs):",
+                "    @decorator",
+                "    def wrapper(method, *args, **kwargs):",
+                "        return method(*args, **kwargs)",
+                "    return wrapper",
+                "",
+                "class SignatureDecorated(object):",
+                "    @precheck()",
+                "    def decorated_kw(self):",
+                "        pass"
+                ));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
 
-        assertThat(robotProject.getKeywordSource("Decorated.Add ${x:\\d+}"))
-                .hasValueSatisfying(equalSource("libs/Decorated.py", 3, 4, 3));
-        assertThat(robotProject.getKeywordSource("Decorated.Deco"))
-                .hasValueSatisfying(equalSource("libs/Decorated.py", 6, 4, 16));
+        assertThat(robotProject.getKeywordSource("SignatureDecorated.Decorated Kw"))
+                .hasValueSatisfying(equalSource("libs/SignatureDecorated.py", 10, 8, 12));
+    }
+
+    @Test
+    public void testKeywordsDefinedWithRobotDecorator() throws Exception {
+        final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
+        libraries.putAll(createLibrary("RobotDecorated",
+                "import robot.api.deco",
+                "from robot.api.deco import keyword",
+                "@robot.api.deco.keyword('Add ${x:\\d+}')",
+                "def add(x):",
+                "  pass",
+                "@keyword(name='Deco')",
+                "def decorated_method():",
+                "  pass"
+                ));
+        configureProject(libraries);
+
+        new KeywordsAutoDiscoverer(robotProject).start();
+
+        assertThat(robotProject.getKeywordSource("RobotDecorated.Add ${x:\\d+}"))
+                .hasValueSatisfying(equalSource("libs/RobotDecorated.py", 3, 4, 3));
+        assertThat(robotProject.getKeywordSource("RobotDecorated.Deco"))
+                .hasValueSatisfying(equalSource("libs/RobotDecorated.py", 6, 4, 16));
     }
 
     @Test
     public void testKeywordsFromDynamicLibrary() throws Exception {
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
-        libraries.putAll(createLibrary("DynaLib", new String[] { "class DynaLib:", "  def get_keyword_names(self):",
-                "    return ['Dyna Kw', 'Other Kw']", "  def run_keyword(self, name, args):", "    pass" }));
+        libraries.putAll(createLibrary("DynaLib",
+                "class DynaLib:",
+                "  def get_keyword_names(self):",
+                "    return ['Dyna Kw', 'Other Kw']",
+                "  def run_keyword(self, name, args):",
+                "    pass"
+                ));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -123,10 +175,18 @@ public class KeywordsAutoDiscovererTest {
 
     @Test
     public void testKeywordsFromClassHierarchy() throws Exception {
-        projectProvider.createFile("libs/Parent.py", "class Parent:", "  def parent_kw(self, arg):", "    pass");
+        projectProvider.createFile("libs/Parent.py",
+                "class Parent:",
+                "  def parent_kw(self, arg):",
+                "    pass"
+                );
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
-        libraries.putAll(createLibrary("Child", new String[] { "import Parent", "class Child(Parent.Parent):",
-                "  def child_kw(self, arg):", "    pass" }));
+        libraries.putAll(createLibrary("Child",
+                "import Parent",
+                "class Child(Parent.Parent):",
+                "  def child_kw(self, arg):",
+                "    pass"
+                ));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -139,10 +199,16 @@ public class KeywordsAutoDiscovererTest {
 
     @Test
     public void testKeywordsFromImportedLibraries() throws Exception {
-        projectProvider.createFile("libs/External.py", "def ex_kw(args):", "  pass");
+        projectProvider.createFile("libs/External.py",
+                "def ex_kw(args):",
+                "  pass"
+                );
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("Internal",
-                new String[] { "from External import ex_kw", "def int_kw(args):", "  pass" }));
+                "from External import ex_kw",
+                "def int_kw(args):",
+                "  pass"
+                ));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -153,7 +219,7 @@ public class KeywordsAutoDiscovererTest {
                 .hasValueSatisfying(equalSource("libs/Internal.py", 1, 4, 6));
     }
 
-    private Map<ReferencedLibrary, LibrarySpecification> createLibrary(final String name, final String[] lines)
+    private Map<ReferencedLibrary, LibrarySpecification> createLibrary(final String name, final String... lines)
             throws IOException, CoreException {
         final IFile sourceFile = projectProvider.createFile("libs/" + name + ".py", lines);
 
