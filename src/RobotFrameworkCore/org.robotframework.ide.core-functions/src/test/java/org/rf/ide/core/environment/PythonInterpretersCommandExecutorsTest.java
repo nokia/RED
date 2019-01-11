@@ -8,7 +8,7 @@ package org.rf.ide.core.environment;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
@@ -21,8 +21,8 @@ import com.google.common.io.Files;
 public class PythonInterpretersCommandExecutorsTest {
 
     @Test
-    public void allRobotSessionServerFilesAreDefined() {
-        final File[] resourceFiles = getResourceFiles("scripts");
+    public void allRobotSessionServerFilesAreDefined() throws Exception {
+        final File[] resourceFiles = getResourceFiles("/scripts");
         final List<String> robotSessionServerFiles = filterPythonScriptFiles(resourceFiles,
                 name -> !name.equals("interruptor.py"));
         assertThat(PythonInterpretersCommandExecutors.SCRIPT_FILES).containsAll(robotSessionServerFiles);
@@ -36,10 +36,8 @@ public class PythonInterpretersCommandExecutorsTest {
                 .collect(Collectors.toList());
     }
 
-    private static File[] getResourceFiles(final String folder) {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final URL url = loader.getResource(folder);
-        final String path = url.getPath();
-        return new File(path).listFiles();
+    private static File[] getResourceFiles(final String folder) throws Exception {
+        final String path = PythonInterpretersCommandExecutors.class.getResource(folder).getFile();
+        return new File(URLDecoder.decode(path, "UTF-8")).listFiles();
     }
 }
