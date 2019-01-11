@@ -1490,6 +1490,23 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
+          defaultHandler="org.robotframework.ide.eclipse.main.plugin.launch.variables.ModifyStringVariablesHandler"
+          id="org.robotframework.red.openActiveStringVariables"
+          name="Modify string variables">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          defaultHandler="org.robotframework.ide.eclipse.main.plugin.launch.variables.ActivateStringVariablesHandler"
+          id="org.robotframework.red.activateStringVariablesSet"
+          name="Activate string variables set">
+       <commandParameter
+             id="org.robotframework.red.activateStringVariablesSet.setName"
+             name="Set name"
+             optional="false">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.runRfLint"
           name="Run RfLint analysis">
     </command>
@@ -1848,7 +1865,7 @@
 	          </iterate>
 	       </with>
 	    </enabledWhen>
-	 </handler>	  
+	 </handler>
      <handler
             class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RunRfLintHandler"
             commandId="org.robotframework.red.runRfLint">
@@ -3920,6 +3937,37 @@
                 style="push">
           </command>
        </menu>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+       <toolbar
+             id="org.robotframework.ide.eclipse.red">
+          <command
+                commandId="org.robotframework.red.openActiveStringVariables"
+                icon="resources/tnames_co.png"
+                id="org.robotframework.ide.eclipse.red.activeVariablesMenu"
+                label="Active string substitution variables"
+                style="pulldown">
+          </command>
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="activePerspectiveId">
+                <equals
+                      value="org.eclipse.ui.perspectives.RobotPerspective">
+                </equals>
+             </with>
+          </visibleWhen>
+       </toolbar>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="menu:org.robotframework.ide.eclipse.red.activeVariablesMenu">
+       <dynamic
+             class="org.robotframework.ide.eclipse.main.plugin.launch.variables.ActivateStringVariablesMenuItem"
+             id="org.robotframework.ide.eclipse.red.activeVariablesMenuDynamic">
+       </dynamic>
     </menuContribution>
  </extension>
  <extension
@@ -6511,6 +6559,12 @@
             class="org.robotframework.ide.eclipse.main.plugin.preferences.DefaultLaunchConfigurationPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.launch.default"
             name="Default Launch Configurations">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.launch"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.ActiveStringSubstitutionSetsPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.launch.activeVarsSets"
+            name="Active String Substitution sets">
       </page>
    </extension>
    <extension

@@ -11,6 +11,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -31,6 +32,10 @@ public class Selections {
 
     public static <T> List<T> getElements(final IStructuredSelection selection, final Class<T> elementsClass) {
         return newArrayList(Iterables.filter(selection.toList(), elementsClass));
+    }
+
+    public static <T> Stream<T> getElementsStream(final IStructuredSelection selection, final Class<T> elementsClass) {
+        return getElements(selection, elementsClass).stream();
     }
 
     public static <T> List<T> getAdaptableElements(final IStructuredSelection selection, final Class<T> elementsClass) {

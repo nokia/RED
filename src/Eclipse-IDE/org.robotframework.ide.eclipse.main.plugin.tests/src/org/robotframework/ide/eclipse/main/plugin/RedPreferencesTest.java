@@ -5,12 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -21,9 +24,12 @@ import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.OverriddenVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 
 public class RedPreferencesTest {
@@ -209,6 +215,58 @@ public class RedPreferencesTest {
                 .containsEntry("X", Priority.LOW)
                 .containsEntry("Y", Priority.NORMAL)
                 .containsEntry("Z", Priority.HIGH);
+    }
+
+    @Test
+    public void activeVariablesSetIsTakenProperlyFromStore_1() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.STRING_VARIABLES_ACTIVE_SET)).thenReturn("");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getActiveVariablesSet()).isEmpty();
+    }
+
+    @Test
+    public void activeVariablesSetIsTakenProperlyFromStore_2() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.STRING_VARIABLES_ACTIVE_SET)).thenReturn("x");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getActiveVariablesSet()).contains("x");
+    }
+
+    @Test
+    public void overriddenVariablesSetIsTakenProperlyFromStore() throws JsonProcessingException {
+        final Map<String, List<List<String>>> input = new LinkedHashMap<>();
+        input.put("a", newArrayList());
+        input.get("a").add(newArrayList("x", "1"));
+        input.get("a").add(newArrayList("y", "2"));
+        input.get("a").add(newArrayList("z", "3"));
+        input.put("b", newArrayList());
+        input.get("b").add(newArrayList("x;", "1"));
+        input.get("b").add(newArrayList("y=", "2=2"));
+        input.put("c;d", newArrayList());
+        input.get("c;d").add(newArrayList("x", "\\"));
+
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.STRING_VARIABLES_SETS))
+                .thenReturn(new ObjectMapper().writeValueAsString(input));
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.getOverriddenVariablesSets()).hasSize(3)
+                .containsEntry("a",
+                        newArrayList(
+                                new OverriddenVariable("x", "1"),
+                                new OverriddenVariable("y", "2"),
+                                new OverriddenVariable("z", "3")))
+                .containsEntry("b",
+                        newArrayList(
+                                new OverriddenVariable("x;", "1"),
+                                new OverriddenVariable("y=", "2=2")))
+                .containsEntry("c;d",
+                        newArrayList(
+                                new OverriddenVariable("x", "\\")));
     }
 
     @Test

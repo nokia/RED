@@ -7,11 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +34,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.red.graphics.ColorsManager;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Streams;
 
@@ -104,6 +108,9 @@ public class RedPreferences {
 
     public static final String TASKS_TAGS = "red.tasks.tags";
     public static final String TASKS_PRIORITIES = "red.tasks.priorities";
+
+    public static final String STRING_VARIABLES_SETS = "red.string.variables.sets";
+    public static final String STRING_VARIABLES_ACTIVE_SET = "red.string.variables.activeSet";
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -388,6 +395,39 @@ public class RedPreferences {
         return store.getString(RFLINT_ADDITIONAL_ARGUMENTS);
     }
 
+    public Optional<String> getActiveVariablesSet() {
+        final String active = store.getString(STRING_VARIABLES_ACTIVE_SET);
+        return active.isEmpty() ? Optional.empty() : Optional.of(active);
+    }
+
+    public Map<String, List<OverriddenVariable>> getOverriddenVariablesSets() {
+        final Map<String, List<OverriddenVariable>> sets = new LinkedHashMap<>();
+        final String jsonMapping = store.getString(STRING_VARIABLES_SETS);
+        if (jsonMapping.isEmpty()) {
+            return sets;
+        }
+
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            final TypeReference<Map<String, List<List<String>>>> stringToObjectMapType = new TypeReference<Map<String, List<List<String>>>>() {
+            };
+
+            final Map<String, List<List<String>>> mapping = mapper.readValue(jsonMapping, stringToObjectMapType);
+
+            for (final Entry<String, List<List<String>>> e : mapping.entrySet()) {
+                final List<OverriddenVariable> vars = new ArrayList<>();
+                for (final List<String> pair : e.getValue()) {
+                    vars.add(new OverriddenVariable(pair.get(0), pair.get(1)));
+                }
+                sets.put(e.getKey(), vars);
+            }
+            return sets;
+
+        } catch (final IOException e) {
+            throw new IllegalStateException();
+        }
+    }
+
     public static class ColoringPreference {
 
         public static ColoringPreference fromPreferenceString(final String coloringValue) {
@@ -436,6 +476,40 @@ public class RedPreferences {
         @Override
         public int hashCode() {
             return Objects.hash(color, fontStyle);
+        }
+    }
+
+    public static class OverriddenVariable {
+
+        private final String name;
+
+        private final String value;
+
+        public OverriddenVariable(final String name, final String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof OverriddenVariable) {
+                final OverriddenVariable that = (OverriddenVariable) obj;
+                return this.name.equals(that.name) && this.value.equals(that.value);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, value);
         }
     }
 

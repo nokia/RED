@@ -8,11 +8,10 @@ package org.robotframework.red.jface.preferences;
 import java.io.File;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.variables.IStringVariableManager;
-import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.robotframework.ide.eclipse.main.plugin.launch.variables.RedStringVariablesManager;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -30,9 +29,9 @@ public class ParameterizedFilePathStringFieldEditor extends StringFieldEditor {
         final String txt = getTextControl().getText();
 
         if (!txt.isEmpty()) {
-            final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+            final RedStringVariablesManager variableManager = new RedStringVariablesManager();
             try {
-                final File file = new File(variableManager.performStringSubstitution(txt));
+                final File file = new File(variableManager.substituteUsingQuickValuesSet(txt));
                 if (!file.exists()) {
                     showErrorMessage(getErrorMessage());
                     return false;

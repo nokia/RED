@@ -45,6 +45,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeLibrariesPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
         initializeDefaultLaunchConfigurationPreferences(preferences);
+        initializeStringVariablesPreferences(preferences);
         initializeRfLintPreferences(preferences);
         initializeValidationPreferences(preferences);
         initializeTasksPreferences(preferences);
@@ -127,6 +128,12 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
                 AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT);
         preferences.put(RedPreferences.DEBUGGER_SUSPEND_ON_ERROR, IssuesStrategy.PROMPT.name().toLowerCase());
         preferences.putBoolean(RedPreferences.DEBUGGER_OMIT_LIB_KEYWORDS, false);
+    }
+
+    private void initializeStringVariablesPreferences(final IEclipsePreferences preferences) {
+        preferences.put(RedPreferences.STRING_VARIABLES_SETS, "");
+        preferences.put(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "");
+
     }
 
     private void initializeRfLintPreferences(final IEclipsePreferences preferences) {

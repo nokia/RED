@@ -23,8 +23,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.variables.IStringVariableManager;
-import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -36,6 +34,7 @@ import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.launch.variables.RedStringVariablesManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RunRfLintHandler.E4RunRfLintHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -129,10 +128,10 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
         }
 
         private static List<String> parseArguments(final String arguments) {
-            final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+            final RedStringVariablesManager variableManager = new RedStringVariablesManager();
             return Stream.of(DebugPlugin.parseArguments(arguments)).map(argument -> {
                 try {
-                    return variableManager.performStringSubstitution(argument);
+                    return variableManager.substituteUsingQuickValuesSet(argument);
                 } catch (final CoreException e) {
                     return argument;
                 }
