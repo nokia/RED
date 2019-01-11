@@ -1,0 +1,55 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: SearchingOfSitePackagesLibrariesKeywords
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _nN2gIBWDEem0i5YE0hM6QA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 1/11/19 10:49 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open suite
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+// ads content with Selenium2Library import and save
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+	+ "Library    Selenium2Library\n"
+	+ "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    Select Checkbox    sth\n"
+    + "test 2\n"
+    + "    Select Checkbox   sth2"
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+// add new line to revalidate after saving
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 7 27
+    key-type Enter
+    key-type "M1+s"
+    // use Ctrl+H to open Search window
+    set-caret-pos 5 12
+    key-type "M1+h"
+}
+// try to search for Select Checkbox keyword from Selenium2Library lib
+with [get-window Search] {
+    get-combo -after [get-label "Containing text:"] | set-text "Select Checkbox"
+    get-button Search | click
+}
+// verify if this keyword is on the list in Search View - there should be two places
+get-view Search | get-button "Expand All" | click
+with [get-view Search | get-tree] {
+    get-item -path "RobotProject/TestFile.robot \\(2 matches\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "5: Select Checkbox    sth" | verify-true
+    get-item -path "RobotProject/TestFile.robot \\(2 matches\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "7: Select Checkbox   sth2" | verify-true
+    get-item -path "RobotProject/TestFile.robot \\(2 matches\\)" | get-property "getItemCount()" | equals 2 
+        | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
