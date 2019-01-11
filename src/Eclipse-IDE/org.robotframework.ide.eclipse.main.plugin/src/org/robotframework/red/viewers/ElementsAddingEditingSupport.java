@@ -72,9 +72,14 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
                 return;
             }
             viewer.refresh();
+            performPriorToEdit(value);
             if (value != null) {
                 viewer.editElement(value, index + getColumnShift());
             }
         };
+    }
+
+    protected void performPriorToEdit(@SuppressWarnings("unused") final Object addedElement) {
+        // nothing to do, override if needed
     }
 }

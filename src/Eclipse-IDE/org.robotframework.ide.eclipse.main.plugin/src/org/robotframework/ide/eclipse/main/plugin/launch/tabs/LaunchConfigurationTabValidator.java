@@ -15,13 +15,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.variables.IStringVariableManager;
-import org.eclipse.core.variables.VariablesPlugin;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.variables.RedStringVariablesManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -136,9 +135,9 @@ class LaunchConfigurationTabValidator {
 
     private void validateExecutableFile(final String filePath) {
         if (!filePath.isEmpty()) {
-            final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+            final RedStringVariablesManager variableManager = new RedStringVariablesManager();
             try {
-                final File file = new File(variableManager.performStringSubstitution(filePath));
+                final File file = new File(variableManager.substituteUsingQuickValuesSet(filePath));
                 if (!file.exists()) {
                     throw new LaunchConfigurationValidationFatalException("Executable file does not exist");
                 }

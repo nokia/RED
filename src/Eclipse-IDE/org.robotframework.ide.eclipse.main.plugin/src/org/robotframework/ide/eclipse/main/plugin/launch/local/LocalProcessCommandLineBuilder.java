@@ -29,8 +29,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.variables.IStringVariableManager;
-import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.DebugPlugin;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder;
@@ -38,6 +36,7 @@ import org.rf.ide.core.execution.RunCommandLineCallBuilder.IRunCommandLineBuilde
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.launch.variables.RedStringVariablesManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
@@ -151,8 +150,8 @@ class LocalProcessCommandLineBuilder {
     }
 
     private static File resolveExecutableFile(final String path) throws CoreException {
-        final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
-        final File executableFile = new File(variableManager.performStringSubstitution(path));
+        final RedStringVariablesManager variableManager = new RedStringVariablesManager();
+        final File executableFile = new File(variableManager.substituteUsingQuickValuesSet(path));
         if (!executableFile.exists()) {
             throw newCoreException("Executable file '" + executableFile.getAbsolutePath() + "' does not exist");
         }
@@ -160,10 +159,10 @@ class LocalProcessCommandLineBuilder {
     }
 
     private static List<String> parseArguments(final String arguments) {
-        final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+        final RedStringVariablesManager variableManager = new RedStringVariablesManager();
         return Stream.of(DebugPlugin.parseArguments(arguments)).map(argument -> {
             try {
-                return variableManager.performStringSubstitution(argument);
+                return variableManager.substituteUsingQuickValuesSet(argument);
             } catch (final CoreException e) {
                 return argument;
             }

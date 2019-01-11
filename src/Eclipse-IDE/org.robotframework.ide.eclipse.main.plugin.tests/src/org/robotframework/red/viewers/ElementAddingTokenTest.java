@@ -21,14 +21,6 @@ import org.robotframework.red.graphics.ImagesManager;
 public class ElementAddingTokenTest {
 
     @Test
-    public void tokenHasCorrectParent() {
-        final Object parent = new Object();
-        final ElementAddingToken token = new ElementAddingToken(parent, "", true, 0);
-
-        assertThat(token.getParent()).isSameAs(parent);
-    }
-
-    @Test
     public void tokenHasAddImage_whenIsEnabledAndRankIsZero() {
         final ElementAddingToken token = new ElementAddingToken("element", true);
 
@@ -38,7 +30,7 @@ public class ElementAddingTokenTest {
 
     @Test
     public void tokenHasNoImage_whenTheRankIsMoreThanZero() {
-        final ElementAddingToken token = new ElementAddingToken(null, "element", true, 1);
+        final ElementAddingToken token = new ElementAddingToken("element", true, 1);
 
         assertThat(token.getImage()).isNull();
     }
@@ -84,7 +76,7 @@ public class ElementAddingTokenTest {
 
     @Test
     public void labelForHigherOrderEnabledTokensHasOnlyItalicBoldGreenDots() {
-        final ElementAddingToken token = new ElementAddingToken(null, "element", true, 1);
+        final ElementAddingToken token = new ElementAddingToken("element", true, 1);
         final StyledString label = token.getStyledText();
 
         final StyleRange[] ranges = label.getStyleRanges();
@@ -99,7 +91,7 @@ public class ElementAddingTokenTest {
 
     @Test
     public void labelForHigherOrderDisabledTokensHasOnlyItalicBoldGrayDots() {
-        final ElementAddingToken token = new ElementAddingToken(null, "element", false, 1);
+        final ElementAddingToken token = new ElementAddingToken("element", false, 1);
         final StyledString label = token.getStyledText();
 
         final StyleRange[] ranges = label.getStyleRanges();
