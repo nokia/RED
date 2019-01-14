@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _x2ENoKdEEeazyPh6f3_hNQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/14/18 4:09 PM
+Save-Time: 1/14/19 11:35 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,9 +17,9 @@ Entry-Name: .content
 get-preferences-menu | click
 with [get-window Preferences] {
 	//autodiscover
-    get-tree | select "Robot Framework/Autodiscovering"
-    get-group "Libraries Autodiscovering" 
-        | get-button "Add project modules recursively to PYTHONPATH/CLASSPATH during Autodiscovering on virtualenv" 
+    get-tree | select "Robot Framework/Libraries"
+    get-group "Libraries autodiscovering" 
+        | get-button "Add project modules recursively to PYTHONPATH/CLASSPATH during autodiscovering on virtualenv" 
         | check
     //content assist    
     get-tree | select "Robot Framework/Editor/Content Assist"
@@ -86,7 +86,7 @@ with [get-window "Export Preferences"] {
 //restore all settings to default
 get-preferences-menu | click
 with [get-window Preferences] {
-    get-tree | select "Robot Framework/Autodiscovering"
+    get-tree | select "Robot Framework/Libraries"
     get-button "Restore Defaults" | click
     get-tree | select "Robot Framework/Editor"
     get-button "Restore Defaults" | click
@@ -123,9 +123,9 @@ with [get-window "Import Preferences"] {
 get-preferences-menu | click
 
 //Autodiscovering
-get-window Preferences | get-tree | select "Robot Framework/Autodiscovering"
-get-window Preferences | get-group "Libraries Autodiscovering" 
-    | get-button "Add project modules recursively to PYTHONPATH/CLASSPATH during Autodiscovering on virtualenv" 
+get-window Preferences | get-tree | select "Robot Framework/Libraries"
+get-window Preferences | get-group "Libraries autodiscovering" 
+    | get-button "Add project modules recursively to PYTHONPATH/CLASSPATH during autodiscovering on virtualenv" 
     | get-property selected | equals true | verify-true
     
 //Content Assist    
