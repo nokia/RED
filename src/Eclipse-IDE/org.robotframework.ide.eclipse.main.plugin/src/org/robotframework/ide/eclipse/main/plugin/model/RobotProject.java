@@ -89,12 +89,11 @@ public class RobotProject extends RobotContainer {
         if (projectHolder == null) {
             projectHolder = new RobotProjectHolder(getRuntimeEnvironment());
         }
-        readProjectConfigurationIfNeeded();
-        projectHolder.configure(configuration, getProject().getLocation().toFile());
+        projectHolder.configure(getRobotProjectConfig(), getProject().getLocation().toFile());
         return projectHolder;
     }
 
-    public RobotParser getRobotParser() {
+    public synchronized RobotParser getRobotParser() {
         return RobotParser.create(getRobotProjectHolder(), getRobotParserComplianceVersion(), createPathsProvider());
     }
 
@@ -106,6 +105,7 @@ public class RobotProject extends RobotContainer {
         return LibspecsFolder.get(getProject());
     }
 
+    @VisibleForTesting
     public void setRobotParserComplianceVersion(final RobotVersion version) {
         this.parserComplianceVersion = version;
     }
@@ -114,28 +114,15 @@ public class RobotProject extends RobotContainer {
         if (parserComplianceVersion != null) {
             return parserComplianceVersion;
         }
-        readProjectConfigurationIfNeeded();
-        final RobotRuntimeEnvironment env = getRuntimeEnvironment();
-        return env == null ? RobotVersion.UNKNOWN : RobotVersion.from(env.getVersion());
-    }
-
-    public String getVersion() {
-        readProjectConfigurationIfNeeded();
-        final RobotRuntimeEnvironment env = getRuntimeEnvironment();
-        return env == null ? null : env.getVersion();
+        return getRuntimeEnvironment().getRobotVersion();
     }
 
     public synchronized Map<LibraryDescriptor, LibrarySpecification> getStandardLibraries() {
         if (stdLibsSpecs != null) {
             return stdLibsSpecs;
         }
-        readProjectConfigurationIfNeeded();
-        final RobotRuntimeEnvironment env = getRuntimeEnvironment();
-        if (env == null) {
-            return new LinkedHashMap<>();
-        }
 
-        final Stream<LibraryDescriptor> stdLibsDescriptorsStream = env.getStandardLibrariesNames()
+        final Stream<LibraryDescriptor> stdLibsDescriptorsStream = getRuntimeEnvironment().getStandardLibrariesNames()
                 .stream()
                 .map(LibraryDescriptor::ofStandardLibrary);
         final Stream<LibraryDescriptor> remoteStdLibsDescriptorsStream = getRobotProjectConfig().getRemoteLocations()
@@ -155,7 +142,6 @@ public class RobotProject extends RobotContainer {
     }
 
     public synchronized boolean hasReferencedLibraries() {
-        readProjectConfigurationIfNeeded();
         if (refLibsSpecs != null && !refLibsSpecs.isEmpty()) {
             return true;
         }
@@ -166,7 +152,6 @@ public class RobotProject extends RobotContainer {
         if (refLibsSpecs != null) {
             return refLibsSpecs;
         }
-        readProjectConfigurationIfNeeded();
 
         refLibsSpecs = new LinkedHashMap<>();
         for (final ReferencedLibrary library : getRobotProjectConfig().getLibraries()) {
@@ -239,16 +224,6 @@ public class RobotProject extends RobotContainer {
         }).orElse(null);
     }
 
-    private synchronized void readProjectConfigurationIfNeeded() {
-        if (configuration == null) {
-            try {
-                configuration = new RedEclipseProjectConfigReader().readConfiguration(getProject());
-            } catch (final CannotReadProjectConfigurationException e) {
-                // nothing happens
-            }
-        }
-    }
-
     /**
      * Returns the configuration model from red.xml
      *
@@ -256,8 +231,14 @@ public class RobotProject extends RobotContainer {
      *         be read
      */
     public synchronized RobotProjectConfig getRobotProjectConfig() {
-        readProjectConfigurationIfNeeded();
-        return configuration == null ? new NullRobotProjectConfig() : configuration;
+        if (configuration == null) {
+            try {
+                configuration = new RedEclipseProjectConfigReader().readConfiguration(getProject());
+            } catch (final CannotReadProjectConfigurationException e) {
+                return new NullRobotProjectConfig();
+            }
+        }
+        return configuration;
     }
 
     @VisibleForTesting
@@ -320,14 +301,13 @@ public class RobotProject extends RobotContainer {
     }
 
     public synchronized RobotRuntimeEnvironment getRuntimeEnvironment() {
-        readProjectConfigurationIfNeeded();
-        if (getRobotProjectConfig().usesPreferences()) {
+        final RobotProjectConfig config = getRobotProjectConfig();
+        if (config.usesPreferences()) {
             return RedPlugin.getDefault().getActiveRobotInstallation();
         }
-        final File file = RedWorkspace.Paths
-                .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(configuration.providePythonLocation()))
-                .toFile();
-        return RedPlugin.getDefault().getRobotInstallation(file, configuration.providePythonInterpreter());
+        final Path path = new Path(config.providePythonLocation());
+        final File file = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(path).toFile();
+        return RedPlugin.getDefault().getRobotInstallation(file, config.providePythonInterpreter());
     }
 
     public IFile getConfigurationFile() {
@@ -340,10 +320,6 @@ public class RobotProject extends RobotContainer {
 
     public PathsProvider createPathsProvider() {
         return new ProjectPathsProvider();
-    }
-
-    public void setModuleSearchPaths(final List<File> paths) {
-        getRobotProjectHolder().setModuleSearchPaths(paths);
     }
 
     public synchronized List<File> getModuleSearchPaths() {
@@ -359,14 +335,11 @@ public class RobotProject extends RobotContainer {
         if (referencedVariableFiles != null) {
             return referencedVariableFiles;
         }
-        readProjectConfigurationIfNeeded();
+        final RobotProjectConfig config = getRobotProjectConfig();
         final RobotRuntimeEnvironment env = getRuntimeEnvironment();
-        if (env == null || configuration == null) {
-            return new ArrayList<>();
-        }
 
         referencedVariableFiles = new ArrayList<>();
-        for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
+        for (final ReferencedVariableFile variableFile : config.getReferencedVariableFiles()) {
             IPath path = new Path(variableFile.getPath());
             if (!path.isAbsolute()) {
                 final IResource targetFile = getProject().getWorkspace().getRoot().findMember(path);
@@ -376,7 +349,7 @@ public class RobotProject extends RobotContainer {
             }
 
             try {
-                final Map<String, Object> varsMap = env.getVariablesFromFile(path.toPortableString(),
+                final Map<String, Object> varsMap = env.getVariablesFromFile(path.toFile(),
                         variableFile.getArguments());
                 variableFile.setVariables(varsMap);
                 referencedVariableFiles.add(variableFile);

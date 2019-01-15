@@ -15,13 +15,12 @@ public class SitePackagesLibraries {
     private final List<String> nonRobotLibs;
 
     public SitePackagesLibraries() {
-        robotLibs = new ArrayList<>();
-        nonRobotLibs = new ArrayList<>();
+        this(new ArrayList<>(), new ArrayList<>());
     }
 
-    public SitePackagesLibraries(final List<List<String>> libs) {
-        robotLibs = libs.get(0);
-        nonRobotLibs = libs.get(1);
+    public SitePackagesLibraries(final List<String> robotLibs, final List<String> nonRobotLibs) {
+        this.robotLibs = robotLibs;
+        this.nonRobotLibs = nonRobotLibs;
     }
 
     public List<String> getRobotLibs() {

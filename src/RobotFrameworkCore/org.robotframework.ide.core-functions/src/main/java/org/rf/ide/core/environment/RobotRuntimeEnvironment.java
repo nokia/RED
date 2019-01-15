@@ -9,8 +9,6 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,7 +22,6 @@ import org.rf.ide.core.rflint.RfLintRule;
 
 import com.google.common.annotations.VisibleForTesting;
 
-@SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotRuntimeEnvironment {
 
     private final RobotCommandsExecutors executors;
@@ -41,83 +38,43 @@ public class RobotRuntimeEnvironment {
         PythonInterpretersCommandExecutors.getInstance().removeProcessListener(listener);
     }
 
-    public static String getVersion(final SuiteExecutor interpreter) throws RobotEnvironmentException {
-        final Optional<PythonInstallationDirectory> installationDirectory = PythonInstallationDirectoryFinder
-                .whereIsPythonInterpreter(interpreter);
-        final PythonInstallationDirectory location = installationDirectory
-                .orElseThrow(() -> new RobotEnvironmentException(
-                        "There is no " + interpreter.name() + " interpreter in system PATH environment variable"));
-        return getExactVersion(location);
-    }
-
-    private static String getExactVersion(final PythonInstallationDirectory location) {
-        final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                .getRobotCommandExecutor(location);
-        final String version = executor.getRobotVersion();
-        return location.getInterpreter().exactVersion(version);
-    }
-
-    public static RobotRuntimeEnvironment create(final String pathToPython) {
-        return create(new File(pathToPython));
-    }
-
-    public static RobotRuntimeEnvironment create(final File pathToPython) {
-        try {
-            final PythonInstallationDirectory location = PythonInstallationDirectoryFinder
-                    .checkPythonInstallationDir(pathToPython);
-            return new RobotRuntimeEnvironment(location, getExactVersion(location));
-        } catch (final IllegalArgumentException e) {
-            return new RobotRuntimeEnvironment(pathToPython, null);
-        }
-    }
-
-    public static RobotRuntimeEnvironment create(final String pathToPython, final SuiteExecutor interpreter) {
-        return create(new File(pathToPython), interpreter);
-    }
-
-    public static RobotRuntimeEnvironment create(final File pathToPython, final SuiteExecutor interpreter) {
-        try {
-            final PythonInstallationDirectory location = PythonInstallationDirectoryFinder
-                    .checkPythonInstallationDir(pathToPython);
-            final PythonInstallationDirectory correctedLocation = new PythonInstallationDirectory(location.toURI(),
-                    interpreter);
-            return new RobotRuntimeEnvironment(correctedLocation, getExactVersion(correctedLocation));
-        } catch (final IllegalArgumentException e) {
-            return new RobotRuntimeEnvironment(pathToPython, null);
-        }
-    }
-
-    private RobotRuntimeEnvironment(final File location, final String version) {
+    public RobotRuntimeEnvironment(final File location, final String version) {
         this(PythonInterpretersCommandExecutors.getInstance(), location, version);
     }
 
     @VisibleForTesting
-    public RobotRuntimeEnvironment(final RobotCommandsExecutors executors, final File location, final String version) {
+    RobotRuntimeEnvironment(final RobotCommandsExecutors executors, final File location, final String version) {
         this.executors = executors;
         this.location = location;
         this.version = version;
     }
 
+    public boolean isNullEnvironment() {
+        return false;
+    }
+
     public boolean isValidPythonInstallation() {
-        return location instanceof PythonInstallationDirectory;
+        return true;
     }
 
     public boolean hasRobotInstalled() {
-        return isValidPythonInstallation() && version != null;
+        return true;
     }
 
     public boolean isCompatibleRobotInstallation() {
-        return hasRobotInstalled() && !PythonVersion.from(version).isDeprecated();
+        return !PythonVersion.from(version).isDeprecated();
     }
 
     public String getVersion() {
         return version;
     }
 
+    public RobotVersion getRobotVersion() {
+        return RobotVersion.from(version);
+    }
+
     public SuiteExecutor getInterpreter() {
-        return location instanceof PythonInstallationDirectory
-                ? ((PythonInstallationDirectory) location).getInterpreter()
-                : null;
+        return ((PythonInstallationDirectory) location).getInterpreter();
     }
 
     public File getFile() {
@@ -125,9 +82,9 @@ public class RobotRuntimeEnvironment {
     }
 
     public String getPythonExecutablePath() {
-        final PythonInstallationDirectory pyLocation = (PythonInstallationDirectory) location;
-        final String pythonExec = pyLocation.getInterpreter().executableName();
-        return Stream.of(pyLocation.listFiles())
+        final SuiteExecutor interpreter = getInterpreter();
+        final String pythonExec = interpreter.executableName();
+        return Stream.of(location.listFiles())
                 .filter(file -> pythonExec.equals(file.getName()))
                 .findFirst()
                 .map(File::getAbsolutePath)
@@ -135,27 +92,17 @@ public class RobotRuntimeEnvironment {
     }
 
     public void resetCommandExecutors() {
-        if (hasRobotInstalled()) {
-            executors.resetExecutorFor((PythonInstallationDirectory) location);
-        }
+        executors.resetExecutorFor((PythonInstallationDirectory) location);
     }
 
     public List<File> getModuleSearchPaths() {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getModulesSearchPaths().stream().map(this::tryToCanonical).collect(toList());
-        }
-        return new ArrayList<>();
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        return executor.getModulesSearchPaths().stream().map(this::tryToCanonical).collect(toList());
     }
 
     public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return Optional.of(executor.getModulePath(moduleName, additionalPaths)).map(this::tryToCanonical);
-        }
-        return Optional.empty();
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        return Optional.of(executor.getModulePath(moduleName, additionalPaths)).map(this::tryToCanonical);
     }
 
     private File tryToCanonical(final File file) {
@@ -166,74 +113,49 @@ public class RobotRuntimeEnvironment {
         }
     }
 
-    public void createLibdoc(final String libName, final File outputFile, final LibdocFormat format)
-            throws RobotEnvironmentException {
+    public void createLibdoc(final String libName, final File outputFile, final LibdocFormat format) {
         createLibdoc(libName, outputFile, format, new EnvironmentSearchPaths());
     }
 
     public void createLibdoc(final String libName, final File outputFile, final LibdocFormat format,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdoc(libName, outputFile, format, additionalPaths);
-        }
+            final EnvironmentSearchPaths additionalPaths) {
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        executor.createLibdoc(libName, outputFile, format, additionalPaths);
     }
 
-    public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format)
-            throws RobotEnvironmentException {
+    public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format) {
         createLibdocInSeparateProcess(libName, outputFile, format, new EnvironmentSearchPaths());
     }
 
     public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths);
-        }
+            final EnvironmentSearchPaths additionalPaths) {
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        executor.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths);
     }
 
     public String createHtmlDoc(final String doc, final DocFormat format) {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.createHtmlDoc(doc, format);
-        }
-        return "";
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        return executor.createHtmlDoc(doc, format);
     }
 
     public List<String> getStandardLibrariesNames() {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            final List<String> libs = executor.getStandardLibrariesNames();
-            // Remote is a library without keywords and libdoc throws
-            // exceptions when trying to generate its specification
-            libs.remove("Remote");
-            return libs;
-        } else {
-            return new ArrayList<>();
-        }
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        final List<String> libs = executor.getStandardLibrariesNames();
+        // Remote is a library without keywords and libdoc throws
+        // exceptions when trying to generate its specification
+        libs.remove("Remote");
+        return libs;
     }
 
     public Optional<File> getStandardLibraryPath(final String libraryName) {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return Optional.of(executor.getStandardLibraryPath(libraryName));
-        }
-        return Optional.empty();
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        return Optional.of(executor.getStandardLibraryPath(libraryName));
     }
 
     public SitePackagesLibraries getSitePackagesLibrariesNames() {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            final List<List<String>> libs = executor.getSitePackagesLibrariesNames();
-            return new SitePackagesLibraries(libs);
-        }
-        return new SitePackagesLibraries();
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        final List<List<String>> libs = executor.getSitePackagesLibrariesNames();
+        return new SitePackagesLibraries(libs.get(0), libs.get(1));
     }
 
     /**
@@ -244,55 +166,33 @@ public class RobotRuntimeEnvironment {
      * @param moduleLocation
      *            Module location
      * @return list of class names or empty list
-     * @throws RobotEnvironmentException
      */
-    public List<String> getClassesFromModule(final File moduleLocation, final EnvironmentSearchPaths additionalPaths)
-            throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getClassesFromModule(moduleLocation, additionalPaths);
-        }
-        return new ArrayList<>();
+    public List<String> getClassesFromModule(final File moduleLocation, final EnvironmentSearchPaths additionalPaths) {
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        return executor.getClassesFromModule(moduleLocation, additionalPaths);
     }
 
     public Map<String, Object> getGlobalVariables() {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getGlobalVariables();
-        }
-        return new LinkedHashMap<>();
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        return executor.getGlobalVariables();
     }
 
-    public Map<String, Object> getVariablesFromFile(final String path, final List<String> args) {
-        if (hasRobotInstalled()) {
-            final String normalizedPath = path.replace('\\', '/');
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getVariables(normalizedPath, args);
-        }
-        return new LinkedHashMap<>();
+    public Map<String, Object> getVariablesFromFile(final File source, final List<String> arguments) {
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        return executor.getVariables(source, arguments);
     }
 
     public void runRfLint(final String host, final int port, final File projectLocation,
             final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
             final List<String> rulesFiles, final List<String> additionalArguments) {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.runRfLint(host, port, projectLocation, excludedPaths, filepath, rules, rulesFiles,
-                    additionalArguments);
-        }
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        executor.runRfLint(host, port, projectLocation, excludedPaths, filepath, rules, rulesFiles,
+                additionalArguments);
     }
 
     public String convertRobotDataFile(final File originalFile) {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.convertRobotDataFile(originalFile);
-        }
-        return "";
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        return executor.convertRobotDataFile(originalFile);
     }
 
     /**
@@ -310,17 +210,13 @@ public class RobotRuntimeEnvironment {
      *            Project relative excluded paths
      * @param additionalPaths
      *            Additional pythonPaths and classPaths
-     * @throws RobotEnvironmentException
      */
     public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
             final boolean recursiveInVirtualenv, final List<String> excludedPaths,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv,
-                    excludedPaths, additionalPaths);
-        }
+            final EnvironmentSearchPaths additionalPaths) {
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        executor.startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv, excludedPaths,
+                additionalPaths);
     }
 
     /**
@@ -332,23 +228,16 @@ public class RobotRuntimeEnvironment {
      *            Test case file with known library imports
      * @param additionalPaths
      *            Additional pythonPaths and classPaths
-     * @throws RobotEnvironmentException
      */
     public void startKeywordAutoDiscovering(final int port, final File dataSource,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.startKeywordAutoDiscovering(port, dataSource, additionalPaths);
-        }
+            final EnvironmentSearchPaths additionalPaths) {
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        executor.startKeywordAutoDiscovering(port, dataSource, additionalPaths);
     }
 
-    public void stopAutoDiscovering() throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = executors
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.stopAutoDiscovering();
-        }
+    public void stopAutoDiscovering() {
+        final RobotCommandExecutor executor = executors.getRobotCommandExecutor((PythonInstallationDirectory) location);
+        executor.stopAutoDiscovering();
     }
 
     @Override

@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.WrappedResource;
-import org.robotframework.ide.eclipse.main.plugin.mockmodel.ResourcesMocks;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 public class NonRobotProjectsFilterTest {
 
@@ -42,8 +42,9 @@ public class NonRobotProjectsFilterTest {
     }
 
     @Test
-    public void whenClosedRobotProjectIsGiven_itPassesThroughFilter() {
-        final IProject project = ResourcesMocks.prepareRobotMockProject();
+    public void whenClosedRobotProjectIsGiven_itPassesThroughFilter() throws Exception {
+        final IProject project = mock(IProject.class);
+        when(project.hasNature(RobotProjectNature.ROBOT_NATURE)).thenReturn(true);
         when(project.isOpen()).thenReturn(false);
 
         final boolean result = filter.select(null, null, project);
@@ -69,8 +70,9 @@ public class NonRobotProjectsFilterTest {
     }
 
     @Test
-    public void whenOpenRobotProjectIsGiven_itPassesThroughFilter() {
-        final IProject project = ResourcesMocks.prepareRobotMockProject();
+    public void whenOpenRobotProjectIsGiven_itPassesThroughFilter() throws Exception {
+        final IProject project = mock(IProject.class);
+        when(project.hasNature(RobotProjectNature.ROBOT_NATURE)).thenReturn(true);
         when(project.isOpen()).thenReturn(true);
 
         final boolean result = filter.select(null, null, project);
@@ -78,8 +80,9 @@ public class NonRobotProjectsFilterTest {
     }
 
     @Test
-    public void whenOpenWrappedRobotProjectIsGiven_itPassesThroughFilter() {
-        final IProject project = ResourcesMocks.prepareRobotMockProject();
+    public void whenOpenWrappedRobotProjectIsGiven_itPassesThroughFilter() throws Exception {
+        final IProject project = mock(IProject.class);
+        when(project.hasNature(RobotProjectNature.ROBOT_NATURE)).thenReturn(true);
         when(project.isOpen()).thenReturn(true);
 
         final boolean result = filter.select(null, null, new WrappedResource(project));

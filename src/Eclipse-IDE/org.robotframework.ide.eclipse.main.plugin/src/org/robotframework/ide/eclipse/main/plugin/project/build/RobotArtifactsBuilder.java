@@ -130,7 +130,7 @@ class RobotArtifactsBuilder {
             final RobotProjectConfig configuration, final ValidationReportingStrategy reporter) {
 
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-        if (runtimeEnvironment == null) {
+        if (runtimeEnvironment.isNullEnvironment()) {
             final String location = configuration.providePythonLocation();
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_MISSING)
                     .formatMessageWith(location == null ? "" : location);

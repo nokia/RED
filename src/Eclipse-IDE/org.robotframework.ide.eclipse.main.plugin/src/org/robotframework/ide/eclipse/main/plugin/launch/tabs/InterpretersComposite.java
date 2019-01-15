@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -22,7 +24,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
@@ -81,7 +84,7 @@ class InterpretersComposite extends Composite {
             }
         });
         comboExecutorName = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
-        comboExecutorName.setItems(SuiteExecutor.allExecutorNames().toArray(new String[0]));
+        comboExecutorName.setItems(Stream.of(SuiteExecutor.values()).map(SuiteExecutor::name).toArray(String[]::new));
         comboExecutorName.addModifyListener(e -> listener.interpreterChanged());
         GridDataFactory.fillDefaults().applyTo(comboExecutorName);
         final Label systemExecutorLbl = new Label(this, SWT.NONE);
@@ -99,14 +102,22 @@ class InterpretersComposite extends Composite {
                 final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
                 try {
                     new ProgressMonitorDialog(getShell()).run(false, false, monitor -> {
-                        final SuiteExecutor executor = SuiteExecutor.valueOf(chosenExecutorName);
-                        final String version = RobotRuntimeEnvironment.getVersion(executor);
-                        if (version == null) {
-                            MessageDialog.openError(null, "Interpreter checked",
-                                    "The " + executor.name() + " interpreter has no Robot installed");
+                        final SuiteExecutor interpreter = SuiteExecutor.valueOf(chosenExecutorName);
+                        final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
+                                .whereIsPythonInterpreter(interpreter);
+                        if (installation.isPresent()) {
+                            final Optional<String> robotVersion = installation
+                                    .flatMap(PythonInstallationDirectory::getRobotVersion);
+                            if (robotVersion.isPresent()) {
+                                MessageDialog.openInformation(null, "Interpreter checked", "The " + interpreter.name()
+                                        + " interpreter has " + robotVersion.get() + " installed");
+                            } else {
+                                MessageDialog.openWarning(null, "Interpreter checked",
+                                        "The " + interpreter.name() + " interpreter has no Robot installed");
+                            }
                         } else {
-                            MessageDialog.openInformation(null, "Interpreter checked",
-                                    "The " + executor.name() + " interpreter has " + version + " installed");
+                            MessageDialog.openError(null, "Interpreter checked", "There is no " + interpreter.name()
+                                    + " interpreter in system PATH environment variable");
                         }
                     });
                 } catch (final InterruptedException e) {

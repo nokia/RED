@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.assertj.core.api.Condition;
@@ -130,7 +131,7 @@ public class InterpretersCompositeTest {
         final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(), listener);
         composite.setInput(false, SuiteExecutor.PyPy);
 
-        executorsCombo(composite).select(SuiteExecutor.allExecutorNames().indexOf(SuiteExecutor.Jython.name()));
+        executorsCombo(composite).select(Arrays.asList(SuiteExecutor.values()).indexOf(SuiteExecutor.Jython));
         executorsCombo(composite).notifyListeners(SWT.Modify, new Event());
 
         assertThat(projectInterpreterButton(composite)).isNot(selected());

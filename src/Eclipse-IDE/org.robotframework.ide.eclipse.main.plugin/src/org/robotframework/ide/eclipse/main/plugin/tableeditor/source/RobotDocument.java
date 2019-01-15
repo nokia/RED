@@ -23,7 +23,6 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocumentListener;
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -192,7 +191,7 @@ public class RobotDocument extends Document {
     /**
      * Gets newest parsed model. Waits for reparsing end if needed. IllegalStateException is thrown
      * when waiting has been interrupted.
-     * 
+     *
      * @return
      * @throws InterruptedException
      */
@@ -204,7 +203,7 @@ public class RobotDocument extends Document {
     /**
      * Gets newest parsed file output. Waits for reparsing end if needed. IllegalStateException is
      * thrown when waiting has been interrupted.
-     * 
+     *
      * @return
      * @throws InterruptedException
      */
@@ -217,13 +216,13 @@ public class RobotDocument extends Document {
     }
 
     private static RobotParser createParser(final RobotSuiteFile model) {
-        final RobotVersion version = model.getRobotParserComplianceVersion();
-        final RobotProjectHolder holder = isNonFileModel(model) ? new RobotProjectHolder()
-                : model.getProject().getRobotProjectHolder();
-        final PathsProvider pathsProvider = isNonFileModel(model) ? null : model.getProject().createPathsProvider();
-        return RobotParser.create(holder, RobotParserConfig.allImportsLazy(version), pathsProvider);
+        if (isNonFileModel(model)) {
+            final RobotVersion version = model.getRobotParserComplianceVersion();
+            return RobotParser.create(new RobotProjectHolder(), RobotParserConfig.allImportsLazy(version));
+        }
+        return model.getProject().getRobotParser();
     }
-    
+
     private static boolean isNonFileModel(final RobotSuiteFile model) {
         // e.g. history revision
         return model.getFile() == null;

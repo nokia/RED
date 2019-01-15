@@ -33,13 +33,13 @@ public class ValidationContextTest {
         when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
         when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
         when(robotProject.getRuntimeEnvironment()).thenReturn(robotRuntime);
-        when(robotProject.getVersion()).thenReturn("3.0");
+        when(robotProject.getRobotParserComplianceVersion()).thenReturn(RobotVersion.from("3.0"));
 
         // execute
         final ValidationContext valCtx = new ValidationContext(robotProject, new BuildLogger());
 
         // verify
-        assertThat(valCtx.getVersion().isEqualTo(new RobotVersion(3, 0))).isTrue();
+        assertThat(valCtx.getVersion()).isEqualTo(new RobotVersion(3, 0));
     }
 
     @Test
@@ -55,12 +55,12 @@ public class ValidationContextTest {
         when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
         when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
         when(robotProject.getRuntimeEnvironment()).thenReturn(robotRuntime);
-        when(robotProject.getVersion()).thenReturn(null);
+        when(robotProject.getRobotParserComplianceVersion()).thenReturn(RobotVersion.from(null));
 
         // execute
         final ValidationContext valCtx = new ValidationContext(robotProject, new BuildLogger());
 
         // verify
-        assertThat(valCtx.getVersion()).isNull();
+        assertThat(valCtx.getVersion()).isEqualTo(RobotVersion.UNKNOWN);
     }
 }

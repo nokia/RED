@@ -55,14 +55,12 @@ public class LibrariesBuilder {
 
     public IFile buildHtmlLibraryDoc(final IFile resourceFile) {
         final RobotModel model = RedPlugin.getModelManager().getModel();
-
-        final IProject project = resourceFile.getProject();
-        final RobotProject robotProject = model.createRobotProject(project);
-        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-
         final RobotSuiteFile suiteFile = model.createSuiteFile(resourceFile);
 
         if (suiteFile.isResourceFile()) {
+            final IProject project = resourceFile.getProject();
+            final RobotProject robotProject = model.createRobotProject(project);
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             final String fileName = Files.getNameWithoutExtension(suiteFile.getName()) + "_"
                     + System.currentTimeMillis();
             final IFile htmlTargetFile = LibspecsFolder.get(project).getHtmlSpecFile(fileName);

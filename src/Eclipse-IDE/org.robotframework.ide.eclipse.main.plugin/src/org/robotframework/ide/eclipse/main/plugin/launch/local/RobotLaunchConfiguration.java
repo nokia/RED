@@ -101,10 +101,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         robotConfig.fillDefaults();
         final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-        if (robotProject.getRuntimeEnvironment() != null) {
-            final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
-            robotConfig.setInterpreter(interpreter);
-        }
+        robotConfig.setInterpreter(robotProject.getRuntimeEnvironment().getInterpreter());
+
         robotConfig.setProjectName(project.getName());
         robotConfig.updateTestCases(suitesMapping);
         robotConfig.setIsGeneralPurposeEnabled(type == RobotLaunchConfigurationType.GENERAL_PURPOSE);

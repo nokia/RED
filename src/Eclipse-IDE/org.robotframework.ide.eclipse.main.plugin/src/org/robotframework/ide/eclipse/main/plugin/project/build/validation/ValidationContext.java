@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.KeywordSpecification;
@@ -76,12 +75,8 @@ public class ValidationContext {
         this.model = (RobotModel) robotProject.getParent();
         this.logger = logger;
         this.projectConfig = robotProject.getRobotProjectConfig();
-        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-
-        final String versionGot = robotProject.getVersion();
-        this.version = (runtimeEnvironment != null && versionGot != null) ? RobotVersion.from(versionGot) : null;
-        this.executorInUse = runtimeEnvironment != null ? runtimeEnvironment.getInterpreter() : null;
-
+        this.version = robotProject.getRobotParserComplianceVersion();
+        this.executorInUse = robotProject.getRuntimeEnvironment().getInterpreter();
         this.accessibleLibraries = collectLibraries(robotProject);
         this.referencedAccessibleLibraries = new HashMap<>(robotProject.getReferencedLibraries());
     }

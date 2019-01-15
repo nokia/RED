@@ -6,14 +6,18 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.io.File;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
+import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -52,10 +56,11 @@ public class RobotArtifactsBuilderTest {
     @Test
     public void missingEnvironmentProblemIsReported_withoutLocation() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
-        when(robotProject.getRuntimeEnvironment()).thenReturn(null);
+        final RobotRuntimeEnvironment env = new NullRuntimeEnvironment();
+        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
         final RobotProjectConfig configuration = new RobotProjectConfig();
 
-        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isNull();
+        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(ProjectConfigurationProblem.ENVIRONMENT_MISSING, new ProblemPosition(1)));
     }
@@ -63,11 +68,12 @@ public class RobotArtifactsBuilderTest {
     @Test
     public void missingEnvironmentProblemIsReported_withLocation() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
-        when(robotProject.getRuntimeEnvironment()).thenReturn(null);
+        final RobotRuntimeEnvironment env = new NullRuntimeEnvironment();
+        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
         final RobotProjectConfig configuration = new RobotProjectConfig();
         configuration.setExecutionEnvironment(ExecutionEnvironment.create("not_existing", SuiteExecutor.Python));
 
-        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isNull();
+        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(ProjectConfigurationProblem.ENVIRONMENT_MISSING, new ProblemPosition(1)));
     }
@@ -75,8 +81,7 @@ public class RobotArtifactsBuilderTest {
     @Test
     public void notPythonProblemIsReported() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
-        when(env.isValidPythonInstallation()).thenReturn(false);
+        final RobotRuntimeEnvironment env = new InvalidPythonRuntimeEnvironment(new File("path"));
         when(robotProject.getRuntimeEnvironment()).thenReturn(env);
         final RobotProjectConfig configuration = new RobotProjectConfig();
 
@@ -88,9 +93,7 @@ public class RobotArtifactsBuilderTest {
     @Test
     public void missingRobotProblemIsReported() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
-        when(env.isValidPythonInstallation()).thenReturn(true);
-        when(env.hasRobotInstalled()).thenReturn(false);
+        final RobotRuntimeEnvironment env = new MissingRobotRuntimeEnvironment(new File("path"));
         when(robotProject.getRuntimeEnvironment()).thenReturn(env);
         final RobotProjectConfig configuration = new RobotProjectConfig();
 
@@ -102,11 +105,8 @@ public class RobotArtifactsBuilderTest {
     @Test
     public void deprecatedPythonProblemIsReported() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
-        when(env.isValidPythonInstallation()).thenReturn(true);
-        when(env.hasRobotInstalled()).thenReturn(true);
-        when(env.isCompatibleRobotInstallation()).thenReturn(false);
-        when(env.getVersion()).thenReturn("Robot Framework 3.0.4 (Python 2.6.6 on win32)");
+        final RobotRuntimeEnvironment env = new RobotRuntimeEnvironment(new File("path"),
+                "Robot Framework 3.0.4 (Python 2.6.6 on win32)");
         when(robotProject.getRuntimeEnvironment()).thenReturn(env);
         final RobotProjectConfig configuration = new RobotProjectConfig();
 
@@ -118,10 +118,8 @@ public class RobotArtifactsBuilderTest {
     @Test
     public void noProblemsAreReported() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
-        when(env.isValidPythonInstallation()).thenReturn(true);
-        when(env.hasRobotInstalled()).thenReturn(true);
-        when(env.isCompatibleRobotInstallation()).thenReturn(true);
+        final RobotRuntimeEnvironment env = new RobotRuntimeEnvironment(new File("path"),
+                "Robot Framework 3.0.4 (Python 3.7.1 on win32)");
         when(robotProject.getRuntimeEnvironment()).thenReturn(env);
         final RobotProjectConfig configuration = new RobotProjectConfig();
 

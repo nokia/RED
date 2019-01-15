@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -97,8 +96,7 @@ public class RobotArtifactsValidator {
                 || !RobotProjectNature.hasRobotNature(file.getProject())) {
             return false;
         }
-        final RobotRuntimeEnvironment runtimeEnvironment = suiteModel.getProject().getRuntimeEnvironment();
-        if (runtimeEnvironment == null || runtimeEnvironment.getVersion() == null) {
+        if (!suiteModel.getProject().getRuntimeEnvironment().hasRobotInstalled()) {
             return false;
         }
         return true;
@@ -301,7 +299,7 @@ public class RobotArtifactsValidator {
                     // those file could have markers reported by prior build job
                     final Collection<IResource> filesToOmit = newHashSet(project.getFile(".project"),
                             project.getFile(RobotProjectConfig.FILENAME));
-                    
+
                     for (final IResource child : project.members()) {
                         if (!filesToOmit.contains(child)) {
                             child.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);

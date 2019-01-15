@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
@@ -35,15 +35,14 @@ public class RobotProjectHolder {
 
     private final List<RobotFileOutput> readableProjectFiles = new ArrayList<>();
 
-    private List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
+    private final List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
 
-    private Map<String, String> variableMappings = new HashMap<>();
+    private final Map<String, String> variableMappings = new HashMap<>();
 
-    private List<File> modulesSearchPath;
+    private final List<File> modulesSearchPaths = new ArrayList<>();
 
-    @VisibleForTesting
     public RobotProjectHolder() {
-        this.robotRuntime = null;
+        this(new NullRuntimeEnvironment());
     }
 
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
@@ -53,30 +52,29 @@ public class RobotProjectHolder {
     public void configure(final RobotProjectConfig configuration, final File projectLocation) {
         if (currentConfiguration != configuration || globalVariables.isEmpty() && variableMappings.isEmpty()) {
             currentConfiguration = configuration;
-            initGlobalVariables();
-            initVariableMappings(projectLocation);
+            setGlobalVariables(map(robotRuntime.getGlobalVariables()));
+            setVariableMappings(
+                    VariableMappingsResolver.resolve(currentConfiguration.getVariableMappings(), projectLocation));
+            setModuleSearchPaths(robotRuntime.getModuleSearchPaths());
         }
-    }
-
-    @VisibleForTesting
-    protected void initGlobalVariables() {
-        final Map<String, Object> variables = robotRuntime == null ? new HashMap<>()
-                : robotRuntime.getGlobalVariables();
-        globalVariables = map(variables);
-    }
-
-    private void initVariableMappings(final File projectLocation) {
-        final List<VariableMapping> mappings = currentConfiguration == null ? new ArrayList<>()
-                : currentConfiguration.getVariableMappings();
-        variableMappings = VariableMappingsResolver.resolve(mappings, projectLocation);
     }
 
     public RobotRuntimeEnvironment getRobotRuntime() {
         return robotRuntime;
     }
 
+    public void setGlobalVariables(final List<ARobotInternalVariable<?>> variables) {
+        globalVariables.clear();
+        globalVariables.addAll(variables);
+    }
+
     public List<ARobotInternalVariable<?>> getGlobalVariables() {
         return globalVariables;
+    }
+
+    public void setVariableMappings(final Map<String, String> mappings) {
+        variableMappings.clear();
+        variableMappings.putAll(mappings);
     }
 
     public Map<String, String> getVariableMappings() {
@@ -84,17 +82,12 @@ public class RobotProjectHolder {
     }
 
     public void setModuleSearchPaths(final List<File> paths) {
-        this.modulesSearchPath = paths;
+        modulesSearchPaths.clear();
+        modulesSearchPaths.addAll(paths);
     }
 
     public List<File> getModuleSearchPaths() {
-        if (robotRuntime == null) {
-            return new ArrayList<>();
-        }
-        if (modulesSearchPath == null) {
-            modulesSearchPath = robotRuntime.getModuleSearchPaths();
-        }
-        return modulesSearchPath;
+        return modulesSearchPaths;
     }
 
     private List<ARobotInternalVariable<?>> map(final Map<String, Object> varsRead) {
@@ -159,12 +152,12 @@ public class RobotProjectHolder {
     }
 
     public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {
-        return (robotOutput != null && shouldBeLoaded(robotOutput.getProcessedFile()));
+        return robotOutput != null && shouldBeLoaded(robotOutput.getProcessedFile());
     }
 
     public boolean shouldBeLoaded(final File file) {
         final RobotFileOutput foundFile = findFileByName(file);
-        return (foundFile == null) || (file.lastModified() != foundFile.getLastModificationEpochTime());
+        return foundFile == null || file.lastModified() != foundFile.getLastModificationEpochTime();
     }
 
     public RobotFileOutput findFileWithImportedVariableFile(final PathsProvider pathsProvider,
@@ -185,19 +178,17 @@ public class RobotProjectHolder {
 
         @Override
         public boolean test(final RobotFileOutput robotFile) {
-            boolean matchResult = false;
             if (robotFile != null) {
                 final List<VariablesFileImportReference> varImports = robotFile
                         .getVariablesImportReferences(RobotProjectHolder.this, pathsProvider);
                 for (final VariablesFileImportReference importReference : varImports) {
                     if (importReference.getVariablesFile().getAbsolutePath().equals(toFound.getAbsolutePath())) {
-                        matchResult = true;
-                        break;
+                        return true;
                     }
                 }
             }
 
-            return matchResult;
+            return false;
         }
 
     }
@@ -216,18 +207,14 @@ public class RobotProjectHolder {
 
         @Override
         public boolean test(final RobotFileOutput robotFile) {
-            boolean result = false;
-            if (robotFile != null && robotFile.getProcessedFile() != null) {
-                result = robotFile.getProcessedFile().getAbsolutePath().equals(toFound.getAbsolutePath());
-            }
-
-            return result;
+            return robotFile != null && robotFile.getProcessedFile() != null
+                    && robotFile.getProcessedFile().getAbsolutePath().equals(toFound.getAbsolutePath());
         }
     }
 
-    protected RobotFileOutput findFile(final Predicate<RobotFileOutput> criteria) {
-        for (int i = 0; i < readableProjectFiles.size(); i++) {
-            final RobotFileOutput robotFile = readableProjectFiles.get(i);
+    @VisibleForTesting
+    RobotFileOutput findFile(final Predicate<RobotFileOutput> criteria) {
+        for (final RobotFileOutput robotFile : readableProjectFiles) {
             if (criteria.test(robotFile)) {
                 return robotFile;
             }

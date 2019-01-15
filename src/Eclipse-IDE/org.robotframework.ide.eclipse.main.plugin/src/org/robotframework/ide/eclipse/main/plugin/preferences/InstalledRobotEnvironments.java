@@ -14,11 +14,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
+import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
@@ -66,9 +70,7 @@ public class InstalledRobotEnvironments {
         if (all == null) {
             all = readAllFromPreferences(preferences);
         }
-
-        final InterpreterWithLocation key = InterpreterWithLocation.create(file, executor);
-        return all.containsKey(key) ? all.get(key).get() : null;
+        return all.getOrDefault(InterpreterWithLocation.create(file, executor), NullRuntimeEnvironment::new).get();
     }
 
     public static List<RobotRuntimeEnvironment> getAllRobotInstallation(final RedPreferences preferences) {
@@ -89,12 +91,19 @@ public class InstalledRobotEnvironments {
 
     private static RobotRuntimeEnvironment createRuntimeEnvironment(final String path, final String exec) {
         if (Strings.isNullOrEmpty(path)) {
-            return null;
-        } else if (exec.isEmpty()) {
-            return RobotRuntimeEnvironment.create(path);
-        } else {
-            return RobotRuntimeEnvironment.create(path, SuiteExecutor.valueOf(exec));
+            return new NullRuntimeEnvironment();
         }
+        final File location = new File(path);
+        final SuiteExecutor interpreter = Strings.isNullOrEmpty(exec) ? null : SuiteExecutor.valueOf(exec);
+        final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
+                .findInstallation(location, interpreter);
+        if (!installation.isPresent()) {
+            return new InvalidPythonRuntimeEnvironment(location);
+        }
+        return installation.get()
+                .getRobotVersion()
+                .map(version -> new RobotRuntimeEnvironment(installation.get(), version))
+                .orElseGet(() -> new MissingRobotRuntimeEnvironment(installation.get()));
     }
 
     private static Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> createRuntimeEnvironments(
@@ -103,7 +112,7 @@ public class InstalledRobotEnvironments {
             return new ConcurrentHashMap<>();
         }
         final Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> envs = Collections
-                .synchronizedMap(new LinkedHashMap<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>>());
+                .synchronizedMap(new LinkedHashMap<>());
 
         final List<String> paths = Splitter.on(';').splitToList(allPaths);
         final List<String> execs = allExecs.isEmpty() ? new ArrayList<>() : Splitter.on(';').splitToList(allExecs);
@@ -116,9 +125,7 @@ public class InstalledRobotEnvironments {
             final SuiteExecutor executor = exec.isEmpty() ? null : SuiteExecutor.valueOf(exec);
 
             final InterpreterWithLocation key = InterpreterWithLocation.create(location, executor);
-            final Supplier<RobotRuntimeEnvironment> envSupplier = environmentSupplier(path,
-                    key.executor == null ? "" : key.executor.name());
-            envs.put(key, envSupplier);
+            envs.put(key, environmentSupplier(path, executor == null ? "" : executor.name()));
         }
         return envs;
     }

@@ -34,6 +34,7 @@ import org.junit.rules.TestRule;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -154,7 +155,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
         validateResourceImport("external_nested.robot");
         assertThat(reporter.getReportedProblems())
@@ -167,7 +169,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<>());
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(tmpFile.getParent()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -185,7 +188,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
         validateResourceImport("external_nested.robot");
 
@@ -355,7 +359,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         projectProvider.createFile("dir/res.robot");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
 
         validateResourceImport("res.robot");
         assertThat(reporter.getReportedProblems())
@@ -369,7 +374,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(dir));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(dir));
 
         validateResourceImport("external_nested.robot");
         assertThat(reporter.getReportedProblems())
@@ -386,7 +392,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(dir));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(dir));
 
         validateResourceImport("external_nested.robot");
         assertThat(reporter.getReportedProblems())
@@ -400,7 +407,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         projectProvider.createFile("dir/res.robot");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<>());
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getLocation().toString()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -417,7 +425,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<File>());
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(new ArrayList<File>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -473,7 +482,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
         resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<>());
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);

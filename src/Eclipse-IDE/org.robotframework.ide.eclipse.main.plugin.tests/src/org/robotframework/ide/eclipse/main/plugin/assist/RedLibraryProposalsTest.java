@@ -100,8 +100,8 @@ public class RedLibraryProposalsTest {
 
     @Test
     public void noSitePackagesLibraryProposalsProvided_whenAllLibrariesAreAlreadyImported() {
-        final SitePackagesLibraries sitePackagesLibs = new SitePackagesLibraries(
-                Arrays.asList(Arrays.asList("libOne"), Arrays.asList("libTwo", "libThree")));
+        final SitePackagesLibraries sitePackagesLibs = new SitePackagesLibraries(Arrays.asList("libOne"),
+                Arrays.asList("libTwo", "libThree"));
         final SetMultimap<LibrarySpecification, Optional<String>> importedLibs = LinkedHashMultimap.create();
         final LibrarySpecification libOneSpec = new LibrarySpecification();
         final LibrarySpecification libTwoSpec = new LibrarySpecification();
@@ -126,8 +126,8 @@ public class RedLibraryProposalsTest {
 
     @Test
     public void allSitePackagesLibraryProposalsAreProvided_whenAllLibrariesAreNotImported() {
-        final SitePackagesLibraries sitePackagesLibs = new SitePackagesLibraries(
-                Arrays.asList(Arrays.asList("libOne"), Arrays.asList("libTwo", "libThree")));
+        final SitePackagesLibraries sitePackagesLibs = new SitePackagesLibraries(Arrays.asList("libOne"),
+                Arrays.asList("libTwo", "libThree"));
         final SetMultimap<LibrarySpecification, Optional<String>> importedLibs = LinkedHashMultimap.create();
         final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
         final RobotSuiteFile suiteFile = mock(RobotSuiteFile.class);

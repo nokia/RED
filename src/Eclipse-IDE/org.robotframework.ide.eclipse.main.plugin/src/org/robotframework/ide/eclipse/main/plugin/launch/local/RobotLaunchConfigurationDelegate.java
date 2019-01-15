@@ -10,14 +10,16 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
@@ -161,9 +163,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, execProcess,
                 consoleData.getProcessLabel());
-        final String projectInterpreterPath = robotProject.getRuntimeEnvironment() != null
-                ? robotProject.getRuntimeEnvironment().getPythonExecutablePath()
-                : null;
+        final String projectInterpreterPath = robotProject.getRuntimeEnvironment().getPythonExecutablePath();
         robotProcess.setInterruptionData(projectInterpreterPath, pidReader::getPid);
 
         robotProcess.onTerminate(serverJob::stopServer);
@@ -209,21 +209,33 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         private static ConsoleData create(final RobotRuntimeEnvironment env, final String projectName)
                 throws CoreException {
-            if (env == null) {
+            if (env.isNullEnvironment()) {
                 throw newCoreException("There is no active runtime environment for project '" + projectName + "'");
-            }
-            if (!env.hasRobotInstalled()) {
+            } else if (!env.isValidPythonInstallation()) {
                 throw newCoreException("The runtime environment " + env.getFile().getAbsolutePath()
-                        + " is either not a python installation or it has no Robot installed");
+                        + " is invalid Python installation");
+            } else if (!env.hasRobotInstalled()) {
+                throw newCoreException("The runtime environment " + env.getFile().getAbsolutePath()
+                        + " has no Robot Framework installed");
             }
             return new ConsoleData(env.getPythonExecutablePath(), env.getVersion());
         }
 
         private static ConsoleData create(final SuiteExecutor interpreter) throws CoreException {
-            try {
-                return new ConsoleData(interpreter.executableName(), RobotRuntimeEnvironment.getVersion(interpreter));
-            } catch (final RobotEnvironmentException e) {
-                throw newCoreException(e.getMessage(), e.getCause());
+            final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
+                    .whereIsPythonInterpreter(interpreter);
+            if (installation.isPresent()) {
+                final Optional<String> robotVersion = installation
+                        .flatMap(PythonInstallationDirectory::getRobotVersion);
+                if (robotVersion.isPresent()) {
+                    return new ConsoleData(interpreter.executableName(), robotVersion.get());
+                } else {
+                    throw newCoreException(
+                            "The " + interpreter.name() + " interpreter has no Robot Framework installed");
+                }
+            } else {
+                throw newCoreException(
+                        "There is no " + interpreter.name() + " interpreter in system PATH environment variable");
             }
         }
 

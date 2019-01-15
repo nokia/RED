@@ -7,7 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -19,11 +21,14 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
+import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationDelegate.ConsoleData;
-import org.robotframework.ide.eclipse.main.plugin.mockmodel.RuntimeEnvironmentsMocks;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
@@ -56,6 +61,8 @@ public class RobotLaunchConfigurationDelegateTest {
     @Test()
     public void pathToPythonAndKnownRobotVersionAreUsed_whenProjectInterpreterIsNotUsedAndPathToExecutableIsNotSet()
             throws Exception {
+        assumeTrue(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.Python).isPresent());
+
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -70,15 +77,7 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @Test()
     public void coreExceptionIsThrown_whenNotExistingInterpreterIsUsedAndPathToExecutableIsNotSet() throws Exception {
-        boolean thereIsNoPypy;
-        try {
-            RobotRuntimeEnvironment.getVersion(SuiteExecutor.PyPy);
-
-            thereIsNoPypy = false;
-        } catch (final RobotEnvironmentException e) {
-            thereIsNoPypy = true;
-        }
-        assumeTrue(thereIsNoPypy);
+        assumeFalse(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.PyPy).isPresent());
 
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
@@ -94,9 +93,12 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     @Test()
-    public void pathToPythonAndKnownRobotVersionAreUsed_whenProjectInterpreterIsUsedAndPathToExecutableIsNotSet()
+    public void pythonExecNameAndKnownRobotVersionAreUsed_whenProjectInterpreterIsUsedAndPathToExecutableIsNotSet()
             throws Exception {
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final PythonInstallationDirectory location = mock(PythonInstallationDirectory.class);
+        when(location.listFiles()).thenReturn(new File[] {});
+        when(location.getInterpreter()).thenReturn(SuiteExecutor.Python);
+        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(location, "RF 3");
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
@@ -104,14 +106,15 @@ public class RobotLaunchConfigurationDelegateTest {
 
         final ConsoleData consoleData = RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject);
 
-        assertThat(consoleData.getProcessLabel()).isEqualTo("some/path/to/python");
+        assertThat(consoleData.getProcessLabel()).isEqualTo(SuiteExecutor.Python.executableName());
         assertThat(consoleData.getSuiteExecutorVersion()).isEqualTo("RF 3");
     }
 
     @Test()
-    public void coreExceptionIsThrown_whenThereIsNoActiveRuntimeEnvironment() throws Exception {
+    public void coreExceptionIsThrown_whenActiveRuntimeEnvironmentIsNullEnvironment() throws Exception {
+        final RobotRuntimeEnvironment environment = new NullRuntimeEnvironment();
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
-        when(robotProject.getRuntimeEnvironment()).thenReturn(null);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
@@ -122,8 +125,9 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     @Test()
-    public void coreExceptionIsThrown__whenActiveRuntimeEnvironmentIsNotValid() throws Exception {
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidRobotEnvironment();
+    public void coreExceptionIsThrown_whenActiveRuntimeEnvironmentIsInvalidPythonEnvironment() throws Exception {
+        final File location = new File("some/path");
+        final RobotRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(location);
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
@@ -131,9 +135,22 @@ public class RobotLaunchConfigurationDelegateTest {
 
         assertThatExceptionOfType(CoreException.class)
                 .isThrownBy(() -> RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject))
-                .withMessage(
-                        "The runtime environment %s is either not a python installation or it has no Robot installed",
-                        new File("some/path/to/python").getAbsolutePath())
+                .withMessage("The runtime environment %s is invalid Python installation", location.getAbsolutePath())
+                .withNoCause();
+    }
+
+    @Test()
+    public void coreExceptionIsThrown_whenActiveRuntimeEnvironmentIsInvalidRobotEnvironment() throws Exception {
+        final File location = new File("some/path/to/python");
+        final RobotRuntimeEnvironment environment = new MissingRobotRuntimeEnvironment(location);
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+
+        assertThatExceptionOfType(CoreException.class)
+                .isThrownBy(() -> RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig, robotProject))
+                .withMessage("The runtime environment %s has no Robot Framework installed", location.getAbsolutePath())
                 .withNoCause();
     }
 
