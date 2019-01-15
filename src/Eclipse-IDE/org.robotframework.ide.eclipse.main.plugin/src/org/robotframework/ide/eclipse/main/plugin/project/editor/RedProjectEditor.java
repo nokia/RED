@@ -43,6 +43,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -208,7 +209,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
                 SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED,
                         editorInput.getProjectConfiguration()));
 
-                final RobotRuntimeEnvironment activeEnvironment = project == null ? null
+                final RobotRuntimeEnvironment activeEnvironment = project == null ? new NullRuntimeEnvironment()
                         : project.getRuntimeEnvironment();
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;

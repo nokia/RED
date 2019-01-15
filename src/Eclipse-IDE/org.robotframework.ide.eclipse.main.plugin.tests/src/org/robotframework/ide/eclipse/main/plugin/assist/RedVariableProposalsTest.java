@@ -26,6 +26,7 @@ import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -49,6 +50,7 @@ public class RedVariableProposalsTest {
                 "${a_res_var}  1",
                 "${b_res_var}  2",
                 "${c_res_var}  3");
+        projectProvider.configure();
     }
 
     @Before
@@ -889,10 +891,8 @@ public class RedVariableProposalsTest {
         for (final String varName : vars) {
             variables.add(new ScalarRobotInternalVariable(varName, "some_value"));
         }
-        final List<ARobotInternalVariable<?>> globalVariables = robotProject.getRobotProjectHolder()
-                .getGlobalVariables();
-        globalVariables.clear();
-        globalVariables.addAll(variables);
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setGlobalVariables(variables);
     }
 
     private static void createGlobalVarFilesVariables(final RobotProject robotProject, final String... vars) {

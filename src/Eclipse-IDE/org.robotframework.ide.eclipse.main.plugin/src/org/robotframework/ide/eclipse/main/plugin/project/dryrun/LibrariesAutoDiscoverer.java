@@ -68,7 +68,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         // TODO: for now we want to start autodiscovering only for one project, see RED-1004
         final List<LibrariesAutoDiscoverer> discoverers = suitesGroupedByProject.entrySet()
                 .stream()
-                .filter(entry -> entry.getKey().getRuntimeEnvironment() != null)
+                .filter(entry -> entry.getKey().getRuntimeEnvironment().hasRobotInstalled())
                 .limit(1)
                 .map(entry -> discovererFactory.create(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());

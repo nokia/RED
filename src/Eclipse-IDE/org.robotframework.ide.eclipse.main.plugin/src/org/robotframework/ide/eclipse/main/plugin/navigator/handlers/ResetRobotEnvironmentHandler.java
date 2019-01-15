@@ -6,9 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Named;
 
@@ -20,7 +18,6 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -40,19 +37,10 @@ public class ResetRobotEnvironmentHandler extends DIParameterizedHandler<E4Reset
 
         @Execute
         public void reloadProject(final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            final List<IProject> projects = Selections.getAdaptableElements(selection, IProject.class);
-
-            final Set<RobotRuntimeEnvironment> envsToReset = new HashSet<>();
-            for (final IProject project : projects) {
+            for (final IProject project : Selections.getAdaptableElements(selection, IProject.class)) {
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-                if (robotProject.getRuntimeEnvironment() != null) {
-                    envsToReset.add(robotProject.getRuntimeEnvironment());
-                }
-
+                robotProject.getRuntimeEnvironment().resetCommandExecutors();
                 robotProject.clearCachedData();
-            }
-            for (final RobotRuntimeEnvironment environment : envsToReset) {
-                environment.resetCommandExecutors();
             }
 
             reparseModelsInOpenedEditors();

@@ -54,7 +54,6 @@ import com.google.common.io.Files;
 /**
  * @author mmarzec
  */
-@SuppressWarnings("PMD.GodClass")
 class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     private static final int CONNECTION_TIMEOUT = 30;
@@ -152,10 +151,11 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Map<String, Object> getVariables(final String filePath, final List<String> fileArguments) {
+    public Map<String, Object> getVariables(final File source, final List<String> arguments) {
         try {
             final Map<String, Object> variables = new LinkedHashMap<>();
-            final Map<?, ?> varToValueMapping = (Map<?, ?>) callRpcFunction("getVariables", filePath, fileArguments);
+            final Map<?, ?> varToValueMapping = (Map<?, ?>) callRpcFunction("getVariables", source.getAbsolutePath(),
+                    arguments);
             for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
                 variables.put((String) entry.getKey(), entry.getValue());
             }

@@ -70,10 +70,10 @@ class LocalProcessCommandLineBuilder {
     private IRunCommandLineBuilder createBuilder(final int port) throws CoreException {
         if (robotConfig.isUsingInterpreterFromProject()) {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-            if (runtimeEnvironment != null) {
-                return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port);
-            } else {
+            if (runtimeEnvironment.isNullEnvironment()) {
                 return RunCommandLineCallBuilder.forExecutor(SuiteExecutor.Python, port);
+            } else {
+                return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port);
             }
         } else {
             return RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);

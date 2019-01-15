@@ -124,12 +124,12 @@ class LaunchConfigurationTabValidator {
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
             final RobotProject robotProject = model.createRobotProject(project);
             final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
-            if (env == null || !env.isValidPythonInstallation()) {
+            if (!env.isValidPythonInstallation()) {
                 throw new LaunchConfigurationValidationFatalException(
-                        "Project '" + projectName + "' is using invalid Python environment");
+                        "Project '" + projectName + "' uses invalid Python environment");
             } else if (!env.hasRobotInstalled()) {
                 throw new LaunchConfigurationValidationFatalException(
-                        "Project '" + projectName + "' is using invalid Python environment (missing Robot Framework)");
+                        "Project '" + projectName + "' uses invalid Python environment (missing Robot Framework)");
             }
         }
     }

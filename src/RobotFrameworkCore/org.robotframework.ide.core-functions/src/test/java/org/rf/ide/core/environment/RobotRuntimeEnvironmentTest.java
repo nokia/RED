@@ -22,11 +22,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rf.ide.core.RedSystemProperties;
-import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotCommandExecutor;
-import org.rf.ide.core.environment.RobotCommandsExecutors;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 public class RobotRuntimeEnvironmentTest {
@@ -106,6 +101,25 @@ public class RobotRuntimeEnvironmentTest {
 
         final List<File> modulesSearchPaths = env.getModuleSearchPaths();
 
-        assertThat(modulesSearchPaths.stream().map(File::getName)).containsOnly("MoDuLe", "module2");
+        assertThat(modulesSearchPaths).extracting(File::getName).containsOnly("MoDuLe", "module2");
     }
+
+    @Test
+    public void remoteLibraryIsFilteredOut_whenStandardLibrariesNamesAreReturned() {
+        final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
+        when(executor.getStandardLibrariesNames()).thenReturn(newArrayList("BuiltIn", "Dialogs", "Remote", "XML"));
+
+        final PythonInstallationDirectory location = new PythonInstallationDirectory(
+                URI.create("file:///path/to/python"), SuiteExecutor.Python);
+
+        final RobotCommandsExecutors executors = mock(RobotCommandsExecutors.class);
+        when(executors.getRobotCommandExecutor(location)).thenReturn(executor);
+
+        final RobotRuntimeEnvironment env = new RobotRuntimeEnvironment(executors, location, "3.0.0");
+
+        final List<String> stdLibNames = env.getStandardLibrariesNames();
+
+        assertThat(stdLibNames).containsExactly("BuiltIn", "Dialogs", "XML");
+    }
+
 }

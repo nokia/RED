@@ -424,8 +424,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         this.environment = envs.getActiveEnvironment();
 
         final boolean isEditable = editorInput.isEditable();
-        final boolean projectMayBeInterpretedByJython = envs.getActiveEnvironment() == null
-                || envs.getActiveEnvironment().getInterpreter() == SuiteExecutor.Jython;
+        final boolean projectMayBeInterpretedByJython = environment.isNullEnvironment()
+                || environment.getInterpreter() == SuiteExecutor.Jython;
 
         addPythonLibButton.setEnabled(isEditable);
         addJavaLibButton.setEnabled(isEditable && projectMayBeInterpretedByJython);
@@ -437,12 +437,10 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         viewer.getTable().setEnabled(isEditable);
 
         if (!projectMayBeInterpretedByJython) {
-            final String envName = java.util.Optional.ofNullable(environment)
-                    .map(RobotRuntimeEnvironment::getInterpreter)
-                    .map(SuiteExecutor::toString)
-                    .orElse("<unknown>");
+            final String interpreter = environment.isValidPythonInstallation() ? environment.getInterpreter().name()
+                    : environment.getVersion();
             decoration = new ControlDecoration(addJavaLibButton, SWT.RIGHT | SWT.TOP);
-            decoration.setDescriptionText("Project is configured to use " + envName
+            decoration.setDescriptionText("Project is configured to use " + interpreter
                     + " interpreter, but Jython is needed for Java libraries.");
             decoration.setImage(FieldDecorationRegistry.getDefault()
                     .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)

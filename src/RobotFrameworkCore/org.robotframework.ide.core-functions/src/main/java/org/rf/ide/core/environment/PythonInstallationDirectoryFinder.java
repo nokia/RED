@@ -59,7 +59,7 @@ public final class PythonInstallationDirectoryFinder {
      * @return Directories where python interpreters are installed or empty list if not found.
      */
     public static List<PythonInstallationDirectory> findPossibleInstallationsFor(final File location) {
-        if (!location.exists()) {
+        if (!location.exists() || !location.isDirectory()) {
             return new ArrayList<>();
         }
         return Stream.of(location.listFiles())
@@ -71,30 +71,14 @@ public final class PythonInstallationDirectoryFinder {
                 .collect(toList());
     }
 
-    /**
-     * Checks if given location is a directory which contains python interpreter.
-     * The {@link IllegalArgumentException} exception is thrown if given location does not contain
-     * python executable. Otherwise {@link PythonInstallationDirectory} instance (copy of location,
-     * but with other type) is returned.
-     *
-     * @param location
-     *            Location to check
-     * @return The same location given as {@link File} subtype
-     * @throws IllegalArgumentException
-     *             thrown when given location is not a directory or does not contain python
-     *             interpreter executables.
-     */
-    public static PythonInstallationDirectory checkPythonInstallationDir(final File location)
-            throws IllegalArgumentException {
-        if (!location.isDirectory()) {
-            throw new IllegalArgumentException("The location " + location.getAbsolutePath() + " is not a directory.");
+    public static Optional<PythonInstallationDirectory> findInstallation(final File location,
+            final SuiteExecutor interpreter) {
+        if (interpreter == null) {
+            return findPossibleInstallationsFor(location).stream().findFirst();
         }
-        final List<PythonInstallationDirectory> installations = findPossibleInstallationsFor(location);
-        if (installations.isEmpty()) {
-            throw new IllegalArgumentException("The location: " + location.getAbsolutePath()
-                    + " does not seem to be a valid python installation directory");
-        }
-        return installations.get(0);
+        return findPossibleInstallationsFor(location).stream()
+                .findFirst()
+                .map(dir -> new PythonInstallationDirectory(dir.toURI(), interpreter));
     }
 
     @SuppressWarnings("serial")
@@ -115,6 +99,12 @@ public final class PythonInstallationDirectoryFinder {
 
         public String getInterpreterPath() {
             return toPath().resolve(interpreter.executableName()).toAbsolutePath().toString();
+        }
+
+        public Optional<String> getRobotVersion() {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor(this);
+            return Optional.ofNullable(executor.getRobotVersion()).map(interpreter::exactVersion);
         }
 
         @Override

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
@@ -44,6 +45,11 @@ public class VariableDefinitionLocatorTest {
 
     @Rule
     public ProjectProvider projectProvider = new ProjectProvider(VariableDefinitionLocatorTest.class);
+
+    @Before
+    public void beforeTest() throws Exception {
+        projectProvider.configure();
+    }
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByOffset_1() throws Exception {
@@ -389,11 +395,9 @@ public class VariableDefinitionLocatorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
         final RobotProjectHolder projectHolder = suiteFile.getProject().getRobotProjectHolder();
-        projectHolder.getGlobalVariables().clear();
-        projectHolder.getGlobalVariables()
-                .addAll(newArrayList(new ScalarRobotInternalVariable("global_scalar", null),
-                        new ListRobotInternalVariable("global_list", null),
-                        new DictionaryRobotInternalVariable("global_dict", null)));
+        projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("global_scalar", null),
+                new ListRobotInternalVariable("global_list", null),
+                new DictionaryRobotInternalVariable("global_dict", null)));
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(sourceFile, model);
@@ -408,11 +412,9 @@ public class VariableDefinitionLocatorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
         final RobotProjectHolder projectHolder = suiteFile.getProject().getRobotProjectHolder();
-        projectHolder.getGlobalVariables().clear();
-        projectHolder.getGlobalVariables()
-                .addAll(newArrayList(new ScalarRobotInternalVariable("global_scalar", null),
-                        new ListRobotInternalVariable("global_list", null),
-                        new DictionaryRobotInternalVariable("global_dict", null)));
+        projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("global_scalar", null),
+                new ListRobotInternalVariable("global_list", null),
+                new DictionaryRobotInternalVariable("global_dict", null)));
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(sourceFile, model);

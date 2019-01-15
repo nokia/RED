@@ -57,6 +57,9 @@ import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.html.HtmlEscapers;
+
 class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     private static final String IMAGE_FOR_LINK = "image";
@@ -265,39 +268,33 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         sourceButton.setEnabled(isEditable);
 
         viewer.setInput(allEnvironments);
-        if (env != null) {
+        if (!env.isNullEnvironment()) {
             viewer.setCheckedElements(new Object[] { env });
         }
         viewer.getTable().setEnabled(isEditable && !isUsingPrefs);
         viewer.refresh();
 
-        if (env == null) {
-            currentFramework.setText(createCurrentFrameworkText("unknown"), true, true);
-        } else {
-            final String activeText = createActiveFrameworkText(env, isUsingPrefs);
-            currentFramework.setText(createCurrentFrameworkText(activeText), true, true);
-        }
+        currentFramework.setText(createActiveFrameworkText(env, isUsingPrefs), true, true);
         currentFramework.getParent().layout();
     }
 
-    private String createCurrentFrameworkText(final String path) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("<form>");
-        builder.append("<p><img href=\"" + IMAGE_FOR_LINK + "\"/> " + path + "</p>");
-        builder.append("</form>");
-        return builder.toString();
-    }
-
-    private String createActiveFrameworkText(final RobotRuntimeEnvironment env, final boolean isUsingPrefs) {
+    @VisibleForTesting
+    static String createActiveFrameworkText(final RobotRuntimeEnvironment env, final boolean isUsingPrefs) {
         final StringBuilder activeText = new StringBuilder();
-        activeText.append("<a href=\"" + PATH_LINK + "\">");
-        activeText.append(RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(env.getFile().getAbsolutePath()))
-                .toOSString());
-        activeText.append("</a>");
-        activeText.append(" " + java.util.Optional.ofNullable(env.getVersion()).orElse("???"));
+        activeText.append("<form>");
+        activeText.append("<p><img href=\"" + IMAGE_FOR_LINK + "\"/>");
+        if (!env.isNullEnvironment()) {
+            activeText.append(" <a href=\"" + PATH_LINK + "\">");
+            final Path fullPath = new Path(env.getFile().getAbsolutePath());
+            activeText.append(RedWorkspace.Paths.toWorkspaceRelativeIfPossible(fullPath).toOSString());
+            activeText.append("</a>");
+        }
+        activeText.append(" " + HtmlEscapers.htmlEscaper().escape(env.getVersion()));
         if (isUsingPrefs) {
             activeText.append(" (<a href=\"" + PREFERENCES_LINK + "\">from Preferences</a>)");
         }
+        activeText.append("</p>");
+        activeText.append("</form>");
         return activeText.toString();
     }
 }

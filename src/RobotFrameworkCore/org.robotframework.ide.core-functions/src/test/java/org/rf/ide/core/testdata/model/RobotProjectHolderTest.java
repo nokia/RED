@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
@@ -34,7 +35,8 @@ public class RobotProjectHolderTest {
     @Test
     public void testInitingVariableMappings_forNotDefinedConfigurationAndNotDefinedProjectLocation() {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
-        projectHolder.configure(null, null);
+        final RobotProjectConfig configuration = new NullRobotProjectConfig();
+        projectHolder.configure(configuration, null);
 
         assertThat(projectHolder.getVariableMappings()).containsOnlyKeys("${/}", "${curdir}", "${space}");
     }
@@ -42,7 +44,8 @@ public class RobotProjectHolderTest {
     @Test
     public void testInitingVariableMappings_forNotDefinedConfiguration() {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
-        projectHolder.configure(null, PROJECT_LOCATION);
+        final RobotProjectConfig configuration = new NullRobotProjectConfig();
+        projectHolder.configure(configuration, PROJECT_LOCATION);
 
         assertThat(projectHolder.getVariableMappings()).containsOnlyKeys("${/}", "${curdir}", "${space}", "${execdir}",
                 "${outputdir}");
@@ -117,9 +120,9 @@ public class RobotProjectHolderTest {
         projectHolder.configure(configuration, null);
 
         final List<ARobotInternalVariable<?>> variables = projectHolder.getGlobalVariables();
-        assertThat(variables.stream().map(ARobotInternalVariable::getName)).containsExactly("SCALAR_VAR", "LIST_VAR",
-                "DICT_VAR", "ARRAY_VAR");
-        assertThat(variables.stream().map(ARobotInternalVariable::getValue).map(Object::toString))
+        assertThat(variables).extracting(ARobotInternalVariable::getName)
+                .containsExactly("SCALAR_VAR", "LIST_VAR", "DICT_VAR", "ARRAY_VAR");
+        assertThat(variables).extracting(v -> v.getValue().toString())
                 .containsExactly("true", "[x, y]", "{k=v}", "[1, 2]");
         assertThat(variables.get(0)).isInstanceOf(ScalarRobotInternalVariable.class);
         assertThat(variables.get(1)).isInstanceOf(ListRobotInternalVariable.class);
@@ -138,11 +141,12 @@ public class RobotProjectHolderTest {
         projectHolder.configure(configuration, null);
         projectHolder.configure(configuration, null);
 
-        assertThat(projectHolder.getGlobalVariables().stream().map(ARobotInternalVariable::getName))
+        assertThat(projectHolder.getGlobalVariables()).extracting(ARobotInternalVariable::getName)
                 .containsExactly("A", "B", "C");
         assertThat(projectHolder.getVariableMappings()).containsOnlyKeys("${/}", "${curdir}", "${space}");
 
         verify(robotRuntime).getGlobalVariables();
+        verify(robotRuntime).getModuleSearchPaths();
         verifyNoMoreInteractions(robotRuntime);
     }
 
@@ -158,11 +162,12 @@ public class RobotProjectHolderTest {
         when(robotRuntime.getGlobalVariables()).thenReturn(ImmutableMap.of("A", 1, "B", 2));
         projectHolder.configure(configuration, null);
 
-        assertThat(projectHolder.getGlobalVariables().stream().map(ARobotInternalVariable::getName))
+        assertThat(projectHolder.getGlobalVariables()).extracting(ARobotInternalVariable::getName)
                 .containsExactly("A", "B");
         assertThat(projectHolder.getVariableMappings()).containsOnlyKeys("${/}", "${curdir}", "${space}", "${abc}");
 
         verify(robotRuntime, times(2)).getGlobalVariables();
+        verify(robotRuntime, times(2)).getModuleSearchPaths();
         verifyNoMoreInteractions(robotRuntime);
     }
 }

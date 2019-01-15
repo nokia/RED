@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -41,7 +40,7 @@ public class RobotProjectDependencies {
     }
 
     String getAdditionalInformation() {
-        return "[" + Optional.ofNullable(project.getVersion()).orElse("???") + "]";
+        return "[" + project.getRuntimeEnvironment().getVersion() + "]";
     }
 
     @Override

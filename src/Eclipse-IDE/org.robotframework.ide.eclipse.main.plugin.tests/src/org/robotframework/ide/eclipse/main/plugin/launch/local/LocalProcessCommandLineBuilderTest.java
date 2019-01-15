@@ -37,6 +37,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.RedTemporaryDirectory;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
@@ -173,7 +174,7 @@ public class LocalProcessCommandLineBuilderTest {
     @Test
     public void commandLineStartsWithDefaultInterpreterName_whenThereIsNoActiveRuntimeEnvironment() throws Exception {
         final RobotProject robotProject = spy(createRobotProject(projectProvider.getProject(), SuiteExecutor.Python));
-        when(robotProject.getRuntimeEnvironment()).thenReturn(null);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(new NullRuntimeEnvironment());
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
         robotConfig.setInterpreterArguments("-a1 -a2");
 

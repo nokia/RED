@@ -88,8 +88,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
         @Override
         public String getText(final Object element) {
-            final String version = ((RobotRuntimeEnvironment) element).getVersion();
-            return version == null ? "<unknown>" : version;
+            return ((RobotRuntimeEnvironment) element).getVersion();
         }
     }
 

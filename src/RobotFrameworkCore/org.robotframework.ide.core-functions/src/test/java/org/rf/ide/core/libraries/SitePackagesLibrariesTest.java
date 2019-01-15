@@ -8,7 +8,6 @@ package org.rf.ide.core.libraries;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -16,18 +15,18 @@ public class SitePackagesLibrariesTest {
 
     @Test
     public void sitePackagesLibrariesObjectIsCreatedWithEmptyRobotAndNonRobotList() throws Exception {
-        final SitePackagesLibraries sitePackagesLibararies = new SitePackagesLibraries();
+        final SitePackagesLibraries sitePackagesLibraries = new SitePackagesLibraries();
 
-        assertThat(sitePackagesLibararies.getRobotLibs()).isEmpty();
-        assertThat(sitePackagesLibararies.getNonRobotLibs()).isEmpty();
+        assertThat(sitePackagesLibraries.getRobotLibs()).isEmpty();
+        assertThat(sitePackagesLibraries.getNonRobotLibs()).isEmpty();
     }
 
     @Test
     public void sitePackagesLibrariesObjectIsCreatedWithRobotAndNonRobotList() throws Exception {
-        final List<List<String>> libs = Arrays.asList(Arrays.asList("libOne"), Arrays.asList("libTwo", "libThree"));
-        final SitePackagesLibraries sitePackagesLibararies = new SitePackagesLibraries(libs);
+        final SitePackagesLibraries sitePackagesLibraries = new SitePackagesLibraries(Arrays.asList("libOne"),
+                Arrays.asList("libTwo", "libThree"));
 
-        assertThat(sitePackagesLibararies.getRobotLibs()).containsExactly("libOne");
-        assertThat(sitePackagesLibararies.getNonRobotLibs()).containsExactly("libTwo", "libThree");
+        assertThat(sitePackagesLibraries.getRobotLibs()).containsExactly("libOne");
+        assertThat(sitePackagesLibraries.getNonRobotLibs()).containsExactly("libTwo", "libThree");
     }
 }

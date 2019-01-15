@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -42,6 +43,30 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     private static KeywordTable keywordTable;
 
     private static TestCaseTable testCaseTable;
+
+    @BeforeClass
+    public static void setup() throws Exception {
+        final Path path = getFile("presenter//DocPositionsFind.robot");
+        final RobotParser parser = RobotParser.create(
+                new RobotProjectHolder(new RobotRuntimeEnvironment(new File("path"), "2.9.0")),
+                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(path, parser);
+        out = modelFile.getParent();
+        assertThat(out).isNotNull();
+
+        settingTable = modelFile.getSettingTable();
+        keywordTable = modelFile.getKeywordTable();
+        testCaseTable = modelFile.getTestCaseTable();
+
+        assertThat(settingTable.isPresent());
+        assertThat(keywordTable.isPresent());
+        assertThat(testCaseTable.isPresent());
+    }
+
+    private static Path getFile(final String path) throws URISyntaxException {
+        final URL resource = DocumentationCacherInsideRobotFileOutputTest.class.getResource(path);
+        return Paths.get(resource.toURI());
+    }
 
     @Test
     public void test_checkForOffsetLessThanFileLength() {
@@ -401,24 +426,6 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         assertThat(docFound.isPresent()).isFalse();
     }
 
-    @BeforeClass
-    public static void setup() throws Exception {
-        final RobotProjectHolder projectHolder = new RobotProjectHolder(
-                new RobotRuntimeEnvironment(null, null, "2.9.0"));
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(getFile("presenter//DocPositionsFind.robot"),
-                RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
-        out = modelFile.getParent();
-        assertThat(out).isNotNull();
-
-        settingTable = modelFile.getSettingTable();
-        keywordTable = modelFile.getKeywordTable();
-        testCaseTable = modelFile.getTestCaseTable();
-
-        assertThat(settingTable.isPresent());
-        assertThat(keywordTable.isPresent());
-        assertThat(testCaseTable.isPresent());
-    }
-
     private int middleOffset(final IDocumentationHolder holder) {
         final int startOffset = holder.getBeginPosition().getOffset();
         final int endOffset = holder.getContinuousRegions()
@@ -427,10 +434,5 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .getOffset();
 
         return startOffset + ((endOffset - startOffset) % 2);
-    }
-
-    private static Path getFile(final String path) throws URISyntaxException {
-        final URL resource = DocumentationCacherInsideRobotFileOutputTest.class.getResource(path);
-        return Paths.get(resource.toURI());
     }
 }

@@ -242,8 +242,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotProjectHolder projectHolder = suiteFile.getProject().getRobotProjectHolder();
-        projectHolder.getGlobalVariables().clear();
-        projectHolder.getGlobalVariables().addAll(newArrayList(new ScalarRobotInternalVariable("var", "val")));
+        projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("var", "val")));
 
         final RobotKeywordCall element = suiteFile.findSection(RobotCasesSection.class).get()
                 .getChildren().get(0)

@@ -53,8 +53,7 @@ public class RobotParserTest {
 
         final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
 
         // execute
         final RobotParser parser = RobotParser.create(projectHolder,
@@ -77,8 +76,7 @@ public class RobotParserTest {
 
         final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
 
         // execute
         final RobotParser parser = RobotParser.create(projectHolder,
@@ -114,8 +112,7 @@ public class RobotParserTest {
         // prepare
         final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
 
         // execute
         final RobotParser parser = RobotParser.create(projectHolder,
@@ -132,8 +129,7 @@ public class RobotParserTest {
         // prepare
         final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
 
         final PathsProvider pathsProvider = mock(PathsProvider.class);
         when(pathsProvider.targetExists(any(URI.class)))
@@ -247,8 +243,7 @@ public class RobotParserTest {
         // prepare
         final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
 
         final RobotParser parser = spy(
                 RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
@@ -300,8 +295,7 @@ public class RobotParserTest {
         // prepare
         final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
 
         final RobotParser parser = spy(
                 RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));

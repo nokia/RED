@@ -5,11 +5,6 @@
  */
 package org.rf.ide.core.environment;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.EnumSet;
-import java.util.List;
-
 import org.rf.ide.core.RedSystemProperties;
 
 public enum SuiteExecutor {
@@ -32,10 +27,6 @@ public enum SuiteExecutor {
 
     private SuiteExecutor(final String fileName) {
         this.fileName = fileName;
-    }
-
-    public static List<String> allExecutorNames() {
-        return EnumSet.allOf(SuiteExecutor.class).stream().map(SuiteExecutor::name).collect(toList());
     }
 
     public String executableName() {

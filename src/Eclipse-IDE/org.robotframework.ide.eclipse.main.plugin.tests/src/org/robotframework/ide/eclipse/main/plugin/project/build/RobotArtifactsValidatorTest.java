@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -16,7 +15,7 @@ import org.eclipse.core.resources.IProject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -35,7 +34,6 @@ public class RobotArtifactsValidatorTest {
         final IFile file = mock(IFile.class);
         final IProject project = mock(IProject.class);
         final RobotProject robotProject = mock(RobotProject.class);
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
 
         when(suiteModel.getFile()).thenReturn(file);
         when(file.exists()).thenReturn(true);
@@ -43,17 +41,17 @@ public class RobotArtifactsValidatorTest {
         when(project.exists()).thenReturn(true);
         when(project.hasNature(RobotProjectNature.ROBOT_NATURE)).thenReturn(true);
         when(suiteModel.getProject()).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(runtime);
-        when(runtime.getVersion()).thenReturn(null);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(new NullRuntimeEnvironment());
 
         // execute
         RobotArtifactsValidator.revalidate(suiteModel);
 
         // verify
-        final InOrder order = inOrder(suiteModel, file, robotProject, runtime);
-        order.verify(suiteModel, times(1)).getFile();
-        order.verify(suiteModel, times(1)).getProject();
-        order.verify(runtime, times(1)).getVersion();
+        final InOrder order = inOrder(suiteModel, file, robotProject);
+        order.verify(suiteModel).getFile();
+        order.verify(file).exists();
+        order.verify(suiteModel).getProject();
+        order.verify(robotProject).getRuntimeEnvironment();
         order.verifyNoMoreInteractions();
     }
 

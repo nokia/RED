@@ -12,6 +12,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -51,6 +54,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
+import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
+import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
@@ -121,7 +126,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
             progressBar = createProgress(parent);
 
             final QualifiedName key = new QualifiedName(RedPlugin.PLUGIN_ID, "result");
-            final Job job = new Job("Looking for python installations") {
+            final Job job = new Job("Looking for Python installations") {
 
                 @Override
                 protected IStatus run(final IProgressMonitor monitor) {
@@ -139,16 +144,12 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     private boolean addOnlyNonExisting(final Collection<PythonInstallationDirectory> locations) {
         boolean added = false;
         for (final PythonInstallationDirectory directory : locations) {
-            boolean contains = false;
-            for (final RobotRuntimeEnvironment environment : installations) {
-                if (environment.getFile().equals(directory)) {
-                    contains = true;
-                    break;
-                }
-            }
-            if (!contains) {
+            if (installations.stream().noneMatch(env -> env.getFile().equals(directory))) {
                 added = true;
-                installations.add(RobotRuntimeEnvironment.create(directory, directory.getInterpreter()));
+                final RobotRuntimeEnvironment envToAdd = directory.getRobotVersion()
+                        .map(version -> new RobotRuntimeEnvironment(directory, version))
+                        .orElseGet(() -> new MissingRobotRuntimeEnvironment(directory));
+                installations.add(envToAdd);
                 dirty = true;
             }
         }
@@ -172,7 +173,8 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     private void createDescription(final Composite parent) {
         final Label lbl = new Label(parent, SWT.WRAP);
         lbl.setText("Add or remove Robot frameworks environments (location of Python interpreter with Robot library "
-                + "installed, currently " + String.join(", ", SuiteExecutor.allExecutorNames())
+                + "installed, currently "
+                + Stream.of(SuiteExecutor.values()).map(SuiteExecutor::name).collect(Collectors.joining(", "))
                 + " are supported). The selected environment will be used by project unless it is explicitly "
                 + "overridden in project configuration.");
         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).hint(600, SWT.DEFAULT).applyTo(lbl);
@@ -243,7 +245,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
     private void initializeValues() {
         final QualifiedName key = new QualifiedName(RedPlugin.PLUGIN_ID, "result");
-        final Job job = new Job("Looking for python installations") {
+        final Job job = new Job("Looking for Python installations") {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
@@ -270,21 +272,23 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
             @Override
             public void widgetSelected(final SelectionEvent event) {
                 final DirectoryDialog dirDialog = new DirectoryDialog(InstalledRobotsPreferencesPage.this.getShell());
-                dirDialog.setText("Browse for python installation");
-                dirDialog.setMessage("Select location of python with robot framework installed");
+                dirDialog.setText("Browse for Python installation");
+                dirDialog.setMessage("Select location of Python with Robot Framework installed");
                 final String path = dirDialog.open();
                 if (path != null) {
+                    final File location = new File(path);
                     final List<PythonInstallationDirectory> possibleExecutors = PythonInstallationDirectoryFinder
-                            .findPossibleInstallationsFor(new File(path));
+                            .findPossibleInstallationsFor(location);
 
                     boolean changed = false;
-                    if (possibleExecutors.size() > 1) {
-                        final List<PythonInstallationDirectory> toAdd = askUsersWhatShouldBeAdded(path,
-                                possibleExecutors);
+                    if (!possibleExecutors.isEmpty()) {
+                        final List<PythonInstallationDirectory> toAdd = possibleExecutors.size() > 1
+                                ? askUsersWhatShouldBeAdded(path, possibleExecutors)
+                                : possibleExecutors;
                         changed = addOnlyNonExisting(toAdd);
                     } else {
                         changed = true;
-                        installations.add(RobotRuntimeEnvironment.create(path));
+                        installations.add(new InvalidPythonRuntimeEnvironment(location));
                     }
                     if (changed) {
                         dirty = true;
@@ -343,7 +347,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
             final String allExecs = String.join(";", allExecsList);
 
             // The execs has to be stored first, because we're listening on ACTIVE_RUNTIMES
-            // and OTHER_RUNTIMES changes and inside we need actaul value of corresponding
+            // and OTHER_RUNTIMES changes and inside we need actual value of corresponding
             // execs preference. This may seem a bit weird to have separated ACTIVE_RUNTIME and
             // ACTIVE_RUNTIME_EXEC pair, but implementing it this way gives us both directions
             // versions compatibility.
@@ -364,8 +368,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     }
 
     private String getExecOf(final RobotRuntimeEnvironment installation) {
-        return installation.getFile() instanceof PythonInstallationDirectory ? installation.getInterpreter().name()
-                : "";
+        return Optional.ofNullable(installation.getInterpreter()).map(SuiteExecutor::name).orElse("");
     }
 
     private void rebuildWorkspace() {

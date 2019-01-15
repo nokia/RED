@@ -543,13 +543,15 @@ public class RobotFormEditor extends FormEditor {
         if (suiteFile != null) {
             final RobotProject robotProject = suiteFile.getProject();
             if (robotProject != null) {
-                final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-                if (runtimeEnvironment == null || !runtimeEnvironment.isValidPythonInstallation()
-                        || !runtimeEnvironment.hasRobotInstalled()) {
+                final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
+                if (!env.isValidPythonInstallation() || !env.hasRobotInstalled()) {
                     final Shell shell = getSite().getShell();
                     if (shell != null && shell.isVisible()) {
-                        new ErrorDialogWithLinkToPreferences(shell, "Runtime Environment Error",
-                                "Unable to provide valid RED runtime environment. Check python/robot installation and set it in Preferences.",
+                        final String dialogMessage = "Project '" + robotProject.getName()
+                                + "' uses invalid Python environment"
+                                + (env.hasRobotInstalled() ? "." : " (missing Robot Framework).")
+                                + " Check Python/Robot Framework installation and set it in Preferences.";
+                        new ErrorDialogWithLinkToPreferences(shell, "Runtime Environment Error", dialogMessage,
                                 InstalledRobotsPreferencesPage.ID, "Installed Robot Frameworks").open();
                     }
                 }

@@ -296,21 +296,20 @@ class PathsFormFragment implements ISectionFormFragment {
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
         final boolean isEditable = editorInput.isEditable();
-        final boolean projectMayBeInterpretedByJython = envs.getActiveEnvironment() == null
-                || envs.getActiveEnvironment().getInterpreter() == SuiteExecutor.Jython;
+        final RobotRuntimeEnvironment environment = envs.getActiveEnvironment();
+        final boolean projectMayBeInterpretedByJython = environment.isNullEnvironment()
+                || environment.getInterpreter() == SuiteExecutor.Jython;
 
         relativityCombo.setEnabled(isEditable);
         pythonPathViewer.getTable().setEnabled(isEditable);
         classPathViewer.getTable().setEnabled(isEditable && projectMayBeInterpretedByJython);
 
         if (!projectMayBeInterpretedByJython) {
-            final String envName = java.util.Optional.ofNullable(envs.getActiveEnvironment())
-                    .map(RobotRuntimeEnvironment::getInterpreter)
-                    .map(SuiteExecutor::toString)
-                    .orElse("<unknown>");
+            final String interpreter = environment.isValidPythonInstallation() ? environment.getInterpreter().name()
+                    : environment.getVersion();
             decoration = new ControlDecoration(classPathViewer.getTable(), SWT.LEFT | SWT.TOP);
-            decoration.setDescriptionText("Project is configured to use " + envName
-                    + " interpreter, but Jython is needed to use CLASSPATH entries.");
+            decoration.setDescriptionText("Project is configured to use " + interpreter
+                    + " interpreter, but Jython is needed for CLASSPATH entries.");
             decoration.setImage(FieldDecorationRegistry.getDefault()
                     .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
                     .getImage());

@@ -93,7 +93,7 @@ public class VariablesImporter {
                         Map<?, ?> variablesFromFile = new HashMap<>();
                         try {
                             variablesFromFile = robotProject.getRobotRuntime()
-                                    .getVariablesFromFile(varFile.getAbsolutePath(), varFileArguments);
+                                    .getVariablesFromFile(varFile, varFileArguments);
                         } catch (final Exception e) {
                             reportError(String.format("Problem importing variable file '%s'. %s", path, e.getMessage()),
                                     currentRobotFile, varImport, robotFile);

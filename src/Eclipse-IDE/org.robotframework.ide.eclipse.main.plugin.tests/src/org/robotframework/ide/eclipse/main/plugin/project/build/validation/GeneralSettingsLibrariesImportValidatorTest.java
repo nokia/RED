@@ -41,6 +41,7 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -584,7 +585,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
         validateLibraryImport("external_nested_lib.py");
         assertThat(reporter.getReportedProblems())
@@ -597,7 +599,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<>());
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(tmpFile.getParent()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -615,7 +618,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
         validateLibraryImport("external_nested_lib.py");
 
@@ -1075,7 +1079,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectProvider.createFile("dir/lib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", libPath);
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
@@ -1094,7 +1099,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(dir));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(dir));
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib",
                 dir.getAbsolutePath());
@@ -1117,7 +1123,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(newArrayList(dir));
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(newArrayList(dir));
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", libPath);
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
@@ -1137,7 +1144,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectProvider.createFile("dir/lib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<>());
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getLocation().toString()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -1159,7 +1167,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<>());
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
@@ -1185,7 +1194,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
-        robotProject.setModuleSearchPaths(new ArrayList<>());
+        final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
+        projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
         robotProject.getRobotProjectConfig().setPythonPath(paths);
