@@ -10,6 +10,7 @@ from robot_session_server import create_libdoc_in_separate_process
 from robot_session_server import get_classes_from_module
 from robot_session_server import get_module_path
 from robot_session_server import get_variables
+from robot_session_server import get_standard_library_path
 from robot_session_server import convert_robot_data_file
 from base64 import b64encode
 
@@ -25,28 +26,13 @@ class RobotSessionServerTests(unittest.TestCase):
     def test_encode_exception(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
 
-        response = create_libdoc("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [])
+        response = get_standard_library_path("NotExistingLib")
 
         self.assertEqual(response['result'], None)
-        self.assertTrue('SyntaxError: ' in response['exception'])
-
-    def test_encode_exception_when_libdoc_is_generated_in_separate_process(self):
-        parent_path = os.path.dirname(os.path.realpath(__file__))
-        timeout_duration = 5 if 'Jython' not in platform.python_implementation() else 20
-
-        response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [], timeout_duration)
-
-        self.assertEqual(response['result'], None)
-        self.assertTrue('SyntaxError: ' in response['exception'])
-
-    @unittest.skipUnless(platform.python_version_tuple()[0] == '3', "requires Python 3")
-    def test_encode_exception_when_libdoc_is_generated_in_separate_process_for_non_ascii_chars_in_library_path(self):
-        parent_path = os.path.dirname(os.path.realpath(__file__))
-
-        response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
-
-        self.assertEqual(response['result'], None)
-        self.assertTrue('SyntaxError: ' in response['exception'])
+        if sys.version_info < (3, 0, 0):
+            self.assertTrue('ImportError: ' in response['exception'])
+        else:
+            self.assertTrue('ModuleNotFoundError: ' in response['exception'])
 
 
 class LibdocGenerationTests(unittest.TestCase):
@@ -69,6 +55,23 @@ class LibdocGenerationTests(unittest.TestCase):
         create_libdoc("lib", 'XML', python_paths, class_paths)
 
         self.assertEqual(old_sys_path, sorted(sys.path))
+        
+    def test_if_libdoc_is_not_generated_and_exception_is_thrown_for_library_with_error(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        response = create_libdoc("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [])
+
+        self.assertEqual(response['result'], None)
+        self.assertTrue('SyntaxError: ' in response['exception'])
+        
+    def test_if_libdoc_is_not_generated_in_separate_process_and_exception_is_thrown_for_library_with_error(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        timeout_duration = 5 if 'Jython' not in platform.python_implementation() else 20
+
+        response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server')], [], timeout_duration)
+
+        self.assertEqual(response['result'], None)
+        self.assertTrue('SyntaxError: ' in response['exception'])
 
     def test_if_libdoc_is_generated_in_separate_process_for_existing_library(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
@@ -111,6 +114,14 @@ class LibdocGenerationForPython2Tests(unittest.TestCase):
 
 @unittest.skipUnless(platform.python_version_tuple()[0] == '3', "requires Python 3")
 class LibdocGenerationForPython3Tests(unittest.TestCase):
+    
+    def test_if_libdoc_is_not_generated_in_separate_process_for_non_ascii_chars_in_error_library_path(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        response = create_libdoc_in_separate_process("LibError", 'XML', [os.path.join(parent_path, 'res_test_robot_session_server', 'żółw')], [])
+
+        self.assertEqual(response['result'], None)
+        self.assertTrue('SyntaxError: ' in response['exception'])
 
     def test_if_libdoc_is_generated_in_separate_process_for_non_ascii_chars_in_library_path(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
