@@ -356,7 +356,7 @@ def create_libdoc_in_separate_process(libname, format, python_paths, class_paths
         if out:
             return out.rstrip().decode('UTF-8')
         else:
-            raise Exception(err.decode('UTF-8'))
+            raise Exception(err.decode('UTF-8', 'replace'))
     except queue.Empty:
         process.kill()
         raise queue.Empty("Libdoc not generated due to timeout")
