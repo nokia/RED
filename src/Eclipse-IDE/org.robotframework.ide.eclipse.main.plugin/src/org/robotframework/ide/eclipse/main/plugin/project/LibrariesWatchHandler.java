@@ -31,7 +31,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -260,7 +260,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         try {
             new LibrariesBuilder(new BuildLogger()).rebuildLibraries(groupedSpecifications,
                     SubMonitor.convert(monitor));
-        } catch (final RobotEnvironmentException e) {
+        } catch (final RuntimeEnvironmentException e) {
             rebuildTasksQueue.clear();
             for (final IProject project : groupedSpecifications.keySet()) {
                 if (project.exists()) {

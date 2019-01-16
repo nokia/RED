@@ -39,8 +39,8 @@ import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.Section;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -161,7 +161,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
                 final Object[] elements = viewer.getCheckedElements();
                 if (elements.length == 1 && sourceButton.getSelection()) {
-                    final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) elements[0];
+                    final IRuntimeEnvironment env = (IRuntimeEnvironment) elements[0];
                     assignPythonLocation(env.getFile());
                 } else {
                     assignPythonLocation(null);
@@ -202,7 +202,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     private ICheckStateListener createCheckListener() {
         return event -> {
             if (event.getChecked()) {
-                final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) event.getElement();
+                final IRuntimeEnvironment env = (IRuntimeEnvironment) event.getElement();
                 viewer.setCheckedElements(new Object[] { env });
                 assignPythonLocation(env.getFile());
             } else {
@@ -254,8 +254,8 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        final List<RobotRuntimeEnvironment> allEnvironments = envs.getAllEnvironments();
-        final RobotRuntimeEnvironment env = envs.getActiveEnvironment();
+        final List<IRuntimeEnvironment> allEnvironments = envs.getAllEnvironments();
+        final IRuntimeEnvironment env = envs.getActiveEnvironment();
 
         final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
         final boolean isEditable = editorInput.isEditable();
@@ -279,7 +279,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     }
 
     @VisibleForTesting
-    static String createActiveFrameworkText(final RobotRuntimeEnvironment env, final boolean isUsingPrefs) {
+    static String createActiveFrameworkText(final IRuntimeEnvironment env, final boolean isUsingPrefs) {
         final StringBuilder activeText = new StringBuilder();
         activeText.append("<form>");
         activeText.append("<p><img href=\"" + IMAGE_FOR_LINK + "\"/>");

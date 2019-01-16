@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import java.util.List;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedImportProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -31,7 +31,7 @@ public class ImportsInCodeProposalsProvider implements RedContentProposalProvide
         final List<? extends AssistProposal> importProposals = new RedImportProposals(suiteFile)
                 .getImportsProposals(prefix);
 
-        final RobotRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
         return importProposals.stream().map(proposal -> new AssistProposalAdapter(env, proposal)).toArray(
                 RedContentProposal[]::new);
     }

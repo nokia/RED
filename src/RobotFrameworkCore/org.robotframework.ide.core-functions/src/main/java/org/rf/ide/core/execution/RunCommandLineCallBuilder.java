@@ -21,9 +21,8 @@ import java.util.Optional;
 import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
+import org.rf.ide.core.environment.SuiteExecutor;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Streams;
@@ -246,9 +245,9 @@ public class RunCommandLineCallBuilder {
             final List<String> interpreterArgs = new ArrayList<>();
             if (executor == SuiteExecutor.Jython) {
                 // in case of 'robot' folder existing in project
-                final Path jythonSitePackagesPath = findJythonSitePackagesPath();
-                if (jythonSitePackagesPath != null) {
-                    interpreterArgs.add("-J-Dpython.path=" + jythonSitePackagesPath.toString());
+                final Optional<Path> jythonSitePackagesPath = findJythonSitePackagesPath();
+                if (jythonSitePackagesPath.isPresent()) {
+                    interpreterArgs.add("-J-Dpython.path=" + jythonSitePackagesPath.get().toString());
                 }
 
                 final String classPath = classPath();
@@ -347,34 +346,22 @@ public class RunCommandLineCallBuilder {
             return pythonPathLocations.stream().filter(not(Strings::isNullOrEmpty)).collect(joining(":"));
         }
 
-        private Path findJythonSitePackagesPath() {
+        private Optional<Path> findJythonSitePackagesPath() {
             final Path jythonPath = Paths.get(executorPath);
-            Path jythonParentPath = jythonPath.getParent();
-            if (jythonParentPath == null) {
-                final List<PythonInstallationDirectory> pythonInterpreters = PythonInstallationDirectoryFinder
-                        .whereArePythonInterpreters();
-                for (final PythonInstallationDirectory pythonInstallationDirectory : pythonInterpreters) {
-                    if (pythonInstallationDirectory.getInterpreter() == SuiteExecutor.Jython) {
-                        jythonParentPath = pythonInstallationDirectory.toPath();
-                        break;
-                    }
-                }
+            Optional<Path> jythonParentPath = Optional.ofNullable(jythonPath.getParent());
+            if (!jythonParentPath.isPresent()) {
+                jythonParentPath = PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.Jython)
+                        .map(PythonInstallationDirectory::toPath);
             }
-            if (jythonParentPath != null && jythonParentPath.getFileName() != null
-                    && jythonParentPath.getFileName().toString().equalsIgnoreCase("bin")) {
-                final Path mainDir = jythonParentPath.getParent();
-                return Paths.get(mainDir.toString(), "Lib", "site-packages");
-            }
-            return null;
+            return jythonParentPath.filter(path -> path.getFileName() != null)
+                    .filter(path -> path.getFileName().toString().equalsIgnoreCase("bin"))
+                    .map(path -> Paths.get(path.getParent().toString(), "Lib", "site-packages"));
         }
     }
 
-    public static IRunCommandLineBuilder forEnvironment(final RobotRuntimeEnvironment env, final int listenerPort) {
-        return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), listenerPort);
-    }
-
-    public static IRunCommandLineBuilder forExecutor(final SuiteExecutor executor, final int listenerPort) {
-        return new Builder(executor, executor.executableName(), listenerPort);
+    public static IRunCommandLineBuilder create(final SuiteExecutor executor, final String executorPath,
+            final int listenerPort) {
+        return new Builder(executor, executorPath, listenerPort);
     }
 
     public static class RunCommandLine {

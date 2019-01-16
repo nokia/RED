@@ -10,14 +10,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
 import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
@@ -95,7 +94,7 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenThereAreNoSuitesSpecified_warningExceptionIsThrown() throws Exception {
-        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(new File("path"), "RF 3.0"));
+        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(null, "RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -112,7 +111,7 @@ public class LaunchConfigurationTabValidatorTest {
         projectProvider.createDir("suiteFolder");
         projectProvider.createFile("suiteFolder/nested.robot", "*** Test Cases ***", "case", " Log 30");
 
-        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(new File("path"), "RF 3.0"));
+        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(null, "RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -130,7 +129,7 @@ public class LaunchConfigurationTabValidatorTest {
     public void whenSuitesSpecifiedToRunDoNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
         projectProvider.createFile("file.robot", "*** Test Cases ***", "case1", " Log 10");
 
-        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(new File("path"), "RF 3.0"));
+        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(null, "RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -150,7 +149,7 @@ public class LaunchConfigurationTabValidatorTest {
         projectProvider.createFile("testSuite.robot", "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20",
                 "case3", "  Log  30");
 
-        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(new File("path"), "RF 3.0"));
+        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(null, "RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -167,7 +166,7 @@ public class LaunchConfigurationTabValidatorTest {
         projectProvider.createFile("taskSuite.robot", "*** Tasks ***", "task1", "  Log  10", "task2", "  Log  20",
                 "task3", "  Log  30");
 
-        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(new File("path"), "RF 3.1"));
+        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(null, "RF 3.1"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -185,7 +184,7 @@ public class LaunchConfigurationTabValidatorTest {
         projectProvider.createFile("noCases.robot", "*** Test Cases ***");
         projectProvider.createFile("resource.robot", "*** Keywords ***", "keyword");
 
-        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(new File("path"), "RF 3.0"));
+        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(null, "RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -205,7 +204,7 @@ public class LaunchConfigurationTabValidatorTest {
         projectProvider.createFile("correctSuite.robot", "*** Test Cases ***", "case1", "  Log  10", "case2",
                 "  Log  20", "case3", "  Log  30");
 
-        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(new File("path"), "RF 3.0"));
+        final RobotModel model = createRobotModel(new RobotRuntimeEnvironment(null, "RF 3.0"));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -321,7 +320,7 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_2() throws Exception {
-        final RobotModel model = createRobotModel(new InvalidPythonRuntimeEnvironment(new File("path")));
+        final RobotModel model = createRobotModel(new InvalidPythonRuntimeEnvironment(null));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -334,7 +333,7 @@ public class LaunchConfigurationTabValidatorTest {
 
     @Test
     public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_3() throws Exception {
-        final RobotModel model = createRobotModel(new MissingRobotRuntimeEnvironment(new File("path")));
+        final RobotModel model = createRobotModel(new MissingRobotRuntimeEnvironment(null));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -368,7 +367,7 @@ public class LaunchConfigurationTabValidatorTest {
     public void nothingIsThrown_whenProjectIsUsingInvalidEnvironmentButExecutableFileIsSet() throws Exception {
         final IFile executableFile = projectProvider.createFile("robot_executable_file.txt", "run robot command");
 
-        final RobotModel model = createRobotModel(new MissingRobotRuntimeEnvironment(new File("path")));
+        final RobotModel model = createRobotModel(new MissingRobotRuntimeEnvironment(null));
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
@@ -393,7 +392,7 @@ public class LaunchConfigurationTabValidatorTest {
         return launchConfig;
     }
 
-    private RobotModel createRobotModel(final RobotRuntimeEnvironment environment) {
+    private RobotModel createRobotModel(final IRuntimeEnvironment environment) {
         final RobotProject robotProject = mock(RobotProject.class);
         final RobotModel model = mock(RobotModel.class);
         when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);

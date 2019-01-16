@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
@@ -359,10 +358,7 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
 
     private RobotFile getModelFile(final String fileName) throws Exception {
         // prepare
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
-        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
         final String mainPath = "parser/bugs/for/";
         final File file = new File(RobotParser.class.getResource(mainPath + fileName).toURI());
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);

@@ -18,7 +18,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -51,7 +51,7 @@ public class SuiteFileInputTest {
 
     @Test
     public void properHtmlIsReturned_forSuiteFile() throws Exception {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
         final RobotSuiteFile suite = createSuite("doc", "kw1", "kw2");

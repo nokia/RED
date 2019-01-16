@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
@@ -65,7 +65,7 @@ public class ReferencedLibraryLocator {
             } else {
                 detector.libraryDetectingByNameFailed(name, libraryFile, "Unable to find '" + name + "' library.");
             }
-        } catch (final RobotEnvironmentException e) {
+        } catch (final RuntimeEnvironmentException e) {
             detector.libraryDetectingByNameFailed(name, libraryFile, e.getMessage());
         }
     }
@@ -95,7 +95,7 @@ public class ReferencedLibraryLocator {
                 detector.libraryDetectingByPathFailed(path, libraryFile,
                         "The path '" + path + "' should point to either .py file or python module directory.");
             }
-        } catch (final RobotEnvironmentException | MalformedPathImportException e) {
+        } catch (final RuntimeEnvironmentException | MalformedPathImportException e) {
             detector.libraryDetectingByPathFailed(path, libraryFile, e.getMessage());
         }
     }

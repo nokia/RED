@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
 import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
@@ -36,9 +37,9 @@ import com.google.common.base.Strings;
 public class InstalledRobotEnvironments {
 
     // active environment is cached, since its retrieval can take a little bit
-    private static RobotRuntimeEnvironment active = null;
+    private static IRuntimeEnvironment active = null;
 
-    private static Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> all = null;
+    private static Map<InterpreterWithLocation, Supplier<IRuntimeEnvironment>> all = null;
     static {
         InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID).addPreferenceChangeListener(event -> {
             if (event == null) {
@@ -58,14 +59,14 @@ public class InstalledRobotEnvironments {
         });
     }
 
-    public static RobotRuntimeEnvironment getActiveRobotInstallation(final RedPreferences preferences) {
+    public static IRuntimeEnvironment getActiveRobotInstallation(final RedPreferences preferences) {
         if (active == null) {
             active = readActiveFromPreferences(preferences);
         }
         return active;
     }
 
-    public static RobotRuntimeEnvironment getRobotInstallation(final RedPreferences preferences, final File file,
+    public static IRuntimeEnvironment getRobotInstallation(final RedPreferences preferences, final File file,
             final SuiteExecutor executor) {
         if (all == null) {
             all = readAllFromPreferences(preferences);
@@ -73,23 +74,23 @@ public class InstalledRobotEnvironments {
         return all.getOrDefault(InterpreterWithLocation.create(file, executor), NullRuntimeEnvironment::new).get();
     }
 
-    public static List<RobotRuntimeEnvironment> getAllRobotInstallation(final RedPreferences preferences) {
+    public static List<IRuntimeEnvironment> getAllRobotInstallation(final RedPreferences preferences) {
         if (all == null) {
             all = readAllFromPreferences(preferences);
         }
         return all.values().stream().map(Supplier::get).collect(Collectors.toList());
     }
 
-    private static RobotRuntimeEnvironment readActiveFromPreferences(final RedPreferences preferences) {
+    private static IRuntimeEnvironment readActiveFromPreferences(final RedPreferences preferences) {
         return createRuntimeEnvironment(preferences.getActiveRuntime(), preferences.getActiveRuntimeExec());
     }
 
-    private static Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> readAllFromPreferences(
+    private static Map<InterpreterWithLocation, Supplier<IRuntimeEnvironment>> readAllFromPreferences(
             final RedPreferences preferences) {
         return createRuntimeEnvironments(preferences.getAllRuntimes(), preferences.getAllRuntimesExecs());
     }
 
-    private static RobotRuntimeEnvironment createRuntimeEnvironment(final String path, final String exec) {
+    private static IRuntimeEnvironment createRuntimeEnvironment(final String path, final String exec) {
         if (Strings.isNullOrEmpty(path)) {
             return new NullRuntimeEnvironment();
         }
@@ -106,12 +107,12 @@ public class InstalledRobotEnvironments {
                 .orElseGet(() -> new MissingRobotRuntimeEnvironment(installation.get()));
     }
 
-    private static Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> createRuntimeEnvironments(
+    private static Map<InterpreterWithLocation, Supplier<IRuntimeEnvironment>> createRuntimeEnvironments(
             final String allPaths, final String allExecs) {
         if (Strings.isNullOrEmpty(allPaths)) {
             return new ConcurrentHashMap<>();
         }
-        final Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> envs = Collections
+        final Map<InterpreterWithLocation, Supplier<IRuntimeEnvironment>> envs = Collections
                 .synchronizedMap(new LinkedHashMap<>());
 
         final List<String> paths = Splitter.on(';').splitToList(allPaths);
@@ -130,13 +131,13 @@ public class InstalledRobotEnvironments {
         return envs;
     }
 
-    private static Supplier<RobotRuntimeEnvironment> environmentSupplier(final String path, final String exec) {
-        return new Supplier<RobotRuntimeEnvironment>() {
+    private static Supplier<IRuntimeEnvironment> environmentSupplier(final String path, final String exec) {
+        return new Supplier<IRuntimeEnvironment>() {
 
-            private RobotRuntimeEnvironment environment;
+            private IRuntimeEnvironment environment;
 
             @Override
-            public RobotRuntimeEnvironment get() {
+            public IRuntimeEnvironment get() {
                 if (environment == null) {
                     environment = createRuntimeEnvironment(path, exec);
                 }

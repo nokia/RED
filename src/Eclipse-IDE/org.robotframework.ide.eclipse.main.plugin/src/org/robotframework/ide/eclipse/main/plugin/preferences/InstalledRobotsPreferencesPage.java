@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
 import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
@@ -73,7 +74,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.installed";
 
-    private List<RobotRuntimeEnvironment> installations;
+    private List<IRuntimeEnvironment> installations;
 
     private Composite parent;
     private CheckboxTableViewer viewer;
@@ -146,7 +147,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
         for (final PythonInstallationDirectory directory : locations) {
             if (installations.stream().noneMatch(env -> env.getFile().equals(directory))) {
                 added = true;
-                final RobotRuntimeEnvironment envToAdd = directory.getRobotVersion()
+                final IRuntimeEnvironment envToAdd = directory.getRobotVersion()
                         .map(version -> new RobotRuntimeEnvironment(directory, version))
                         .orElseGet(() -> new MissingRobotRuntimeEnvironment(directory));
                 installations.add(envToAdd);
@@ -250,8 +251,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
             protected IStatus run(final IProgressMonitor monitor) {
                 final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
                 installations = InstalledRobotEnvironments.getAllRobotInstallation(preferences);
-                final RobotRuntimeEnvironment active = InstalledRobotEnvironments
-                        .getActiveRobotInstallation(preferences);
+                final IRuntimeEnvironment active = InstalledRobotEnvironments.getActiveRobotInstallation(preferences);
                 setProperty(key, active);
                 return Status.OK_STATUS;
             }
@@ -260,10 +260,10 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
         job.schedule();
     }
 
-    private RobotRuntimeEnvironment getSelectedInstallation() {
+    private IRuntimeEnvironment getSelectedInstallation() {
         // multiselection is not possible
-        final List<RobotRuntimeEnvironment> elements = Selections.getElements(
-                (IStructuredSelection) viewer.getSelection(), RobotRuntimeEnvironment.class);
+        final List<IRuntimeEnvironment> elements = Selections.getElements((IStructuredSelection) viewer.getSelection(),
+                IRuntimeEnvironment.class);
         return elements.isEmpty() ? null : elements.get(0);
     }
 
@@ -317,7 +317,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
     private SelectionListener createRemoveListener() {
         return widgetSelectedAdapter(e -> {
-            final RobotRuntimeEnvironment env = getSelectedInstallation();
+            final IRuntimeEnvironment env = getSelectedInstallation();
             installations.remove(env);
 
             dirty = true;
@@ -330,13 +330,13 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     public boolean performOk() {
         if (dirty) {
             final Object[] checkedElement = viewer.getCheckedElements();
-            final RobotRuntimeEnvironment checkedEnv = checkedElement.length == 0 ? null
-                    : (RobotRuntimeEnvironment) checkedElement[0];
+            final IRuntimeEnvironment checkedEnv = checkedElement.length == 0 ? null
+                    : (IRuntimeEnvironment) checkedElement[0];
 
             final List<String> allPathsList = new ArrayList<>();
             final List<String> allExecsList = new ArrayList<>();
 
-            for (final RobotRuntimeEnvironment installation : installations) {
+            for (final IRuntimeEnvironment installation : installations) {
                 allPathsList.add(installation.getFile().getAbsolutePath());
                 allExecsList.add(getExecOf(installation));
             }
@@ -367,7 +367,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
         }
     }
 
-    private String getExecOf(final RobotRuntimeEnvironment installation) {
+    private String getExecOf(final IRuntimeEnvironment installation) {
         return Optional.ofNullable(installation.getInterpreter()).map(SuiteExecutor::name).orElse("");
     }
 
@@ -403,7 +403,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
         @Override
         public void done(final IJobChangeEvent event) {
             SwtThread.asyncExec(() -> {
-                final RobotRuntimeEnvironment active = (RobotRuntimeEnvironment) event.getJob().getProperty(key);
+                final IRuntimeEnvironment active = (IRuntimeEnvironment) event.getJob().getProperty(key);
                 final Control control = InstalledRobotsPreferencesPage.this.getControl();
                 if (control == null || control.isDisposed()) {
                     return;

@@ -7,8 +7,6 @@ package org.rf.ide.core.execution;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,36 +14,14 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.rf.ide.core.RedTemporaryDirectory;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
-import org.rf.ide.core.execution.RunCommandLineCallBuilder;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
 
 public class RunCommandLineCallBuilderTest {
 
     @Test
-    public void testCall_forEnvironment() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345).build();
-
-        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith("/x/y/z/python", "-m", "robot.run", "--listener");
-        assertThat(cmdLine.getArgumentFile()).isNotPresent();
-    }
-
-    @Test
-    public void testCall_forExecutor() throws IOException {
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forExecutor(SuiteExecutor.PyPy, 12345).build();
-
-        assertThat(cmdLine.getCommandLine()).hasSize(5)
-                .startsWith(SuiteExecutor.PyPy.executableName(), "-m", "robot.run", "--listener");
-        assertThat(cmdLine.getArgumentFile()).isNotPresent();
-    }
-
-    @Test
-    public void testSimpleCall_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testSimpleCall_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .build();
 
@@ -56,10 +32,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testSimpleCall_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testSimpleCall_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .build();
 
@@ -70,12 +44,10 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithDataSourcePaths_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
+    public void testCallWithDataSourcePaths_argsFile() throws IOException {
         final File f1 = new File("a");
         final File f2 = new File("b");
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .withDataSources(newArrayList(f1, f2))
                 .build();
@@ -87,12 +59,10 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithDataSourcePaths_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
+    public void testCallWithDataSourcePaths_argsInline() throws IOException {
         final File f1 = new File("a");
         final File f2 = new File("b");
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .withDataSources(newArrayList(f1, f2))
                 .build();
@@ -104,10 +74,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWrappedWithOtherExecutable_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWrappedWithOtherExecutable_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .withExecutableFile(new File("exec"))
                 .build();
@@ -119,10 +87,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWrappedWithOtherExecutable_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWrappedWithOtherExecutable_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .withExecutableFile(new File("exec"))
                 .build();
@@ -134,10 +100,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWrappedWithOtherExecutableAndArguments_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWrappedWithOtherExecutableAndArguments_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .withExecutableFile(new File("exec"))
                 .addUserArgumentsForExecutableFile(newArrayList("args"))
@@ -150,10 +114,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWrappedWithOtherExecutableAndArguments_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWrappedWithOtherExecutableAndArguments_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .withExecutableFile(new File("exec"))
                 .addUserArgumentsForExecutableFile(newArrayList("args"))
@@ -166,11 +128,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallNotWrappedWithExecutableButWithArgumentsHaveNothing_withRuntimeEnvironment_argsFile()
-            throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallNotWrappedWithExecutableButWithArgumentsHaveNothing_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .addUserArgumentsForExecutableFile(newArrayList("args"))
                 .build();
@@ -181,11 +140,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallNotWrappedWithExecutableButWithArgumentsHaveNothing_withRuntimeEnvironment_argsInline()
-            throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallNotWrappedWithExecutableButWithArgumentsHaveNothing_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .addUserArgumentsForExecutableFile(newArrayList("args"))
                 .build();
@@ -196,11 +152,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWrappedWithOtherExecutableAndArguments_withRuntimeEnvironment_withSequenceRobotCommandArg()
-            throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWrappedWithOtherExecutableAndArguments_withSequenceRobotCommandArg() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .withExecutableFile(new File("exec"))
                 .addUserArgumentsForExecutableFile(newArrayList("args"))
                 .useSingleRobotCommandLineArg(false)
@@ -213,11 +166,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWrappedWithOtherExecutableAndArguments_withRuntimeEnvironment_withSingleRobotCommandArg()
-            throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWrappedWithOtherExecutableAndArguments_withSingleRobotCommandArg() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .withExecutableFile(new File("exec"))
                 .addUserArgumentsForExecutableFile(newArrayList("args"))
                 .useSingleRobotCommandLineArg(true)
@@ -230,11 +180,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWrappedWithOtherExecutableAndSeveralArguments_withRuntimeEnvironment_withSequenceRobotCommandArg()
-            throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWrappedWithOtherExecutableAndSeveralArguments_withSequenceRobotCommandArg() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .withExecutableFile(new File("exec"))
                 .addUserArgumentsForExecutableFile(newArrayList("a1", "-a2", "a3 a4", "-a5", "a6", "a7"))
                 .useSingleRobotCommandLineArg(false)
@@ -248,10 +195,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithInterpreterArgumentsAdded_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithInterpreterArgumentsAdded_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .addUserArgumentsForInterpreter(newArrayList("args"))
                 .build();
@@ -262,10 +207,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithInterpreterArgumentsAdded_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithInterpreterArgumentsAdded_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .addUserArgumentsForInterpreter(newArrayList("args"))
                 .build();
@@ -276,10 +219,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithSeveralInterpreterArgumentsAdded_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithSeveralInterpreterArgumentsAdded_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .addUserArgumentsForInterpreter(newArrayList("a1", "-a2", "a3 a4", "-a5", "a6", "a7"))
                 .build();
@@ -291,10 +232,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithClassPathForJython_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Jython, "/x/y/z/jython");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithClassPathForJython_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Jython, "/x/y/z/jython", 12345)
                 .useArgumentFile(true)
                 .addLocationsToClassPath(newArrayList("cp/path", "other"))
                 .build();
@@ -306,10 +245,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithClassPathForJython_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Jython, "/x/y/z/jython");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithClassPathForJython_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Jython, "/x/y/z/jython", 12345)
                 .useArgumentFile(false)
                 .addLocationsToClassPath(newArrayList("cp/path", "other"))
                 .build();
@@ -321,10 +258,9 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithAdditionalPythonPathForJython_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Jython, "/path/to/bin/jython");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithAdditionalPythonPathForJython_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder
+                .create(SuiteExecutor.Jython, "/path/to/bin/jython", 12345)
                 .useArgumentFile(true)
                 .build();
 
@@ -336,10 +272,9 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithAdditionalPythonPathForJython_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Jython, "/path/to/bin/jython");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithAdditionalPythonPathForJython_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder
+                .create(SuiteExecutor.Jython, "/path/to/bin/jython", 12345)
                 .useArgumentFile(false)
                 .build();
 
@@ -351,10 +286,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithSuitesInArgumentFile_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithSuitesInArgumentFile_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .suitesToRun(newArrayList("s1", "s2"))
                 .build();
@@ -366,10 +299,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithSuitesInArgumentFile_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithSuitesInArgumentFile_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .suitesToRun(newArrayList("s1", "s2"))
                 .build();
@@ -380,10 +311,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithTestsInArgumentFile_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithTestsInArgumentFile_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .testsToRun(newArrayList("t1", "t2"))
                 .build();
@@ -395,10 +324,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithTestsInArgumentFile_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithTestsInArgumentFile_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .testsToRun(newArrayList("t1", "t2"))
                 .build();
@@ -409,10 +336,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithIncludedTagsInArgumentFile_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithIncludedTagsInArgumentFile_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .includeTags(newArrayList("tag1", "tag2"))
                 .build();
@@ -425,10 +350,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithIncludedTagsInArgumentFile_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithIncludedTagsInArgumentFile_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .includeTags(newArrayList("tag1", "tag2"))
                 .build();
@@ -439,10 +362,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithExcludedTagsInArgumentFile_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithExcludedTagsInArgumentFile_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .excludeTags(newArrayList("tag1", "tag2"))
                 .build();
@@ -455,10 +376,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithExcludedTagsInArgumentFile_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithExcludedTagsInArgumentFile_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .excludeTags(newArrayList("tag1", "tag2"))
                 .build();
@@ -469,10 +388,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithVarFilesInArgumentFile_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithVarFilesInArgumentFile_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .addVariableFiles(newArrayList("var1.py", "var2.py"))
                 .build();
@@ -485,10 +402,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithVarFilesInArgumentFile_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithVarFilesInArgumentFile_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .addVariableFiles(newArrayList("var1.py", "var2.py"))
                 .build();
@@ -500,10 +415,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithPythonpathInArgumentFile_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithPythonpathInArgumentFile_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .addLocationsToPythonPath(newArrayList("path1", "path2"))
                 .build();
@@ -515,10 +428,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithPythonpathInArgumentFile_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithPythonpathInArgumentFile_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .addLocationsToPythonPath(newArrayList("path1", "path2"))
                 .build();
@@ -529,10 +440,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithUserArgumentsInArgumentFile_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithUserArgumentsInArgumentFile_argsFile() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)
                 .addUserArgumentsForRobot(newArrayList("--arg", "val1", "-X", "val 2", "--other", "--other2"))
                 .build();
@@ -545,10 +454,8 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithUserArgumentsInArgumentFile_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+    public void testCallWithUserArgumentsInArgumentFile_argsInline() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(false)
                 .addUserArgumentsForRobot(newArrayList("--arg", "val1", "-X", "val 2", "--other", "--other2"))
                 .build();
@@ -557,14 +464,6 @@ public class RunCommandLineCallBuilderTest {
                 .containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener", "--arg", "val1", "-X", "val 2",
                         "--other", "--other2");
         assertThat(cmdLine.getArgumentFile()).isNotPresent();
-    }
-
-    private static RobotRuntimeEnvironment prepareEnvironment(final SuiteExecutor executor,
-            final String interpreterPath) {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
-        when(env.getInterpreter()).thenReturn(executor);
-        when(env.getPythonExecutablePath()).thenReturn(interpreterPath);
-        return env;
     }
 
 }

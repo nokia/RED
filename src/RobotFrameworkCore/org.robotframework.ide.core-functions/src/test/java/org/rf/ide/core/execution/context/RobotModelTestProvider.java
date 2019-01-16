@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
@@ -34,21 +34,21 @@ public class RobotModelTestProvider {
     }
 
     public static RobotParser getParser(final String version) {
-        final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn(version);
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
         return RobotParser.create(robotProject, RobotParserConfig.allImportsEager(RobotVersion.from(version)));
     }
 
     public static RobotParser getLazyParser() {
-        final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn("3.0a1");
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
         return RobotParser.create(robotProject, RobotParserConfig.allImportsLazy(new RobotVersion(3, 0)));
     }
 
     public static RobotParser getLazyParser(final String version) {
-        final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn(version);
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
         return RobotParser.create(robotProject, RobotParserConfig.allImportsLazy(RobotVersion.from(version)));

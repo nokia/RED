@@ -21,7 +21,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -113,7 +113,7 @@ public class RedLibraryProposalsTest {
         importedLibs.put(libTwoSpec, Optional.of("libTwo"));
         importedLibs.put(libThreeSpec, Optional.of("libThree"));
 
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         final RobotSuiteFile suiteFile = mock(RobotSuiteFile.class);
         when(env.getSitePackagesLibrariesNames()).thenReturn(sitePackagesLibs);
         when(suiteFile.getRuntimeEnvironment()).thenReturn(env);
@@ -129,7 +129,7 @@ public class RedLibraryProposalsTest {
         final SitePackagesLibraries sitePackagesLibs = new SitePackagesLibraries(Arrays.asList("libOne"),
                 Arrays.asList("libTwo", "libThree"));
         final SetMultimap<LibrarySpecification, Optional<String>> importedLibs = LinkedHashMultimap.create();
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         final RobotSuiteFile suiteFile = mock(RobotSuiteFile.class);
         when(env.getSitePackagesLibrariesNames()).thenReturn(sitePackagesLibs);
         when(suiteFile.getRuntimeEnvironment()).thenReturn(env);

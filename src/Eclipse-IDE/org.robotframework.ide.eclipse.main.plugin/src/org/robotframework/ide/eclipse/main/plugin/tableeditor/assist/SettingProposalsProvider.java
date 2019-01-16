@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import java.util.List;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
@@ -18,11 +18,11 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 
 public class SettingProposalsProvider implements RedContentProposalProvider {
 
-    private final RobotRuntimeEnvironment environment;
+    private final IRuntimeEnvironment environment;
 
     private final SettingTarget settingTarget;
 
-    public SettingProposalsProvider(final RobotRuntimeEnvironment environment, final SettingTarget settingTarget) {
+    public SettingProposalsProvider(final IRuntimeEnvironment environment, final SettingTarget settingTarget) {
         this.environment = environment;
         this.settingTarget = settingTarget;
     }

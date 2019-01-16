@@ -8,10 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import java.net.URI;
 import java.util.Collection;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
-
-
+@FunctionalInterface
 public interface ILibraryStructureBuilder {
 
-    Collection<ILibraryClass> provideEntriesFromFile(URI uri) throws RobotEnvironmentException;
+    Collection<ILibraryClass> provideEntriesFromFile(URI uri);
 }

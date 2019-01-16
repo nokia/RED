@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
@@ -111,11 +111,11 @@ public class RobotProjectHolderTest {
 
     @Test
     public void testInitingGlobalVariables_forDefinedRobotRuntime() {
-        final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
-        when(robotRuntime.getGlobalVariables()).thenReturn(ImmutableMap.of("SCALAR_VAR", true, "LIST_VAR",
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
+        when(env.getGlobalVariables()).thenReturn(ImmutableMap.of("SCALAR_VAR", true, "LIST_VAR",
                 Arrays.asList("x", "y"), "DICT_VAR", ImmutableMap.of("k", "v"), "ARRAY_VAR", new Integer[] { 1, 2 }));
 
-        final RobotProjectHolder projectHolder = new RobotProjectHolder(robotRuntime);
+        final RobotProjectHolder projectHolder = new RobotProjectHolder(env);
         final RobotProjectConfig configuration = RobotProjectConfig.create();
         projectHolder.configure(configuration, null);
 
@@ -132,10 +132,10 @@ public class RobotProjectHolderTest {
 
     @Test
     public void testIfProjectIsConfiguredOnlyOnce_forTheSameConfiguration() {
-        final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
-        when(robotRuntime.getGlobalVariables()).thenReturn(ImmutableMap.of("A", 1, "B", 2, "C", 3));
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
+        when(env.getGlobalVariables()).thenReturn(ImmutableMap.of("A", 1, "B", 2, "C", 3));
 
-        final RobotProjectHolder projectHolder = new RobotProjectHolder(robotRuntime);
+        final RobotProjectHolder projectHolder = new RobotProjectHolder(env);
         final RobotProjectConfig configuration = RobotProjectConfig.create();
         projectHolder.configure(configuration, null);
         projectHolder.configure(configuration, null);
@@ -145,29 +145,29 @@ public class RobotProjectHolderTest {
                 .containsExactly("A", "B", "C");
         assertThat(projectHolder.getVariableMappings()).containsOnlyKeys("${/}", "${curdir}", "${space}");
 
-        verify(robotRuntime).getGlobalVariables();
-        verify(robotRuntime).getModuleSearchPaths();
-        verifyNoMoreInteractions(robotRuntime);
+        verify(env).getGlobalVariables();
+        verify(env).getModuleSearchPaths();
+        verifyNoMoreInteractions(env);
     }
 
     @Test
     public void testIfProjectIsConfiguredTwice_whenConfigurationIsChanged() {
-        final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
-        when(robotRuntime.getGlobalVariables()).thenReturn(ImmutableMap.of("A", 1));
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
+        when(env.getGlobalVariables()).thenReturn(ImmutableMap.of("A", 1));
 
-        final RobotProjectHolder projectHolder = new RobotProjectHolder(robotRuntime);
+        final RobotProjectHolder projectHolder = new RobotProjectHolder(env);
         projectHolder.configure(RobotProjectConfig.create(), null);
         final RobotProjectConfig configuration = RobotProjectConfig.create();
         configuration.addVariableMapping(VariableMapping.create("${abc}", "x"));
-        when(robotRuntime.getGlobalVariables()).thenReturn(ImmutableMap.of("A", 1, "B", 2));
+        when(env.getGlobalVariables()).thenReturn(ImmutableMap.of("A", 1, "B", 2));
         projectHolder.configure(configuration, null);
 
         assertThat(projectHolder.getGlobalVariables()).extracting(ARobotInternalVariable::getName)
                 .containsExactly("A", "B");
         assertThat(projectHolder.getVariableMappings()).containsOnlyKeys("${/}", "${curdir}", "${space}", "${abc}");
 
-        verify(robotRuntime, times(2)).getGlobalVariables();
-        verify(robotRuntime, times(2)).getModuleSearchPaths();
-        verifyNoMoreInteractions(robotRuntime);
+        verify(env, times(2)).getGlobalVariables();
+        verify(env, times(2)).getModuleSearchPaths();
+        verifyNoMoreInteractions(env);
     }
 }

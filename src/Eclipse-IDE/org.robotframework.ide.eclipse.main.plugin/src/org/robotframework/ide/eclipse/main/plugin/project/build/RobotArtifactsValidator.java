@@ -96,10 +96,7 @@ public class RobotArtifactsValidator {
                 || !RobotProjectNature.hasRobotNature(file.getProject())) {
             return false;
         }
-        if (!suiteModel.getProject().getRuntimeEnvironment().hasRobotInstalled()) {
-            return false;
-        }
-        return true;
+        return suiteModel.getProject().getRuntimeEnvironment().hasRobotInstalled();
     }
 
     private static synchronized ModelUnitValidator createSynchronizedValidator(final IResource resource,

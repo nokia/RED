@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IFile;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.rflint.RfLintIntegrationServer;
 import org.rf.ide.core.rflint.RfLintRule;
@@ -49,7 +49,7 @@ public class RunRfLintHandlerTest {
 
     @Test
     public void rfLintAnalysisIsRun_forEmptyConfiguration() throws Exception {
-        final RobotRuntimeEnvironment environment = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProject robotProject = createRobotProjectSpy(environment, new RobotProjectConfig());
         final RedPreferences preferences = mock(RedPreferences.class);
 
@@ -62,7 +62,7 @@ public class RunRfLintHandlerTest {
 
     @Test
     public void rfLintAnalysisIsRun_withExcludedPathsTakenFromProjectConfig() throws Exception {
-        final RobotRuntimeEnvironment environment = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProjectConfig projectConfig = new RobotProjectConfig();
         projectConfig.addExcludedPath("x");
         projectConfig.addExcludedPath("x/y");
@@ -79,7 +79,7 @@ public class RunRfLintHandlerTest {
 
     @Test
     public void rfLintAnalysisIsRun_withRulesTakenFromPreferences() throws Exception {
-        final RobotRuntimeEnvironment environment = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProject robotProject = createRobotProjectSpy(environment, new RobotProjectConfig());
         final RedPreferences preferences = mock(RedPreferences.class);
         final List<RfLintRule> rules = newArrayList(new RfLintRule("x", RfLintViolationSeverity.ERROR, "1"),
@@ -95,7 +95,7 @@ public class RunRfLintHandlerTest {
 
     @Test
     public void rfLintAnalysisIsRun_withRuleFilesTakenFromPreferences() throws Exception {
-        final RobotRuntimeEnvironment environment = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProject robotProject = createRobotProjectSpy(environment, new RobotProjectConfig());
         final RedPreferences preferences = mock(RedPreferences.class);
         final List<String> ruleFiles = newArrayList(projectProvider.createFile("rule1.py").getLocation().toOSString(),
@@ -110,7 +110,7 @@ public class RunRfLintHandlerTest {
 
     @Test
     public void rfLintAnalysisIsRun_withAdditionalArgumentsTakenFromPreferences() throws Exception {
-        final RobotRuntimeEnvironment environment = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProject robotProject = createRobotProjectSpy(environment, new RobotProjectConfig());
         final RedPreferences preferences = mock(RedPreferences.class);
         final IFile argFile = projectProvider.createFile("argfile.arg");
@@ -124,7 +124,7 @@ public class RunRfLintHandlerTest {
                 newArrayList("arg", "${var}", "-A", argFile.getLocation().toOSString()));
     }
 
-    private RobotProject createRobotProjectSpy(final RobotRuntimeEnvironment environment,
+    private RobotProject createRobotProjectSpy(final IRuntimeEnvironment environment,
             final RobotProjectConfig projectConfig) {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);

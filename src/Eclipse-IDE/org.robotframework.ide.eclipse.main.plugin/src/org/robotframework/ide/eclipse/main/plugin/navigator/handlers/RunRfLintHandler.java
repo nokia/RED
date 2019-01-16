@@ -28,7 +28,7 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.rf.ide.core.rflint.RfLintClientEventsListener;
 import org.rf.ide.core.rflint.RfLintIntegrationServer;
@@ -66,7 +66,7 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
             }
             try {
                 runRfLint(selectedResource, server);
-            } catch (final RobotEnvironmentException e) {
+            } catch (final RuntimeEnvironmentException e) {
                 killServer(server);
                 showErrorDialog(e);
             }

@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.ui.IWorkbenchPage;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 
 
@@ -53,7 +53,7 @@ public class SingleParagraphInputTest {
 
     @Test
     public void theSuppliedParagraphIsProperlyHtmlified() {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("paragraph");
 
         final SingleParagraphInput input = new SingleParagraphInput(() -> "paragraph");

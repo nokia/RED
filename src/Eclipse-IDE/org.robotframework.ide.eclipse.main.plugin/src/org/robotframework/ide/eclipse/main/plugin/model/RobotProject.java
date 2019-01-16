@@ -33,8 +33,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.EnvironmentVariableReplacer;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -300,7 +300,7 @@ public class RobotProject extends RobotContainer {
         kwSources.clear();
     }
 
-    public synchronized RobotRuntimeEnvironment getRuntimeEnvironment() {
+    public synchronized IRuntimeEnvironment getRuntimeEnvironment() {
         final RobotProjectConfig config = getRobotProjectConfig();
         if (config.usesPreferences()) {
             return RedPlugin.getDefault().getActiveRobotInstallation();
@@ -336,7 +336,7 @@ public class RobotProject extends RobotContainer {
             return referencedVariableFiles;
         }
         final RobotProjectConfig config = getRobotProjectConfig();
-        final RobotRuntimeEnvironment env = getRuntimeEnvironment();
+        final IRuntimeEnvironment env = getRuntimeEnvironment();
 
         referencedVariableFiles = new ArrayList<>();
         for (final ReferencedVariableFile variableFile : config.getReferencedVariableFiles()) {
@@ -353,7 +353,7 @@ public class RobotProject extends RobotContainer {
                         variableFile.getArguments());
                 variableFile.setVariables(varsMap);
                 referencedVariableFiles.add(variableFile);
-            } catch (final RobotEnvironmentException e) {
+            } catch (final RuntimeEnvironmentException e) {
                 // unable to import the variables file
             }
         }

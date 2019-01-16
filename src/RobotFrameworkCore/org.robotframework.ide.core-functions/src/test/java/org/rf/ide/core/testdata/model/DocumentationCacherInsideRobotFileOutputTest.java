@@ -7,7 +7,6 @@ package org.rf.ide.core.testdata.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -48,7 +47,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     public static void setup() throws Exception {
         final Path path = getFile("presenter//DocPositionsFind.robot");
         final RobotParser parser = RobotParser.create(
-                new RobotProjectHolder(new RobotRuntimeEnvironment(new File("path"), "2.9.0")),
+                new RobotProjectHolder(new RobotRuntimeEnvironment(null, "2.9.0")),
                 RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(path, parser);
         out = modelFile.getParent();

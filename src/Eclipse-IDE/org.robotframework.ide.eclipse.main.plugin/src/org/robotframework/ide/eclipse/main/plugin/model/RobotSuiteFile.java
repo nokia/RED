@@ -34,7 +34,7 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
@@ -393,7 +393,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return getProject().getRobotParserComplianceVersion();
     }
 
-    public RobotRuntimeEnvironment getRuntimeEnvironment() {
+    public IRuntimeEnvironment getRuntimeEnvironment() {
         final RobotProject project = getProject();
         return project == null ? null : project.getRuntimeEnvironment();
     }

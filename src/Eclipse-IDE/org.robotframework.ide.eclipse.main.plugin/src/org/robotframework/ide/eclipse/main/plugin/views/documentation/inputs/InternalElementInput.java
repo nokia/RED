@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
@@ -53,7 +53,7 @@ abstract class InternalElementInput<T extends RobotFileInternalElement> implemen
     }
 
     @Override
-    public final String provideHtml(final RobotRuntimeEnvironment environment) {
+    public final String provideHtml(final IRuntimeEnvironment environment) {
         prepare();
 
         final String header = createHeader();

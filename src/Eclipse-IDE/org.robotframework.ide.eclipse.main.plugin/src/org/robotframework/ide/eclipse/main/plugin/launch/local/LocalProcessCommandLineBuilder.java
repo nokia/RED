@@ -33,8 +33,6 @@ import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.DebugPlugin;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
@@ -48,36 +46,28 @@ import com.google.common.collect.Maps;
 
 class LocalProcessCommandLineBuilder {
 
+    private final LocalProcessInterpreter interpreter;
+
     private final RobotLaunchConfiguration robotConfig;
 
     private final RobotProject robotProject;
 
-    LocalProcessCommandLineBuilder(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject) {
+    LocalProcessCommandLineBuilder(final LocalProcessInterpreter interpreter,
+            final RobotLaunchConfiguration robotConfig, final RobotProject robotProject) {
+        this.interpreter = interpreter;
         this.robotConfig = robotConfig;
         this.robotProject = robotProject;
     }
 
     RunCommandLine createRunCommandLine(final int port, final RedPreferences preferences)
             throws CoreException, IOException {
-        final IRunCommandLineBuilder builder = createBuilder(port);
+        final IRunCommandLineBuilder builder = RunCommandLineCallBuilder.create(interpreter.getExecutor(),
+                interpreter.getPath(), port);
         addArgumentEntries(builder, preferences);
         addProjectConfigEntries(builder);
         addTags(builder);
         addDataSources(builder, preferences);
         return builder.build();
-    }
-
-    private IRunCommandLineBuilder createBuilder(final int port) throws CoreException {
-        if (robotConfig.isUsingInterpreterFromProject()) {
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-            if (runtimeEnvironment.isNullEnvironment()) {
-                return RunCommandLineCallBuilder.forExecutor(SuiteExecutor.Python, port);
-            } else {
-                return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port);
-            }
-        } else {
-            return RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
-        }
     }
 
     private void addArgumentEntries(final IRunCommandLineBuilder builder, final RedPreferences preferences)

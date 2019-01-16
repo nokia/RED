@@ -10,17 +10,12 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
-import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.TestsMode;
@@ -137,7 +132,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         final RobotModel model = RedPlugin.getModelManager().getModel();
         final RobotProject robotProject = model.createRobotProject(robotConfig.getProject());
-        final ConsoleData consoleData = ConsoleData.create(robotConfig, robotProject);
+        final LocalProcessInterpreter interpreter = LocalProcessInterpreter.create(robotConfig, robotProject);
 
         final TestsPidReader pidReader = new TestsPidReader();
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
@@ -157,14 +152,14 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             return new LaunchExecution(serverJob, null, null);
         }
 
-        final RunCommandLine cmdLine = new LocalProcessCommandLineBuilder(robotConfig, robotProject)
+        final ConsoleData consoleData = ConsoleData.create(robotConfig, interpreter);
+        final RunCommandLine cmdLine = new LocalProcessCommandLineBuilder(interpreter, robotConfig, robotProject)
                 .createRunCommandLine(port, RedPlugin.getDefault().getPreferences());
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, execProcess,
                 consoleData.getProcessLabel());
-        final String projectInterpreterPath = robotProject.getRuntimeEnvironment().getPythonExecutablePath();
-        robotProcess.setInterruptionData(projectInterpreterPath, pidReader::getPid);
+        robotProcess.setInterruptionData(interpreter.getPath(), pidReader::getPid);
 
         robotProcess.onTerminate(serverJob::stopServer);
 
@@ -196,48 +191,12 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             return suiteExecutorVersion;
         }
 
-        static ConsoleData create(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject)
+        static ConsoleData create(final RobotLaunchConfiguration robotConfig, final LocalProcessInterpreter interpreter)
                 throws CoreException {
             if (robotConfig.getExecutableFilePath().isEmpty()) {
-                if (robotConfig.isUsingInterpreterFromProject()) {
-                    return ConsoleData.create(robotProject.getRuntimeEnvironment(), robotProject.getName());
-                }
-                return ConsoleData.create(robotConfig.getInterpreter());
+                return new ConsoleData(interpreter.getPath(), interpreter.getVersion());
             }
             return new ConsoleData(robotConfig.getExecutableFilePath(), "<unknown>");
         }
-
-        private static ConsoleData create(final RobotRuntimeEnvironment env, final String projectName)
-                throws CoreException {
-            if (env.isNullEnvironment()) {
-                throw newCoreException("There is no active runtime environment for project '" + projectName + "'");
-            } else if (!env.isValidPythonInstallation()) {
-                throw newCoreException("The runtime environment " + env.getFile().getAbsolutePath()
-                        + " is invalid Python installation");
-            } else if (!env.hasRobotInstalled()) {
-                throw newCoreException("The runtime environment " + env.getFile().getAbsolutePath()
-                        + " has no Robot Framework installed");
-            }
-            return new ConsoleData(env.getPythonExecutablePath(), env.getVersion());
-        }
-
-        private static ConsoleData create(final SuiteExecutor interpreter) throws CoreException {
-            final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
-                    .whereIsPythonInterpreter(interpreter);
-            if (installation.isPresent()) {
-                final Optional<String> robotVersion = installation
-                        .flatMap(PythonInstallationDirectory::getRobotVersion);
-                if (robotVersion.isPresent()) {
-                    return new ConsoleData(interpreter.executableName(), robotVersion.get());
-                } else {
-                    throw newCoreException(
-                            "The " + interpreter.name() + " interpreter has no Robot Framework installed");
-                }
-            } else {
-                throw newCoreException(
-                        "There is no " + interpreter.name() + " interpreter in system PATH environment variable");
-            }
-        }
-
     }
 }

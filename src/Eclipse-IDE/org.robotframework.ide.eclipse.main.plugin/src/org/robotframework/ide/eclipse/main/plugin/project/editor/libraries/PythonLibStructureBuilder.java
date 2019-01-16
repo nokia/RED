@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -30,13 +29,13 @@ import com.google.common.base.Splitter;
 
 public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
-    private final RobotRuntimeEnvironment environment;
+    private final IRuntimeEnvironment environment;
 
     private final RobotProjectConfig config;
 
     private final IProject project;
 
-    public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config,
+    public PythonLibStructureBuilder(final IRuntimeEnvironment environment, final RobotProjectConfig config,
             final IProject project) {
         this.environment = environment;
         this.config = config;
@@ -44,16 +43,16 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
     }
 
     @Override
-    public Collection<ILibraryClass> provideEntriesFromFile(final URI path) throws RobotEnvironmentException {
+    public Collection<ILibraryClass> provideEntriesFromFile(final URI path) {
         return provideEntriesFromFile(path, PythonClass::createWithoutDuplicationOfFileAndClassName);
     }
 
-    public Collection<ILibraryClass> provideAllEntriesFromFile(final URI path) throws RobotEnvironmentException {
+    public Collection<ILibraryClass> provideAllEntriesFromFile(final URI path) {
         return provideEntriesFromFile(path, PythonClass::new);
     }
 
     private Collection<ILibraryClass> provideEntriesFromFile(final URI path,
-            final Function<String, ILibraryClass> classNameMapper) throws RobotEnvironmentException {
+            final Function<String, ILibraryClass> classNameMapper) {
         final List<String> classes = environment.getClassesFromModule(new File(path),
                 new RedEclipseProjectConfig(project, config).createAdditionalEnvironmentSearchPaths());
         return classes.stream().map(classNameMapper).distinct().collect(Collectors.toList());

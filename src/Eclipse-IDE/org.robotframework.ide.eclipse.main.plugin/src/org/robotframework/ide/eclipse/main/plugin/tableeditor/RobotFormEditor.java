@@ -45,7 +45,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.RobotFileDumper;
@@ -543,7 +543,7 @@ public class RobotFormEditor extends FormEditor {
         if (suiteFile != null) {
             final RobotProject robotProject = suiteFile.getProject();
             if (robotProject != null) {
-                final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
+                final IRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
                 if (!env.isValidPythonInstallation() || !env.hasRobotInstalled()) {
                     final Shell shell = getSite().getShell();
                     if (shell != null && shell.isVisible()) {

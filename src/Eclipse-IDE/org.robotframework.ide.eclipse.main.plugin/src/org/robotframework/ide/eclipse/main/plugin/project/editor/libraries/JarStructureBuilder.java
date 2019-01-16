@@ -17,8 +17,7 @@ import java.util.zip.ZipInputStream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -29,13 +28,13 @@ import com.google.common.base.Objects;
 
 public class JarStructureBuilder implements ILibraryStructureBuilder {
 
-    private final RobotRuntimeEnvironment environment;
+    private final IRuntimeEnvironment environment;
 
     private final RobotProjectConfig config;
 
     private final IProject project;
 
-    public JarStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config,
+    public JarStructureBuilder(final IRuntimeEnvironment environment, final RobotProjectConfig config,
             final IProject project) {
         this.environment = environment;
         this.config = config;
@@ -44,7 +43,7 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
     }
 
     @Override
-    public Collection<ILibraryClass> provideEntriesFromFile(final URI uri) throws RobotEnvironmentException {
+    public Collection<ILibraryClass> provideEntriesFromFile(final URI uri) {
         if (uri.getPath().endsWith(".jar")) {
             return provideEntriesFromJarFile(uri);
         } else {
@@ -52,7 +51,7 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
         }
     }
 
-    private Collection<ILibraryClass> provideEntriesFromJarFile(final URI uri) throws RobotEnvironmentException {
+    private Collection<ILibraryClass> provideEntriesFromJarFile(final URI uri) {
         final List<ILibraryClass> jarClasses = new ArrayList<>();
         try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(new File(uri)))) {
             ZipEntry entry = zipStream.getNextEntry();
@@ -71,7 +70,7 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
         return jarClasses;
     }
 
-    private Collection<JarClass> providePythonEntriesFromJarFile(final URI uri) throws RobotEnvironmentException {
+    private Collection<JarClass> providePythonEntriesFromJarFile(final URI uri) {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
         final Collection<ILibraryClass> pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(uri);

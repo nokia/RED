@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 
@@ -22,7 +22,7 @@ public class DocumentationsFormatterTest {
 
     @Test
     public void namesInBackticksAreLinkedToHeadersIfTheyExist() throws Exception {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT)))
                 .thenReturn("<p>First `Section` and `Second`</p>"
                         + "<h1>Section</h1>");
@@ -36,7 +36,7 @@ public class DocumentationsFormatterTest {
 
     @Test
     public void namesInBackticksAreLinkedToLocalKeywordsIfTheyExist() {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT)))
                 .thenReturn("<p>The link to `Kw1` and `Kw2` but not to `Kw3`</p>");
 

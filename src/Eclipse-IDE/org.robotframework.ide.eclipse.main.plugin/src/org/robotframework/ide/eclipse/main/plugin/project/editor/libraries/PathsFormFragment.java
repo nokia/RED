@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
@@ -296,7 +296,7 @@ class PathsFormFragment implements ISectionFormFragment {
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
         final boolean isEditable = editorInput.isEditable();
-        final RobotRuntimeEnvironment environment = envs.getActiveEnvironment();
+        final IRuntimeEnvironment environment = envs.getActiveEnvironment();
         final boolean projectMayBeInterpretedByJython = environment.isNullEnvironment()
                 || environment.getInterpreter() == SuiteExecutor.Jython;
 

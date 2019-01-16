@@ -92,7 +92,7 @@ public class VariablesImporter {
                         // could not find import reference in project, so will ask interpreter
                         Map<?, ?> variablesFromFile = new HashMap<>();
                         try {
-                            variablesFromFile = robotProject.getRobotRuntime()
+                            variablesFromFile = robotProject.getRuntimeEnvironment()
                                     .getVariablesFromFile(varFile, varFileArguments);
                         } catch (final Exception e) {
                             reportError(String.format("Problem importing variable file '%s'. %s", path, e.getMessage()),

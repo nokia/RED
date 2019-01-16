@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -44,7 +44,7 @@ public class JarStructureBuilderTest {
     public static ProjectProvider projectProvider = new ProjectProvider(JarStructureBuilderTest.class);
 
     @Mock
-    private RobotRuntimeEnvironment environment;
+    private IRuntimeEnvironment environment;
 
     private RobotProjectConfig config;
 

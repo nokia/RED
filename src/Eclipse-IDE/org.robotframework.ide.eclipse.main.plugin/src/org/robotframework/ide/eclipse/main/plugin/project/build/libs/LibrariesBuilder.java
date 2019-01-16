@@ -22,12 +22,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
+import org.rf.ide.core.libraries.LibrarySpecification.LibdocFormat;
 import org.rf.ide.core.libraries.LibrarySpecificationReader;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -60,12 +60,12 @@ public class LibrariesBuilder {
         if (suiteFile.isResourceFile()) {
             final IProject project = resourceFile.getProject();
             final RobotProject robotProject = model.createRobotProject(project);
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            final IRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             final String fileName = Files.getNameWithoutExtension(suiteFile.getName()) + "_"
                     + System.currentTimeMillis();
             final IFile htmlTargetFile = LibspecsFolder.get(project).getHtmlSpecFile(fileName);
             runtimeEnvironment.createLibdoc(resourceFile.getLocation().toFile().toString(),
-                    htmlTargetFile.getLocation().toFile(), LibdocFormat.HTML);
+                    htmlTargetFile.getLocation().toFile(), LibdocFormat.HTML, new EnvironmentSearchPaths());
             return htmlTargetFile;
         } else {
             throw new IllegalStateException("Unable to generate HTML documentation file. The file '"
@@ -118,7 +118,7 @@ public class LibrariesBuilder {
         monitor.setWorkRemaining(groupedGenerators.size());
         for (final IProject project : groupedGenerators.keySet()) {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            final IRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
             MultiStatus multiStatus = null;
             for (final ILibdocGenerator generator : groupedGenerators.get(project)) {
@@ -129,7 +129,7 @@ public class LibrariesBuilder {
                                 new RedEclipseProjectConfig(project, robotProject.getRobotProjectConfig())
                                         .createAdditionalEnvironmentSearchPaths());
                     }
-                } catch (final RobotEnvironmentException e) {
+                } catch (final RuntimeEnvironmentException e) {
                     final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
                             "\nProblem occurred during " + generator.getMessage() + ".", e);
                     if (multiStatus == null) {
@@ -186,7 +186,7 @@ public class LibrariesBuilder {
         return String.join("::", nameToGenerate);
     }
 
-    public void buildLibraries(final RobotProject robotProject, final RobotRuntimeEnvironment environment,
+    public void buildLibraries(final RobotProject robotProject, final IRuntimeEnvironment environment,
             final RobotProjectConfig configuration, final SubMonitor monitor) {
         logger.log("BUILDING: generating library docs");
         monitor.subTask("generating libdocs");
@@ -195,13 +195,11 @@ public class LibrariesBuilder {
 
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(robotProject.getProject());
         libdocGenerators.addAll(getStandardLibrariesToRecreate(environment, libspecsFolder));
-        if (configuration != null) {
-            libdocGenerators.addAll(getStandardRemoteLibrariesToRecreate(configuration, libspecsFolder));
-            libdocGenerators.addAll(getReferencedVirtualLibrariesToRecreate(configuration, libspecsFolder));
-            libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder));
-            if (environment.getInterpreter() == SuiteExecutor.Jython) {
-                libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
-            }
+        libdocGenerators.addAll(getStandardRemoteLibrariesToRecreate(configuration, libspecsFolder));
+        libdocGenerators.addAll(getReferencedVirtualLibrariesToRecreate(configuration, libspecsFolder));
+        libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder));
+        if (environment.getInterpreter() == SuiteExecutor.Jython) {
+            libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
         }
 
         monitor.setWorkRemaining(libdocGenerators.size());
@@ -214,13 +212,13 @@ public class LibrariesBuilder {
             logger.log("BUILDING: " + generator.getMessage());
             monitor.subTask(generator.getMessage());
             try {
-                final EnvironmentSearchPaths additionalSearchPaths = configuration == null
+                final EnvironmentSearchPaths additionalSearchPaths = configuration.isNullConfig()
                         ? new EnvironmentSearchPaths()
                         : new RedEclipseProjectConfig(robotProject.getProject(), configuration)
                                 .createAdditionalEnvironmentSearchPaths();
                 generator.generateLibdoc(environment, additionalSearchPaths);
 
-            } catch (final RobotEnvironmentException e) {
+            } catch (final RuntimeEnvironmentException e) {
                 // the libraries with missing libspec are reported in validation phase
             }
             monitor.worked(1);
@@ -229,7 +227,7 @@ public class LibrariesBuilder {
         monitor.done();
     }
 
-    private List<ILibdocGenerator> getStandardLibrariesToRecreate(final RobotRuntimeEnvironment environment,
+    private List<ILibdocGenerator> getStandardLibrariesToRecreate(final IRuntimeEnvironment environment,
             final LibspecsFolder libspecsFolder) {
         final List<ILibdocGenerator> generators = new ArrayList<>();
 

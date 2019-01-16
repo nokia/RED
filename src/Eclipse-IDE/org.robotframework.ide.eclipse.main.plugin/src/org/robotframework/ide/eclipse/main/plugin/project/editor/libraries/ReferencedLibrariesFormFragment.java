@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -92,7 +92,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     private ControlDecoration decoration;
 
-    private RobotRuntimeEnvironment environment;
+    private IRuntimeEnvironment environment;
 
     public TableViewer getViewer() {
         return viewer;

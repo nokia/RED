@@ -35,6 +35,14 @@ public class RobotRuntimeEnvironmentTest {
     }
 
     @Test
+    public void testRobotInstallationCompatibility() throws Exception {
+        assertThat(new RobotRuntimeEnvironment(null, null, "RF 3.0.2 (Python 2.6.9 on win32)")
+                .isCompatibleRobotInstallation()).isFalse();
+        assertThat(new RobotRuntimeEnvironment(null, null, "RF 3.0.2 (Python 2.7.1 on win32)")
+                .isCompatibleRobotInstallation()).isTrue();
+    }
+
+    @Test
     public void moduleCanonicalPathIsReturned_evenWhenExecutorReturnsLowerCasePath() {
         // this test only makes sense on case-insensitive platforms like windows
         assumeTrue(RedSystemProperties.isWindowsPlatform());
@@ -44,13 +52,7 @@ public class RobotRuntimeEnvironmentTest {
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
         when(executor.getModulePath("module", searchPaths)).thenReturn(new File(folder.getRoot(), "module"));
 
-        final PythonInstallationDirectory location = new PythonInstallationDirectory(
-                URI.create("file:///path/to/python"), SuiteExecutor.Python);
-
-        final RobotCommandsExecutors executors = mock(RobotCommandsExecutors.class);
-        when(executors.getRobotCommandExecutor(location)).thenReturn(executor);
-
-        final RobotRuntimeEnvironment env = new RobotRuntimeEnvironment(executors, location, "3.0.0");
+        final RobotRuntimeEnvironment env = createEnvironment(executor);
 
         final Optional<File> path = env.getModulePath("module", searchPaths);
 
@@ -68,13 +70,7 @@ public class RobotRuntimeEnvironmentTest {
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
         when(executor.getModulePath("module2", searchPaths)).thenReturn(new File(folder.getRoot(), "module2"));
 
-        final PythonInstallationDirectory location = new PythonInstallationDirectory(
-                URI.create("file:///path/to/python"), SuiteExecutor.Python);
-
-        final RobotCommandsExecutors executors = mock(RobotCommandsExecutors.class);
-        when(executors.getRobotCommandExecutor(location)).thenReturn(executor);
-
-        final RobotRuntimeEnvironment env = new RobotRuntimeEnvironment(executors, location, "3.0.0");
+        final RobotRuntimeEnvironment env = createEnvironment(executor);
 
         final Optional<File> path = env.getModulePath("module2", searchPaths);
 
@@ -91,13 +87,7 @@ public class RobotRuntimeEnvironmentTest {
         when(executor.getModulesSearchPaths())
                 .thenReturn(newArrayList(new File(folder.getRoot(), "module"), new File(folder.getRoot(), "module2")));
 
-        final PythonInstallationDirectory location = new PythonInstallationDirectory(
-                URI.create("file:///path/to/python"), SuiteExecutor.Python);
-
-        final RobotCommandsExecutors executors = mock(RobotCommandsExecutors.class);
-        when(executors.getRobotCommandExecutor(location)).thenReturn(executor);
-
-        final RobotRuntimeEnvironment env = new RobotRuntimeEnvironment(executors, location, "3.0.0");
+        final RobotRuntimeEnvironment env = createEnvironment(executor);
 
         final List<File> modulesSearchPaths = env.getModuleSearchPaths();
 
@@ -109,17 +99,21 @@ public class RobotRuntimeEnvironmentTest {
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
         when(executor.getStandardLibrariesNames()).thenReturn(newArrayList("BuiltIn", "Dialogs", "Remote", "XML"));
 
+        final RobotRuntimeEnvironment env = createEnvironment(executor);
+
+        final List<String> stdLibNames = env.getStandardLibrariesNames();
+
+        assertThat(stdLibNames).containsExactly("BuiltIn", "Dialogs", "XML");
+    }
+
+    private RobotRuntimeEnvironment createEnvironment(final RobotCommandExecutor executor) {
         final PythonInstallationDirectory location = new PythonInstallationDirectory(
                 URI.create("file:///path/to/python"), SuiteExecutor.Python);
 
         final RobotCommandsExecutors executors = mock(RobotCommandsExecutors.class);
         when(executors.getRobotCommandExecutor(location)).thenReturn(executor);
 
-        final RobotRuntimeEnvironment env = new RobotRuntimeEnvironment(executors, location, "3.0.0");
-
-        final List<String> stdLibNames = env.getStandardLibrariesNames();
-
-        assertThat(stdLibNames).containsExactly("BuiltIn", "Dialogs", "XML");
+        return new RobotRuntimeEnvironment(executors, location, "3.0.0");
     }
 
 }

@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryEventListener;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
@@ -157,8 +157,9 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getProject(),
                 projectConfig).createExecutionEnvironmentSearchPaths();
 
-        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSource, projectLocation,
-                recursiveInVirtualenv, excludedPaths, additionalPaths);
+        robotProject.getRuntimeEnvironment()
+                .startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv, excludedPaths,
+                        additionalPaths);
     }
 
     void setImporters(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> suites) {
@@ -244,7 +245,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 final Collection<ILibraryClass> libraryClasses = pythonLibStructureBuilder
                         .provideAllEntriesFromFile(libraryImport.getSource());
                 addReferencedLibrariesFromClasses(libraryImport, libraryClasses);
-            } catch (final RobotEnvironmentException e) {
+            } catch (final RuntimeEnvironmentException e) {
                 final Optional<File> modulePath = findPythonLibraryModulePath(libraryImport);
                 if (modulePath.isPresent()) {
                     final Path path = new Path(modulePath.get().getPath());
@@ -263,7 +264,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getProject(),
                         config).createAdditionalEnvironmentSearchPaths();
                 return robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(), additionalPaths);
-            } catch (final RobotEnvironmentException e) {
+            } catch (final RuntimeEnvironmentException e) {
                 return Optional.empty();
             }
         }
@@ -276,7 +277,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 final Collection<ILibraryClass> libraryClasses = jarStructureBuilder
                         .provideEntriesFromFile(libraryImport.getSource());
                 addReferencedLibrariesFromClasses(libraryImport, libraryClasses);
-            } catch (final RobotEnvironmentException e) {
+            } catch (final RuntimeEnvironmentException e) {
                 libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                 libraryImport.setAdditionalInfo(e.getMessage());
             }
