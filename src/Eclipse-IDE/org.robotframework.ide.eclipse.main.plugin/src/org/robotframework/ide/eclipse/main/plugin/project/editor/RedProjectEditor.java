@@ -43,8 +43,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -209,12 +209,12 @@ public class RedProjectEditor extends MultiPageEditorPart {
                 SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED,
                         editorInput.getProjectConfiguration()));
 
-                final RobotRuntimeEnvironment activeEnvironment = project == null ? new NullRuntimeEnvironment()
+                final IRuntimeEnvironment activeEnvironment = project == null ? new NullRuntimeEnvironment()
                         : project.getRuntimeEnvironment();
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
                 }
-                final List<RobotRuntimeEnvironment> allRuntimeEnvironments = RedPlugin.getDefault()
+                final List<IRuntimeEnvironment> allRuntimeEnvironments = RedPlugin.getDefault()
                         .getAllRuntimeEnvironments();
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
@@ -229,9 +229,9 @@ public class RedProjectEditor extends MultiPageEditorPart {
             @SuppressWarnings("unchecked")
             @Override
             public void done(final IJobChangeEvent event) {
-                final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) envLoadingJob
+                final IRuntimeEnvironment env = (IRuntimeEnvironment) envLoadingJob
                         .getProperty(createKey(activeEnv));
-                final List<RobotRuntimeEnvironment> allEnvironments = (List<RobotRuntimeEnvironment>) envLoadingJob
+                final List<IRuntimeEnvironment> allEnvironments = (List<IRuntimeEnvironment>) envLoadingJob
                         .getProperty(createKey(allEnvs));
 
                 SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED,

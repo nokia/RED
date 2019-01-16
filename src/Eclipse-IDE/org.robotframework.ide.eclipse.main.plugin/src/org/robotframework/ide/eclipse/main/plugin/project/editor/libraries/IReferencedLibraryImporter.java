@@ -8,21 +8,21 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 
 public interface IReferencedLibraryImporter {
 
-    Collection<ReferencedLibrary> importPythonLib(RobotRuntimeEnvironment environment, IProject project,
+    Collection<ReferencedLibrary> importPythonLib(IRuntimeEnvironment environment, IProject project,
             RobotProjectConfig config, String fullLibraryPath);
 
-    Collection<ReferencedLibrary> importPythonLib(RobotRuntimeEnvironment environment, IProject project,
+    Collection<ReferencedLibrary> importPythonLib(IRuntimeEnvironment environment, IProject project,
             RobotProjectConfig config, String fullLibraryPath, String name);
 
-    Collection<ReferencedLibrary> importJavaLib(RobotRuntimeEnvironment environment, IProject project,
+    Collection<ReferencedLibrary> importJavaLib(IRuntimeEnvironment environment, IProject project,
             RobotProjectConfig config, String fullLibraryPath);
 
-    Collection<ReferencedLibrary> importJavaLib(RobotRuntimeEnvironment environment, IProject project,
+    Collection<ReferencedLibrary> importJavaLib(IRuntimeEnvironment environment, IProject project,
             RobotProjectConfig config, String fullLibraryPath, String name);
 }

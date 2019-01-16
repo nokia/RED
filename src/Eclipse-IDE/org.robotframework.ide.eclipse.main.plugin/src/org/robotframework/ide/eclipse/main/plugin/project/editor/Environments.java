@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import java.util.List;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 
 
 /**
@@ -16,21 +16,20 @@ import org.rf.ide.core.environment.RobotRuntimeEnvironment;
  */
 public class Environments {
 
-    private final List<RobotRuntimeEnvironment> allEnvironments;
+    private final List<IRuntimeEnvironment> allEnvironments;
 
-    private final RobotRuntimeEnvironment activeEnvironment;
+    private final IRuntimeEnvironment activeEnvironment;
 
-    Environments(final List<RobotRuntimeEnvironment> allEnvironments,
-            final RobotRuntimeEnvironment activeEnvironment) {
+    Environments(final List<IRuntimeEnvironment> allEnvironments, final IRuntimeEnvironment activeEnvironment) {
         this.allEnvironments = allEnvironments;
         this.activeEnvironment = activeEnvironment;
     }
 
-    public RobotRuntimeEnvironment getActiveEnvironment() {
+    public IRuntimeEnvironment getActiveEnvironment() {
         return activeEnvironment;
     }
 
-    public List<RobotRuntimeEnvironment> getAllEnvironments() {
+    public List<IRuntimeEnvironment> getAllEnvironments() {
         return allEnvironments;
     }
 

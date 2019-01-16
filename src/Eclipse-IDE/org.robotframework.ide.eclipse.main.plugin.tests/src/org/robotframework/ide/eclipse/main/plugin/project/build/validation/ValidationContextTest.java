@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IProject;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -27,12 +27,12 @@ public class ValidationContextTest {
         final IProject project = mock(IProject.class);
         final RobotProject robotProject = mock(RobotProject.class);
         final RobotProjectConfig robotProjectConfig = mock(RobotProjectConfig.class);
-        final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment runtimeEnvironment = mock(IRuntimeEnvironment.class);
 
         when(model.createRobotProject(project)).thenReturn(robotProject);
         when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
         when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(robotRuntime);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(runtimeEnvironment);
         when(robotProject.getRobotParserComplianceVersion()).thenReturn(RobotVersion.from("3.0"));
 
         // execute
@@ -49,12 +49,12 @@ public class ValidationContextTest {
         final IProject project = mock(IProject.class);
         final RobotProject robotProject = mock(RobotProject.class);
         final RobotProjectConfig robotProjectConfig = mock(RobotProjectConfig.class);
-        final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment runtimeEnvironment = mock(IRuntimeEnvironment.class);
 
         when(model.createRobotProject(project)).thenReturn(robotProject);
         when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
         when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(robotRuntime);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(runtimeEnvironment);
         when(robotProject.getRobotParserComplianceVersion()).thenReturn(RobotVersion.from(null));
 
         // execute

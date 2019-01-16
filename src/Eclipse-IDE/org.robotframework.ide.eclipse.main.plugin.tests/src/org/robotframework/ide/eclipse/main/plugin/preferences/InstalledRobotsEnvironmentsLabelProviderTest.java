@@ -18,9 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
 import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
@@ -31,25 +29,17 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnv
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 
 public class InstalledRobotsEnvironmentsLabelProviderTest {
 
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            InstalledRobotsEnvironmentsLabelProviderTest.class);
-
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
-
-    public static ShellProvider shellProvider = new ShellProvider();
-
     @ClassRule
-    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder).around(shellProvider);
+    public static ShellProvider shellProvider = new ShellProvider();
 
     @Test
     public void testGettingForeground_forInvalidPythonInstallation() throws Exception {
-        final RobotRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(new File("path"));
+        final IRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(null);
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(createViewer());
         assertThat(labelProvider.getForeground(environment))
                 .isEqualTo(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -57,7 +47,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingForeground_forValidPythonInstallationWithoutRobotInstalled() throws Exception {
-        final RobotRuntimeEnvironment environment = new MissingRobotRuntimeEnvironment(new File("path"));
+        final IRuntimeEnvironment environment = new MissingRobotRuntimeEnvironment(null);
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(createViewer());
         assertThat(labelProvider.getForeground(environment))
                 .isEqualTo(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW));
@@ -65,7 +55,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingForeground_forDeprecatedPythonInstallationWithRobotInstalled() throws Exception {
-        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(new File("path"),
+        final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.2 (Python 2.6.1 on win32)");
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(createViewer());
         assertThat(labelProvider.getForeground(environment))
@@ -74,7 +64,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingForeground_forValidPythonInstallationWithRobotInstalled() throws Exception {
-        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(new File("path"),
+        final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.2 (Python 3.6.5 on win32)");
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(createViewer());
         assertThat(labelProvider.getForeground(environment)).isNull();
@@ -82,7 +72,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingFont_forNotSelectedPythonInstallation() throws Exception {
-        final RobotRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(new File("path"));
+        final IRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(null);
         final CheckboxTableViewer viewer = createViewer();
         viewer.setInput(Arrays.asList(environment));
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(viewer);
@@ -91,7 +81,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingFont_forSelectedPythonInstallation() throws Exception {
-        final RobotRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(new File("path"));
+        final IRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(null);
         final CheckboxTableViewer viewer = createViewer();
         viewer.setInput(Arrays.asList(environment));
         viewer.setCheckedElements(new Object[] { environment });
@@ -102,7 +92,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
     @Test
     public void testGettingToolTipText_forInvalidPythonInstallation() throws Exception {
         final File pythonInstallation = new File("py_installation");
-        final RobotRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(pythonInstallation);
+        final IRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(pythonInstallation);
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipText(environment)).isEqualTo("The location '"
                 + pythonInstallation.getAbsolutePath() + "' does not seem to be a valid Python directory");
@@ -148,7 +138,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingToolTipImage_forInvalidPythonInstallation() throws Exception {
-        final RobotRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(new File("path"));
+        final IRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(new File("path"));
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipImage(environment))
                 .isSameAs(ImagesManager.getImage(RedImages.getTooltipProhibitedImage()));
@@ -156,7 +146,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingToolTipImage_forValidPythonInstallationWithoutRobotInstalled() throws Exception {
-        final RobotRuntimeEnvironment environment = new MissingRobotRuntimeEnvironment(new File("path"));
+        final IRuntimeEnvironment environment = new MissingRobotRuntimeEnvironment(null);
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipImage(environment))
                 .isSameAs(ImagesManager.getImage(RedImages.getTooltipWarnImage()));
@@ -164,7 +154,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingToolTipImage_forDeprecatedPythonInstallationWithRobotInstalled() throws Exception {
-        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(new File("path"),
+        final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.2 (Python 2.6.1 on win32)");
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipImage(environment))
@@ -173,7 +163,7 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingToolTipImage_forValidPythonInstallationWithRobotInstalled() throws Exception {
-        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(new File("path"),
+        final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.2 (Python 3.6.5 on win32)");
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipImage(environment))
@@ -182,28 +172,26 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
 
     @Test
     public void testGettingName_forPythonInstallationWithKnownVersion() throws Exception {
-        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(new File("path"),
+        final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.2 (Python 3.6.5 on win32)");
         final InstalledRobotsNamesLabelProvider labelProvider = new InstalledRobotsNamesLabelProvider(null);
         assertThat(labelProvider.getText(environment)).isEqualTo("Robot Framework 3.0.2 (Python 3.6.5 on win32)");
     }
 
     @Test
-    public void testGettingPath_forWorkspacePythonInstallation() throws Exception {
-        projectProvider.createDir("workspace_py_installation");
-        final File file = projectProvider.createFile("workspace_py_installation/python").getLocation().toFile();
-        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(file, "RF 3.0");
-        final InstalledRobotsPathsLabelProvider labelProvider = new InstalledRobotsPathsLabelProvider(null);
-        assertThat(labelProvider.getText(environment)).isEqualTo(file.getAbsolutePath());
+    public void testGettingName_forPythonInstallationWithUnknownVersion() throws Exception {
+        final IRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(null);
+        final InstalledRobotsNamesLabelProvider labelProvider = new InstalledRobotsNamesLabelProvider(null);
+        assertThat(labelProvider.getText(environment)).isEqualTo("<unknown>");
     }
 
     @Test
-    public void testGettingPath_forNonWorkspacePythonInstallation() throws Exception {
-        tempFolder.newFolder("non_workspace_py_installation");
-        final File file = tempFolder.newFile("python");
-        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(file, "RF 3.0");
+    public void testGettingPath() throws Exception {
+        final PythonInstallationDirectory pythonInstallation = mock(PythonInstallationDirectory.class);
+        when(pythonInstallation.getAbsolutePath()).thenReturn("path");
+        final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(pythonInstallation, "RF 3.0");
         final InstalledRobotsPathsLabelProvider labelProvider = new InstalledRobotsPathsLabelProvider(null);
-        assertThat(labelProvider.getText(environment)).isEqualTo(file.getAbsolutePath());
+        assertThat(labelProvider.getText(environment)).isEqualTo(pythonInstallation.getAbsolutePath());
     }
 
     private CheckboxTableViewer createViewer() {

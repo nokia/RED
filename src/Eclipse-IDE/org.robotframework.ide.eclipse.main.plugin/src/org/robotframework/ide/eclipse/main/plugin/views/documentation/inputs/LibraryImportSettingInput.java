@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -61,7 +61,7 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
 
     @Override
     protected String createFooter() {
-        final RobotRuntimeEnvironment env = element.getSuiteFile().getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = element.getSuiteFile().getProject().getRuntimeEnvironment();
         return LibrarySpecificationInput.createFooter(specification, env);
     }
 

@@ -17,8 +17,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.libraries.LibrarySpecification.LibdocFormat;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -60,7 +60,7 @@ public class PythonLibraryLibdocGeneratorTest {
     }
 
     @Test
-    public void verifyIfCreateLibdocInSeparateProcessMethodIsCalled_whenLibdocGenerationInSeparateProcessPreferanceIsEnabled()
+    public void verifyIfCreateLibdocInSeparateProcessMethodIsCalled_whenLibdocGenerationInSeparateProcessPreferenceIsEnabled()
             throws Exception {
         preferenceUpdater.setValue(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
                 true);
@@ -77,7 +77,7 @@ public class PythonLibraryLibdocGeneratorTest {
         final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName, libPath,
                 targetSpecFile, format);
 
-        final RobotRuntimeEnvironment runtimeEnvironment = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment runtimeEnvironment = mock(IRuntimeEnvironment.class);
 
         pythonGenerator.generateLibdoc(runtimeEnvironment, additionalPaths);
 
@@ -86,7 +86,7 @@ public class PythonLibraryLibdocGeneratorTest {
     }
 
     @Test
-    public void verifyIfCreateLibdocMethodIsCalled_whenLibdocGenerationInSeparateProcessPreferanceIsNotEnabled()
+    public void verifyIfCreateLibdocMethodIsCalled_whenLibdocGenerationInSeparateProcessPreferenceIsNotEnabled()
             throws Exception {
         preferenceUpdater.setValue(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
                 false);
@@ -103,7 +103,7 @@ public class PythonLibraryLibdocGeneratorTest {
         final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName, libPath,
                 targetSpecFile, format);
 
-        final RobotRuntimeEnvironment runtimeEnvironment = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment runtimeEnvironment = mock(IRuntimeEnvironment.class);
 
         pythonGenerator.generateLibdoc(runtimeEnvironment, additionalPaths);
 

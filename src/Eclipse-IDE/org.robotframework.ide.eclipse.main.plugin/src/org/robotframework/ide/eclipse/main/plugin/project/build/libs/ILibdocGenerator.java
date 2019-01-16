@@ -7,13 +7,11 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 
 interface ILibdocGenerator {
 
-    void generateLibdoc(RobotRuntimeEnvironment runtimeEnvironment, EnvironmentSearchPaths additionalPaths)
-            throws RobotEnvironmentException;
+    void generateLibdoc(IRuntimeEnvironment environment, EnvironmentSearchPaths additionalPaths);
 
     String getMessage();
 

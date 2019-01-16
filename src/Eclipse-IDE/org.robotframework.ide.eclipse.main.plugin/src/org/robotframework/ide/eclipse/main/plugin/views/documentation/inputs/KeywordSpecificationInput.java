@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -57,7 +57,7 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
     }
 
     @Override
-    public String provideHtml(final RobotRuntimeEnvironment environment) throws DocumentationInputGenerationException {
+    public String provideHtml(final IRuntimeEnvironment environment) throws DocumentationInputGenerationException {
         final String header = createHeader();
         final Documentation doc = libSpec.createKeywordDocumentation(kwSpec.getName());
 

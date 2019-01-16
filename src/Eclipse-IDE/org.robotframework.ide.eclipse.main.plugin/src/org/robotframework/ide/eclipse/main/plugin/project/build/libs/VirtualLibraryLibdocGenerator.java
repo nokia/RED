@@ -16,9 +16,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
+import org.rf.ide.core.libraries.LibrarySpecification.LibdocFormat;
 
 import com.google.common.io.Files;
 
@@ -28,7 +28,9 @@ import com.google.common.io.Files;
 class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
 
     private final IPath path;
+
     private final IFile targetSpecFile;
+
     private final LibdocFormat format;
 
     public VirtualLibraryLibdocGenerator(final IPath libPath, final IFile targetSpecFile, final LibdocFormat format) {
@@ -38,8 +40,7 @@ class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
+    public void generateLibdoc(final IRuntimeEnvironment environment, final EnvironmentSearchPaths additionalPaths) {
         final IPath pathToUse = format == LibdocFormat.XML ? path : path.removeFileExtension().addFileExtension("html");
         if (pathToUse.isAbsolute()) {
             // we only copy virtual libraries from outside of workspace; those contained inside will
@@ -47,13 +48,13 @@ class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
             try {
                 Files.copy(pathToUse.toFile(), targetSpecFile.getLocation().toFile());
             } catch (final IOException e) {
-                throw new RobotEnvironmentException(
+                throw new RuntimeEnvironmentException(
                         "Unable to create link to '" + pathToUse.toOSString() + "' libspec file", e);
             }
         } else if (format == LibdocFormat.HTML) {
             final IResource member = ResourcesPlugin.getWorkspace().getRoot().findMember(pathToUse);
             if (member == null) {
-                throw new RobotEnvironmentException(
+                throw new RuntimeEnvironmentException(
                         "Unable to create link to '" + pathToUse.toOSString() + "' libspec file");
             }
 
@@ -64,7 +65,7 @@ class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
                     targetSpecFile.create(source, true, new NullProgressMonitor());
                 }
             } catch (final IOException | CoreException e) {
-                throw new RobotEnvironmentException(
+                throw new RuntimeEnvironmentException(
                         "Unable to create link to '" + pathToUse.toOSString() + "' libdoc file", e);
             }
 

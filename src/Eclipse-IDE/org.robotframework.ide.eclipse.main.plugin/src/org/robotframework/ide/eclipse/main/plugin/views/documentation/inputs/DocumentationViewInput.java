@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 
 public interface DocumentationViewInput {
 
@@ -18,7 +18,7 @@ public interface DocumentationViewInput {
 
     public String provideHtml() throws DocumentationInputGenerationException;
 
-    public String provideHtml(RobotRuntimeEnvironment environment) throws DocumentationInputGenerationException;
+    public String provideHtml(IRuntimeEnvironment environment) throws DocumentationInputGenerationException;
 
     public String provideRawText() throws DocumentationInputGenerationException;
 

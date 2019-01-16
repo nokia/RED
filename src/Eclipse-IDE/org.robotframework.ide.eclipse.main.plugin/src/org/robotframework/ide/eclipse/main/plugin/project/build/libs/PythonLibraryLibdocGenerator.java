@@ -10,16 +10,18 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.libraries.LibrarySpecification.LibdocFormat;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
     private final String libName;
+
     private final String libPath;
+
     private final IFile targetSpecFile;
+
     private final LibdocFormat format;
 
     PythonLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile,
@@ -31,16 +33,15 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
+    public void generateLibdoc(final IRuntimeEnvironment environment, final EnvironmentSearchPaths additionalPaths) {
         final File libFile = new File(libPath);
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
         final File outputFile = targetSpecFile.getLocation().toFile();
         if (RedPlugin.getDefault().getPreferences().isPythonLibrariesLibdocGenerationInSeparateProcessEnabled()) {
-            runtimeEnvironment.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths);
+            environment.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths);
         } else {
-            runtimeEnvironment.createLibdoc(libName, outputFile, format, additionalPaths);
+            environment.createLibdoc(libName, outputFile, format, additionalPaths);
         }
     }
 

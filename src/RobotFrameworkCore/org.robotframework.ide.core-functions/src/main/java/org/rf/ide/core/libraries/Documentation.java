@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 
 public final class Documentation {
 
@@ -41,7 +41,7 @@ public final class Documentation {
         return localSymbols;
     }
 
-    public String provideFormattedDocumentation(final RobotRuntimeEnvironment env) {
+    public String provideFormattedDocumentation(final IRuntimeEnvironment env) {
         return env.createHtmlDoc(rawDocumentation, format);
     }
 

@@ -10,7 +10,7 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
@@ -43,7 +43,7 @@ public class CodeElementsTableEditConfiguration extends AbstractRegistryConfigur
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
-        final RobotRuntimeEnvironment env = suiteFile.getRuntimeEnvironment();
+        final IRuntimeEnvironment env = suiteFile.getRuntimeEnvironment();
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new SettingProposalsProvider(env, settingsProposalsTarget),
                 new CodeReservedElementsProposalsProvider(env, dataProvider),

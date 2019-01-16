@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
@@ -29,7 +29,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class RobotProjectHolder {
 
-    private final RobotRuntimeEnvironment robotRuntime;
+    private final IRuntimeEnvironment runtimeEnvironment;
 
     private RobotProjectConfig currentConfiguration;
 
@@ -45,22 +45,22 @@ public class RobotProjectHolder {
         this(new NullRuntimeEnvironment());
     }
 
-    public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
-        this.robotRuntime = robotRuntime;
+    public RobotProjectHolder(final IRuntimeEnvironment runtimeEnvironment) {
+        this.runtimeEnvironment = runtimeEnvironment;
     }
 
     public void configure(final RobotProjectConfig configuration, final File projectLocation) {
         if (currentConfiguration != configuration || globalVariables.isEmpty() && variableMappings.isEmpty()) {
             currentConfiguration = configuration;
-            setGlobalVariables(map(robotRuntime.getGlobalVariables()));
+            setGlobalVariables(map(runtimeEnvironment.getGlobalVariables()));
             setVariableMappings(
                     VariableMappingsResolver.resolve(currentConfiguration.getVariableMappings(), projectLocation));
-            setModuleSearchPaths(robotRuntime.getModuleSearchPaths());
+            setModuleSearchPaths(runtimeEnvironment.getModuleSearchPaths());
         }
     }
 
-    public RobotRuntimeEnvironment getRobotRuntime() {
-        return robotRuntime;
+    public IRuntimeEnvironment getRuntimeEnvironment() {
+        return runtimeEnvironment;
     }
 
     public void setGlobalVariables(final List<ARobotInternalVariable<?>> variables) {

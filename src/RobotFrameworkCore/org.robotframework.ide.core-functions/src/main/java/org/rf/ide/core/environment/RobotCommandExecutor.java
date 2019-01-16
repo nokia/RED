@@ -9,8 +9,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
+import org.rf.ide.core.libraries.LibrarySpecification.LibdocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
 
 /**

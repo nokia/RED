@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.core.resources.IFile;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -49,7 +49,7 @@ public class TaskInputTest {
 
     @Test
     public void properHtmlIsReturned_forTaskWithoutTemplate() throws Exception {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
         final RobotTask task = createTask("task");
@@ -67,7 +67,7 @@ public class TaskInputTest {
 
     @Test
     public void properHtmlIsReturned_forTaskWithTemplate() throws Exception {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
         final RobotTask task = createTemplatedTask("task", "template kw");

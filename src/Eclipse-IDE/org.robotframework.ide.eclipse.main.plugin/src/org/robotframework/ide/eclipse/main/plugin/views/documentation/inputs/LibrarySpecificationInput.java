@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.KeywordSpecification;
@@ -59,7 +59,7 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
     }
 
     @Override
-    public String provideHtml(final RobotRuntimeEnvironment environment) throws DocumentationInputGenerationException {
+    public String provideHtml(final IRuntimeEnvironment environment) throws DocumentationInputGenerationException {
         final String header = createHeader(project.getProject(), specification);
         final Documentation doc = specification.createDocumentation();
         final String footer = createFooter(specification, environment);
@@ -92,12 +92,12 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
         }
     }
 
-    static String createFooter(final LibrarySpecification specification, final RobotRuntimeEnvironment env) {
+    static String createFooter(final LibrarySpecification specification, final IRuntimeEnvironment env) {
         final String shortcuts = specification.getKeywordsStream()
                 .map(KeywordSpecification::getName)
                 .map(name -> "`" + name + "`")
                 .collect(joining(" &middot; "));
-        
+
         final StringBuilder builder = new StringBuilder();
         if (specification.getConstructor() != null) {
             builder.append(Formatters.title("Importing", 2));

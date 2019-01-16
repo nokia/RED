@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.swt.graphics.RGB;
 import org.rf.ide.core.RedURI;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
@@ -28,9 +28,9 @@ public class DocumentationsFormatter {
 
     private static final Pattern HEADER_PATTERN = Pattern.compile("<h(\\d)>([\\w\\d _]+)</h\\d>");
 
-    private final RobotRuntimeEnvironment env;
+    private final IRuntimeEnvironment env;
 
-    public DocumentationsFormatter(final RobotRuntimeEnvironment env) {
+    public DocumentationsFormatter(final IRuntimeEnvironment env) {
         this.env = env;
     }
 

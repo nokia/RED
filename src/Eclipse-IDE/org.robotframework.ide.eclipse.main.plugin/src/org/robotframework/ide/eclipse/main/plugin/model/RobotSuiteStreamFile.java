@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import java.io.File;
 import java.util.List;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
@@ -59,14 +59,14 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         if (version != null) {
             return version;
         }
-        final RobotRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
+        final IRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
         return env == null ? RobotVersion.UNKNOWN : RobotVersion.from(env.getVersion());
     }
 
     @Override
     protected ParsingStrategy createReparsingStrategy(final String newContent) {
         return () -> {
-            final RobotRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
+            final IRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
             final RobotParser parser = RobotParser.create(new RobotProjectHolder(env),
                     getRobotParserComplianceVersion(), (PathsProvider) null);
             return parser.parseEditorContent(newContent, new File(name));

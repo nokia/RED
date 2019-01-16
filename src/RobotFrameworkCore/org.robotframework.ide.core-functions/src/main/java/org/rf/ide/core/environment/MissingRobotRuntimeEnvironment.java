@@ -12,13 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
+import org.rf.ide.core.libraries.LibrarySpecification.LibdocFormat;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.rf.ide.core.rflint.RfLintRule;
 
 public class MissingRobotRuntimeEnvironment extends RobotRuntimeEnvironment {
 
-    public MissingRobotRuntimeEnvironment(final File location) {
+    public MissingRobotRuntimeEnvironment(final PythonInstallationDirectory location) {
         super(location, null);
     }
 

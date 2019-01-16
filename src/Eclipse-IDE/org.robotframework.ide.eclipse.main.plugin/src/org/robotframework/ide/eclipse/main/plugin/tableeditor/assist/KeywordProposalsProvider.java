@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
@@ -46,7 +46,7 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> keywordsProposals = new RedKeywordProposals(suiteFile.get())
                 .getKeywordProposals(prefix);
 
-        final RobotRuntimeEnvironment env = suiteFile.get().getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = suiteFile.get().getProject().getRuntimeEnvironment();
         if (!dataProvider.isPresent()) {
             return keywordsProposals.stream().map(proposal -> new AssistProposalAdapter(env, proposal)).toArray(
                     RedContentProposal[]::new);

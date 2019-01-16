@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -61,7 +61,7 @@ public class RedLibraryProposals {
     public List<? extends AssistProposal> getSitePackagesLibrariesProposals(final String userContent,
             final Comparator<? super RedSitePackagesLibraryProposal> comparator) {
 
-        final RobotRuntimeEnvironment env = suiteFile.getRuntimeEnvironment();
+        final IRuntimeEnvironment env = suiteFile.getRuntimeEnvironment();
         final SitePackagesLibraries sitePackagesLibraries = env.getSitePackagesLibrariesNames();
         final List<RedSitePackagesLibraryProposal> robotProposals = new ArrayList<>();
         final List<RedSitePackagesLibraryProposal> nonRobotProposals = new ArrayList<>();

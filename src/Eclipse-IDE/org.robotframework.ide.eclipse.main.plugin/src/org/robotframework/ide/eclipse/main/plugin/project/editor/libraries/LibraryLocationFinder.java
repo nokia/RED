@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
@@ -36,7 +36,7 @@ public class LibraryLocationFinder {
 
     private static Optional<IPath> findStandardLibPath(final RobotProject robotProject,
             final LibrarySpecification libSpec) {
-        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+        final IRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         final Optional<File> standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(libSpec.getName());
         return standardLibraryPath.map(file -> new Path(file.getAbsolutePath()));
     }

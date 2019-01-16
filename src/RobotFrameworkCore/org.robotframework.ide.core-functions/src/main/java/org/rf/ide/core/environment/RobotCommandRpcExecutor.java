@@ -37,11 +37,11 @@ import org.apache.xmlrpc.serializer.NullSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializerImpl;
 import org.rf.ide.core.RedSystemProperties;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.LibdocFormat;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
+import org.rf.ide.core.libraries.LibrarySpecification.LibdocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -161,7 +161,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return variables;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -175,7 +175,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return variables;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -189,7 +189,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return libraries;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -199,7 +199,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             final String path = (String) callRpcFunction("getStandardLibraryPath", libName);
             return new File(path);
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -218,7 +218,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return libraries;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -227,7 +227,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         try {
             return (String) callRpcFunction("getRobotVersion");
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -240,9 +240,9 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     additionalPaths.getClassPaths());
             writeBase64EncodedLibdoc(outputFile, base64EncodedLibFileContent);
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         } catch (final IOException e) {
-            throw new RobotEnvironmentException(
+            throw new RuntimeEnvironmentException(
                     "Unable to generate library specification file for library '" + libName + "'", e);
         }
     }
@@ -258,9 +258,9 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 writeBase64EncodedLibdoc(outputFile, base64EncodedLibFileContent);
             }
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         } catch (final IOException e) {
-            throw new RobotEnvironmentException(
+            throw new RuntimeEnvironmentException(
                     "Unable to generate library specification file for library '" + libName + "'", e);
         }
     }
@@ -283,7 +283,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         try {
             return (String) callRpcFunction("createHtmlDoc", doc, format.name());
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -299,7 +299,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return libraries;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -310,7 +310,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     additionalPaths.getExtendedPythonPaths(interpreterType), additionalPaths.getClassPaths());
             return new File(path);
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -325,7 +325,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return classes;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -338,7 +338,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     projectLocation.getAbsolutePath(), recursiveInVirtualenv, excludedPaths,
                     additionalPaths.getExtendedPythonPaths(interpreterType), additionalPaths.getClassPaths());
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -349,7 +349,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             callRpcFunction("startKeywordAutoDiscovering", port, dataSource.getAbsolutePath(),
                     additionalPaths.getExtendedPythonPaths(interpreterType), additionalPaths.getClassPaths());
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -358,7 +358,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         try {
             callRpcFunction("stopAutoDiscovering");
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -371,7 +371,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     filepath.getAbsolutePath(), createRfLintArguments(rules, rulesFiles, additionalArguments));
 
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -405,7 +405,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             return new String(bytes, Charsets.UTF_8);
 
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -424,7 +424,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             final String exception = (String) result.get("exception");
             final String indent = Strings.repeat(" ", 12);
             final String indentedException = indent + exception.replaceAll("\n", "\n" + indent);
-            throw new RobotEnvironmentException("RED python session problem. Following exception has been thrown by "
+            throw new RuntimeEnvironmentException("RED python session problem. Following exception has been thrown by "
                     + "python service:\n" + indentedException);
         }
         return result.get("result");

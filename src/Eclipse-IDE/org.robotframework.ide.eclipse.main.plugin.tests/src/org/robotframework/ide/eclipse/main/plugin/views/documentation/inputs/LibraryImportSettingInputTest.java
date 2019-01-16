@@ -20,7 +20,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -86,7 +86,7 @@ public class LibraryImportSettingInputTest {
 
     @Test
     public void properHtmlIsReturned_forLibraryImport() throws Exception {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
         final RobotSetting libImport = createLibraryImportSetting("lib");

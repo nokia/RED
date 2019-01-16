@@ -17,7 +17,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.VariablesPlugin;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
@@ -123,7 +123,7 @@ class LaunchConfigurationTabValidator {
         if (!projectName.isEmpty() && executableFilePath.isEmpty()) {
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
             final RobotProject robotProject = model.createRobotProject(project);
-            final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
+            final IRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
             if (!env.isValidPythonInstallation()) {
                 throw new LaunchConfigurationValidationFatalException(
                         "Project '" + projectName + "' uses invalid Python environment");

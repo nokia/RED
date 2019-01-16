@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -60,20 +60,20 @@ public class ConvertToRobotFileFormat extends RedSuiteMarkerResolution {
         final IResource file = marker.getResource();
         final IContainer parent = file.getParent();
         final RobotProject project = RedPlugin.getModelManager().createProject(file.getProject());
-        final RobotRuntimeEnvironment runtimeEnvironment = project.getRuntimeEnvironment();
+        final IRuntimeEnvironment runtimeEnvironment = project.getRuntimeEnvironment();
 
         return Optional.of(new FormatConversionProposal(runtimeEnvironment, parent, localFile));
     }
 
     private class FormatConversionProposal implements ICompletionProposal {
 
-        private final RobotRuntimeEnvironment runtimeEnvironment;
+        private final IRuntimeEnvironment runtimeEnvironment;
 
         private final IContainer parentResource;
 
         private final File originalFile;
 
-        public FormatConversionProposal(final RobotRuntimeEnvironment runtimeEnvironment,
+        public FormatConversionProposal(final IRuntimeEnvironment runtimeEnvironment,
                 final IContainer parentResource, final File originalFile) {
             this.runtimeEnvironment = runtimeEnvironment;
             this.parentResource = parentResource;

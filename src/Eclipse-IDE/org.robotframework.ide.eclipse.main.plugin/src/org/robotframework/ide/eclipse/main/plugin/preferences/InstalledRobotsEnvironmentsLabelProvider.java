@@ -14,8 +14,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonVersion;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -33,7 +33,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
     @Override
     public Color getForeground(final Object element) {
-        final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
+        final IRuntimeEnvironment env = (IRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
             return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_RED);
         } else if (!env.hasRobotInstalled() || !env.isCompatibleRobotInstallation()) {
@@ -52,7 +52,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
     @Override
     public String getToolTipText(final Object element) {
-        final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
+        final IRuntimeEnvironment env = (IRuntimeEnvironment) element;
         final String dirPath = env.getFile().getAbsolutePath();
         if (!env.isValidPythonInstallation()) {
             return String.format("The location '%s' does not seem to be a valid Python directory", dirPath);
@@ -71,7 +71,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
     @Override
     public Image getToolTipImage(final Object element) {
-        final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) element;
+        final IRuntimeEnvironment env = (IRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
             return ImagesManager.getImage(RedImages.getTooltipProhibitedImage());
         } else if (!env.hasRobotInstalled() || !env.isCompatibleRobotInstallation()) {
@@ -88,7 +88,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
         @Override
         public String getText(final Object element) {
-            return ((RobotRuntimeEnvironment) element).getVersion();
+            return ((IRuntimeEnvironment) element).getVersion();
         }
     }
 
@@ -100,7 +100,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
         @Override
         public String getText(final Object element) {
-            return ((RobotRuntimeEnvironment) element).getFile().getAbsolutePath();
+            return ((IRuntimeEnvironment) element).getFile().getAbsolutePath();
         }
     }
 }

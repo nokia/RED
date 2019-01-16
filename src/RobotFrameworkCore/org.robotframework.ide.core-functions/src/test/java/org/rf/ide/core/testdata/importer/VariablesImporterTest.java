@@ -18,7 +18,7 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -43,7 +43,7 @@ public class VariablesImporterTest {
         // prepare
         final PathsProvider pathsProvider = mock(PathsProvider.class);
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
         final File processedFile = temporaryFolder.newFile("robot.robot");
 
@@ -83,7 +83,7 @@ public class VariablesImporterTest {
                 .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
 
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
         final File processedFile = temporaryFolder.newFile("robot.robot");
         temporaryFolder.newFile("empty.py");
@@ -124,7 +124,7 @@ public class VariablesImporterTest {
                 .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
 
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
         final File processedFile = temporaryFolder.newFile("importing.robot");
         temporaryFolder.newFile("robot.py");
@@ -160,7 +160,7 @@ public class VariablesImporterTest {
                 .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
 
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
         final File processedFile = temporaryFolder.newFile("robot.robot");
         temporaryFolder.newFile("robot.py");
@@ -188,7 +188,7 @@ public class VariablesImporterTest {
         // prepare
         final PathsProvider pathsProvider = mock(PathsProvider.class);
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         final RobotFile fileModel = robotFile.getFileModel();

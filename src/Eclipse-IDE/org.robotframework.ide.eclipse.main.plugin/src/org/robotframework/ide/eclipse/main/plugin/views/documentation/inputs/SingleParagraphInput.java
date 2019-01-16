@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 
@@ -35,7 +35,7 @@ public class SingleParagraphInput implements DocumentationViewInput {
     }
 
     @Override
-    public String provideHtml(final RobotRuntimeEnvironment environment) throws DocumentationInputGenerationException {
+    public String provideHtml(final IRuntimeEnvironment environment) throws DocumentationInputGenerationException {
         final Documentation doc = new Documentation(DocFormat.ROBOT, paragraphSupplier.get());
         return new DocumentationsFormatter(environment).format(doc);
     }

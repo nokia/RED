@@ -16,6 +16,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rf.ide.core.RedSystemProperties;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.watcher.RedFileWatcher;
@@ -84,15 +85,15 @@ public class RedPlugin extends AbstractUIPlugin {
         return new RedPreferences(getPreferenceStore());
     }
 
-    public RobotRuntimeEnvironment getActiveRobotInstallation() {
+    public IRuntimeEnvironment getActiveRobotInstallation() {
         return InstalledRobotEnvironments.getActiveRobotInstallation(getPreferences());
     }
 
-    public RobotRuntimeEnvironment getRobotInstallation(final File file, final SuiteExecutor executor) {
+    public IRuntimeEnvironment getRobotInstallation(final File file, final SuiteExecutor executor) {
         return InstalledRobotEnvironments.getRobotInstallation(getPreferences(), file, executor);
     }
 
-    public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
+    public List<IRuntimeEnvironment> getAllRuntimeEnvironments() {
         return InstalledRobotEnvironments.getAllRobotInstallation(getPreferences());
     }
 

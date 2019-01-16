@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
@@ -51,9 +50,7 @@ public class RobotParserTest {
         // prepare
         final String fileContent = "*** Test Cases ***\nTest1\n\tLog\t\tc";
 
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
         final RobotParser parser = RobotParser.create(projectHolder,
@@ -74,9 +71,7 @@ public class RobotParserTest {
         // prepare
         final String fileContent = "*** Test Cases ***\nTest1\n\tLog\t\tc\n";
 
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
         final RobotParser parser = RobotParser.create(projectHolder,
@@ -110,9 +105,7 @@ public class RobotParserTest {
     @Test
     public void test_create_when_robotFramework_correct29() {
         // prepare
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
         final RobotParser parser = RobotParser.create(projectHolder,
@@ -127,9 +120,7 @@ public class RobotParserTest {
     @Test(timeout = 10000)
     public void test_loopedResources_shouldPassFastAndWithoutAny_reReadFiles_BUG_RED_352_GITHUB_23() throws Exception {
         // prepare
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
+        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder());
 
         final PathsProvider pathsProvider = mock(PathsProvider.class);
         when(pathsProvider.targetExists(any(URI.class)))
@@ -241,9 +232,7 @@ public class RobotParserTest {
     private void assertOneCorrectAndOneWrongVariable_ifAllWasReadAndWillBePresented(final String filename)
             throws Exception {
         // prepare
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         final RobotParser parser = spy(
                 RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
@@ -293,9 +282,7 @@ public class RobotParserTest {
     public void test_givenTwoTestCasesInTsvFile_oneIsEmpty_andSecondIsJustVariableName_withEmptyExecute()
             throws Exception {
         // prepare
-        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
-        when(runtime.getVersion()).thenReturn("2.9");
-        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder(runtime));
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         final RobotParser parser = spy(
                 RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));

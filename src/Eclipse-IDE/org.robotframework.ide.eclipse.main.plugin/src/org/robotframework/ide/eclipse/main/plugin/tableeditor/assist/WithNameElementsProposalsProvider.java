@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
@@ -21,11 +21,11 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 
 public class WithNameElementsProposalsProvider implements RedContentProposalProvider {
 
-    private final RobotRuntimeEnvironment environment;
+    private final IRuntimeEnvironment environment;
 
     private final IRowDataProvider<?> dataProvider;
 
-    public WithNameElementsProposalsProvider(final RobotRuntimeEnvironment environment,
+    public WithNameElementsProposalsProvider(final IRuntimeEnvironment environment,
             final IRowDataProvider<?> dataProvider) {
         this.environment = environment;
         this.dataProvider = dataProvider;

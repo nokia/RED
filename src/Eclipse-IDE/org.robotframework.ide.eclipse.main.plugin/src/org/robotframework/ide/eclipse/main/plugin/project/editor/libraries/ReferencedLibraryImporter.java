@@ -30,8 +30,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.RedURI;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -53,29 +53,29 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
     }
 
     @Override
-    public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
-            final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
+    public Collection<ReferencedLibrary> importPythonLib(final IRuntimeEnvironment environment, final IProject project,
+            final RobotProjectConfig config, final String fullLibraryPath) {
         final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
         return importLib(builder, fullLibraryPath, Optional.empty(), RedImages.getPythonLibraryImage());
     }
 
     @Override
-    public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
-            final IProject project, final RobotProjectConfig config, final String fullLibraryPath, final String name) {
+    public Collection<ReferencedLibrary> importPythonLib(final IRuntimeEnvironment environment, final IProject project,
+            final RobotProjectConfig config, final String fullLibraryPath, final String name) {
         final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
         return importLib(builder, fullLibraryPath, Optional.of(name), RedImages.getPythonLibraryImage());
     }
 
     @Override
-    public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
-            final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
+    public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment, final IProject project,
+            final RobotProjectConfig config, final String fullLibraryPath) {
         final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
         return importLib(builder, fullLibraryPath, Optional.empty(), RedImages.getJavaClassImage());
     }
 
     @Override
-    public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
-            final IProject project, final RobotProjectConfig config, final String fullLibraryPath, final String name) {
+    public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment, final IProject project,
+            final RobotProjectConfig config, final String fullLibraryPath, final String name) {
         final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
         return importLib(builder, fullLibraryPath, Optional.of(name), RedImages.getJavaClassImage());
     }
@@ -97,7 +97,7 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
                     libClasses.addAll(libClassesFromFile.stream()
                             .filter(libClass -> !name.isPresent() || libClass.getQualifiedName().equals(name.get()))
                             .collect(Collectors.toList()));
-                } catch (final RobotEnvironmentException | URISyntaxException e) {
+                } catch (final RuntimeEnvironmentException | URISyntaxException e) {
                     throw new InvocationTargetException(e);
                 }
             });

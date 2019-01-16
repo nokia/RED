@@ -198,4 +198,9 @@ public class LibrarySpecification {
     public int hashCode() {
         return Objects.hashCode(name, keywords, version, descriptor);
     }
+
+    public static enum LibdocFormat {
+        XML,
+        HTML
+    }
 }

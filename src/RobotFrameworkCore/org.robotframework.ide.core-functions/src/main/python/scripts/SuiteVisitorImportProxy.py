@@ -133,7 +133,7 @@ class RedImporter(object):
         return None
 
     def _handle_keywords(self, library):
-        if library and hasattr(library, 'handlers'):
+        if library is not None and hasattr(library, 'handlers'):
             for keyword in library.handlers:
                 if keyword not in self.cached_kw_items and not isinstance(keyword, _JavaHandler):
                     try:
@@ -184,4 +184,20 @@ class PythonKeywordSource(object):
         else:
             function = keyword._get_handler(keyword.library.get_instance(), keyword._handler_name)
 
-        return function.__wrapped__ if hasattr(function, '__wrapped__') else function
+        return PythonKeywordSource._try_to_find_decorated_function(function)
+
+    @staticmethod
+    def _try_to_find_decorated_function(function):
+        try:
+            if hasattr(function, '__wrapped__'):
+                # decorated functions support, https://pypi.org/project/decorator
+                wrapped = getattr(function, '__wrapped__')
+                return PythonKeywordSource._try_to_find_decorated_function(wrapped)
+            elif hasattr(function, '__functions'):
+                # overloaded functions support, see https://github.com/bintoro/overloading.py
+                overloaded = getattr(function, '__functions')[0][0]
+                return PythonKeywordSource._try_to_find_decorated_function(overloaded)
+            else:
+                return function
+        except:
+            return function

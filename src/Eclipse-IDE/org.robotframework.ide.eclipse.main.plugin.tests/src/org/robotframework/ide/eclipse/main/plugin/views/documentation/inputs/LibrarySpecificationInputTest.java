@@ -18,7 +18,7 @@ import java.net.URISyntaxException;
 import org.eclipse.ui.IWorkbenchPage;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryConstructor;
@@ -58,7 +58,7 @@ public class LibrarySpecificationInputTest {
 
     @Test
     public void properHtmlIsReturnedForLibrary_whenItHasNoConstructor() {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
@@ -86,7 +86,7 @@ public class LibrarySpecificationInputTest {
 
     @Test
     public void properHtmlIsReturnedForLibrary_whenItHasConstructor() {
-        final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());

@@ -13,8 +13,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonVersion;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -94,7 +94,7 @@ class RobotArtifactsBuilder {
         }
 
         final SubMonitor runtimeEnvCreationMonitor = subMonitor.newChild(15);
-        final RobotRuntimeEnvironment runtimeEnvironment = provideRuntimeEnvironment(robotProject, configuration,
+        final IRuntimeEnvironment runtimeEnvironment = provideRuntimeEnvironment(robotProject, configuration,
                 fatalReporter);
         runtimeEnvCreationMonitor.done();
         if (subMonitor.isCanceled()) {
@@ -126,10 +126,10 @@ class RobotArtifactsBuilder {
     }
 
     @VisibleForTesting
-    RobotRuntimeEnvironment provideRuntimeEnvironment(final RobotProject robotProject,
+    IRuntimeEnvironment provideRuntimeEnvironment(final RobotProject robotProject,
             final RobotProjectConfig configuration, final ValidationReportingStrategy reporter) {
 
-        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+        final IRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         if (runtimeEnvironment.isNullEnvironment()) {
             final String location = configuration.providePythonLocation();
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_MISSING)

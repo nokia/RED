@@ -25,7 +25,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.RedURI;
-import org.rf.ide.core.environment.RobotRuntimeEnvironment;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -214,14 +214,14 @@ class ExternalLibrariesImportCollector {
     private static class DiscoveringLibraryImporter implements IReferencedLibraryImporter {
 
         @Override
-        public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
+        public Collection<ReferencedLibrary> importPythonLib(final IRuntimeEnvironment environment,
                 final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
             final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
             return importLib(builder, fullLibraryPath, Optional.empty());
         }
 
         @Override
-        public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
+        public Collection<ReferencedLibrary> importPythonLib(final IRuntimeEnvironment environment,
                 final IProject project, final RobotProjectConfig config, final String fullLibraryPath,
                 final String name) {
             final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
@@ -229,14 +229,14 @@ class ExternalLibrariesImportCollector {
         }
 
         @Override
-        public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
+        public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment,
                 final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
             final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
             return importLib(builder, fullLibraryPath, Optional.empty());
         }
 
         @Override
-        public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
+        public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment,
                 final IProject project, final RobotProjectConfig config, final String fullLibraryPath,
                 final String name) {
             final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
