@@ -25,7 +25,7 @@ public class KeywordsProblemTest {
     }
 
     @Test
-    public void forInExpressionWronglyTyped_hasResolutionAndProvidesAFixer() {
+    public void forInExpressionWronglyTyped_hasResolutionAndProvidesFixer() {
         final IMarker marker = mock(IMarker.class);
         when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("IN RANGE");
         
@@ -34,6 +34,18 @@ public class KeywordsProblemTest {
         assertThat(problem.hasResolution()).isTrue();
         final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
         assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to 'IN RANGE'");
+    }
+
+    @Test
+    public void keywordFromNestedLibrary_hasResoulutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("myLib");
+
+        final KeywordsProblem problem = KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Import 'myLib' library");
     }
 
 }
