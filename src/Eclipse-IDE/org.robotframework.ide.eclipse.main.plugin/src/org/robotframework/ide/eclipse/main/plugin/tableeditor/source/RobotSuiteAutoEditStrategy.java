@@ -139,10 +139,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
     }
 
     private boolean isEmptyCellToken(final IRobotLineElement firstElement) {
-        final List<IRobotTokenType> types = firstElement.getTypes();
-        return types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL)
-                || types.contains(RobotTokenType.TASK_EMPTY_CELL)
-                || types.contains(RobotTokenType.KEYWORD_EMPTY_CELL);
+        return firstElement.getTypes().contains(RobotTokenType.EMPTY_CELL);
     }
 
     private boolean isEndTerminatedForLoopStyle(final RobotToken token) {

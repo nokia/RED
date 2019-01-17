@@ -57,10 +57,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
         this.keywordName = keywordName;
     }
 
+    @Override
     public AModelElement<UserKeyword> addElement(final AModelElement<?> element) {
         return addElement(allElements.size(), element);
     }
 
+    @Override
     public AModelElement<UserKeyword> addElement(final int index, final AModelElement<?> element) {
         @SuppressWarnings("unchecked")
         final AModelElement<UserKeyword> elementCasted = (AModelElement<UserKeyword>) element;
@@ -102,13 +104,9 @@ public class UserKeyword extends AModelElement<KeywordTable>
         allElements.clear();
     }
 
-    public List<AModelElement<UserKeyword>> getAllElements() {
-        return Collections.unmodifiableList(allElements);
-    }
-
     @Override
     public List<AModelElement<UserKeyword>> getElements() {
-        return getAllElements();
+        return Collections.unmodifiableList(allElements);
     }
 
     @Override

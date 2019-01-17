@@ -16,7 +16,6 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -82,15 +81,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public ModelType getModelType() {
-        final List<IRobotTokenType> types = empty.getTypes();
-        if (types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL)) {
-            return ModelType.TEST_CASE_EMPTY_LINE;
-        } else if (types.contains(RobotTokenType.TASK_EMPTY_CELL)) {
-            return ModelType.TASK_EMPTY_LINE;
-        } else if (types.contains(RobotTokenType.KEYWORD_EMPTY_CELL)) {
-            return ModelType.USER_KEYWORD_EMPTY_LINE;
-        }
-        return ModelType.UNKNOWN;
+        return empty.getTypes().contains(RobotTokenType.EMPTY_CELL) ? ModelType.EMPTY_LINE : ModelType.UNKNOWN;
     }
 
     @Override
@@ -128,18 +119,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
     }
 
     private RobotTokenType getRobotTokenType() {
-        final AModelElement<?> parent = (AModelElement<?>) getParent();
-        if (parent != null) {
-            final ModelType parentType = parent.getModelType();
-            if (parentType == ModelType.TEST_CASE) {
-                return RobotTokenType.TEST_CASE_EMPTY_CELL;
-            } else if (parentType == ModelType.TASK) {
-                return RobotTokenType.TASK_EMPTY_CELL;
-            } else if (parentType == ModelType.USER_KEYWORD) {
-                return RobotTokenType.KEYWORD_EMPTY_CELL;
-            }
-        }
-        return RobotTokenType.UNKNOWN;
+        return getParent() != null ? RobotTokenType.EMPTY_CELL : RobotTokenType.UNKNOWN;
     }
 
 }

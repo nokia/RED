@@ -78,10 +78,12 @@ public class Task extends CommonCase<TaskTable, Task> implements Serializable {
         return taskName;
     }
 
+    @Override
     public AModelElement<Task> addElement(final AModelElement<?> element) {
         return addElement(allElements.size(), element);
     }
 
+    @Override
     public AModelElement<Task> addElement(final int index, final AModelElement<?> element) {
         @SuppressWarnings("unchecked")
         final AModelElement<Task> elementCasted = (AModelElement<Task>) element;
@@ -122,13 +124,9 @@ public class Task extends CommonCase<TaskTable, Task> implements Serializable {
         allElements.clear();
     }
 
-    public List<AModelElement<Task>> getAllElements() {
-        return Collections.unmodifiableList(allElements);
-    }
-
     @Override
     public List<AModelElement<Task>> getElements() {
-        return getAllElements();
+        return Collections.unmodifiableList(allElements);
     }
 
     @Override

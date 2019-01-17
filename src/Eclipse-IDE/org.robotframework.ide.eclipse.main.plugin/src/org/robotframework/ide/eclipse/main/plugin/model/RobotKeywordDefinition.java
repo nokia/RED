@@ -66,7 +66,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     public void link() {
         final UserKeyword keyword = getLinkedElement();
 
-        for (final AModelElement<UserKeyword> el : keyword.getAllElements()) {
+        for (final AModelElement<UserKeyword> el : keyword.getElements()) {
             if (el instanceof RobotExecutableRow) {
                 getChildren().add(new RobotKeywordCall(this, el));
             } else if (el instanceof RobotEmptyRow) {

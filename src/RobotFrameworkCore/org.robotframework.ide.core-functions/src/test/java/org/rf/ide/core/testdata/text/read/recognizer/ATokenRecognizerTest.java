@@ -18,7 +18,7 @@ public class ATokenRecognizerTest {
     public void test_hasNextAndNextGetting_twoTimesForFoobar() {
         // prepare
         final Pattern p = Pattern.compile("foobar");
-        final RobotTokenType type = RobotTokenType.TEST_CASE_EMPTY_CELL;
+        final RobotTokenType type = RobotTokenType.EMPTY_CELL;
         final ATokenRecognizer rec = new DummyTokenRecognizer(p, type);
         final StringBuilder text = new StringBuilder("foobarfoobar");
 
@@ -42,7 +42,7 @@ public class ATokenRecognizerTest {
     public void test_hasNextAndNextGetting_oneTimeForFoobar() {
         // prepare
         final Pattern p = Pattern.compile("foobar");
-        final RobotTokenType type = RobotTokenType.TEST_CASE_EMPTY_CELL;
+        final RobotTokenType type = RobotTokenType.EMPTY_CELL;
         final ATokenRecognizer rec = new DummyTokenRecognizer(p, type);
         final StringBuilder text = new StringBuilder("foobar");
 
@@ -123,7 +123,7 @@ public class ATokenRecognizerTest {
     public void test_retrieveTypeAndPattern() {
         // prepare
         final Pattern p = Pattern.compile("foobar");
-        final RobotTokenType type = RobotTokenType.TEST_CASE_EMPTY_CELL;
+        final RobotTokenType type = RobotTokenType.EMPTY_CELL;
         final ATokenRecognizer rec = new DummyTokenRecognizer(p, type);
 
         // execute & verify
@@ -135,7 +135,7 @@ public class ATokenRecognizerTest {
     public void test_getProducedType() {
         // prepare
         final Pattern p = Pattern.compile("foobar");
-        final RobotTokenType type = RobotTokenType.TEST_CASE_EMPTY_CELL;
+        final RobotTokenType type = RobotTokenType.EMPTY_CELL;
         final ATokenRecognizer rec = new DummyTokenRecognizer(p, type);
 
         // execute & verify
@@ -146,7 +146,7 @@ public class ATokenRecognizerTest {
     public void test_getPattern() {
         // prepare
         final Pattern p = Pattern.compile("foobar");
-        final RobotTokenType type = RobotTokenType.TEST_CASE_EMPTY_CELL;
+        final RobotTokenType type = RobotTokenType.EMPTY_CELL;
         final ATokenRecognizer rec = new DummyTokenRecognizer(p, type);
 
         // execute & verify

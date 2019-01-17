@@ -21,10 +21,11 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.text.read.postfixes.PostProcessingFixActions.IPostProcessFixer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
-public class EndTerminatedForLoopsFixer implements IPostProcessFixAction {
+class EndTerminatedForLoopsFixer implements IPostProcessFixer {
 
     @Override
     public void applyFix(final RobotFileOutput parsingOutput) {

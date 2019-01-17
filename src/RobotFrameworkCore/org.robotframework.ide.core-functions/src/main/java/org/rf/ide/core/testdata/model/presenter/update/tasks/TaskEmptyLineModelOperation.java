@@ -19,12 +19,12 @@ public class TaskEmptyLineModelOperation implements IExecutablesStepsHolderEleme
 
     @Override
     public boolean isApplicable(final ModelType elementType) {
-        return elementType == ModelType.TASK_EMPTY_LINE;
+        return elementType == ModelType.EMPTY_LINE;
     }
 
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
-        return elementType == RobotTokenType.TASK_EMPTY_LINE;
+        return elementType == RobotTokenType.EMPTY_CELL;
     }
 
     @Override

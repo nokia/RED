@@ -20,14 +20,14 @@ public class TestCasesSectionTableDumper extends AExecutableTableDumper<TestCase
         super(helper, getDumpers(helper));
     }
 
-    private static List<IExecutableSectionElementDumper> getDumpers(final DumperHelper helper) {
-        final List<IExecutableSectionElementDumper> dumpers = new ArrayList<>();
+    private static List<ExecutableTableElementDumper> getDumpers(final DumperHelper helper) {
+        final List<ExecutableTableElementDumper> dumpers = new ArrayList<>();
 
         for (final ModelType settingType : LocalSetting.TEST_SETTING_TYPES) {
             dumpers.add(new LocalSettingDumper(helper, settingType));
         }
         dumpers.add(new ExecutableHolderExecutionRowDumper(helper, ModelType.TEST_CASE_EXECUTABLE_ROW));
-        dumpers.add(new ExecutableHolderEmptyLineDumper(helper, ModelType.TEST_CASE_EMPTY_LINE));
+        dumpers.add(new ExecutableHolderEmptyLineDumper(helper, ModelType.EMPTY_LINE));
         return dumpers;
     }
 

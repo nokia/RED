@@ -15,7 +15,6 @@ import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
-import org.rf.ide.core.testdata.model.presenter.update.keywords.EmptyLineToKeywordEmptyLineMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.ExecRowToKeywordExecRowMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordDocumentationModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordEmptyLineModelOperation;
@@ -44,13 +43,13 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
             new KeywordSettingModelOperation(ModelType.USER_KEYWORD_TIMEOUT),
             new KeywordSettingModelOperation(ModelType.USER_KEYWORD_SETTING_UNKNOWN),
 
-            new ExecRowToKeywordExecRowMorphOperation(), new EmptyLineToKeywordEmptyLineMorphOperation(),
+            new ExecRowToKeywordExecRowMorphOperation(),
             new LocalSettingToKeywordSettingMorphOperation());
 
     @Override
     public AModelElement<UserKeyword> createEmptyLine(final UserKeyword userKeyword, final int index, final String name) {
         final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
-                ModelType.USER_KEYWORD_EMPTY_LINE);
+                ModelType.EMPTY_LINE);
         if (operationHandler == null || userKeyword == null) {
             throw new IllegalArgumentException(
                     "Unable to create empty line. Operation handler is missing");

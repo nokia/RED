@@ -35,7 +35,7 @@ public class UpdateKeywordWithInlinedSettingTest extends RobotFormatParameterize
 
         // execute
         final UserKeyword keyword = modelFile.getKeywordTable().getKeywords().get(0);
-        final AModelElement<UserKeyword> inlinedSetting = keyword.getAllElements().get(0);
+        final AModelElement<UserKeyword> inlinedSetting = keyword.getElements().get(0);
         final RobotToken inlinedSettingText = inlinedSetting.getElementTokens().get(1);
         inlinedSettingText.setText("modified");
 
