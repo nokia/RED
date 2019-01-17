@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _A9XVMAiaEea9m_qlhlPmsQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 4/16/18 3:13 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 1/17/19 4:47 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -53,9 +53,9 @@ with [get-window "New Robot Test Suite"] {
 
 //check window with error
 with [get-window "Runtime Environment Error"] {
-    get-label "Unable to provide valid RED runtime environment. Check python/robot installation and set it in Preferences." 
+    get-label "Project 'new' uses invalid Python environment (missing Robot Framework). Check Python/Robot Framework installation and set it in Preferences." 
         | get-property caption 
-        | equals "Unable to provide valid RED runtime environment. Check python/robot installation and set it in Preferences." 
+        | equals "Project 'new' uses invalid Python environment (missing Robot Framework). Check Python/Robot Framework installation and set it in Preferences." 
         | verify-true
     get-link "Go to preferences page: <a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.installed\">'Installed Robot Frameworks'</a>" 
         | get-property caption 
