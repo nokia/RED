@@ -6,11 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IFile;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -21,8 +23,10 @@ import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
+import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExecutionEnvironment;
+import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -117,7 +121,7 @@ public class RobotArtifactsBuilderTest {
     }
 
     @Test
-    public void noProblemsAreReported() throws Exception {
+    public void noProblemsAreReported_whenEnvironmentCanBeProvided() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
         final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.4 (Python 3.7.1 on win32)");
@@ -125,6 +129,36 @@ public class RobotArtifactsBuilderTest {
         final RobotProjectConfig configuration = new RobotProjectConfig();
 
         assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void missingConfigProblemIsReported() throws Exception {
+        final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
+        when(robotProject.getConfigurationFile()).thenReturn(mock(IFile.class));
+
+        assertThat(builder.provideConfiguration(robotProject, reporter))
+                .isExactlyInstanceOf(NullRobotProjectConfig.class);
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ProjectConfigurationProblem.CONFIG_FILE_MISSING, new ProblemPosition(1)));
+    }
+
+    @Test
+    public void readingConfigProblemIsReported() throws Exception {
+        final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
+        when(robotProject.readRobotProjectConfig()).thenThrow(CannotReadProjectConfigurationException.class);
+
+        assertThat(builder.provideConfiguration(robotProject, reporter))
+                .isExactlyInstanceOf(NullRobotProjectConfig.class);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ProjectConfigurationProblem.CONFIG_FILE_READING_PROBLEM, new ProblemPosition(1)));
+    }
+
+    @Test
+    public void noProblemsAreReported_whenConfigCanBeProvided() throws Exception {
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+
+        assertThat(builder.provideConfiguration(robotProject, reporter)).isExactlyInstanceOf(RobotProjectConfig.class);
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 

@@ -195,10 +195,9 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     private static class ImportedLibrariesConfigUpdater extends LibrariesConfigUpdater {
 
         public static ImportedLibrariesConfigUpdater createFor(final RobotProject project) {
-            final RobotProjectConfig openConfig = project.getOpenedProjectConfig();
-            return openConfig == null
-                    ? new ImportedLibrariesConfigUpdater(project, project.getRobotProjectConfig(), true)
-                    : new ImportedLibrariesConfigUpdater(project, openConfig, false);
+            final Optional<RobotProjectConfig> openedConfig = project.getOpenedProjectConfig();
+            final RobotProjectConfig config = openedConfig.orElseGet(project::getRobotProjectConfig);
+            return new ImportedLibrariesConfigUpdater(project, config, !openedConfig.isPresent());
         }
 
         private ImportedLibrariesConfigUpdater(final RobotProject project, final RobotProjectConfig config,
