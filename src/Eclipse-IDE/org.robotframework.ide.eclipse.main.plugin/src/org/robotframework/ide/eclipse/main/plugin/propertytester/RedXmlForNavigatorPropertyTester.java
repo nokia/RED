@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
+import java.util.Optional;
+
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -70,20 +72,15 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     }
 
     private boolean isExcluded(final IResource projectElement, final RobotProjectConfig config) {
-        if (config != null) {
-            return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
-        }
-        return false;
+        return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
     }
 
     private RobotProjectConfig getConfig(final IResource projectElement) {
-        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(
-                projectElement.getProject());
-        RobotProjectConfig config = robotProject.getOpenedProjectConfig();
-        if (config == null) {
-            config = robotProject.getRobotProjectConfig();
-        }
-        return config;
+        final RobotProject robotProject = RedPlugin.getModelManager()
+                .getModel()
+                .createRobotProject(projectElement.getProject());
+        final Optional<RobotProjectConfig> openedConfig = robotProject.getOpenedProjectConfig();
+        return openedConfig.orElseGet(robotProject::getRobotProjectConfig);
     }
 
     private boolean isExcludedViaInheritance(final IResource projectElement) {

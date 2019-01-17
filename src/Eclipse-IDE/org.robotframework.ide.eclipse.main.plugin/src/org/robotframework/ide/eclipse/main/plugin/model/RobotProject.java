@@ -233,12 +233,16 @@ public class RobotProject extends RobotContainer {
     public synchronized RobotProjectConfig getRobotProjectConfig() {
         if (configuration == null) {
             try {
-                configuration = new RedEclipseProjectConfigReader().readConfiguration(getProject());
+                configuration = readRobotProjectConfig();
             } catch (final CannotReadProjectConfigurationException e) {
                 return new NullRobotProjectConfig();
             }
         }
         return configuration;
+    }
+
+    public synchronized RobotProjectConfig readRobotProjectConfig() {
+        return new RedEclipseProjectConfigReader().readConfiguration(getConfigurationFile());
     }
 
     @VisibleForTesting
@@ -249,14 +253,14 @@ public class RobotProject extends RobotContainer {
     /**
      * Returns the configuration model from opened editor.
      *
-     * @return opened configuration or null if configuration is not opened in editor
+     * @return configuration opened in editor or empty
      */
-    public RobotProjectConfig getOpenedProjectConfig() {
+    public Optional<RobotProjectConfig> getOpenedProjectConfig() {
         final RedProjectEditorInput redProjectInput = findEditorInputIfAlreadyOpened();
         if (redProjectInput != null) {
-            return redProjectInput.getProjectConfiguration();
+            return Optional.ofNullable(redProjectInput.getProjectConfiguration());
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -398,9 +402,6 @@ public class RobotProject extends RobotContainer {
         @Override
         public List<File> provideUserSearchPaths() {
             final RobotProjectConfig configuration = getRobotProjectConfig();
-            if (configuration == null) {
-                return new ArrayList<>();
-            }
             final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer();
             final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(getProject(), configuration);
             return configuration.getPythonPath()

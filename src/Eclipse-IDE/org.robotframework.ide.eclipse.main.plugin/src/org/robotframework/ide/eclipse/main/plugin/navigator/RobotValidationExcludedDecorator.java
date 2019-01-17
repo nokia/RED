@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -46,13 +48,10 @@ public class RobotValidationExcludedDecorator implements ILightweightLabelDecora
             final RobotProject robotProject = RedPlugin.getModelManager()
                     .getModel()
                     .createRobotProject(resource.getProject());
-            RobotProjectConfig config = robotProject.getOpenedProjectConfig();
-            if (config == null) {
-                config = robotProject.getRobotProjectConfig();
-            }
+            final Optional<RobotProjectConfig> openedConfig = robotProject.getOpenedProjectConfig();
+            final RobotProjectConfig config = openedConfig.orElseGet(robotProject::getRobotProjectConfig);
 
-            if (config != null
-                    && config.isExcludedFromValidation(resource.getProjectRelativePath().toPortableString())) {
+            if (config.isExcludedFromValidation(resource.getProjectRelativePath().toPortableString())) {
                 decoration.addSuffix(" [excluded]");
                 decoration.setForegroundColor(ColorsManager.getColor(200, 200, 200));
             }

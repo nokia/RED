@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -29,15 +30,16 @@ public class RemoveLibraryFromConfigurationFileFixer implements IMarkerResolutio
     @Override
     public void run(final IMarker marker) {
         final IResource redFile = marker.getResource();
-        if (redFile == null || !redFile.exists() || !redFile.getName().equals(RobotProjectConfig.FILENAME)) {
+        if (redFile == null || !redFile.exists() || redFile.getType() != IResource.FILE
+                || !redFile.getName().equals(RobotProjectConfig.FILENAME)) {
             throw new IllegalStateException("Marker is assigned to invalid file");
         }
         final int indexOfLibrary = marker.getAttribute(ConfigFileProblem.LIBRARY_INDEX, -1);
         if (indexOfLibrary < 0) {
             return;
         }
-        
-        final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration(redFile.getProject());
+
+        final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration((IFile) redFile);
         if (indexOfLibrary < config.getLibraries().size()) {
             config.getLibraries().remove(indexOfLibrary);
         }

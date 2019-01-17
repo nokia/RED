@@ -80,9 +80,9 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 }
                 buildJob.join();
 
+                robotProject.clearConfiguration();
                 if (buildJob.getResult().getSeverity() == IStatus.CANCEL
                         || buildJob.getResult().getSeverity() == IStatus.ERROR) {
-                    robotProject.clearConfiguration();
                     if (libspecsFolder.exists()) {
                         libspecsFolder.remove();
                         if (!isValidationTurnedOff) {
@@ -91,7 +91,6 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                         return;
                     }
                 }
-                robotProject.clearConfiguration();
                 project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
                 if (!monitor.isCanceled()) {

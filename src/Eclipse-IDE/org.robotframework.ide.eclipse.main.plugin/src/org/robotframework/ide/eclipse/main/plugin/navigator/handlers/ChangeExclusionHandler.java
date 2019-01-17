@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,18 +55,14 @@ abstract class ChangeExclusionHandler {
     }
 
     private void changeExclusion(final RobotProject robotProject, final Collection<IPath> toChange) {
-        RobotProjectConfig config = robotProject.getOpenedProjectConfig();
-
-        final boolean inEditor = config != null;
-        if (config == null) {
-            config = robotProject.getRobotProjectConfig();
-        }
+        final Optional<RobotProjectConfig> openedConfig = robotProject.getOpenedProjectConfig();
+        final RobotProjectConfig config = openedConfig.orElseGet(robotProject::getRobotProjectConfig);
 
         for (final IPath pathToChange : toChange) {
             changeExclusion(config, pathToChange);
         }
 
-        if (!inEditor) {
+        if (!openedConfig.isPresent()) {
             new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
         }
         try {
@@ -82,5 +79,5 @@ abstract class ChangeExclusionHandler {
     }
 
     protected abstract void changeExclusion(RobotProjectConfig config, IPath pathToChange);
-    
+
 }

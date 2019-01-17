@@ -6,15 +6,12 @@
 package org.rf.ide.core.project;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -26,18 +23,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharStreams;
 
 public class RobotProjectConfigWriter {
-
-    public void writeConfiguration(final RobotProjectConfig configuration, final File projectDir) {
-        try {
-            final InputStream source = writeConfiguration(configuration);
-
-            final File configFile = new File(projectDir, RobotProjectConfig.FILENAME);
-            Files.copy(source, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (final IOException e) {
-            throw new CannotWriteProjectConfigurationException(
-                    "Unable to write configuration file for '" + projectDir.getName() + "' project", e);
-        }
-    }
 
     public InputStream writeConfiguration(final RobotProjectConfig configuration) {
         final StringWriter writer = new StringWriter(512);

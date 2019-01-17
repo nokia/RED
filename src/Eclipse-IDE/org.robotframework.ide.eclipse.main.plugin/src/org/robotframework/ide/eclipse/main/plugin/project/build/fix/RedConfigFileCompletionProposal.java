@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.eclipse.core.resources.IFile;
@@ -30,7 +32,6 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 
@@ -67,17 +68,13 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
     public void apply(final IDocument currentFileDocument) {
         try {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(externalFile.getProject());
-            RobotProjectConfig config = robotProject.getOpenedProjectConfig();
-
-            final boolean isEditorOpened = config != null;
-            if (config == null) {
-                config = new RedEclipseProjectConfigReader().readConfiguration(robotProject);
-            }
+            final Optional<RobotProjectConfig> openedConfig = robotProject.getOpenedProjectConfig();
+            final RobotProjectConfig config = openedConfig.orElseGet(robotProject::getRobotProjectConfig);
 
             if (apply(externalFile, config)) {
                 marker.delete();
 
-                if (!isEditorOpened) {
+                if (!openedConfig.isPresent()) {
                     new RedEclipseProjectConfigWriter().writeConfiguration(config, externalFile.getProject());
                 }
 
