@@ -65,10 +65,12 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
         return getName();
     }
 
+    @Override
     public AModelElement<TestCase> addElement(final AModelElement<?> element) {
         return addElement(allElements.size(), element);
     }
 
+    @Override
     public AModelElement<TestCase> addElement(final int index, final AModelElement<?> element) {
         @SuppressWarnings("unchecked")
         final AModelElement<TestCase> elementCasted = (AModelElement<TestCase>) element;
@@ -118,13 +120,9 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
         return (LocalSetting<TestCase>) addElement(index, new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN, dec));
     }
 
-    public List<AModelElement<TestCase>> getAllElements() {
-        return Collections.unmodifiableList(allElements);
-    }
-
     @Override
     public List<AModelElement<TestCase>> getElements() {
-        return getAllElements();
+        return Collections.unmodifiableList(allElements);
     }
 
     @Override

@@ -210,9 +210,7 @@ public class ExecutableCallRule extends VariableUsageRule {
                 final List<IRobotTokenType> types = element.getTypes();
                 return types.contains(RobotTokenType.START_HASH_COMMENT)
                         || types.contains(RobotTokenType.COMMENT_CONTINUE)
-                        || types.contains(RobotTokenType.KEYWORD_EMPTY_CELL)
-                        || types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL)
-                        || types.contains(RobotTokenType.TASK_EMPTY_CELL);
+                        || types.contains(RobotTokenType.EMPTY_CELL);
             }
         }
         return false;

@@ -20,7 +20,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 
 
-class LocalSettingDumper extends AExecutableTableElementDumper {
+class LocalSettingDumper extends ExecutableTableElementDumper {
 
     LocalSettingDumper(final DumperHelper helper, final ModelType modelType) {
         super(helper, modelType, newArrayList());

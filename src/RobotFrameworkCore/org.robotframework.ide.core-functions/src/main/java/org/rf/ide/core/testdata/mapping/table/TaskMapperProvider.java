@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.tasks.TaskDocumentationTextMapper;
-import org.rf.ide.core.testdata.mapping.tasks.TaskEmptyLineMapper;
 import org.rf.ide.core.testdata.mapping.tasks.TaskNameMapper;
 import org.rf.ide.core.testdata.mapping.tasks.TaskSettingDeclarationMapper;
 import org.rf.ide.core.testdata.mapping.tasks.TaskSetupKeywordArgumentMapper;
@@ -60,8 +59,6 @@ public class TaskMapperProvider {
         MAPPERS.add(new TaskSettingDeclarationMapper(RobotTokenType.TASK_SETTING_DOCUMENTATION,
                 ParsingState.TASK_SETTING_DOCUMENTATION_DECLARATION, ModelType.TASK_DOCUMENTATION));
         MAPPERS.add(new TaskDocumentationTextMapper());
-
-        MAPPERS.add(new TaskEmptyLineMapper());
     }
 
     public List<IParsingMapper> getMappers(final RobotVersion robotVersion) {

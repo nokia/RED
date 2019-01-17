@@ -35,7 +35,7 @@ public class UpdateTestCaseWithInlinedSettingTest extends RobotFormatParameteriz
 
         // execute
         final TestCase testCase = modelFile.getTestCaseTable().getTestCases().get(0);
-        final AModelElement<TestCase> inlinedSetting = testCase.getAllElements().get(0);
+        final AModelElement<TestCase> inlinedSetting = testCase.getElements().get(0);
         final RobotToken inlinedSettingText = inlinedSetting.getElementTokens().get(1);
         inlinedSettingText.setText("modified");
 
