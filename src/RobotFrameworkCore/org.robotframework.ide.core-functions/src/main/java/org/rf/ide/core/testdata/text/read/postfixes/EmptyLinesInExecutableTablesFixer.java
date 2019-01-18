@@ -63,10 +63,7 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
             for (int i = holderStartLine; i <= holderEndLine; i++) {
                 final RobotLine line = lines.get(i - 1);
 
-                final boolean isEmpty = line.elementsStream()
-                        .map(IRobotLineElement::getText)
-                        .allMatch(s -> s.trim().isEmpty());
-                if (isEmpty && linesToModelElements.get(i) == null) {
+                if (line.isEmpty() && linesToModelElements.get(i) == null) {
                     addEmptyRow(execHolder, elements, i, line);
                 }
             }

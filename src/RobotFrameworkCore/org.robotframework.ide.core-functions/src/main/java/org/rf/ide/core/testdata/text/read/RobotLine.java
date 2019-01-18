@@ -73,64 +73,37 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public void addLineElement(final IRobotLineElement lineElement) {
-        this.lineElements.add(lineElement);
+        lineElements.add(lineElement);
     }
 
     public void addLineElementAt(final int position, final IRobotLineElement lineElement) {
-        this.lineElements.add(position, lineElement);
+        lineElements.add(position, lineElement);
     }
 
     public void setLineElementAt(final int position, final IRobotLineElement lineElement) {
-        this.lineElements.set(position, lineElement);
+        lineElements.set(position, lineElement);
+    }
+
+    public boolean isEmpty() {
+        return elementsStream().map(IRobotLineElement::getText).allMatch(s -> s.trim().isEmpty());
     }
 
     public Optional<Integer> getElementPositionInLine(final int offset, final PositionCheck posCheckStrategy) {
-        final int size = lineElements.size();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < lineElements.size(); i++) {
             final IRobotLineElement e = lineElements.get(i);
             if (posCheckStrategy.meets(e, offset)) {
                 return Optional.of(i);
             }
         }
-
         return Optional.empty();
     }
 
-    public static enum PositionCheck {
-        STARTS {
-
-            @Override
-            public boolean meets(final IRobotLineElement element, final int offset) {
-                return (element.getFilePosition().getOffset() == offset);
-            }
-        },
-        INSIDE {
-
-            @Override
-            public boolean meets(final IRobotLineElement element, final int offset) {
-                return (element.getStartOffset() >= offset
-                        && offset <= (element.getStartOffset() + (element.getEndColumn() - element.getStartColumn())));
-            }
-        },
-        ENDS {
-
-            @Override
-            public boolean meets(final IRobotLineElement element, final int offset) {
-                return (element.getStartOffset() + (element.getEndColumn() - element.getStartColumn()) == offset);
-            }
-        };
-
-        public abstract boolean meets(final IRobotLineElement element, final int offset);
-    }
-
     public Optional<Integer> getElementPositionInLine(final IRobotLineElement elem) {
-        final int size = lineElements.size();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < lineElements.size(); i++) {
             if (lineElements.get(i) == elem) {
                 return Optional.of(i);
             }
         }
-
         return Optional.empty();
     }
 
@@ -139,7 +112,7 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public IRobotLineElement getEndOfLine() {
-        return this.eol;
+        return eol;
     }
 
     public void setEndOfLine(final List<Constant> endOfLine, final int currentOffset, final int currentColumn) {
@@ -167,7 +140,33 @@ public class RobotLine implements IChildElement<RobotFile> {
             copy.setEndOfLine(LineReader.Constant.get(endOfLine), endOfLine.getStartOffset(),
                     endOfLine.getStartColumn());
         }
-
         return copy;
+    }
+
+    public static enum PositionCheck {
+        STARTS {
+
+            @Override
+            public boolean meets(final IRobotLineElement element, final int offset) {
+                return element.getFilePosition().getOffset() == offset;
+            }
+        },
+        INSIDE {
+
+            @Override
+            public boolean meets(final IRobotLineElement element, final int offset) {
+                return element.getStartOffset() >= offset
+                        && offset <= element.getStartOffset() + element.getEndColumn() - element.getStartColumn();
+            }
+        },
+        ENDS {
+
+            @Override
+            public boolean meets(final IRobotLineElement element, final int offset) {
+                return element.getStartOffset() + element.getEndColumn() - element.getStartColumn() == offset;
+            }
+        };
+
+        public abstract boolean meets(final IRobotLineElement element, final int offset);
     }
 }
