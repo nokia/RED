@@ -23,6 +23,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
@@ -59,7 +61,7 @@ public class RobotSuiteFileTest {
     public void afterTest() {
         robotModel = null;
     }
-    
+
     @Test
     public void librarySpecsAreReturned_whenSuiteImportsLibrariesByName() throws Exception {
         final IFile file = projectProvider.createFile("suite.robot",
@@ -68,13 +70,13 @@ public class RobotSuiteFileTest {
                 "Library  Collections",
                 "Library  myLib");
         final RobotSuiteFile fileModel = robotModel.createSuiteFile(file);
-    
+
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         robotProject.setStandardLibraries(createStdLibs("Collections", "OperatingSystem"));
         robotProject.setReferencedLibraries(createRefLibs("myLib", "myLib2"));
-    
+
         final Multimap<LibrarySpecification, Optional<String>> imported = fileModel.getImportedLibraries();
-    
+
         assertThat(imported.keySet()).hasSize(2);
         assertThat(imported.keySet().stream().map(LibrarySpecification::getName)).containsOnly("Collections", "myLib");
     }
@@ -163,6 +165,20 @@ public class RobotSuiteFileTest {
         assertThat(files).containsExactly(projectProvider.getFile("res/res1.robot"),
                 projectProvider.getFile("res/a/res2.robot"), projectProvider.getFile("res/a/b/res3.robot"),
                 projectProvider.getFile("res/a/b/c/res4.robot"));
+    }
+
+    @Test
+    public void robotEnvironmentIsReturned_whenProjectIsDefined() throws Exception {
+        final IFile file = projectProvider.getFile("res/res1.robot");
+        final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
+        final RobotSuiteFile suiteFile = new RobotSuiteFile(robotProject, file);
+        assertThat(suiteFile.getRuntimeEnvironment()).isExactlyInstanceOf(RobotRuntimeEnvironment.class);
+    }
+
+    @Test
+    public void nullEnvironmentIsReturned_whenProjectIsNotDefined() throws Exception {
+        final RobotSuiteFile suiteFile = new RobotSuiteFile(null, null);
+        assertThat(suiteFile.getRuntimeEnvironment()).isExactlyInstanceOf(NullRuntimeEnvironment.class);
     }
 
     private static String[] createResourceImportSection(final String... resourcePaths) {
