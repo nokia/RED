@@ -35,11 +35,14 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -127,8 +130,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             @Override
             public RobotFileOutput parse() {
                 if (getProject().getProject().exists()) {
-                    final List<RobotFileOutput> outputs = getProject().getRobotParser()
-                            .parse(file.getLocation().toFile());
+                    final List<RobotFileOutput> outputs = createRobotParser().parse(file.getLocation().toFile());
                     return outputs.isEmpty() ? null : outputs.get(0);
                 } else {
                     // this can happen e.g. when renaming project
@@ -221,9 +223,9 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                     if (location == null) {
                         final File f = new File(file.getName());
                         final String content = newContent.isEmpty() ? getContent(file) : newContent;
-                        return getProject().getRobotParser().parseEditorContent(content, f);
+                        return createRobotParser().parseEditorContent(content, f);
                     } else {
-                        return getProject().getRobotParser().parseEditorContent(newContent, location.toFile());
+                        return createRobotParser().parseEditorContent(newContent, location.toFile());
                     }
 
                 }
@@ -389,13 +391,18 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return (RobotProject) current;
     }
 
-    public RobotVersion getRobotParserComplianceVersion() {
-        return getProject().getRobotParserComplianceVersion();
+    public RobotParser createRobotParser() {
+        final RobotProject project = getProject();
+        final RobotVersion version = project.getRobotParserComplianceVersion();
+        if (file == null) { // e.g. history revision
+            return RobotParser.create(new RobotProjectHolder(), RobotParserConfig.allImportsLazy(version));
+        }
+        return RobotParser.create(project.getRobotProjectHolder(), version, project.createPathsProvider());
     }
 
     public IRuntimeEnvironment getRuntimeEnvironment() {
         final RobotProject project = getProject();
-        return project == null ? null : project.getRuntimeEnvironment();
+        return project == null ? new NullRuntimeEnvironment() : project.getRuntimeEnvironment();
     }
 
     public <T extends RobotElement> Optional<T> findSection(final Class<T> sectionClass) {

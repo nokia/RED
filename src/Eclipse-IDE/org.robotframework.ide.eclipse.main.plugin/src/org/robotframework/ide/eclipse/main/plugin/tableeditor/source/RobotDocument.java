@@ -22,12 +22,9 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocumentListener;
-import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -109,7 +106,7 @@ public class RobotDocument extends Document {
     private void createParserIfNeeded() {
         if (parser == null) {
             final RobotSuiteFile suiteFile = fileModelSupplier.get();
-            parser = createParser(suiteFile);
+            parser = suiteFile.createRobotParser();
             file = suiteFile.getFile() == null || suiteFile.getFile().getLocation() == null
                     ? new File(suiteFile.getName())
                     : suiteFile.getFile().getLocation().toFile();
@@ -213,19 +210,6 @@ public class RobotDocument extends Document {
         } catch (final ExecutionException e) {
             throw new IllegalStateException("Parsing the file coulnd't be finished", e.getCause());
         }
-    }
-
-    private static RobotParser createParser(final RobotSuiteFile model) {
-        if (isNonFileModel(model)) {
-            final RobotVersion version = model.getRobotParserComplianceVersion();
-            return RobotParser.create(new RobotProjectHolder(), RobotParserConfig.allImportsLazy(version));
-        }
-        return model.getProject().getRobotParser();
-    }
-
-    private static boolean isNonFileModel(final RobotSuiteFile model) {
-        // e.g. history revision
-        return model.getFile() == null;
     }
 
     public static interface IRobotDocumentParsingListener {
