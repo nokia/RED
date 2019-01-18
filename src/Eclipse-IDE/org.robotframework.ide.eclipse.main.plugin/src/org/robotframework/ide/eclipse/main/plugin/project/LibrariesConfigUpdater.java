@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -29,10 +30,9 @@ public class LibrariesConfigUpdater {
     private final List<Object> addedLibraries;
 
     public static LibrariesConfigUpdater createFor(final RobotProject project) {
-        final RobotProjectConfig openConfig = project.getOpenedProjectConfig();
-        return openConfig == null
-                ? new LibrariesConfigUpdater(project, project.getRobotProjectConfig(), true)
-                : new LibrariesConfigUpdater(project, openConfig, false);
+        final Optional<RobotProjectConfig> openedConfig = project.getOpenedProjectConfig();
+        final RobotProjectConfig config = openedConfig.orElseGet(project::getRobotProjectConfig);
+        return new LibrariesConfigUpdater(project, config, !openedConfig.isPresent());
     }
 
     protected LibrariesConfigUpdater(final RobotProject project, final RobotProjectConfig config,

@@ -108,14 +108,11 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     }
 
     private boolean shouldStartAutoDiscovering(final RobotSuiteFile suite) {
-        final boolean projectHasRobotNature = RobotProjectNature.hasRobotNature(suite.getProject().getProject());
         final RobotProjectConfig projectConfig = suite.getProject().getRobotProjectConfig();
-        final boolean isAutodiscoveryEnabled = projectConfig != null
-                && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled();
-        final boolean suiteShouldBeProcessed = projectConfig != null
+        return RobotProjectNature.hasRobotNature(suite.getProject().getProject())
+                && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled()
                 && !ExcludedResources.isHiddenInEclipse(suite.getFile())
-                && !ExcludedResources.isInsideExcludedPath(suite.getFile(), projectConfig);
-        return projectHasRobotNature && isAutodiscoveryEnabled && suiteShouldBeProcessed
+                && !ExcludedResources.isInsideExcludedPath(suite.getFile(), projectConfig)
                 && suiteHasUnknownLibraryIncludingNestedResources(suite);
     }
 

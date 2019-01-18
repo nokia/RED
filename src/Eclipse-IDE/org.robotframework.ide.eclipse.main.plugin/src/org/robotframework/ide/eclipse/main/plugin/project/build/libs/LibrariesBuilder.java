@@ -212,10 +212,8 @@ public class LibrariesBuilder {
             logger.log("BUILDING: " + generator.getMessage());
             monitor.subTask(generator.getMessage());
             try {
-                final EnvironmentSearchPaths additionalSearchPaths = configuration.isNullConfig()
-                        ? new EnvironmentSearchPaths()
-                        : new RedEclipseProjectConfig(robotProject.getProject(), configuration)
-                                .createAdditionalEnvironmentSearchPaths();
+                final EnvironmentSearchPaths additionalSearchPaths = new RedEclipseProjectConfig(
+                        robotProject.getProject(), configuration).createAdditionalEnvironmentSearchPaths();
                 generator.generateLibdoc(environment, additionalSearchPaths);
 
             } catch (final RuntimeEnvironmentException e) {
