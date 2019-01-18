@@ -119,6 +119,9 @@ class DocumentationLineContinueMissingFixer implements IPostProcessFixer {
         for (int lineNumber = searchStartNumber; lineNumber < lines; lineNumber++) {
             final RobotLine line = fileContent.get(lineNumber);
             if (fetchMode) {
+                if (line.isEmpty()) {
+                    continue;
+                }
 
                 final List<IRobotLineElement> lineElements = line.getLineElements();
                 for (int i = 0; i < lineElements.size(); i++) {
