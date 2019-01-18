@@ -41,6 +41,7 @@ public abstract class SettingDeclarationMapper implements IParsingMapper {
 
     @Override
     public boolean isApplicableFor(final RobotVersion robotVersion) {
+        additionalTypes.clear();
         if (robotVersion.isOlderThan(new RobotVersion(3, 0))) {
             additionalTypes.add(RobotTokenType.SETTING_NAME_DUPLICATION);
         }
