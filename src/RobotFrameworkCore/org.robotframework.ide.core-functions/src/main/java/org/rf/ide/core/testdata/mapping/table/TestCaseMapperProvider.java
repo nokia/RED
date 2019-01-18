@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseDocumentationTextMapper;
-import org.rf.ide.core.testdata.mapping.testcases.TestCaseEmptyLineMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseNameMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseSettingDeclarationMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseSettingDeclarationMapperOld;
@@ -78,8 +77,6 @@ public class TestCaseMapperProvider {
                 ParsingState.TEST_CASE_SETTING_DOCUMENTATION_DECLARATION,
                 ModelType.TEST_CASE_DOCUMENTATION, testCase -> testCase.getDocumentation().isEmpty()));
         MAPPERS.add(new TestCaseDocumentationTextMapper());
-
-        MAPPERS.add(new TestCaseEmptyLineMapper());
     }
 
     public List<IParsingMapper> getMappers(final RobotVersion robotVersion) {

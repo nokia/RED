@@ -15,7 +15,6 @@ import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.EmptyLineToTestEmptyLineMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.ExecRowToTestExecRowMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.LocalSettingToTestSettingMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseDocumentationModelOperation;
@@ -40,13 +39,13 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             new TestCaseSettingModelOperation(ModelType.TEST_CASE_TIMEOUT),
             new TestCaseSettingModelOperation(ModelType.TEST_CASE_SETTING_UNKNOWN),
 
-            new ExecRowToTestExecRowMorphOperation(), new EmptyLineToTestEmptyLineMorphOperation(),
+            new ExecRowToTestExecRowMorphOperation(),
             new LocalSettingToTestSettingMorphOperation());
 
     @Override
     public AModelElement<TestCase> createEmptyLine(final TestCase testCase, final int index, final String name) {
         final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
-                ModelType.TEST_CASE_EMPTY_LINE);
+                ModelType.EMPTY_LINE);
         if (operationHandler == null || testCase == null) {
             throw new IllegalArgumentException("Unable to create empty line. Operation handler is missing");
         }

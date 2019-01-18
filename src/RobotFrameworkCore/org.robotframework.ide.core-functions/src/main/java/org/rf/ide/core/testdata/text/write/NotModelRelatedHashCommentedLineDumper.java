@@ -30,6 +30,7 @@ public class NotModelRelatedHashCommentedLineDumper {
 
     public <T> void dumpHashCommentsIfTheyExists(final AModelElement<T> previousElementDumped,
             final AModelElement<?> nextElementToBeDumped, final RobotFile model, final List<RobotLine> lines) {
+
         if (nextElementToBeDumped == null || previousElementDumped.getEndPosition().getLine()
                 + 1 != nextElementToBeDumped.getBeginPosition().getLine()) {
             if (previousElementDumped.getBeginPosition().isNotSet()) {
@@ -84,17 +85,15 @@ public class NotModelRelatedHashCommentedLineDumper {
         final int lineSize = lines.size();
         for (int lineIndex = startLine; lineIndex < lineSize; lineIndex++) {
             final RobotLine line = lines.get(lineIndex);
-            for (final IRobotLineElement rle : line.getLineElements()) {
-                if (rle instanceof RobotToken) {
-                    if ((rle.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            || rle.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)
-                            || (rle.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
-                                    && line.getLineElements().size() == 1))
-                            && rle != lastTokenInLines) {
-                        lastHash = line.getLineNumber();
-                    } else {
-                        return lastHash;
-                    }
+            for (final RobotToken token : line.getLineTokens()) {
+                if ((token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                        || token.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)
+                        || (token.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                                && line.getLineElements().size() == 1))
+                        && token != lastTokenInLines) {
+                    lastHash = line.getLineNumber();
+                } else {
+                    return lastHash;
                 }
             }
         }

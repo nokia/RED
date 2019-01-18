@@ -80,10 +80,10 @@ public class DeleteKeywordCallCommandTest {
         // assert that there are no settings
         if (codeHolder instanceof RobotCase) {
             final TestCase testCase = ((RobotCase) codeHolder).getLinkedElement();
-            assertThat(testCase.getAllElements()).hasSameSizeAs(testCase.getExecutionContext());
+            assertThat(testCase.getElements()).hasSameSizeAs(testCase.getExecutionContext());
         } else {
             final UserKeyword userKeyword = ((RobotKeywordDefinition) codeHolder).getLinkedElement();
-            assertThat(userKeyword.getAllElements()).hasSameSizeAs(userKeyword.getExecutionContext());
+            assertThat(userKeyword.getElements()).hasSameSizeAs(userKeyword.getExecutionContext());
         }
 
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);

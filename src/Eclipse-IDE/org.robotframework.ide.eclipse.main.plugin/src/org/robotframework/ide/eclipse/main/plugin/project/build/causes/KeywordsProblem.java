@@ -26,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarker
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddPrefixToKeywordUsage;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywordFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
 
 import com.google.common.base.Splitter;
@@ -133,6 +134,17 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' is from a library nested in a resource file";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String libName = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+            return newArrayList(new ImportLibraryFixer(libName));
         }
     },
     ARGUMENT_DEFINED_TWICE {

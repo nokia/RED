@@ -61,7 +61,7 @@ public class ConvertCallToEmptyTest {
         final RobotKeywordCall result = testCase.getChildren().get(0);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.TEST_CASE_EMPTY_CELL);
+                .containsExactly(RobotTokenType.EMPTY_CELL);
         assertThat(result.getName()).isEmpty();
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEmpty();
@@ -94,7 +94,7 @@ public class ConvertCallToEmptyTest {
         final RobotKeywordCall result = keyword.getChildren().get(0);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.KEYWORD_EMPTY_CELL);
+                .containsExactly(RobotTokenType.EMPTY_CELL);
         assertThat(result.getName()).isEmpty();
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEmpty();
@@ -127,7 +127,7 @@ public class ConvertCallToEmptyTest {
         final RobotKeywordCall result = testCase.getChildren().get(1);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.TEST_CASE_EMPTY_CELL);
+                .containsExactly(RobotTokenType.EMPTY_CELL);
         assertThat(result.getName()).isEmpty();
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEmpty();
@@ -161,7 +161,7 @@ public class ConvertCallToEmptyTest {
         final RobotKeywordCall result = keyword.getChildren().get(1);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.KEYWORD_EMPTY_CELL);
+                .containsExactly(RobotTokenType.EMPTY_CELL);
         assertThat(result.getName()).isEmpty();
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEmpty();
