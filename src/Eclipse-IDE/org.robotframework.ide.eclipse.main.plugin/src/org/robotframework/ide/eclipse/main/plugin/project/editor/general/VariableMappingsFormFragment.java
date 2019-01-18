@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
@@ -54,6 +55,9 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     @Inject
     private IEditorSite site;
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private RedFormToolkit toolkit;
@@ -121,7 +125,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
                 .withWidth(150)
                 .withMinWidth(50)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, elementsCreator))
+                .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, elementsCreator, eventBroker))
                 .labelsProvidedBy(new VariableMappingsNameLabelProvider())
                 .createFor(viewer);
 
@@ -130,7 +134,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
                 .shouldGrabAllTheSpaceLeft(true)
                 .withMinWidth(50)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new VariableMappingValueEditingSupport(viewer, elementsCreator))
+                .editingSupportedBy(new VariableMappingValueEditingSupport(viewer, elementsCreator, eventBroker))
                 .labelsProvidedBy(new VariableMappingsValueLabelProvider())
                 .createFor(viewer);
     }
