@@ -5,8 +5,6 @@
  */
 package org.rf.ide.core.project;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,40 +37,25 @@ import com.google.common.io.CharStreams;
 
 public class RobotProjectConfigReader {
 
-    public static final String MISSING_FILE_MESSAGE = "Project configuration file '" + RobotProjectConfig.FILENAME
-            + "' does not exist";
-
-    public RobotProjectConfig readConfiguration(final File file) {
-        if (file == null || !file.isFile() || !file.exists()) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
-        }
-        try (InputStream stream = new FileInputStream(file)) {
-            return readConfiguration(stream);
-        } catch (final IOException e) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
-        }
-    }
-
     public RobotProjectConfig readConfiguration(final InputStream contents) {
-        return readConfiguration(new InputStreamReader(contents, StandardCharsets.UTF_8));
-    }
-
-    public RobotProjectConfigWithLines readConfigurationWithLines(final File file) {
-        if (file == null || !file.isFile() || !file.exists()) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
-        }
-        try (InputStream stream = new FileInputStream(file)) {
-            return readConfigurationWithLines(stream);
+        try (Reader reader = new InputStreamReader(contents, StandardCharsets.UTF_8)) {
+            return readConfiguration(reader);
         } catch (final IOException e) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
+            throw new CannotReadProjectConfigurationException(
+                    "Project configuration file '" + RobotProjectConfig.FILENAME + "' cannot be read", e);
         }
     }
 
     public RobotProjectConfigWithLines readConfigurationWithLines(final InputStream contents) {
-        return readConfigurationWithLines(new InputStreamReader(contents, StandardCharsets.UTF_8));
+        try (Reader reader = new InputStreamReader(contents, StandardCharsets.UTF_8)) {
+            return readConfigurationWithLines(reader);
+        } catch (final IOException e) {
+            throw new CannotReadProjectConfigurationException(
+                    "Project configuration file '" + RobotProjectConfig.FILENAME + "' cannot be read", e);
+        }
     }
 
-    protected final RobotProjectConfig readConfiguration(final Reader reader) {
+    private final RobotProjectConfig readConfiguration(final Reader reader) {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(RobotProjectConfig.class);
             return (RobotProjectConfig) jaxbContext.createUnmarshaller().unmarshal(reader);
@@ -86,7 +69,7 @@ public class RobotProjectConfigReader {
         }
     }
 
-    protected final RobotProjectConfigWithLines readConfigurationWithLines(final Reader reader) {
+    private final RobotProjectConfigWithLines readConfigurationWithLines(final Reader reader) {
         try {
             final String content = CharStreams.toString(reader);
 
@@ -168,8 +151,8 @@ public class RobotProjectConfigReader {
 
         private final TreeSet<FileRegion> elementRegions;
 
-        public RobotProjectConfigWithLines(final RobotProjectConfig config,
-                final TreeSet<FileRegion> elementRegions, final Map<Object, FilePosition> locations) {
+        public RobotProjectConfigWithLines(final RobotProjectConfig config, final TreeSet<FileRegion> elementRegions,
+                final Map<Object, FilePosition> locations) {
             this.config = config;
             this.elementRegions = elementRegions;
             this.locations = locations;
@@ -240,10 +223,12 @@ public class RobotProjectConfigReader {
         }
 
         public int getLineNumber() {
-            final JAXBException jaxbException = (JAXBException) getCause();
-            if (jaxbException.getLinkedException() instanceof SAXParseException) {
-                final SAXParseException saxException = (SAXParseException) jaxbException.getLinkedException();
-                return saxException.getLineNumber();
+            if (getCause() instanceof JAXBException) {
+                final JAXBException jaxbException = (JAXBException) getCause();
+                if (jaxbException.getLinkedException() instanceof SAXParseException) {
+                    final SAXParseException saxException = (SAXParseException) jaxbException.getLinkedException();
+                    return saxException.getLineNumber();
+                }
             }
             return 1;
         }

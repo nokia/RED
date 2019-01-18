@@ -9,41 +9,35 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public class RedEclipseProjectConfigReader extends RobotProjectConfigReader {
 
-    public RobotProjectConfig readConfiguration(final RobotProject robotProject) {
-        return readConfiguration(robotProject.getProject());
-    }
-
-    public RobotProjectConfig readConfiguration(final IProject project) {
-        return readConfiguration(project.getFile(RobotProjectConfig.FILENAME));
-    }
-
     public RobotProjectConfig readConfiguration(final IFile file) {
-        if (file == null) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
+        if (file == null || !file.exists()) {
+            throw new CannotReadProjectConfigurationException(
+                    "Project configuration file '" + RobotProjectConfig.FILENAME + "' does not exist");
         }
-        try (InputStream stream = file.getContents()) {
-            return readConfiguration(stream);
+        try (InputStream contents = file.getContents()) {
+            return readConfiguration(contents);
         } catch (final IOException | CoreException e) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
+            throw new CannotReadProjectConfigurationException(
+                    "Project configuration file '" + RobotProjectConfig.FILENAME + "' cannot be read", e);
         }
     }
 
     public RobotProjectConfigWithLines readConfigurationWithLines(final IFile file) {
-        if (file == null) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
+        if (file == null || !file.exists()) {
+            throw new CannotReadProjectConfigurationException(
+                    "Project configuration file '" + RobotProjectConfig.FILENAME + "' does not exist");
         }
-        try (InputStream stream = file.getContents()) {
-            return readConfigurationWithLines(stream);
+        try (InputStream contents = file.getContents()) {
+            return readConfigurationWithLines(contents);
         } catch (final IOException | CoreException e) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
+            throw new CannotReadProjectConfigurationException(
+                    "Project configuration file '" + RobotProjectConfig.FILENAME + "' cannot be read", e);
         }
     }
 }
