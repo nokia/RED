@@ -22,6 +22,8 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RedStringVariablesManager {
 
     private final IStringVariableManager manager;
@@ -29,8 +31,13 @@ public class RedStringVariablesManager {
     private final RedPreferences preferences;
 
     public RedStringVariablesManager() {
-        this.manager = VariablesPlugin.getDefault().getStringVariableManager();
-        this.preferences = RedPlugin.getDefault().getPreferences();
+        this(VariablesPlugin.getDefault().getStringVariableManager(), RedPlugin.getDefault().getPreferences());
+    }
+
+    @VisibleForTesting
+    RedStringVariablesManager(final IStringVariableManager varManager, final RedPreferences preferences) {
+        this.manager = varManager;
+        this.preferences = preferences;
     }
 
     public String substitute(final String expression) throws CoreException {

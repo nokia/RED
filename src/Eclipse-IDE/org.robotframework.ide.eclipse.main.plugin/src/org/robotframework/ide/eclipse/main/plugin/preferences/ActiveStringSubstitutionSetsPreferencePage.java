@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -296,14 +295,8 @@ public class ActiveStringSubstitutionSetsPreferencePage extends RedPreferencePag
     protected void performDefaults() {
         variableSets.clear();
         activeVariablesSet = null;
+        viewer.refresh();
 
-        final IPreferenceStore store = getPreferenceStore();
-        store.putValue(RedPreferences.STRING_VARIABLES_SETS,
-                store.getDefaultString(RedPreferences.STRING_VARIABLES_SETS));
-        store.putValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET,
-                store.getDefaultString(RedPreferences.STRING_VARIABLES_ACTIVE_SET));
-
-        initializeValues();
         super.performDefaults();
     }
 

@@ -124,6 +124,15 @@ public class RedPreferencesInitializerTest {
     }
 
     @Test
+    public void byDefaultThereAreNoActiveVariablesSetsNorTheSetsThemselves() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).put(RedPreferences.STRING_VARIABLES_SETS, "");
+        verify(preferences).put(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "");
+    }
+
+    @Test
     public void byDefaultThereAreNoAdditionalRfRulesFiles() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
