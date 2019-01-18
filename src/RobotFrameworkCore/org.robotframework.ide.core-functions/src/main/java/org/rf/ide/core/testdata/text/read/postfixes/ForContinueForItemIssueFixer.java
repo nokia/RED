@@ -16,17 +16,14 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.text.read.postfixes.PostProcessingFixActions.IPostProcessFixer;
 
 /**
  * @author wypych
  */
-public class FixerForForContinueForItemIssue implements IPostProcessFixAction {
+class ForContinueForItemIssueFixer implements IPostProcessFixer {
 
-    private final ExecutableUnitsFixer execUnitFixer;
-
-    public FixerForForContinueForItemIssue() {
-        this.execUnitFixer = new ExecutableUnitsFixer();
-    }
+    private final ExecutableUnitsFixer execUnitFixer = new ExecutableUnitsFixer();
 
     /**
      * fix issue with test cases like below:

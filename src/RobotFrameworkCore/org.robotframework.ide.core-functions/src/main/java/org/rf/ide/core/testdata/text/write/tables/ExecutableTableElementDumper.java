@@ -15,10 +15,8 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
-import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -27,9 +25,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
-import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 
-public abstract class AExecutableTableElementDumper implements IExecutableSectionElementDumper {
+public abstract class ExecutableTableElementDumper {
 
     private final DumperHelper helper;
 
@@ -41,7 +38,7 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
     private final List<IForceFixBeforeDumpTask> afterSortTasks;
 
-    public AExecutableTableElementDumper(final DumperHelper helper, final ModelType servedType,
+    public ExecutableTableElementDumper(final DumperHelper helper, final ModelType servedType,
             final List<IForceFixBeforeDumpTask> afterSortTasks) {
         this.helper = helper;
         this.elemUtility = new ElementsUtility();
@@ -50,25 +47,19 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
         this.afterSortTasks = afterSortTasks;
     }
 
-    @Override
-    public boolean isServedType(final AModelElement<? extends IExecutableStepsHolder<?>> element) {
+    public final boolean isServedType(final AModelElement<? extends IExecutableStepsHolder<?>> element) {
         return element.getModelType() == servedType;
     }
 
-    public abstract RobotElementsComparatorWithPositionChangedPresave getSorter(
+    protected abstract RobotElementsComparatorWithPositionChangedPresave getSorter(
             final AModelElement<? extends IExecutableStepsHolder<?>> currentElement);
 
-    @Override
-    public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
-            final TableHeader<? extends ARobotSectionTable> th,
-            final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedSettings,
+    public final void dump(final RobotFile model,
             final AModelElement<? extends IExecutableStepsHolder<?>> currentElement, final List<RobotLine> lines) {
+
         final RobotToken elemDeclaration = currentElement.getDeclaration();
         final FilePosition filePosition = elemDeclaration.getFilePosition();
-        int fileOffset = -1;
-        if (filePosition != null && !filePosition.isNotSet()) {
-            fileOffset = filePosition.getOffset();
-        }
+        final int fileOffset = filePosition == null || filePosition.isNotSet() ? -1 : filePosition.getOffset();
 
         final RobotLine currentLine = getLineForOffset(model, fileOffset);
 
@@ -231,13 +222,11 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
     private boolean dumpAfterSeparator(final List<RobotToken> tokens, final int nrOfTokens, final int tokenId,
             final IRobotLineElement tokElem) {
         if (tokenId + 1 < nrOfTokens) {
-            if (!isComment(tokElem) && isComment(tokens.get(tokenId + 1))) {
-                return true;
-            }
+            return !isComment(tokElem) && isComment(tokens.get(tokenId + 1));
+
         } else {
             return true;
         }
-        return false;
     }
 
     private IRobotLineElement prettyAlignForCurrentDumpedNotDeclarationToken(final RobotFile model,

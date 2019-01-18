@@ -167,8 +167,6 @@ public class TaskTest {
 
         assertThatExceptionOfType(UnsupportedOperationException.class)
                 .isThrownBy(() -> task.getElements().add(child));
-        assertThatExceptionOfType(UnsupportedOperationException.class)
-                .isThrownBy(() -> task.getAllElements().add(child));
 
     }
 

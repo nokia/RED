@@ -123,7 +123,8 @@ class KeywordCallValidator implements ModelUnitValidator {
         if (foundKeyword.isFromNestedLibrary(file)) {
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
                     .formatMessageWith(actualName);
-            reporter.handleProblem(problem, file, position);
+            reporter.handleProblem(problem, file, position,
+                    ImmutableMap.of(AdditionalMarkerAttributes.NAME, foundKeyword.getSourceName()));
         }
         if (foundKeyword.hasInconsistentName(actualName)) {
             final RobotProblem problem = RobotProblem

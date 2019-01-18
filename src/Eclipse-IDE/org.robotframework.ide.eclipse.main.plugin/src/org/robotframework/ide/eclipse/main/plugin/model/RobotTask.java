@@ -54,7 +54,7 @@ public class RobotTask extends RobotCodeHoldingElement<Task> {
     public void link() {
         final Task task = getLinkedElement();
 
-        for (final AModelElement<Task> el : task.getAllElements()) {
+        for (final AModelElement<Task> el : task.getElements()) {
             if (el instanceof RobotExecutableRow) {
                 getChildren().add(new RobotKeywordCall(this, el));
             } else if (el instanceof RobotEmptyRow) {

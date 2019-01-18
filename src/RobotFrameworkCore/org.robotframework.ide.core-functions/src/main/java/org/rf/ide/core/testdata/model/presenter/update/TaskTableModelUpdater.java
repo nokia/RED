@@ -15,7 +15,6 @@ import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
-import org.rf.ide.core.testdata.model.presenter.update.tasks.EmptyLineToTaskEmptyLineMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.tasks.ExecRowToTaskExecRowMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.tasks.LocalSettingToTaskSettingMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.tasks.TaskDocumentationModelOperation;
@@ -39,13 +38,13 @@ public class TaskTableModelUpdater implements IExecutablesTableModelUpdater<Task
             new TaskSettingModelOperation(ModelType.TASK_TIMEOUT),
             new TaskSettingModelOperation(ModelType.TASK_SETTING_UNKNOWN),
 
-            new ExecRowToTaskExecRowMorphOperation(), new EmptyLineToTaskEmptyLineMorphOperation(),
+            new ExecRowToTaskExecRowMorphOperation(),
             new LocalSettingToTaskSettingMorphOperation());
 
     @Override
     public AModelElement<Task> createEmptyLine(final Task task, final int index, final String name) {
         final IExecutablesStepsHolderElementOperation<Task> operationHandler = getOperationHandler(
-                ModelType.TASK_EMPTY_LINE);
+                ModelType.EMPTY_LINE);
         if (operationHandler == null || task == null) {
             throw new IllegalArgumentException("Unable to create empty line. Operation handler is missing");
         }

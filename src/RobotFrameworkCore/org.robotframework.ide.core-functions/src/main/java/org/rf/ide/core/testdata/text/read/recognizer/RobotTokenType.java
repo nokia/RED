@@ -31,6 +31,10 @@ public enum RobotTokenType implements IRobotTokenType {
     PRETTY_ALIGN_SPACE(
             TableType.NOT_STRICTLY_BELONGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation(" ").build()),
+
+    EMPTY_CELL(
+            TableType.NOT_STRICTLY_BELONGS,
+            VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
     /**
      */
     USER_OWN_TABLE_HEADER(TableType.NOT_STRICTLY_BELONGS),
@@ -383,11 +387,7 @@ public enum RobotTokenType implements IRobotTokenType {
     VARIABLES_DICTIONARY_VALUE(
             TableType.VARIABLES,
             VersionAvailabilityInfoBuilder.create().availableFrom("2.9").build()),
-    /**
-     */
-    TEST_CASE_EMPTY_CELL(
-            TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
+
     /**
      */
     TEST_CASE_SETTING_NAME_DUPLICATION(TableType.TEST_CASES, true),
@@ -485,14 +485,8 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     TEST_CASE_ACTION_ARGUMENT(TableType.TEST_CASES),
-    /**
-     */
-    TEST_CASE_EMPTY_LINE(TableType.TEST_CASES),
 
 
-    TASK_EMPTY_CELL(
-            TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
     TASK_SETTING_UNKNOWN_DECLARATION(TableType.TASKS, true),
     TASK_SETTING_UNKNOWN_ARGUMENTS(TableType.TASKS),
     TASK_SETTING_DOCUMENTATION(
@@ -532,16 +526,8 @@ public enum RobotTokenType implements IRobotTokenType {
     TASK_NAME(TableType.TASKS),
     TASK_ACTION_NAME(TableType.TASKS),
     TASK_ACTION_ARGUMENT(TableType.TASKS),
-    TASK_EMPTY_LINE(TableType.TASKS),
 
 
-    /**
-     */
-    KEYWORD_EMPTY_CELL(
-            TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
-    /**
-     */
     KEYWORD_SETTING_NAME_DUPLICATION(TableType.KEYWORDS, true),
     KEYWORD_SETTING_UNKNOWN_DECLARATION(TableType.KEYWORDS, true),
     /**
@@ -628,9 +614,6 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     KEYWORD_ACTION_ARGUMENT(TableType.KEYWORDS),
-    /**
-     */
-    KEYWORD_EMPTY_LINE(TableType.KEYWORDS),
 
     FOR_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,

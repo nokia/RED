@@ -19,13 +19,14 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.postfixes.PostProcessingFixActions.IPostProcessFixer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 /**
  * @author wypych
  */
-public class UnknownSettingsInExecutableTablesFixer implements IPostProcessFixAction {
+public class UnknownSettingsInExecutableTablesFixer implements IPostProcessFixer {
 
     @Override
     public void applyFix(final RobotFileOutput parsingOutput) {

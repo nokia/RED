@@ -21,7 +21,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 
-class ExecutableHolderExecutionRowDumper extends AExecutableTableElementDumper {
+class ExecutableHolderExecutionRowDumper extends ExecutableTableElementDumper {
 
     private final static Map<ModelType, List<RobotTokenType>> TYPES = new HashMap<>();
     static {
