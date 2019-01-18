@@ -66,17 +66,14 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
 
     @VisibleForTesting
     Runnable refreshAndEdit(final Object value) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                final ColumnViewer viewer = getViewer();
-                if (viewer.getControl() != null && viewer.getControl().isDisposed()) {
-                    return;
-                }
-                viewer.refresh();
-                if (value != null) {
-                    viewer.editElement(value, index + getColumnShift());
-                }
+        return () -> {
+            final ColumnViewer viewer = getViewer();
+            if (viewer.getControl() != null && viewer.getControl().isDisposed()) {
+                return;
+            }
+            viewer.refresh();
+            if (value != null) {
+                viewer.editElement(value, index + getColumnShift());
             }
         };
     }
