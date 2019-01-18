@@ -50,7 +50,7 @@ public class EmptyLinesInExecutableTablesFixerOutputCheckTest {
         assertThat(elements).hasSize(4);
 
         assertThat(elements.get(0).getModelType()).isEqualTo(ModelType.TEST_CASE_DOCUMENTATION);
-        assertThat(cellsOf(elements.get(0))).containsExactly("[Documentation]", "...", "first line", "", "...",
+        assertThat(cellsOf(elements.get(0))).containsExactly("[Documentation]", "...", "first line", "...",
                 "second line");
         assertThat(elements.get(1).getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
         assertThat(cellsOf(elements.get(1))).containsExactly("Log", "1");
@@ -79,7 +79,7 @@ public class EmptyLinesInExecutableTablesFixerOutputCheckTest {
         assertThat(elements).hasSize(4);
 
         assertThat(elements.get(0).getModelType()).isEqualTo(ModelType.TASK_DOCUMENTATION);
-        assertThat(cellsOf(elements.get(0))).containsExactly("[Documentation]", "...", "first line", "", "...",
+        assertThat(cellsOf(elements.get(0))).containsExactly("[Documentation]", "...", "first line", "...",
                 "second line");
         assertThat(elements.get(1).getModelType()).isEqualTo(ModelType.TASK_EXECUTABLE_ROW);
         assertThat(cellsOf(elements.get(1))).containsExactly("Log", "1");
@@ -108,7 +108,7 @@ public class EmptyLinesInExecutableTablesFixerOutputCheckTest {
         assertThat(elements).hasSize(4);
 
         assertThat(elements.get(0).getModelType()).isEqualTo(ModelType.USER_KEYWORD_DOCUMENTATION);
-        assertThat(cellsOf(elements.get(0))).containsExactly("[Documentation]", "...", "first line", "", "...",
+        assertThat(cellsOf(elements.get(0))).containsExactly("[Documentation]", "...", "first line", "...",
                 "second line");
         assertThat(elements.get(1).getModelType()).isEqualTo(ModelType.USER_KEYWORD_EXECUTABLE_ROW);
         assertThat(cellsOf(elements.get(1))).containsExactly("Log", "1");
