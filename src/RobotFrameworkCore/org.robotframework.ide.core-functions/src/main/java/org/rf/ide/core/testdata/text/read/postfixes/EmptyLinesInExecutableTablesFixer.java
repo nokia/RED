@@ -13,7 +13,6 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
-import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.postfixes.PostProcessingFixActions.IPostProcessFixer;
@@ -72,11 +71,7 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
                 if (line.getLineElements().isEmpty()) {
                     break;
                 }
-
-                final boolean isEmpty = line.elementsStream()
-                        .map(IRobotLineElement::getText)
-                        .allMatch(s -> s.trim().isEmpty());
-                if (isEmpty) {
+                if (line.isEmpty()) {
                     addEmptyRow(execHolder, elements, i, line);
                 } else {
                     break;
