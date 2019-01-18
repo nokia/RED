@@ -133,7 +133,6 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     private void initializeStringVariablesPreferences(final IEclipsePreferences preferences) {
         preferences.put(RedPreferences.STRING_VARIABLES_SETS, "");
         preferences.put(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "");
-
     }
 
     private void initializeRfLintPreferences(final IEclipsePreferences preferences) {
