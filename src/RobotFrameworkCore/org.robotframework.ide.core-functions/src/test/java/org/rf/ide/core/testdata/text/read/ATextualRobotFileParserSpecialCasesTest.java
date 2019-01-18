@@ -74,11 +74,10 @@ public class ATextualRobotFileParserSpecialCasesTest {
         // execute
         final ATextualRobotFileParser fileParser = new DummyATextualRobotFileParser();
 
-        final int newOffset = fileParser.handleCRLFcaseSplittedBetweenBuffers(parsingOutput, lineHolder, 3,
-                currentOffset + 1);
+        final int deltaShift = fileParser.handleCrLfSplittedBetweenBuffers(fileModel, lineHolder, 3);
 
         // verify
-        assertThat(newOffset).isEqualTo(2);
+        assertThat(deltaShift).isEqualTo(1);
         assertThat(line.getEndOfLine().getStartOffset()).isEqualTo(0);
         assertThat(line.getEndOfLine().getTypes()).containsExactly(EndOfLineTypes.CRLF);
     }
