@@ -48,7 +48,6 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
-import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
@@ -91,10 +90,6 @@ public class RobotProject extends RobotContainer {
         }
         projectHolder.configure(getRobotProjectConfig(), getProject().getLocation().toFile());
         return projectHolder;
-    }
-
-    public synchronized RobotParser getRobotParser() {
-        return RobotParser.create(getRobotProjectHolder(), getRobotParserComplianceVersion(), createPathsProvider());
     }
 
     public IProject getProject() {
