@@ -72,7 +72,10 @@ class DocumentationViewPartListener implements IPartListener {
     private void removeEditorListener() {
         currentlyActiveEditor.removePageChangedListener(editorListener);
         currentlyActiveEditor.getEditorSite().getSelectionProvider().removeSelectionChangedListener(editorListener);
-        currentlyActiveEditor.getSourceEditor().getViewer().getTextWidget().removeCaretListener(editorListener);
+        final SuiteSourceEditor sourceEditor = currentlyActiveEditor.getSourceEditor();
+        if (sourceEditor != null) {
+            sourceEditor.getViewer().getTextWidget().removeCaretListener(editorListener);
+        }
     }
 
     @Override
