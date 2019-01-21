@@ -199,9 +199,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        final boolean isEditable = editorInput.isEditable();
-
-        viewer.getTable().setEnabled(isEditable);
+        viewer.getTable().setEnabled(editorInput.isEditable());
     }
 
     @Inject

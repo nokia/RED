@@ -16,17 +16,17 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.IncludeFolderForValidationHandler.E4IncludeFolderForValidationHandler;
+import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.IncludePathForValidationHandler.E4IncludePathForValidationHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class IncludeFolderForValidationHandler extends DIParameterizedHandler<E4IncludeFolderForValidationHandler> {
+public class IncludePathForValidationHandler extends DIParameterizedHandler<E4IncludePathForValidationHandler> {
 
-    public IncludeFolderForValidationHandler() {
-        super(E4IncludeFolderForValidationHandler.class);
+    public IncludePathForValidationHandler() {
+        super(E4IncludePathForValidationHandler.class);
     }
 
-    public static class E4IncludeFolderForValidationHandler extends ChangeExclusionHandler {
+    public static class E4IncludePathForValidationHandler extends ChangeExclusionHandler {
 
         private static final long REVALIDATE_JOB_DELAY = 2000;
 

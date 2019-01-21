@@ -20,8 +20,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -320,40 +318,26 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     private void installResourceChangeListener() {
-        final IResourceChangeListener resourceListener = new IResourceChangeListener() {
+        final IResourceChangeListener resourceListener = event -> {
+            final AtomicBoolean shouldRefresh = new AtomicBoolean(false);
 
-            @Override
-            public void resourceChanged(final IResourceChangeEvent event) {
-                final AtomicBoolean shouldRefresh = new AtomicBoolean(false);
+            if (event.getType() != IResourceChangeEvent.POST_CHANGE || event.getDelta() == null) {
+                return;
+            }
 
-                if (event.getType() != IResourceChangeEvent.POST_CHANGE || event.getDelta() == null) {
-                    return;
-                }
-
-                try {
-                    event.getDelta().accept(new IResourceDeltaVisitor() {
-
-                        @Override
-                        public boolean visit(final IResourceDelta delta) throws CoreException {
-                            if (editorInput.getRobotProject().getProject().equals(delta.getResource().getProject())) {
-                                shouldRefresh.set(true);
-                                return false;
-                            }
-                            return true;
-                        }
-                    });
-                } catch (final CoreException e) {
-                    // nothing to do
-                }
-                if (shouldRefresh.get() && viewer.getTree() != null && !viewer.getTree().isDisposed()) {
-                    SwtThread.syncExec(viewer.getTree().getDisplay(), new Runnable() {
-
-                        @Override
-                        public void run() {
-                            setInput();
-                        }
-                    });
-                }
+            try {
+                event.getDelta().accept(delta -> {
+                    if (editorInput.getRobotProject().getProject().equals(delta.getResource().getProject())) {
+                        shouldRefresh.set(true);
+                        return false;
+                    }
+                    return true;
+                });
+            } catch (final CoreException e) {
+                // nothing to do
+            }
+            if (shouldRefresh.get() && viewer.getTree() != null && !viewer.getTree().isDisposed()) {
+                SwtThread.syncExec(viewer.getTree().getDisplay(), () -> setInput());
             }
         };
         ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
@@ -380,6 +364,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
         setInput();
+
         viewer.getTree().setEnabled(false);
         excludeFilesBtn.setEnabled(false);
         excludeFilesTxt.setEditable(false);

@@ -121,6 +121,8 @@ class PathsFormFragment implements ISectionFormFragment {
         pythonPathViewer = createPathViewer(internalComposite, new PythonPathViewerConfiguration());
         classPathViewer = createPathViewer(internalComposite, new ClassPathViewerConfiguration());
         scrolledParent.setMinSize(internalComposite.computeSize(-1, -1));
+
+        setInput();
     }
 
     private Section createSection(final Composite parent) {

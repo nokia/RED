@@ -253,9 +253,9 @@ public class RobotProjectConfig {
         if (excludedPath == null) {
             excludedPath = new ArrayList<>();
         }
-        final ExcludedFolderPath excludedFolderPath = ExcludedFolderPath.create(path);
-        if (!excludedPath.contains(excludedFolderPath)) {
-            excludedPath.add(excludedFolderPath);
+        final ExcludedFolderPath toAdd = ExcludedFolderPath.create(path);
+        if (!excludedPath.contains(toAdd)) {
+            excludedPath.add(toAdd);
         }
     }
 
@@ -263,14 +263,9 @@ public class RobotProjectConfig {
         if (excludedPath == null) {
             return;
         }
-        ExcludedFolderPath foundToRemove = null;
-        for (final ExcludedFolderPath excludedPath : excludedPath) {
-            if (excludedPath.path.equals(path)) {
-                foundToRemove = excludedPath;
-            }
-        }
-        if (foundToRemove != null) {
-            excludedPath.remove(foundToRemove);
+        final ExcludedFolderPath toRemove = getExcludedPath(path);
+        if (toRemove != null) {
+            excludedPath.remove(toRemove);
         }
     }
 
