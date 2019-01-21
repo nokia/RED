@@ -14,8 +14,6 @@ import java.util.List;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 
-import com.google.common.base.Joiner;
-
 public class RobotSettingTest {
 
     @Test
@@ -87,8 +85,8 @@ public class RobotSettingTest {
     private static List<RobotKeywordCall> createSettingsForTest(final List<String> arguments,
             final List<String> comments) {
 
-        final String argsToAdd = arguments.isEmpty() ? "" : "  " + Joiner.on("  ").join(arguments);
-        final String commentsToAdd = comments.isEmpty() ? "" : "  " + Joiner.on("  ").join(comments);
+        final String argsToAdd = arguments.isEmpty() ? "" : "  " + String.join("  ", arguments);
+        final String commentsToAdd = comments.isEmpty() ? "" : "  " + String.join("  ", comments);
         final String toAdd = argsToAdd + commentsToAdd;
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")

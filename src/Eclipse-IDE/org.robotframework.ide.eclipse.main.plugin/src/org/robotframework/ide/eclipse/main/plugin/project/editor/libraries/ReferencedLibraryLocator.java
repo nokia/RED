@@ -101,9 +101,9 @@ public class ReferencedLibraryLocator {
     }
 
     private Optional<File> findLibraryFileByPath(final RobotSuiteFile suiteFile, final String path) {
-        final Map<String, String> vars = suiteFile.getProject().getRobotProjectHolder().getVariableMappings();
+        final Map<String, String> vars = suiteFile.getRobotProject().getRobotProjectHolder().getVariableMappings();
         return ResolvedImportPath.from(ImportPath.from(path), vars).flatMap(resolvedPath -> {
-            final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
+            final PathsProvider pathsProvider = suiteFile.getRobotProject().createPathsProvider();
             final URI importingFileUri = RedWorkspace.tryToGetLocalUri(suiteFile.getFile());
             return new ImportSearchPaths(pathsProvider).findAbsoluteUri(importingFileUri, resolvedPath);
         }).map(File::new);

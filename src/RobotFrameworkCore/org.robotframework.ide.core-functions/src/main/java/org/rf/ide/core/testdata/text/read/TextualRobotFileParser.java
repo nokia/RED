@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Stack;
 
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.testdata.IRobotFileParser;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler.LineContinueType;
 import org.rf.ide.core.testdata.mapping.setting.imports.LibraryAliasFixer;
@@ -40,6 +39,7 @@ import org.rf.ide.core.testdata.mapping.table.UnknownTableElementsMapper;
 import org.rf.ide.core.testdata.mapping.table.UserKeywordMapperProvider;
 import org.rf.ide.core.testdata.mapping.table.VariablesDeclarationMapperProvider;
 import org.rf.ide.core.testdata.mapping.variables.CommonVariableHelper;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -66,7 +66,7 @@ import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public abstract class ATextualRobotFileParser implements IRobotFileParser {
+public class TextualRobotFileParser {
 
     private final List<ATokenRecognizer> recognizers = new ArrayList<>();
 
@@ -94,8 +94,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     private final PostProcessingFixActions postFixerActions;
 
-    public ATextualRobotFileParser(final TokenSeparatorBuilder tokenSeparatorBuilder) {
-        this.tokenSeparatorBuilder = tokenSeparatorBuilder;
+    public TextualRobotFileParser(final FileFormat fileFormat) {
+        this.tokenSeparatorBuilder = new TokenSeparatorBuilder(fileFormat);
         this.utility = new ElementsUtility();
         this.metadataUtility = new MetadataOldSyntaxUtility();
         this.alignUtility = new PrettyAlignSpaceUtility();
@@ -107,7 +107,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     }
 
-    @Override
     public void parse(final RobotFileOutput parsingOutput, final InputStream inputStream, final File robotFile) {
         initializeRecognizersAndMappers(parsingOutput.getRobotVersion());
 
@@ -126,7 +125,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         }
     }
 
-    @Override
     public void parse(final RobotFileOutput parsingOutput, final File robotFile) {
         initializeRecognizersAndMappers(parsingOutput.getRobotVersion());
 

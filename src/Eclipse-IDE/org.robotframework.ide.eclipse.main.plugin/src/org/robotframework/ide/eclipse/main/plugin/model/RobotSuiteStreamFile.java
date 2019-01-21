@@ -7,11 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Function;
 
 import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
@@ -38,12 +40,10 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         return name.contains(".") ? name.substring(name.lastIndexOf('.') + 1) : null;
     }
 
-
     @Override
     protected String getContentTypeId() {
-        final String id = super.getContentTypeId();
-        if (id != null) {
-            return id;
+        if (contentTypeId != null) {
+            return contentTypeId;
         }
         contentTypeId = ASuiteFileDescriber.getContentType(name, content);
         return contentTypeId;
@@ -55,18 +55,28 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     }
 
     @Override
-    public RobotParser createRobotParser() {
+    public RobotParser createRobotParser(final Function<RobotVersion, RobotParserConfig> configMapper) {
         final IRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
-        return RobotParser.create(new RobotProjectHolder(env), version == null ? env.getRobotVersion() : version,
-                (PathsProvider) null);
+        final RobotParserConfig parserConfig = configMapper.apply(version == null ? env.getRobotVersion() : version);
+        return new RobotParser(new RobotProjectHolder(env), parserConfig);
     }
 
     @Override
-    protected ParsingStrategy createReparsingStrategy(final String newContent) {
+    public File getRobotParserFile() {
+        return new File(name);
+    }
+
+    @Override
+    protected ParsingStrategy createReparsingStrategy(final String fileContent) {
         return () -> {
-            final RobotParser parser = createRobotParser();
-            return parser.parseEditorContent(newContent, new File(name));
+            final RobotParser parser = createRobotParser(RobotParserConfig::new);
+            return parser.parseEditorContent(fileContent, getRobotParserFile());
         };
+    }
+
+    @Override
+    public IRuntimeEnvironment getRuntimeEnvironment() {
+        return new NullRuntimeEnvironment();
     }
 
     @Override

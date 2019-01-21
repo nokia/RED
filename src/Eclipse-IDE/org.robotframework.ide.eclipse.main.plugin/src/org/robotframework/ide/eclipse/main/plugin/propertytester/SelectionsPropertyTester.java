@@ -133,7 +133,7 @@ public class SelectionsPropertyTester extends PropertyTester {
             }
         }
         for (final RobotFileInternalElement element : elements) {
-            if (projects.add(element.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
+            if (projects.add(element.getSuiteFile().getRobotProject().getProject()) && projects.size() > 1) {
                 return false;
             }
         }

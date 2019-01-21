@@ -192,7 +192,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(getContent(file));
 
-        final RobotProject project = suiteFile.getProject();
+        final RobotProject project = suiteFile.getRobotProject();
         project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
 
@@ -280,7 +280,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(getContent(file));
 
-        final RobotProject project = suiteFile.getProject();
+        final RobotProject project = suiteFile.getRobotProject();
         project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
 

@@ -66,7 +66,7 @@ public class AddRemoteLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution 
 
         @Override
         protected void fireEvents() {
-            final RobotProject robotProject = suiteFile.getProject();
+            final RobotProject robotProject = suiteFile.getRobotProject();
             final RobotProjectConfig config = robotProject.getRobotProjectConfig();
             final RedProjectConfigEventData<Collection<RemoteLocation>> eventData = new RedProjectConfigEventData<>(
                     externalFile, config.getRemoteLocations());

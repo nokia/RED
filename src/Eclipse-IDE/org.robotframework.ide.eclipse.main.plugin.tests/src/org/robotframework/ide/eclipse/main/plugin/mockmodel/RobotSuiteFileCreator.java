@@ -12,8 +12,6 @@ import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 
-import com.google.common.base.Joiner;
-
 /**
  * @author Michal Anglart
  *
@@ -48,7 +46,7 @@ public class RobotSuiteFileCreator {
     }
 
     public String getContent() {
-        return Joiner.on('\n').join(lines);
+        return String.join("\n", lines);
     }
 
     public RobotSuiteFile build() {

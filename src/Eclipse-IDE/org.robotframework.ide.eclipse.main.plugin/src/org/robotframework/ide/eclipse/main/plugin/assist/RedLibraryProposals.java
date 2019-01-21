@@ -42,7 +42,7 @@ public class RedLibraryProposals {
 
         final List<RedLibraryProposal> proposals = new ArrayList<>();
 
-        for (final LibrarySpecification libSpec : suiteFile.getProject().getLibrarySpecifications()) {
+        for (final LibrarySpecification libSpec : suiteFile.getRobotProject().getLibrarySpecifications()) {
             final Optional<ProposalMatch> match = matcher.matches(userContent, libSpec.getName());
 
             if (match.isPresent()) {

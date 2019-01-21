@@ -364,7 +364,7 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder,
+        final RobotParser parser = new RobotParser(projectHolder,
                 RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final List<RobotFileOutput> parsed = parser.parse(file);
 

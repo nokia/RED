@@ -50,7 +50,7 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
         final Predicate<AssistProposal> shouldCommitAfterAccepting = proposal -> !EmbeddedKeywordNamesSupport
                 .hasEmbeddedArguments(proposal.getContent());
 
-        final IRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = suiteFile.getRobotProject().getRuntimeEnvironment();
         return keywordsProposals.stream()
                 .map(proposal -> new AssistProposalAdapter(env, proposal, shouldCommitAfterAccepting,
                         () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal,

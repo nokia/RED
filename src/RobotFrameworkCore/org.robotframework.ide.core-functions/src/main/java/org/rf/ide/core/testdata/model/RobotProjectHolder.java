@@ -162,63 +162,26 @@ public class RobotProjectHolder {
 
     public RobotFileOutput findFileWithImportedVariableFile(final PathsProvider pathsProvider,
             final File variableFile) {
-        return findFile(new SearchByVariablesImport(pathsProvider, variableFile));
-    }
-
-    private class SearchByVariablesImport implements Predicate<RobotFileOutput> {
-
-        private final File toFound;
-
-        private final PathsProvider pathsProvider;
-
-        public SearchByVariablesImport(final PathsProvider pathsProvider, final File toFound) {
-            this.pathsProvider = pathsProvider;
-            this.toFound = toFound;
-        }
-
-        @Override
-        public boolean test(final RobotFileOutput robotFile) {
+        return findFile(robotFile -> {
             if (robotFile != null) {
-                final List<VariablesFileImportReference> varImports = robotFile
-                        .getVariablesImportReferences(RobotProjectHolder.this, pathsProvider);
-                for (final VariablesFileImportReference importReference : varImports) {
-                    if (importReference.getVariablesFile().getAbsolutePath().equals(toFound.getAbsolutePath())) {
+                for (final VariablesFileImportReference reference : robotFile.getVariablesImportReferences(this,
+                        pathsProvider)) {
+                    if (reference.getVariablesFile().getAbsolutePath().equals(variableFile.getAbsolutePath())) {
                         return true;
                     }
                 }
             }
-
             return false;
-        }
-
+        });
     }
 
     public RobotFileOutput findFileByName(final File file) {
-        return findFile(new SearchByName(file));
-    }
-
-    private class SearchByName implements Predicate<RobotFileOutput> {
-
-        private final File toFound;
-
-        public SearchByName(final File toFound) {
-            this.toFound = toFound;
-        }
-
-        @Override
-        public boolean test(final RobotFileOutput robotFile) {
-            return robotFile != null && robotFile.getProcessedFile() != null
-                    && robotFile.getProcessedFile().getAbsolutePath().equals(toFound.getAbsolutePath());
-        }
+        return findFile(robotFile -> robotFile != null && robotFile.getProcessedFile() != null
+                && robotFile.getProcessedFile().getAbsolutePath().equals(file.getAbsolutePath()));
     }
 
     @VisibleForTesting
     RobotFileOutput findFile(final Predicate<RobotFileOutput> criteria) {
-        for (final RobotFileOutput robotFile : readableProjectFiles) {
-            if (criteria.test(robotFile)) {
-                return robotFile;
-            }
-        }
-        return null;
+        return readableProjectFiles.stream().filter(criteria).findFirst().orElse(null);
     }
 }

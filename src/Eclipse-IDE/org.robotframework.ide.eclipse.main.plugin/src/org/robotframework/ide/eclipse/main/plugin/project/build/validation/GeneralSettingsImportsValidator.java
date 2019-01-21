@@ -82,7 +82,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             final String pathOrName = RobotExpressions.unescapeSpaces(pathOrNameToken.getText());
             if (RobotExpressions.isParameterized(pathOrName)) {
                 final String resolved = RobotExpressions
-                        .resolve(suiteFile.getProject().getRobotProjectHolder().getVariableMappings(), pathOrName);
+                        .resolve(suiteFile.getRobotProject().getRobotProjectHolder().getVariableMappings(), pathOrName);
                 if (RobotExpressions.isParameterized(resolved)) {
                     // still parameterized after resolving
                     reportUnresolvedParameterizedImport(pathOrNameToken);
@@ -202,7 +202,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     protected Optional<MarkedUri> calculateAbsoluteUri(final String path) {
-        final Map<String, String> variablesMapping = suiteFile.getProject()
+        final Map<String, String> variablesMapping = suiteFile.getRobotProject()
                 .getRobotProjectHolder()
                 .getVariableMappings();
         try {
@@ -211,7 +211,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             if (!resolvedPath.isPresent()) {
                 return Optional.empty();
             }
-            final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
+            final PathsProvider pathsProvider = suiteFile.getRobotProject().createPathsProvider();
             final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
             return searchPaths.findAbsoluteMarkedUri(RedWorkspace.tryToGetLocalUri(suiteFile.getFile()),
                     resolvedPath.get());

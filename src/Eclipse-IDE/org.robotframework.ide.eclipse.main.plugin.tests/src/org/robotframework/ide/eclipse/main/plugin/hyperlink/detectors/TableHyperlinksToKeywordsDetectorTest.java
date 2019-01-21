@@ -138,7 +138,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final RobotKeywordCall element = suiteFile.findSection(RobotCasesSection.class).get()
                 .getChildren().get(0).getChildren().get(0);
 
-        final RobotProject project = suiteFile.getProject();
+        final RobotProject project = suiteFile.getRobotProject();
         project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
 
@@ -223,7 +223,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final RobotKeywordCall element = suiteFile.findSection(RobotCasesSection.class).get()
                 .getChildren().get(0).getChildren().get(0);
 
-        final RobotProject project = suiteFile.getProject();
+        final RobotProject project = suiteFile.getRobotProject();
         project.setStandardLibraries(new HashMap<>());
         project.setReferencedLibraries(refLibs);
 

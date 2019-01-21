@@ -66,7 +66,7 @@ class RobotFormEditorPartListener implements IPartListener {
     }
 
     private void scheduleValidationJob(final RobotSuiteFile suiteModel) {
-        final IProject project = suiteModel.getProject().getProject();
+        final IProject project = suiteModel.getRobotProject().getProject();
         final List<RobotSuiteFile> suiteModels = Collections.singletonList(suiteModel);
         final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
         validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);

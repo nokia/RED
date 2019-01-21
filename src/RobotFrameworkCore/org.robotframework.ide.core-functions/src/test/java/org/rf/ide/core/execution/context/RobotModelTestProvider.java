@@ -37,21 +37,21 @@ public class RobotModelTestProvider {
         final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn(version);
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        return RobotParser.create(robotProject, RobotParserConfig.allImportsEager(RobotVersion.from(version)));
+        return new RobotParser(robotProject, RobotParserConfig.allImportsEager(RobotVersion.from(version)));
     }
 
     public static RobotParser getLazyParser() {
         final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn("3.0a1");
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        return RobotParser.create(robotProject, RobotParserConfig.allImportsLazy(new RobotVersion(3, 0)));
+        return new RobotParser(robotProject, RobotParserConfig.allImportsLazy(new RobotVersion(3, 0)));
     }
 
     public static RobotParser getLazyParser(final String version) {
         final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn(version);
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        return RobotParser.create(robotProject, RobotParserConfig.allImportsLazy(RobotVersion.from(version)));
+        return new RobotParser(robotProject, RobotParserConfig.allImportsLazy(RobotVersion.from(version)));
     }
 
     public static RobotFile getModelFile(final String fileContent, final FileFormat format, final RobotParser parser) {

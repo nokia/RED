@@ -44,7 +44,7 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
         final WorkspaceJob suiteCollectingJob = RobotSuiteFileCollector.createCollectingJob(selectedResources,
                 suites -> {
                     final Map<RobotProject, List<RobotSuiteFile>> suitesGroupedByProject = suites.stream()
-                            .collect(Collectors.groupingBy(RobotSuiteFile::getProject));
+                            .collect(Collectors.groupingBy(RobotSuiteFile::getRobotProject));
                     suitesGroupedByProject.forEach((robotProject, suiteModels) -> {
                         final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory
                                 .create(suiteModels);

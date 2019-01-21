@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -35,19 +36,16 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
-import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.LibrarySpecification;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -62,9 +60,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.io.CharStreams;
 
-public class RobotSuiteFile implements RobotFileInternalElement {
-
-    private final RobotElement parent;
+public class RobotSuiteFile extends RobotProjectElement implements RobotFileInternalElement {
 
     private final IFile file;
 
@@ -72,41 +68,19 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     private RobotFileOutput fileOutput;
 
-    private List<RobotSuiteFileSection> sections = null;
+    private List<RobotSuiteFileSection> sections;
 
     public RobotSuiteFile(final RobotElement parent, final IFile file) {
-        this.parent = parent;
+        super(parent);
         this.file = file;
-    }
-
-    @Override
-    public int getIndex() {
-        return parent == null ? -1 : parent.getChildren().indexOf(this);
     }
 
     public RobotSuiteFileSection createRobotSection(final String name) {
         final RobotTokenType headerType = RobotTokenType.findTypeOfDeclarationForTableHeader(name);
-        getLinkedElement().includeTableSection(headerType);
+        final RobotFile model = getLinkedElement();
+        model.includeTableSection(headerType);
 
-        final RobotSuiteFileSection section;
-        if (headerType == RobotTokenType.VARIABLES_TABLE_HEADER) {
-            section = new RobotVariablesSection(this, getLinkedElement().getVariableTable());
-
-        } else if (headerType == RobotTokenType.SETTINGS_TABLE_HEADER) {
-            section = new RobotSettingsSection(this, getLinkedElement().getSettingTable());
-
-        } else if (headerType == RobotTokenType.TEST_CASES_TABLE_HEADER) {
-            section = new RobotCasesSection(this, getLinkedElement().getTestCaseTable());
-
-        } else if (headerType == RobotTokenType.TASKS_TABLE_HEADER) {
-            section = new RobotTasksSection(this, getLinkedElement().getTasksTable());
-
-        } else if (headerType == RobotTokenType.KEYWORDS_TABLE_HEADER) {
-            section = new RobotKeywordsSection(this, getLinkedElement().getKeywordTable());
-
-        } else {
-            throw new IllegalStateException("Unrecognized section '" + name + "' cannot be created");
-        }
+        final RobotSuiteFileSection section = createRobotSection(headerType, model);
 
         if (getSections().contains(section)) {
             return sections.get(sections.indexOf(section));
@@ -116,33 +90,42 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         }
     }
 
-    public List<RobotSuiteFileSection> getSections() {
-        if (file.getLocation() != null) {
-            return getSections(createFileParsingStrategy());
-        } else {
-            return getSections(createReparsingStrategy(""));
+    private RobotSuiteFileSection createRobotSection(final RobotTokenType headerType, final RobotFile model) {
+        switch (headerType) {
+            case VARIABLES_TABLE_HEADER:
+                return new RobotVariablesSection(this, model.getVariableTable());
+            case SETTINGS_TABLE_HEADER:
+                return new RobotSettingsSection(this, model.getSettingTable());
+            case TEST_CASES_TABLE_HEADER:
+                return new RobotCasesSection(this, model.getTestCaseTable());
+            case TASKS_TABLE_HEADER:
+                return new RobotTasksSection(this, model.getTasksTable());
+            case KEYWORDS_TABLE_HEADER:
+                return new RobotKeywordsSection(this, model.getKeywordTable());
+            default:
+                throw new IllegalStateException("Unrecognized section header type");
         }
     }
 
-    private ParsingStrategy createFileParsingStrategy() {
-        return new ParsingStrategy() {
+    public List<RobotSuiteFileSection> getSections() {
+        if (file.getLocation() == null) {
+            return getSections(createReparsingStrategy(getContent(file)));
+        } else {
+            return getSections(createFileParsingStrategy());
+        }
+    }
 
-            @Override
-            public RobotFileOutput parse() {
-                if (getProject().getProject().exists()) {
-                    final List<RobotFileOutput> outputs = createRobotParser().parse(file.getLocation().toFile());
-                    return outputs.isEmpty() ? null : outputs.get(0);
-                } else {
-                    // this can happen e.g. when renaming project
-                    return null;
-                }
-            }
-        };
+    private String getContent(final IFile file) {
+        try (InputStream stream = file.getContents()) {
+            return CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
+        } catch (IOException | CoreException e) {
+            return "";
+        }
     }
 
     public synchronized List<RobotSuiteFileSection> getSections(final ParsingStrategy parsingStrategy) {
         if (sections == null) {
-            link(parseModel(parsingStrategy));
+            link(parsingStrategy.parse());
         }
         return sections == null ? new ArrayList<>() : sections;
     }
@@ -159,7 +142,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     private synchronized void link(final RobotFile model) {
-        sections = Collections.synchronizedList(new ArrayList<RobotSuiteFileSection>());
+        sections = Collections.synchronizedList(new ArrayList<>());
         if (model.getKeywordTable().isPresent()) {
             final RobotKeywordsSection section = new RobotKeywordsSection(this, model.getKeywordTable());
             section.link();
@@ -189,10 +172,6 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 (section1, section2) -> Integer.compare(section1.getHeaderLine(), section2.getHeaderLine()));
     }
 
-    protected RobotFileOutput parseModel(final ParsingStrategy parsingStrategy) {
-        return parsingStrategy.parse();
-    }
-
     public synchronized void dispose() {
         if (fileOutput != null) {
             // this is required because we want to reparse file output when user did some
@@ -210,37 +189,6 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         fileOutput = null;
 
         getSections(createReparsingStrategy(newContent));
-    }
-
-    protected ParsingStrategy createReparsingStrategy(final String newContent) {
-        return new ParsingStrategy() {
-
-            @Override
-            public RobotFileOutput parse() {
-                if (getProject().getProject().exists()) {
-                    final IPath location = file.getLocation();
-
-                    if (location == null) {
-                        final File f = new File(file.getName());
-                        final String content = newContent.isEmpty() ? getContent(file) : newContent;
-                        return createRobotParser().parseEditorContent(content, f);
-                    } else {
-                        return createRobotParser().parseEditorContent(newContent, location.toFile());
-                    }
-
-                }
-                // this can happen e.g. when renaming project
-                return null;
-            }
-
-            private String getContent(final IFile file) {
-                try (InputStream stream = file.getContents()) {
-                    return CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
-                } catch (IOException | CoreException e) {
-                    return "";
-                }
-            }
-        };
     }
 
     protected synchronized void refreshOnFileChange() {
@@ -282,22 +230,20 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         if (contentTypeId != null) {
             return contentTypeId;
         }
-        if (file != null) {
-            try {
-                if (!file.isSynchronized(IResource.DEPTH_ONE)) {
-                    file.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
-                }
-                final IContentDescription contentDescription = file.getContentDescription();
-                if (contentDescription != null) {
-                    final IContentType contentType = contentDescription.getContentType();
-                    if (contentType != null) {
-                        contentTypeId = contentType.getId();
-                        return contentTypeId;
-                    }
-                }
-            } catch (final CoreException e) {
-                return null;
+        try {
+            if (!file.isSynchronized(IResource.DEPTH_ONE)) {
+                file.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
             }
+            final IContentDescription contentDescription = file.getContentDescription();
+            if (contentDescription != null) {
+                final IContentType contentType = contentDescription.getContentType();
+                if (contentType != null) {
+                    contentTypeId = contentType.getId();
+                    return contentTypeId;
+                }
+            }
+        } catch (final CoreException e) {
+            return null;
         }
         return null;
     }
@@ -348,11 +294,6 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return new OpenStrategy();
     }
 
-    @Override
-    public RobotElement getParent() {
-        return parent;
-    }
-
     public IFile getFile() {
         return file;
     }
@@ -380,29 +321,42 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return this;
     }
 
-    /**
-     * Returns project to which this file belongs. May be null for RobotSuiteStreamFile objects
-     */
-    public RobotProject getProject() {
-        RobotElement current = parent;
-        while (current != null && !(current instanceof RobotProject)) {
-            current = current.getParent();
-        }
-        return (RobotProject) current;
+    public RobotParser createRobotParser(final Function<RobotVersion, RobotParserConfig> configMapper) {
+        final RobotProject robotProject = getRobotProject();
+        final RobotParserConfig parserConfig = configMapper.apply(robotProject.getRobotParserComplianceVersion());
+        return new RobotParser(robotProject.getRobotProjectHolder(), parserConfig, robotProject.createPathsProvider());
     }
 
-    public RobotParser createRobotParser() {
-        final RobotProject project = getProject();
-        final RobotVersion version = project.getRobotParserComplianceVersion();
-        if (file == null) { // e.g. history revision
-            return RobotParser.create(new RobotProjectHolder(), RobotParserConfig.allImportsLazy(version));
-        }
-        return RobotParser.create(project.getRobotProjectHolder(), version, project.createPathsProvider());
+    public File getRobotParserFile() {
+        final IPath location = file.getLocation();
+        return location == null ? new File(file.getName()) : location.toFile();
+    }
+
+    protected ParsingStrategy createReparsingStrategy(final String fileContent) {
+        return () -> {
+            if (getRobotProject().getProject().exists()) {
+                final RobotParser parser = createRobotParser(RobotParserConfig::new);
+                return parser.parseEditorContent(fileContent, getRobotParserFile());
+            }
+            // this can happen e.g. when renaming project
+            return null;
+        };
+    }
+
+    private ParsingStrategy createFileParsingStrategy() {
+        return () -> {
+            if (getRobotProject().getProject().exists()) {
+                final RobotParser parser = createRobotParser(RobotParserConfig::new);
+                final List<RobotFileOutput> outputs = parser.parse(getRobotParserFile());
+                return outputs.isEmpty() ? null : outputs.get(0);
+            }
+            // this can happen e.g. when renaming project
+            return null;
+        };
     }
 
     public IRuntimeEnvironment getRuntimeEnvironment() {
-        final RobotProject project = getProject();
-        return project == null ? new NullRuntimeEnvironment() : project.getRuntimeEnvironment();
+        return getRobotProject().getRuntimeEnvironment();
     }
 
     public <T extends RobotElement> Optional<T> findSection(final Class<T> sectionClass) {
@@ -432,13 +386,13 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public Set<LibrarySpecification> getNotImportedLibraries() {
-        final Set<LibrarySpecification> allLibraries = new HashSet<>(getProject().getLibrarySpecifications());
+        final Set<LibrarySpecification> allLibraries = new HashSet<>(getRobotProject().getLibrarySpecifications());
         allLibraries.removeAll(getImportedLibraries().keySet());
         return allLibraries;
     }
 
     public Multimap<LibrarySpecification, Optional<String>> getImportedLibraries() {
-        final Collection<LibrarySpecification> specifications = getProject().getLibrarySpecifications();
+        final Collection<LibrarySpecification> specifications = getRobotProject().getLibrarySpecifications();
         final ImmutableListMultimap<String, LibrarySpecification> specs = Multimaps.index(specifications,
                 LibrarySpecification::getName);
 
@@ -501,10 +455,12 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {
-        final RobotProjectHolder projectHolder = getProject().getRobotProjectHolder();
-        final PathsProvider pathsProvider = getProject().createPathsProvider();
-        return fileOutput != null ? fileOutput.getVariablesImportReferences(projectHolder, pathsProvider)
-                : new ArrayList<>();
+        if (fileOutput == null) {
+            return new ArrayList<>();
+        }
+        final RobotProject robotProject = getRobotProject();
+        return fileOutput.getVariablesImportReferences(robotProject.getRobotProjectHolder(),
+                robotProject.createPathsProvider());
     }
 
     public String getDocumentation() {
@@ -532,6 +488,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return initFile;
     }
 
+    @FunctionalInterface
     public interface ParsingStrategy {
 
         RobotFileOutput parse();

@@ -9,8 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
@@ -18,8 +17,6 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
-
-import com.google.common.base.Joiner;
 
 public class DocumentationServiceHandlerTest {
 
@@ -113,18 +110,10 @@ public class DocumentationServiceHandlerTest {
         DocumentationServiceHandler.update(suiteDoc, newDocumentation);
 
         // verify
-        assertThat(toText(text(suiteDoc.getDocumentationText()))).isEqualTo(expectedText);
-    }
-
-    private String toText(final List<String> text) {
-        return Joiner.on("").join(text);
-    }
-
-    private List<String> text(final List<RobotToken> toks) {
-        final List<String> wholeText = new ArrayList<>();
-        for (final RobotToken r : toks) {
-            wholeText.add(r.getText());
-        }
-        return wholeText;
+        final String actualText = suiteDoc.getDocumentationText()
+                .stream()
+                .map(RobotToken::getText)
+                .collect(Collectors.joining(""));
+        assertThat(actualText).isEqualTo(expectedText);
     }
 }

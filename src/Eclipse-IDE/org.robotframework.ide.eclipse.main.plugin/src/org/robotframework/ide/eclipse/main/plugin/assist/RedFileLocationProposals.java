@@ -55,7 +55,7 @@ public abstract class RedFileLocationProposals {
 
     public List<? extends AssistProposal> getFilesLocationsProposals(final String userContent) {
         return getFilesLocationsProposals(userContent,
-                ImportedFiles.createComparator(suiteFile.getProject().getProject(), userContent));
+                ImportedFiles.createComparator(suiteFile.getRobotProject().getProject(), userContent));
     }
 
     public List<? extends AssistProposal> getFilesLocationsProposals(final String userContent,

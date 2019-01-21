@@ -35,7 +35,7 @@ public class RevalidateEditorHandler extends DIParameterizedHandler<E4Revalidate
         public void revalidate(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile suiteModel,
                 @Named(REVALIDATE_EDITOR_COMMAND_MODE_PARAMETER) final String mode) {
 
-            final IProject project = suiteModel.getProject().getProject();
+            final IProject project = suiteModel.getRobotProject().getProject();
             final ModelUnitValidatorConfig validatorConfig = createValidatorConfig(suiteModel, Mode.valueOf(mode));
             final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
             validationJob.schedule();
@@ -43,7 +43,7 @@ public class RevalidateEditorHandler extends DIParameterizedHandler<E4Revalidate
 
         private ModelUnitValidatorConfig createValidatorConfig(final RobotSuiteFile suiteModel, final Mode mode) {
             if (mode == Mode.PROJECT) {
-                final IProject project = suiteModel.getProject().getProject();
+                final IProject project = suiteModel.getRobotProject().getProject();
                 return ModelUnitValidatorConfigFactory.create(project);
             } else {
                 final List<RobotSuiteFile> suiteFiles = Collections.singletonList(suiteModel);

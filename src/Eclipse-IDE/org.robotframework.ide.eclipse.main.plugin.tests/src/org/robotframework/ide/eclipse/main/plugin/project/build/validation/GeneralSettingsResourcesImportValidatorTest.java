@@ -544,7 +544,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
     }
 
     private FileValidationContext prepareContext(final RobotSuiteFile suiteFile) {
-        final ValidationContext parentContext = new ValidationContext(suiteFile.getProject().getRobotProjectConfig(),
+        final ValidationContext parentContext = new ValidationContext(
+                suiteFile.getRobotProject().getRobotProjectConfig(),
                 model, RobotVersion.from("0.0"), SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
         return new FileValidationContext(parentContext, suiteFile.getFile());
     }

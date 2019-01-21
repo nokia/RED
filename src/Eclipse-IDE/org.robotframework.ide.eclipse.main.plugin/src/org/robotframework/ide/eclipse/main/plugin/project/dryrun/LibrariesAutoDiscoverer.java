@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -19,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -63,7 +63,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     public static void start(final Collection<RobotSuiteFile> suites, final DiscovererFactory discovererFactory) {
         final Map<RobotProject, List<RobotSuiteFile>> suitesGroupedByProject = suites.stream()
-                .collect(Collectors.groupingBy(RobotSuiteFile::getProject, LinkedHashMap::new, Collectors.toList()));
+                .collect(groupingBy(RobotSuiteFile::getRobotProject, LinkedHashMap::new, toList()));
 
         // TODO: for now we want to start autodiscovering only for one project, see RED-1004
         final List<LibrariesAutoDiscoverer> discoverers = suitesGroupedByProject.entrySet()
@@ -71,7 +71,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 .filter(entry -> entry.getKey().getRuntimeEnvironment().hasRobotInstalled())
                 .limit(1)
                 .map(entry -> discovererFactory.create(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+                .collect(toList());
 
         discoverers.forEach(LibrariesAutoDiscoverer::start);
     }

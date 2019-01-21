@@ -7,8 +7,10 @@ package org.rf.ide.core.testdata;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.rf.ide.core.environment.RobotVersion;
@@ -16,58 +18,35 @@ import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.importer.ResourceImporter;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.importer.VariablesImporter;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
-import org.rf.ide.core.testdata.text.read.TsvRobotFileParser;
-import org.rf.ide.core.testdata.text.read.TxtRobotFileParser;
+import org.rf.ide.core.testdata.text.read.TextualRobotFileParser;
 
 public class RobotParser {
 
     private static final int MAX_NUMBER_OF_TRASH_LINES = 5000;
 
-    private static final List<IRobotFileParser> AVAIL_FORMAT_PARSERS = new ArrayList<>();
-
-    static {
-        AVAIL_FORMAT_PARSERS.add(new TxtRobotFileParser());
-        AVAIL_FORMAT_PARSERS.add(new TsvRobotFileParser());
-    }
-
-    private final RobotParserConfig parserCfg;
+    private static final FileFormat[] AVAILABLE_FORMATS = new FileFormat[] { FileFormat.TXT_OR_ROBOT, FileFormat.TSV };
 
     private final RobotProjectHolder robotProject;
 
+    private final RobotParserConfig parserCfg;
+
     private final PathsProvider pathsProvider;
 
-    /**
-     * Creates parser which parses only given file without dependencies.
-     * 
-     * @param projectHolder
-     * @param version
-     * @parem pathsProvider
-     * @return normal parser
-     */
-    public static RobotParser create(final RobotProjectHolder projectHolder, final RobotVersion version,
-            final PathsProvider pathsProvider) {
-        return new RobotParser(projectHolder, new RobotParserConfig(version), pathsProvider);
+    public RobotParser(final RobotProjectHolder robotProject, final RobotParserConfig cfg) {
+        this(robotProject, cfg, null);
     }
 
-    public static RobotParser create(final RobotProjectHolder projectHolder, final RobotParserConfig cfg,
-            final PathsProvider pathsProvider) {
-        return new RobotParser(projectHolder, cfg, pathsProvider);
-    }
-
-    public static RobotParser create(final RobotProjectHolder projectHolder, final RobotParserConfig cfg) {
-        return new RobotParser(projectHolder, cfg, null);
-    }
-
-    private RobotParser(final RobotProjectHolder robotProject, final RobotParserConfig cfg,
+    public RobotParser(final RobotProjectHolder robotProject, final RobotParserConfig cfg,
             final PathsProvider pathsProvider) {
         this.robotProject = robotProject;
-        this.pathsProvider = pathsProvider;
         this.parserCfg = cfg;
+        this.pathsProvider = pathsProvider;
     }
 
     public final RobotVersion getRobotVersion() {
@@ -75,13 +54,13 @@ public class RobotParser {
     }
 
     public boolean isImportingEagerly() {
-        return this.parserCfg.isEagerImportOn();
+        return parserCfg.isEagerImportOn();
     }
 
     /**
      * Should be used for unsaved editor content. Parsed output is not replacing
      * saved robot model in {@link RobotProjectHolder} object.
-     * 
+     *
      * @param fileContent
      * @param fileOrDir
      * @return
@@ -89,26 +68,16 @@ public class RobotParser {
     public RobotFileOutput parseEditorContent(final String fileContent, final File fileOrDir) {
         final RobotFileOutput robotFile = new RobotFileOutput(getRobotVersion());
 
-        final IRobotFileParser parserToUse = getParser(fileOrDir, true);
+        final TextualRobotFileParser parserToUse = getParser(fileOrDir, true);
 
         if (parserToUse != null) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(new byte[0]);
-            if (fileContent != null && fileContent.length() > 0) {
-                bais = new ByteArrayInputStream(fileContent.getBytes(Charset.forName("UTF-8")));
-            }
+            final InputStream inputStream = fileContent == null || fileContent.isEmpty()
+                    ? new ByteArrayInputStream(new byte[0])
+                    : new ByteArrayInputStream(fileContent.getBytes(Charset.forName("UTF-8")));
 
-            parserToUse.parse(robotFile, bais, fileOrDir);
+            parserToUse.parse(robotFile, inputStream, fileOrDir);
 
-            final RobotFile fileModel = robotFile.getFileModel();
-            if (fileModel.containsAnyRobotSection()) {
-                final List<File> alreadyImported = new ArrayList<>();
-                alreadyImported.add(fileOrDir);
-                importExternal(robotFile);
-            } else {
-                if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
-                    fileModel.removeLines();
-                }
-            }
+            applyPostParsingActions(robotFile);
         } else {
             robotFile.addBuildMessage(
                     BuildMessage.createErrorMessage("No parser found for file.", fileOrDir.getAbsolutePath()));
@@ -126,21 +95,12 @@ public class RobotParser {
 
     private void parse(final File fileOrDir, final List<RobotFileOutput> output) {
         if (fileOrDir != null) {
-            final boolean isDir = fileOrDir.isDirectory();
-            if (isDir) {
-                final int currentOutputSize = output.size();
-                final File[] files = fileOrDir.listFiles();
-                for (final File f : files) {
+            if (fileOrDir.isDirectory()) {
+                for (final File f : fileOrDir.listFiles()) {
                     parse(f, output);
                 }
-
-                if (currentOutputSize < output.size()) {
-                    // is high level test suite
-                    // TODO: place where in case of TH type we should put
-                    // information
-                }
             } else if (robotProject.shouldBeLoaded(fileOrDir)) {
-                final IRobotFileParser parserToUse = getParser(fileOrDir, false);
+                final TextualRobotFileParser parserToUse = getParser(fileOrDir, false);
 
                 if (parserToUse != null) {
                     final RobotFileOutput robotFile = new RobotFileOutput(getRobotVersion());
@@ -152,14 +112,7 @@ public class RobotParser {
                     parserToUse.parse(robotFile, fileOrDir);
                     robotProject.addModelFile(robotFile);
 
-                    final RobotFile fileModel = robotFile.getFileModel();
-                    if (fileModel.containsAnyRobotSection()) {
-                        importExternal(robotFile);
-                    } else {
-                        if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
-                            fileModel.removeLines();
-                        }
-                    }
+                    applyPostParsingActions(robotFile);
                 }
             } else {
                 final RobotFileOutput fileByName = robotProject.findFileByName(fileOrDir);
@@ -167,6 +120,15 @@ public class RobotParser {
                     output.add(fileByName);
                 }
             }
+        }
+    }
+
+    private void applyPostParsingActions(final RobotFileOutput robotFile) {
+        final RobotFile fileModel = robotFile.getFileModel();
+        if (fileModel.containsAnyRobotSection()) {
+            importExternal(robotFile);
+        } else if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
+            fileModel.removeLines();
         }
     }
 
@@ -187,17 +149,15 @@ public class RobotParser {
         }
     }
 
-    private IRobotFileParser getParser(final File fileOrDir, final boolean isFromStringContent) {
-        IRobotFileParser parserToUse = null;
-        for (final IRobotFileParser parser : AVAIL_FORMAT_PARSERS) {
-            synchronized (parser) {
-                if (parser.canParseFile(fileOrDir, isFromStringContent)) {
-                    parserToUse = parser.newInstance();
-                    break;
-                }
-            }
+    private TextualRobotFileParser getParser(final File fileOrDir, final boolean isFromStringContent) {
+        if (fileOrDir == null || !fileOrDir.isFile() && !isFromStringContent) {
+            return null;
         }
-        return parserToUse;
+        return Arrays.stream(AVAILABLE_FORMATS)
+                .filter(fileFormat -> FileFormat.getByFile(fileOrDir) == fileFormat)
+                .findFirst()
+                .map(TextualRobotFileParser::new)
+                .orElse(null);
     }
 
     public static class RobotParserConfig {
@@ -230,20 +190,12 @@ public class RobotParser {
             return version;
         }
 
-        public void setEagerImport(final boolean shouldEagerImport) {
-            this.shouldEagerImport = shouldEagerImport;
-        }
-
-        public void setIncludeImportVariables(final boolean shouldImportVariables) {
-            this.shouldImportVariables = shouldImportVariables;
-        }
-
         public boolean isEagerImportOn() {
-            return this.shouldEagerImport;
+            return shouldEagerImport;
         }
 
         public boolean shouldImportVariables() {
-            return this.shouldImportVariables;
+            return shouldImportVariables;
         }
     }
 }

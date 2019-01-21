@@ -31,7 +31,7 @@ public class LibraryImportCollector {
 
     private static Map<RobotSuiteFile, List<LibraryImport>> collectLibraryImportsIncludingNestedResources(
             final RobotSuiteFile suite, final Set<IResource> alreadyVisited) {
-        final RobotModel model = (RobotModel) suite.getProject().getParent();
+        final RobotModel model = (RobotModel) suite.getRobotProject().getParent();
 
         final Map<RobotSuiteFile, List<LibraryImport>> imports = collectLibraryImports(suite);
         for (final IFile resourceFile : findResourceImportFiles(suite, alreadyVisited)) {

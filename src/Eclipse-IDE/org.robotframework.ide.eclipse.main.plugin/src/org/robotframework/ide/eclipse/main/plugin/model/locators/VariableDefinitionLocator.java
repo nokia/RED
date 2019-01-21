@@ -276,7 +276,7 @@ public class VariableDefinitionLocator {
 
     private ContinueDecision locateGlobalVariables(final RobotSuiteFile startingFile,
             final VariableDetector detector) {
-        final RobotProjectHolder projectHolder = startingFile.getProject().getRobotProjectHolder();
+        final RobotProjectHolder projectHolder = startingFile.getRobotProject().getRobotProjectHolder();
         final List<ARobotInternalVariable<?>> globalVariables = projectHolder.getGlobalVariables();
 
         for (final ARobotInternalVariable<?> variable : globalVariables) {

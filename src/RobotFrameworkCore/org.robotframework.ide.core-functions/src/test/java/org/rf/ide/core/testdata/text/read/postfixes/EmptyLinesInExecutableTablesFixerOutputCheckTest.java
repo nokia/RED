@@ -127,7 +127,7 @@ public class EmptyLinesInExecutableTablesFixerOutputCheckTest {
         final File file = new File(RobotParser.class.getResource("parser/bugs/" + fileName).toURI());
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
-        final RobotParser parser = RobotParser.create(projectHolder,
+        final RobotParser parser = new RobotParser(projectHolder,
                 RobotParserConfig.allImportsLazy(new RobotVersion(3, 1)));
         final List<RobotFileOutput> parsed = parser.parse(file);
 

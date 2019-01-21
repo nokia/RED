@@ -103,7 +103,8 @@ class ExternalLibrariesImportCollector {
     private void findLibrariesInSuite(final RobotSuiteFile currentSuite, final List<LibraryImport> imports) {
         this.currentSuite = currentSuite;
 
-        final ValidationContext generalContext = new ValidationContext(currentSuite.getProject(), new BuildLogger());
+        final ValidationContext generalContext = new ValidationContext(currentSuite.getRobotProject(),
+                new BuildLogger());
         final FileValidationContext fileContext = new FileValidationContext(generalContext, currentSuite.getFile());
         final DiscoveringImportValidator importsValidator = new DiscoveringImportValidator(fileContext, imports,
                 new DiscoveringReportingStrategy());

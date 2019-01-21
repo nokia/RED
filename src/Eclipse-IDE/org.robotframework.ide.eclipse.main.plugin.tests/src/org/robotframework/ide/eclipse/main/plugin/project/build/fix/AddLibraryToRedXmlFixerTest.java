@@ -51,7 +51,7 @@ public class AddLibraryToRedXmlFixerTest {
 
         assertThat(marker.exists()).isTrue();
 
-        verify(factory).create(suite.getProject(), newArrayList(suite));
+        verify(factory).create(suite.getRobotProject(), newArrayList(suite));
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
     }
