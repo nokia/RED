@@ -36,6 +36,8 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private int currentPage;
 
+    private int processorsSkipped = 0;
+
     private boolean canReopenAssistantProgramatically;
 
     public CycledContentAssistProcessor(final SuiteSourceAssistantContext assistContext,
@@ -70,7 +72,9 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
         final ICompletionProposal[] proposals = getCurrentProcessor().computeCompletionProposals(viewer, offset);
 
-        currentPage = processors.indexOf(nextApplicableProcessor);
+        final int newCurrentPage = processors.indexOf(nextApplicableProcessor);
+        processorsSkipped = newCurrentPage - currentPage;
+        currentPage = newCurrentPage;
         return proposals;
     }
 
@@ -107,16 +111,21 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     @Override
     public void assistSessionRestarted(final ContentAssistEvent event) {
-        if (event.processor == this) {
+        assistSessionRestarted(event.processor);
+    }
+
+    @VisibleForTesting
+    void assistSessionRestarted(final IContentAssistProcessor processor) {
+        if (processor == this) {
             canReopenAssistantProgramatically = true;
-            currentPage--;
+            currentPage -= processorsSkipped;
+            processorsSkipped = 0;
             if (currentPage < 0) {
                 currentPage = processors.size() - 1;
             }
         } else {
             canReopenAssistantProgramatically = false;
         }
-
     }
 
     @Override

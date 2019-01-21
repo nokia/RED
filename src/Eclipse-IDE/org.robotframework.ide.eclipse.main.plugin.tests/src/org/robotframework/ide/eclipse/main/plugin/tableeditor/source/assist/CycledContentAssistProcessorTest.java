@@ -119,6 +119,50 @@ public class CycledContentAssistProcessorTest {
         assertThat(cycledProcessor.computeCompletionProposals(viewer, 0)).containsExactly(p1, p2, p3);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Test
+    public void proposalsAreTakenFromNestedProcessors_butWhenSessionRestartsItProperlyMovesToPreviousOne()
+            throws Exception {
+
+        final ICompletionProposal p1 = mock(ICompletionProposal.class), p2 = mock(ICompletionProposal.class),
+                p3 = mock(ICompletionProposal.class);
+        final ICompletionProposal q1 = mock(ICompletionProposal.class), q2 = mock(ICompletionProposal.class);
+        final ICompletionProposal r1 = mock(ICompletionProposal.class), r2 = mock(ICompletionProposal.class),
+                r3 = mock(ICompletionProposal.class);
+
+        final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
+                null);
+        final AssistantCallbacks callback = mock(AssistantCallbacks.class);
+
+        final IDocument document = spy(new Document());
+        when(document.getContentType(0)).thenReturn("__ct");
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(document);
+
+        final RedContentAssistProcessor processor1 = mock(RedContentAssistProcessor.class);
+        when(processor1.getApplicableContentTypes()).thenReturn(newArrayList("__ct"));
+        when(processor1.computeProposals(viewer, 0)).thenReturn((List) newArrayList(p1, p2, p3));
+
+        final RedContentAssistProcessor processor2 = mock(RedContentAssistProcessor.class);
+        when(processor2.getApplicableContentTypes()).thenReturn(newArrayList("foo"));
+        when(processor2.computeProposals(viewer, 0)).thenReturn((List) newArrayList(q1, q2));
+
+        final RedContentAssistProcessor processor3 = mock(RedContentAssistProcessor.class);
+        when(processor3.getApplicableContentTypes()).thenReturn(newArrayList("__ct"));
+        when(processor3.computeProposals(viewer, 0)).thenReturn((List) newArrayList(r1, r2, r3));
+
+        final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, callback);
+        cycledProcessor.addProcessor(processor1);
+        cycledProcessor.addProcessor(processor2);
+        cycledProcessor.addProcessor(processor3);
+
+        assertThat(cycledProcessor.computeCompletionProposals(viewer, 0)).containsExactly(p1, p2, p3);
+        cycledProcessor.assistSessionRestarted(cycledProcessor);
+        assertThat(cycledProcessor.computeCompletionProposals(viewer, 0)).containsExactly(p1, p2, p3);
+    }
+
     @Test
     public void nextProposalStatusesWithCorrectActivationTriggerAreSet_forNestedProcessors() throws Exception {
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, '9'));
