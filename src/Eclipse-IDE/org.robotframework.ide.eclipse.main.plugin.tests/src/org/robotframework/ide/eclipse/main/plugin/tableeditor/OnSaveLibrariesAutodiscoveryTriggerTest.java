@@ -215,7 +215,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verify(factory).create(suite.getProject(), newArrayList(suite));
+        verify(factory).create(suite.getRobotProject(), newArrayList(suite));
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
@@ -237,7 +237,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verify(factory).create(suite.getProject(), newArrayList(suite));
+        verify(factory).create(suite.getRobotProject(), newArrayList(suite));
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
@@ -259,7 +259,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verify(factory).create(suite.getProject(), newArrayList(suite));
+        verify(factory).create(suite.getRobotProject(), newArrayList(suite));
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
@@ -281,7 +281,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verify(factory).create(suite.getProject(), newArrayList(suite));
+        verify(factory).create(suite.getRobotProject(), newArrayList(suite));
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
@@ -333,7 +333,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         trigger1.postExecuteSuccess(OnSaveLibrariesAutodiscoveryTrigger.SAVE_ALL_COMMAND_ID, new Object());
         trigger2.postExecuteSuccess(OnSaveLibrariesAutodiscoveryTrigger.SAVE_ALL_COMMAND_ID, new Object());
 
-        verify(factory).create(suite1.getProject(), newArrayList(suite1, suite2));
+        verify(factory).create(suite1.getRobotProject(), newArrayList(suite1, suite2));
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);

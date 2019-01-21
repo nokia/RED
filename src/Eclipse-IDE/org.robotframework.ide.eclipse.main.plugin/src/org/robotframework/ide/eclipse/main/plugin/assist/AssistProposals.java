@@ -66,7 +66,7 @@ public class AssistProposals {
             final ProposalMatch match) {
 
         final boolean isImported = suiteFile.getImportedLibraries().containsKey(libSpec);
-        return new RedLibraryProposal(suiteFile.getProject(), libSpec, isImported, match);
+        return new RedLibraryProposal(suiteFile.getRobotProject(), libSpec, isImported, match);
     }
 
     static RedSitePackagesLibraryProposal createSitePackagesLibraryProposal(final String name,

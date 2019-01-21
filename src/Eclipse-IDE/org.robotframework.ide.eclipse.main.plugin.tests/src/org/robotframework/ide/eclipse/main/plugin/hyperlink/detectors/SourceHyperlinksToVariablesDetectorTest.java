@@ -224,7 +224,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "  Log  ${var}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final RobotProject robotProject = suiteFile.getProject();
+        final RobotProject robotProject = suiteFile.getRobotProject();
         final ReferencedVariableFile varsImportRef = new ReferencedVariableFile();
         varsImportRef.setVariables(ImmutableMap.of("x", 100, "var", 42, "z", 1729));
         robotProject.setReferencedVariablesFiles(newArrayList(varsImportRef));
@@ -248,7 +248,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "  Log  ${var}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final RobotProjectHolder projectHolder = suiteFile.getProject().getRobotProjectHolder();
+        final RobotProjectHolder projectHolder = suiteFile.getRobotProject().getRobotProjectHolder();
         projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("var", "val")));
         final Document document = new Document(getContent(file));
 

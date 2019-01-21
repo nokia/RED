@@ -80,7 +80,7 @@ public class RedSourceDoubleClickStrategyTest {
     private static RobotDocument createDocument(final String... lines) {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
-        final RobotParser parser = RobotParser.create(robotProject.getRobotProjectHolder(),
+        final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(),
                 RobotParserConfig.allImportsLazy(new RobotVersion(3, 1)));
         final File file = new File("file.robot");
 

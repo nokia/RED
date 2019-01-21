@@ -31,7 +31,7 @@ public class ImportsInCodeProposalsProvider implements RedContentProposalProvide
         final List<? extends AssistProposal> importProposals = new RedImportProposals(suiteFile)
                 .getImportsProposals(prefix);
 
-        final IRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = suiteFile.getRobotProject().getRuntimeEnvironment();
         return importProposals.stream().map(proposal -> new AssistProposalAdapter(env, proposal)).toArray(
                 RedContentProposal[]::new);
     }

@@ -62,7 +62,7 @@ public class RobotArtifactsValidator {
     public static Job revalidate(final RobotSuiteFile suiteModel) {
         if (shouldValidate(suiteModel)) {
             final IFile file = suiteModel.getFile();
-            final ValidationContext context = new ValidationContext(suiteModel.getProject(), new BuildLogger());
+            final ValidationContext context = new ValidationContext(suiteModel.getRobotProject(), new BuildLogger());
 
             try {
                 final Optional<? extends ModelUnitValidator> validator = ModelUnitValidatorConfigFactory
@@ -96,7 +96,7 @@ public class RobotArtifactsValidator {
                 || !RobotProjectNature.hasRobotNature(file.getProject())) {
             return false;
         }
-        return suiteModel.getProject().getRuntimeEnvironment().hasRobotInstalled();
+        return suiteModel.getRobotProject().getRuntimeEnvironment().hasRobotInstalled();
     }
 
     private static synchronized ModelUnitValidator createSynchronizedValidator(final IResource resource,

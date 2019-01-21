@@ -51,7 +51,7 @@ abstract class HyperlinksToFilesDetector {
     }
 
     private Optional<URI> createAbsoluteUri(final RobotSuiteFile suiteFile, final String path) {
-        final Map<String, String> variablesMapping = suiteFile.getProject()
+        final Map<String, String> variablesMapping = suiteFile.getRobotProject()
                 .getRobotProjectHolder()
                 .getVariableMappings();
         try {
@@ -60,7 +60,7 @@ abstract class HyperlinksToFilesDetector {
             if (!resolvedPath.isPresent()) {
                 return Optional.empty();
             }
-            final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
+            final PathsProvider pathsProvider = suiteFile.getRobotProject().createPathsProvider();
             final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
             return searchPaths.findAbsoluteUri(RedWorkspace.tryToGetLocalUri(suiteFile.getFile()), resolvedPath.get());
         } catch (final MalformedPathImportException e) {

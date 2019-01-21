@@ -85,7 +85,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         @Override
         public boolean apply(final IFile externalFile, final RobotProjectConfig config) {
             final Shell shell = Display.getCurrent().getActiveShell();
-            final ReferencedLibraryLocator libraryLocator = new ReferencedLibraryLocator(suiteFile.getProject(),
+            final ReferencedLibraryLocator libraryLocator = new ReferencedLibraryLocator(suiteFile.getRobotProject(),
                     new ReferencedLibraryImporter(shell), new IReferencedLibraryDetector() {
 
                         @Override
@@ -103,7 +103,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                         @Override
                         public void libraryDetectingByNameFailed(final String name, final Optional<File> libraryFile,
                                 final String failReason) {
-                            discovererFactory.create(suiteFile.getProject(), newArrayList(suiteFile)).start();
+                            discovererFactory.create(suiteFile.getRobotProject(), newArrayList(suiteFile)).start();
                         }
 
                         @Override

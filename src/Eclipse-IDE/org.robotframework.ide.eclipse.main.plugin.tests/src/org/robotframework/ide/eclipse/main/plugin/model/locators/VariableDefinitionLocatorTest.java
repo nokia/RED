@@ -394,7 +394,7 @@ public class VariableDefinitionLocatorTest {
 
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
-        final RobotProjectHolder projectHolder = suiteFile.getProject().getRobotProjectHolder();
+        final RobotProjectHolder projectHolder = suiteFile.getRobotProject().getRobotProjectHolder();
         projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("global_scalar", null),
                 new ListRobotInternalVariable("global_list", null),
                 new DictionaryRobotInternalVariable("global_dict", null)));
@@ -411,7 +411,7 @@ public class VariableDefinitionLocatorTest {
 
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
-        final RobotProjectHolder projectHolder = suiteFile.getProject().getRobotProjectHolder();
+        final RobotProjectHolder projectHolder = suiteFile.getRobotProject().getRobotProjectHolder();
         projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("global_scalar", null),
                 new ListRobotInternalVariable("global_list", null),
                 new DictionaryRobotInternalVariable("global_dict", null)));

@@ -46,7 +46,7 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> keywordsProposals = new RedKeywordProposals(suiteFile.get())
                 .getKeywordProposals(prefix);
 
-        final IRuntimeEnvironment env = suiteFile.get().getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = suiteFile.get().getRobotProject().getRuntimeEnvironment();
         if (!dataProvider.isPresent()) {
             return keywordsProposals.stream().map(proposal -> new AssistProposalAdapter(env, proposal)).toArray(
                     RedContentProposal[]::new);

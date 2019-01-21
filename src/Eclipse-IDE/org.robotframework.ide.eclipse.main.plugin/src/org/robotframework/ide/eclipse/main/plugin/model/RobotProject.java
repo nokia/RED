@@ -321,10 +321,6 @@ public class RobotProject extends RobotContainer {
         return new ProjectPathsProvider();
     }
 
-    public synchronized List<File> getModuleSearchPaths() {
-        return getRobotProjectHolder().getModuleSearchPaths();
-    }
-
     @VisibleForTesting
     public void setReferencedVariablesFiles(final List<ReferencedVariableFile> varFiles) {
         this.referencedVariableFiles = varFiles;
@@ -391,7 +387,7 @@ public class RobotProject extends RobotContainer {
 
         @Override
         public List<File> providePythonModulesSearchPaths() {
-            return getModuleSearchPaths();
+            return getRobotProjectHolder().getModuleSearchPaths();
         }
 
         @Override

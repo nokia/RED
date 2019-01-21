@@ -32,7 +32,7 @@ public class AddRemoteLibraryToRedXmlFixerTest {
     public static void beforeSuite() throws Exception {
         projectProvider.configure();
         suite = new RobotModel().createSuiteFile(projectProvider.createFile("suite.robot"));
-        robotProject = suite.getProject();
+        robotProject = suite.getRobotProject();
     }
 
     @Test

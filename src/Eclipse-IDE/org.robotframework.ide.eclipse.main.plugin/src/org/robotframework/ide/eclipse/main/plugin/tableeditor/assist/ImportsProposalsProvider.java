@@ -55,7 +55,7 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
         final Stream<? extends AssistProposal> sitePackagesLibrariesProposals = importType == SettingsGroup.LIBRARIES
                 ? new RedLibraryProposals(model).getSitePackagesLibrariesProposals(prefix).stream()
                 : Stream.empty();
-        final IRuntimeEnvironment env = model.getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = model.getRobotProject().getRuntimeEnvironment();
         return Streams.concat(librariesProposals, fileLocationProposals, sitePackagesLibrariesProposals)
                 .map(proposal -> new AssistProposalAdapter(env, proposal, p -> true))
                 .toArray(RedContentProposal[]::new);

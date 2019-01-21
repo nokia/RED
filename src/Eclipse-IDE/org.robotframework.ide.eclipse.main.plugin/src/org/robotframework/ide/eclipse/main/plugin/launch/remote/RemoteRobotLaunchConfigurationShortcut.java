@@ -91,12 +91,12 @@ public class RemoteRobotLaunchConfigurationShortcut implements ILaunchShortcut2 
             }
         }
         for (final RobotCasesSection section : sections) {
-            if (projects.add(section.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
+            if (projects.add(section.getSuiteFile().getRobotProject().getProject()) && projects.size() > 1) {
                 return Optional.empty();
             }
         }
         for (final RobotCase robotCase : cases) {
-            if (projects.add(robotCase.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
+            if (projects.add(robotCase.getSuiteFile().getRobotProject().getProject()) && projects.size() > 1) {
                 return Optional.empty();
             }
         }

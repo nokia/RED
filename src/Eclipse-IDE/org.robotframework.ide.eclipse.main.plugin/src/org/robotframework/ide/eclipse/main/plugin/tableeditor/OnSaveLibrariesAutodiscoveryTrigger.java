@@ -108,8 +108,8 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     }
 
     private boolean shouldStartAutoDiscovering(final RobotSuiteFile suite) {
-        final RobotProjectConfig projectConfig = suite.getProject().getRobotProjectConfig();
-        return RobotProjectNature.hasRobotNature(suite.getProject().getProject())
+        final RobotProjectConfig projectConfig = suite.getRobotProject().getRobotProjectConfig();
+        return RobotProjectNature.hasRobotNature(suite.getRobotProject().getProject())
                 && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled()
                 && !ExcludedResources.isHiddenInEclipse(suite.getFile())
                 && !ExcludedResources.isInsideExcludedPath(suite.getFile(), projectConfig)
@@ -130,7 +130,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     private boolean suiteHasUnknownLibrary(final RobotSuiteFile suite, final List<LibraryImport> imports) {
         final UnknownLibraryDetectingReportingStrategy reporter = new UnknownLibraryDetectingReportingStrategy();
 
-        final ValidationContext generalContext = new ValidationContext(suite.getProject(), new BuildLogger());
+        final ValidationContext generalContext = new ValidationContext(suite.getRobotProject(), new BuildLogger());
         final FileValidationContext fileContext = new FileValidationContext(generalContext, suite.getFile());
         final GeneralSettingsLibrariesImportValidator importsValidator = new GeneralSettingsLibrariesImportValidator(
                 fileContext, suite, imports, reporter);

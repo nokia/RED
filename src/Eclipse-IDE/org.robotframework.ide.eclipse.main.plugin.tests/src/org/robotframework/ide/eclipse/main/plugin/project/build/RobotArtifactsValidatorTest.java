@@ -40,7 +40,7 @@ public class RobotArtifactsValidatorTest {
         when(file.getProject()).thenReturn(project);
         when(project.exists()).thenReturn(true);
         when(project.hasNature(RobotProjectNature.ROBOT_NATURE)).thenReturn(true);
-        when(suiteModel.getProject()).thenReturn(robotProject);
+        when(suiteModel.getRobotProject()).thenReturn(robotProject);
         when(robotProject.getRuntimeEnvironment()).thenReturn(new NullRuntimeEnvironment());
 
         // execute
@@ -50,7 +50,7 @@ public class RobotArtifactsValidatorTest {
         final InOrder order = inOrder(suiteModel, file, robotProject);
         order.verify(suiteModel).getFile();
         order.verify(file).exists();
-        order.verify(suiteModel).getProject();
+        order.verify(suiteModel).getRobotProject();
         order.verify(robotProject).getRuntimeEnvironment();
         order.verifyNoMoreInteractions();
     }

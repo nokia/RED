@@ -56,10 +56,6 @@ public class RedProjectEditorInput {
         return isEditable;
     }
 
-    public void refreshProjectConfiguration() {
-        // FIXME : callee wanted to achieve something...
-    }
-
     public void refreshProjectConfiguration(final IFile file) {
         this.file = Optional.ofNullable(file);
         projectConfiguration = new RedEclipseProjectConfigReader().readConfigurationWithLines(file);

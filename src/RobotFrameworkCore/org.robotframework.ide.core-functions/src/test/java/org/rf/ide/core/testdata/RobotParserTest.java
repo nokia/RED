@@ -53,7 +53,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder,
+        final RobotParser parser = new RobotParser(projectHolder,
                 RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
@@ -74,7 +74,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder,
+        final RobotParser parser = new RobotParser(projectHolder,
                 RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
@@ -108,7 +108,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder,
+        final RobotParser parser = new RobotParser(projectHolder,
                 RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
 
         // verify
@@ -126,7 +126,7 @@ public class RobotParserTest {
         when(pathsProvider.targetExists(any(URI.class)))
                 .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
 
-        final RobotParser parser = spy(RobotParser.create(projectHolder,
+        final RobotParser parser = spy(new RobotParser(projectHolder,
                 RobotParserConfig.allImportsEager(new RobotVersion(2, 9)), pathsProvider));
 
         //// prepare paths
@@ -235,7 +235,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         final RobotParser parser = spy(
-                RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
+                new RobotParser(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
 
         //// prepare paths
         final File startFile = new File(this.getClass().getResource(filename).toURI());
@@ -285,7 +285,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         final RobotParser parser = spy(
-                RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
+                new RobotParser(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
 
         // prepare paths
         final File startFile = new File(this.getClass().getResource("parser/bugs/tsv_positionCheck.tsv").toURI());

@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRefLibs;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRemoteLib;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createStdLibs;
@@ -23,7 +25,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -168,7 +169,7 @@ public class RobotSuiteFileTest {
     }
 
     @Test
-    public void robotEnvironmentIsReturned_whenProjectIsDefined() throws Exception {
+    public void robotEnvironmentIsReturned() throws Exception {
         final IFile file = projectProvider.getFile("res/res1.robot");
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         final RobotSuiteFile suiteFile = new RobotSuiteFile(robotProject, file);
@@ -176,9 +177,21 @@ public class RobotSuiteFileTest {
     }
 
     @Test
-    public void nullEnvironmentIsReturned_whenProjectIsNotDefined() throws Exception {
-        final RobotSuiteFile suiteFile = new RobotSuiteFile(null, null);
-        assertThat(suiteFile.getRuntimeEnvironment()).isExactlyInstanceOf(NullRuntimeEnvironment.class);
+    public void robotParserFileIsReturned_whenLocationIsNotNull() throws Exception {
+        final IFile file = projectProvider.getFile("res/res1.robot");
+        final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
+        final RobotSuiteFile suiteFile = new RobotSuiteFile(robotProject, file);
+        assertThat(suiteFile.getRobotParserFile()).hasName("res1.robot");
+    }
+
+    @Test
+    public void robotParserFileIsReturned_whenLocationIsNull() throws Exception {
+        final IFile file = mock(IFile.class);
+        when(file.getLocation()).thenReturn(null);
+        when(file.getName()).thenReturn("abc.robot");
+        final RobotProject robotProject = mock(RobotProject.class);
+        final RobotSuiteFile suiteFile = new RobotSuiteFile(robotProject, file);
+        assertThat(suiteFile.getRobotParserFile()).hasName("abc.robot");
     }
 
     private static String[] createResourceImportSection(final String... resourcePaths) {

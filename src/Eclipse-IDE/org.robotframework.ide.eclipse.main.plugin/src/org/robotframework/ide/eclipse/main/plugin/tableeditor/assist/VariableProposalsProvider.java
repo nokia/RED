@@ -64,7 +64,7 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> variableProposals = new RedVariableProposals(suiteFile, predicate)
                 .getVariableProposals(userContentToReplace, getModelElement(rowElement));
 
-        final IRuntimeEnvironment env = suiteFile.getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = suiteFile.getRobotProject().getRuntimeEnvironment();
         return variableProposals.stream()
                 .map(proposal -> new AssistProposalAdapter(env, proposal, modificationStrategy))
                 .toArray(RedContentProposal[]::new);

@@ -186,7 +186,7 @@ public class RobotSetting extends RobotKeywordCall {
     }
 
     public Optional<ImportedLibrary> getImportedLibrary() {
-        final RobotProject project = getSuiteFile().getProject();
+        final RobotProject project = getSuiteFile().getRobotProject();
         return getImportedLibrary(Multimaps.index(project.getLibrarySpecifications(), LibrarySpecification::getName));
     }
 
@@ -240,7 +240,7 @@ public class RobotSetting extends RobotKeywordCall {
     }
 
     private Optional<ImportedLibrary> findSpecForPath(final String path) {
-        final RobotProject project = getSuiteFile().getProject();
+        final RobotProject project = getSuiteFile().getRobotProject();
 
         final Optional<IPath> possiblePath = getPath(project, path).map(URI::getPath).map(Path::new);
         if (!possiblePath.isPresent()) {
@@ -299,7 +299,7 @@ public class RobotSetting extends RobotKeywordCall {
 
         final String path = RobotExpressions.unescapeSpaces(args.get(0));
 
-        final RobotProject project = getSuiteFile().getProject();
+        final RobotProject project = getSuiteFile().getRobotProject();
         final Optional<URI> possiblePath = getPath(project, path);
         if (!possiblePath.isPresent()) {
             return Optional.empty();

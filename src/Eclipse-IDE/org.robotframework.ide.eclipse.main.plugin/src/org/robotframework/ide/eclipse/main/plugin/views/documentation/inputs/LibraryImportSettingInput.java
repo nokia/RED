@@ -31,7 +31,7 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
     @Override
     public boolean contains(final Object wrappedInput) {
         if (wrappedInput instanceof IProject) {
-            return element.getSuiteFile().getProject().getProject().equals(wrappedInput);
+            return element.getSuiteFile().getRobotProject().getProject().equals(wrappedInput);
         }
         return super.contains(wrappedInput);
     }
@@ -44,13 +44,13 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
 
     @Override
     public URI getInputUri() throws URISyntaxException {
-        final String projectName = element.getSuiteFile().getProject().getName();
+        final String projectName = element.getSuiteFile().getRobotProject().getName();
         return LibraryUri.createShowLibraryDocUri(projectName, specification.getName());
     }
 
     @Override
     protected String createHeader() {
-        final IProject project = element.getSuiteFile().getProject().getProject();
+        final IProject project = element.getSuiteFile().getRobotProject().getProject();
         return LibrarySpecificationInput.createHeader(project, specification);
     }
 
@@ -61,14 +61,14 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
 
     @Override
     protected String createFooter() {
-        final IRuntimeEnvironment env = element.getSuiteFile().getProject().getRuntimeEnvironment();
+        final IRuntimeEnvironment env = element.getSuiteFile().getRobotProject().getRuntimeEnvironment();
         return LibrarySpecificationInput.createFooter(specification, env);
     }
 
     @Override
     protected String localKeywordsLinker(final String name) {
         try {
-            final String projectName = element.getSuiteFile().getProject().getName();
+            final String projectName = element.getSuiteFile().getRobotProject().getName();
             return LibraryUri.createShowKeywordDocUri(projectName, specification.getName(), name).toString();
         } catch (final URISyntaxException e) {
             return "#";
@@ -77,7 +77,7 @@ public class LibraryImportSettingInput extends InternalElementInput<RobotSetting
 
     @Override
     public IFile generateHtmlLibdoc() {
-        return new LibrariesBuilder(new BuildLogger()).buildHtmlLibraryDoc(element.getSuiteFile().getProject(),
+        return new LibrariesBuilder(new BuildLogger()).buildHtmlLibraryDoc(element.getSuiteFile().getRobotProject(),
                 specification);
     }
 

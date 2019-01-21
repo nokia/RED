@@ -21,16 +21,14 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
-public abstract class RobotContainer implements RobotElement {
-
-    private final RobotElement parent;
+public abstract class RobotContainer extends RobotProjectElement {
 
     protected final IContainer container;
 
     private final List<RobotElement> elements;
 
     RobotContainer(final RobotElement parent, final IContainer container) {
-        this.parent = parent;
+        super(parent);
         this.container = container;
         this.elements = new ArrayList<>();
     }
@@ -82,19 +80,6 @@ public abstract class RobotContainer implements RobotElement {
         return container.getName();
     }
 
-    @Override
-    public RobotElement getParent() {
-        return parent;
-    }
-
-    public RobotProject getRobotProject() {
-        RobotElement current = parent;
-        while (!(current instanceof RobotProject)) {
-            current = current.getParent();
-        }
-        return (RobotProject) current;
-    }
-
     public IContainer getContainer() {
         return container;
     }
@@ -102,11 +87,6 @@ public abstract class RobotContainer implements RobotElement {
     @Override
     public List<RobotElement> getChildren() {
         return elements;
-    }
-
-    @Override
-    public int getIndex() {
-        return parent == null ? -1 : parent.getChildren().indexOf(this);
     }
 
     @Override

@@ -541,7 +541,7 @@ public class RobotFormEditor extends FormEditor {
 
     private void checkRuntimeEnvironment(final RobotSuiteFile suiteFile) {
         if (suiteFile != null) {
-            final RobotProject robotProject = suiteFile.getProject();
+            final RobotProject robotProject = suiteFile.getRobotProject();
             if (robotProject != null) {
                 final IRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
                 if (!env.isValidPythonInstallation() || !env.hasRobotInstalled()) {

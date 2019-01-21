@@ -59,7 +59,7 @@ public class SuiteSourceAssistantContext {
     }
 
     public IRuntimeEnvironment getEnvironment() {
-        return getModel().getProject().getRuntimeEnvironment();
+        return getModel().getRobotProject().getRuntimeEnvironment();
     }
 
     public IFile getFile() {
