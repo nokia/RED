@@ -107,7 +107,7 @@ public class RedPreferencesInitializerTest {
 
         verify(preferences).putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
-                false);
+                true);
     }
 
     @Test
