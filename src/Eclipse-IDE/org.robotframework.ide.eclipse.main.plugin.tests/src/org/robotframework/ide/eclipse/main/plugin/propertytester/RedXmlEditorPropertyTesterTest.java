@@ -10,8 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
-
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -47,8 +45,8 @@ public class RedXmlEditorPropertyTesterTest {
         final RedProjectEditor editorWithEditableFile = mock(RedProjectEditor.class);
         final RedProjectEditor editorWithNonEditableFile = mock(RedProjectEditor.class);
 
-        final RedProjectEditorInput editableInput = new RedProjectEditorInput(Optional.empty(), true, null);
-        final RedProjectEditorInput nonEditableInput = new RedProjectEditorInput(Optional.empty(), false, null);
+        final RedProjectEditorInput editableInput = new RedProjectEditorInput(true, null);
+        final RedProjectEditorInput nonEditableInput = new RedProjectEditorInput(false, null);
 
         when(editorWithEditableFile.getRedProjectEditorInput()).thenReturn(editableInput);
         when(editorWithNonEditableFile.getRedProjectEditorInput()).thenReturn(nonEditableInput);

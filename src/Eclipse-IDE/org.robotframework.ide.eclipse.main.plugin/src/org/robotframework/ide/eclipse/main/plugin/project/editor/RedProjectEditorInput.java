@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -17,28 +16,31 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 public class RedProjectEditorInput {
 
-    private Optional<IFile> file;
+    private final IFile file;
 
     private final boolean isEditable;
 
-    private RobotProjectConfigWithLines projectConfiguration;
+    private final RobotProjectConfigWithLines projectConfiguration;
 
-    public RedProjectEditorInput(final Optional<IFile> file, final boolean isEditable,
-            final RobotProjectConfigWithLines robotProjectConfig) {
+    public RedProjectEditorInput(final boolean isEditable, final RobotProjectConfigWithLines projectConfiguration) {
+        this(null, isEditable, projectConfiguration);
+    }
+
+    public RedProjectEditorInput(final IFile file, final boolean isEditable,
+            final RobotProjectConfigWithLines projectConfiguration) {
         this.file = file;
         this.isEditable = isEditable;
-        this.projectConfiguration = robotProjectConfig;
+        this.projectConfiguration = projectConfiguration;
     }
 
     public RobotProject getRobotProject() {
-        if (file.isPresent()) {
-            return RedPlugin.getModelManager().getModel().createRobotProject(file.get().getProject());
+        if (file != null) {
+            return RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
         } else {
             return null;
         }
@@ -56,20 +58,14 @@ public class RedProjectEditorInput {
         return isEditable;
     }
 
-    public void refreshProjectConfiguration(final IFile file) {
-        this.file = Optional.ofNullable(file);
-        projectConfiguration = new RedEclipseProjectConfigReader().readConfigurationWithLines(file);
-    }
-
     public List<RedXmlProblem> getProblemsFor(final Object modelPart) {
-        if (file.isPresent()) {
+        if (file != null) {
             final int xmlLine = projectConfiguration.getLineFor(modelPart);
             if (xmlLine == -1) {
                 return new ArrayList<>();
             }
-            final IFile redXmlFile = file.get();
             try {
-                final IMarker[] markers = redXmlFile.findMarkers(RobotProblem.TYPE_ID, true, 1);
+                final IMarker[] markers = file.findMarkers(RobotProblem.TYPE_ID, true, 1);
                 final List<RedXmlProblem> problems = new ArrayList<>();
                 for (final IMarker marker : markers) {
                     if (marker.getAttribute(IMarker.LINE_NUMBER, -1) == xmlLine) {

@@ -20,17 +20,17 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ExcludeFolderForValidationHandler.E4ExcludeFolderForValidationHandler;
+import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ExcludePathForValidationHandler.E4ExcludePathForValidationHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class ExcludeFolderForValidationHandler extends DIParameterizedHandler<E4ExcludeFolderForValidationHandler> {
+public class ExcludePathForValidationHandler extends DIParameterizedHandler<E4ExcludePathForValidationHandler> {
 
-    public ExcludeFolderForValidationHandler() {
-        super(E4ExcludeFolderForValidationHandler.class);
+    public ExcludePathForValidationHandler() {
+        super(E4ExcludePathForValidationHandler.class);
     }
 
-    public static class E4ExcludeFolderForValidationHandler extends ChangeExclusionHandler {
+    public static class E4ExcludePathForValidationHandler extends ChangeExclusionHandler {
 
         @Execute
         public void changeExclusion(final IEventBroker eventBroker,
