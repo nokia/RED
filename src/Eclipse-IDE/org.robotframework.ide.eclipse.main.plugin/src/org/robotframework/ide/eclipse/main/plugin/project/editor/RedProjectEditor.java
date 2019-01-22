@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -82,7 +81,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             final IFile file = ((FileEditorInput) input).getFile();
             setPartName(file.getProject().getName() + "/" + input.getName());
 
-            editorInput = new RedProjectEditorInput(Optional.of(file), !file.isReadOnly(),
+            editorInput = new RedProjectEditorInput(file, !file.isReadOnly(),
                     new RedEclipseProjectConfigReader().readConfigurationWithLines(file));
             installResourceListener();
         } else {
@@ -91,7 +90,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
                 try (InputStream stream = storage.getContents()) {
-                    editorInput = new RedProjectEditorInput(Optional.empty(), !storage.isReadOnly(),
+                    editorInput = new RedProjectEditorInput(!storage.isReadOnly(),
                             new RobotProjectConfigReader().readConfigurationWithLines(stream));
                 } catch (final CoreException | IOException e) {
                     throw new IllegalProjectConfigurationEditorInputException(
@@ -143,7 +142,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
                 final IEditorInput input = new FileEditorInput(movedFile);
 
                 setPartName(movedFile.getProject().getName() + "/" + input.getName());
-                editorInput = new RedProjectEditorInput(Optional.of(movedFile), !movedFile.isReadOnly(),
+                editorInput = new RedProjectEditorInput(movedFile, !movedFile.isReadOnly(),
                         editorInput.getProjectConfig());
 
                 RedProjectEditor.super.setInput(input);
@@ -156,8 +155,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
             @Override
             public void whenFileChanged() {
-                editorInput.refreshProjectConfiguration(((IFileEditorInput) getEditorInput()).getFile());
-                setupEnvironmentLoadingJob();
+                refreshDecorators();
             }
         });
         ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
@@ -334,6 +332,10 @@ public class RedProjectEditor extends MultiPageEditorPart {
         }
         super.dispose();
 
+        refreshDecorators();
+    }
+
+    private void refreshDecorators() {
         SwtThread.asyncExec(() -> {
             final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
             manager.update(RobotValidationExcludedDecorator.ID);
