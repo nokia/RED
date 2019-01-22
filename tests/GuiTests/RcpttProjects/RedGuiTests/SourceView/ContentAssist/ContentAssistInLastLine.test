@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _JPBOsIb7EeWrUbOa1Nzguw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/18 5:34 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 1/22/19 9:39 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -174,5 +174,26 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "k2_1\n"
     + "    kw_1@{EMPTY}" | verify-true
     
-        
+
+
+
+//bug 703
+//add new line and open CA, type text (window was closed)
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 17
+    key-type Enter
+    key-type "M1+SPACE"
+    type-text lo
+}
+
+//check if in window are filtered values
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "Log - BuiltIn" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Log Many - BuiltIn" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "Log To Console - BuiltIn" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "Log Variables - BuiltIn" | verify-true
+}
+//close window
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Log To Console - BuiltIn" 
+    | key-type "TRAVERSE_ESCAPE"        
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
