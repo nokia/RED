@@ -35,21 +35,18 @@ public class IncludePathHandler extends DIParameterizedHandler<E4IncludePathHand
         public void include(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
 
-            final List<ProjectTreeElement> locationsToInclude = Selections.getElements(selection,
-                    ProjectTreeElement.class);
+            final List<IPath> locationsToInclude = Selections.getElements(selection, ProjectTreeElement.class)
+                    .stream()
+                    .map(ProjectTreeElement::getPath)
+                    .collect(Collectors.toList());
 
-            for (final ProjectTreeElement locationToInclude : locationsToInclude) {
-                final IPath toRemove = locationToInclude.getPath();
-                input.getProjectConfiguration().removeExcludedPath(toRemove.toPortableString());
+            for (final IPath path : locationsToInclude) {
+                input.getProjectConfiguration().removeExcludedPath(path.toPortableString());
             }
 
-            final List<IPath> includedPaths = locationsToInclude.stream().map(ProjectTreeElement::getPath).collect(
-                    Collectors.toList());
             final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
-                    input.getRobotProject().getConfigurationFile(), includedPaths);
+                    input.getRobotProject().getConfigurationFile(), locationsToInclude);
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED,
-                    locationsToInclude);
         }
     }
 

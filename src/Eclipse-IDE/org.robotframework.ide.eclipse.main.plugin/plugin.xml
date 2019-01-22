@@ -1587,7 +1587,7 @@
        </activeWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ExcludeFolderForValidationHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ExcludePathForValidationHandler"
           commandId="org.robotframework.red.exclude">
        <activeWhen>
           <with
@@ -1633,7 +1633,7 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.IncludeFolderForValidationHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.IncludePathForValidationHandler"
           commandId="org.robotframework.red.include">
        <activeWhen>
           <with
