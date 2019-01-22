@@ -388,33 +388,6 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
-    public void testCallWithVarFilesInArgumentFile_argsFile() throws IOException {
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
-                .useArgumentFile(true)
-                .addVariableFiles(newArrayList("var1.py", "var2.py"))
-                .build();
-
-        assertThat(cmdLine.getCommandLine()).hasSize(7)
-                .containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener", "--argumentfile");
-        assertThat(cmdLine.getArgumentFile())
-                .hasValueSatisfying((argumentFile -> assertThat(argumentFile.generateContent())
-                        .contains("--variablefile var1.py", "--variablefile var2.py")));
-    }
-
-    @Test
-    public void testCallWithVarFilesInArgumentFile_argsInline() throws IOException {
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
-                .useArgumentFile(false)
-                .addVariableFiles(newArrayList("var1.py", "var2.py"))
-                .build();
-
-        assertThat(cmdLine.getCommandLine()).hasSize(9)
-                .containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener", "-V", "var1.py", "-V",
-                        "var2.py");
-        assertThat(cmdLine.getArgumentFile()).isNotPresent();
-    }
-
-    @Test
     public void testCallWithPythonpathInArgumentFile_argsFile() throws IOException {
         final RunCommandLine cmdLine = RunCommandLineCallBuilder.create(SuiteExecutor.Python, "/x/y/z/python", 12345)
                 .useArgumentFile(true)

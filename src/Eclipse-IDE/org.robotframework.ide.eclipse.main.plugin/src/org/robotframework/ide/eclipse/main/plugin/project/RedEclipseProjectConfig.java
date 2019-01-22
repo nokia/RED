@@ -129,13 +129,4 @@ public class RedEclipseProjectConfig {
                 .map(lib -> Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath())).toOSString())
                 .collect(toList());
     }
-
-    public List<String> getVariableFilePaths() {
-        return config.getReferencedVariableFiles().stream().map(file -> {
-            final String path = Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(file.getPath())).toOSString();
-            final List<String> args = file.getArguments();
-            final String arguments = args.isEmpty() ? "" : ":" + String.join(":", args);
-            return path + arguments;
-        }).collect(toList());
-    }
 }

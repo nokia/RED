@@ -767,7 +767,7 @@ public class LocalProcessCommandLineBuilderTest {
     }
 
     @Test
-    public void commandLineContainsPathsForVariableFiles() throws Exception {
+    public void commandLineDoesNotContainPathsForVariableFiles() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars1.py"));
         config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars2.py", "a", "b", "c"));
@@ -779,11 +779,7 @@ public class LocalProcessCommandLineBuilderTest {
 
         final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
 
-        assertThat(commandLine.getCommandLine()).hasSize(12)
-                .containsSequence("-V",
-                        projectProvider.getProject().getLocation().toOSString() + File.separator + "vars1.py")
-                .containsSequence("-V",
-                        projectProvider.getProject().getLocation().toOSString() + File.separator + "vars2.py:a:b:c");
+        assertThat(commandLine.getCommandLine()).hasSize(8).doesNotContain("-V");
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
