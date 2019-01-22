@@ -51,13 +51,16 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
+import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
@@ -214,7 +217,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     private void setInput() {
-        if (viewer.getTree() == null || viewer.getTree().isDisposed()
+        if (viewer.getTree() == null || viewer.getTree().isDisposed() || editorInput.getRobotProject() == null
                 || !editorInput.getRobotProject().getProject().exists()) {
             return;
         }
@@ -315,7 +318,8 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
             try {
                 event.getDelta().accept(delta -> {
-                    if (editorInput.getRobotProject().getProject().equals(delta.getResource().getProject())) {
+                    if (editorInput.getRobotProject() != null
+                            && editorInput.getRobotProject().getProject().equals(delta.getResource().getProject())) {
                         shouldRefresh.set(true);
                         return false;
                     }
@@ -370,12 +374,22 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     private void whenExclusionListChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final RedProjectConfigEventData<Collection<IPath>> eventData) {
         // some other file model has changed
-        if (!eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
+        if (editorInput.getRobotProject() == null
+                || !eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
             return;
         }
 
         setDirty(true);
         setInput();
+
+        refreshDecorators();
+    }
+
+    private void refreshDecorators() {
+        SwtThread.asyncExec(() -> {
+            final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
+            manager.update(RobotValidationExcludedDecorator.ID);
+        });
     }
 
     private static final class ViewerSorter extends ViewerComparator {
