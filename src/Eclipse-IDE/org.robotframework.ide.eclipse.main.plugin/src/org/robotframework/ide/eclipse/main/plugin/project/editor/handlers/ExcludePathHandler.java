@@ -35,18 +35,17 @@ public class ExcludePathHandler extends DIParameterizedHandler<E4ExcludePathHand
         public void exclude(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
 
-            final List<ProjectTreeElement> locationsToExclude = Selections.getElements(selection,
-                    ProjectTreeElement.class);
+            final List<IPath> locationsToExclude = Selections.getElements(selection, ProjectTreeElement.class)
+                    .stream()
+                    .map(ProjectTreeElement::getPath)
+                    .collect(Collectors.toList());
 
-            for (final ProjectTreeElement locationToExclude : locationsToExclude) {
-                final IPath toRemove = locationToExclude.getPath();
-                input.getProjectConfiguration().addExcludedPath(toRemove.toPortableString());
+            for (final IPath path : locationsToExclude) {
+                input.getProjectConfiguration().addExcludedPath(path.toPortableString());
             }
 
-            final List<IPath> excludedPaths = locationsToExclude.stream().map(ProjectTreeElement::getPath).collect(
-                    Collectors.toList());
             final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
-                    input.getRobotProject().getConfigurationFile(), excludedPaths);
+                    input.getRobotProject().getConfigurationFile(), locationsToExclude);
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
         }
     }

@@ -43,12 +43,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -167,35 +163,27 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         excludeFilesTxt = toolkit.createText(parent, projectConfiguration.getValidatedFileMaxSize());
         GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(excludeFilesTxt);
 
-        excludeFilesTxt.addVerifyListener(new VerifyListener() {
-
-            @Override
-            public void verifyText(final VerifyEvent e) {
-                final String string = e.text;
-                if (string != null) {
-                    final char[] chars = new char[string.length()];
-                    string.getChars(0, chars.length, chars, 0);
-                    for (int i = 0; i < chars.length; i++) {
-                        if (!('0' <= chars[i] && chars[i] <= '9')) {
-                            e.doit = false;
-                            return;
-                        }
+        excludeFilesTxt.addVerifyListener(e -> {
+            final String string = e.text;
+            if (string != null) {
+                final char[] chars = new char[string.length()];
+                string.getChars(0, chars.length, chars, 0);
+                for (int i = 0; i < chars.length; i++) {
+                    if (!('0' <= chars[i] && chars[i] <= '9')) {
+                        e.doit = false;
+                        return;
                     }
                 }
             }
         });
-        excludeFilesTxt.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                try {
-                    final String fileMaxSizeTxt = excludeFilesTxt.getText();
-                    Long.parseLong(fileMaxSizeTxt);
-                    editorInput.getProjectConfiguration().setValidatedFileMaxSize(fileMaxSizeTxt);
-                    setDirty(true);
-                } catch (final NumberFormatException e1) {
-                    // nothing to do
-                }
+        excludeFilesTxt.addModifyListener(e -> {
+            try {
+                final String fileMaxSizeTxt = excludeFilesTxt.getText();
+                Long.parseLong(fileMaxSizeTxt);
+                editorInput.getProjectConfiguration().setValidatedFileMaxSize(fileMaxSizeTxt);
+                setDirty(true);
+            } catch (final NumberFormatException e1) {
+                // nothing to do
             }
         });
 
@@ -363,8 +351,6 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        setInput();
-
         viewer.getTree().setEnabled(false);
         excludeFilesBtn.setEnabled(false);
         excludeFilesTxt.setEditable(false);

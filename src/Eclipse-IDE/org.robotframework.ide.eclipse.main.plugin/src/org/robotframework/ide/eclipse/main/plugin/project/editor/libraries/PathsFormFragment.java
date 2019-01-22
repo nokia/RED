@@ -30,8 +30,6 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -144,20 +142,16 @@ class PathsFormFragment implements ISectionFormFragment {
         relativityCombo.setItems(new String[] { RelativeTo.WORKSPACE.toString(), RelativeTo.PROJECT.toString() });
         GridDataFactory.fillDefaults().indent(10, 0).applyTo(relativityCombo);
 
-        relativityCombo.addModifyListener(new ModifyListener() {
+        relativityCombo.addModifyListener(e -> {
+            final RobotProjectConfig config = editorInput.getProjectConfiguration();
 
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                final RobotProjectConfig config = editorInput.getProjectConfiguration();
+            final RelativeTo oldRelativeTo = config.getRelativityPoint().getRelativeTo();
+            final RelativeTo newRelativeTo = RelativeTo
+                    .valueOf(relativityCombo.getItem(relativityCombo.getSelectionIndex()));
 
-                final RelativeTo oldRelativeTo = config.getRelativityPoint().getRelativeTo();
-                final RelativeTo newRelativeTo = RelativeTo
-                        .valueOf(relativityCombo.getItem(relativityCombo.getSelectionIndex()));
-
-                if (oldRelativeTo != newRelativeTo) {
-                    setDirty(true);
-                    config.setRelativityPoint(RelativityPoint.create(newRelativeTo));
-                }
+            if (oldRelativeTo != newRelativeTo) {
+                setDirty(true);
+                config.setRelativityPoint(RelativityPoint.create(newRelativeTo));
             }
         });
     }
@@ -286,8 +280,6 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        setInput();
-
         relativityCombo.setEnabled(false);
         pythonPathViewer.getTable().setEnabled(false);
         classPathViewer.getTable().setEnabled(false);

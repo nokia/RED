@@ -130,12 +130,13 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     }
 
     private void createFileColumn(final Supplier<ReferencedVariableFile> creator) {
-        ViewerColumnsFactory.newColumn("File").withWidth(300)
-            .withMinWidth(100)
-            .editingEnabledOnlyWhen(editorInput.isEditable())
-            .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
-            .labelsProvidedBy(new VariableFilesLabelProvider(editorInput))
-            .createFor(viewer);
+        ViewerColumnsFactory.newColumn("File")
+                .withWidth(300)
+                .withMinWidth(100)
+                .editingEnabledOnlyWhen(editorInput.isEditable())
+                .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
+                .labelsProvidedBy(new VariableFilesLabelProvider(editorInput))
+                .createFor(viewer);
     }
 
     private int calculateLongestArgumentsLength() {
@@ -154,12 +155,14 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     private void createArgumentColumn(final String name, final int index,
             final Supplier<ReferencedVariableFile> elementsCreator, final boolean shouldGrabAllTheSpace) {
-        ViewerColumnsFactory.newColumn(name).withWidth(100)
-            .shouldGrabAllTheSpaceLeft(shouldGrabAllTheSpace).withMinWidth(50)
-            .editingEnabledOnlyWhen(editorInput.isEditable())
-            .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, elementsCreator))
-            .labelsProvidedBy(new VariableFileArgumentsLabelProvider(index))
-            .createFor(viewer);
+        ViewerColumnsFactory.newColumn(name)
+                .withWidth(100)
+                .shouldGrabAllTheSpaceLeft(shouldGrabAllTheSpace)
+                .withMinWidth(50)
+                .editingEnabledOnlyWhen(editorInput.isEditable())
+                .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, elementsCreator))
+                .labelsProvidedBy(new VariableFileArgumentsLabelProvider(index))
+                .createFor(viewer);
     }
 
     private void createContextMenu() {
@@ -195,8 +198,6 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        setInput();
-
         viewer.getTable().setEnabled(false);
     }
 
