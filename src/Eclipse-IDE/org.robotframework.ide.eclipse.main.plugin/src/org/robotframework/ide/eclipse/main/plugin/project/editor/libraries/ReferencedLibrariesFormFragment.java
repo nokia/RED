@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -123,6 +124,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         createAutoReloadAndDiscoverButtons(internalComposite);
 
         scrolledParent.setMinSize(internalComposite.computeSize(-1, -1));
+
         setInput();
     }
 
@@ -203,26 +205,13 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
             @Override
             public void widgetSelected(final SelectionEvent event) {
-
-                final FileDialog dialog = createReferencedLibFileDialog();
-                dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
-
-                final String chosenFilePath = dialog.open();
-                if (chosenFilePath != null) {
+                final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.py", "*.*" }, path -> {
                     final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
                             viewer.getTable().getShell());
-
-                    final List<ReferencedLibrary> libs = new ArrayList<>();
-                    final String[] chosenFiles = dialog.getFileNames();
-                    for (final String file : chosenFiles) {
-                        final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);    //add separator when filterPath is e.g. 'D:'
-                        final Collection<ReferencedLibrary> importedLibs = importer.importPythonLib(environment,
-                                editorInput.getRobotProject().getProject(), editorInput.getProjectConfiguration(),
-                                path.toString());
-                        libs.addAll(importedLibs);
-                    }
-                    addLibraries(libs);
-                }
+                    return importer.importPythonLib(environment, editorInput.getRobotProject().getProject(),
+                            editorInput.getProjectConfiguration(), path.toString());
+                });
+                addLibraries(libs);
             }
         });
     }
@@ -232,25 +221,13 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-
-                final FileDialog dialog = createReferencedLibFileDialog();
-                dialog.setFilterExtensions(new String[] { "*.jar" });
-                final String chosenFilePath = dialog.open();
-                if (chosenFilePath != null) {
+                final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.jar" }, path -> {
                     final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
                             viewer.getTable().getShell());
-
-                    final List<ReferencedLibrary> libs = new ArrayList<>();
-                    final String[] chosenFiles = dialog.getFileNames();
-                    for (final String file : chosenFiles) {
-                        final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);
-                        final Collection<ReferencedLibrary> importedLibs = importer.importJavaLib(environment,
-                                editorInput.getRobotProject().getProject(), editorInput.getProjectConfiguration(),
-                                path.toString());
-                        libs.addAll(importedLibs);
-                    }
-                    addLibraries(libs);
-                }
+                    return importer.importJavaLib(environment, editorInput.getRobotProject().getProject(),
+                            editorInput.getProjectConfiguration(), path.toString());
+                });
+                addLibraries(libs);
             }
         });
     }
@@ -260,44 +237,45 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                final FileDialog dialog = createReferencedLibFileDialog();
-                dialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
-                final String chosenFilePath = dialog.open();
-                if (chosenFilePath != null) {
+                final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.xml", "*.*" }, path -> {
                     final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
                             viewer.getTable().getShell());
-
-                    final List<ReferencedLibrary> libs = new ArrayList<>();
-                    final String[] chosenFiles = dialog.getFileNames();
-                    for (final String file : chosenFiles) {
-                        final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);
-                        final ReferencedLibrary lib = importer.importLibFromSpecFile(path.toString());
-                        if (lib != null) {
-                            libs.add(lib);
-                        }
-                    }
-                    addLibraries(libs);
-                }
+                    return newArrayList(importer.importLibFromSpecFile(path.toString()));
+                });
+                addLibraries(libs);
             }
         });
     }
 
+    private List<ReferencedLibrary> selectLibraries(final String[] extensions,
+            final Function<IPath, Collection<ReferencedLibrary>> importer) {
+        final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN | SWT.MULTI);
+        dialog.setFilterPath(editorInput.getRobotProject().getProject().getLocation().toOSString());
+        dialog.setFilterExtensions(extensions);
+
+        final List<ReferencedLibrary> libs = new ArrayList<>();
+        final String chosenFilePath = dialog.open();
+        if (chosenFilePath != null) {
+            final String[] chosenFiles = dialog.getFileNames();
+            for (final String file : chosenFiles) {
+                // add separator when filterPath is e.g. 'D:'
+                final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);
+                final Collection<ReferencedLibrary> importedLibs = importer.apply(path);
+                libs.addAll(importedLibs);
+            }
+        }
+        return libs;
+    }
+
     private void addRemoteHandler() {
         addRemoteButton.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final RemoteLocationDialog dialog = new RemoteLocationDialog(viewer.getTable().getShell());
                 if (dialog.open() == Window.OK) {
                     final RemoteLocation remoteLocation = dialog.getRemoteLocation();
-
-                    final List<RemoteLocation> locations = editorInput.getProjectConfiguration().getRemoteLocations();
-                    if (!locations.contains(remoteLocation)) {
-                        editorInput.getProjectConfiguration().addRemoteLocation(remoteLocation);
-
-                        final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<>(
-                                editorInput.getRobotProject().getConfigurationFile(), newArrayList(remoteLocation));
-                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
-                    }
+                    addRemoteLocation(remoteLocation);
                 }
             }
         });
@@ -318,11 +296,13 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         }
     }
 
-    private FileDialog createReferencedLibFileDialog() {
-        final String startingPath = editorInput.getRobotProject().getProject().getLocation().toOSString();
-        final FileDialog dialog = new FileDialog(viewer.getTable().getShell(), SWT.OPEN | SWT.MULTI);
-        dialog.setFilterPath(startingPath);
-        return dialog;
+    private void addRemoteLocation(final RemoteLocation remoteLocation) {
+        final boolean wasAdded = editorInput.getProjectConfiguration().addRemoteLocation(remoteLocation);
+        if (wasAdded) {
+            final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<>(
+                    editorInput.getRobotProject().getConfigurationFile(), newArrayList(remoteLocation));
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
+        }
     }
 
     private void createAutoReloadAndDiscoverButtons(final Composite parent) {
@@ -405,8 +385,6 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        setInput();
-
         addPythonLibButton.setEnabled(false);
         addJavaLibButton.setEnabled(false);
         addLibspecButton.setEnabled(false);
