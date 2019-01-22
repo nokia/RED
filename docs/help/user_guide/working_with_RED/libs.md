@@ -96,16 +96,17 @@ _python -m robot.libdoc &ltPATH;_TO_LIBNAME> list _
 In some cases there are the problems occurring during the libdoc generation
 via session server. It leads to a situation when a server hang due to [Global
 Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) between
-the server code and the library code. To avoid this problem you can use one of
-our preferences located in _Window -> Preferences -> Robot Framework ->
-Libraries_  
+the server code and the library code. To avoid this problem the preference
+located in _Window -> Preferences -> Robot Framework -> Libraries_ is enabled
+by default.  
   
 ![](libs/libdoc_generation_preference.png)  
   
-This preference runs the libdoc generation in a separate process and is
-disabled by default. Note that this solution may affect the time of libdoc
-generation, i.e. slowing down the libraries import, especially with jython
-interpreter.
+This preference controls if the libdoc is generated in a separate process or
+not. Note that this solution may affect the time of libdoc generation, i.e.
+slowing down the libraries import, especially with jython interpreter. If you
+are not using problematic libraries you can disable the preference to make
+libdoc generation faster.
 
 ### Reloading libraries after change
 
