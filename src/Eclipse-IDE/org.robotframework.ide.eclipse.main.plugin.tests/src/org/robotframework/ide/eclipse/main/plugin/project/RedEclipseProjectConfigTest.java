@@ -24,7 +24,6 @@ import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
 import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -160,18 +159,6 @@ public class RedEclipseProjectConfigTest {
         assertThat(redConfig.createExecutionEnvironmentSearchPaths()).isEqualTo(new EnvironmentSearchPaths(
                 newArrayList(".", absolutePath("lib1.jar"), absolutePath("lib2.jar"), absolutePath("java", "lib.jar")),
                 newArrayList(absolutePath("folder1"), absolutePath("folder2"), absolutePath("python", "folder"))));
-    }
-
-    @Test
-    public void variableFilePathsAreReturned() throws Exception {
-        final RobotProjectConfig projectConfig = new RobotProjectConfig();
-        projectConfig.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars1.py"));
-        projectConfig.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars2.py", "a", "b"));
-
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
-
-        assertThat(redConfig.getVariableFilePaths()).containsExactly(absolutePath("vars1.py"),
-                absolutePath("vars2.py:a:b"));
     }
 
     @Test

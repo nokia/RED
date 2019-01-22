@@ -48,8 +48,6 @@ public class RunCommandLineCallBuilder {
 
         IRunCommandLineBuilder addLocationsToClassPath(final Collection<String> paths);
 
-        IRunCommandLineBuilder addVariableFiles(final Collection<String> varFiles);
-
         IRunCommandLineBuilder suitesToRun(final Collection<String> suites);
 
         IRunCommandLineBuilder testsToRun(final Collection<String> tests);
@@ -78,8 +76,6 @@ public class RunCommandLineCallBuilder {
         private final List<String> pythonPathLocations = new ArrayList<>();
 
         private final List<String> classPathLocations = new ArrayList<>();
-
-        private final List<String> variableFiles = new ArrayList<>();
 
         private final List<String> suitesToRun = new ArrayList<>();
 
@@ -146,12 +142,6 @@ public class RunCommandLineCallBuilder {
         @Override
         public IRunCommandLineBuilder addLocationsToClassPath(final Collection<String> paths) {
             classPathLocations.addAll(paths);
-            return this;
-        }
-
-        @Override
-        public IRunCommandLineBuilder addVariableFiles(final Collection<String> varFiles) {
-            variableFiles.addAll(varFiles);
             return this;
         }
 
@@ -267,10 +257,6 @@ public class RunCommandLineCallBuilder {
                 robotArgs.add("-P");
                 robotArgs.add(pythonPath);
             }
-            for (final String varFile : variableFiles) {
-                robotArgs.add("-V");
-                robotArgs.add(varFile);
-            }
             for (final String tagToInclude : tagsToInclude) {
                 robotArgs.add("-i");
                 robotArgs.add(tagToInclude);
@@ -297,9 +283,6 @@ public class RunCommandLineCallBuilder {
             final String pythonPath = pythonPath();
             if (!pythonPath.isEmpty()) {
                 argumentsFile.addLine("--pythonpath", pythonPath);
-            }
-            for (final String varFile : variableFiles) {
-                argumentsFile.addLine("--variablefile", varFile);
             }
             for (final String tagToInclude : tagsToInclude) {
                 argumentsFile.addLine("--include", tagToInclude);

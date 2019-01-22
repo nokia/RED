@@ -90,7 +90,6 @@ class LocalProcessCommandLineBuilder {
             final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();
             builder.addLocationsToClassPath(searchPaths.getClassPaths());
             builder.addLocationsToPythonPath(searchPaths.getPythonPaths());
-            builder.addVariableFiles(redConfig.getVariableFilePaths());
         }
     }
 
