@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,8 +44,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -190,16 +189,12 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             }
         });
 
-        excludeFilesBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final boolean selection = excludeFilesBtn.getSelection();
-                excludeFilesTxt.setEnabled(selection);
-                editorInput.getProjectConfiguration().setIsValidatedFileSizeCheckingEnabled(selection);
-                setDirty(true);
-            }
-        });
+        excludeFilesBtn.addSelectionListener(widgetSelectedAdapter(e -> {
+            final boolean selection = excludeFilesBtn.getSelection();
+            excludeFilesTxt.setEnabled(selection);
+            editorInput.getProjectConfiguration().setIsValidatedFileSizeCheckingEnabled(selection);
+            setDirty(true);
+        }));
     }
 
     private void createContextMenu() {

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,8 +35,6 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -201,50 +200,35 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     }
 
     private void addPythonHandler() {
-        addPythonLibButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.py", "*.*" }, path -> {
-                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
-                            viewer.getTable().getShell());
-                    return importer.importPythonLib(environment, editorInput.getRobotProject().getProject(),
-                            editorInput.getProjectConfiguration(), path.toString());
-                });
-                addLibraries(libs);
-            }
-        });
+        addPythonLibButton.addSelectionListener(widgetSelectedAdapter(e -> {
+            final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.py", "*.*" }, path -> {
+                final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(viewer.getTable().getShell());
+                return importer.importPythonLib(environment, editorInput.getRobotProject().getProject(),
+                        editorInput.getProjectConfiguration(), path.toString());
+            });
+            addLibraries(libs);
+        }));
     }
 
     private void addJavaHandler() {
-        addJavaLibButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.jar" }, path -> {
-                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
-                            viewer.getTable().getShell());
-                    return importer.importJavaLib(environment, editorInput.getRobotProject().getProject(),
-                            editorInput.getProjectConfiguration(), path.toString());
-                });
-                addLibraries(libs);
-            }
-        });
+        addJavaLibButton.addSelectionListener(widgetSelectedAdapter(e -> {
+            final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.jar" }, path -> {
+                final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(viewer.getTable().getShell());
+                return importer.importJavaLib(environment, editorInput.getRobotProject().getProject(),
+                        editorInput.getProjectConfiguration(), path.toString());
+            });
+            addLibraries(libs);
+        }));
     }
 
     private void addLibspecHandler() {
-        addLibspecButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.xml", "*.*" }, path -> {
-                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
-                            viewer.getTable().getShell());
-                    return newArrayList(importer.importLibFromSpecFile(path.toString()));
-                });
-                addLibraries(libs);
-            }
-        });
+        addLibspecButton.addSelectionListener(widgetSelectedAdapter(e -> {
+            final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.xml", "*.*" }, path -> {
+                final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(viewer.getTable().getShell());
+                return newArrayList(importer.importLibFromSpecFile(path.toString()));
+            });
+            addLibraries(libs);
+        }));
     }
 
     private List<ReferencedLibrary> selectLibraries(final String[] extensions,
@@ -268,17 +252,13 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     }
 
     private void addRemoteHandler() {
-        addRemoteButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final RemoteLocationDialog dialog = new RemoteLocationDialog(viewer.getTable().getShell());
-                if (dialog.open() == Window.OK) {
-                    final RemoteLocation remoteLocation = dialog.getRemoteLocation();
-                    addRemoteLocation(remoteLocation);
-                }
+        addRemoteButton.addSelectionListener(widgetSelectedAdapter(e -> {
+            final RemoteLocationDialog dialog = new RemoteLocationDialog(viewer.getTable().getShell());
+            if (dialog.open() == Window.OK) {
+                final RemoteLocation remoteLocation = dialog.getRemoteLocation();
+                addRemoteLocation(remoteLocation);
             }
-        });
+        }));
     }
 
     private void addLibraries(final List<ReferencedLibrary> libs) {
@@ -307,44 +287,31 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     private void createAutoReloadAndDiscoverButtons(final Composite parent) {
         autoLibDiscoverButton = createCheckButton(parent, "Auto discover libraries after test suite save action",
-                new SelectionAdapter() {
-
-                    @Override
-                    public void widgetSelected(final SelectionEvent e) {
-                        final boolean selection = autoLibDiscoverButton.getSelection();
-                        editorInput.getProjectConfiguration().setReferencedLibrariesAutoDiscoveringEnabled(selection);
-                        if (!selection) {
-                            showAutoLibDiscoverDialogButton.setSelection(selection);
-                            editorInput.getProjectConfiguration()
-                                    .setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
-                        }
-                        showAutoLibDiscoverDialogButton.setEnabled(selection);
-                        setDirty(true);
-                    }
-                });
-
-        showAutoLibDiscoverDialogButton = createCheckButton(parent,
-                "Show discovering summary after test suite save action", new SelectionAdapter() {
-
-                    @Override
-                    public void widgetSelected(final SelectionEvent e) {
-                        final boolean selection = showAutoLibDiscoverDialogButton.getSelection();
+                widgetSelectedAdapter(e -> {
+                    final boolean selection = autoLibDiscoverButton.getSelection();
+                    editorInput.getProjectConfiguration().setReferencedLibrariesAutoDiscoveringEnabled(selection);
+                    if (!selection) {
+                        showAutoLibDiscoverDialogButton.setSelection(selection);
                         editorInput.getProjectConfiguration()
                                 .setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
-                        setDirty(true);
                     }
-                });
+                    showAutoLibDiscoverDialogButton.setEnabled(selection);
+                    setDirty(true);
+                }));
+
+        showAutoLibDiscoverDialogButton = createCheckButton(parent,
+                "Show discovering summary after test suite save action", widgetSelectedAdapter(e -> {
+                    final boolean selection = showAutoLibDiscoverDialogButton.getSelection();
+                    editorInput.getProjectConfiguration().setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
+                    setDirty(true);
+                }));
 
         autoLibReloadButton = createCheckButton(parent, "Automatically reload changed libraries",
-                new SelectionAdapter() {
-
-                    @Override
-                    public void widgetSelected(final SelectionEvent e) {
-                        final boolean selection = autoLibReloadButton.getSelection();
-                        editorInput.getProjectConfiguration().setIsReferencedLibrariesAutoReloadEnabled(selection);
-                        setDirty(true);
-                    }
-                });
+                widgetSelectedAdapter(e -> {
+                    final boolean selection = autoLibReloadButton.getSelection();
+                    editorInput.getProjectConfiguration().setIsReferencedLibrariesAutoReloadEnabled(selection);
+                    setDirty(true);
+                }));
     }
 
     private Button createCheckButton(final Composite parent, final String label,

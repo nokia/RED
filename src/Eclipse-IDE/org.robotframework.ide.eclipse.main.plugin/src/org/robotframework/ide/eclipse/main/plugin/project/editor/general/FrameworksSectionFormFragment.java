@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
 
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +27,6 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -153,22 +153,18 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         sourceButton = toolkit.createButton(parent, "Use local settings for this project", SWT.CHECK);
         sourceButton.setEnabled(false);
 
-        sourceButton.addSelectionListener(new SelectionAdapter() {
+        sourceButton.addSelectionListener(widgetSelectedAdapter(e -> {
+            viewer.getTable().setEnabled(sourceButton.getSelection());
 
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                viewer.getTable().setEnabled(sourceButton.getSelection());
-
-                final Object[] elements = viewer.getCheckedElements();
-                if (elements.length == 1 && sourceButton.getSelection()) {
-                    final IRuntimeEnvironment env = (IRuntimeEnvironment) elements[0];
-                    assignPythonLocation(env.getFile());
-                } else {
-                    assignPythonLocation(null);
-                }
-                setDirty(true);
+            final Object[] elements = viewer.getCheckedElements();
+            if (elements.length == 1 && sourceButton.getSelection()) {
+                final IRuntimeEnvironment env = (IRuntimeEnvironment) elements[0];
+                assignPythonLocation(env.getFile());
+            } else {
+                assignPythonLocation(null);
             }
-        });
+            setDirty(true);
+        }));
     }
 
     private void createViewer(final Composite tableParent) {
