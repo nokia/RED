@@ -9,7 +9,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -29,27 +28,26 @@ class RedXmlFileChangeListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(final IResourceChangeEvent event) {
         if (event.getType() == IResourceChangeEvent.POST_CHANGE && event.getDelta() != null) {
-            final IResourceDelta delta = event.getDelta();
             try {
-                delta.accept(new IResourceDeltaVisitor() {
-                    @Override
-                    public boolean visit(final IResourceDelta delta) {
-                        if (delta.getResource().getFullPath().segmentCount() > 2) {
-                            return false;
-                        }
-                        if (delta.getResource().equals(project.getFile(RobotProjectConfig.FILENAME))) {
-                            if (delta.getKind() == IResourceDelta.REMOVED
-                                    && (delta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
-                                performOnChange.whenFileWasMoved(delta.getMovedToPath());
-                            } else if (delta.getKind() == IResourceDelta.REMOVED) {
-                                performOnChange.whenFileWasRemoved();
-                            } else {
-                                performOnChange.whenFileChanged();
-                            }
-                            return false;
-                        }
-                        return true;
+                event.getDelta().accept(delta -> {
+                    if (delta.getResource().getFullPath().segmentCount() > 2) {
+                        return false;
                     }
+                    if (delta.getResource().equals(project.getFile(RobotProjectConfig.FILENAME))) {
+                        if (delta.getKind() == IResourceDelta.REMOVED
+                                && (delta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
+                            performOnChange.whenFileMoved(delta.getMovedToPath());
+                        } else if (delta.getKind() == IResourceDelta.REMOVED) {
+                            performOnChange.whenFileRemoved();
+                        } else if (delta.getKind() == IResourceDelta.CHANGED
+                                && (delta.getFlags() & IResourceDelta.MARKERS) == 0) {
+                            performOnChange.whenFileChanged();
+                        } else if (delta.getKind() == IResourceDelta.CHANGED) {
+                            performOnChange.whenFileMarkerChanged();
+                        }
+                        return false;
+                    }
+                    return true;
                 });
             } catch (final CoreException e) {
                 // nothing to do
@@ -59,10 +57,12 @@ class RedXmlFileChangeListener implements IResourceChangeListener {
 
     interface OnRedConfigFileChange {
 
+        void whenFileMoved(IPath movedToPath);
+
+        void whenFileRemoved();
+
         void whenFileChanged();
 
-        void whenFileWasMoved(IPath movedToPath);
-
-        void whenFileWasRemoved();
+        void whenFileMarkerChanged();
     }
 }

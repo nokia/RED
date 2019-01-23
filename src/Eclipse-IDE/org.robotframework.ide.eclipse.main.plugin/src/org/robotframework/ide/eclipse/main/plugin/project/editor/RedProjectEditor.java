@@ -137,25 +137,32 @@ public class RedProjectEditor extends MultiPageEditorPart {
         resourceListener = new RedXmlFileChangeListener(project, new OnRedConfigFileChange() {
 
             @Override
-            public void whenFileWasMoved(final IPath movedToPath) {
+            public void whenFileMoved(final IPath movedToPath) {
                 final IFile movedFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(movedToPath);
                 final IEditorInput input = new FileEditorInput(movedFile);
 
                 setPartName(movedFile.getProject().getName() + "/" + input.getName());
-                editorInput = new RedProjectEditorInput(movedFile, !movedFile.isReadOnly(),
-                        editorInput.getProjectConfig());
+                editorInput.setFile(movedFile);
+                editorInput.setEditable(!movedFile.isReadOnly());
 
                 RedProjectEditor.super.setInput(input);
             }
 
             @Override
-            public void whenFileWasRemoved() {
+            public void whenFileRemoved() {
                 SwtThread.syncExec(() -> getSite().getPage().closeEditor(RedProjectEditor.this, false));
             }
 
             @Override
             public void whenFileChanged() {
-                refreshDecorators();
+                editorInput.setConfig(new RedEclipseProjectConfigReader()
+                        .readConfigurationWithLines(((FileEditorInput) getEditorInput()).getFile()));
+            }
+
+            @Override
+            public void whenFileMarkerChanged() {
+                SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED,
+                        editorInput.getProjectConfiguration()));
             }
         });
         ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);

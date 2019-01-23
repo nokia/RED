@@ -250,17 +250,16 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        final List<IRuntimeEnvironment> allEnvironments = envs.getAllEnvironments();
-        final IRuntimeEnvironment env = envs.getActiveEnvironment();
-
-        final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
-        final boolean isEditable = editorInput.isEditable();
-
         if (viewer.getTable() == null || viewer.getTable().isDisposed()) {
             return;
         }
 
-        final boolean isUsingPrefs = configuration.usesPreferences();
+        final List<IRuntimeEnvironment> allEnvironments = envs.getAllEnvironments();
+        final IRuntimeEnvironment env = envs.getActiveEnvironment();
+
+        final boolean isEditable = editorInput.isEditable();
+        final boolean isUsingPrefs = editorInput.getProjectConfiguration().usesPreferences();
+
         sourceButton.setEnabled(isEditable);
 
         viewer.setInput(allEnvironments);
