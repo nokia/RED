@@ -21,21 +21,32 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 
 public class RedProjectEditorInput {
 
-    private final IFile file;
+    private IFile file;
 
-    private final boolean isEditable;
+    private boolean isEditable;
 
-    private final RobotProjectConfigWithLines projectConfiguration;
+    private RobotProjectConfigWithLines config;
 
-    public RedProjectEditorInput(final boolean isEditable, final RobotProjectConfigWithLines projectConfiguration) {
-        this(null, isEditable, projectConfiguration);
+    public RedProjectEditorInput(final boolean isEditable, final RobotProjectConfigWithLines config) {
+        this(null, isEditable, config);
     }
 
-    public RedProjectEditorInput(final IFile file, final boolean isEditable,
-            final RobotProjectConfigWithLines projectConfiguration) {
+    public RedProjectEditorInput(final IFile file, final boolean isEditable, final RobotProjectConfigWithLines config) {
         this.file = file;
         this.isEditable = isEditable;
-        this.projectConfiguration = projectConfiguration;
+        this.config = config;
+    }
+
+    void setFile(final IFile file) {
+        this.file = file;
+    }
+
+    void setEditable(final boolean isEditable) {
+        this.isEditable = isEditable;
+    }
+
+    void setConfig(final RobotProjectConfigWithLines config) {
+        this.config = config;
     }
 
     public RobotProject getRobotProject() {
@@ -46,12 +57,8 @@ public class RedProjectEditorInput {
         }
     }
 
-    RobotProjectConfigWithLines getProjectConfig() {
-        return projectConfiguration;
-    }
-
     public RobotProjectConfig getProjectConfiguration() {
-        return projectConfiguration.getConfigurationModel();
+        return config.getConfigurationModel();
     }
 
     public boolean isEditable() {
@@ -60,7 +67,7 @@ public class RedProjectEditorInput {
 
     public List<RedXmlProblem> getProblemsFor(final Object modelPart) {
         if (file != null) {
-            final int xmlLine = projectConfiguration.getLineFor(modelPart);
+            final int xmlLine = config.getLineFor(modelPart);
             if (xmlLine == -1) {
                 return new ArrayList<>();
             }

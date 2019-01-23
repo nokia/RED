@@ -8,10 +8,11 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 public class RobotProjectConfigEvents {
 
+    public static final String ROBOT_CONFIG_MARKER_CHANGED = "robot/redxml/marker/changed";
+
     public static final String ROBOT_CONFIG_ENV_LOADING_STARTED = "robot/redxml/env/loading_started";
 
     public static final String ROBOT_CONFIG_ENV_LOADED = "robot/redxml/env/loaded";
-
 
     public static final String ROBOT_CONFIG_VAR_MAP_DETAIL_CHANGED = "robot/redxml/detail/varmap/changed/*";
     public static final String ROBOT_CONFIG_VAR_MAP_NAME_CHANGED = "robot/redxml/detail/varmap/changed/name";

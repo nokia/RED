@@ -188,6 +188,13 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
+    private void whenMarkerChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
+        setInput();
+    }
+
+    @Inject
+    @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
         viewer.getTable().setEnabled(false);
