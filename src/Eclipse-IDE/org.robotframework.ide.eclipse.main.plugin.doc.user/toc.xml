@@ -61,6 +61,8 @@
        </topic>
        <topic href="doc/user_guide/launching/remote_launch.html" label="Remote launches">
        </topic>
+       <topic href="doc/user_guide/launching/string_substitution.html" label="Parameterizing launches">
+       </topic>
        <topic href="doc/user_guide/launching/exec_control.html" label="Controlling execution">
        </topic>
        <topic href="doc/user_guide/launching/debug.html" label="Debugging Robot">
@@ -76,8 +78,6 @@
           </topic>
        </topic>
        <topic href="doc/user_guide/launching/launch_prefs.html" label="Launching preferences">
-       </topic>
-       <topic href="doc/user_guide/launching/string_substitution.html" label="String substitution variables">
        </topic>
        <topic href="doc/user_guide/launching/red_agent.html" label="RED Tests Runner Agent">
        </topic>
