@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
@@ -152,7 +154,7 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByPath(suite, "dir_lib.py");
 
         verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
-                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath());
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile());
         verifyNoMoreInteractions(importer);
 
         verify(detector).libraryDetectingByPathFailed("dir_lib.py", Optional.of(libResource.getLocation().toFile()),
@@ -169,7 +171,7 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByPath(suite, "dir_lib.py");
 
         verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
-                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath());
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile());
         verifyNoMoreInteractions(importer);
 
         verify(detector).libraryDetectedByPath(eq("dir_lib.py"),
@@ -187,7 +189,7 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByPath(suite, "${CURDIR}/dir_lib.py");
 
         verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
-                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath());
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile());
         verifyNoMoreInteractions(importer);
 
         verify(detector).libraryDetectedByPath(eq("${CURDIR}/dir_lib.py"),
@@ -286,7 +288,7 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByName(suite, "dir_lib");
 
         verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
-                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath(), "dir_lib");
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile(), "dir_lib");
         verifyNoMoreInteractions(importer);
 
         verify(detector).libraryDetectingByNameFailed("dir_lib", Optional.of(libResource.getLocation().toFile()),
@@ -316,7 +318,7 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByName(suite, "path_lib");
 
         verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
-                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath(), "path_lib");
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile(), "path_lib");
         verifyNoMoreInteractions(importer);
 
         verify(detector).libraryDetectedByName(eq("path_lib"),
@@ -334,7 +336,7 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByName(suite, "dir_lib");
 
         verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
-                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath(), "dir_lib");
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile(), "dir_lib");
         verifyNoMoreInteractions(importer);
 
         verify(detector).libraryDetectedByName(eq("dir_lib"),
@@ -358,7 +360,7 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByName(suite, "JavaLib");
 
         verify(importer).importJavaLib(environment, projectProvider.getProject(), robotProject.getRobotProjectConfig(),
-                libResource.getLocation().toFile().getAbsolutePath(), "JavaLib");
+                libResource.getLocation().toFile(), "JavaLib");
         verifyNoMoreInteractions(importer);
 
         verify(detector).libraryDetectedByName(eq("JavaLib"),
@@ -378,7 +380,7 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByPath(suite, "../" + PROJECT_NAME + "/python_path/path_lib.py");
 
         verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
-                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath());
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile());
         verifyNoMoreInteractions(importer);
 
         verify(detector).libraryDetectedByPath(eq("python_path/path_lib.py"),
@@ -392,6 +394,32 @@ public class ReferencedLibraryLocatorTest {
                 argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
         verifyNoMoreInteractions(detector);
     }
+
+    @Test
+    public void libraryIsImportedFromTheSameFileByPathOnlyOnce_whenPathIsCanonicalized() {
+        // this test only makes sense on case-insensitive platforms like windows
+        assumeTrue(RedSystemProperties.isWindowsPlatform());
+
+        final IResource libResource = projectProvider.getFile("python_path/path_lib.py");
+        setupPythonImport(libResource);
+
+        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
+        locator.locateByPath(suite, "python_path/Path_Lib.py");
+        locator.locateByPath(suite, "../" + PROJECT_NAME + "/python_path/../python_path/PaTh_LiB.py");
+
+        verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile());
+        verifyNoMoreInteractions(importer);
+
+        verify(detector).libraryDetectedByPath(eq("python_path/Path_Lib.py"),
+                eq(projectProvider.getFile("python_path/path_lib.py").getLocation().toFile()),
+                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
+        verify(detector).libraryDetectedByPath(eq("../" + PROJECT_NAME + "/python_path/../python_path/PaTh_LiB.py"),
+                eq(projectProvider.getFile("python_path/path_lib.py").getLocation().toFile()),
+                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
+        verifyNoMoreInteractions(detector);
+    }
+
 
     @Test
     public void libraryIsImportedFromTheSameFileByNameOnlyOnce() throws Exception {
@@ -419,11 +447,11 @@ public class ReferencedLibraryLocatorTest {
         locator.locateByName(suite, "NameA");
 
         verify(importer).importJavaLib(environment, projectProvider.getProject(), robotProject.getRobotProjectConfig(),
-                libResource.getLocation().toFile().getAbsolutePath(), "NameA");
+                libResource.getLocation().toFile(), "NameA");
         verify(importer).importJavaLib(environment, projectProvider.getProject(), robotProject.getRobotProjectConfig(),
-                libResource.getLocation().toFile().getAbsolutePath(), "NameB");
+                libResource.getLocation().toFile(), "NameB");
         verify(importer).importJavaLib(environment, projectProvider.getProject(), robotProject.getRobotProjectConfig(),
-                libResource.getLocation().toFile().getAbsolutePath(), "NameC");
+                libResource.getLocation().toFile(), "NameC");
         verifyNoMoreInteractions(importer);
 
         verify(detector, times(3)).libraryDetectedByName(eq("NameA"),
@@ -443,14 +471,14 @@ public class ReferencedLibraryLocatorTest {
         final String path = libResource.getLocation().toPortableString();
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.JAVA, name, path);
         when(importer.importJavaLib(any(IRuntimeEnvironment.class), any(IProject.class),
-                any(RobotProjectConfig.class), anyString(), eq(name))).thenReturn(Collections.singletonList(lib));
+                any(RobotProjectConfig.class), any(File.class), eq(name))).thenReturn(Collections.singletonList(lib));
     }
 
     private void setupJavaImport(final IResource libResource, final String name) {
         final String path = libResource.getLocation().toPortableString();
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.JAVA, name, path);
         when(importer.importJavaLib(any(IRuntimeEnvironment.class), any(IProject.class),
-                any(RobotProjectConfig.class), anyString(), eq(name))).thenReturn(Collections.singletonList(lib));
+                any(RobotProjectConfig.class), any(File.class), eq(name))).thenReturn(Collections.singletonList(lib));
     }
 
     private void setupPythonImport(final IResource libResource) {
@@ -458,24 +486,25 @@ public class ReferencedLibraryLocatorTest {
         final String path = libResource.getLocation().toPortableString();
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, name, path);
         when(importer.importPythonLib(any(IRuntimeEnvironment.class), any(IProject.class),
-                any(RobotProjectConfig.class), anyString())).thenReturn(Collections.singletonList(lib));
+                any(RobotProjectConfig.class), any(File.class))).thenReturn(Collections.singletonList(lib));
     }
 
     private void setupPythonImport(final IResource libResource, final String name) {
         final String path = libResource.getLocation().toPortableString();
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, name, path);
         when(importer.importPythonLib(any(IRuntimeEnvironment.class), any(IProject.class),
-                any(RobotProjectConfig.class), anyString(), eq(name))).thenReturn(Collections.singletonList(lib));
+                any(RobotProjectConfig.class), any(File.class), eq(name))).thenReturn(Collections.singletonList(lib));
     }
 
     private void setupFailedPythonImport() {
         when(importer.importPythonLib(any(IRuntimeEnvironment.class), any(IProject.class),
-                any(RobotProjectConfig.class), anyString())).thenThrow(new RuntimeEnvironmentException("fail reason"));
+                any(RobotProjectConfig.class), any(File.class)))
+                        .thenThrow(new RuntimeEnvironmentException("fail reason"));
     }
 
     private void setupFailedPythonImport(final String name) {
         when(importer.importPythonLib(any(IRuntimeEnvironment.class), any(IProject.class),
-                any(RobotProjectConfig.class), anyString(), eq(name)))
+                any(RobotProjectConfig.class), any(File.class), eq(name)))
                         .thenThrow(new RuntimeEnvironmentException("fail reason"));
     }
 

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
@@ -106,16 +107,24 @@ public class ReferencedLibraryLocator {
             final PathsProvider pathsProvider = suiteFile.getRobotProject().createPathsProvider();
             final URI importingFileUri = RedWorkspace.tryToGetLocalUri(suiteFile.getFile());
             return new ImportSearchPaths(pathsProvider).findAbsoluteUri(importingFileUri, resolvedPath);
-        }).map(File::new);
+        }).map(File::new).map(this::tryToCanonical);
     }
 
-    private Entry<File, Collection<ReferencedLibrary>> importByName(final File libraryFile, final String name) {
-        if (libraryFile.getAbsolutePath().endsWith(".jar")) {
-            return importJavaLibrary(libraryFile, name);
-        } else if (isPythonModule(libraryFile)) {
-            return importPythonModuleLibrary(new File(libraryFile, "__init__.py"));
+    private File tryToCanonical(final File file) {
+        try {
+            return file.getCanonicalFile();
+        } catch (final IOException e) {
+            return file;
+        }
+    }
+
+    private Entry<File, Collection<ReferencedLibrary>> importByName(final File library, final String name) {
+        if (library.getName().endsWith(".jar")) {
+            return importJavaLibrary(library, name);
+        } else if (isPythonModule(library)) {
+            return importPythonModuleLibrary(new File(library, "__init__.py"));
         } else {
-            return importPythonLibrary(libraryFile, name);
+            return importPythonLibrary(library, name);
         }
     }
 
@@ -131,22 +140,22 @@ public class ReferencedLibraryLocator {
         return libraryFile.isDirectory() && new File(libraryFile, "__init__.py").exists();
     }
 
-    private Entry<File, Collection<ReferencedLibrary>> importJavaLibrary(final File libraryFile, final String name) {
-        return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, name),
+    private Entry<File, Collection<ReferencedLibrary>> importJavaLibrary(final File library, final String name) {
+        return importLibsFromFileWithCaching(new LibImportCacheKey(library, name),
                 () -> importer.importJavaLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
-                        projectConfig, libraryFile.getAbsolutePath(), name));
+                        projectConfig, library, name));
     }
 
-    private Entry<File, Collection<ReferencedLibrary>> importPythonLibrary(final File libraryFile, final String name) {
-        return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, name),
+    private Entry<File, Collection<ReferencedLibrary>> importPythonLibrary(final File library, final String name) {
+        return importLibsFromFileWithCaching(new LibImportCacheKey(library, name),
                 () -> importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
-                        projectConfig, libraryFile.getAbsolutePath(), name));
+                        projectConfig, library, name));
     }
 
-    private Entry<File, Collection<ReferencedLibrary>> importPythonLibrary(final File libraryFile) {
-        return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, null),
+    private Entry<File, Collection<ReferencedLibrary>> importPythonLibrary(final File library) {
+        return importLibsFromFileWithCaching(new LibImportCacheKey(library, null),
                 () -> importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
-                        projectConfig, libraryFile.getAbsolutePath()));
+                        projectConfig, library));
     }
 
     private Entry<File, Collection<ReferencedLibrary>> importPythonModuleLibrary(final File libraryFile) {

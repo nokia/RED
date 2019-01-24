@@ -204,7 +204,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
             final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.py", "*.*" }, path -> {
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(viewer.getTable().getShell());
                 return importer.importPythonLib(environment, editorInput.getRobotProject().getProject(),
-                        editorInput.getProjectConfiguration(), path.toString());
+                        editorInput.getProjectConfiguration(), path.toFile());
             });
             addLibraries(libs);
         }));
@@ -215,7 +215,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
             final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.jar" }, path -> {
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(viewer.getTable().getShell());
                 return importer.importJavaLib(environment, editorInput.getRobotProject().getProject(),
-                        editorInput.getProjectConfiguration(), path.toString());
+                        editorInput.getProjectConfiguration(), path.toFile());
             });
             addLibraries(libs);
         }));
@@ -225,7 +225,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addLibspecButton.addSelectionListener(widgetSelectedAdapter(e -> {
             final List<ReferencedLibrary> libs = selectLibraries(new String[] { "*.xml", "*.*" }, path -> {
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(viewer.getTable().getShell());
-                return newArrayList(importer.importLibFromSpecFile(path.toString()));
+                return newArrayList(importer.importLibFromSpecFile(path.toFile()));
             });
             addLibraries(libs);
         }));
