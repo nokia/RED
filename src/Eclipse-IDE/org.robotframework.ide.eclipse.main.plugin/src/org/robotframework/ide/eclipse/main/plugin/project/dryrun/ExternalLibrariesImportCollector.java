@@ -19,12 +19,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.rf.ide.core.RedURI;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -216,44 +217,40 @@ class ExternalLibrariesImportCollector {
 
         @Override
         public Collection<ReferencedLibrary> importPythonLib(final IRuntimeEnvironment environment,
-                final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
+                final IProject project, final RobotProjectConfig config, final File library) {
             final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
-            return importLib(builder, fullLibraryPath, Optional.empty());
+            return importLib(builder, library, libClass -> true);
         }
 
         @Override
         public Collection<ReferencedLibrary> importPythonLib(final IRuntimeEnvironment environment,
-                final IProject project, final RobotProjectConfig config, final String fullLibraryPath,
-                final String name) {
+                final IProject project, final RobotProjectConfig config, final File library, final String name) {
             final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
-            return importLib(builder, fullLibraryPath, Optional.of(name));
+            return importLib(builder, library, libClass -> libClass.getQualifiedName().equals(name));
         }
 
         @Override
         public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment,
-                final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
+                final IProject project, final RobotProjectConfig config, final File library) {
             final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
-            return importLib(builder, fullLibraryPath, Optional.empty());
+            return importLib(builder, library, libClass -> true);
         }
 
         @Override
         public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment,
-                final IProject project, final RobotProjectConfig config, final String fullLibraryPath,
-                final String name) {
+                final IProject project, final RobotProjectConfig config, final File library, final String name) {
             final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
-            return importLib(builder, fullLibraryPath, Optional.of(name));
+            return importLib(builder, library, libClass -> libClass.getQualifiedName().equals(name));
         }
 
-        Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder, final String fullLibraryPath,
-                final Optional<String> name) {
+        Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder, final File library,
+                final Predicate<ILibraryClass> shouldInclude) {
             try {
-                final Collection<ILibraryClass> libClassesFromFile = builder
-                        .provideEntriesFromFile(RedURI.fromString(fullLibraryPath));
-                return libClassesFromFile.stream()
-                        .filter(libClass -> !name.isPresent() || libClass.getQualifiedName().equals(name.get()))
-                        .findFirst()
-                        .map(libClass -> Collections.singletonList(libClass.toReferencedLibrary(fullLibraryPath)))
-                        .orElse(Collections.emptyList());
+                return builder.provideEntriesFromFile(library, shouldInclude)
+                        .stream()
+                        .limit(1)
+                        .map(libClass -> libClass.toReferencedLibrary(library.getAbsolutePath()))
+                        .collect(Collectors.toList());
             } catch (final URISyntaxException e) {
                 return Collections.emptyList();
             }

@@ -58,8 +58,7 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
                 } else {
                     final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(
                             robotProject.getRuntimeEnvironment(), robotProject.getProject(), updater.getConfig(),
-                            file.getLocation().toString());
-
+                            file.getLocation().toFile());
                     updater.addLibraries(newLibraries);
                     updater.finalizeLibrariesAdding(eventBroker);
                 }

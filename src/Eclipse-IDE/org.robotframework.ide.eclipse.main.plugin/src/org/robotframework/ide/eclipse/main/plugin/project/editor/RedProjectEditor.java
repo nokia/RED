@@ -157,6 +157,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             public void whenFileChanged() {
                 editorInput.setConfig(new RedEclipseProjectConfigReader()
                         .readConfigurationWithLines(((FileEditorInput) getEditorInput()).getFile()));
+                setupEnvironmentLoadingJob();
             }
 
             @Override
