@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-Bu-sJ0oEeeRmMnJfp9igw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 1/17/19 7:27 PM
+Save-Time: 1/24/19 4:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -25,35 +25,32 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 // verify Discovering libraries summary content
-try -times 10 -delay 1000 -command {
-	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-		with [get-window "Discovering libraries summary" | get-control Any -index 1] {
-		    get-property "getChildren().Control[0].getText()" | equals "Discovered libraries (184):" | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().length" | equals 184 | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[0].getText()" 
-		        | equals abcatexit | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[180].getText()" 
-		        | equals zlib | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[181].getText()" | equals al 
-		        | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[183].getText()" | equals gl
-		        | verify-true
-		}
-	}-else{
-		with [get-window "Discovering libraries summary" | get-control Any -index 1] {
-			get-property "getChildren().Control[0].getText()" | equals "Discovered libraries (184):" | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().length" | equals 184 | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[0].getText()" 
-		        | equals abcatexit | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[172].getText()" | equals warnings 
-		        | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[181].getText()" | equals libs/Al.py 
-		        | verify-true
-		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[183].getText()" | equals libs/GL.py
-		        | verify-true
-		}
+wait-for-discover-window -times 10
+
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	with [get-window "Discovering libraries summary" | get-control Any -index 1] {
+	    get-property "getChildren().Control[0].getText()" | equals "Discovered libraries (181):" | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().length" | equals 181 | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[0].getText()" 
+	        | equals abcatexit | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[180].getText()" 
+	        | equals zlib | verify-true
+	}
+}-else{
+	with [get-window "Discovering libraries summary" | get-control Any -index 1] {
+		get-property "getChildren().Control[0].getText()" | equals "Discovered libraries (184):" | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().length" | equals 184 | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[0].getText()" 
+	        | equals abcatexit | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[172].getText()" | equals warnings 
+	        | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[181].getText()" | equals libs/Al.py 
+	        | verify-true
+	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[183].getText()" | equals libs/GL.py
+	        | verify-true
 	}
 }
+
 //// close Discovering libraries summary
 //get-window "Discovering libraries summary" | get-button OK | click
 //with [get-editor "lib_with_variable.robot" | get-text-viewer] {
