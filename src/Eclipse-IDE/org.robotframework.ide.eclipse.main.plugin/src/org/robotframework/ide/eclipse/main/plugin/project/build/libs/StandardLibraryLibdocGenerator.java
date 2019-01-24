@@ -24,7 +24,8 @@ class StandardLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public void generateLibdoc(final IRuntimeEnvironment environment, final EnvironmentSearchPaths additionalPaths) {
-        environment.createLibdoc(libName, targetSpecFile.getLocation().toFile(), format, additionalPaths);
+        // no need to pass additional paths, because standard Robot libraries are already in sys.path
+        environment.createLibdoc(libName, targetSpecFile.getLocation().toFile(), format, new EnvironmentSearchPaths());
     }
 
     @Override
