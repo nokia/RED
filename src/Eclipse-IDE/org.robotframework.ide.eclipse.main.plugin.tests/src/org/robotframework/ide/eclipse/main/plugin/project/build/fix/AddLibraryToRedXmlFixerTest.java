@@ -11,8 +11,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -28,15 +30,17 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class AddLibraryToRedXmlFixerTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(AddLibraryToRedXmlFixerTest.class);
+    private static final String PROJECT_NAME = AddLibraryToRedXmlFixerTest.class.getSimpleName();
 
-    private static RobotSuiteFile suite;
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+
+    @ClassRule
+    public static ProjectProvider notConfiguredProjectProvider = new ProjectProvider(PROJECT_NAME + "NoConfig");
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
         projectProvider.configure();
-        suite = new RobotModel().createSuiteFile(projectProvider.createFile("suite.robot"));
     }
 
     @Test
@@ -45,15 +49,34 @@ public class AddLibraryToRedXmlFixerTest {
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
 
-        final IMarker marker = suite.getFile().createMarker(RedPlugin.PLUGIN_ID);
+        final IFile file = projectProvider.createFile("suite.robot");
+        final IMarker marker = file.createMarker(RedPlugin.PLUGIN_ID);
         final AddLibraryToRedXmlFixer fixer = new AddLibraryToRedXmlFixer("UnknownPythonLibrary", false, factory);
         fixer.asContentProposal(marker).apply(null);
 
         assertThat(marker.exists()).isTrue();
 
+        final RobotSuiteFile suite = new RobotModel().createSuiteFile(file);
         verify(factory).create(suite.getRobotProject(), newArrayList(suite));
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
+    }
+
+    @Test
+    public void autodiscovererIsNotStarted_whenConfigurationFileDoesNotExist() throws Exception {
+        final SimpleLibrariesAutoDiscoverer discoverer = mock(SimpleLibrariesAutoDiscoverer.class);
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
+
+        final IFile file = notConfiguredProjectProvider.createFile("suite.robot");
+        final IMarker marker = file.createMarker(RedPlugin.PLUGIN_ID);
+        final AddLibraryToRedXmlFixer fixer = new AddLibraryToRedXmlFixer("UnknownPythonLibrary", false, factory);
+        fixer.asContentProposal(marker).apply(null);
+
+        assertThat(marker.exists()).isTrue();
+
+        verifyZeroInteractions(factory);
+        verifyZeroInteractions(discoverer);
     }
 
 }
