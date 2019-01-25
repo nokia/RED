@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,18 +34,20 @@ import org.robotframework.red.swt.SwtThread;
  */
 abstract class ChangeExclusionHandler {
 
-    protected void changeExclusion(final IEventBroker eventBroker, final List<IResource> selectedResources)
-            throws UnsupportedOperationException {
-        final Map<RobotProject, List<IPath>> pathsGroupedByProject = groupByProject(selectedResources);
-        pathsGroupedByProject.forEach((robotProject, paths) -> {
-            changeExclusion(robotProject, paths);
-            fireEvents(eventBroker, robotProject.getProject(), paths);
-        });
+    protected boolean changeExclusion(final IEventBroker eventBroker, final List<IResource> selectedResources) {
+        boolean wasChanged = false;
+        for (final Entry<RobotProject, List<IPath>> entry : groupByProject(selectedResources).entrySet()) {
+            wasChanged |= changeExclusion(entry.getKey(), entry.getValue(), eventBroker);
+        }
 
-        SwtThread.asyncExec(() -> {
-            final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
-            manager.update(RobotValidationExcludedDecorator.ID);
-        });
+        if (wasChanged) {
+            SwtThread.asyncExec(() -> {
+                final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
+                manager.update(RobotValidationExcludedDecorator.ID);
+            });
+        }
+
+        return wasChanged;
     }
 
     private Map<RobotProject, List<IPath>> groupByProject(final List<IResource> selectedResources) {
@@ -54,22 +57,28 @@ abstract class ChangeExclusionHandler {
                 Collectors.mapping(IResource::getProjectRelativePath, Collectors.toList())));
     }
 
-    private void changeExclusion(final RobotProject robotProject, final Collection<IPath> toChange) {
+    private boolean changeExclusion(final RobotProject robotProject, final Collection<IPath> toChange,
+            final IEventBroker eventBroker) {
         final Optional<RobotProjectConfig> openedConfig = robotProject.getOpenedProjectConfig();
         final RobotProjectConfig config = openedConfig.orElseGet(robotProject::getRobotProjectConfig);
 
+        boolean wasChanged = false;
         for (final IPath pathToChange : toChange) {
-            changeExclusion(config, pathToChange);
+            wasChanged |= changeExclusion(config, pathToChange);
         }
 
-        if (!openedConfig.isPresent()) {
-            new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
+        if (wasChanged) {
+            if (!openedConfig.isPresent()) {
+                new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
+            }
+            try {
+                robotProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (final CoreException e) {
+                // nothing to do
+            }
+            fireEvents(eventBroker, robotProject.getProject(), toChange);
         }
-        try {
-            robotProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-        } catch (final CoreException e) {
-            // nothing to do
-        }
+        return wasChanged;
     }
 
     private void fireEvents(final IEventBroker eventBroker, final IProject project, final Collection<IPath> toChange) {
@@ -78,6 +87,6 @@ abstract class ChangeExclusionHandler {
         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
     }
 
-    protected abstract void changeExclusion(RobotProjectConfig config, IPath pathToChange);
+    protected abstract boolean changeExclusion(RobotProjectConfig config, IPath pathToChange);
 
 }

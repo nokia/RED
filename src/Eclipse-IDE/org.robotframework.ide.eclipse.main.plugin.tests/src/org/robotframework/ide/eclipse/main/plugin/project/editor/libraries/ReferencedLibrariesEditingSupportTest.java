@@ -109,6 +109,23 @@ public class ReferencedLibrariesEditingSupportTest {
     }
 
     @Test
+    public void whenTryingToSetSameUriForRemoteLocation_nothingHappens() {
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+        final RedProjectEditorInput input = mock(RedProjectEditorInput.class);
+        when(input.getRobotProject()).thenReturn(mock(RobotProject.class));
+
+        final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(
+                mock(ColumnViewer.class), input, eventBroker);
+
+        final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
+
+        support.setValue(location, "http://some.uri.com");
+
+        assertThat(location.getUri()).isEqualTo("http://some.uri.com");
+        verifyZeroInteractions(eventBroker);
+    }
+
+    @Test
     public void whenTryingToSetValueForReferencedLibrary_nothingHappens() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(

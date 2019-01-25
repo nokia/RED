@@ -49,53 +49,23 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
-    public void setLibraries(final List<ReferencedLibrary> libraries) {
+    public void setReferencedLibraries(final List<ReferencedLibrary> libraries) {
         // nothing to do
     }
 
     @Override
-    public List<ReferencedLibrary> getLibraries() {
+    public List<ReferencedLibrary> getReferencedLibraries() {
         return new ArrayList<>();
     }
 
     @Override
-    public void setPythonPath(final List<SearchPath> pythonPaths) {
-        // nothing to do
-    }
-
-    @Override
-    public List<SearchPath> getPythonPath() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public boolean addPythonPath(final SearchPath searchPath) {
+    public boolean addReferencedLibrary(final ReferencedLibrary library) {
         return false;
     }
 
     @Override
-    public void removePythonPath(final List<SearchPath> paths) {
-        // nothing to do
-    }
-
-    @Override
-    public void setClassPath(final List<SearchPath> classPaths) {
-        // nothing to do
-    }
-
-    @Override
-    public boolean addClassPath(final SearchPath searchPath) {
+    public boolean removeReferencedLibraries(final List<ReferencedLibrary> libraries) {
         return false;
-    }
-
-    @Override
-    public void removeClassPath(final List<SearchPath> paths) {
-        // nothing to do
-    }
-
-    @Override
-    public List<SearchPath> getClassPath() {
-        return new ArrayList<>();
     }
 
     @Override
@@ -109,6 +79,76 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
+    public boolean addRemoteLocation(final RemoteLocation remoteLocation) {
+        return false;
+    }
+
+    @Override
+    public boolean removeRemoteLocations(final List<RemoteLocation> remoteLocations) {
+        return false;
+    }
+
+    @Override
+    public void setPythonPath(final List<SearchPath> pythonPaths) {
+        // nothing to do
+    }
+
+    @Override
+    public List<SearchPath> getPythonPath() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean addPythonPath(final SearchPath path) {
+        return false;
+    }
+
+    @Override
+    public boolean removePythonPath(final List<SearchPath> paths) {
+        return false;
+    }
+
+    @Override
+    public void setClassPath(final List<SearchPath> classPaths) {
+        // nothing to do
+    }
+
+    @Override
+    public List<SearchPath> getClassPath() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean addClassPath(final SearchPath path) {
+        return false;
+    }
+
+    @Override
+    public boolean removeClassPath(final List<SearchPath> paths) {
+        return false;
+    }
+
+    @Override
+    public void setReferencedVariableFiles(final List<ReferencedVariableFile> referencedVariableFiles) {
+        // nothing to do
+    }
+
+    @Override
+    public List<ReferencedVariableFile> getReferencedVariableFiles() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean addReferencedVariableFile(final ReferencedVariableFile variableFile) {
+        return false;
+    }
+
+    @Override
+    public boolean removeReferencedVariableFiles(final List<ReferencedVariableFile> referencedVariableFiles) {
+        return false;
+    }
+
+    @Override
     public void setVariableMappings(final List<VariableMapping> variableMappings) {
         // nothing to do
     }
@@ -119,6 +159,16 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
+    public boolean addVariableMapping(final VariableMapping mapping) {
+        return false;
+    }
+
+    @Override
+    public boolean removeVariableMappings(final List<VariableMapping> variableMappings) {
+        return false;
+    }
+
+    @Override
     public void setExcludedPath(final List<ExcludedFolderPath> excludedPaths) {
         // nothing to do
     }
@@ -126,6 +176,26 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     @Override
     public List<ExcludedFolderPath> getExcludedPath() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public boolean addExcludedPath(final String path) {
+        return false;
+    }
+
+    @Override
+    public boolean removeExcludedPath(final String path) {
+        return false;
+    }
+
+    @Override
+    public boolean isExcludedPath(final String path) {
+        return false;
+    }
+
+    @Override
+    public ExcludedFolderPath getExcludedPath(final String path) {
+        return null;
     }
 
     @Override
@@ -181,56 +251,6 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
-    public void addExcludedPath(final String path) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void removeExcludedPath(final String path) {
-        // nothing to do
-    }
-
-    @Override
-    public boolean isExcludedFromValidation(final String path) {
-        return false;
-    }
-
-    @Override
-    public ExcludedFolderPath getExcludedPath(final String path) {
-        return null;
-    }
-
-    @Override
-    public boolean addReferencedLibrary(final ReferencedLibrary referencedLibrary) {
-        return false;
-    }
-
-    @Override
-    public void removeLibraries(final List<ReferencedLibrary> selectedLibs) {
-        // nothing to do
-    }
-
-    @Override
-    public boolean addRemoteLocation(final RemoteLocation remoteLocation) {
-        return false;
-    }
-
-    @Override
-    public void removeRemoteLocations(final List<RemoteLocation> locations) {
-        // nothing to do
-    }
-
-    @Override
-    public void addVariableMapping(final VariableMapping mapping) {
-        // nothing to do
-    }
-
-    @Override
-    public void removeVariableMappings(final List<VariableMapping> mappings) {
-        // nothing to do
-    }
-
-    @Override
     public boolean usesPreferences() {
         return true;
     }
@@ -247,31 +267,6 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
 
     @Override
     public void assignPythonLocation(final String path, final SuiteExecutor executor) {
-        // nothing to do
-    }
-
-    @Override
-    public boolean hasReferencedLibraries() {
-        return false;
-    }
-
-    @Override
-    public boolean hasRemoteLibraries() {
-        return false;
-    }
-
-    @Override
-    public List<ReferencedVariableFile> getReferencedVariableFiles() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public void addReferencedVariableFile(final ReferencedVariableFile variableFile) {
-        // nothing to do
-    }
-
-    @Override
-    public void removeReferencedVariableFiles(final List<ReferencedVariableFile> selectedFiles) {
         // nothing to do
     }
 }

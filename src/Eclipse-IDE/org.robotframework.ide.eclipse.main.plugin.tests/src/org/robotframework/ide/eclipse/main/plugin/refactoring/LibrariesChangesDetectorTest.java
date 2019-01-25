@@ -41,8 +41,8 @@ public class LibrariesChangesDetectorTest {
                 config);
         detector.detect(processor);
 
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(0)));
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(1)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(0)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(1)));
         verifyNoMoreInteractions(processor);
     }
 
@@ -63,9 +63,9 @@ public class LibrariesChangesDetectorTest {
                 Optional.of(Path.fromPortableString("project/different_resource")), config);
         detector.detect(processor);
 
-        verify(processor).pathModified(same(config.getLibraries().get(0)), argThat(hasSameFields(
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(0)), argThat(hasSameFields(
                 ReferencedLibrary.create(LibraryType.VIRTUAL, "different_resource", "project/different_resource"))));
-        verify(processor).pathModified(same(config.getLibraries().get(1)), argThat(hasSameFields(
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(1)), argThat(hasSameFields(
                 ReferencedLibrary.create(LibraryType.VIRTUAL, "lib.xml", "project/different_resource/lib.xml"))));
         verifyNoMoreInteractions(processor);
     }
@@ -87,8 +87,8 @@ public class LibrariesChangesDetectorTest {
                 config);
         detector.detect(processor);
 
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(0)));
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(1)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(0)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(1)));
         verifyNoMoreInteractions(processor);
     }
 
@@ -109,9 +109,9 @@ public class LibrariesChangesDetectorTest {
                 Optional.of(Path.fromPortableString("project/different_resource")), config);
         detector.detect(processor);
 
-        verify(processor).pathModified(same(config.getLibraries().get(0)), argThat(
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(0)), argThat(
                 hasSameFields(ReferencedLibrary.create(LibraryType.JAVA, "lib1.c", "project/different_resource"))));
-        verify(processor).pathModified(same(config.getLibraries().get(1)), argThat(hasSameFields(
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(1)), argThat(hasSameFields(
                 ReferencedLibrary.create(LibraryType.JAVA, "lib2.c", "project/different_resource/lib.jar"))));
         verifyNoMoreInteractions(processor);
     }
@@ -136,12 +136,12 @@ public class LibrariesChangesDetectorTest {
                 config);
         detector.detect(processor);
 
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(0)));
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(1)));
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(2)));
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(3)));
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(5)));
-        verify(processor).pathRemoved(same(config), same(config.getLibraries().get(6)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(0)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(1)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(2)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(3)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(5)));
+        verify(processor).pathRemoved(same(config), same(config.getReferencedLibraries().get(6)));
         verifyNoMoreInteractions(processor);
     }
 
@@ -165,17 +165,17 @@ public class LibrariesChangesDetectorTest {
                 Optional.of(Path.fromPortableString("project/resource/xyz")), config);
         detector.detect(processor);
 
-        verify(processor).pathModified(same(config.getLibraries().get(0)),
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(0)),
                 argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/xyz"))));
-        verify(processor).pathModified(same(config.getLibraries().get(1)),
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(1)),
                 argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "d.x", "project/resource/xyz"))));
-        verify(processor).pathModified(same(config.getLibraries().get(2)),
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(2)),
                 argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "xyz.c", "project/resource"))));
-        verify(processor).pathModified(same(config.getLibraries().get(3)),
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(3)),
                 argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "xyz.c.d", "project/resource"))));
-        verify(processor).pathModified(same(config.getLibraries().get(5)),
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(5)),
                 argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "resource.xyz", "project"))));
-        verify(processor).pathModified(same(config.getLibraries().get(6)),
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(6)),
                 argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "resource.xyz.z", "project"))));
         verifyNoMoreInteractions(processor);
     }

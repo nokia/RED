@@ -66,15 +66,15 @@ public class LibraryModifyChangeTest {
         final Change undoOperation = change.perform(null);
 
         assertThat(undoOperation).isInstanceOf(LibraryModifyChange.class);
-        assertThat(config.getLibraries()).hasSize(1);
-        assertThat(config.getLibraries().get(0))
+        assertThat(config.getReferencedLibraries()).hasSize(1);
+        assertThat(config.getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "d", "x/y")));
         verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);
-        assertThat(config.getLibraries()).hasSize(1);
-        assertThat(config.getLibraries().get(0))
+        assertThat(config.getReferencedLibraries()).hasSize(1);
+        assertThat(config.getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b")));
     }
 

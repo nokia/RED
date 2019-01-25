@@ -326,7 +326,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         final RobotProjectConfig config = editorInput.getProjectConfiguration();
         final List<Object> input = new ArrayList<>();
         input.addAll(config.getRemoteLocations());
-        input.addAll(config.getLibraries());
+        input.addAll(config.getReferencedLibraries());
         viewer.setInput(input);
 
         autoLibDiscoverButton.setSelection(config.isReferencedLibrariesAutoDiscoveringEnabled());

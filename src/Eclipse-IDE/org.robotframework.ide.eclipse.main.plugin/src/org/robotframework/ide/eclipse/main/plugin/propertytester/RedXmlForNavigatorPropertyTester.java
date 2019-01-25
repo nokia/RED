@@ -24,6 +24,9 @@ import com.google.common.base.Preconditions;
 public class RedXmlForNavigatorPropertyTester extends PropertyTester {
 
     @VisibleForTesting
+    static final String IS_APPLICABLE = "isApplicable";
+
+    @VisibleForTesting
     static final String IS_EXCLUDED = "isExcluded";
 
     @VisibleForTesting
@@ -53,7 +56,10 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final IResource projectElement, final String property, final boolean expected) {
-        if (IS_INTERNAL_FOLDER.equals(property)) {
+        if (IS_APPLICABLE.equals(property)) {
+            final RobotProjectConfig config = getConfig(projectElement);
+            return !config.isNullConfig() == expected;
+        } else if (IS_INTERNAL_FOLDER.equals(property)) {
             return projectElement instanceof IFolder == expected;
         } else if (IS_EXCLUDED.equals(property)) {
             final RobotProjectConfig config = getConfig(projectElement);
@@ -72,7 +78,7 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     }
 
     private boolean isExcluded(final IResource projectElement, final RobotProjectConfig config) {
-        return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
+        return config.isExcludedPath(projectElement.getProjectRelativePath().toPortableString());
     }
 
     private RobotProjectConfig getConfig(final IResource projectElement) {

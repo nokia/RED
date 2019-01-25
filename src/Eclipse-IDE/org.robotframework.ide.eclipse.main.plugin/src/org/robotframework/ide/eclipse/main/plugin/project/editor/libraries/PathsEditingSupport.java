@@ -64,9 +64,14 @@ class PathsEditingSupport extends ElementsAddingEditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof SearchPath) {
-            ((SearchPath) element).setLocation((String) value);
+            final SearchPath path = (SearchPath) element;
+            final String oldValue = (String) getValue(element);
+            final String newValue = (String) value;
 
-            eventBroker.send(topic, element);
+            if (!newValue.equals(oldValue)) {
+                path.setLocation(newValue);
+                eventBroker.send(topic, element);
+            }
         } else {
             super.setValue(element, value);
         }
