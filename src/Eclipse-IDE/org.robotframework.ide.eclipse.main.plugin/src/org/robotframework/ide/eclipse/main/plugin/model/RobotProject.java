@@ -140,7 +140,7 @@ public class RobotProject extends RobotContainer {
         if (refLibsSpecs != null && !refLibsSpecs.isEmpty()) {
             return true;
         }
-        return getRobotProjectConfig().hasReferencedLibraries();
+        return !getRobotProjectConfig().getReferencedLibraries().isEmpty();
     }
 
     public synchronized Map<LibraryDescriptor, LibrarySpecification> getReferencedLibraries() {
@@ -149,7 +149,7 @@ public class RobotProject extends RobotContainer {
         }
 
         refLibsSpecs = new LinkedHashMap<>();
-        for (final ReferencedLibrary library : getRobotProjectConfig().getLibraries()) {
+        for (final ReferencedLibrary library : getRobotProjectConfig().getReferencedLibraries()) {
             final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
 
             final LibrarySpecification spec = findLibSpec(descriptor);

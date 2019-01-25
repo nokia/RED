@@ -191,21 +191,21 @@ public class RedXmlInTextEditorChangesCollectorTest {
         // no change in file yet
         final RedEclipseProjectConfigReader reader = new RedEclipseProjectConfigReader();
         RobotProjectConfig config = reader.readConfiguration(redXmlFile);
-        assertThat(config.getLibraries()).hasSize(4);
-        assertThat(config.getLibraries().get(0))
+        assertThat(config.getReferencedLibraries()).hasSize(4);
+        assertThat(config.getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(1))
+        assertThat(config.getReferencedLibraries().get(1))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "inner_lib", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(2)).has(
+        assertThat(config.getReferencedLibraries().get(2)).has(
                 sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "inner_lib.inside", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(3)).has(
+        assertThat(config.getReferencedLibraries().get(3)).has(
                 sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "inside", PROJECT_NAME + "/libs/inner_lib")));
 
         // after saving the change should be written to the file
         editor.doSave(new NullProgressMonitor());
         config = reader.readConfiguration(redXmlFile);
-        assertThat(config.getLibraries()).hasSize(1);
-        assertThat(config.getLibraries().get(0))
+        assertThat(config.getReferencedLibraries()).hasSize(1);
+        assertThat(config.getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs")));
     }
 
@@ -228,27 +228,27 @@ public class RedXmlInTextEditorChangesCollectorTest {
         // no change in file yet
         final RedEclipseProjectConfigReader reader = new RedEclipseProjectConfigReader();
         RobotProjectConfig config = reader.readConfiguration(redXmlFile);
-        assertThat(config.getLibraries()).hasSize(4);
-        assertThat(config.getLibraries().get(0))
+        assertThat(config.getReferencedLibraries()).hasSize(4);
+        assertThat(config.getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(1))
+        assertThat(config.getReferencedLibraries().get(1))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "inner_lib", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(2)).has(
+        assertThat(config.getReferencedLibraries().get(2)).has(
                 sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "inner_lib.inside", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(3)).has(
+        assertThat(config.getReferencedLibraries().get(3)).has(
                 sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "inside", PROJECT_NAME + "/libs/inner_lib")));
 
         // after saving the change should be written to the file
         editor.doSave(new NullProgressMonitor());
         config = reader.readConfiguration(redXmlFile);
-        assertThat(config.getLibraries()).hasSize(4);
-        assertThat(config.getLibraries().get(0))
+        assertThat(config.getReferencedLibraries()).hasSize(4);
+        assertThat(config.getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(1))
+        assertThat(config.getReferencedLibraries().get(1))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "moved", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(2)).has(
+        assertThat(config.getReferencedLibraries().get(2)).has(
                 sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "moved.inside", PROJECT_NAME + "/libs")));
-        assertThat(config.getLibraries().get(3)).has(
+        assertThat(config.getReferencedLibraries().get(3)).has(
                 sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "inside", PROJECT_NAME + "/libs/moved")));
     }
 

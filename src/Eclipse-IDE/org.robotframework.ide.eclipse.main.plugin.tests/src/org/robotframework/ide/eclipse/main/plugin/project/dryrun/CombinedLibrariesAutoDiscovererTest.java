@@ -133,12 +133,12 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite1, suite2, suite3), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME)));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(1)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir")));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(2))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -163,8 +163,8 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -191,8 +191,8 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -225,10 +225,10 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite1, suite2, suite3), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(2);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(2);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir")));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(1))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -255,10 +255,10 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite1, suite2), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(2);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(2);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir")));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(1))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -292,8 +292,8 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "SomePathLib",
@@ -325,12 +325,12 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite1, suite2, suite3), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME)));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(1)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir")));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(2))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -366,12 +366,12 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite1, suite2), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassA", PROJECT_NAME + "/libs")));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(1)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassB", PROJECT_NAME + "/libs")));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(2)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassC", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -454,7 +454,7 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEmpty();
 
         verify(summaryHandler)
                 .accept(argThat(hasLibImports(createImport(NOT_ADDED, "SomePathLib.py", newHashSet(suite.getFile())),
@@ -479,8 +479,8 @@ public class CombinedLibrariesAutoDiscovererTest {
                 newArrayList(suite), summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -508,12 +508,12 @@ public class CombinedLibrariesAutoDiscovererTest {
 
         verify(discovererSpy).startDryRunDiscovering(any(), eq(newHashSet("ErrorLib", "SomePathLib")));
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME)));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(1)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir")));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(2))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
@@ -549,12 +549,12 @@ public class CombinedLibrariesAutoDiscovererTest {
 
         verify(discovererSpy, times(0)).startDryRunDiscovering(any(), anySet());
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME)));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(1)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir")));
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(2))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(

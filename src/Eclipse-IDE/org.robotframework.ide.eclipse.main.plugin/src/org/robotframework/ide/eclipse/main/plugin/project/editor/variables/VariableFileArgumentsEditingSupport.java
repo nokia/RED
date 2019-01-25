@@ -15,7 +15,6 @@ import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
@@ -26,11 +25,14 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport;
  * @author Michal Anglart
  *
  */
-public class VariableFileArgumentsEditingSupport extends ElementsAddingEditingSupport {
+class VariableFileArgumentsEditingSupport extends ElementsAddingEditingSupport {
 
-    public VariableFileArgumentsEditingSupport(final ColumnViewer viewer, final int index,
-            final Supplier<ReferencedVariableFile> elementsCreator) {
+    private final IEventBroker eventBroker;
+
+    VariableFileArgumentsEditingSupport(final ColumnViewer viewer, final int index,
+            final Supplier<ReferencedVariableFile> elementsCreator, final IEventBroker eventBroker) {
         super(viewer, index, elementsCreator);
+        this.eventBroker = eventBroker;
     }
 
     @Override
@@ -60,41 +62,44 @@ public class VariableFileArgumentsEditingSupport extends ElementsAddingEditingSu
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof ReferencedVariableFile) {
-            final String argument = (String) value;
             final ReferencedVariableFile variableFile = (ReferencedVariableFile) element;
-            List<String> arguments = variableFile.getArguments();
-            if (arguments.isEmpty()) {
-                arguments = new ArrayList<>();
-                variableFile.setArguments(arguments);
-            }
+            final String oldValue = (String) getValue(element);
+            final String newValue = (String) value;
 
-            if (index < arguments.size()) {
-                arguments.set(index, argument);
-            } else {
-                arguments.add(argument);
+            if (!newValue.equals(oldValue)) {
+                setArgument(variableFile, newValue);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_ARGUMENT_CHANGED, variableFile);
             }
-
-            final List<String> filteredArguments = new ArrayList<>();
-            Collections.reverse(arguments);
-            boolean nonWhitespaceFound = false;
-            for (final String arg : arguments) {
-                if (!arg.isEmpty()) {
-                    nonWhitespaceFound = true;
-                }
-                if (nonWhitespaceFound) {
-                    filteredArguments.add(arg);
-                }
-            }
-            Collections.reverse(filteredArguments);
-            variableFile.setArguments(filteredArguments);
-
-            getEventBroker().send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_ARGUMENT_CHANGED, variableFile);
         } else {
             super.setValue(element, value);
         }
     }
 
-    private IEventBroker getEventBroker() {
-        return PlatformUI.getWorkbench().getService(IEventBroker.class);
+    private void setArgument(final ReferencedVariableFile variableFile, final String newValue) {
+        List<String> arguments = variableFile.getArguments();
+        if (arguments.isEmpty()) {
+            arguments = new ArrayList<>();
+            variableFile.setArguments(arguments);
+        }
+
+        if (index < arguments.size()) {
+            arguments.set(index, newValue);
+        } else {
+            arguments.add(newValue);
+        }
+
+        final List<String> filteredArguments = new ArrayList<>();
+        Collections.reverse(arguments);
+        boolean nonWhitespaceFound = false;
+        for (final String arg : arguments) {
+            if (!arg.isEmpty()) {
+                nonWhitespaceFound = true;
+            }
+            if (nonWhitespaceFound) {
+                filteredArguments.add(arg);
+            }
+        }
+        Collections.reverse(filteredArguments);
+        variableFile.setArguments(filteredArguments);
     }
 }

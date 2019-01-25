@@ -100,8 +100,8 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "CorrectLib", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLib", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLib",
@@ -120,8 +120,8 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "proj_module", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0))
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "proj_module", PROJECT_NAME)));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "proj_module",
@@ -140,8 +140,8 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "CorrectLibWithClasses.ClassB", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLibWithClasses.ClassB", PROJECT_NAME + "/libs")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLibWithClasses.ClassB",
@@ -164,8 +164,8 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "module.ModuleLib", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries().get(0)).has(sameFieldsAs(
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
                 ReferencedLibrary.create(LibraryType.PYTHON, "module.ModuleLib", PROJECT_NAME + "/python_path")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "module.ModuleLib",
@@ -184,7 +184,7 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "ErrorLib", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEmpty();
 
         verify(summaryHandler)
                 .accept(argThat(hasLibImports(createImport(NOT_ADDED, "ErrorLib", newHashSet(suite.getFile())))));
@@ -202,7 +202,7 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "NotExistingLib", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEmpty();
 
         verify(summaryHandler)
                 .accept(argThat(hasLibImports(createImport(NOT_ADDED, "NotExistingLib", newHashSet(suite.getFile())))));
@@ -222,7 +222,7 @@ public class SimpleLibrariesAutoDiscovererTest {
                 "ExcludedLib", summaryHandler);
         discoverer.start().join();
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEmpty();
 
         verify(summaryHandler)
                 .accept(argThat(hasLibImports(createImport(NOT_ADDED, "ExcludedLib", newHashSet(suite.getFile())))));

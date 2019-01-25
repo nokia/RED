@@ -36,7 +36,7 @@ class LibrariesChangesDetector {
     }
 
     void detect(final RedXmlChangesProcessor<ReferencedLibrary> processor) {
-        for (final ReferencedLibrary library : config.getLibraries()) {
+        for (final ReferencedLibrary library : config.getReferencedLibraries()) {
             if (library.provideType() == LibraryType.VIRTUAL) {
                 detectChangeInVirtualLibrary(processor, library);
             } else if (library.provideType() == LibraryType.JAVA) {

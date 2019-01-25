@@ -89,7 +89,7 @@ public class GeneralSettingsImportsFixesTest {
     @Test
     public void thereIsAFixersForByNameImports_whenThereIsLibraryKnownForGivenPath() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setLibraries(newArrayList(
+        config.setReferencedLibraries(newArrayList(
                 ReferencedLibrary.create(LibraryType.PYTHON, "LibFromConfig", projectProvider.getProject().getName())));
         projectProvider.configure(config);
 

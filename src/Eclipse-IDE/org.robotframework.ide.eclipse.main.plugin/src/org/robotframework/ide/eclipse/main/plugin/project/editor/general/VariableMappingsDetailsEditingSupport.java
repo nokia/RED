@@ -54,7 +54,7 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
     protected void setValue(final Object element, final Object value) {
         if (element instanceof VariableMapping) {
             final VariableMapping mapping = (VariableMapping) element;
-            final String oldValue = getMappingValue(mapping);
+            final String oldValue = (String) getValue(element);
             final String newValue = (String) value;
 
             if (!newValue.equals(oldValue)) {

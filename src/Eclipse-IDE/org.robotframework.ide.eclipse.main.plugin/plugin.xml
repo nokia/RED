@@ -1632,6 +1632,10 @@
                       type="org.eclipse.core.resources.IResource">
                    <and>
                       <test
+                            property="org.robotframework.redxml.navigator.isApplicable"
+                            value="true">
+                      </test>
+                      <test
                             property="org.robotframework.redxml.navigator.isHidden"
                             value="false">
                       </test>
@@ -1678,6 +1682,10 @@
                       type="org.eclipse.core.resources.IResource">
                    <and>
                       <test
+                            property="org.robotframework.redxml.navigator.isApplicable"
+                            value="true">
+                      </test>
+                      <test
                             property="org.robotframework.redxml.navigator.isHidden"
                             value="false">
                       </test>
@@ -1715,14 +1723,16 @@
 		  </with>
 	   </activeWhen>
 	   <enabledWhen>
-		  <with
-				variable="selection">
-			 <iterate ifEmpty="false">
-		 		<adapt type="org.eclipse.core.resources.IFile">
-		            <test property="org.eclipse.core.resources.name" value="*.py"/>
-		      	</adapt>
-			  </iterate>
-		   </with>
+          <with variable="selection">
+             <iterate ifEmpty="false" operator="and">
+                <adapt type="org.eclipse.core.resources.IFile">
+                   <and>
+                      <test property="org.robotframework.redxml.navigator.isApplicable" value="true"/>
+                      <test property="org.eclipse.core.resources.name" value="*.py"/>
+                   </and>
+                </adapt>
+             </iterate>
+          </with>
         </enabledWhen>
 	</handler>
 	<handler
@@ -1747,7 +1757,7 @@
 	   <enabledWhen>
 		  <with
 				variable="selection">
-	          <iterate operator="or" ifEmpty="false">
+	          <iterate operator="and" ifEmpty="false">
                 <and>
                     <or>
                         <adapt type="org.eclipse.core.resources.IFile">
@@ -1764,6 +1774,10 @@
                     <adapt
                           type="org.eclipse.core.resources.IResource">
                        <and>
+	                      <test
+	                            property="org.robotframework.redxml.navigator.isApplicable"
+	                            value="true">
+	                      </test>
 	                      <test
 	                           property="org.robotframework.redxml.navigator.isHidden"
 	                           value="false">
@@ -5320,7 +5334,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester"
           id="org.robotframework.redxml.navigatorProjectConfigPropertyTester"
           namespace="org.robotframework.redxml.navigator"
-          properties="isInternalFolder, isExcluded, isFile, isExcludedViaInheritance, isProject, isHidden"
+          properties="isApplicable, isInternalFolder, isExcluded, isFile, isExcludedViaInheritance, isProject, isHidden"
           type="org.eclipse.core.resources.IResource">
     </propertyTester>
     <propertyTester
