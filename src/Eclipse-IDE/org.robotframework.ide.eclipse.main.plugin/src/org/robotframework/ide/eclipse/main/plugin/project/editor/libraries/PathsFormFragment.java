@@ -212,7 +212,9 @@ class PathsFormFragment implements ISectionFormFragment {
                     added |= adder.addPath(path);
                 }
                 if (added) {
+                    setInput();
                     setDirty(true);
+                    classPathViewer.refresh();
                 }
                 return paths.get(paths.size() - 1);
             }
