@@ -71,7 +71,7 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
             final Optional<RobotProjectConfig> openedConfig = robotProject.getOpenedProjectConfig();
             final RobotProjectConfig config = openedConfig.orElseGet(robotProject::getRobotProjectConfig);
 
-            if (apply(externalFile, config)) {
+            if (!config.isNullConfig() && apply(externalFile, config)) {
                 marker.delete();
 
                 if (!openedConfig.isPresent()) {
