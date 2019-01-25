@@ -38,7 +38,7 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
         public void deleteLibraries(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<ReferencedLibrary> libraries = Selections.getElements(selection, ReferencedLibrary.class);
-            input.getProjectConfiguration().removeLibraries(libraries);
+            input.getProjectConfiguration().removeReferencedLibraries(libraries);
             input.getRobotProject().unregisterWatchingOnReferencedLibraries(libraries);
 
             if (!libraries.isEmpty()) {

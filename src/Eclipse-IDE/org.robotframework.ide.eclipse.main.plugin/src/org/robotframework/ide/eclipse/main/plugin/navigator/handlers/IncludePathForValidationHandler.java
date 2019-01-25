@@ -34,13 +34,15 @@ public class IncludePathForValidationHandler extends DIParameterizedHandler<E4In
         public void changeExclusion(final IEventBroker eventBroker,
                 final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
-            changeExclusion(eventBroker, selectedResources);
-            scheduleRevalidation(selectedResources);
+            final boolean wasChanged = changeExclusion(eventBroker, selectedResources);
+            if (wasChanged) {
+                scheduleRevalidation(selectedResources);
+            }
         }
 
         @Override
-        protected void changeExclusion(final RobotProjectConfig config, final IPath pathToChange) {
-            config.removeExcludedPath(pathToChange.toPortableString());
+        protected boolean changeExclusion(final RobotProjectConfig config, final IPath pathToChange) {
+            return config.removeExcludedPath(pathToChange.toPortableString());
         }
 
         private void scheduleRevalidation(final List<IResource> selectedResources) {

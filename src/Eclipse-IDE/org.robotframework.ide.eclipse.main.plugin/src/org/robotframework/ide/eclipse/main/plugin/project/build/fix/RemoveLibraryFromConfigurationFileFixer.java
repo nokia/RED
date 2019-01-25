@@ -40,8 +40,8 @@ public class RemoveLibraryFromConfigurationFileFixer implements IMarkerResolutio
         }
 
         final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration((IFile) redFile);
-        if (indexOfLibrary < config.getLibraries().size()) {
-            config.getLibraries().remove(indexOfLibrary);
+        if (indexOfLibrary < config.getReferencedLibraries().size()) {
+            config.getReferencedLibraries().remove(indexOfLibrary);
         }
         new RedEclipseProjectConfigWriter().writeConfiguration(config, redFile.getProject());
         try {

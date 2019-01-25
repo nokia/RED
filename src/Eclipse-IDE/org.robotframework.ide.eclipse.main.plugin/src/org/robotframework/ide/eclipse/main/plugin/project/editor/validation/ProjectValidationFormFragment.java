@@ -255,7 +255,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         }
 
         final boolean isExcluded = editorInput.getProjectConfiguration()
-                .isExcludedFromValidation(resource.getProjectRelativePath().toPortableString());
+                .isExcludedPath(resource.getProjectRelativePath().toPortableString());
 
         final ProjectTreeElement wrappedChild = new ProjectTreeElement(resource, isExcluded);
         parent.addChild(wrappedChild);

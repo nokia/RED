@@ -123,7 +123,7 @@ public class RedEclipseProjectConfig {
     }
 
     private List<String> getReferenceLibPaths(final LibraryType libType) {
-        return config.getLibraries()
+        return config.getReferencedLibraries()
                 .stream()
                 .filter(lib -> lib.provideType() == libType)
                 .map(lib -> Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath())).toOSString())

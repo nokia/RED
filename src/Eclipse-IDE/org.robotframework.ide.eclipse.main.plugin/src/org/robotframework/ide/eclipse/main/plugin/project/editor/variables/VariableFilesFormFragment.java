@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
@@ -55,6 +56,9 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     @Inject
     private IEditorSite site;
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private RedFormToolkit toolkit;
@@ -118,7 +122,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     private void createColumns() {
         final Supplier<ReferencedVariableFile> elementsCreator = new VariableFileCreator(viewer.getTable().getShell(),
-                editorInput);
+                editorInput, eventBroker);
         createFileColumn(elementsCreator);
 
         final int numberOfColumns = calculateLongestArgumentsLength();
@@ -154,13 +158,13 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     }
 
     private void createArgumentColumn(final String name, final int index,
-            final Supplier<ReferencedVariableFile> elementsCreator, final boolean shouldGrabAllTheSpace) {
+            final Supplier<ReferencedVariableFile> creator, final boolean shouldGrabAllTheSpace) {
         ViewerColumnsFactory.newColumn(name)
                 .withWidth(100)
                 .shouldGrabAllTheSpaceLeft(shouldGrabAllTheSpace)
                 .withMinWidth(50)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, elementsCreator))
+                .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, creator, eventBroker))
                 .labelsProvidedBy(new VariableFileArgumentsLabelProvider(index))
                 .createFor(viewer);
     }
@@ -227,6 +231,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenVarFileChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED) final List<ReferencedVariableFile> varFiles) {
+        setInput();
         setDirty(true);
         viewer.refresh();
     }

@@ -7,8 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,7 +36,7 @@ public class PathsEditingSupportTest {
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
         final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
-        
+
         assertThat(support.canEdit(new ElementAddingToken("search path", true))).isTrue();
         assertThat(support.canEdit(SearchPath.create("custom", false))).isTrue();
         assertThat(support.canEdit(SearchPath.create("system", true))).isFalse();
@@ -101,9 +101,24 @@ public class PathsEditingSupportTest {
         support.setValue(searchPath, "new_path");
 
         assertThat(searchPath.getLocation()).isEqualTo("new_path");
-        verify(eventBroker, times(1)).send("topic", searchPath);
+        verify(eventBroker).send("topic", searchPath);
     }
-    
+
+    @Test
+    public void newPathIsNotSetToSearchPathAndBrokerDoesNotNotifyListenersAboutIt() {
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+        final Supplier<SearchPath> creator = () -> null;
+        final ColumnViewer viewer = mock(ColumnViewer.class);
+
+        final SearchPath searchPath = SearchPath.create("path");
+
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        support.setValue(searchPath, "path");
+
+        assertThat(searchPath.getLocation()).isEqualTo("path");
+        verifyZeroInteractions(eventBroker);
+    }
+
     @Test
     public void creatorIsCalledWhenSettingValueForAddingToken() {
         final AtomicBoolean creatorCalled = new AtomicBoolean(false);

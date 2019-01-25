@@ -54,6 +54,9 @@ public class RobotProjectConfig {
     @XmlElement(name = "referencedLibrary", required = false)
     private List<ReferencedLibrary> libraries = new ArrayList<>();
 
+    @XmlElement(name = "remoteLocations", required = false)
+    private List<RemoteLocation> remoteLocations = new ArrayList<>();
+
     @XmlElementWrapper(name = "pythonpath", required = false)
     @XmlElement(name = "path", type = SearchPath.class)
     private List<SearchPath> pythonPaths = new ArrayList<>();
@@ -61,9 +64,6 @@ public class RobotProjectConfig {
     @XmlElementWrapper(name = "classpath", required = false)
     @XmlElement(name = "path", type = SearchPath.class)
     private List<SearchPath> classPaths = new ArrayList<>();
-
-    @XmlElement(name = "remoteLocations", required = false)
-    private List<RemoteLocation> remoteLocations = new ArrayList<>();
 
     @XmlElement(name = "variableFiles", required = false)
     private List<ReferencedVariableFile> referencedVariableFiles = new ArrayList<>();
@@ -123,62 +123,24 @@ public class RobotProjectConfig {
         return pathsRelativityPoint;
     }
 
-    public void setLibraries(final List<ReferencedLibrary> libraries) {
+    public void setReferencedLibraries(final List<ReferencedLibrary> libraries) {
         this.libraries = libraries;
     }
 
-    public List<ReferencedLibrary> getLibraries() {
+    public List<ReferencedLibrary> getReferencedLibraries() {
         return libraries;
     }
 
-    public void setPythonPath(final List<SearchPath> pythonPaths) {
-        this.pythonPaths = pythonPaths;
-    }
-
-    public List<SearchPath> getPythonPath() {
-        return pythonPaths;
-    }
-
-    public boolean addPythonPath(final SearchPath searchPath) {
-        if (pythonPaths == null) {
-            pythonPaths = new ArrayList<>();
-        }
-        if (!pythonPaths.contains(searchPath)) {
-            pythonPaths.add(searchPath);
+    public boolean addReferencedLibrary(final ReferencedLibrary library) {
+        if (!libraries.contains(library)) {
+            libraries.add(library);
             return true;
         }
         return false;
     }
 
-    public void removePythonPath(final List<SearchPath> paths) {
-        if (pythonPaths != null) {
-            pythonPaths.removeAll(paths);
-        }
-    }
-
-    public void setClassPath(final List<SearchPath> classPaths) {
-        this.classPaths = classPaths;
-    }
-
-    public boolean addClassPath(final SearchPath searchPath) {
-        if (classPaths == null) {
-            classPaths = new ArrayList<>();
-        }
-        if (!classPaths.contains(searchPath)) {
-            classPaths.add(searchPath);
-            return true;
-        }
-        return false;
-    }
-
-    public void removeClassPath(final List<SearchPath> paths) {
-        if (classPaths != null) {
-            classPaths.removeAll(paths);
-        }
-    }
-
-    public List<SearchPath> getClassPath() {
-        return classPaths;
+    public boolean removeReferencedLibraries(final List<ReferencedLibrary> libraries) {
+        return this.libraries.removeAll(libraries);
     }
 
     public void setRemoteLocations(final List<RemoteLocation> remoteLocations) {
@@ -189,6 +151,78 @@ public class RobotProjectConfig {
         return remoteLocations;
     }
 
+    public boolean addRemoteLocation(final RemoteLocation remoteLocation) {
+        if (!remoteLocations.contains(remoteLocation)) {
+            remoteLocations.add(remoteLocation);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeRemoteLocations(final List<RemoteLocation> remoteLocations) {
+        return this.remoteLocations.removeAll(remoteLocations);
+    }
+
+    public void setPythonPath(final List<SearchPath> pythonPaths) {
+        this.pythonPaths = pythonPaths;
+    }
+
+    public List<SearchPath> getPythonPath() {
+        return pythonPaths;
+    }
+
+    public boolean addPythonPath(final SearchPath path) {
+        if (!pythonPaths.contains(path)) {
+            pythonPaths.add(path);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removePythonPath(final List<SearchPath> paths) {
+        return pythonPaths.removeAll(paths);
+    }
+
+    public void setClassPath(final List<SearchPath> classPaths) {
+        this.classPaths = classPaths;
+    }
+
+    public List<SearchPath> getClassPath() {
+        return classPaths;
+    }
+
+    public boolean addClassPath(final SearchPath path) {
+        if (!classPaths.contains(path)) {
+            classPaths.add(path);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeClassPath(final List<SearchPath> paths) {
+        return classPaths.removeAll(paths);
+    }
+
+    public void setReferencedVariableFiles(final List<ReferencedVariableFile> referencedVariableFiles) {
+        this.referencedVariableFiles = referencedVariableFiles;
+    }
+
+    public List<ReferencedVariableFile> getReferencedVariableFiles() {
+        return referencedVariableFiles;
+    }
+
+    public boolean addReferencedVariableFile(final ReferencedVariableFile variableFile) {
+        if (!referencedVariableFiles.contains(variableFile)) {
+            referencedVariableFiles.add(variableFile);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeReferencedVariableFiles(final List<ReferencedVariableFile> referencedVariableFiles) {
+        return this.referencedVariableFiles.removeAll(referencedVariableFiles);
+    }
+
     public void setVariableMappings(final List<VariableMapping> variableMappings) {
         this.variableMappings = variableMappings;
     }
@@ -197,12 +231,54 @@ public class RobotProjectConfig {
         return variableMappings;
     }
 
+    public boolean addVariableMapping(final VariableMapping mapping) {
+        if (!variableMappings.contains(mapping)) {
+            variableMappings.add(mapping);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeVariableMappings(final List<VariableMapping> variableMappings) {
+        return this.variableMappings.removeAll(variableMappings);
+    }
+
     public void setExcludedPath(final List<ExcludedFolderPath> excludedPaths) {
         this.excludedPath = excludedPaths;
     }
 
     public List<ExcludedFolderPath> getExcludedPath() {
         return excludedPath;
+    }
+
+    public boolean addExcludedPath(final String path) {
+        final ExcludedFolderPath toAdd = ExcludedFolderPath.create(path);
+        if (!excludedPath.contains(toAdd)) {
+            excludedPath.add(toAdd);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeExcludedPath(final String path) {
+        final ExcludedFolderPath toRemove = getExcludedPath(path);
+        if (toRemove != null) {
+            return excludedPath.remove(toRemove);
+        }
+        return false;
+    }
+
+    public boolean isExcludedPath(final String path) {
+        return getExcludedPath(path) != null;
+    }
+
+    public ExcludedFolderPath getExcludedPath(final String path) {
+        for (final ExcludedFolderPath excludedPath : excludedPath) {
+            if (excludedPath.getPath().equals(path)) {
+                return excludedPath;
+            }
+        }
+        return null;
     }
 
     public void setIsValidatedFileSizeCheckingEnabled(final boolean isFileSizeCheckingEnabled) {
@@ -249,84 +325,6 @@ public class RobotProjectConfig {
         this.isLibrariesAutoDiscoveringSummaryWindowEnabled = isLibrariesAutoDiscoveringSummaryWindowEnabled;
     }
 
-    public void addExcludedPath(final String path) {
-        if (excludedPath == null) {
-            excludedPath = new ArrayList<>();
-        }
-        final ExcludedFolderPath toAdd = ExcludedFolderPath.create(path);
-        if (!excludedPath.contains(toAdd)) {
-            excludedPath.add(toAdd);
-        }
-    }
-
-    public void removeExcludedPath(final String path) {
-        if (excludedPath == null) {
-            return;
-        }
-        final ExcludedFolderPath toRemove = getExcludedPath(path);
-        if (toRemove != null) {
-            excludedPath.remove(toRemove);
-        }
-    }
-
-    public boolean isExcludedFromValidation(final String path) {
-        return getExcludedPath(path) != null;
-    }
-
-    public ExcludedFolderPath getExcludedPath(final String path) {
-        if (excludedPath == null) {
-            return null;
-        }
-        for (final ExcludedFolderPath excludedPath : excludedPath) {
-            if (excludedPath.getPath().equals(path)) {
-                return excludedPath;
-            }
-        }
-        return null;
-    }
-
-    public boolean addReferencedLibrary(final ReferencedLibrary referencedLibrary) {
-        if (libraries == null) {
-            libraries = new ArrayList<>();
-        }
-        if (!libraries.contains(referencedLibrary)) {
-            libraries.add(referencedLibrary);
-            return true;
-        }
-        return false;
-    }
-
-    public void removeLibraries(final List<ReferencedLibrary> selectedLibs) {
-        libraries.removeAll(selectedLibs);
-    }
-
-    public boolean addRemoteLocation(final RemoteLocation remoteLocation) {
-        if (remoteLocations == null) {
-            remoteLocations = new ArrayList<>();
-        }
-        if (!remoteLocations.contains(remoteLocation)) {
-            remoteLocations.add(remoteLocation);
-            return true;
-        }
-        return false;
-    }
-
-
-    public void removeRemoteLocations(final List<RemoteLocation> locations) {
-        remoteLocations.removeAll(locations);
-    }
-
-    public void addVariableMapping(final VariableMapping mapping) {
-        if (variableMappings == null) {
-            variableMappings = new ArrayList<>();
-        }
-        variableMappings.add(mapping);
-    }
-
-    public void removeVariableMappings(final List<VariableMapping> mappings) {
-        variableMappings.removeAll(mappings);
-    }
-
     public boolean usesPreferences() {
         return executionEnvironment == null;
     }
@@ -353,31 +351,6 @@ public class RobotProjectConfig {
         if (executionEnvironment.getInterpreter() != executor) {
             executionEnvironment.setInterpreter(executor);
         }
-    }
-
-    public boolean hasReferencedLibraries() {
-        return libraries != null && !libraries.isEmpty();
-    }
-
-    public boolean hasRemoteLibraries() {
-        return remoteLocations != null && !remoteLocations.isEmpty();
-    }
-
-    public List<ReferencedVariableFile> getReferencedVariableFiles() {
-        return referencedVariableFiles;
-    }
-
-    public void addReferencedVariableFile(final ReferencedVariableFile variableFile) {
-        if (referencedVariableFiles == null) {
-            referencedVariableFiles = new ArrayList<>();
-        }
-        if (!referencedVariableFiles.contains(variableFile)) {
-            referencedVariableFiles.add(variableFile);
-        }
-    }
-
-    public void removeReferencedVariableFiles(final List<ReferencedVariableFile> selectedFiles) {
-        referencedVariableFiles.removeAll(selectedFiles);
     }
 
     @Override
@@ -614,7 +587,7 @@ public class RobotProjectConfig {
         private String path;
 
         @XmlElement
-        private List<String> arguments;
+        private List<String> arguments = new ArrayList<>();;
 
         @XmlTransient
         private Map<String, Object> variables;
@@ -632,7 +605,7 @@ public class RobotProjectConfig {
         }
 
         public List<String> getArguments() {
-            return arguments == null ? new ArrayList<>() : arguments;
+            return arguments;
         }
 
         @XmlTransient

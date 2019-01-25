@@ -262,20 +262,24 @@ public class LibrariesBuilder {
             final LibspecsFolder libspecsFolder) {
         final List<ILibdocGenerator> generators = new ArrayList<>();
 
-        configuration.getLibraries().stream().filter(lib -> lib.provideType() == LibraryType.VIRTUAL).forEach(lib -> {
-            final Path libPath = new Path(lib.getPath());
+        configuration.getReferencedLibraries()
+                .stream()
+                .filter(lib -> lib.provideType() == LibraryType.VIRTUAL)
+                .forEach(lib -> {
+                    final Path libPath = new Path(lib.getPath());
 
-            // we only copy workspace-external specs to libspecs folder; those in workspace should
-            // be read directly
-            if (libPath.isAbsolute()) {
-                final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
+                    // we only copy workspace-external specs to libspecs folder; those in workspace
+                    // should
+                    // be read directly
+                    if (libPath.isAbsolute()) {
+                        final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
 
-                final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-                if (!fileExist(xmlSpecFile)) {
-                    generators.add(new VirtualLibraryLibdocGenerator(libPath, xmlSpecFile, LibdocFormat.XML));
-                }
-            }
-        });
+                        final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
+                        if (!fileExist(xmlSpecFile)) {
+                            generators.add(new VirtualLibraryLibdocGenerator(libPath, xmlSpecFile, LibdocFormat.XML));
+                        }
+                    }
+                });
         return generators;
     }
 
@@ -283,15 +287,18 @@ public class LibrariesBuilder {
             final LibspecsFolder libspecsFolder) {
         final List<ILibdocGenerator> generators = new ArrayList<>();
 
-        configuration.getLibraries().stream().filter(lib -> lib.provideType() == LibraryType.PYTHON).forEach(lib -> {
-            final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
+        configuration.getReferencedLibraries()
+                .stream()
+                .filter(lib -> lib.provideType() == LibraryType.PYTHON)
+                .forEach(lib -> {
+                    final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
 
-            final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-            if (!fileExist(xmlSpecFile)) {
-                generators.add(new PythonLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile,
-                        LibdocFormat.XML));
-            }
-        });
+                    final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
+                    if (!fileExist(xmlSpecFile)) {
+                        generators.add(new PythonLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()),
+                                xmlSpecFile, LibdocFormat.XML));
+                    }
+                });
         return generators;
     }
 
@@ -299,15 +306,18 @@ public class LibrariesBuilder {
             final LibspecsFolder libspecsFolder) {
         final List<ILibdocGenerator> generators = new ArrayList<>();
 
-        configuration.getLibraries().stream().filter(lib -> lib.provideType() == LibraryType.JAVA).forEach(lib -> {
-            final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
+        configuration.getReferencedLibraries()
+                .stream()
+                .filter(lib -> lib.provideType() == LibraryType.JAVA)
+                .forEach(lib -> {
+                    final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
 
-            final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-            if (!fileExist(xmlSpecFile)) {
-                generators.add(new JavaLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()), xmlSpecFile,
-                        LibdocFormat.XML));
-            }
-        });
+                    final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
+                    if (!fileExist(xmlSpecFile)) {
+                        generators.add(new JavaLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()),
+                                xmlSpecFile, LibdocFormat.XML));
+                    }
+                });
         return generators;
     }
 
