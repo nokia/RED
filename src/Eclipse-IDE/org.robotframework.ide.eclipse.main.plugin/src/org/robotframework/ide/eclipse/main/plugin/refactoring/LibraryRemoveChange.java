@@ -67,7 +67,7 @@ class LibraryRemoveChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        config.getLibraries().remove(libraryToRemove);
+        config.getReferencedLibraries().remove(libraryToRemove);
 
         final List<ReferencedLibrary> changedPaths = new ArrayList<>();
         changedPaths.add(libraryToRemove);

@@ -83,13 +83,10 @@ class LocalProcessCommandLineBuilder {
 
     private void addProjectConfigEntries(final IRunCommandLineBuilder builder) {
         final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
-        if (!projectConfig.isNullConfig()) {
-            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(),
-                    projectConfig);
-            final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();
-            builder.addLocationsToClassPath(searchPaths.getClassPaths());
-            builder.addLocationsToPythonPath(searchPaths.getPythonPaths());
-        }
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(), projectConfig);
+        final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();
+        builder.addLocationsToClassPath(searchPaths.getClassPaths());
+        builder.addLocationsToPythonPath(searchPaths.getPythonPaths());
     }
 
     private void addTags(final IRunCommandLineBuilder builder) throws CoreException {

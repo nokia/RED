@@ -55,7 +55,7 @@ public class LibrariesConfigUpdaterTest {
 
         updater.finalizeLibrariesAdding(eventBroker);
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEmpty();
         verifyZeroInteractions(eventBroker);
     }
 
@@ -68,7 +68,7 @@ public class LibrariesConfigUpdaterTest {
 
         updater.finalizeLibrariesAdding(eventBroker);
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEqualTo(libs);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEqualTo(libs);
         verify(eventBroker, times(1)).send(
                 eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));
@@ -84,7 +84,7 @@ public class LibrariesConfigUpdaterTest {
 
         updater.finalizeLibrariesAdding(eventBroker);
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEmpty();
         verify(eventBroker, times(1)).send(
                 eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));
@@ -103,7 +103,7 @@ public class LibrariesConfigUpdaterTest {
 
         final List<ReferencedLibrary> allLibs = new ArrayList<>(libs1);
         allLibs.addAll(libs2);
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEqualTo(allLibs);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEqualTo(allLibs);
         verify(eventBroker, times(1)).send(
                 eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));
@@ -119,7 +119,7 @@ public class LibrariesConfigUpdaterTest {
         updater.finalizeLibrariesAdding(eventBroker);
         updater.finalizeLibrariesAdding(eventBroker);
 
-        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEqualTo(libs);
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEqualTo(libs);
         verify(eventBroker, times(1)).send(
                 eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));

@@ -90,7 +90,10 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
             if (variableMapping == null) {
                 return false;
             }
-            config.addVariableMapping(variableMapping);
+            final boolean wasAdded = config.addVariableMapping(variableMapping);
+            if (!wasAdded) {
+                return false;
+            }
             changedMappings = config.getVariableMappings();
             return true;
         }

@@ -125,7 +125,7 @@ public class LocalProcessCommandLineBuilderTest {
     public void commandLineIsCreated_whenProjectDoesNotContainConfigurationFile() throws Exception {
         projectProvider.deconfigure();
 
-        final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Jython);
+        final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
         final RobotProject robotProject = createRobotProject(projectProvider.getProject());
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
 

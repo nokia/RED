@@ -18,8 +18,13 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class RedXmlForNavigatorPropertyTesterTest {
 
+    private static final String PROJECT_NAME = RedXmlForNavigatorPropertyTesterTest.class.getSimpleName();
+
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedXmlForNavigatorPropertyTesterTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+
+    @ClassRule
+    public static ProjectProvider notConfiguredProjectProvider = new ProjectProvider(PROJECT_NAME + "NoConfig");
 
     private final RedXmlForNavigatorPropertyTester tester = new RedXmlForNavigatorPropertyTester();
 
@@ -34,6 +39,8 @@ public class RedXmlForNavigatorPropertyTesterTest {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("excluded_dir");
         projectProvider.configure(config);
+
+        notConfiguredProjectProvider.createFile("file.robot");
     }
 
     @Test
@@ -56,6 +63,15 @@ public class RedXmlForNavigatorPropertyTesterTest {
     public void falseIsReturnedForUnknownProperty() {
         assertThat(tester.test(mock(IResource.class), "unknown_property", null, true)).isFalse();
         assertThat(tester.test(mock(IResource.class), "unknown_property", null, false)).isFalse();
+    }
+
+    @Test
+    public void testIsApplicableProperty() {
+        assertThat(isApplicable(projectProvider.getFile("excluded_dir/file.robot"), true)).isTrue();
+        assertThat(isApplicable(projectProvider.getFile("excluded_dir/file.robot"), false)).isFalse();
+
+        assertThat(isApplicable(notConfiguredProjectProvider.getFile("file.robot"), true)).isFalse();
+        assertThat(isApplicable(notConfiguredProjectProvider.getFile("file.robot"), false)).isTrue();
     }
 
     @Test
@@ -146,6 +162,10 @@ public class RedXmlForNavigatorPropertyTesterTest {
 
         assertThat(isHidden(projectProvider.getFile("excluded_dir/file.robot"), true)).isFalse();
         assertThat(isHidden(projectProvider.getFile("excluded_dir/file.robot"), false)).isTrue();
+    }
+
+    private boolean isApplicable(final IResource element, final boolean expected) {
+        return tester.test(element, RedXmlForNavigatorPropertyTester.IS_APPLICABLE, null, expected);
     }
 
     private boolean isExcluded(final IResource element, final boolean expected) {

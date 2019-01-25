@@ -100,7 +100,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             validateRemoteLocation(monitor, location, config);
         }
         int index = 0;
-        for (final ReferencedLibrary library : model.getLibraries()) {
+        for (final ReferencedLibrary library : model.getReferencedLibraries()) {
             validateReferencedLibrary(monitor, library, index, config);
             index++;
         }

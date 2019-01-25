@@ -336,6 +336,7 @@ class PathsFormFragment implements ISectionFormFragment {
     private void whenPythonPathStructureChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED) final List<SearchPath> affectedPaths) {
         if (editorInput.getProjectConfiguration().getPythonPath() == affectedPaths) {
+            setInput();
             setDirty(true);
             pythonPathViewer.refresh();
             adjustColumnWidth(pythonPathViewer.getTable());
@@ -358,6 +359,7 @@ class PathsFormFragment implements ISectionFormFragment {
     private void whenClassPathStructureChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED) final List<SearchPath> affectedPaths) {
         if (editorInput.getProjectConfiguration().getClassPath() == affectedPaths) {
+            setInput();
             setDirty(true);
             classPathViewer.refresh();
             adjustColumnWidth(classPathViewer.getTable());
@@ -445,6 +447,7 @@ class PathsFormFragment implements ISectionFormFragment {
         }
     }
 
+    @FunctionalInterface
     private interface PathAdder {
 
         boolean addPath(SearchPath path);

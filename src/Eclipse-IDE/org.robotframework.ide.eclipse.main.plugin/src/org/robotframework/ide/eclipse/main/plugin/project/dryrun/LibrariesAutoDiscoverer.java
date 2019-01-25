@@ -208,7 +208,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         private List<RobotDryRunLibraryImport> getLibraryImportsToAdd(
                 final List<RobotDryRunLibraryImport> libraryImports) {
             final Set<String> existingLibraryNames = Streams
-                    .concat(config.getLibraries().stream().map(ReferencedLibrary::getName),
+                    .concat(config.getReferencedLibraries().stream().map(ReferencedLibrary::getName),
                             config.getRemoteLocations().stream().map(RemoteLocation::getRemoteName))
                     .collect(toSet());
 

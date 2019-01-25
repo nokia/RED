@@ -66,7 +66,7 @@ class LibraryAddChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        config.getLibraries().add(libraryToAdd);
+        config.getReferencedLibraries().add(libraryToAdd);
 
         final List<ReferencedLibrary> changedPaths = new ArrayList<>();
         changedPaths.add(libraryToAdd);

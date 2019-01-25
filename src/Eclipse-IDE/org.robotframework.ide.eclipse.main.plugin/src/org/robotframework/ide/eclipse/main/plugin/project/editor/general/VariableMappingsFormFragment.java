@@ -144,13 +144,12 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
             final VariableMappingDialog dialog = new VariableMappingDialog(viewer.getTable().getShell());
             if (dialog.open() == Window.OK) {
                 final VariableMapping mapping = dialog.getMapping();
-                @SuppressWarnings("unchecked")
-                final List<VariableMapping> mappings = (List<VariableMapping>) viewer.getInput();
-                if (!mappings.contains(mapping)) {
-                    editorInput.getProjectConfiguration().addVariableMapping(mapping);
+                final boolean wasAdded = editorInput.getProjectConfiguration().addVariableMapping(mapping);
+                if (wasAdded) {
+                    setInput();
                     setDirty(true);
+                    viewer.refresh();
                 }
-
                 return mapping;
             }
             return null;
@@ -219,6 +218,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenMappingsChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED) final List<VariableMapping> mappings) {
+        setInput();
         setDirty(true);
         viewer.refresh();
     }
