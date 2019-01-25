@@ -21,7 +21,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 import org.rf.ide.core.project.RobotProjectConfigWriter;
@@ -52,7 +52,7 @@ class RedXmlInFileChangesCollector {
         final RobotProjectConfig config = configWithLines.getConfigurationModel();
         final Function<FileRegion, FileRegion> regionMapper = r -> TextOperations.getAffectedRegion(r, redXmlFile);
 
-        final TextBasedChangesProcessor<ExcludedFolderPath> pathsProcessor = new TextBasedChangesProcessor<>(
+        final TextBasedChangesProcessor<ExcludedPath> pathsProcessor = new TextBasedChangesProcessor<>(
                 configWithLines, regionMapper);
         new ExcludedPathsChangesDetector(pathBeforeRefactoring, pathAfterRefactoring, config).detect(pathsProcessor);
 

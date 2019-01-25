@@ -28,7 +28,7 @@ import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ConfigVersion;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
@@ -104,17 +104,17 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             validateReferencedLibrary(monitor, library, index, config);
             index++;
         }
-        for (final SearchPath path : model.getPythonPath()) {
+        for (final SearchPath path : model.getPythonPaths()) {
             validateSearchPath(monitor, path, config);
         }
-        for (final SearchPath path : model.getClassPath()) {
+        for (final SearchPath path : model.getClassPaths()) {
             validateSearchPath(monitor, path, config);
         }
         for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
             validateReferencedVariableFile(monitor, variableFile, config);
         }
-        for (final ExcludedFolderPath excludedPath : model.getExcludedPath()) {
-            validateExcludedPath(monitor, excludedPath, model.getExcludedPath(), config);
+        for (final ExcludedPath excludedPath : model.getExcludedPaths()) {
+            validateExcludedPath(monitor, excludedPath, model.getExcludedPaths(), config);
         }
     }
 
@@ -263,8 +263,8 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateExcludedPath(final IProgressMonitor monitor, final ExcludedFolderPath excludedPath,
-            final List<ExcludedFolderPath> allExcluded, final RobotProjectConfigWithLines config) {
+    private void validateExcludedPath(final IProgressMonitor monitor, final ExcludedPath excludedPath,
+            final List<ExcludedPath> allExcluded, final RobotProjectConfigWithLines config) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -278,7 +278,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             reporter.handleProblem(problem, configFile, position);
         }
 
-        for (final ExcludedFolderPath otherPath : allExcluded) {
+        for (final ExcludedPath otherPath : allExcluded) {
             if (otherPath != excludedPath) {
                 final IPath otherAsPath = Path.fromPortableString(otherPath.getPath());
                 if (otherAsPath.isPrefixOf(asExcludedPath)) {

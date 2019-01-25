@@ -49,8 +49,8 @@ public class DeletePythonPathHandlerTest {
         handler.deleteSearchPaths(selectedPaths, input, eventBroker);
 
         verify(eventBroker, times(1)).send(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED,
-                config.getPythonPath());
-        assertThat(config.getPythonPath()).containsExactly(SearchPath.create("path1"), SearchPath.create("path3"));
+                config.getPythonPaths());
+        assertThat(config.getPythonPaths()).containsExactly(SearchPath.create("path1"), SearchPath.create("path3"));
     }
 
     @Test
@@ -74,6 +74,6 @@ public class DeletePythonPathHandlerTest {
         handler.deleteSearchPaths(selectedPaths, input, eventBroker);
 
         verifyZeroInteractions(eventBroker);
-        assertThat(config.getPythonPath()).containsExactly(SearchPath.create("path1"), SearchPath.create("path2"));
+        assertThat(config.getPythonPaths()).containsExactly(SearchPath.create("path1"), SearchPath.create("path2"));
     }
 }
