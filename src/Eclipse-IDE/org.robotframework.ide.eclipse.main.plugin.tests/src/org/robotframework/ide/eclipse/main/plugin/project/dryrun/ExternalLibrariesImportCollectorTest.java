@@ -124,7 +124,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void librariesImportedByNameAreCollected_whenNamesContainSpaces() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
@@ -270,7 +270,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void singleLibraryImportIsCollected_whenLibraryIsImportedByName() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
@@ -292,7 +292,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void singleLibraryImportWithMultipleImportersIsCollected_whenLibraryIsImportedByName() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite.robot",
@@ -327,7 +327,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void multipleLibraryImportsAreCollected_whenLibrariesAreImportedByName() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
@@ -354,7 +354,7 @@ public class ExternalLibrariesImportCollectorTest {
     public void multipleLibraryImportsWithMultipleImportersAreCollected_whenLibrariesAreImportedByName()
             throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString()),
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString()),
                 SearchPath.create(projectProvider.getProject().getLocation().toString())));
         projectProvider.configure(config);
 
@@ -853,7 +853,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void remoteLibraryImportIsCollected_togetherWithOtherImports() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
@@ -926,7 +926,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void multipleLibraryNamesAreCollected_whenUnknownLibrariesAreImportedByName() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
@@ -949,7 +949,7 @@ public class ExternalLibrariesImportCollectorTest {
     public void multipleLibraryNamesWithMultipleImportersAreCollected_whenUnknownLibrariesAreImportedByName()
             throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
@@ -1083,7 +1083,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void libraryImportsAreCollected_whenVariablesAreResolved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         config.setVariableMappings(newArrayList(VariableMapping.create("${known_path}", "libs"),
                 VariableMapping.create("${known_name}", "NameLib")));
         projectProvider.configure(config);
@@ -1114,7 +1114,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void libraryImportsAndUnknownLibraryNamesAreCollected_fromSuiteWithImportedResources() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
@@ -1161,7 +1161,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void libraryImportsAndUnknownLibraryNamesAreCollected_fromInitFile() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         projectProvider.createDir("init_without_suite");
@@ -1189,7 +1189,7 @@ public class ExternalLibrariesImportCollectorTest {
     @Test
     public void libraryImportsAndUnknownLibraryNamesAreCollected_fromSuiteWithInitFile() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         projectProvider.createDir("suite_with_init");

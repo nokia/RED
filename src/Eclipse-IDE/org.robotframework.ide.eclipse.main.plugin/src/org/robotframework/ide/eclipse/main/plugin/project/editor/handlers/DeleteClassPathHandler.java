@@ -28,7 +28,7 @@ public class DeleteClassPathHandler extends DIParameterizedHandler<E4DeleteClass
         @Execute
         public void deleteSearchPaths(@Named(value = Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
-            super.deleteSearchPaths(input.getProjectConfiguration().getClassPath(), selection, eventBroker,
+            super.deleteSearchPaths(input.getProjectConfiguration().getClassPaths(), selection, eventBroker,
                     RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED);
         }
     }

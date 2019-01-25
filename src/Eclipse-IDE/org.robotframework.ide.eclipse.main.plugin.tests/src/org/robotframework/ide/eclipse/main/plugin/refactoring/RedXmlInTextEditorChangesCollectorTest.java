@@ -23,7 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
@@ -136,12 +136,12 @@ public class RedXmlInTextEditorChangesCollectorTest {
 
         // no change in file yet
         final RedEclipseProjectConfigReader reader = new RedEclipseProjectConfigReader();
-        assertThat(reader.readConfiguration(redXmlFile).getExcludedPath()).containsOnly(ExcludedFolderPath.create("a"),
-                ExcludedFolderPath.create("a/b"), ExcludedFolderPath.create("c"));
+        assertThat(reader.readConfiguration(redXmlFile).getExcludedPaths()).containsOnly(ExcludedPath.create("a"),
+                ExcludedPath.create("a/b"), ExcludedPath.create("c"));
 
         // after saving the change should be written to the file
         editor.doSave(new NullProgressMonitor());
-        assertThat(reader.readConfiguration(redXmlFile).getExcludedPath()).containsOnly(ExcludedFolderPath.create("c"));
+        assertThat(reader.readConfiguration(redXmlFile).getExcludedPaths()).containsOnly(ExcludedPath.create("c"));
     }
 
     @Test
@@ -162,14 +162,13 @@ public class RedXmlInTextEditorChangesCollectorTest {
 
         // no change in file yet
         final RedEclipseProjectConfigReader reader = new RedEclipseProjectConfigReader();
-        assertThat(reader.readConfiguration(redXmlFile).getExcludedPath()).containsOnly(ExcludedFolderPath.create("a"),
-                ExcludedFolderPath.create("a/b"), ExcludedFolderPath.create("c"));
+        assertThat(reader.readConfiguration(redXmlFile).getExcludedPaths()).containsOnly(ExcludedPath.create("a"),
+                ExcludedPath.create("a/b"), ExcludedPath.create("c"));
 
         // after saving the change should be written to the file
         editor.doSave(new NullProgressMonitor());
-        assertThat(reader.readConfiguration(redXmlFile).getExcludedPath()).containsOnly(
-                ExcludedFolderPath.create("moved"), ExcludedFolderPath.create("moved/b"),
-                ExcludedFolderPath.create("c"));
+        assertThat(reader.readConfiguration(redXmlFile).getExcludedPaths()).containsOnly(ExcludedPath.create("moved"),
+                ExcludedPath.create("moved/b"), ExcludedPath.create("c"));
     }
 
     @Test

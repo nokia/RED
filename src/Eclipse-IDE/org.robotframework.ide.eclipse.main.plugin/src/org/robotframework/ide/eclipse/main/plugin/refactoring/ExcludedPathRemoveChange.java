@@ -18,7 +18,7 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 
@@ -33,20 +33,20 @@ class ExcludedPathRemoveChange extends Change {
 
     private final IFile redXmlFile;
 
-    private final ExcludedFolderPath excludedPathToRemove;
+    private final ExcludedPath excludedPathToRemove;
 
     private final RobotProjectConfig config;
 
     private final IEventBroker eventBroker;
 
     ExcludedPathRemoveChange(final IFile redXmlFile, final RobotProjectConfig config,
-            final ExcludedFolderPath excludedPathToRemove) {
+            final ExcludedPath excludedPathToRemove) {
         this(redXmlFile, config, excludedPathToRemove, PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting
     ExcludedPathRemoveChange(final IFile redXmlFile, final RobotProjectConfig config,
-            final ExcludedFolderPath excludedPathToRemove, final IEventBroker eventBroker) {
+            final ExcludedPath excludedPathToRemove, final IEventBroker eventBroker) {
         this.redXmlFile = redXmlFile;
         this.config = config;
         this.excludedPathToRemove = excludedPathToRemove;
@@ -70,8 +70,8 @@ class ExcludedPathRemoveChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        config.getExcludedPath().remove(excludedPathToRemove);
-        
+        config.getExcludedPaths().remove(excludedPathToRemove);
+
         final Collection<IPath> changedPaths = new ArrayList<>();
         final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
                 redXmlFile, changedPaths);

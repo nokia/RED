@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
@@ -138,12 +138,12 @@ public class RobotProjectConfigTest {
     public void pythonPathIsAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final List<SearchPath> paths = newArrayList(SearchPath.create("abc"), SearchPath.create("def"));
-        config.setPythonPath(paths);
+        config.setPythonPaths(paths);
 
         final boolean result = config.addPythonPath(SearchPath.create("ghi"));
 
         assertThat(result).isTrue();
-        assertThat(config.getPythonPath()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"),
+        assertThat(config.getPythonPaths()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"),
                 SearchPath.create("ghi"));
     }
 
@@ -151,48 +151,48 @@ public class RobotProjectConfigTest {
     public void pythonPathIsNotAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final List<SearchPath> paths = newArrayList(SearchPath.create("abc"), SearchPath.create("def"));
-        config.setPythonPath(paths);
+        config.setPythonPaths(paths);
 
         final boolean result = config.addPythonPath(SearchPath.create("def"));
 
         assertThat(result).isFalse();
-        assertThat(config.getPythonPath()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"));
+        assertThat(config.getPythonPaths()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"));
     }
 
     @Test
     public void pythonPathIsRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final List<SearchPath> paths = newArrayList(SearchPath.create("abc"), SearchPath.create("def"));
-        config.setPythonPath(paths);
+        config.setPythonPaths(paths);
 
-        final boolean result = config.removePythonPath(newArrayList(SearchPath.create("def")));
+        final boolean result = config.removePythonPaths(newArrayList(SearchPath.create("def")));
 
         assertThat(result).isTrue();
-        assertThat(config.getPythonPath()).containsExactly(SearchPath.create("abc"));
+        assertThat(config.getPythonPaths()).containsExactly(SearchPath.create("abc"));
     }
 
     @Test
     public void pythonPathIsNotRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final List<SearchPath> paths = newArrayList(SearchPath.create("abc"), SearchPath.create("def"));
-        config.setPythonPath(paths);
+        config.setPythonPaths(paths);
 
-        final boolean result = config.removePythonPath(newArrayList(SearchPath.create("ghi")));
+        final boolean result = config.removePythonPaths(newArrayList(SearchPath.create("ghi")));
 
         assertThat(result).isFalse();
-        assertThat(config.getPythonPath()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"));
+        assertThat(config.getPythonPaths()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"));
     }
 
     @Test
     public void classPathIsAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final List<SearchPath> paths = newArrayList(SearchPath.create("abc"), SearchPath.create("def"));
-        config.setClassPath(paths);
+        config.setClassPaths(paths);
 
         final boolean result = config.addClassPath(SearchPath.create("ghi"));
 
         assertThat(result).isTrue();
-        assertThat(config.getClassPath()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"),
+        assertThat(config.getClassPaths()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"),
                 SearchPath.create("ghi"));
     }
 
@@ -200,36 +200,36 @@ public class RobotProjectConfigTest {
     public void classPathIsNotAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final List<SearchPath> paths = newArrayList(SearchPath.create("abc"), SearchPath.create("def"));
-        config.setClassPath(paths);
+        config.setClassPaths(paths);
 
         final boolean result = config.addClassPath(SearchPath.create("def"));
 
         assertThat(result).isFalse();
-        assertThat(config.getClassPath()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"));
+        assertThat(config.getClassPaths()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"));
     }
 
     @Test
     public void classPathIsRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final List<SearchPath> paths = newArrayList(SearchPath.create("abc"), SearchPath.create("def"));
-        config.setClassPath(paths);
+        config.setClassPaths(paths);
 
-        final boolean result = config.removeClassPath(newArrayList(SearchPath.create("def")));
+        final boolean result = config.removeClassPaths(newArrayList(SearchPath.create("def")));
 
         assertThat(result).isTrue();
-        assertThat(config.getClassPath()).containsExactly(SearchPath.create("abc"));
+        assertThat(config.getClassPaths()).containsExactly(SearchPath.create("abc"));
     }
 
     @Test
     public void classPathIsNotRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final List<SearchPath> paths = newArrayList(SearchPath.create("abc"), SearchPath.create("def"));
-        config.setClassPath(paths);
+        config.setClassPaths(paths);
 
-        final boolean result = config.removeClassPath(newArrayList(SearchPath.create("ghi")));
+        final boolean result = config.removeClassPaths(newArrayList(SearchPath.create("ghi")));
 
         assertThat(result).isFalse();
-        assertThat(config.getClassPath()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"));
+        assertThat(config.getClassPaths()).containsExactly(SearchPath.create("abc"), SearchPath.create("def"));
     }
 
     @Test
@@ -349,64 +349,64 @@ public class RobotProjectConfigTest {
     @Test
     public void excludedPathIsAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedFolderPath> paths = newArrayList(ExcludedFolderPath.create("abc"),
-                ExcludedFolderPath.create("def"));
-        config.setExcludedPath(paths);
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
+                ExcludedPath.create("def"));
+        config.setExcludedPaths(paths);
 
         final boolean result = config.addExcludedPath("ghi");
 
         assertThat(result).isTrue();
-        assertThat(config.getExcludedPath()).containsExactly(ExcludedFolderPath.create("abc"),
-                ExcludedFolderPath.create("def"), ExcludedFolderPath.create("ghi"));
+        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"),
+                ExcludedPath.create("def"), ExcludedPath.create("ghi"));
     }
 
     @Test
     public void excludedPathIsNotAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedFolderPath> paths = newArrayList(ExcludedFolderPath.create("abc"),
-                ExcludedFolderPath.create("def"));
-        config.setExcludedPath(paths);
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
+                ExcludedPath.create("def"));
+        config.setExcludedPaths(paths);
 
         final boolean result = config.addExcludedPath("def");
 
         assertThat(result).isFalse();
-        assertThat(config.getExcludedPath()).containsExactly(ExcludedFolderPath.create("abc"),
-                ExcludedFolderPath.create("def"));
+        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"),
+                ExcludedPath.create("def"));
     }
 
     @Test
     public void excludedPathIsRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedFolderPath> paths = newArrayList(ExcludedFolderPath.create("abc"),
-                ExcludedFolderPath.create("def"));
-        config.setExcludedPath(paths);
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
+                ExcludedPath.create("def"));
+        config.setExcludedPaths(paths);
 
         final boolean result = config.removeExcludedPath("def");
 
         assertThat(result).isTrue();
-        assertThat(config.getExcludedPath()).containsExactly(ExcludedFolderPath.create("abc"));
+        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"));
     }
 
     @Test
     public void excludedPathIsNotRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedFolderPath> paths = newArrayList(ExcludedFolderPath.create("abc"),
-                ExcludedFolderPath.create("def"));
-        config.setExcludedPath(paths);
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
+                ExcludedPath.create("def"));
+        config.setExcludedPaths(paths);
 
         final boolean result = config.removeExcludedPath("ghi");
 
         assertThat(result).isFalse();
-        assertThat(config.getExcludedPath()).containsExactly(ExcludedFolderPath.create("abc"),
-                ExcludedFolderPath.create("def"));
+        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"),
+                ExcludedPath.create("def"));
     }
 
     @Test
     public void excludedPathIsChecked() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedFolderPath> paths = newArrayList(ExcludedFolderPath.create("abc"),
-                ExcludedFolderPath.create("def"));
-        config.setExcludedPath(paths);
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
+                ExcludedPath.create("def"));
+        config.setExcludedPaths(paths);
 
         assertThat(config.isExcludedPath("abc")).isTrue();
         assertThat(config.isExcludedPath("ghi")).isFalse();

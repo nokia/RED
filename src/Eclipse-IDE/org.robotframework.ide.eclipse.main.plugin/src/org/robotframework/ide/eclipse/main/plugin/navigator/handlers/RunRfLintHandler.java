@@ -27,7 +27,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.rflint.RfLintClientEventsListener;
 import org.rf.ide.core.rflint.RfLintIntegrationServer;
 import org.rf.ide.core.rflint.RfLintRule;
@@ -115,9 +115,9 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
                 final RfLintIntegrationServer server, final RedPreferences preferences) {
             final File projectLocation = robotProject.getProject().getLocation().toFile();
             final List<String> excludedPaths = robotProject.getRobotProjectConfig()
-                    .getExcludedPath()
+                    .getExcludedPaths()
                     .stream()
-                    .map(ExcludedFolderPath::getPath)
+                    .map(ExcludedPath::getPath)
                     .collect(toList());
             final File filepath = resource.getLocation().toFile();
             final List<RfLintRule> rules = preferences.getRfLintRules();
