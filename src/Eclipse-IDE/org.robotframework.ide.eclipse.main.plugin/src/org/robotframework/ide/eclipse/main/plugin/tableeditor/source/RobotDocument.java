@@ -109,6 +109,7 @@ public class RobotDocument extends Document {
             final RobotSuiteFile suiteFile = fileModelSupplier.get();
             parser = suiteFile.createRobotParser(RobotParserConfig::allImportsLazy);
             file = suiteFile.getRobotParserFile();
+            reparse();
         }
     }
 
