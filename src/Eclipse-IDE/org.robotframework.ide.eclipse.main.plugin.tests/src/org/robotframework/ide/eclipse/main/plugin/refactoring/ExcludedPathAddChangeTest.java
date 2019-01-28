@@ -18,7 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.red.junit.ProjectProvider;
@@ -36,7 +36,7 @@ public class ExcludedPathAddChangeTest {
     @Test
     public void checkChangeName() {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final ExcludedFolderPath excludedPathToAdd = ExcludedFolderPath.create("a/b/c");
+        final ExcludedPath excludedPathToAdd = ExcludedPath.create("a/b/c");
 
         final ExcludedPathAddChange change = new ExcludedPathAddChange(projectProvider.getFile("red.xml"),
                 config, excludedPathToAdd);
@@ -48,7 +48,7 @@ public class ExcludedPathAddChangeTest {
     @Test
     public void excludedPathIsAdded_whenChangeIsPerformed() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final ExcludedFolderPath excludedPathToAdd = ExcludedFolderPath.create("a/b/c");
+        final ExcludedPath excludedPathToAdd = ExcludedPath.create("a/b/c");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final ExcludedPathAddChange change = new ExcludedPathAddChange(projectProvider.getFile("red.xml"),
@@ -59,12 +59,12 @@ public class ExcludedPathAddChangeTest {
         final Change undoOperation = change.perform(null);
 
         assertThat(undoOperation).isInstanceOf(ExcludedPathRemoveChange.class);
-        assertThat(config.getExcludedPath()).contains(ExcludedFolderPath.create("a/b/c"));
+        assertThat(config.getExcludedPaths()).contains(ExcludedPath.create("a/b/c"));
         verify(eventBroker, times(1)).send(
                 eq(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);
-        assertThat(config.getExcludedPath()).isEmpty();
+        assertThat(config.getExcludedPaths()).isEmpty();
     }
 }

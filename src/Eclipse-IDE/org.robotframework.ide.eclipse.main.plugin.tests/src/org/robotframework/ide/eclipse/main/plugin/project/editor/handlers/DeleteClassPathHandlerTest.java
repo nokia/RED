@@ -28,7 +28,7 @@ public class DeleteClassPathHandlerTest {
     @Test
     public void whenSomePathsShouldBeRemoved_theyAreAndEventBrokerNotifiesAboutIt() {
         final E4DeleteClassPathHandler handler = new E4DeleteClassPathHandler();
-        
+
         final SearchPath path1 = SearchPath.create("path1");
         final SearchPath path2 = SearchPath.create("path2");
         final SearchPath path3 = SearchPath.create("path3");
@@ -49,8 +49,8 @@ public class DeleteClassPathHandlerTest {
         handler.deleteSearchPaths(selectedPaths, input, eventBroker);
 
         verify(eventBroker, times(1)).send(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED,
-                config.getClassPath());
-        assertThat(config.getClassPath()).containsExactly(SearchPath.create("path1"), SearchPath.create("path3"));
+                config.getClassPaths());
+        assertThat(config.getClassPaths()).containsExactly(SearchPath.create("path1"), SearchPath.create("path3"));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class DeleteClassPathHandlerTest {
         handler.deleteSearchPaths(selectedPaths, input, eventBroker);
 
         verifyZeroInteractions(eventBroker);
-        assertThat(config.getClassPath()).containsExactly(SearchPath.create("path1"), SearchPath.create("path2"));
+        assertThat(config.getClassPaths()).containsExactly(SearchPath.create("path1"), SearchPath.create("path2"));
     }
 
 }

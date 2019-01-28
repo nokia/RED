@@ -248,8 +248,8 @@ class PathsFormFragment implements ISectionFormFragment {
 
     private void setInput() {
         final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
-        pythonPathViewer.setInput(configuration.getPythonPath());
-        classPathViewer.setInput(configuration.getClassPath());
+        pythonPathViewer.setInput(configuration.getPythonPaths());
+        classPathViewer.setInput(configuration.getClassPaths());
 
         final int indexToSelect = newArrayList(relativityCombo.getItems())
                 .indexOf(configuration.getRelativityPoint().getRelativeTo().toString());
@@ -326,7 +326,7 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenPythonPathChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_CHANGED) final SearchPath newPath) {
-        if (editorInput.getProjectConfiguration().getPythonPath().contains(newPath)) {
+        if (editorInput.getProjectConfiguration().getPythonPaths().contains(newPath)) {
             setDirty(true);
             pythonPathViewer.refresh();
             adjustColumnWidth(pythonPathViewer.getTable());
@@ -337,7 +337,7 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenPythonPathStructureChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED) final List<SearchPath> affectedPaths) {
-        if (editorInput.getProjectConfiguration().getPythonPath() == affectedPaths) {
+        if (editorInput.getProjectConfiguration().getPythonPaths() == affectedPaths) {
             setInput();
             setDirty(true);
             pythonPathViewer.refresh();
@@ -349,7 +349,7 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenClassPathChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_CHANGED) final SearchPath newPath) {
-        if (editorInput.getProjectConfiguration().getClassPath().contains(newPath)) {
+        if (editorInput.getProjectConfiguration().getClassPaths().contains(newPath)) {
             setDirty(true);
             classPathViewer.refresh();
             adjustColumnWidth(classPathViewer.getTable());
@@ -360,7 +360,7 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenClassPathStructureChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED) final List<SearchPath> affectedPaths) {
-        if (editorInput.getProjectConfiguration().getClassPath() == affectedPaths) {
+        if (editorInput.getProjectConfiguration().getClassPaths() == affectedPaths) {
             setInput();
             setDirty(true);
             classPathViewer.refresh();

@@ -18,7 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.red.junit.ProjectProvider;
@@ -35,8 +35,8 @@ public class ExcludedPathModifyChangeTest {
 
     @Test
     public void checkChangeName() {
-        final ExcludedFolderPath excludedPathToModify = ExcludedFolderPath.create("a/b/c");
-        final ExcludedFolderPath modifiedPath = ExcludedFolderPath.create("d/e/f/b/c");
+        final ExcludedPath excludedPathToModify = ExcludedPath.create("a/b/c");
+        final ExcludedPath modifiedPath = ExcludedPath.create("d/e/f/b/c");
 
         final ExcludedPathModifyChange change = new ExcludedPathModifyChange(projectProvider.getFile("red.xml"),
                 excludedPathToModify, modifiedPath);
@@ -50,8 +50,8 @@ public class ExcludedPathModifyChangeTest {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("a/b/c");
 
-        final ExcludedFolderPath excludedPathToModify = config.getExcludedPath().get(0);
-        final ExcludedFolderPath modifiedPath = ExcludedFolderPath.create("d/e/f/b/c");
+        final ExcludedPath excludedPathToModify = config.getExcludedPaths().get(0);
+        final ExcludedPath modifiedPath = ExcludedPath.create("d/e/f/b/c");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final ExcludedPathModifyChange change = new ExcludedPathModifyChange(projectProvider.getFile("red.xml"),
@@ -62,12 +62,12 @@ public class ExcludedPathModifyChangeTest {
         final Change undoOperation = change.perform(null);
 
         assertThat(undoOperation).isInstanceOf(ExcludedPathModifyChange.class);
-        assertThat(config.getExcludedPath()).contains(ExcludedFolderPath.create("d/e/f/b/c"));
+        assertThat(config.getExcludedPaths()).contains(ExcludedPath.create("d/e/f/b/c"));
         verify(eventBroker, times(1)).send(
                 eq(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);
-        assertThat(config.getExcludedPath()).contains(ExcludedFolderPath.create("a/b/c"));
+        assertThat(config.getExcludedPaths()).contains(ExcludedPath.create("a/b/c"));
     }
 }

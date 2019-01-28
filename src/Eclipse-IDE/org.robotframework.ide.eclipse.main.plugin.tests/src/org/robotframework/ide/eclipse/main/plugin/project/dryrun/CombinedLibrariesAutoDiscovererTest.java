@@ -347,7 +347,7 @@ public class CombinedLibrariesAutoDiscovererTest {
     @Test
     public void libsAreAddedToProjectConfig_whenQualifiedNamesAreUsed() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
@@ -531,7 +531,7 @@ public class CombinedLibrariesAutoDiscovererTest {
     @Test
     public void dryRunDiscoveringIsNotRun_whenAllLibrariesImportedByNameAreDiscovered() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",

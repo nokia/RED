@@ -17,14 +17,14 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 
 public class ExcludedPathsChangesDetectorTest {
 
     @Test
     public void excludedPathIsReportedForDeletion_whenPathIsEmptyAfterRefactoringAndIsChildOfPathBefore() {
         @SuppressWarnings("unchecked")
-        final RedXmlChangesProcessor<ExcludedFolderPath> processor = mock(RedXmlChangesProcessor.class);
+        final RedXmlChangesProcessor<ExcludedPath> processor = mock(RedXmlChangesProcessor.class);
 
         final IPath beforeRefactorPath = Path.fromPortableString("project/resource");
 
@@ -40,16 +40,16 @@ public class ExcludedPathsChangesDetectorTest {
                 Optional.empty(), config);
         detector.detect(processor);
 
-        verify(processor).pathRemoved(same(config), same(config.getExcludedPath().get(1)));
-        verify(processor).pathRemoved(same(config), same(config.getExcludedPath().get(2)));
-        verify(processor).pathRemoved(same(config), same(config.getExcludedPath().get(3)));
+        verify(processor).pathRemoved(same(config), same(config.getExcludedPaths().get(1)));
+        verify(processor).pathRemoved(same(config), same(config.getExcludedPaths().get(2)));
+        verify(processor).pathRemoved(same(config), same(config.getExcludedPaths().get(3)));
         verifyNoMoreInteractions(processor);
     }
 
     @Test
     public void excludedPathIsReportedForModification_whenThereIsAPathAfterRefactoringAndHasCommonPartWitPathBefore() {
         @SuppressWarnings("unchecked")
-        final RedXmlChangesProcessor<ExcludedFolderPath> processor = mock(RedXmlChangesProcessor.class);
+        final RedXmlChangesProcessor<ExcludedPath> processor = mock(RedXmlChangesProcessor.class);
 
         final IPath beforeRefactorPath = Path.fromPortableString("project/resource");
 
@@ -65,12 +65,12 @@ public class ExcludedPathsChangesDetectorTest {
                 Optional.of(Path.fromPortableString("project/different_res")), config);
         detector.detect(processor);
 
-        verify(processor).pathModified(same(config.getExcludedPath().get(1)),
-                eq(ExcludedFolderPath.create("different_res")));
-        verify(processor).pathModified(same(config.getExcludedPath().get(2)),
-                eq(ExcludedFolderPath.create("different_res/a")));
-        verify(processor).pathModified(same(config.getExcludedPath().get(3)),
-                eq(ExcludedFolderPath.create("different_res/b")));
+        verify(processor).pathModified(same(config.getExcludedPaths().get(1)),
+                eq(ExcludedPath.create("different_res")));
+        verify(processor).pathModified(same(config.getExcludedPaths().get(2)),
+                eq(ExcludedPath.create("different_res/a")));
+        verify(processor).pathModified(same(config.getExcludedPaths().get(3)),
+                eq(ExcludedPath.create("different_res/b")));
         verifyNoMoreInteractions(processor);
     }
 }

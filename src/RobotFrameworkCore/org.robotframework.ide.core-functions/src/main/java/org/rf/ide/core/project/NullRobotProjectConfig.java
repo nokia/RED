@@ -89,12 +89,12 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
-    public void setPythonPath(final List<SearchPath> pythonPaths) {
+    public void setPythonPaths(final List<SearchPath> pythonPaths) {
         // nothing to do
     }
 
     @Override
-    public List<SearchPath> getPythonPath() {
+    public List<SearchPath> getPythonPaths() {
         return new ArrayList<>();
     }
 
@@ -104,17 +104,17 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
-    public boolean removePythonPath(final List<SearchPath> paths) {
+    public boolean removePythonPaths(final List<SearchPath> paths) {
         return false;
     }
 
     @Override
-    public void setClassPath(final List<SearchPath> classPaths) {
+    public void setClassPaths(final List<SearchPath> classPaths) {
         // nothing to do
     }
 
     @Override
-    public List<SearchPath> getClassPath() {
+    public List<SearchPath> getClassPaths() {
         return new ArrayList<>();
     }
 
@@ -124,7 +124,7 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
-    public boolean removeClassPath(final List<SearchPath> paths) {
+    public boolean removeClassPaths(final List<SearchPath> paths) {
         return false;
     }
 
@@ -169,12 +169,12 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
-    public void setExcludedPath(final List<ExcludedFolderPath> excludedPaths) {
+    public void setExcludedPaths(final List<ExcludedPath> excludedPaths) {
         // nothing to do
     }
 
     @Override
-    public List<ExcludedFolderPath> getExcludedPath() {
+    public List<ExcludedPath> getExcludedPaths() {
         return new ArrayList<>();
     }
 
@@ -194,7 +194,7 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
-    public ExcludedFolderPath getExcludedPath(final String path) {
+    public ExcludedPath getExcludedPath(final String path) {
         return null;
     }
 

@@ -173,14 +173,14 @@ public class GeneralSettingsResourcesImportValidatorTest {
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(tmpFile.getParent()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
+        robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         validateResourceImport("external_nested.robot");
         assertThat(reporter.getReportedProblems())
                 .contains(new Problem(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
                         new ProblemPosition(2, Range.closed(27, 48))));
 
-        robotProject.getRobotProjectConfig().setPythonPath(null);
+        robotProject.getRobotProjectConfig().setPythonPaths(null);
     }
 
     @Test
@@ -411,7 +411,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getLocation().toString()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
+        robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         validateResourceImport("res.robot");
         assertThat(reporter.getReportedProblems())
@@ -429,7 +429,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
         projectHolder.setModuleSearchPaths(new ArrayList<File>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
+        robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         validateResourceImport("external_nested.robot");
         assertThat(reporter.getReportedProblems())
@@ -486,7 +486,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
+        robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         validateResourceImport("external_nested.robot");
         assertThat(reporter.getReportedProblems())

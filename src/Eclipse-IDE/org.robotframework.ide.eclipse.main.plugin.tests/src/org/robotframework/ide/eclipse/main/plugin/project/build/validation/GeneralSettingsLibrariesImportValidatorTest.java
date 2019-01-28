@@ -603,14 +603,14 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(tmpFile.getParent()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
+        robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         validateLibraryImport("external_nested_lib.py");
         assertThat(reporter.getReportedProblems())
                 .contains(new Problem(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
                         new ProblemPosition(2, Range.closed(26, 48))));
 
-        robotProject.getRobotProjectConfig().setPythonPath(null);
+        robotProject.getRobotProjectConfig().setPythonPaths(null);
     }
 
     @Test
@@ -1148,7 +1148,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getLocation().toString()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
+        robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", libPath);
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
@@ -1171,7 +1171,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
+        robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib",
                 dir.getAbsolutePath());
@@ -1198,7 +1198,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
         final List<SearchPath> paths = newArrayList(SearchPath.create(dir.getAbsolutePath()));
-        robotProject.getRobotProjectConfig().setPythonPath(paths);
+        robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", libPath);
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);

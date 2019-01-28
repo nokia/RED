@@ -395,7 +395,7 @@ public class RobotProject extends RobotContainer {
             final RobotProjectConfig configuration = getRobotProjectConfig();
             final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer();
             final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(getProject(), configuration);
-            return configuration.getPythonPath()
+            return configuration.getPythonPaths()
                     .stream()
                     .map(SearchPath::getLocation)
                     .map(variableReplacer::replaceKnownEnvironmentVariables)

@@ -57,7 +57,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
@@ -271,11 +271,11 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     private void addMissingEntriesToTree(final ProjectTreeElement wrappedRoot,
             final Collection<ProjectTreeElement> allElements) {
         final Set<ProjectTreeElement> excludedShownInTree = getExcludedElementsInTheTree(allElements);
-        final List<ExcludedFolderPath> allExcluded = editorInput.getProjectConfiguration().getExcludedPath();
-        final List<ExcludedFolderPath> excludedNotShownInTree = getExcludedNotShownInTheTree(allExcluded,
+        final List<ExcludedPath> allExcluded = editorInput.getProjectConfiguration().getExcludedPaths();
+        final List<ExcludedPath> excludedNotShownInTree = getExcludedNotShownInTheTree(allExcluded,
                 excludedShownInTree);
 
-        for (final ExcludedFolderPath excludedNotShown : excludedNotShownInTree) {
+        for (final ExcludedPath excludedNotShown : excludedNotShownInTree) {
             wrappedRoot.createVirtualNodeFor(Path.fromPortableString(excludedNotShown.getPath()));
         }
     }
@@ -284,11 +284,11 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         return allElements.stream().filter(ProjectTreeElement::isExcluded).collect(Collectors.toSet());
     }
 
-    private List<ExcludedFolderPath> getExcludedNotShownInTheTree(final List<ExcludedFolderPath> allExcluded,
+    private List<ExcludedPath> getExcludedNotShownInTheTree(final List<ExcludedPath> allExcluded,
             final Set<ProjectTreeElement> excludedShownInTree) {
-        final List<ExcludedFolderPath> paths = newArrayList();
+        final List<ExcludedPath> paths = newArrayList();
 
-        for (final ExcludedFolderPath excludedPath : allExcluded) {
+        for (final ExcludedPath excludedPath : allExcluded) {
             boolean isInTree = false;
             for (final ProjectTreeElement element : excludedShownInTree) {
                 if (element.getPath().equals(Path.fromPortableString(excludedPath.getPath()))) {

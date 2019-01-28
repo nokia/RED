@@ -94,18 +94,18 @@ public class RedEclipseProjectConfig {
     }
 
     public EnvironmentSearchPaths createAdditionalEnvironmentSearchPaths() {
-        return new EnvironmentSearchPaths(getResolvedPaths(config.getClassPath()),
-                getResolvedPaths(config.getPythonPath()));
+        return new EnvironmentSearchPaths(getResolvedPaths(config.getClassPaths()),
+                getResolvedPaths(config.getPythonPaths()));
     }
 
     public EnvironmentSearchPaths createExecutionEnvironmentSearchPaths() {
         final List<String> classPaths = new ArrayList<>();
         classPaths.add(".");
         classPaths.addAll(getReferenceLibPaths(LibraryType.JAVA));
-        classPaths.addAll(getResolvedPaths(config.getClassPath()));
+        classPaths.addAll(getResolvedPaths(config.getClassPaths()));
         final List<String> pythonPaths = new ArrayList<>();
         pythonPaths.addAll(getReferenceLibPaths(LibraryType.PYTHON));
-        pythonPaths.addAll(getResolvedPaths(config.getPythonPath()));
+        pythonPaths.addAll(getResolvedPaths(config.getPythonPaths()));
         return new EnvironmentSearchPaths(classPaths, pythonPaths);
     }
 
