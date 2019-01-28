@@ -56,16 +56,17 @@ class SuiteSourceEditorFoldingSupport {
     private final RedPreferences preferences;
 
     private final StyledTextWrapper textControl;
+
     private final ProjectionAnnotationModel annotationsModel;
 
     private Map<Position, Annotation> oldFoldingAnnotations;
 
-    @VisibleForTesting
     SuiteSourceEditorFoldingSupport(final StyledTextWrapper textControl,
             final ProjectionAnnotationModel annotationsModel) {
         this(RedPlugin.getDefault().getPreferences(), textControl, annotationsModel);
     }
 
+    @VisibleForTesting
     SuiteSourceEditorFoldingSupport(final RedPreferences preferences, final StyledTextWrapper textControl,
             final ProjectionAnnotationModel annotationsModel) {
         this.preferences = preferences;
@@ -74,24 +75,27 @@ class SuiteSourceEditorFoldingSupport {
         this.oldFoldingAnnotations = new HashMap<>();
     }
 
-    public void reset() {
+    void reset() {
         if (annotationsModel != null) {
-            final Iterator<Annotation> annotationIterator = annotationsModel.getAnnotationIterator();
-            while (annotationIterator.hasNext()) {
-                final Annotation next = annotationIterator.next();
-                if (next instanceof ProjectionAnnotation) {
-                    annotationsModel.removeAnnotation(next);
-                }
+            synchronized (annotationsModel) {
+                resetFoldingStructure();
             }
+            oldFoldingAnnotations.clear();
         }
-        oldFoldingAnnotations.clear();
     }
 
     void updateFoldingStructure(final RobotSuiteFile model, final IDocument document) {
-        final Collection<Position> positions = calculateFoldingPositions(model, document);
-        SwtThread.asyncExec(() -> updateFoldingStructure(positions));
+        if (annotationsModel != null) {
+            final Collection<Position> positions = calculateFoldingPositions(model, document);
+            SwtThread.asyncExec(() -> {
+                synchronized (annotationsModel) {
+                    updateFoldingStructure(positions);
+                }
+            });
+        }
     }
 
+    @VisibleForTesting
     Collection<Position> calculateFoldingPositions(final RobotSuiteFile model, final IDocument document) {
         final Collection<Position> positions = new HashSet<>();
 
@@ -281,12 +285,18 @@ class SuiteSourceEditorFoldingSupport {
         };
     }
 
+    private void resetFoldingStructure() {
+        final Iterator<Annotation> annotationIterator = annotationsModel.getAnnotationIterator();
+        while (annotationIterator.hasNext()) {
+            final Annotation next = annotationIterator.next();
+            if (next instanceof ProjectionAnnotation) {
+                annotationsModel.removeAnnotation(next);
+            }
+        }
+    }
+
     @VisibleForTesting
     void updateFoldingStructure(final Collection<Position> positions) {
-        if (annotationsModel == null) {
-            return;
-        }
-
         final List<Annotation> annotationsToRemove = new ArrayList<>();
         final HashMap<ProjectionAnnotation, Position> annotationsToAdd = new HashMap<>();
         final List<Annotation> annotationsToChange = new ArrayList<>();
