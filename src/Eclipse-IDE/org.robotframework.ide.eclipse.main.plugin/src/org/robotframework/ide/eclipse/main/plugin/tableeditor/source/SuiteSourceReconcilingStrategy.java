@@ -28,14 +28,6 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         this.editor = editor;
     }
 
-    private RobotSuiteFile getSuiteModel() {
-        return editor.getFileModel();
-    }
-
-    private SuiteSourceEditorFoldingSupport getFoldingSupport() {
-        return editor.getFoldingSupport();
-    }
-
     @Override
     public void setProgressMonitor(final IProgressMonitor monitor) {
         // we don't need monitor
@@ -48,10 +40,10 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
 
     @Override
     public void initialReconcile() {
-        reparseModel(); // to make sure the model is in sync with this, which is hold reparsed by document
-
+        final RobotSuiteFile suiteModel = editor.getFileModel();
+        reparseModel(suiteModel);
         getFoldingSupport().reset();
-        getFoldingSupport().updateFoldingStructure(getSuiteModel(), document);
+        getFoldingSupport().updateFoldingStructure(suiteModel, document);
     }
 
     @Override
@@ -65,16 +57,16 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     }
 
     private void reconcile() {
-        reparseModel();
-        getFoldingSupport().updateFoldingStructure(getSuiteModel(), document);
-        RobotArtifactsValidator.revalidate(getSuiteModel());
+        final RobotSuiteFile suiteModel = editor.getFileModel();
+        reparseModel(suiteModel);
+        getFoldingSupport().updateFoldingStructure(suiteModel, document);
+        RobotArtifactsValidator.revalidate(suiteModel);
     }
 
-    private void reparseModel() {
+    private void reparseModel(final RobotSuiteFile suiteModel) {
+        // to make sure the model is in sync with this, which is hold reparsed by document
         try {
             final RobotFileOutput fileOutput = document.getNewestFileOutput();
-            final RobotSuiteFile suiteModel = getSuiteModel();
-            suiteModel.dispose();
             suiteModel.link(fileOutput);
 
             final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
@@ -82,5 +74,19 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         } catch (final InterruptedException e) {
             // ok so the model will be reparsed later
         }
+    }
+
+    private SuiteSourceEditorFoldingSupport getFoldingSupport() {
+        // to make sure folding support is initialized
+        SuiteSourceEditorFoldingSupport foldingSupport = editor.getFoldingSupport();
+        while (foldingSupport == null) {
+            foldingSupport = editor.getFoldingSupport();
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException e) {
+                // retry
+            }
+        }
+        return foldingSupport;
     }
 }
