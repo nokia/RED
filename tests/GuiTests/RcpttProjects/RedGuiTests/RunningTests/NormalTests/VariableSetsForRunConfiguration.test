@@ -1,0 +1,280 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Kh1akCMLEemEjfjIU9tmyw,_d8aMACuvEeW667Afdo4DcA
+Element-Name: VariableSetsForRunConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _ENrfcCMMEemEjfjIU9tmyw
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 1/28/19 5:30 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//check if button is on toolbar
+with [get-button "Modify string variables"] {
+    get-property enablement | equals true | verify-true
+    get-property tooltip | equals "Modify string variables" | verify-true
+}
+
+//open prefernce and go to robot pref
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Launching/Active String Substitution sets"
+
+//check if no set is set
+with [get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "...add new variables set" | verify-true
+}
+
+//click on link to go to add variable
+get-window Preferences 
+    | get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables." 
+    | click-link
+
+//check tah no var is in window    
+with [get-window Preferences] {
+    get-tree | get-item -path "Run\\/Debug/String Substitution" | get-property selected | equals true | verify-true
+    get-table | get-property itemCount | equals 0 | verify-true
+}
+
+//add new vars
+with [get-window Preferences] {
+    get-button "New..." | click
+    with [get-window "New String Substitution Variable"] {
+        get-editbox -after [get-label "Name:"] | set-text path
+        get-editbox -after [get-label "Value:"] | set-text [concat $RED_workspace_path "/Sets/vars/var.py"]
+        get-editbox -after [get-label "Description:"] | set-text "This is path for variabes"
+        get-button OK | click
+    }
+    //addd var with space
+    get-button "New..." | click
+    with [get-window "New String Substitution Variable"] {
+        get-editbox -after [get-label "Name:"] | set-text "var 1"
+        get-editbox -after [get-label "Value:"] | set-text 55
+        get-editbox -after [get-label "Description:"] | set-text "var with space"
+        get-button OK | click
+    }
+    get-button "Apply and Close" | click
+}
+
+// preference must be close to be updated in robot preference
+
+// add new set
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Launching/Active String Substitution sets"
+    get-tree 
+        -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+        | get-item "...add new variables set" | double-click
+}
+with [get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+    get-property "columns[0].caption" | equals Variable | verify-true
+    get-property "columns[1].caption" | equals Value | verify-true
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals path | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "...add new variables set" | verify-true
+    get-item -path "set/path" | get-property "columns[0]" | equals path | verify-true
+    get-item -path "set/path" | get-property "columns[1]" | equals [concat $RED_workspace_path "/Sets/vars/var.py"] | verify-true
+    get-item -path "set/var 1" | get-property "columns[0]" | equals "var 1" | verify-true
+    get-item -path "set/var 1" | get-property "columns[1]" | equals 55 | verify-true
+}
+get-window Preferences | get-button "Apply and Close" | click
+
+
+//run test to add run config
+get-view "Project Explorer" | get-tree | select "Sets/test.robot" | get-menu -path "Run As/1 Robot Test" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Sets.Test.test\n"
+    + ".* : FAIL : Variable '\$\{x\}' not found.\n"
+    + "Ending test: Sets.Test.test" | verify-true
+    
+//add vars from substruction    
+get-menu -path "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-group Arguments | get-button "Variables..." | click
+    with [get-window "Select Variable"] {
+        get-table | select path
+        get-button OK | click
+    }
+    get-group Arguments | get-button "Variables..." | click
+    with [get-window "Select Variable"] {
+        get-table | select "var 1"
+        get-button OK | click
+    }
+}
+//check if were added
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text | equals "${path}${var 1}" 
+    | verify-true
+    
+//add -V switch    
+with [get-window "Run Configurations"] {
+    with [get-group Arguments | get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
+        set-text "${path}"
+        key-type Left -times 13
+        set-text "-V ${path}"
+    }
+    get-button Apply | click
+    get-button Close | click
+}
+
+// go to preference and add new set 1 - change path to folder
+get-preferences-menu | click
+with [get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+    get-item "...add new variables set" | double-click
+    select "set 1/path" | double-click
+    select "set 1/path" | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+    get-editbox | set-text [concat $RED_workspace_path "/Sets/vars2/var.py"] 
+    apply-cell-edit -deactivate
+    //change value of second variable in set 0
+    select "set/var 1" | double-click
+    select "set/var 1" | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+    get-editbox | set-text 700
+    apply-cell-edit -deactivate
+}
+
+//check if only those vars were changed
+with [get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+    get-item -path "set/var 1" | get-property "values['Variable']" | equals "var 1" | verify-true
+    get-item -path "set/var 1" | get-property "values['Value']" | equals 700 | verify-true
+    get-item -path "set/path" | get-property "values['Variable']" | equals path | verify-true
+    get-item -path "set/path" | get-property "values['Value']" 
+        | equals "C:\\rcptt_2_2\\aut-aa-product/Sets/vars/var.py" | verify-true
+    get-item -path "set 1/path" | get-property "values['Variable']" | equals path | verify-true
+    get-item -path "set 1/path" | get-property "values['Value']" 
+        | equals "C:\\rcptt_2_2\\aut-aa-product/Sets/vars2/var.py" | verify-true
+    get-item -path "set 1/var 1" | get-property "values['Variable']" | equals "var 1" | verify-true
+    get-item -path "set 1/var 1" | get-property "values['Value']" | equals 55 | verify-true
+}
+get-window Preferences|  get-button Apply | click
+
+
+//check waht menu is active on what element
+proc "check-set-menu" [val activate] [val deactivate] [val clean] [val delete]{
+	with [get-window Preferences | get-tree 
+	    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+	    get-menu -path Activate | get-property enablement | equals $activate | verify-true
+	    get-menu -path Deactivate | get-property enablement | equals $deactivate | verify-true
+	    get-menu -path "Clean overridden value(s)" | get-property enablement | equals $clean | verify-true
+	    get-menu -path Delete | get-property enablement | equals $delete | verify-true
+	}
+}
+
+with [get-window Preferences] {
+    get-tree 
+        -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+        | select set
+}
+check-set-menu -activate true -deactivate false -clean true -delete true
+
+get-window Preferences | get-tree 
+        -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+        | select "set/path"
+check-set-menu -activate false -deactivate false -clean false -delete false
+
+get-window Preferences | get-tree 
+        -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+        | select "set/var 1"
+check-set-menu -activate false -deactivate false -clean true -delete false
+
+//set 1
+get-window Preferences | get-tree 
+        -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+        | select "set 1"
+check-set-menu -activate true -deactivate false -clean true -delete true
+
+get-window Preferences | get-tree 
+        -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+        | select "set 1/path"
+check-set-menu -activate false -deactivate false -clean true -delete false
+
+get-window Preferences | get-tree 
+        -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+        | select "set 1/var 1"
+check-set-menu -activate false -deactivate false -clean false -delete false
+
+
+get-window Preferences | get-button "Apply and Close" | click
+get-button "Run.*" | click
+
+//set 0 was used - ??
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Sets.Test.test\n"
+    + ".* : INFO : 8\n"
+    + "Ending test: Sets.Test.test" | verify-true
+
+//select set 1
+get-button "Modify string variables" | click -arrow
+get-menu -path "set 1" | click
+get-button "Run.*" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Sets.Test.test\n"
+    + ".* : INFO : 9\n"
+    + "Ending test: Sets.Test.test" | verify-true
+    
+//use set 0
+get-button "Modify string variables" | click -arrow
+get-menu -path set | click
+get-button "Run.*" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Sets.Test.test\n"
+    + ".*: INFO : 8\n"
+    + "Ending test: Sets.Test.test" | verify-true
+
+//check that set 0 is active
+get-preferences-menu | click
+with [get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+    get-item -path "\\[active\\] set" | get-property caption | equals "[active] set" | verify-true
+    get-item -path "set 1" | get-property caption | equals "set 1" | verify-true
+}
+
+//reset var 1 in set 0 
+get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+    | select "[active] set/var 1" | get-menu -path "Clean overridden value(s)" | click
+with [get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+    get-item -path "\\[active\\] set/var 1" | get-property "values['Variable']" | equals "var 1" | verify-true
+    get-item -path "\\[active\\] set/var 1" | get-property "values['Value']" | equals 55 | verify-true
+}
+
+// clear values when focus is set on root
+get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."] 
+    | select "set 1" | get-menu -path "Clean overridden value(s)" | click
+with [get-window Preferences | get-tree 
+    -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+    get-item -path "set 1/path" | get-property "values['Variable']" | equals path | verify-true
+    get-item -path "set 1/path" | get-property "values['Value']" 
+        | equals [concat $RED_workspace_path "/Sets/vars/var.py"] | verify-true
+}
+
+
+
+
+//change to incorrect path
+with [get-window Preferences] {
+    with [get-tree 
+        -after [get-link "Create string substitution variables set and choose the active one (if any). This can be used to quickly switch between different values for already defined <a href=\"org.eclipse.debug.ui.StringVariablePreferencePage\">String Substitution</a> variables."]] {
+        select "set 1/path" | double-click
+        select "set 1/path" | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+        with [get-editbox] {
+            set-text [concat $RED_workspace_path "/Sets/vars/var4.py"]
+        }
+        apply-cell-edit -deactivate
+    }
+    get-button "Apply and Close" | click
+}
+get-button "Modify string variables" | click -arrow
+get-menu -path "set 1" | click
+get-button "Run.*" | click
+
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Sets.Test.test\n"
+    + ".* : FAIL : Variable '\$\{x\}' not found.\n"
+    + "Ending test: Sets.Test.test" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
