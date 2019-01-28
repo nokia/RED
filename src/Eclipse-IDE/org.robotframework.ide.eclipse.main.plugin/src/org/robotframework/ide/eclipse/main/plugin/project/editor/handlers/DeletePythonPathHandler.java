@@ -27,7 +27,7 @@ public class DeletePythonPathHandler extends DIParameterizedHandler<E4DeletePyth
         @Execute
         public void deleteSearchPaths(@Named(value = Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
-            super.deleteSearchPaths(input.getProjectConfiguration().getPythonPath(), selection, eventBroker,
+            super.deleteSearchPaths(input.getProjectConfiguration().getPythonPaths(), selection, eventBroker,
                     RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED);
         }
     }

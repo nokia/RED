@@ -20,7 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.red.junit.Editors;
 import org.robotframework.red.junit.ProjectProvider;
@@ -117,14 +117,14 @@ public class RedXmlChangesCollectorTest {
 
     private static void assertThatConfigFileHasOriginalContent(final IFile redXmlFile) {
         final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration(redXmlFile);
-        assertThat(config.getExcludedPath()).containsOnly(ExcludedFolderPath.create("a"),
-                ExcludedFolderPath.create("a/b"), ExcludedFolderPath.create("c"));
+        assertThat(config.getExcludedPaths()).containsOnly(ExcludedPath.create("a"), ExcludedPath.create("a/b"),
+                ExcludedPath.create("c"));
     }
 
     private static void assertThatConfigFileModifiedContent(final IFile redXmlFile) {
         final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration(redXmlFile);
-        assertThat(config.getExcludedPath()).containsOnly(ExcludedFolderPath.create("moved"),
-                ExcludedFolderPath.create("moved/b"), ExcludedFolderPath.create("c"));
+        assertThat(config.getExcludedPaths()).containsOnly(ExcludedPath.create("moved"), ExcludedPath.create("moved/b"),
+                ExcludedPath.create("c"));
     }
 
 }

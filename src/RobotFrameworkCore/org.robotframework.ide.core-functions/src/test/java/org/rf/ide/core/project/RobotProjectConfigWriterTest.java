@@ -8,7 +8,7 @@ package org.rf.ide.core.project;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 
@@ -65,7 +65,7 @@ public class RobotProjectConfigWriterTest {
 
     @Test
     public void excludedPathIsProperlyWrittenAsFragment() {
-        final ExcludedFolderPath path = ExcludedFolderPath.create("some/excluded/path");
+        final ExcludedPath path = ExcludedPath.create("some/excluded/path");
 
         final String fragment = new RobotProjectConfigWriter().writeFragment(path);
         assertThat(fragment).doesNotContain("<%xml")
@@ -75,7 +75,7 @@ public class RobotProjectConfigWriterTest {
 
     @Test
     public void excludedPathIsProperlyWrittenAsFragment_withNonAsciiCharacters() {
-        final ExcludedFolderPath path = ExcludedFolderPath.create("ą/ę");
+        final ExcludedPath path = ExcludedPath.create("ą/ę");
 
         final String fragment = new RobotProjectConfigWriter().writeFragment(path);
         assertThat(fragment).doesNotContain("<%xml")

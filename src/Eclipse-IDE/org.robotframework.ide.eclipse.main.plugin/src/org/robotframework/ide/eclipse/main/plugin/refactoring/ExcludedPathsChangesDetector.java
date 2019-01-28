@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 
 class ExcludedPathsChangesDetector {
 
@@ -27,8 +27,8 @@ class ExcludedPathsChangesDetector {
         this.config = config;
     }
 
-    void detect(final RedXmlChangesProcessor<ExcludedFolderPath> processor) {
-        for (final ExcludedFolderPath excluded : config.getExcludedPath()) {
+    void detect(final RedXmlChangesProcessor<ExcludedPath> processor) {
+        for (final ExcludedPath excluded : config.getExcludedPaths()) {
             final IPath potentiallyAffectedPath = Path.fromPortableString(excluded.getPath());
             final IPath adjustedPathBeforeRefactoring = beforeRefactorPath.removeFirstSegments(1);
 
@@ -41,8 +41,7 @@ class ExcludedPathsChangesDetector {
                 final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
                         adjustedPathAfterRefactoring, potentiallyAffectedPath);
                 if (transformedPath.isPresent()) {
-                    processor.pathModified(excluded,
-                            ExcludedFolderPath.create(transformedPath.get().toPortableString()));
+                    processor.pathModified(excluded, ExcludedPath.create(transformedPath.get().toPortableString()));
                 }
             } else if (adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
                 processor.pathRemoved(config, excluded);

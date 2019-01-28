@@ -18,7 +18,7 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 
@@ -33,20 +33,20 @@ class ExcludedPathAddChange extends Change {
 
     private final IFile redXmlFile;
 
-    private final ExcludedFolderPath excludedPathToAdd;
+    private final ExcludedPath excludedPathToAdd;
 
     private final RobotProjectConfig config;
 
     private final IEventBroker eventBroker;
 
     ExcludedPathAddChange(final IFile redXmlFile, final RobotProjectConfig config,
-            final ExcludedFolderPath excludedPathToAdd) {
+            final ExcludedPath excludedPathToAdd) {
         this(redXmlFile, config, excludedPathToAdd, PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting
-    ExcludedPathAddChange(final IFile redXmlFile, final RobotProjectConfig config,
-            final ExcludedFolderPath excludedPathToAdd, final IEventBroker eventBroker) {
+    ExcludedPathAddChange(final IFile redXmlFile, final RobotProjectConfig config, final ExcludedPath excludedPathToAdd,
+            final IEventBroker eventBroker) {
         this.redXmlFile = redXmlFile;
         this.config = config;
         this.excludedPathToAdd = excludedPathToAdd;
@@ -70,8 +70,8 @@ class ExcludedPathAddChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        config.getExcludedPath().add(excludedPathToAdd);
-        
+        config.getExcludedPaths().add(excludedPathToAdd);
+
         final Collection<IPath> changedPaths = new ArrayList<>();
         final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
                 redXmlFile, changedPaths);

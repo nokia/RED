@@ -17,7 +17,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -93,7 +93,7 @@ class RedXmlInProjectEditorChangesCollector {
         return Optional.of(Changes.normalizeCompositeChange(change));
     }
 
-    private class OpenedConfigExcludedPathsProcessor implements RedXmlChangesProcessor<ExcludedFolderPath> {
+    private class OpenedConfigExcludedPathsProcessor implements RedXmlChangesProcessor<ExcludedPath> {
 
         private final CompositeChange compositeChange;
 
@@ -102,12 +102,12 @@ class RedXmlInProjectEditorChangesCollector {
         }
 
         @Override
-        public void pathModified(final ExcludedFolderPath excludedPath, final ExcludedFolderPath newPath) {
+        public void pathModified(final ExcludedPath excludedPath, final ExcludedPath newPath) {
             compositeChange.add(new ExcludedPathModifyChange(redXmlFile, excludedPath, newPath));
         }
 
         @Override
-        public void pathRemoved(final RobotProjectConfig config, final ExcludedFolderPath pathToRemove) {
+        public void pathRemoved(final RobotProjectConfig config, final ExcludedPath pathToRemove) {
             compositeChange.add(new ExcludedPathRemoveChange(redXmlFile, config, pathToRemove));
         }
     }

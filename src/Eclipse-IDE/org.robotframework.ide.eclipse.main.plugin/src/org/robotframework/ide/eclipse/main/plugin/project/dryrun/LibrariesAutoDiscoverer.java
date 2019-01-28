@@ -40,7 +40,7 @@ import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryTy
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImportCollector;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
@@ -150,9 +150,9 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 .getPreferences()
                 .isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
         final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
-        final List<String> excludedPaths = projectConfig.getExcludedPath()
+        final List<String> excludedPaths = projectConfig.getExcludedPaths()
                 .stream()
-                .map(ExcludedFolderPath::getPath)
+                .map(ExcludedPath::getPath)
                 .collect(toList());
         final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getProject(),
                 projectConfig).createExecutionEnvironmentSearchPaths();

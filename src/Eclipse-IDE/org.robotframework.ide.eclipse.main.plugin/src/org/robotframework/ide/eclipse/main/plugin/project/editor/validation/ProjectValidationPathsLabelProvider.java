@@ -14,7 +14,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
@@ -34,7 +34,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
         final ProjectTreeElement projectTreeElement = (ProjectTreeElement) element;
 
         if (projectTreeElement.isExcluded()) {
-            final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
+            final ExcludedPath excludedPath = editorInput.getProjectConfiguration()
                     .getExcludedPath(projectTreeElement.getPath().toPortableString());
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
             if (!problems.isEmpty()) {
@@ -53,7 +53,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
     public Image getImage(final Object element) {
         final ProjectTreeElement projectTreeElement = (ProjectTreeElement) element;
 
-        final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
+        final ExcludedPath excludedPath = editorInput.getProjectConfiguration()
                 .getExcludedPath(projectTreeElement.getPath().toPortableString());
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
         if (!problems.isEmpty()) {
@@ -72,7 +72,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
     public String getToolTipText(final Object element) {
         final ProjectTreeElement projectTreeElement = (ProjectTreeElement) element;
 
-        final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
+        final ExcludedPath excludedPath = editorInput.getProjectConfiguration()
                 .getExcludedPath(projectTreeElement.getPath().toPortableString());
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
 
@@ -84,7 +84,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
     public Image getToolTipImage(final Object element) {
         final ProjectTreeElement projectTreeElement = (ProjectTreeElement) element;
 
-        final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
+        final ExcludedPath excludedPath = editorInput.getProjectConfiguration()
                 .getExcludedPath(projectTreeElement.getPath().toPortableString());
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
 

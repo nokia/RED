@@ -18,7 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.red.junit.ProjectProvider;
@@ -36,7 +36,7 @@ public class ExcludedPathRemoveChangeTest {
     @Test
     public void checkChangeName() {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final ExcludedFolderPath excludedPathToAdd = ExcludedFolderPath.create("a/b/c");
+        final ExcludedPath excludedPathToAdd = ExcludedPath.create("a/b/c");
 
         final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(projectProvider.getFile("red.xml"), config,
                 excludedPathToAdd);
@@ -50,7 +50,7 @@ public class ExcludedPathRemoveChangeTest {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("a/b/c");
 
-        final ExcludedFolderPath excludedPathToRemove = config.getExcludedPath().get(0);
+        final ExcludedPath excludedPathToRemove = config.getExcludedPaths().get(0);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(projectProvider.getFile("red.xml"), config,
@@ -61,12 +61,12 @@ public class ExcludedPathRemoveChangeTest {
         final Change undoOperation = change.perform(null);
 
         assertThat(undoOperation).isInstanceOf(ExcludedPathAddChange.class);
-        assertThat(config.getExcludedPath()).isEmpty();
+        assertThat(config.getExcludedPaths()).isEmpty();
         verify(eventBroker, times(1)).send(
                 eq(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED),
                 any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);
-        assertThat(config.getExcludedPath()).contains(ExcludedFolderPath.create("a/b/c"));
+        assertThat(config.getExcludedPaths()).contains(ExcludedPath.create("a/b/c"));
     }
 }

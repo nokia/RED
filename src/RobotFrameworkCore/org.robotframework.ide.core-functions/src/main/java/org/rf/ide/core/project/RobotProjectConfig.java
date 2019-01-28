@@ -30,7 +30,7 @@ import org.rf.ide.core.environment.SuiteExecutor;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "pathsRelativityPoint", "variableMappings", "libraries",
-        "pythonPaths", "classPaths", "remoteLocations", "referencedVariableFiles", "excludedPath",
+        "pythonPaths", "classPaths", "remoteLocations", "referencedVariableFiles", "excludedPaths",
         "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize", "isReferencedLibrariesAutoReloadEnabled",
         "isReferencedLibrariesAutoDiscoveringEnabled", "isLibrariesAutoDiscoveringSummaryWindowEnabled" })
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -72,7 +72,8 @@ public class RobotProjectConfig {
     private List<VariableMapping> variableMappings = new ArrayList<>();
 
     @XmlElementWrapper(name = "excludedForValidation", required = false)
-    private List<ExcludedFolderPath> excludedPath = new ArrayList<>();
+    @XmlElement(name = "excludedPath", type = ExcludedPath.class)
+    private List<ExcludedPath> excludedPaths = new ArrayList<>();
 
     @XmlElement(name = "isValidatedFileSizeCheckingEnabled", required = false)
     private boolean isValidatedFileSizeCheckingEnabled = true;
@@ -163,11 +164,11 @@ public class RobotProjectConfig {
         return this.remoteLocations.removeAll(remoteLocations);
     }
 
-    public void setPythonPath(final List<SearchPath> pythonPaths) {
+    public void setPythonPaths(final List<SearchPath> pythonPaths) {
         this.pythonPaths = pythonPaths;
     }
 
-    public List<SearchPath> getPythonPath() {
+    public List<SearchPath> getPythonPaths() {
         return pythonPaths;
     }
 
@@ -179,15 +180,15 @@ public class RobotProjectConfig {
         return false;
     }
 
-    public boolean removePythonPath(final List<SearchPath> paths) {
+    public boolean removePythonPaths(final List<SearchPath> paths) {
         return pythonPaths.removeAll(paths);
     }
 
-    public void setClassPath(final List<SearchPath> classPaths) {
+    public void setClassPaths(final List<SearchPath> classPaths) {
         this.classPaths = classPaths;
     }
 
-    public List<SearchPath> getClassPath() {
+    public List<SearchPath> getClassPaths() {
         return classPaths;
     }
 
@@ -199,7 +200,7 @@ public class RobotProjectConfig {
         return false;
     }
 
-    public boolean removeClassPath(final List<SearchPath> paths) {
+    public boolean removeClassPaths(final List<SearchPath> paths) {
         return classPaths.removeAll(paths);
     }
 
@@ -243,27 +244,27 @@ public class RobotProjectConfig {
         return this.variableMappings.removeAll(variableMappings);
     }
 
-    public void setExcludedPath(final List<ExcludedFolderPath> excludedPaths) {
-        this.excludedPath = excludedPaths;
+    public void setExcludedPaths(final List<ExcludedPath> excludedPaths) {
+        this.excludedPaths = excludedPaths;
     }
 
-    public List<ExcludedFolderPath> getExcludedPath() {
-        return excludedPath;
+    public List<ExcludedPath> getExcludedPaths() {
+        return excludedPaths;
     }
 
     public boolean addExcludedPath(final String path) {
-        final ExcludedFolderPath toAdd = ExcludedFolderPath.create(path);
-        if (!excludedPath.contains(toAdd)) {
-            excludedPath.add(toAdd);
+        final ExcludedPath toAdd = ExcludedPath.create(path);
+        if (!excludedPaths.contains(toAdd)) {
+            excludedPaths.add(toAdd);
             return true;
         }
         return false;
     }
 
     public boolean removeExcludedPath(final String path) {
-        final ExcludedFolderPath toRemove = getExcludedPath(path);
+        final ExcludedPath toRemove = getExcludedPath(path);
         if (toRemove != null) {
-            return excludedPath.remove(toRemove);
+            return excludedPaths.remove(toRemove);
         }
         return false;
     }
@@ -272,8 +273,8 @@ public class RobotProjectConfig {
         return getExcludedPath(path) != null;
     }
 
-    public ExcludedFolderPath getExcludedPath(final String path) {
-        for (final ExcludedFolderPath excludedPath : excludedPath) {
+    public ExcludedPath getExcludedPath(final String path) {
+        for (final ExcludedPath excludedPath : excludedPaths) {
             if (excludedPath.getPath().equals(path)) {
                 return excludedPath;
             }
@@ -712,10 +713,10 @@ public class RobotProjectConfig {
 
     @XmlRootElement(name = "excludedPath")
     @XmlAccessorType(XmlAccessType.FIELD)
-    public static class ExcludedFolderPath {
+    public static class ExcludedPath {
 
-        public static ExcludedFolderPath create(final String path) {
-            final ExcludedFolderPath excludedPath = new ExcludedFolderPath();
+        public static ExcludedPath create(final String path) {
+            final ExcludedPath excludedPath = new ExcludedPath();
             excludedPath.setPath(path);
             return excludedPath;
         }
@@ -733,8 +734,8 @@ public class RobotProjectConfig {
 
         @Override
         public boolean equals(final Object obj) {
-            if (obj instanceof ExcludedFolderPath) {
-                final ExcludedFolderPath that = (ExcludedFolderPath) obj;
+            if (obj instanceof ExcludedPath) {
+                final ExcludedPath that = (ExcludedPath) obj;
                 return Objects.equals(this.path, that.path);
             }
             return false;

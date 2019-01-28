@@ -702,7 +702,7 @@ public class RobotProjectConfigFileValidatorTest {
         config.addExcludedPath("does/not/exist");
 
         final Map<Object, FilePosition> locations = new HashMap<>();
-        locations.put(config.getExcludedPath().get(0), new FilePosition(42, 0));
+        locations.put(config.getExcludedPaths().get(0), new FilePosition(42, 0));
 
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
                 new TreeSet<>(), locations);
@@ -720,7 +720,7 @@ public class RobotProjectConfigFileValidatorTest {
         config.addExcludedPath("directory");
 
         final Map<Object, FilePosition> locations = new HashMap<>();
-        locations.put(config.getExcludedPath().get(0), new FilePosition(42, 0));
+        locations.put(config.getExcludedPaths().get(0), new FilePosition(42, 0));
 
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
                 new TreeSet<>(), locations);
@@ -742,8 +742,8 @@ public class RobotProjectConfigFileValidatorTest {
         config.addExcludedPath("directory/nested/1/2");
 
         final Map<Object, FilePosition> locations = new HashMap<>();
-        locations.put(config.getExcludedPath().get(0), new FilePosition(42, 0));
-        locations.put(config.getExcludedPath().get(1), new FilePosition(43, 0));
+        locations.put(config.getExcludedPaths().get(0), new FilePosition(42, 0));
+        locations.put(config.getExcludedPaths().get(1), new FilePosition(43, 0));
 
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
                 new TreeSet<>(), locations);
