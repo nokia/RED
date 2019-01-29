@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _IcayMHoSEei-nLLniRADXQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/4/18 4:24 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 1/29/19 6:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -100,7 +100,6 @@ compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 13 -ref_ta
 compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 14 -ref_table [list "\\" "Convert To Boolean" "" "66" "" "" "" "" ]
 compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 15 -ref_table [list "#com2" "" "" "" "" "" "" "" ]
 compare-row-with-list -file "TestFile.robot" -table "Test Cases" -row 16 -ref_table [list "..." "" "" "" "" "" "" "" ]
-get-editor "TestFile.robot" | restore
 
 //go to source
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
@@ -122,12 +121,13 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 
 //automaticly adding new cell
 get-button "Save (M1+S)" | click
+wait 500
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
-        set-caret-pos 4 45
+        set-caret-pos 4 8
         key-type F4
     }
-    wait 1500
+    wait 1000
     
     //adding 3 new cells
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
