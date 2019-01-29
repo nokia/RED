@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ENrfcCMMEemEjfjIU9tmyw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 1/28/19 5:30 PM
+Save-Time: 1/29/19 9:52 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -146,10 +146,10 @@ with [get-window Preferences | get-tree
     get-item -path "set/var 1" | get-property "values['Value']" | equals 700 | verify-true
     get-item -path "set/path" | get-property "values['Variable']" | equals path | verify-true
     get-item -path "set/path" | get-property "values['Value']" 
-        | equals "C:\\rcptt_2_2\\aut-aa-product/Sets/vars/var.py" | verify-true
+        | equals  [concat $RED_workspace_path "/Sets/vars/var.py"]| verify-true
     get-item -path "set 1/path" | get-property "values['Variable']" | equals path | verify-true
     get-item -path "set 1/path" | get-property "values['Value']" 
-        | equals "C:\\rcptt_2_2\\aut-aa-product/Sets/vars2/var.py" | verify-true
+        | equals  [concat $RED_workspace_path "/Sets/vars2/var.py"] | verify-true
     get-item -path "set 1/var 1" | get-property "values['Variable']" | equals "var 1" | verify-true
     get-item -path "set 1/var 1" | get-property "values['Value']" | equals 55 | verify-true
 }
