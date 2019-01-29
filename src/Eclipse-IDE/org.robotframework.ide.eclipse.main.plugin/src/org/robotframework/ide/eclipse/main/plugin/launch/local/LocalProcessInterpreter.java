@@ -50,36 +50,21 @@ class LocalProcessInterpreter {
     static LocalProcessInterpreter create(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject)
             throws CoreException {
         if (robotConfig.isUsingInterpreterFromProject()) {
-            return LocalProcessInterpreter.create(robotProject.getRuntimeEnvironment(), robotProject.getName());
+            if (robotConfig.getExecutableFilePath().isEmpty()) {
+                return createForProject(robotProject);
+            } else {
+                return createForExecutable(robotProject);
+            }
+        } else {
+            if (robotConfig.getExecutableFilePath().isEmpty()) {
+                return createForSystem(robotConfig.getInterpreter());
+            } else {
+                return createForExecutable(robotConfig.getInterpreter());
+            }
         }
-        return LocalProcessInterpreter.create(robotConfig.getInterpreter());
     }
 
-    private static LocalProcessInterpreter create(final IRuntimeEnvironment env, final String projectName)
-            throws CoreException {
-        if (env.isNullEnvironment()) {
-            throw newCoreException("There is no active runtime environment for project '" + projectName + "'");
-        } else if (!env.isValidPythonInstallation()) {
-            throw newCoreException(
-                    "The runtime environment " + env.getFile().getAbsolutePath() + " is invalid Python installation");
-        } else if (!env.hasRobotInstalled()) {
-            throw newCoreException(
-                    "The runtime environment " + env.getFile().getAbsolutePath() + " has no Robot Framework installed");
-        }
-        return new LocalProcessInterpreter(env.getInterpreter(), findPythonExecutablePath(env), env.getVersion());
-    }
-
-    private static String findPythonExecutablePath(final IRuntimeEnvironment env) {
-        final SuiteExecutor interpreter = env.getInterpreter();
-        final String pythonExec = interpreter.executableName();
-        return Stream.of(env.getFile().listFiles())
-                .filter(file -> pythonExec.equals(file.getName()))
-                .findFirst()
-                .map(File::getAbsolutePath)
-                .orElse(pythonExec);
-    }
-
-    private static LocalProcessInterpreter create(final SuiteExecutor interpreter) throws CoreException {
+    private static LocalProcessInterpreter createForSystem(final SuiteExecutor interpreter) throws CoreException {
         final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
                 .whereIsPythonInterpreter(interpreter);
         if (installation.isPresent()) {
@@ -93,6 +78,49 @@ class LocalProcessInterpreter {
             throw newCoreException(
                     "There is no " + interpreter.name() + " interpreter in system PATH environment variable");
         }
+    }
+
+    private static LocalProcessInterpreter createForExecutable(final SuiteExecutor interpreter) {
+        final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
+                .whereIsPythonInterpreter(interpreter);
+        final String path = installation.map(PythonInstallationDirectory::getInterpreter)
+                .map(SuiteExecutor::executableName)
+                .orElse(SuiteExecutor.Python.executableName());
+        final String version = installation.flatMap(PythonInstallationDirectory::getRobotVersion).orElse("<unknown>");
+        return new LocalProcessInterpreter(interpreter, path, version);
+    }
+
+    private static LocalProcessInterpreter createForProject(final RobotProject robotProject) throws CoreException {
+        final IRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
+        if (env.isNullEnvironment()) {
+            throw newCoreException(
+                    "There is no active runtime environment for project '" + robotProject.getName() + "'");
+        } else if (!env.isValidPythonInstallation()) {
+            throw newCoreException(
+                    "The runtime environment " + env.getFile().getAbsolutePath() + " is invalid Python installation");
+        } else if (!env.hasRobotInstalled()) {
+            throw newCoreException(
+                    "The runtime environment " + env.getFile().getAbsolutePath() + " has no Robot Framework installed");
+        } else {
+            return new LocalProcessInterpreter(env.getInterpreter(), findPythonExecutablePath(env), env.getVersion());
+        }
+    }
+
+    private static LocalProcessInterpreter createForExecutable(final RobotProject robotProject) {
+        final IRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
+        return new LocalProcessInterpreter(Optional.ofNullable(env.getInterpreter()).orElse(SuiteExecutor.Python),
+                findPythonExecutablePath(env), env.getVersion());
+    }
+
+    private static String findPythonExecutablePath(final IRuntimeEnvironment env) {
+        final SuiteExecutor interpreter = Optional.ofNullable(env.getInterpreter()).orElse(SuiteExecutor.Python);
+        return Optional.ofNullable(env.getFile())
+                .map(File::listFiles)
+                .flatMap(files -> Stream.of(files)
+                        .filter(file -> interpreter.executableName().equals(file.getName()))
+                        .findFirst()
+                        .map(File::getAbsolutePath))
+                .orElseGet(interpreter::executableName);
     }
 
 }
