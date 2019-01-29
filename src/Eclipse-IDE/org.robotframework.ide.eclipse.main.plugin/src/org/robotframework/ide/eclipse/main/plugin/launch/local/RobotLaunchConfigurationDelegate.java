@@ -193,8 +193,11 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         static ConsoleData create(final RobotLaunchConfiguration robotConfig, final LocalProcessInterpreter interpreter)
                 throws CoreException {
-            return new ConsoleData(robotConfig.getExecutableFilePath().isEmpty() ? interpreter.getPath()
-                    : robotConfig.getExecutableFilePath(), interpreter.getVersion());
+            if (robotConfig.getExecutableFilePath().isEmpty()) {
+                return new ConsoleData(interpreter.getPath(), interpreter.getVersion());
+            } else {
+                return new ConsoleData(robotConfig.getExecutableFilePath(), "<unknown>");
+            }
         }
     }
 }
