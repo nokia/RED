@@ -79,6 +79,40 @@ public class LocalProcessInterpreterTest {
     }
 
     @Test()
+    public void defaultPythonExecNameAndUnknownRobotVersionAreUsed_whenPathToExecutableIsSet() throws Exception {
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(new NullRuntimeEnvironment());
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setExecutableFilePath("some/path/to/script");
+        robotConfig.setUsingInterpreterFromProject(true);
+
+        final LocalProcessInterpreter interpreter = LocalProcessInterpreter.create(robotConfig, robotProject);
+
+        assertThat(interpreter.getExecutor()).isEqualTo(SuiteExecutor.Python);
+        assertThat(interpreter.getPath()).isEqualTo(SuiteExecutor.Python.executableName());
+        assertThat(interpreter.getVersion()).isEqualTo("<unknown>");
+    }
+
+    @Test()
+    public void selectedPythonExecNameAndKnownRobotVersionAreUsed_whenPathToExecutableIsSet() throws Exception {
+        assumeTrue(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.Python).isPresent());
+
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(new NullRuntimeEnvironment());
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setExecutableFilePath("some/path/to/script");
+        robotConfig.setUsingInterpreterFromProject(false);
+        robotConfig.setInterpreter(SuiteExecutor.Python);
+
+        final LocalProcessInterpreter interpreter = LocalProcessInterpreter.create(robotConfig, robotProject);
+
+        assertThat(interpreter.getExecutor()).isEqualTo(SuiteExecutor.Python);
+        assertThat(interpreter.getPath()).isEqualTo(SuiteExecutor.Python.executableName());
+        assertThat(interpreter.getVersion()).isNotEqualTo("<unknown>");
+    }
+    @Test()
     public void pythonExecNameAndKnownRobotVersionAreUsed_whenProjectInterpreterIsUsed()
             throws Exception {
         final PythonInstallationDirectory pythonInstallation = mock(PythonInstallationDirectory.class);
