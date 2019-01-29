@@ -36,15 +36,14 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.setExecutableFilePath("some/path/to/script");
 
         final ConsoleData consoleData = RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig,
-                new LocalProcessInterpreter(SuiteExecutor.Python, "some/path/to/python", "RF 1.2.3"));
+                new LocalProcessInterpreter(SuiteExecutor.Python, "some/path/to/python", "<unknown>"));
 
         assertThat(consoleData.getProcessLabel()).isEqualTo("some/path/to/script");
         assertThat(consoleData.getSuiteExecutorVersion()).isEqualTo("<unknown>");
     }
 
     @Test()
-    public void pathToPythonAndKnownRobotVersionAreUsed_whenPathToExecutableIsNotSet()
-            throws Exception {
+    public void pathToPythonAndKnownRobotVersionAreUsed_whenPathToExecutableIsNotSet() throws Exception {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         robotConfig.setExecutableFilePath("");
 

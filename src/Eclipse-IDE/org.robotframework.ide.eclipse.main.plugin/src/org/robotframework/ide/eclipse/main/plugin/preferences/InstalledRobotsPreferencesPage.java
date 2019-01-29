@@ -145,7 +145,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     private boolean addOnlyNonExisting(final Collection<PythonInstallationDirectory> locations) {
         boolean added = false;
         for (final PythonInstallationDirectory directory : locations) {
-            if (installations.stream().noneMatch(env -> env.getFile().equals(directory))) {
+            if (installations.stream().noneMatch(env -> directory.equals(env.getFile()))) {
                 added = true;
                 final IRuntimeEnvironment envToAdd = directory.getRobotVersion()
                         .map(version -> new RobotRuntimeEnvironment(directory, version))
