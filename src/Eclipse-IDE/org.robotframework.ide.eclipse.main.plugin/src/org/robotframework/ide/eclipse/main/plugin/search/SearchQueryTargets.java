@@ -12,7 +12,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -61,22 +60,18 @@ class SearchQueryTargets {
             }
 
             try {
-                resourceRoot.accept(new IResourceVisitor() {
-
-                    @Override
-                    public boolean visit(final IResource resource) throws CoreException {
-                        if (resource.getType() == IResource.FILE && !ExcludedResources.isHiddenInEclipse(resource)) {
-                            final IFile file = (IFile) resource;
-                            if (targets.contains(SearchTarget.SUITE) && ASuiteFileDescriber.isSuiteFile(file)) {
-                                filesToSearch.add(file);
-                            } else if (targets.contains(SearchTarget.RESOURCE)
-                                    && (ASuiteFileDescriber.isInitializationFile(file)
-                                            || ASuiteFileDescriber.isResourceFile(file))) {
-                                filesToSearch.add(file);
-                            }
+                resourceRoot.accept(resource -> {
+                    if (resource.getType() == IResource.FILE && !ExcludedResources.isHiddenInEclipse(resource)) {
+                        final IFile file = (IFile) resource;
+                        if (targets.contains(SearchTarget.SUITE) && ASuiteFileDescriber.isSuiteFile(file)) {
+                            filesToSearch.add(file);
+                        } else if (targets.contains(SearchTarget.RESOURCE)
+                                && (ASuiteFileDescriber.isInitializationFile(file)
+                                        || ASuiteFileDescriber.isResourceFile(file))) {
+                            filesToSearch.add(file);
                         }
-                        return true;
                     }
+                    return true;
                 });
             } catch (final CoreException e) {
                 // then we'll try to get those resources we would be able to

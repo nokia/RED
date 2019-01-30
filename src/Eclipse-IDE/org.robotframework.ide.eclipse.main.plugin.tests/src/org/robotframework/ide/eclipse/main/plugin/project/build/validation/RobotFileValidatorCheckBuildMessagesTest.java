@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -35,21 +34,16 @@ public class RobotFileValidatorCheckBuildMessagesTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RobotFileValidatorCheckBuildMessagesTest.class);
 
-    private static IFile file;
-
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        file = projectProvider.createFile("suite.robot", "");
-    }
-
-    @AfterClass
-    public static void afterSuite() {
-        file = null;
+        projectProvider.createFile("error.py", "syntax");
+        projectProvider.createFile("suite.robot");
+        projectProvider.createFile("suite_with_vars.robot", "***Settings***", "Variables  error.py");
     }
 
     @Test
     public void test_validateForParsingPassed_oneInfo_oneWarn_oneError() {
-        final Collection<Problem> problems = validate(Status.PASSED, createBuildWarnMessage(),
+        final Collection<Problem> problems = validate("suite.robot", Status.PASSED, createBuildWarnMessage(),
                 createBuildErrorMessage());
 
         assertThat(problems).containsOnly(
@@ -59,7 +53,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @Test
     public void test_validateForParsingPassed_oneWarning() {
-        final Collection<Problem> problems = validate(Status.PASSED, createBuildWarnMessage());
+        final Collection<Problem> problems = validate("suite.robot", Status.PASSED, createBuildWarnMessage());
 
         assertThat(problems).containsOnly(
                 new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))));
@@ -67,7 +61,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @Test
     public void test_validateForParsingPassed_oneError() {
-        final Collection<Problem> problems = validate(Status.PASSED, createBuildErrorMessage());
+        final Collection<Problem> problems = validate("suite.robot", Status.PASSED, createBuildErrorMessage());
 
         assertThat(problems).containsOnly(
                 new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))));
@@ -75,14 +69,14 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @Test
     public void test_validateForParsingPassed_noExtraMessages() {
-        final Collection<Problem> problems = validate(Status.PASSED);
+        final Collection<Problem> problems = validate("suite.robot", Status.PASSED);
 
         assertThat(problems).isEmpty();
     }
 
     @Test
     public void test_validateForParsingFailed_oneInfo_oneWarn_oneError() {
-        final Collection<Problem> problems = validate(Status.FAILED, createBuildWarnMessage(),
+        final Collection<Problem> problems = validate("suite.robot", Status.FAILED, createBuildWarnMessage(),
                 createBuildErrorMessage());
 
         assertThat(problems).containsOnly(
@@ -93,7 +87,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @Test
     public void test_validateForParsingFailed_oneWarning() {
-        final Collection<Problem> problems = validate(Status.FAILED, createBuildWarnMessage());
+        final Collection<Problem> problems = validate("suite.robot", Status.FAILED, createBuildWarnMessage());
 
         assertThat(problems).containsOnly(
                 new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
@@ -102,7 +96,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @Test
     public void test_validateForParsingFailed_oneError() {
-        final Collection<Problem> problems = validate(Status.FAILED, createBuildErrorMessage());
+        final Collection<Problem> problems = validate("suite.robot", Status.FAILED, createBuildErrorMessage());
 
         assertThat(problems).containsOnly(new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
                 new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))));
@@ -110,14 +104,24 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     @Test
     public void test_validateForParsingFailed_noExtraMessages() {
-        final Collection<Problem> problems = validate(Status.FAILED);
+        final Collection<Problem> problems = validate("suite.robot", Status.FAILED);
 
         assertThat(problems).containsOnly(new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)));
     }
 
-    private static Collection<Problem> validate(final Status status, final BuildMessage... messages) {
+    @Test
+    public void test_validateForParsingFailed_oneError_whenVariableImportFails() {
+        final Collection<Problem> problems = validate("suite_with_vars.robot", Status.FAILED);
+
+        assertThat(problems).containsOnly(new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
+                new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(2, Range.closed(26, 34))));
+    }
+
+    private static Collection<Problem> validate(final String filePath, final Status status,
+            final BuildMessage... messages) {
         final ValidationContext context = createValidationContext(new RobotModel(), new BuildLogger());
 
+        final IFile file = projectProvider.getFile(filePath);
         final RobotSuiteFile fileModel = context.getModel().createSuiteFile(file);
         fileModel.parse();
 

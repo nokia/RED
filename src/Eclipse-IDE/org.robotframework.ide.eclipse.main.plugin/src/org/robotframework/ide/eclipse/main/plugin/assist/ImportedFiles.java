@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -38,18 +37,14 @@ class ImportedFiles {
     private static List<IFile> getMatchingFiles(final IResource wsRoot, final Predicate<IFile> matcher) {
         final List<IFile> matchingFiles = new ArrayList<>();
         try {
-            wsRoot.accept(new IResourceVisitor() {
-
-                @Override
-                public boolean visit(final IResource resource) throws CoreException {
-                    if (resource.getType() == IResource.FILE) {
-                        final IFile file = (IFile) resource;
-                        if (matcher.test(file)) {
-                            matchingFiles.add(file);
-                        }
+            wsRoot.accept(resource -> {
+                if (resource.getType() == IResource.FILE) {
+                    final IFile file = (IFile) resource;
+                    if (matcher.test(file)) {
+                        matchingFiles.add(file);
                     }
-                    return true;
                 }
+                return true;
             });
         } catch (final CoreException e) {
             // ok, we'll return what we've gathered so far
