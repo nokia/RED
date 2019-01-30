@@ -36,8 +36,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final String inFileName = convert("InputOneKeywordWithExecMultiline");
         final String outputFileName = convert("OutputOneKeywordWithExecMultiline");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         final DumpContext ctx = new DumpContext(" | ", true);
 
@@ -57,8 +56,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final String inFileName = convert("Input_OneKeyword_andOneExec_whenAddNewParameter");
         final String outputFileName = convert("Output_OneKeyword_andOneExec_whenAddNewParameterPipe");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         final DumpContext ctx = new DumpContext("\t", true);
 
@@ -78,8 +76,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final String inFileName = convert("Input_OneKeyword_andOneExec_whenAddNewParameter");
         final String outputFileName = convert("Output_OneKeyword_andOneExec_whenAddNewParameterPipe");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         final DumpContext ctx = new DumpContext(" | ", true);
 
@@ -99,8 +96,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final String inFileName = convert("Input_OneKeyword_andThenAddNewExec");
         final String outputFileName = convert("Output_OneKeyword_andThenAddNewExec");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         final DumpContext ctx = new DumpContext(" | ", true);
 
@@ -125,8 +121,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         final String outputFileName = convert(
                 "Output_OnlyHeaderOfKeyword_andThenAddNewKeyword_andOneExecLine_sepSpacePipeSpace");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         final DumpContext ctx = new DumpContext(" | ", true);
 

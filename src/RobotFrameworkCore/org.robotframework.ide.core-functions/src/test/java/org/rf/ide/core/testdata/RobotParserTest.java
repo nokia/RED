@@ -5,29 +5,24 @@
 */
 package org.rf.ide.core.testdata;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.InOrder;
+import org.junit.rules.TemporaryFolder;
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
-import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage.LogLevel;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
@@ -43,7 +38,67 @@ import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
+import com.google.common.io.Files;
+
 public class RobotParserTest {
+
+    @ClassRule
+    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    @Test
+    public void errorMessageIsReported_whenFileHasNotSupportedExtension() throws Exception {
+        final String fileContent = "some content";
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.unknown"));
+
+        final RobotFile fileModel = editorContent.getFileModel();
+        final List<RobotLine> lineContents = fileModel.getFileContent();
+        assertThat(lineContents).isEmpty();
+
+        final List<BuildMessage> buildingMessages = editorContent.getBuildingMessages();
+        assertThat(buildingMessages).hasSize(1);
+        final BuildMessage buildMessage = buildingMessages.get(0);
+        assertThat(buildMessage.getFileName()).contains("f.unknown");
+        assertThat(buildMessage.getType()).isEqualTo(LogLevel.ERROR);
+        assertThat(buildMessage.getMessage()).contains("No parser found for file.");
+    }
+
+    @Test
+    public void emptyOutputIsReturned_whenContentIsNull() throws Exception {
+        final String fileContent = null;
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
+
+        assertThat(editorContent.getFileModel().getFileContent()).isEmpty();
+    }
+
+    @Test
+    public void emptyOutputIsReturned_whenContentIsEmpty() throws Exception {
+        final String fileContent = "";
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
+
+        assertThat(editorContent.getFileModel().getFileContent()).isEmpty();
+    }
+
+    @Test
+    public void notEmptyOutputIsReturned_whenContentIsNotEmptyAndFileHasSupportedExtension() throws Exception {
+        final String fileContent = "***Settings***";
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        for (final String name : newHashSet("f.robot", "f.txt", "f.tsv")) {
+            final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File(name));
+
+            assertThat(editorContent.getFileModel().getFileContent()).isNotEmpty();
+        }
+    }
 
     @Test
     public void test_eolInLinux_lineChecksWithoutNewLineAtTheEnd_offsetCheck() {
@@ -53,8 +108,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder,
-                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
         // verify
@@ -74,8 +128,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder,
-                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
         // verify
@@ -103,119 +156,6 @@ public class RobotParserTest {
     }
 
     @Test
-    public void test_create_when_robotFramework_correct29() {
-        // prepare
-        final RobotProjectHolder projectHolder = new RobotProjectHolder();
-
-        // execute
-        final RobotParser parser = new RobotParser(projectHolder,
-                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
-
-        // verify
-        final RobotVersion robotVersion = parser.getRobotVersion();
-        assertThat(robotVersion).isNotNull();
-        assertThat(robotVersion.isEqualTo(new RobotVersion(2, 9))).isTrue();
-    }
-
-    @Test(timeout = 10000)
-    public void test_loopedResources_shouldPassFastAndWithoutAny_reReadFiles_BUG_RED_352_GITHUB_23() throws Exception {
-        // prepare
-        final RobotProjectHolder projectHolder = spy(new RobotProjectHolder());
-
-        final PathsProvider pathsProvider = mock(PathsProvider.class);
-        when(pathsProvider.targetExists(any(URI.class)))
-                .thenAnswer(invocation -> new File((URI) invocation.getArgument(0)).exists());
-
-        final RobotParser parser = spy(new RobotParser(projectHolder,
-                RobotParserConfig.allImportsEager(new RobotVersion(2, 9)), pathsProvider));
-
-        //// prepare paths
-        final String mainPath = "parser/bugs/RED_352_ReadManyTimesPrevReadReferenceFile_LoopPrevent/";
-        final File startFile = new File(this.getClass().getResource(mainPath + "StartFile.robot").toURI());
-        final File normalFile = new File(this.getClass().getResource(mainPath + "NormalFile.robot").toURI());
-        final File anotherLoop = new File(this.getClass().getResource(mainPath + "anotherLoop.robot").toURI());
-        final File loopEndWithRefToFirst = new File(
-                this.getClass().getResource(mainPath + "resources/loopEndWithRefToFirst.robot").toURI());
-        final File middle = new File(this.getClass().getResource(mainPath + "resources/Middle.robot").toURI());
-        final File theFirst = new File(this.getClass().getResource(mainPath + "resources/theFirst.robot").toURI());
-
-        // execute
-        final List<RobotFileOutput> output = parser.parse(startFile);
-
-        // verify content
-        //// StartFile.robot
-        assertThat(output).hasSize(1);
-        final RobotFileOutput startFileOutput = output.get(0);
-        assertThat(startFileOutput.getProcessedFile()).isEqualTo(startFile);
-
-        final List<ResourceImportReference> resourceImportReferences = startFileOutput.getResourceImportReferences();
-        assertThat(resourceImportReferences).hasSize(3);
-
-        final ResourceImportReference theFirstImportMain = resourceImportReferences.get(0);
-        assertThat(theFirstImportMain.getImportDeclaration().getPathOrName().getText()).isEqualTo("NormalFile.robot");
-        assertThat(theFirstImportMain.getReference().getProcessedFile()).isEqualTo(normalFile);
-
-        final ResourceImportReference anotherFileResource = resourceImportReferences.get(1);
-        assertThat(anotherFileResource.getImportDeclaration().getPathOrName().getText()).isEqualTo("anotherLoop.robot");
-        assertThat(anotherFileResource.getReference().getProcessedFile()).isEqualTo(anotherLoop);
-
-        final ResourceImportReference res_theFirst = resourceImportReferences.get(2);
-        assertThat(res_theFirst.getImportDeclaration().getPathOrName().getText()).isEqualTo("resources/theFirst.robot");
-        assertThat(res_theFirst.getReference().getProcessedFile()).isEqualTo(theFirst);
-
-        //// NormalFile.robot
-        final RobotFileOutput normalFileOutput = theFirstImportMain.getReference();
-        assertThat(normalFileOutput.getResourceImportReferences()).hasSize(0);
-
-        //// anotherLoop.robot
-        final RobotFileOutput anotherFileOutput = anotherFileResource.getReference();
-        final List<ResourceImportReference> anotherLoopRefs = anotherFileOutput.getResourceImportReferences();
-        assertThat(anotherLoopRefs).hasSize(1);
-
-        final ResourceImportReference loopEndRef = anotherLoopRefs.get(0);
-        assertThat(loopEndRef.getImportDeclaration().getPathOrName().getText())
-                .isEqualTo("resources/loopEndWithRefToFirst.robot");
-        assertThat(loopEndRef.getReference().getProcessedFile()).isEqualTo(loopEndWithRefToFirst);
-
-        //// loopEndWithRefToFirst.robot
-        final RobotFileOutput loopEndOutput = loopEndRef.getReference();
-        final List<ResourceImportReference> loopEndRefs = loopEndOutput.getResourceImportReferences();
-        assertThat(loopEndRefs).hasSize(1);
-
-        final ResourceImportReference middleRef = loopEndRefs.get(0);
-        assertThat(middleRef.getImportDeclaration().getPathOrName().getText()).isEqualTo("../resources/Middle.robot");
-        assertThat(middleRef.getReference().getProcessedFile()).isEqualTo(middle);
-
-        //// middle.robot
-        final RobotFileOutput middleOutput = middleRef.getReference();
-        final List<ResourceImportReference> middleRefs = middleOutput.getResourceImportReferences();
-        assertThat(middleRefs).hasSize(1);
-
-        final ResourceImportReference res_theFirstAgain = middleRefs.get(0);
-        assertThat(res_theFirstAgain.getImportDeclaration().getPathOrName().getText())
-                .isEqualTo("../resources/theFirst.robot");
-        assertThat(res_theFirstAgain.getReference()).isSameAs(res_theFirst.getReference());
-
-        // verify order
-        final InOrder order = inOrder(projectHolder, parser);
-        order.verify(projectHolder, times(1)).shouldBeLoaded(startFile);
-        order.verify(projectHolder, times(1)).addModelFile(output.get(0));
-        order.verify(projectHolder, times(1)).shouldBeLoaded(normalFile);
-        order.verify(projectHolder, times(1)).addModelFile(theFirstImportMain.getReference());
-        order.verify(projectHolder, times(1)).shouldBeLoaded(anotherLoop);
-        order.verify(projectHolder, times(1)).addModelFile(anotherFileResource.getReference());
-        order.verify(projectHolder, times(1)).shouldBeLoaded(loopEndWithRefToFirst);
-        order.verify(projectHolder, times(1)).addModelFile(loopEndRef.getReference());
-        order.verify(projectHolder, times(1)).shouldBeLoaded(middle);
-        order.verify(projectHolder, times(1)).addModelFile(middleRef.getReference());
-        order.verify(projectHolder, times(1)).shouldBeLoaded(theFirst);
-        order.verify(projectHolder, times(1)).addModelFile(res_theFirst.getReference());
-        order.verify(projectHolder, times(1)).shouldBeLoaded(theFirst);
-        order.verify(projectHolder, times(1)).findFileByName(theFirst);
-
-    }
-
-    @Test
     public void testGivenFileTSV_withVariableTable_withOneWrongVariable_andOneCorrect_thenCheckRawAndTextParameter()
             throws Exception {
         assertOneCorrectAndOneWrongVariable_ifAllWasReadAndWillBePresented(
@@ -234,8 +174,7 @@ public class RobotParserTest {
         // prepare
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = spy(
-                new RobotParser(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
 
         //// prepare paths
         final File startFile = new File(this.getClass().getResource(filename).toURI());
@@ -284,8 +223,7 @@ public class RobotParserTest {
         // prepare
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = spy(
-                new RobotParser(projectHolder, RobotParserConfig.allImportsLazy(new RobotVersion(2, 9))));
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
 
         // prepare paths
         final File startFile = new File(this.getClass().getResource("parser/bugs/tsv_positionCheck.tsv").toURI());
@@ -327,4 +265,123 @@ public class RobotParserTest {
         assertThat(emptyActionPosition.isSamePlace(new FilePosition(4, 5, 43))).as("got %s", emptyActionPosition)
                 .isTrue();
     }
+
+    @Test
+    public void emptyOutputIsReturned_whenFileIsNull() throws Exception {
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final File startFile = null;
+
+        final List<RobotFileOutput> output = parser.parse(startFile);
+
+        assertThat(output).isEmpty();
+    }
+
+    @Test
+    public void emptyOutputIsReturned_whenFileHasNotSupportedExtension() throws Exception {
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final File startFile = temporaryFolder.newFile("file.unknown");
+
+        final List<RobotFileOutput> output = parser.parse(startFile);
+
+        assertThat(output).isEmpty();
+    }
+
+    @Test
+    public void notEmptyOutputIsReturned_whenFileHasSupportedExtension() throws Exception {
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        for (final String name : newHashSet("f.robot", "f.txt", "f.tsv")) {
+            final File startFile = temporaryFolder.newFile(name);
+            final String fileContent = "***Settings***";
+            Files.write(fileContent.getBytes(), startFile);
+
+            final List<RobotFileOutput> output = parser.parse(startFile);
+
+            assertThat(output).isNotEmpty();
+        }
+    }
+
+    @Test
+    public void fileShouldBeParsedOnlyOnce() throws Exception {
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final File startFile = temporaryFolder.newFile("file.robot");
+        final String fileContent = "***Settings***";
+        Files.write(fileContent.getBytes(), startFile);
+
+        final List<RobotFileOutput> output1 = parser.parse(startFile);
+        final List<RobotFileOutput> output2 = parser.parse(startFile);
+        final List<RobotFileOutput> output3 = parser.parse(startFile);
+
+        assertThat(output1).hasSize(1);
+        assertThat(output2).hasSize(1);
+        assertThat(output3).hasSize(1);
+        assertThat(output2.get(0)).isSameAs(output1.get(0));
+        assertThat(output3.get(0)).isSameAs(output1.get(0));
+    }
+
+    @Test
+    public void fileShouldBeCleared_whenContainsTooManyLines() throws Exception {
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final File startFile = temporaryFolder.newFile("file_with_5000_lines.robot");
+        final String fileContent = String.join("", Collections.nCopies(5000, "abc" + System.lineSeparator()));
+        Files.write(fileContent.getBytes(), startFile);
+
+        final List<RobotFileOutput> output = parser.parse(startFile);
+
+        assertThat(output).hasSize(1);
+        assertThat(output.get(0).getFileModel().getFileContent()).isEmpty();
+    }
+
+    @Test
+    public void fileShouldNotBeCleared_whenDoesNotContainTooManyLines() throws Exception {
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final File startFile = temporaryFolder.newFile("file_with_4999_lines.robot");
+        final String fileContent = String.join("", Collections.nCopies(4999, "abc" + System.lineSeparator()));
+        Files.write(fileContent.getBytes(), startFile);
+
+        final List<RobotFileOutput> output = parser.parse(startFile);
+
+        assertThat(output).hasSize(1);
+        assertThat(output.get(0).getFileModel().getFileContent()).isNotEmpty();
+    }
+
+    @Test
+    public void directoryShouldBeParsed() throws Exception {
+        final RobotProjectHolder projectHolder = new RobotProjectHolder();
+
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+
+        final File startDir = temporaryFolder.newFolder("dir_with_suites");
+        final File file1 = temporaryFolder.newFile("dir_with_suites/file1.robot");
+        final File file2 = temporaryFolder.newFile("dir_with_suites/file2.robot");
+        final File file3 = temporaryFolder.newFile("dir_with_suites/file3.robot");
+        Files.write("***Settings***".getBytes(), file1);
+        Files.write("***Keywords***".getBytes(), file2);
+        Files.write("***Test Cases***".getBytes(), file3);
+
+        final List<RobotFileOutput> output = parser.parse(startDir);
+
+        assertThat(output).hasSize(3);
+        assertThat(output.get(0).getFileModel().getFileContent()).isNotEmpty();
+        assertThat(output.get(1).getFileModel().getFileContent()).isNotEmpty();
+        assertThat(output.get(2).getFileModel().getFileContent()).isNotEmpty();
+    }
+
 }

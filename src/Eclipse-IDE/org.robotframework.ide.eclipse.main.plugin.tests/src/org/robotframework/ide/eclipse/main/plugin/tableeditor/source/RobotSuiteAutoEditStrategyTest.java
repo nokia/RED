@@ -18,7 +18,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
@@ -286,8 +285,7 @@ public class RobotSuiteAutoEditStrategyTest {
     private static RobotDocument newDocument(final String... lines) {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
-        final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(),
-                RobotParserConfig.allImportsLazy(new RobotVersion(3, 1)));
+        final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(), new RobotVersion(3, 1));
         final File file = new File("file.robot");
 
         final RobotDocument document = new RobotDocument(parser, file);

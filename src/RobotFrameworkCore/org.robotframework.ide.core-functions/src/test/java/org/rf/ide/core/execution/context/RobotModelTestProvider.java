@@ -17,7 +17,6 @@ import java.util.List;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -37,21 +36,7 @@ public class RobotModelTestProvider {
         final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn(version);
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        return new RobotParser(robotProject, RobotParserConfig.allImportsEager(RobotVersion.from(version)));
-    }
-
-    public static RobotParser getLazyParser() {
-        final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
-        when(runEnv.getVersion()).thenReturn("3.0a1");
-        final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        return new RobotParser(robotProject, RobotParserConfig.allImportsLazy(new RobotVersion(3, 0)));
-    }
-
-    public static RobotParser getLazyParser(final String version) {
-        final IRuntimeEnvironment runEnv = mock(IRuntimeEnvironment.class);
-        when(runEnv.getVersion()).thenReturn(version);
-        final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        return new RobotParser(robotProject, RobotParserConfig.allImportsLazy(RobotVersion.from(version)));
+        return new RobotParser(robotProject, RobotVersion.from(version));
     }
 
     public static RobotFile getModelFile(final String fileContent, final FileFormat format, final RobotParser parser) {

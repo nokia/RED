@@ -108,8 +108,7 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordName extends RobotForm
         // prepare
         final String filePath = convert("InKeywordsWithPrettyAlignWithThreeEmptyLinesBefore");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test prepare
         final KeywordTable table = modelFile.getKeywordTable();

@@ -27,8 +27,7 @@ public class HeadersOrderDumpTest extends RobotFormatParameterizedTest {
         final String inFileName = convert("Input_TestCaseExists_addingSettings");
         final String outputFileName = convert("Output_TestCaseExists_addingSettings");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // action
         modelFile.includeSettingTableSection();
@@ -44,8 +43,7 @@ public class HeadersOrderDumpTest extends RobotFormatParameterizedTest {
         final String inFileName = convert("Input_TestCaseExists_addingSettingsAndVariables");
         final String outputFileName = convert("Output_TestCaseExists_addingSettingsAndVariables");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // action
         modelFile.includeVariableTableSection();
