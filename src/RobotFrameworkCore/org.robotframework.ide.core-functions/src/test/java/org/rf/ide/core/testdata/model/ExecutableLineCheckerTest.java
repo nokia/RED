@@ -20,7 +20,7 @@ public class ExecutableLineCheckerTest {
     @Test
     public void test() throws URISyntaxException {
 
-        final RobotParser parser = RobotModelTestProvider.getLazyParser();
+        final RobotParser parser = RobotModelTestProvider.getParser();
         modelFile = RobotModelTestProvider.getModelFile("test_ExeChecker_1.robot", parser);
 
         checkExecutableLines(2, 3, 4, 5, 13, 14, 16, 17, 18, 22, 23, 24, 26, 29, 32, 36, 38, 41, 43);

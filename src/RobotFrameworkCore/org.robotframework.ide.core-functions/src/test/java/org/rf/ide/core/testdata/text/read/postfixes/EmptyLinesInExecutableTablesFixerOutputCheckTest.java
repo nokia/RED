@@ -17,7 +17,6 @@ import java.util.List;
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -127,8 +126,7 @@ public class EmptyLinesInExecutableTablesFixerOutputCheckTest {
         final File file = new File(RobotParser.class.getResource("parser/bugs/" + fileName).toURI());
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
-        final RobotParser parser = new RobotParser(projectHolder,
-                RobotParserConfig.allImportsLazy(new RobotVersion(3, 1)));
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(3, 1));
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify

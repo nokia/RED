@@ -22,7 +22,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -44,8 +43,7 @@ public class RedTokenScannerTest {
     public static void beforeSuite() {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
-        final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(),
-                RobotParserConfig.allImportsLazy(new RobotVersion(3, 0)));
+        final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(), new RobotVersion(3, 0));
         final File file = new File("file.robot");
 
         document = new RobotDocument(parser, file);

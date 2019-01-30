@@ -30,7 +30,7 @@ public class TestCaseNotChangedDumperTest extends RobotFormatParameterizedTest {
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
 
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(fileContent, getFormat(),
-                RobotModelTestProvider.getLazyParser("2.9"));
+                RobotModelTestProvider.getParser("2.9"));
         final RobotFileDumper dumper = new RobotFileDumper();
         final DumpContext ctx = new DumpContext(null, false);
 

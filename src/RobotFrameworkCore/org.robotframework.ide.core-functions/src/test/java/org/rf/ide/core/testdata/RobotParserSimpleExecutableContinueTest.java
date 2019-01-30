@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
@@ -43,8 +42,7 @@ public class RobotParserSimpleExecutableContinueTest {
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder,
-                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify
@@ -74,8 +72,7 @@ public class RobotParserSimpleExecutableContinueTest {
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder,
-                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify

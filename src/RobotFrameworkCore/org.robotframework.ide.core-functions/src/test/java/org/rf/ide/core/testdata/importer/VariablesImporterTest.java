@@ -62,7 +62,7 @@ public class VariablesImporterTest {
         // verify
         assertThat(importVariables).isEmpty();
         final List<BuildMessage> buildingMessages = robotFile.getBuildingMessages();
-        assertThat(buildingMessages.size()).isEqualTo(1);
+        assertThat(buildingMessages).hasSize(1);
         final BuildMessage buildMessage = buildingMessages.get(0);
         assertThat(buildMessage.getFileName()).contains("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.ERROR);
@@ -103,7 +103,7 @@ public class VariablesImporterTest {
         // verify
         assertThat(importVariables).hasSize(1);
         final List<BuildMessage> buildingMessages = robotFile.getBuildingMessages();
-        assertThat(buildingMessages.size()).isEqualTo(1);
+        assertThat(buildingMessages).hasSize(1);
         final BuildMessage buildMessage = buildingMessages.get(0);
         assertThat(buildMessage.getFileName()).contains("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.WARN);

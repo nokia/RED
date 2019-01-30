@@ -102,8 +102,7 @@ public class DocumentationServiceHandlerTest {
             final String expectedText) throws Exception {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getLazyParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
         final SuiteDocumentation suiteDoc = modelFile.getSettingTable().documentation().get();
 
         // execute

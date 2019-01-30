@@ -21,7 +21,6 @@ import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.SettingTable;
@@ -47,7 +46,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     public static void setup() throws Exception {
         final Path path = getFile("presenter//DocPositionsFind.robot");
         final RobotParser parser = new RobotParser(new RobotProjectHolder(new RobotRuntimeEnvironment(null, "2.9.0")),
-                RobotParserConfig.allImportsLazy(new RobotVersion(2, 9)));
+                new RobotVersion(2, 9));
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(path, parser);
         out = modelFile.getParent();
         assertThat(out).isNotNull();
