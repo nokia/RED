@@ -23,7 +23,6 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocumentListener;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -107,7 +106,7 @@ public class RobotDocument extends Document {
     private void createParserIfNeeded() {
         if (parser == null) {
             final RobotSuiteFile suiteFile = fileModelSupplier.get();
-            parser = suiteFile.createRobotParser(RobotParserConfig::allImportsLazy);
+            parser = suiteFile.createRobotParser();
             file = suiteFile.getRobotParserFile();
             reparse();
         }

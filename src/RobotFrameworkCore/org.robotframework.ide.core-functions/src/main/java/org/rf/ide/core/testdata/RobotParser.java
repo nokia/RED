@@ -38,6 +38,10 @@ public class RobotParser {
 
     private final PathsProvider pathsProvider;
 
+    public RobotParser(final RobotProjectHolder robotProject, final RobotVersion version) {
+        this(robotProject, RobotParserConfig.allImportsLazy(version));
+    }
+
     public RobotParser(final RobotProjectHolder robotProject, final RobotParserConfig cfg) {
         this(robotProject, cfg, null);
     }
@@ -51,10 +55,6 @@ public class RobotParser {
 
     public final RobotVersion getRobotVersion() {
         return parserCfg.getVersion();
-    }
-
-    public boolean isImportingEagerly() {
-        return parserCfg.isEagerImportOn();
     }
 
     /**
