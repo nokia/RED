@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -36,12 +35,10 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
-import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -321,10 +318,9 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
         return this;
     }
 
-    public RobotParser createRobotParser(final Function<RobotVersion, RobotParserConfig> configMapper) {
+    public RobotParser createRobotParser() {
         final RobotProject robotProject = getRobotProject();
-        final RobotParserConfig parserConfig = configMapper.apply(robotProject.getRobotParserComplianceVersion());
-        return new RobotParser(robotProject.getRobotProjectHolder(), parserConfig, robotProject.createPathsProvider());
+        return new RobotParser(robotProject.getRobotProjectHolder(), robotProject.getRobotParserComplianceVersion());
     }
 
     public File getRobotParserFile() {
@@ -335,7 +331,7 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
     protected ParsingStrategy createReparsingStrategy(final String fileContent) {
         return () -> {
             if (getRobotProject().getProject().exists()) {
-                final RobotParser parser = createRobotParser(RobotParserConfig::new);
+                final RobotParser parser = createRobotParser();
                 return parser.parseEditorContent(fileContent, getRobotParserFile());
             }
             // this can happen e.g. when renaming project
@@ -346,7 +342,7 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
     private ParsingStrategy createFileParsingStrategy() {
         return () -> {
             if (getRobotProject().getProject().exists()) {
-                final RobotParser parser = createRobotParser(RobotParserConfig::new);
+                final RobotParser parser = createRobotParser();
                 final List<RobotFileOutput> outputs = parser.parse(getRobotParserFile());
                 return outputs.isEmpty() ? null : outputs.get(0);
             }

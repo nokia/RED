@@ -7,13 +7,11 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.io.File;
 import java.util.List;
-import java.util.function.Function;
 
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
@@ -55,10 +53,9 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     }
 
     @Override
-    public RobotParser createRobotParser(final Function<RobotVersion, RobotParserConfig> configMapper) {
+    public RobotParser createRobotParser() {
         final IRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
-        final RobotParserConfig parserConfig = configMapper.apply(version == null ? env.getRobotVersion() : version);
-        return new RobotParser(new RobotProjectHolder(env), parserConfig);
+        return new RobotParser(new RobotProjectHolder(env), version == null ? env.getRobotVersion() : version);
     }
 
     @Override
@@ -69,7 +66,7 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     @Override
     protected ParsingStrategy createReparsingStrategy(final String fileContent) {
         return () -> {
-            final RobotParser parser = createRobotParser(RobotParserConfig::new);
+            final RobotParser parser = createRobotParser();
             return parser.parseEditorContent(fileContent, getRobotParserFile());
         };
     }
