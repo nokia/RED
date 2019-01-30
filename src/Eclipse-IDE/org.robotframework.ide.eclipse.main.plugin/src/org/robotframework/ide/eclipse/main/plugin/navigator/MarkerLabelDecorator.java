@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -149,11 +148,13 @@ public class MarkerLabelDecorator implements ILightweightLabelDecorator, IResour
         final IResourceDelta delta = event.getDelta();
         if (delta != null) {
             try {
-                final CollectAllResourcesVisitor visitor = new CollectAllResourcesVisitor();
-                delta.accept(visitor);
-                final List<IResource> list = visitor.getResources();
+                final List<IResource> allResources = new ArrayList<>();
+                delta.accept(d -> {
+                    allResources.add(d.getResource());
+                    return true;
+                });
                 final LabelProviderChangedEvent labelProviderChangedEvent = new LabelProviderChangedEvent(this,
-                        list.toArray());
+                        allResources.toArray());
                 for (final ILabelProviderListener listener : listeners) {
                     listener.labelProviderChanged(labelProviderChangedEvent);
                 }
@@ -182,20 +183,5 @@ public class MarkerLabelDecorator implements ILightweightLabelDecorator, IResour
             resource = resource.getParent();
         }
         return false;
-    }
-
-    private static class CollectAllResourcesVisitor implements IResourceDeltaVisitor {
-
-        private final List<IResource> resources = new ArrayList<>();
-
-        @Override
-        public boolean visit(final IResourceDelta delta) {
-            resources.add(delta.getResource());
-            return true;
-        }
-
-        public List<IResource> getResources() {
-            return resources;
-        }
     }
 }

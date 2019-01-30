@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -42,22 +41,18 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
     public NavigatorLibrariesContentProvider() {
         final IEclipseContext activeContext = getContext().getActiveLeaf();
         ContextInjectionFactory.inject(this, activeContext);
-        
+
         listener = new IResourceChangeListener() {
             @Override
             public void resourceChanged(final IResourceChangeEvent event) {
                 if (event.getType() == IResourceChangeEvent.POST_BUILD) {
                     final AtomicBoolean shouldRefresh = new AtomicBoolean(false);
                     try {
-                        event.getDelta().accept(new IResourceDeltaVisitor() {
-
-                            @Override
-                            public boolean visit(final IResourceDelta delta) throws CoreException {
-                                if (delta.getFlags() != 0 && delta.getFlags() != IResourceDelta.MARKERS) {
-                                    shouldRefresh.set(true);
-                                }
-                                return true;
+                        event.getDelta().accept(delta -> {
+                            if (delta.getFlags() != 0 && delta.getFlags() != IResourceDelta.MARKERS) {
+                                shouldRefresh.set(true);
                             }
+                            return true;
                         });
                     } catch (final CoreException e) {
                         // nothing to do
@@ -67,15 +62,12 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
                     }
                 } else if (event.getType() == IResourceChangeEvent.POST_CHANGE && event.getDelta() != null) {
                     try {
-                        event.getDelta().accept(new IResourceDeltaVisitor() {
-                            @Override
-                            public boolean visit(final IResourceDelta delta) throws CoreException {
-                                if (delta.getResource().getName().equals(RobotProjectConfig.FILENAME)) {
-                                    refreshViewer();
-                                    return false;
-                                }
-                                return true;
+                        event.getDelta().accept(delta -> {
+                            if (delta.getResource().getName().equals(RobotProjectConfig.FILENAME)) {
+                                refreshViewer();
+                                return false;
                             }
+                            return true;
                         });
                     } catch (final CoreException e) {
                         // nothing to do
@@ -97,7 +89,7 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
         ResourcesPlugin.getWorkspace().addResourceChangeListener(listener,
                 IResourceChangeEvent.POST_BUILD | IResourceChangeEvent.POST_CHANGE);
     }
-    
+
     private IEclipseContext getContext() {
         return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }

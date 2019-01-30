@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -91,17 +90,13 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
             return;
         }
         try {
-            event.getDelta().accept(new IResourceDeltaVisitor() {
-
-                @Override
-                public boolean visit(final IResourceDelta delta) throws CoreException {
-                    if ((delta.getFlags() & IResourceDelta.MARKERS) != 0
-                            && delta.getResource().equals(suiteModel.getFile())) {
-                        refresh(delta.getMarkerDeltas());
-                        return false;
-                    }
-                    return true;
+            event.getDelta().accept(delta -> {
+                if ((delta.getFlags() & IResourceDelta.MARKERS) != 0
+                        && delta.getResource().equals(suiteModel.getFile())) {
+                    refresh(delta.getMarkerDeltas());
+                    return false;
                 }
+                return true;
             });
             eventBroker.post(RobotModelEvents.MARKERS_CACHE_RELOADED, suiteModel);
         } catch (final CoreException e) {

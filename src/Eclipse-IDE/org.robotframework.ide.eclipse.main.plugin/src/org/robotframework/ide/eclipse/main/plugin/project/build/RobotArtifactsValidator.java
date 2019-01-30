@@ -22,8 +22,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -226,6 +224,7 @@ public class RobotArtifactsValidator {
         }
     }
 
+    @FunctionalInterface
     public interface ModelUnitValidatorConfig {
 
         List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException;
@@ -247,94 +246,69 @@ public class RobotArtifactsValidator {
         }
 
         public static ModelUnitValidatorConfig create(final Collection<RobotSuiteFile> suiteModels) {
-            return new ModelUnitValidatorConfig() {
-
-                @Override
-                public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
-                    final List<ModelUnitValidator> validators = new ArrayList<>();
-                    for (final RobotSuiteFile suiteModel : suiteModels) {
-                        if (RobotArtifactsValidator.shouldValidate(suiteModel)) {
-                            suiteModel.getFile().accept(new IResourceVisitor() {
-
-                                @Override
-                                public boolean visit(final IResource resource) throws CoreException {
-                                    final Optional<? extends ModelUnitValidator> validator = createValidator(context,
-                                            resource, ValidationReportingStrategy.reportOnly(), false);
-                                    if (validator.isPresent()) {
-                                        validators.add(createSynchronizedValidator(resource, validator.get()));
-                                    }
-                                    return true;
-                                }
-                            });
-                        }
+            return context -> {
+                final List<ModelUnitValidator> validators = new ArrayList<>();
+                for (final RobotSuiteFile suiteModel : suiteModels) {
+                    if (RobotArtifactsValidator.shouldValidate(suiteModel)) {
+                        suiteModel.getFile().accept(resource -> {
+                            final Optional<? extends ModelUnitValidator> validator = createValidator(context, resource,
+                                    ValidationReportingStrategy.reportOnly(), false);
+                            if (validator.isPresent()) {
+                                validators.add(createSynchronizedValidator(resource, validator.get()));
+                            }
+                            return true;
+                        });
                     }
-                    return validators;
                 }
+                return validators;
             };
         }
 
         private static ModelUnitValidatorConfig createForWholeProject(final IProject project,
                 final ValidationReportingStrategy reporter) {
-            return new ModelUnitValidatorConfig() {
-
-                @Override
-                public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
-                    final List<ModelUnitValidator> validators = new ArrayList<>();
-                    project.accept(new IResourceVisitor() {
-
-                        @Override
-                        public boolean visit(final IResource resource) throws CoreException {
-                            final Optional<? extends ModelUnitValidator> validator = createValidator(context, resource,
-                                    reporter, false);
-                            if (validator.isPresent()) {
-                                validators.add(validator.get());
-                            }
-                            return true;
-                        }
-                    });
-
-                    // those file could have markers reported by prior build job
-                    final Collection<IResource> filesToOmit = newHashSet(project.getFile(".project"),
-                            project.getFile(RobotProjectConfig.FILENAME));
-
-                    for (final IResource child : project.members()) {
-                        if (!filesToOmit.contains(child)) {
-                            child.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-                        }
+            return context -> {
+                final List<ModelUnitValidator> validators = new ArrayList<>();
+                project.accept(resource -> {
+                    final Optional<? extends ModelUnitValidator> validator = createValidator(context, resource,
+                            reporter, false);
+                    if (validator.isPresent()) {
+                        validators.add(validator.get());
                     }
-                    project.deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_INFINITE);
-                    return validators;
+                    return true;
+                });
+
+                // those file could have markers reported by prior build job
+                final Collection<IResource> filesToOmit = newHashSet(project.getFile(".project"),
+                        project.getFile(RobotProjectConfig.FILENAME));
+
+                for (final IResource child : project.members()) {
+                    if (!filesToOmit.contains(child)) {
+                        child.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+                    }
                 }
+                project.deleteMarkers(RobotTask.TYPE_ID, true, IResource.DEPTH_INFINITE);
+                return validators;
             };
         }
 
         private static ModelUnitValidatorConfig createForChangedFiles(final IResourceDelta delta,
                 final ValidationReportingStrategy reporter) {
-            return new ModelUnitValidatorConfig() {
+            return context -> {
+                final List<ModelUnitValidator> validators = new ArrayList<>();
+                delta.accept(d -> {
+                    if (d.getKind() != IResourceDelta.REMOVED && (d.getFlags() & IResourceDelta.CONTENT) != 0) {
+                        context.setIsValidatingChangedFiles(true);
 
-                @Override
-                public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
-                    final List<ModelUnitValidator> validators = new ArrayList<>();
-                    delta.accept(new IResourceDeltaVisitor() {
-
-                        @Override
-                        public boolean visit(final IResourceDelta delta) throws CoreException {
-                            if (delta.getKind() != IResourceDelta.REMOVED
-                                    && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-                                context.setIsValidatingChangedFiles(true);
-
-                                final IResource resource = delta.getResource();
-                                final Optional<? extends ModelUnitValidator> validator = createValidator(context,
-                                        resource, reporter, false);
-                                if (validator.isPresent()) {
-                                    validators.add(createSynchronizedValidator(resource, validator.get()));
-                                }
-                            }
-                            return true;
+                        final IResource resource = d.getResource();
+                        final Optional<? extends ModelUnitValidator> validator = createValidator(context, resource,
+                                reporter, false);
+                        if (validator.isPresent()) {
+                            validators.add(createSynchronizedValidator(resource, validator.get()));
                         }
-                    });
-                    return validators;
-                }
+                    }
+                    return true;
+                });
+                return validators;
             };
         }
 

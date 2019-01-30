@@ -22,7 +22,6 @@ import java.util.stream.Stream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -116,28 +115,23 @@ class TagsProposalsSupport {
 
             for (final Entry<IResource, List<String>> entry : currentSuitesToRun.entrySet()) {
                 try {
-                    entry.getKey().accept(new IResourceVisitor() {
+                    entry.getKey().accept(resource -> {
+                        // only suites files contains tags
+                        if (resource.getType() == IResource.FILE && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
+                                || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
+                            final RobotSuiteFile suiteModel = RedPlugin.getModelManager()
+                                    .createSuiteFile((IFile) resource);
+                            if (suiteModel != null && (suiteModel.isSuiteFile() || suiteModel.isRpaSuiteFile())) {
+                                final IPath groupingPath = suiteModel.getFile().getFullPath();
 
-                        @Override
-                        public boolean visit(final IResource resource) throws CoreException {
-                            // only suites files contains tags
-                            if (resource.getType() == IResource.FILE
-                                    && (ASuiteFileDescriber.isSuiteFile((IFile) resource)
-                                            || ASuiteFileDescriber.isRpaSuiteFile((IFile) resource))) {
-                                final RobotSuiteFile suiteModel = RedPlugin.getModelManager()
-                                        .createSuiteFile((IFile) resource);
-                                if (suiteModel != null && (suiteModel.isSuiteFile() || suiteModel.isRpaSuiteFile())) {
-                                    final IPath groupingPath = suiteModel.getFile().getFullPath();
-
-                                    if (!allTagsCache.containsKey(groupingPath)) {
-                                        allTagsCache.putAll(groupingPath, extractTagsFromSuite(suiteModel));
-                                    }
-                                    final Collection<SourcedTag> tags = allTagsCache.get(groupingPath);
-                                    groupedTags.putAll(groupingPath, filterMatchingTags(tags, entry.getValue()));
+                                if (!allTagsCache.containsKey(groupingPath)) {
+                                    allTagsCache.putAll(groupingPath, extractTagsFromSuite(suiteModel));
                                 }
+                                final Collection<SourcedTag> tags = allTagsCache.get(groupingPath);
+                                groupedTags.putAll(groupingPath, filterMatchingTags(tags, entry.getValue()));
                             }
-                            return true;
                         }
+                        return true;
                     });
                 } catch (final CoreException e) {
                     // nothing
