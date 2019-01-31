@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Ocx3EOniEeWqgY2-QUmvuQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/31/19 11:07 AM
+Save-Time: 1/31/19 11:48 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -51,10 +51,10 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 }
 
 // for windows:
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-	echo "test on windows will fail as jython/java keeps lock on jar file thus next RCPTT test will file anyway"
-
-}-else{
+//if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+//	echo "test on windows will fail as jython/java keeps lock on jar file thus next RCPTT test will file anyway"
+//
+//}-else{
 
 	// check problems for unknown libs and KW
 	//get-view Console | click
@@ -76,6 +76,7 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" | equals "Unknown keyword 'Go'" 
 	        | verify-true
 	}
+	
 	//add path 
 	get-view "Project Explorer" | get-tree | select "PythonInJar/red.xml" | double-click
 	get-editor "PythonInJar/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
@@ -91,7 +92,32 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	}
 	get-editor "PythonInJar/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
 	
+	// add single python lib from jar
+	set-dialog-result File "platform:/resource/PythonInJar/JythonLibraryWithPython.jar"
+	get-editor "PythonInJar/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+	with [get-window "Select library class"] {
+	    get-table | select ClassInClass
+	    get-button OK | click
+	}
+	get-editor "PythonInJar/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" 
+	    | key-type "M1+s"
+	get-view "Project Explorer" | get-tree | get-item 
+	    -path "PythonInJar/Robot Referenced libraries/ClassInClass PythonInJar \\(1\\)" | get-property caption 
+	    | equals "ClassInClass PythonInJar (1)" | verify-true
+	with [get-editor "PythonInJar/red.xml" | get-section "Referenced libraries" | get-table] {
+	    select "ClassInClass - PythonInJar" | key-type Del
+	    key-type "M1+s"
+	}
 	
+	// disable preference for libdoc generation
+	get-preferences-menu | click
+	with [get-window Preferences] {
+		get-tree | select "Robot Framework/Libraries"
+	    get-group "Libdoc generating" | get-button "Generate Python libraries libdocs in separate process" | uncheck
+	    get-button Apply | click
+	    get-button "Apply and Close" | click
+	}
+		
 	// open red.xml and add jar and python from jar file
 	set-dialog-result File "platform:/resource/PythonInJar/JythonLibraryWithPython.jar"
 	get-editor "PythonInJar/red.xml" | get-section "Referenced libraries" | get-button "Add Java library" | click
@@ -138,5 +164,5 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    + "    Class Pat\n"
 	    + "    Go\n"
 	    + "    Call Libatron    name" | verify-true
-}
+//}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
