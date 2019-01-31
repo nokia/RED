@@ -319,7 +319,7 @@ def create_libdoc(libname, format, python_paths, class_paths):
 @cleanup_modules
 @cleanup_sys_path
 @logargs
-def create_libdoc_in_separate_process(libname, format, python_paths, class_paths, timeout_duration=10):
+def create_libdoc_in_separate_process(libname, format, python_paths, class_paths, timeout_duration=30):
     import os
     import subprocess
     import threading
