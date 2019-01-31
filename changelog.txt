@@ -1,3 +1,46 @@
+RED 0.8.11 - 2019/01/31
+Feature
+
+	[RED-941] - Launching parameters for run/debug - defined by user and from Env
+
+Enhancement
+
+	[RED-307] - Remove all files that are not test from run configuration
+	[RED-370] - [GitHub #27] Unselected Test Suites are automatically removed from Run Configurations
+	[RED-1061] - [GitHub #186] - double click for multiword KW should select whole KW, not item between space
+	[RED-1194] - Provide alternative way to generate libdocs
+	[RED-1210] - [Github #263] Console retrieving problem with 2018-12
+	[RED-1220] - [Github #266] Parser exception is thrown when extracting variables
+	[RED-1228] - Provide quick fix for nested library keyword warning
+	[RED-1229] - Variable files defined in red.xml should not be taken to tests execution
+
+Bug
+
+	[RED-590] - Red.xml is dirty after clicking on variable mapping
+	[RED-703] - Content assist is closed in last line in resource file
+	[RED-919] - Better handle projects without red.xml - building & validation
+	[RED-1116] - Documentation view when there is no interpreter
+	[RED-1147] - [Github #231] pandas library hangs XML-RPC server
+	[RED-1149] - [Github #217] pymouse library raises AssertionError
+	[RED-1185] - [GitHub #245] JSONLibrary import by autodiscovery fails, QuickFix works fine
+	[RED-1197] - Exception for Variables file with windows path
+	[RED-1213] - Launch configuration problem when adding new suite
+	[RED-1215] - Upgrade to 0.8.9 from 0.8.2: libs cannot be loaded anymore
+	[RED-1217] - [Github #264] Missing library file for external library
+	[RED-1219] - Some libs can't be loaded
+	[RED-1223] - [GitHub #269] Wrong validation problem when keyword uses dot character in name
+	[RED-1224] - Documentation with empty lines is not generated correctly
+	[RED-1225] - Keyword source finding does not always work for RF3.1
+	[RED-1227] - red.xml is not excluded from validation
+
+Task
+
+	[RED-1221] - Analyze E2E-SC-Robot project problems
+
+Sub-task
+
+	[RED-1226] - Retrieve python names from library without importing
+
 RED 0.8.10 - 2018/12/17
 Enhancement
 
