@@ -40,7 +40,7 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>3.1.8</version>
+				<version>3.1.10</version>
 				<configuration>
 					<linkXRef>false</linkXRef>
 					<onlyAnalyze>org.rf.-,org.robotframework.-</onlyAnalyze>
