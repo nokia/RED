@@ -1,3 +1,38 @@
+# RED - Robot Editor v0.8.11
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7) or newer  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.11 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- Launching parameters for run/debug - defined by user and from Env
+- Alternative way to generate libdocs - preference for generating libdocs in separate process
+- Variable files defined in red.xml are not passed to tests execution
+- Enhancements in keyword source searching - support for decorated and overloaded methods
+- Enhancements in run configuration suites composite
+
+## GitHub issues updates
+ - #27 - Unselected Test Suites are automatically removed from Run Configurations
+ - #186 - double click for multiword KW should select whole KW, not item between space
+ - #217 - pymouse library raises AssertionError
+ - #231 - pandas library hangs XML-RPC server
+ - #245 - JSONLibrary import by autodiscovery fails, QuickFix works fine
+ - #263 - Console retrieving problem with 2018-12
+ - #264 - Missing library file for external library
+ - #266 - Parser exception is thrown when extracting variables
+ - #269 - Wrong validation problem when keyword uses dot character in name
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.10
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
