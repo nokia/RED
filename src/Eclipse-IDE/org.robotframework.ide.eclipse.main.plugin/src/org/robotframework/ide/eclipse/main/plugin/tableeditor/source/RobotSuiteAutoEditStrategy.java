@@ -16,6 +16,7 @@ import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -25,6 +26,8 @@ import org.rf.ide.core.testdata.text.read.separators.Separator;
 
 public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
+    private static final String VAR_WRAP_PATTERN = "\\w+";
+
     private final Supplier<String> separatorSupplier;
 
     public RobotSuiteAutoEditStrategy(final Supplier<String> separatorSupplier) {
@@ -33,12 +36,44 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
     @Override
     public void customizeDocumentCommand(final IDocument document, final DocumentCommand command) {
-        if (command.length == 0 && "\t".equals(command.text)) {
-            replaceTabWithSpecifiedSeparator(command);
+        if (command.offset == -1 || command.text == null) {
+            return;
+        }
 
-        } else if (command.offset != -1 && command.length == 0 && command.text != null && document.getLength() > 0
-                && TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
+        try {
+            if (command.length == 0) {
+                customizeZeroLengthDocumentCommand(document, command);
+            } else if (command.length > 0) {
+                customizePositiveLengthDocumentCommand(document, command);
+            }
+        } catch (final BadLocationException | InterruptedException e) {
+            // ok, no change in command then
+        }
+    }
+
+    private void customizeZeroLengthDocumentCommand(final IDocument document, final DocumentCommand command)
+            throws InterruptedException, BadLocationException {
+        if ("\t".equals(command.text)) {
+            replaceTabWithSpecifiedSeparator(command);
+        } else if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)) {
+            addVariableBrackets(command, "");
+        } else if (TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
             autoIndentAfterNewLine(document, command);
+        }
+    }
+
+    private void customizePositiveLengthDocumentCommand(final IDocument document, final DocumentCommand command)
+            throws BadLocationException {
+        if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)) {
+            final String selectedText = document.get(command.offset, command.length);
+            if (selectedText.matches(VAR_WRAP_PATTERN)) {
+                addVariableBrackets(command, selectedText);
+            }
+        } else if (command.length == 1 && command.text.isEmpty()
+                && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(document.get(command.offset - 1, 1))
+                && document.get(command.offset, 2).equals("{}")) {
+            // deleting empty variable brackets
+            command.length = 2;
         }
     }
 
@@ -46,18 +81,21 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         command.text = getSeparator();
     }
 
-    private void autoIndentAfterNewLine(final IDocument document, final DocumentCommand command) {
-        try {
-            final RobotFileOutput rfo = ((RobotDocument) document).getNewestFileOutput();
-            final int lineNumber = document.getLineOfOffset(command.offset);
-            final List<RobotLine> contents = rfo.getFileModel().getFileContent();
-            if (lineNumber < contents.size()) {
-                final RobotLine currentLine = contents.get(lineNumber);
-                autoIndentAfterNewLine(currentLine, DocumentUtilities.getDelimiter(document), command);
-            }
+    private void addVariableBrackets(final DocumentCommand command, final String selectedText) {
+        final String wrappedText = "{" + selectedText + "}";
+        command.text += wrappedText;
+        command.shiftsCaret = false;
+        command.caretOffset = command.offset + wrappedText.length();
+    }
 
-        } catch (final InterruptedException | BadLocationException e) {
-            // ok, no change in command then
+    private void autoIndentAfterNewLine(final IDocument document, final DocumentCommand command)
+            throws InterruptedException, BadLocationException {
+        final RobotFileOutput rfo = ((RobotDocument) document).getNewestFileOutput();
+        final int lineNumber = document.getLineOfOffset(command.offset);
+        final List<RobotLine> contents = rfo.getFileModel().getFileContent();
+        if (lineNumber < contents.size()) {
+            final RobotLine currentLine = contents.get(lineNumber);
+            autoIndentAfterNewLine(currentLine, DocumentUtilities.getDelimiter(document), command);
         }
     }
 
@@ -75,9 +113,9 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         } else {
             String addedIndent = "";
             if (firstElement instanceof Separator || isEmptyCellToken(firstElement)) {
-                final int lenght = Math.max(0,
+                final int length = Math.max(0,
                         Math.min(firstElement.getText().length(), command.offset - firstElement.getStartOffset()));
-                addedIndent = firstElement.getText().substring(0, lenght);
+                addedIndent = firstElement.getText().substring(0, length);
                 command.text += addedIndent;
             }
 
