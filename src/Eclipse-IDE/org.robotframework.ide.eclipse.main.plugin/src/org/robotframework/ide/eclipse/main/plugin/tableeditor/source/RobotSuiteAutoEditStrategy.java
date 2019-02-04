@@ -55,10 +55,11 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             throws InterruptedException, BadLocationException {
         if ("\t".equals(command.text)) {
             replaceTabWithSpecifiedSeparator(command);
-        } else if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)) {
-            addVariableBrackets(command, "");
         } else if (TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
             autoIndentAfterNewLine(document, command);
+        } else if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)
+                && (command.offset == document.getLength() || !"{".equals(document.get(command.offset, 1)))) {
+            addVariableBrackets(command, "");
         }
     }
 
