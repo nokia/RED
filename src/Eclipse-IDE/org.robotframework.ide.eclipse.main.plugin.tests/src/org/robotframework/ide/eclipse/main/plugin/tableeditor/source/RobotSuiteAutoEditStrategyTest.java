@@ -38,17 +38,49 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
-    public void variableBracketsAreAdded_whenVariableIdentifiersAreRequested() {
+    public void variableBracketsAreAdded_whenVariableIdentifiersAreRequestedAtDocumentEnd() {
         for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
-            final RobotDocument document = newDocument("");
-            final DocumentCommand command = newDocumentCommand(varId);
+            final RobotDocument document = newDocument("abc");
+            final DocumentCommand command = newDocumentCommand(3, varId);
 
             final RobotSuiteAutoEditStrategy strategy = newStrategy();
             strategy.customizeDocumentCommand(document, command);
 
             assertThat(command.text).isEqualTo(varId + "{}");
             assertThat(command.shiftsCaret).isFalse();
-            assertThat(command.caretOffset).isEqualTo(2);
+            assertThat(command.caretOffset).isEqualTo(5);
+            assertThat(command.length).isEqualTo(0);
+        }
+    }
+
+    @Test
+    public void variableBracketsAreAdded_whenVariableIdentifiersAreRequestedInsideDocument() {
+        for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
+            final RobotDocument document = newDocument("abc");
+            final DocumentCommand command = newDocumentCommand(1, varId);
+
+            final RobotSuiteAutoEditStrategy strategy = newStrategy();
+            strategy.customizeDocumentCommand(document, command);
+
+            assertThat(command.text).isEqualTo(varId + "{}");
+            assertThat(command.shiftsCaret).isFalse();
+            assertThat(command.caretOffset).isEqualTo(3);
+            assertThat(command.length).isEqualTo(0);
+        }
+    }
+
+    @Test
+    public void variableBracketsAreNotAdded_whenVariableIdentifiersAreRequestedBeforeOpenningBracket() {
+        for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
+            final RobotDocument document = newDocument("{name}");
+            final DocumentCommand command = newDocumentCommand(varId);
+
+            final RobotSuiteAutoEditStrategy strategy = newStrategy();
+            strategy.customizeDocumentCommand(document, command);
+
+            assertThat(command.text).isEqualTo(varId);
+            assertThat(command.shiftsCaret).isTrue();
+            assertThat(command.caretOffset).isEqualTo(-1);
             assertThat(command.length).isEqualTo(0);
         }
     }
