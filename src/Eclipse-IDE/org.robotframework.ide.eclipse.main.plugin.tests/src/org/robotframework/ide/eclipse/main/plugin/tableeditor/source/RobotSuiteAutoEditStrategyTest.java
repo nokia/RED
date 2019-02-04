@@ -5,19 +5,18 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.eclipse.jface.text.DocumentCommand;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
@@ -30,12 +29,94 @@ public class RobotSuiteAutoEditStrategyTest {
     @Test
     public void separatorIsUsed_whenTabWasOriginallyRequested() {
         final RobotDocument document = newDocument("");
-        final DocumentCommand command = newDocumentCommand(0, "\t");
+        final DocumentCommand command = newDocumentCommand("\t");
 
         final RobotSuiteAutoEditStrategy strategy = newStrategy("the_separator");
         strategy.customizeDocumentCommand(document, command);
 
         assertThat(command.text).isEqualTo("the_separator");
+    }
+
+    @Test
+    public void variableBracketsAreAdded_whenVariableIdentifiersAreRequested() {
+        for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
+            final RobotDocument document = newDocument("");
+            final DocumentCommand command = newDocumentCommand(varId);
+
+            final RobotSuiteAutoEditStrategy strategy = newStrategy();
+            strategy.customizeDocumentCommand(document, command);
+
+            assertThat(command.text).isEqualTo(varId + "{}");
+            assertThat(command.shiftsCaret).isFalse();
+            assertThat(command.caretOffset).isEqualTo(2);
+            assertThat(command.length).isEqualTo(0);
+        }
+    }
+
+    @Test
+    public void bracketsAreDeleted_whenBackspaceOrDeleteIsRequestedOnEmptyVariableBrackets() {
+        for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
+            final RobotDocument document = newDocument(varId + "{}");
+
+            final DocumentCommand command = newDocumentCommand(1, "", 1);
+
+            final RobotSuiteAutoEditStrategy strategy = newStrategy();
+            strategy.customizeDocumentCommand(document, command);
+
+            assertThat(command.text).isEmpty();
+            assertThat(command.shiftsCaret).isTrue();
+            assertThat(command.caretOffset).isEqualTo(-1);
+            assertThat(command.length).isEqualTo(2);
+        }
+    }
+
+    @Test
+    public void bracketsAreNotDeleted_whenBackspaceOrDeleteIsRequestedOnEmptyNonVariableBrackets() {
+        final RobotDocument document = newDocument("abc{}");
+
+        final DocumentCommand command = newDocumentCommand(3, "", 1);
+
+        final RobotSuiteAutoEditStrategy strategy = newStrategy();
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEmpty();
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(1);
+    }
+
+    @Test
+    public void textIsWrappedInVariableBrackets_whenVariableIdentifiersAreRequestedOnSelectedTextContainingOnlyWordCharacters() {
+        for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
+            final RobotDocument document = newDocument("Abc Def_123");
+
+            final DocumentCommand command = newDocumentCommand(4, varId, 7);
+
+            final RobotSuiteAutoEditStrategy strategy = newStrategy();
+            strategy.customizeDocumentCommand(document, command);
+
+            assertThat(command.text).isEqualTo(varId + "{Def_123}");
+            assertThat(command.shiftsCaret).isFalse();
+            assertThat(command.caretOffset).isEqualTo(13);
+            assertThat(command.length).isEqualTo(7);
+        }
+    }
+
+    @Test
+    public void textIsNotWrappedInVariableBrackets_whenVariableIdentifiersAreRequestedOnSelectedTextContainingNonWordCharacter() {
+        for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
+            final RobotDocument document = newDocument("Abc Def_123");
+
+            final DocumentCommand command = newDocumentCommand(2, varId, 6);
+
+            final RobotSuiteAutoEditStrategy strategy = newStrategy();
+            strategy.customizeDocumentCommand(document, command);
+
+            assertThat(command.text).isEqualTo(varId);
+            assertThat(command.shiftsCaret).isTrue();
+            assertThat(command.caretOffset).isEqualTo(-1);
+            assertThat(command.length).isEqualTo(6);
+        }
     }
 
     @Test
@@ -289,17 +370,26 @@ public class RobotSuiteAutoEditStrategyTest {
         final File file = new File("file.robot");
 
         final RobotDocument document = new RobotDocument(parser, file);
-        document.set(Stream.of(lines).collect(joining("\n")));
+        document.set(String.join("\n", lines));
         return document;
     }
 
+    private static DocumentCommand newDocumentCommand(final String text) {
+        return newDocumentCommand(0, text);
+    }
+
     private static DocumentCommand newDocumentCommand(final int offset, final String text) {
-        final DocumentCommand document = new DocumentCommand() { };
-        document.offset = offset;
-        document.text = text;
-        document.shiftsCaret = true;
-        document.caretOffset = -1;
-        return document;
+        return newDocumentCommand(offset, text, 0);
+    }
+
+    private static DocumentCommand newDocumentCommand(final int offset, final String text, final int length) {
+        final DocumentCommand command = new DocumentCommand() {};
+        command.offset = offset;
+        command.text = text;
+        command.shiftsCaret = true;
+        command.caretOffset = -1;
+        command.length = length;
+        return command;
     }
 
     private RobotSuiteAutoEditStrategy newStrategy() {

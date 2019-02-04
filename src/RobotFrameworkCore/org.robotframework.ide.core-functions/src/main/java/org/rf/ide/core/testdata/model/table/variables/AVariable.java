@@ -9,6 +9,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -20,10 +23,17 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
+import com.google.common.collect.ImmutableSet;
+
 public abstract class AVariable extends AModelElement<VariableTable>
         implements IVariableHolder, ICommentHolder, Serializable {
 
     private static final long serialVersionUID = 3690914169761757467L;
+
+    public static final Set<String> ROBOT_VAR_IDENTIFICATORS = Stream
+            .of(VariableType.SCALAR, VariableType.LIST, VariableType.DICTIONARY)
+            .map(VariableType::getIdentificator)
+            .collect(Collectors.collectingAndThen(Collectors.toSet(), ImmutableSet::copyOf));
 
     protected VariableType type;
 
