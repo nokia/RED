@@ -11,13 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinksToFilesDetectorTest.objectsOfClass;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -40,7 +34,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
@@ -63,7 +56,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "case",
                 "  Log  10");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -82,7 +75,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "*** Variables ***",
                 "${var}  1");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -113,7 +106,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "case2",
                 "  ${var}=  kw");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -132,7 +125,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "  Log  ${var}",
                 "  ${var}=  kw");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -152,7 +145,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "*** Variables ***",
                 "${v}  1");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -173,7 +166,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "Resource  file.robot");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -203,7 +196,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
         varsImportRef.map(ImmutableMap.of("x", 100, "var", 42, "z", 1729));
         final RobotFileOutput output = suiteFile.getLinkedElement().getParent();
         output.setVariablesImportReferences(newArrayList(varsImportRef));
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -228,7 +221,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
         final ReferencedVariableFile varsImportRef = new ReferencedVariableFile();
         varsImportRef.setVariables(ImmutableMap.of("x", 100, "var", 42, "z", 1729));
         robotProject.setReferencedVariablesFiles(newArrayList(varsImportRef));
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -250,7 +243,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotProjectHolder projectHolder = suiteFile.getRobotProject().getRobotProjectHolder();
         projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("var", "val")));
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -272,7 +265,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "  Log  ${var}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -296,7 +289,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "  Log  ${var}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -319,7 +312,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "  Log  ${arg}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -341,7 +334,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "  Log  ${arg}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -366,7 +359,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "${var}  1");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -390,7 +383,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 "Resource  file.robot");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -405,13 +398,5 @@ public class SourceHyperlinksToVariablesDetectorTest {
                 .isEqualTo(projectProvider.getFile("file.robot"));
         assertThat(((SuiteFileSourceRegionHyperlink) hyperlinks[0]).getDestinationRegion())
                 .isEqualTo(new Region(18, 10));
-    }
-
-    private static List<String> getContent(final IFile file) {
-        try (InputStream stream = file.getContents()) {
-            return Splitter.on('\n').splitToList(projectProvider.getFileContent(file));
-        } catch (IOException | CoreException e) {
-            return new ArrayList<>();
-        }
     }
 }

@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
 
 import java.util.Comparator;
 import java.util.List;
@@ -71,7 +70,7 @@ public class ForLoopReservedWordsProposalsTest {
         final ForLoopReservedWordsProposals proposalsProvider = new ForLoopReservedWordsProposals(
                 AssistProposalPredicates.alwaysTrue());
 
-        final Comparator<AssistProposal> comparator = reverseComparator(AssistProposals.sortedByLabels());
+        final Comparator<AssistProposal> comparator = AssistProposals.sortedByLabels().reversed();
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("", comparator);
         assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("IN ZIP", "IN RANGE", "IN ENUMERATE", "IN", "FOR", "END", ":FOR");

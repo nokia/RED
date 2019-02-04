@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
 
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class RedSectionProposalsTest {
     @Test
     public void proposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("*",
-                reverseComparator(AssistProposals.sortedByLabels()));
+                AssistProposals.sortedByLabels().reversed());
 
         assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("*** Variables ***", "*** Test Cases ***", "*** Tasks ***", "*** Settings ***",

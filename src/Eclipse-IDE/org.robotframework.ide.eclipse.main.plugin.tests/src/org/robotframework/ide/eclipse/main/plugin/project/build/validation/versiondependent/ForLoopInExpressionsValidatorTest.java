@@ -5,10 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
 
-import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -87,7 +84,7 @@ public class ForLoopInExpressionsValidatorTest {
     private static ForLoopDeclarationRowDescriptor<?> createLoopDescriptor(final String... forLoopCells) {
         final RobotSuiteFile model = new RobotSuiteFileCreator(new RobotVersion(3, 1)).appendLine("*** Test Cases ***")
                 .appendLine("test")
-                .appendLine("    " + Stream.of(forLoopCells).collect(joining("    ")))
+                .appendLine("    " + String.join("    ", forLoopCells))
                 .appendLine("    \\    Log    1")
                 .build();
         final RobotExecutableRow<?> forRow = (RobotExecutableRow<?>) model.findSection(RobotCasesSection.class)
