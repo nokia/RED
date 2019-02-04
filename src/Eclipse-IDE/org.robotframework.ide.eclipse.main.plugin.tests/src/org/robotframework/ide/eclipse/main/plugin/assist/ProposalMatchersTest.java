@@ -129,7 +129,7 @@ public class ProposalMatchersTest {
     }
 
     @Test
-    public void variablesMatcherReturnsMatches_whenDefinitionContainsUserContentAndUserContentDoesNotNotStartWithVariableIdentificator() {
+    public void variablesMatcherReturnsMatches_whenDefinitionContainsUserContentAndUserContentDoesNotStartWithVariableIdentificator() {
         assertThat(VARIABLES_MATCHER.matches("", "${abcdef}")).hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
         assertThat(VARIABLES_MATCHER.matches("A", "${abcde}")).hasValue(new ProposalMatch(Range.closedOpen(2, 3)));
         assertThat(VARIABLES_MATCHER.matches("BC", "${abcdef}")).hasValue(new ProposalMatch(Range.closedOpen(3, 5)));
