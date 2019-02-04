@@ -16,6 +16,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -33,14 +34,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
-
 public class ImportsInCodeAssistProcessorTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(ImportsInCodeAssistProcessorTest.class);
 
     private static RobotModel robotModel;
+
+    private static IFile suite;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
@@ -49,7 +50,7 @@ public class ImportsInCodeAssistProcessorTest {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(Libraries.createStdLibs("Lib1", "Lib2", "Lib3"));
 
-        projectProvider.createFile("suite.robot",
+        suite = projectProvider.createFile("suite.robot",
                 "*** Settings ***",
                 "Library  Lib1",
                 "Library  Lib3",
@@ -65,11 +66,12 @@ public class ImportsInCodeAssistProcessorTest {
     @AfterClass
     public static void afterSuite() {
         robotModel = null;
+        suite = null;
     }
 
     @Test
     public void importsInCodeProcessorIsValidOnlyForKeywordsOrCasesSections() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
@@ -78,7 +80,7 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void importsInCodeProcessorHasTitleDefined() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
@@ -88,12 +90,12 @@ public class ImportsInCodeAssistProcessorTest {
         final int offset = 115;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -106,12 +108,12 @@ public class ImportsInCodeAssistProcessorTest {
         final int offset = 116;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -124,12 +126,12 @@ public class ImportsInCodeAssistProcessorTest {
         final int offset = 115;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -155,12 +157,12 @@ public class ImportsInCodeAssistProcessorTest {
         final int offset = 118;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -186,12 +188,12 @@ public class ImportsInCodeAssistProcessorTest {
         final int offset = 119;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -210,12 +212,12 @@ public class ImportsInCodeAssistProcessorTest {
         final int offset = 130;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -229,10 +231,5 @@ public class ImportsInCodeAssistProcessorTest {
                         "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib1."),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
                         "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib3."));
-    }
-
-    private static IDocument documentFromSuiteFile() throws Exception {
-        final String content = projectProvider.getFileContent("suite.robot");
-        return new Document(Splitter.on('\n').splitToList(content));
     }
 }

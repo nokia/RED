@@ -9,15 +9,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -45,7 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -89,7 +83,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "case",
                 "  Log  10");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -110,7 +104,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "kw1",
                 "kw2");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -146,7 +140,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "  kw1  ${x}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -168,7 +162,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "Resource  file.robot");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -190,7 +184,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "Library  testlib");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final RobotProject project = suiteFile.getRobotProject();
         project.setStandardLibraries(new HashMap<>());
@@ -217,7 +211,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotKeywordDefinition kw1 = suiteFile.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -248,7 +242,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final RobotSuiteFile resSuiteFile = model.createSuiteFile(projectProvider.getFile("file.robot"));
         final RobotKeywordDefinition resKw = resSuiteFile.findSection(RobotKeywordsSection.class).get()
                 .getChildren().get(0);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -278,7 +272,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "Library  testlib");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final RobotProject project = suiteFile.getRobotProject();
         project.setStandardLibraries(new HashMap<>());
@@ -317,7 +311,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "kw");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -354,7 +348,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotKeywordDefinition kw = suiteFile.findSection(RobotKeywordsSection.class)
                 .get().getChildren().get(0);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -381,13 +375,5 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         assertThat(((CompoundHyperlink) hyperlinks[3]).getHyperlinks()).hasSize(2);
         assertThat(((CompoundHyperlink) hyperlinks[3]).getHyperlinks().get(0)).isInstanceOf(UserKeywordDocumentationHyperlink.class);
         assertThat(((CompoundHyperlink) hyperlinks[3]).getHyperlinks().get(1)).isInstanceOf(UserKeywordDocumentationHyperlink.class);
-    }
-
-    private static List<String> getContent(final IFile file) {
-        try (InputStream stream = file.getContents()) {
-            return Splitter.on('\n').splitToList(projectProvider.getFileContent(file));
-        } catch (IOException | CoreException e) {
-            return new ArrayList<>();
-        }
     }
 }

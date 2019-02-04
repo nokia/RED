@@ -5,11 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.util.stream.Stream;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
@@ -83,7 +81,7 @@ public class RedSourceDoubleClickStrategyTest {
         final File file = new File("file.robot");
 
         final RobotDocument document = new RobotDocument(parser, file);
-        document.set(Stream.of(lines).collect(joining("\n")));
+        document.set(String.join("\n", lines));
         return document;
     }
 }

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,35 +62,31 @@ public class VariableProposalsProviderTest {
         projectProvider.configure(config);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrownWhenDataProviderReturnsOrdinaryObject() {
         final RobotSuiteFile suite = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(new Object());
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(new Object());
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
-
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        provider.getProposals("${xyz}", 0, context);
+
+        assertThatIllegalStateException().isThrownBy(() -> provider.getProposals("${xyz}", 0, context))
+                .withMessage("Unrecognized element in table")
+                .withNoCause();
     }
 
     @Test
     public void thereAreNoVariablesProposalsProvided_whenThereIsNoVariableMatchingCurrentInput() {
-        RobotModel model = new RobotModel();
+        final RobotModel model = new RobotModel();
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
         final RobotKeywordCall callElement = suite.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(callElement);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
-
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals("${xyz}", 3, context);
+
         assertThat(proposals).isEmpty();
     }
 
@@ -103,14 +100,11 @@ public class VariableProposalsProviderTest {
         final RobotKeywordCall settingElement = suite.findSection(RobotSettingsSection.class).get().getChildren().get(0);
         final Entry<String, RobotKeywordCall> entry = Iterables.getFirst(ImmutableMap.of("x", settingElement).entrySet(), null);
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(entry);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(entry);
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
-
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), text.getSelection().x, context);
+
         assertThat(proposals).hasSize(1);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -127,14 +121,11 @@ public class VariableProposalsProviderTest {
         final RobotKeywordCall callElement = suite.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(callElement);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
-
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), text.getSelection().x, context);
+
         assertThat(proposals).hasSize(1);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -151,14 +142,11 @@ public class VariableProposalsProviderTest {
         final RobotKeywordCall callElement = suite.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(callElement);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
-
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), text.getSelection().x, context);
+
         assertThat(proposals).hasSize(2);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -175,17 +163,21 @@ public class VariableProposalsProviderTest {
         final RobotKeywordCall callElement = suite.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(callElement);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
-
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), text.getSelection().x, context);
-        assertThat(proposals).hasSize(1);
+
+        assertThat(proposals).hasSize(2);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
         assertThat(text.getText()).isEqualTo("a${a_var}b");
+    }
+
+    private static IRowDataProvider<Object> createDataProvider(final Object rowObject) {
+        @SuppressWarnings("unchecked")
+        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
+        when(dataProvider.getRowObject(0)).thenReturn(rowObject);
+        return dataProvider;
     }
 }

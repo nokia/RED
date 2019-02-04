@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import java.util.Optional;
 
+@FunctionalInterface
 public interface ProposalMatcher {
 
     Optional<ProposalMatch> matches(String userContent, String proposalContent);
