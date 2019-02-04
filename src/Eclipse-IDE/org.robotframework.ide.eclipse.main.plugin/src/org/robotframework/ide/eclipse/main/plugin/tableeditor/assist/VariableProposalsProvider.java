@@ -90,20 +90,15 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
 
         @Override
         public void insert(final Text text, final IContentProposal proposal) {
+            final String textBeforeSelection = text.getText().substring(0, text.getSelection().x);
+            final String textAfterSelection = text.getText().substring(text.getSelection().x);
+
             final String content = proposal.getContent();
+            final String prefix = findPrefix(content, textBeforeSelection);
+            final String suffix = findSuffix(textAfterSelection);
 
-            final String currentTextBeforeSelection = text.getText().substring(0, text.getSelection().x);
-            final String currentTextAfterSelection = text.getText().substring(text.getSelection().x);
-
-            final int maxCommon = calculateMaxCommon(content, currentTextBeforeSelection);
-
-            String toInsert = currentTextBeforeSelection.substring(0, currentTextBeforeSelection.length() - maxCommon)
-                    + content;
-            final int newSelection = toInsert.length();
-            toInsert += findSuffix(currentTextAfterSelection);
-
-            text.setText(toInsert);
-            text.setSelection(newSelection);
+            text.setText(prefix + content + suffix);
+            text.setSelection(prefix.length() + content.length());
         }
 
         @Override
@@ -111,28 +106,25 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
             throw new IllegalStateException("Not implemented");
         }
 
-        private int calculateMaxCommon(final String content, final String currentTextBeforeSelection) {
-            int maxCommon = 0;
-            for (int i = 0; i < content.length() && i <= currentTextBeforeSelection.length(); i++) {
-                final String currentSuffix = currentTextBeforeSelection
-                        .substring(currentTextBeforeSelection.length() - i, currentTextBeforeSelection.length());
-                final String toInsertPrefix = content.substring(0, i);
-
-                if (currentSuffix.equalsIgnoreCase(toInsertPrefix)) {
-                    maxCommon = toInsertPrefix.length();
+        private String findPrefix(final String content, final String textBeforeSelection) {
+            final String varStart = content.substring(0, 2);
+            for (int i = 2; i <= textBeforeSelection.length(); i++) {
+                final String currentSuffix = textBeforeSelection.substring(textBeforeSelection.length() - i,
+                        textBeforeSelection.length());
+                if (currentSuffix.startsWith(varStart)) {
+                    return textBeforeSelection.substring(0, textBeforeSelection.length() - i);
                 }
             }
-            return maxCommon;
+            return textBeforeSelection;
         }
 
-        private String findSuffix(final String currentTextAfterSelection) {
-            for (int i = 0; i < currentTextAfterSelection.length(); i++) {
-                if (currentTextAfterSelection.charAt(i) == '}') {
-                    return i == currentTextAfterSelection.length() - 1 ? ""
-                            : currentTextAfterSelection.substring(i + 1);
+        private String findSuffix(final String textAfterSelection) {
+            for (int i = 0; i < textAfterSelection.length(); i++) {
+                if (textAfterSelection.charAt(i) == '}') {
+                    return i == textAfterSelection.length() - 1 ? "" : textAfterSelection.substring(i + 1);
                 }
             }
-            return currentTextAfterSelection;
+            return textAfterSelection;
         }
 
         @Override
