@@ -1,0 +1,153 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _WOokIClGEemgl9-Lt8nhYA,_VzYJ0KEAEea9Cvae3yWo1A,_MmUoECkwEemgl9-Lt8nhYA
+Element-Name: TasksInTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _yUzRgCkuEemgl9-Lt8nhYA
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/5/19 3:02 PM
+Testcase-Type: ecl
+Verifications: _J6DFsClJEemgl9-Lt8nhYA,_DEcqYClKEemgl9-Lt8nhYA
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add new task file
+get-view "Project Explorer" | get-tree | select MyProject | get-menu -path "New/Robot Task Suite" | click
+with [get-window "New Robot Task Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text task
+    get-button Finish | click
+}
+
+// add simpe case
+with [get-editor "task.robot" | get-text-viewer] {
+    key-type End
+    key-type Enter
+    type-text "new task"
+    key-type Enter
+    type-text "log  77"
+    key-type Enter
+    type-text "log  8"
+    key-type Enter
+    type-text "log  9"
+    key-type "M1+s"
+}
+
+//check if menu is enabled
+with [get-view "Project Explorer" | get-tree] {
+    get-menu -path "Run As/1 Robot Test" | get-property enablement | equals true | verify-true
+    get-menu -path "Run As/2 Robot Remote Test" | get-property enablement | equals true | verify-true
+    get-menu -path "Debug As/1 Robot Test" | get-property enablement | equals true | verify-true
+    get-menu -path "Debug As/2 Robot Remote Test" | get-property enablement | equals true | verify-true
+}
+
+//run test
+get-view "Project Explorer" | get-tree | select "MyProject/task.robot" | get-menu -path "Run As/1 Robot Test" | click
+
+//check console    
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* -m robot.run --listener .*TestRunnerAgent.py:(\d)+ -s MyProject.Task .*MyProject\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "==============================================================================\n"
+    + "MyProject                                                                     \n"
+    + "==============================================================================\n"
+    + "MyProject.Task                                                                \n"
+    + "==============================================================================\n"
+    + "new task                                                              \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "MyProject.Task                                                        \| PASS \|\n"
+    + "1 critical task, 1 passed, 0 failed\n"
+    + "1 task total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "MyProject                                                             \| PASS \|\n"
+    + "1 critical task, 1 passed, 0 failed\n"
+    + "1 task total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true  
+    
+      
+// check message log    
+get-view "Message Log" | get-editbox | get-property text | equals "Starting task: MyProject.Task.new task\n"
+    + ".* : INFO : 77\n"
+    + ".* : INFO : 8\n"
+    + ".* : INFO : 9\n"
+    + "Ending task: MyProject.Task.new task" | verify-true
+    
+//check labels on execution view    
+get-view "Execution View" | click
+with [get-view "Execution View"] {
+    get-label "Tasks: 1/1" | get-property caption | equals "Tasks: 1/1" | verify-true
+    get-label "Passed: 1" | get-property caption | equals "Passed: 1" | verify-true
+    get-label "Failed: 0" | get-property caption | equals "Failed: 0" | verify-true
+}
+
+get-view "Execution View" | get-button "Expand All" | click
+with [get-view "Execution View" | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals "MyProject \(.* s\)" | verify-true
+    get-property "getItems().TreeItem[0].getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Task \(.* s\)" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "new task \(.* s\)" | verify-true
+}
+
+
+get-editor "task.robot" | get-tab-folder | get-tab-item Tasks | click
+
+check-task-row -file "task.robot" -row 1 -task "new task"
+check-task-row -file "task.robot" -row 2 -task "log" -c1 77
+check-task-row -file "task.robot" -row 3 -task "log" -c1 8
+check-task-row -file "task.robot" -row 4 -task "log" -c1 9
+check-task-row -file "task.robot" -row 5 -task "..."
+check-task-row -file "task.robot" -row 6 -task  "...add new task"
+
+get-view Outline | get-tree | select "task.robot/Tasks/new task" | click
+wait 300
+with [get-editor "task.robot" | get-canvas -after [get-label Tasks] -index 1] {
+    key-type Down -times 5
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+
+check-task-row -file "task.robot" -row 6 -task  "task"
+check-task-row -file "task.robot" -row 7 -task  "..."
+check-task-row -file "task.robot" -row 8 -task "...add new task"
+
+//check menu
+with [get-editor "task.robot" | get-canvas -after [get-label Tasks] -index 1] {
+    get-menu -path "Add new task" | get-property index | equals 0 | verify-true
+    get-menu -path "Add new line" | get-property index | equals 1 | verify-true
+}
+
+//open file where task is forst in file
+get-view "Project Explorer" | get-tree | select "MyProject/task_first.robot" | double-click
+with [get-editor "task_first.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals Tasks | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+
+//open file where test is first in source
+get-view "Project Explorer" | get-tree | select "MyProject/test_first.robot" | select "MyProject/test_first.robot" 
+    | double-click
+with [get-editor "test_first.robot" | get-tab-folder] {
+    get-property "pages[0]" | equals "Test Cases" | verify-true
+    get-property "pages[1]" | equals Keywords | verify-true
+    get-property "pages[2]" | equals Settings | verify-true
+    get-property "pages[3]" | equals Variables | verify-true
+    get-property "pages[4]" | equals Source | verify-true
+    get-property activePage | equals Source | verify-true
+    get-property tabCount | equals 5 | verify-true
+}
+
+
+get-editor "task.robot" | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
