@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 7/16/18 3:47 PM
+Save-Time: 2/5/19 1:42 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -19,63 +19,48 @@ proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {
 
 //HINT: do not use hexstring in comments! As parameter in procedure they are converted to decimal value
 
-//rows starts from 1
-proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
-{	
+proc "compare-rows" [val file] [val table ][val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]{
 	if [$extended_col | eq false]{
-		get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 
+		get-editor $file | get-canvas -after [get-label $table] -index 1 
 			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | equals 6 | verify-true
 	}-else{
-		get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 
+		get-editor $file | get-canvas -after [get-label $table] -index 1 
 			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | equals 7 | verify-true
 	}
 		
-	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
+	get-editor $file | get-canvas -after [get-label $table] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $tc -row $row -col 1 
-	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue 
+	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c1 -row $row -col 2
-	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue 
+	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c2 -row $row -col 3 
-	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 4 $row|  invoke getDataValue 
+	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object | invoke getCellByPosition 4 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c3 -row $row -col 4 
-	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 5 $row|  invoke getDataValue 
+	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object | invoke getCellByPosition 5 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c4 -row $row -col 5     
-	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
+	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c5 -row $row -col 6 
 	    
 	if [$extended_col | not-eq false]{
-		get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
+		get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
 	    	| my-assert-true -expected $c6 -row $row -col 7
 	}
-	
 }
 
 //rows starts from 1
-proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 "" ] [val c4 "" ] [val c5 "" ] [val c6 "" ] [val extended_col false]
-{
-	if [$extended_col | eq false]{
-		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 
-			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | eq 6 | verify-true
-	}-else{
-		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 
-			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | eq 7 | verify-true
-	}
-	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
-		| my-assert-true -expected $kw -row $row -col 1 
-	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c1 -row $row -col 2
-	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c2 -row $row -col 3 
-	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 4 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c3 -row $row -col 4 
-	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 5 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c4 -row $row -col 5     
-	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c5 -row $row -col 6
-	if [$extended_col | not-eq false]{
-		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
-	    	| my-assert-true -expected $c6 -row $row -col 7
-	}     
+proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
+{	
+	compare-rows -file $file -table "Test Cases" -row $row -tc $tc -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
+}
+
+proc "check-keyword-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
+{	
+	compare-rows -file $file -table "User Keywords" -row $row -tc $tc -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
+}
+
+proc "check-task-row" [val file] [val row] [val task ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
+{	
+	compare-rows -file $file -table "Tasks" -row $row -tc $task -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
 }
 
 proc "compare-markers-list-with-ref" [val markers -input] [val ref_markers] [val type]{
