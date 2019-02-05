@@ -5,15 +5,27 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.eclipse.jface.text.DocumentCommand;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -21,10 +33,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RobotSuiteAutoEditStrategyTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RobotSuiteAutoEditStrategyTest.class);
+
+    @Mock
+    private Consumer<Collection<IRegion>> linkedEditRegionsConsumer;
 
     @Test
     public void separatorIsUsed_whenTabWasOriginallyRequested() {
@@ -51,6 +67,9 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(5);
             assertThat(command.length).isEqualTo(0);
         }
+
+        verify(linkedEditRegionsConsumer, times(3)).accept(newArrayList(new Region(5, 0), new Region(6, 0)));
+        verifyNoMoreInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -67,10 +86,13 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(3);
             assertThat(command.length).isEqualTo(0);
         }
+
+        verify(linkedEditRegionsConsumer, times(3)).accept(newArrayList(new Region(3, 0), new Region(4, 0)));
+        verifyNoMoreInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
-    public void variableBracketsAreNotAdded_whenVariableIdentifiersAreRequestedBeforeOpenningBracket() {
+    public void variableBracketsAreNotAdded_whenVariableIdentifiersAreRequestedBeforeOpeningBracket() {
         for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
             final RobotDocument document = newDocument("{name}");
             final DocumentCommand command = newDocumentCommand(varId);
@@ -83,6 +105,8 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(-1);
             assertThat(command.length).isEqualTo(0);
         }
+
+        verifyZeroInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -100,6 +124,8 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(-1);
             assertThat(command.length).isEqualTo(2);
         }
+
+        verifyZeroInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -115,6 +141,8 @@ public class RobotSuiteAutoEditStrategyTest {
         assertThat(command.shiftsCaret).isTrue();
         assertThat(command.caretOffset).isEqualTo(-1);
         assertThat(command.length).isEqualTo(1);
+
+        verifyZeroInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -132,6 +160,9 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(13);
             assertThat(command.length).isEqualTo(7);
         }
+
+        verify(linkedEditRegionsConsumer, times(3)).accept(newArrayList(new Region(6, 7), new Region(14, 0)));
+        verifyNoMoreInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -149,6 +180,8 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(-1);
             assertThat(command.length).isEqualTo(6);
         }
+
+        verifyZeroInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -429,6 +462,6 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     private RobotSuiteAutoEditStrategy newStrategy(final String separator) {
-        return new RobotSuiteAutoEditStrategy(() -> separator);
+        return new RobotSuiteAutoEditStrategy(() -> separator, linkedEditRegionsConsumer);
     }
 }
