@@ -15,14 +15,25 @@ import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class RedEditorLinkedModeUI extends LinkedModeUI {
 
     public static void enableLinkedMode(final ITextViewer viewer, final Collection<IRegion> regionsToLinkedEdit) {
+        final LinkedModeUI linkedModeUi = createLinkedMode(viewer, regionsToLinkedEdit);
+        linkedModeUi.enter();
+    }
+
+    public static void enableNoCycleLinkedMode(final ITextViewer viewer,
+            final Collection<IRegion> regionsToLinkedEdit) {
+        final LinkedModeUI linkedModeUi = createLinkedMode(viewer, regionsToLinkedEdit);
+        linkedModeUi.setCyclingMode(CYCLE_NEVER);
+        linkedModeUi.enter();
+    }
+
+    private static LinkedModeUI createLinkedMode(final ITextViewer viewer,
+            final Collection<IRegion> regionsToLinkedEdit) {
         try {
             final LinkedModeModel model = new LinkedModeModel();
             for (final IRegion region : regionsToLinkedEdit) {
@@ -31,14 +42,13 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
                 model.addGroup(group);
             }
             model.forceInstall();
-            final LinkedModeUI linkedModeUi = new RedEditorLinkedModeUI(model, viewer);
-            linkedModeUi.enter();
+            return new RedEditorLinkedModeUI(model, viewer);
         } catch (final BadLocationException e) {
             throw new IllegalStateException("Invalid location for linked mode regions", e);
         }
     }
 
-    public RedEditorLinkedModeUI(final LinkedModeModel model, final ITextViewer... viewers) {
+    private RedEditorLinkedModeUI(final LinkedModeModel model, final ITextViewer... viewers) {
         super(model, viewers);
     }
 }

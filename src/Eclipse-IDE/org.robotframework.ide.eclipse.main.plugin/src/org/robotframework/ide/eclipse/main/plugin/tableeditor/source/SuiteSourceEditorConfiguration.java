@@ -6,9 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
@@ -17,6 +19,7 @@ import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
@@ -89,6 +92,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
+import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -148,8 +153,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IAutoEditStrategy[] getAutoEditStrategies(final ISourceViewer sourceViewer, final String contentType) {
-        return new IAutoEditStrategy[] { new RobotSuiteAutoEditStrategy(
-                () -> RedPlugin.getDefault().getPreferences().getSeparatorToUse(editor.fileModel.isTsvFile())) };
+        final Supplier<String> separatorSupplier = () -> RedPlugin.getDefault()
+                .getPreferences()
+                .getSeparatorToUse(editor.fileModel.isTsvFile());
+        final Consumer<Collection<IRegion>> regionsConsumer = linkedEditRegionsConsumer -> SwtThread.asyncExec(
+                () -> RedEditorLinkedModeUI.enableNoCycleLinkedMode(editor.getViewer(), linkedEditRegionsConsumer));
+        return new IAutoEditStrategy[] { new RobotSuiteAutoEditStrategy(separatorSupplier, regionsConsumer) };
     }
 
     @Override

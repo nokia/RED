@@ -6,14 +6,18 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -30,8 +34,12 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
     private final Supplier<String> separatorSupplier;
 
-    public RobotSuiteAutoEditStrategy(final Supplier<String> separatorSupplier) {
+    private final Consumer<Collection<IRegion>> linkedEditRegionsConsumer;
+
+    public RobotSuiteAutoEditStrategy(final Supplier<String> separatorSupplier,
+            final Consumer<Collection<IRegion>> linkedEditRegionsConsumer) {
         this.separatorSupplier = separatorSupplier;
+        this.linkedEditRegionsConsumer = linkedEditRegionsConsumer;
     }
 
     @Override
@@ -87,6 +95,11 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         command.text += wrappedText;
         command.shiftsCaret = false;
         command.caretOffset = command.offset + wrappedText.length();
+
+        final Collection<IRegion> regionsToLinkedEdit = new ArrayList<>();
+        regionsToLinkedEdit.add(new Region(command.caretOffset - selectedText.length(), selectedText.length()));
+        regionsToLinkedEdit.add(new Region(command.caretOffset + 1, 0));
+        linkedEditRegionsConsumer.accept(regionsToLinkedEdit);
     }
 
     private void autoIndentAfterNewLine(final IDocument document, final DocumentCommand command)
