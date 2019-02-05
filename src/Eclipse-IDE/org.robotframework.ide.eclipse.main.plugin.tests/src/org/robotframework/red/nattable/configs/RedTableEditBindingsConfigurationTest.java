@@ -20,8 +20,9 @@ import org.eclipse.nebula.widgets.nattable.resize.mode.ColumnResizeDragMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellEditorMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.LetterOrDigitKeyEventMatcher;
 import org.junit.Test;
+import org.robotframework.red.nattable.configs.RedTableEditBindingsConfiguration.RedKeyEditAction;
+import org.robotframework.red.nattable.configs.RedTableEditBindingsConfiguration.RedKeyEventMatcher;
 
 public class RedTableEditBindingsConfigurationTest {
 
@@ -34,8 +35,7 @@ public class RedTableEditBindingsConfigurationTest {
 
         verify(configRegistry, times(2)).registerKeyBinding(isA(KeyEventMatcher.class), isA(KeyEditAction.class));
         verify(configRegistry, times(3)).registerFirstKeyBinding(isA(KeyEventMatcher.class), isA(KeyEditAction.class));
-        verify(configRegistry, times(2)).registerKeyBinding(isA(LetterOrDigitKeyEventMatcher.class),
-                isA(KeyEditAction.class));
+        verify(configRegistry, times(2)).registerKeyBinding(isA(RedKeyEventMatcher.class), isA(RedKeyEditAction.class));
 
         verify(configRegistry).registerDoubleClickBinding(isA(CellEditorMouseEventMatcher.class),
                 isA(MouseEditAction.class));
