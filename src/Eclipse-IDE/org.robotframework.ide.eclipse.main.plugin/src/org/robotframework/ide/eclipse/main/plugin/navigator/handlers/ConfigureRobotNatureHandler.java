@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.inject.Named;
 
@@ -39,31 +40,37 @@ public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4Config
 
             for (final IProject project : projects) {
                 if ("enable".equalsIgnoreCase(enablement)) {
-                    RobotProjectNature.addRobotNature(project, new NullProgressMonitor(),
-                            () -> shouldRedXmlBeReplaced(project.getName()));
+                    RobotProjectNature.addRobotNature(project, new NullProgressMonitor(), shouldRedXmlBeReplaced());
                 } else if ("disable".equalsIgnoreCase(enablement)) {
-                    RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(),
-                            () -> shouldRedXmlBeRemoved(project.getName()));
+                    RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(), shouldRedXmlBeRemoved());
                 }
             }
         }
 
-        private static boolean shouldRedXmlBeRemoved(final String projectName) {
-            return MessageDialog.openQuestion(Display.getCurrent().getActiveShell(),
-                    "Confirm configuration file removal",
-                    String.format(
-                            "You have deconfigured the project '%s' as a Robot project.\n"
-                                    + "Do you want to remove project configuration file '%s' too?",
-                            projectName, RobotProjectConfig.FILENAME));
+        private static Predicate<IProject> shouldRedXmlBeRemoved() {
+            return project -> {
+                final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
+                        "Confirm configuration file removal", null,
+                        String.format(
+                                "You have deconfigured the project '%s' as a Robot project.\n"
+                                        + "Do you want to remove project configuration file '%s' too?",
+                                project.getName(), RobotProjectConfig.FILENAME),
+                        MessageDialog.QUESTION, new String[] { "Leave", "Remove" }, 0);
+                return dialog.open() == 1;
+            };
         }
 
-        private static boolean shouldRedXmlBeReplaced(final String projectName) {
-            return MessageDialog.openQuestion(Display.getCurrent().getActiveShell(),
-                    "Confirm configuration file replacement",
-                    String.format(
-                            "You have configured the project '%s' as a Robot project.\n"
-                                    + "Do you want to replace project configuration file '%s' too?",
-                            projectName, RobotProjectConfig.FILENAME));
+        private static Predicate<IProject> shouldRedXmlBeReplaced() {
+            return project -> {
+                final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
+                        "Confirm configuration file replacement", null,
+                        String.format(
+                                "You have configured the project '%s' as a Robot project.\n"
+                                        + "Do you want to replace project configuration file '%s' too?",
+                                project.getName(), RobotProjectConfig.FILENAME),
+                        MessageDialog.QUESTION, new String[] { "Leave", "Replace" }, 0);
+                return dialog.open() == 1;
+            };
         }
     }
 }

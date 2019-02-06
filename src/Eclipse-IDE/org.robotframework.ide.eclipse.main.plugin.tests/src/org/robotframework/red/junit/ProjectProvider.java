@@ -58,11 +58,11 @@ public class ProjectProvider implements TestRule {
      * @throws CoreException
      */
     public void addRobotNature() throws CoreException {
-        RobotProjectNature.addRobotNature(project, null, () -> true);
+        RobotProjectNature.addRobotNature(project, null, p -> true);
     }
 
     public void removeRobotNature() throws CoreException {
-        RobotProjectNature.removeRobotNature(project, null, () -> true);
+        RobotProjectNature.removeRobotNature(project, null, p -> true);
     }
 
     public void configure() throws IOException, CoreException {
