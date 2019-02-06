@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -46,7 +46,8 @@ public class RobotProjectNatureTest {
     public void robotNatureIsSetAndDefaultConfigIsCreated_whenDoesNotExist() throws Exception {
         final IProject project = projectProvider.getProject();
 
-        final BooleanSupplier shouldReplaceConfig = mock(BooleanSupplier.class);
+        @SuppressWarnings("unchecked")
+        final Predicate<IProject> shouldReplaceConfig = mock(Predicate.class);
         RobotProjectNature.addRobotNature(project, monitor, shouldReplaceConfig);
 
         assertThat(RobotProjectNature.hasRobotNature(project)).isTrue();
@@ -66,7 +67,7 @@ public class RobotProjectNatureTest {
         config.addVariableMapping(VariableMapping.create("${xyz}", "abc"));
         projectProvider.configure(config);
 
-        RobotProjectNature.addRobotNature(project, monitor, () -> true);
+        RobotProjectNature.addRobotNature(project, monitor, p -> true);
 
         assertThat(RobotProjectNature.hasRobotNature(project)).isTrue();
 
@@ -83,7 +84,7 @@ public class RobotProjectNatureTest {
         config.addVariableMapping(VariableMapping.create("${xyz}", "abc"));
         projectProvider.configure(config);
 
-        RobotProjectNature.addRobotNature(project, monitor, () -> false);
+        RobotProjectNature.addRobotNature(project, monitor, p -> false);
 
         assertThat(RobotProjectNature.hasRobotNature(project)).isTrue();
 
@@ -98,7 +99,8 @@ public class RobotProjectNatureTest {
         projectProvider.configure();
         project.getFile(RobotProjectConfig.FILENAME).delete(true, null);
 
-        final BooleanSupplier shouldRemoveConfig = mock(BooleanSupplier.class);
+        @SuppressWarnings("unchecked")
+        final Predicate<IProject> shouldRemoveConfig = mock(Predicate.class);
         RobotProjectNature.removeRobotNature(project, monitor, shouldRemoveConfig);
 
         assertThat(RobotProjectNature.hasRobotNature(project)).isFalse();
@@ -114,7 +116,7 @@ public class RobotProjectNatureTest {
         final IProject project = projectProvider.getProject();
         projectProvider.configure();
 
-        RobotProjectNature.removeRobotNature(project, monitor, () -> true);
+        RobotProjectNature.removeRobotNature(project, monitor, p -> true);
 
         assertThat(RobotProjectNature.hasRobotNature(project)).isFalse();
 
@@ -127,7 +129,7 @@ public class RobotProjectNatureTest {
         final IProject project = projectProvider.getProject();
         projectProvider.configure();
 
-        RobotProjectNature.removeRobotNature(project, monitor, () -> false);
+        RobotProjectNature.removeRobotNature(project, monitor, p -> false);
 
         assertThat(RobotProjectNature.hasRobotNature(project)).isFalse();
 

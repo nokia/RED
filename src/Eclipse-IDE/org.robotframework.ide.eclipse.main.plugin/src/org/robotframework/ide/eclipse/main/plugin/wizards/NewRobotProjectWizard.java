@@ -87,9 +87,9 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
         final IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
         description.setLocationURI(location);
 
-        final IRunnableWithProgress op = new CreateNewRobotProjectRunnable(newProjectHandle, description);
+        final IRunnableWithProgress runnable = new CreateNewRobotProjectRunnable(newProjectHandle, description);
         try {
-            getContainer().run(true, true, op);
+            getContainer().run(true, true, runnable);
         } catch (InterruptedException | InvocationTargetException e) {
             throw new ProjectCreatingException("Problem occurred when trying to create new Robot project.", e);
         }
@@ -123,7 +123,7 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
                 PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(operation, monitor,
                         WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
 
-                RobotProjectNature.addRobotNature(newProjectHandle, monitor, () -> true);
+                RobotProjectNature.addRobotNature(newProjectHandle, monitor, p -> true);
             } catch (final ExecutionException | CoreException e) {
                 throw new InvocationTargetException(e);
             }

@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
-import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -29,7 +29,7 @@ public class RobotProjectNature implements IProjectNature {
     private IProject project;
 
     public static void addRobotNature(final IProject project, final IProgressMonitor monitor,
-            final BooleanSupplier shouldReplaceConfig) throws CoreException {
+            final Predicate<IProject> shouldReplaceConfig) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
         final List<String> natures = newArrayList(desc.getNatureIds());
@@ -39,13 +39,13 @@ public class RobotProjectNature implements IProjectNature {
         project.setDescription(desc, monitor);
 
         final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
-        if (!cfgFile.exists() || shouldReplaceConfig.getAsBoolean()) {
+        if (!cfgFile.exists() || shouldReplaceConfig.test(project)) {
             new RedEclipseProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
         }
     }
 
     public static void removeRobotNature(final IProject project, final IProgressMonitor monitor,
-            final BooleanSupplier shouldRemoveConfig) throws CoreException {
+            final Predicate<IProject> shouldRemoveConfig) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
         final List<String> natures = newArrayList(desc.getNatureIds());
@@ -55,7 +55,7 @@ public class RobotProjectNature implements IProjectNature {
         project.setDescription(desc, monitor);
 
         final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
-        if (cfgFile.exists() && shouldRemoveConfig.getAsBoolean()) {
+        if (cfgFile.exists() && shouldRemoveConfig.test(project)) {
             cfgFile.delete(true, null);
         }
     }
