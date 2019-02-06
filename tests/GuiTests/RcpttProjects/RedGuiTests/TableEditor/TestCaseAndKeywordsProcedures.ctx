@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/5/19 1:42 PM
+Save-Time: 2/6/19 2:27 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -53,9 +53,9 @@ proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 
 	compare-rows -file $file -table "Test Cases" -row $row -tc $tc -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
 }
 
-proc "check-keyword-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
+proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
 {	
-	compare-rows -file $file -table "User Keywords" -row $row -tc $tc -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
+	compare-rows -file $file -table "User Keywords" -row $row -tc $kw -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
 }
 
 proc "check-task-row" [val file] [val row] [val task ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
