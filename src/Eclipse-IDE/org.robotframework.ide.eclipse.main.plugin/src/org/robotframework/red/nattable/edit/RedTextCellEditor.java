@@ -16,6 +16,8 @@ import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -24,6 +26,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.red.jface.assist.AssistantContext;
@@ -44,6 +47,8 @@ import com.google.common.annotations.VisibleForTesting;
  * @author Michal Anglart
  */
 public class RedTextCellEditor extends TextCellEditor {
+
+    private static final String VAR_WRAP_PATTERN = "\\w+";
 
     private final int selectionStartShift;
 
@@ -120,6 +125,7 @@ public class RedTextCellEditor extends TextCellEditor {
         textControl.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
         textControl.addKeyListener(new TextKeyListener(parent));
+        textControl.addVerifyListener(new TextVerifyListener(textControl));
         validationJobScheduler.armRevalidationOn(textControl);
 
         return textControl;
@@ -230,6 +236,57 @@ public class RedTextCellEditor extends TextCellEditor {
             } catch (final Exception ex) {
                 // do nothing
             }
+        }
+    }
+
+    private class TextVerifyListener implements VerifyListener {
+
+        private final Text control;
+
+        private TextVerifyListener(final Text control) {
+            this.control = control;
+        }
+
+        @Override
+        public void verifyText(final VerifyEvent event) {
+            if (support.areContentProposalsShown()) {
+                return;
+            }
+
+            if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(event.text)
+                    && !"{".equals(control.getText(event.start, event.end))) {
+                final String selectedText = control.getText(event.start, event.end - 1);
+                if (selectedText.isEmpty() || selectedText.matches(VAR_WRAP_PATTERN)) {
+                    addVariableBrackets(event);
+                }
+            } else if ((event.keyCode == SWT.BS || event.keyCode == SWT.DEL) && event.start == event.end - 1) {
+                final String bracketsCandidate = control.getText(event.start, event.end);
+                final String varTypeCandidate = control.getText(event.start - 1, event.end - 2);
+                if ("{}".equals(bracketsCandidate) && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(varTypeCandidate)) {
+                    deleteVariableBrackets(event);
+                }
+            }
+        }
+
+        private void addVariableBrackets(final VerifyEvent event) {
+            final String wrappedText = "{" + control.getText(event.start, event.end - 1) + "}";
+            event.text += wrappedText;
+
+            SwtThread.asyncExec(event.display, () -> control.setSelection(event.start + wrappedText.length()));
+        }
+
+        private void deleteVariableBrackets(final VerifyEvent event) {
+            final String prefix = control.getText(0, event.start);
+            final String suffix = control.getText().substring(event.end + 1);
+
+            // when empty brackets are deleted we want to set control text and selection ourself,
+            // so cannot deliver this event to control
+            event.doit = false;
+
+            SwtThread.asyncExec(event.display, () -> {
+                control.setText(prefix + suffix);
+                control.setSelection(event.start);
+            });
         }
     }
 
