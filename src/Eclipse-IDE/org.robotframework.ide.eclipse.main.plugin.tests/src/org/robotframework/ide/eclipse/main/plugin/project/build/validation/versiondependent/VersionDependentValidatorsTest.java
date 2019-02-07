@@ -22,50 +22,16 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
 @RunWith(Enclosed.class)
 public class VersionDependentValidatorsTest {
 
-    public static class VariableValidatorsTest {
-
-        @Test
-        public void properValidatorsAreReturnedForVersionUnder28() {
-            assertThat(getVariableValidators("2.7.7")).hasSize(2)
-                    .hasOnlyElementsOfTypes(DictionaryExistenceValidator.class,
-                            ScalarAsListInOlderRobotValidator.class);
-        }
-
-        @Test
-        public void properValidatorsAreReturnedForVersion28() {
-            assertThat(getVariableValidators("2.8.0")).hasSize(2)
-                    .hasOnlyElementsOfTypes(DictionaryExistenceValidator.class, ScalarAsListValidator.class);
-        }
-
-        @Test
-        public void properValidatorsAreReturnedForVersion29() {
-            assertThat(getVariableValidators("2.9")).isEmpty();
-        }
-
-        private Stream<VersionDependentModelUnitValidator> getVariableValidators(final String version) {
-            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
-            return validators.getVariableValidators(mock(IVariableHolder.class));
-        }
-
-    }
-
     public static class GeneralSettingsTableValidatorsTest {
 
         @Test
-        public void properValidatorsAreReturnedForVersionUnder28() {
-            assertThat(getGeneralSettingsTableValidators("2.7.7")).hasSize(9)
-                    .hasOnlyElementsOfTypes(SettingsDuplicationInOldRfValidator.class);
-        }
-
-        @Test
-        public void properValidatorsAreReturnedForVersion28() {
+        public void properValidatorsAreReturnedForVersionUnder29() {
             assertThat(getGeneralSettingsTableValidators("2.8.0")).hasSize(9)
                     .hasOnlyElementsOfTypes(SettingsDuplicationInOldRfValidator.class);
         }
@@ -127,13 +93,7 @@ public class VersionDependentValidatorsTest {
     public static class TestCaseSettingsValidatorsTest {
 
         @Test
-        public void properValidatorsAreReturnedForVersionUnder29() {
-            assertThat(getTestCaseSettingsValidators("2.8.0")).hasSize(1)
-                    .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
-        }
-
-        @Test
-        public void properValidatorsAreReturnedForVersion29() {
+        public void properValidatorsAreReturnedForVersionUnder30() {
             assertThat(getTestCaseSettingsValidators("2.9")).hasSize(1)
                     .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
         }
@@ -166,13 +126,7 @@ public class VersionDependentValidatorsTest {
     public static class KeywordSettingsValidatorsTest {
 
         @Test
-        public void properValidatorsAreReturnedForVersionUnder29() {
-            assertThat(getKeywordSettingsValidators("2.8.0")).hasSize(1)
-                    .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
-        }
-
-        @Test
-        public void properValidatorsAreReturnedForVersion29() {
+        public void properValidatorsAreReturnedForVersionUnder30() {
             assertThat(getKeywordSettingsValidators("2.9")).hasSize(1)
                     .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
         }

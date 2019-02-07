@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -46,8 +44,6 @@ class VariablesTableValidator implements ModelUnitValidator {
     private final Optional<RobotVariablesSection> variablesSection;
 
     private final ValidationReportingStrategy reporter;
-
-    private final VersionDependentValidators versionDependentValidators;
 
     private static final Pattern VARIABLE_WITHOUT_NAME_PATTERN = Pattern.compile("^[$&@]\\{\\}=?$");
 
@@ -64,7 +60,6 @@ class VariablesTableValidator implements ModelUnitValidator {
         this.validationContext = validationContext;
         this.variablesSection = variablesSection;
         this.reporter = reporter;
-        this.versionDependentValidators = versionDependentValidators;
     }
 
     @Override
@@ -74,8 +69,6 @@ class VariablesTableValidator implements ModelUnitValidator {
         }
         final VariableTable variableTable = variablesSection.get().getLinkedElement();
 
-        reportVersionSpecificProblems(variableTable, monitor);
-
         reportInvalidVariableName(variableTable);
         reportUnknownVariableTypes(variableTable);
         reportDuplicatedVariables(variableTable);
@@ -83,18 +76,6 @@ class VariablesTableValidator implements ModelUnitValidator {
         reportUnknownVariablesInValues(variableTable);
         reportVariableDeclarationWithoutAssignment(variableTable);
         reportVariableDeclarationWithoutName(variableTable);
-    }
-
-    private void reportVersionSpecificProblems(final VariableTable variableTable, final IProgressMonitor monitor)
-            throws CoreException {
-        for (final IVariableHolder variable : variableTable.getVariables()) {
-            final List<VersionDependentModelUnitValidator> validators = versionDependentValidators
-                    .getVariableValidators(variable)
-                    .collect(toList());
-            for (final ModelUnitValidator validator : validators) {
-                validator.validate(monitor);
-            }
-        }
     }
 
     private void reportInvalidVariableName(final VariableTable variableTable) {
