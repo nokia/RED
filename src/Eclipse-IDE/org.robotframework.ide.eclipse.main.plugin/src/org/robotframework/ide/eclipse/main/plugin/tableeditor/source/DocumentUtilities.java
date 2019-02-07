@@ -169,7 +169,7 @@ public class DocumentUtilities {
     }
 
     /**
-     * Returns region around offset which consitutues a cell during live editing. This is very
+     * Returns region around offset which constitutes a cell during live editing. This is very
      * similar to {@link #findCellRegion(IDocument, int)} method with a single exception that
      * there can be a single space just before offset prefixed with whole cell content.
      *

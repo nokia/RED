@@ -5,27 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.eclipse.jface.text.DocumentCommand;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Region;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -33,24 +21,79 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
-@RunWith(MockitoJUnitRunner.class)
 public class RobotSuiteAutoEditStrategyTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RobotSuiteAutoEditStrategyTest.class);
 
-    @Mock
-    private Consumer<Collection<IRegion>> linkedEditRegionsConsumer;
-
     @Test
-    public void separatorIsUsed_whenTabWasOriginallyRequested() {
-        final RobotDocument document = newDocument("");
-        final DocumentCommand command = newDocumentCommand("\t");
+    public void separatorIsInserted_whenTabWasOriginallyRequestedInsideCellRegion_andJumpOfModeIsDisabled() {
+        final RobotDocument document = newDocument("abc  def");
+        final DocumentCommand command = newDocumentCommand(1, "\t");
 
-        final RobotSuiteAutoEditStrategy strategy = newStrategy("the_separator");
+        final RobotSuiteAutoEditStrategy strategy = newStrategy("the_separator", false);
         strategy.customizeDocumentCommand(document, command);
 
         assertThat(command.text).isEqualTo("the_separator");
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void separatorIsInserted_whenTabWasOriginallyRequestedInsideVariableRegion_andJumpOfModeIsDisabled() {
+        final RobotDocument document = newDocument("a${var}bc  def");
+        final DocumentCommand command = newDocumentCommand(4, "\t");
+
+        final RobotSuiteAutoEditStrategy strategy = newStrategy("the_separator", false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEqualTo("the_separator");
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void separatorIsInserted_whenTabWasOriginallyRequestedInTheEndOfCellRegion_andJumpOfModeIsEnabled() {
+        final RobotDocument document = newDocument("abc  def");
+        final DocumentCommand command = newDocumentCommand(3, "\t");
+
+        final RobotSuiteAutoEditStrategy strategy = newStrategy("the_separator", true);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEqualTo("the_separator");
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void caretIsShifted_whenTabWasOriginallyRequestedInsideCellRegion_andJumpOfModeIsEnabled() {
+        final RobotDocument document = newDocument("abc  def");
+        final DocumentCommand command = newDocumentCommand(1, "\t");
+
+        final RobotSuiteAutoEditStrategy strategy = newStrategy("the_separator", true);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isNull();
+        assertThat(command.shiftsCaret).isFalse();
+        assertThat(command.caretOffset).isEqualTo(3);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void caretIsShifted_whenTabWasOriginallyRequestedInsideVariableRegion_andJumpOfModeIsEnabled() {
+        final RobotDocument document = newDocument("a${var}bc  def");
+        final DocumentCommand command = newDocumentCommand(3, "\t");
+
+        final RobotSuiteAutoEditStrategy strategy = newStrategy("the_separator", true);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isNull();
+        assertThat(command.shiftsCaret).isFalse();
+        assertThat(command.caretOffset).isEqualTo(7);
+        assertThat(command.length).isEqualTo(0);
     }
 
     @Test
@@ -67,9 +110,6 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(5);
             assertThat(command.length).isEqualTo(0);
         }
-
-        verify(linkedEditRegionsConsumer, times(3)).accept(newArrayList(new Region(5, 0), new Region(6, 0)));
-        verifyNoMoreInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -86,9 +126,6 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(3);
             assertThat(command.length).isEqualTo(0);
         }
-
-        verify(linkedEditRegionsConsumer, times(3)).accept(newArrayList(new Region(3, 0), new Region(4, 0)));
-        verifyNoMoreInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -105,8 +142,6 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(-1);
             assertThat(command.length).isEqualTo(0);
         }
-
-        verifyZeroInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -124,8 +159,6 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(-1);
             assertThat(command.length).isEqualTo(2);
         }
-
-        verifyZeroInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -141,8 +174,6 @@ public class RobotSuiteAutoEditStrategyTest {
         assertThat(command.shiftsCaret).isTrue();
         assertThat(command.caretOffset).isEqualTo(-1);
         assertThat(command.length).isEqualTo(1);
-
-        verifyZeroInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -160,9 +191,6 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(13);
             assertThat(command.length).isEqualTo(7);
         }
-
-        verify(linkedEditRegionsConsumer, times(3)).accept(newArrayList(new Region(6, 7), new Region(14, 0)));
-        verifyNoMoreInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -180,8 +208,6 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.caretOffset).isEqualTo(-1);
             assertThat(command.length).isEqualTo(6);
         }
-
-        verifyZeroInteractions(linkedEditRegionsConsumer);
     }
 
     @Test
@@ -458,10 +484,10 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     private RobotSuiteAutoEditStrategy newStrategy() {
-        return newStrategy("  ");
+        return newStrategy("  ", false);
     }
 
-    private RobotSuiteAutoEditStrategy newStrategy(final String separator) {
-        return new RobotSuiteAutoEditStrategy(() -> separator, linkedEditRegionsConsumer);
+    private RobotSuiteAutoEditStrategy newStrategy(final String separator, final boolean isSeparatorJumpModeEnabled) {
+        return new RobotSuiteAutoEditStrategy(() -> separator, isSeparatorJumpModeEnabled, false);
     }
 }

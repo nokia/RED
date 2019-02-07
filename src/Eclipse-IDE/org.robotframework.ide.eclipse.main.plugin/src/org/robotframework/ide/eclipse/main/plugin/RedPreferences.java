@@ -56,6 +56,7 @@ public class RedPreferences {
     public static final String FILE_ELEMENTS_OPEN_MODE = "red.editor.general.fileElementOpenMode";
     public static final String SEPARATOR_MODE = "separatorMode";
     public static final String SEPARATOR_TO_USE = "separatorToUse";
+    public static final String SEPARATOR_JUMP_MODE_ENABLED = "red.editor.general.separatorJumpModeEnabled";
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
     public static final String BEHAVIOR_ON_CELL_COMMIT = "cellCommitBehavior";
     public static final String CELL_WRAPPING = "red.editor.tables.cellWrapping";
@@ -172,6 +173,10 @@ public class RedPreferences {
             default:
                 throw new IllegalStateException("Unrecognized separators mode: " + mode.toString());
         }
+    }
+
+    public boolean isSeparatorJumpModeEnabled() {
+        return store.getBoolean(SEPARATOR_JUMP_MODE_ENABLED);
     }
 
     public int getMinimalNumberOfArgumentColumns() {
