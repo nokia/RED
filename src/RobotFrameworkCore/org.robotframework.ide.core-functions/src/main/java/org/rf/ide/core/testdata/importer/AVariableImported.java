@@ -30,7 +30,7 @@ public abstract class AVariableImported<T> implements IVariableHolder {
     public AVariableImported(final String name, final VariableType type) {
         this.type = type;
         if (shouldWrapName(name, type)) {
-            final String corrected = correctNameForRobot28(name);
+            final String corrected = correctName(name);
             this.name = corrected;
             this.robotRepresentation = type.getIdentificator() + '{' + corrected + '}';
         } else {
@@ -53,7 +53,7 @@ public abstract class AVariableImported<T> implements IVariableHolder {
         return result;
     }
 
-    private String correctNameForRobot28(final String oldName) {
+    private String correctName(final String oldName) {
         String newName = oldName;
         if (oldName != null && oldName.length() > 3) {
             final int startIndex = oldName.indexOf('{');

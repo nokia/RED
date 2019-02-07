@@ -80,11 +80,7 @@ def _wrap_variable_if_needed(varname):
 
 def get_variables(path, arguments):
     import inspect
-    try:
-        from robot.utils.dotdict import DotDict
-    except:  # for robot <2.9
-        class DotDict:
-            pass
+    from robot.utils.dotdict import DotDict
 
     vars_from_file = _get_variables_from_file(path, arguments)
 
@@ -108,10 +104,7 @@ def _get_variables_from_file(path, arguments):
     variables = robot.variables.Variables()
     variables.set_from_file(path, arguments)
     
-    if __get_robot_version() < (2, 9, 0):
-        return variables
-    else:
-        return variables.store.data
+    return variables.store.data
 
 def __get_robot_version():
     import robot.version as ver

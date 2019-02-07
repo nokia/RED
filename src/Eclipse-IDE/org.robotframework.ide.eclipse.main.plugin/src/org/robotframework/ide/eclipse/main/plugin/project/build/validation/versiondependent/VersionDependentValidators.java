@@ -18,7 +18,6 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -53,16 +52,6 @@ public class VersionDependentValidators {
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
-    public Stream<VersionDependentModelUnitValidator> getVariableValidators(final IVariableHolder variable) {
-        final IFile file = validationContext.getFile();
-        final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
-                new DictionaryExistenceValidator(file, variable, reporter),
-                new ScalarAsListInOlderRobotValidator(file, variable, reporter),
-                new ScalarAsListValidator(file, variable, reporter));
-
-        return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
-    }
-
     public Stream<VersionDependentModelUnitValidator> getGeneralSettingsTableValidators(final SettingTable table) {
         final IFile file = validationContext.getFile();
         final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
@@ -70,31 +59,31 @@ public class VersionDependentValidators {
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestTemplates, reporter),
                 new SettingsDuplicationValidator<>(file, table::getTestTemplates, reporter, ". No template will be used"),
-                
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getSuiteSetups, reporter),
                 new SettingsDuplicationValidator<>(file, table::getSuiteSetups, reporter, ". No Suite Setup will be executed"),
-                
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getSuiteTeardowns, reporter),
                 new SettingsDuplicationValidator<>(file, table::getSuiteTeardowns, reporter, ". No Suite Teardown will be executed"),
-                
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestSetups, reporter),
                 new SettingsDuplicationValidator<>(file, table::getTestSetups, reporter, ". No Test Setup will be executed"),
-                
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestTeardowns, reporter),
                 new SettingsDuplicationValidator<>(file, table::getTestTeardowns, reporter, ". No Test Teardown will be executed"),
-                
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestTimeouts, reporter),
                 new SettingsDuplicationValidator<>(file, table::getTestTimeouts, reporter, ". No timeout will be checked"),
-                
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getForceTags, reporter),
                 new SettingsDuplicationValidator<>(file, table::getForceTags, reporter),
-                
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getDefaultTags, reporter),
                 new SettingsDuplicationValidator<>(file, table::getDefaultTags, reporter),
-                
+
                 new SettingsDuplicationInOldRfValidator<>(file, table::getDocumentation, reporter),
                 new SettingsDuplicationValidator<>(file, table::getDocumentation, reporter),
-                
+
                 new DeprecatedGeneralSettingNameValidator(file, table, reporter),
                 new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, table, reporter),
                 new TimeoutMessageValidator<>(file, table::getTestTimeouts, TestTimeout::getMessageArguments, reporter),

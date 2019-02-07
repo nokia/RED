@@ -30,27 +30,8 @@ public abstract class ARobotInternalVariable<T> implements IVariableHolder {
     public ARobotInternalVariable(final String name, final T value, final VariableType type) {
         this.type = type;
         this.value = value;
-        if (!name.startsWith(type.getIdentificator())) {
-            final String corrected = correctNameForRobot28(name);
-            this.name = corrected;
-            this.robotRepresentation = type.getIdentificator() + '{' + corrected + '}';
-        } else {
-            this.name = name;
-            this.robotRepresentation = name;
-        }
-    }
-
-    private String correctNameForRobot28(final String oldName) {
-        String newName = oldName;
-        if (oldName != null && oldName.length() > 3) {
-            final int startIndex = oldName.indexOf('{');
-            final int endIndex = oldName.lastIndexOf('}');
-            if (startIndex > -1 && endIndex > -1) {
-                newName = new String(oldName.substring(startIndex + 1, endIndex));
-            }
-        }
-
-        return newName;
+        this.name = name;
+        this.robotRepresentation = name;
     }
 
     @Override

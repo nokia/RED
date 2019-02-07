@@ -65,35 +65,21 @@ except:
 # Setting Output encoding to UTF-8 and ignoring the platform specs
 import robot.utils.encoding
 robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
-# RF 2.6.3 and RF 2.5.7
-robot.utils.encoding._output_encoding = robot.utils.encoding.OUTPUT_ENCODING
 
 from robot.libraries.BuiltIn import BuiltIn
 from robot.errors import HandlerExecutionFailed, UserKeywordExecutionFailed
 from robot import version
-try:
-    # RF 2.7.5
-    from robot.running import EXECUTION_CONTEXTS
+from robot.running import EXECUTION_CONTEXTS
 
 
-    def _is_logged(level):
-        current = EXECUTION_CONTEXTS.current
-        if current is None:
-            return True
-        out = current.output
-        if out is None:
-            return True
-        return out._xmllogger._log_message_is_logged(level)
-except ImportError:
-    # RF 2.5.6
-    # RF 2.6.3
-    def _is_logged(level):
-        # Needs to be imported in the function as OUTPUT is not a constant
-        from robot.output import OUTPUT
-
-        if OUTPUT is None:
-            return True
-        return OUTPUT._xmllogger._log_message_is_logged(level)
+def _is_logged(level):
+    current = EXECUTION_CONTEXTS.current
+    if current is None:
+        return True
+    out = current.output
+    if out is None:
+        return True
+    return out._xmllogger._log_message_is_logged(level)
 
         
 def _fix_unicode(max_length, data):
