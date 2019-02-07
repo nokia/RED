@@ -3840,9 +3840,9 @@
           </command>
           <command
                 commandId="org.robotframework.red.configureRobotNature"
-                label="Configure as Robot project"
+                label="Add Robot nature"
                 style="push"
-                tooltip="Configure as Robot project">
+                tooltip="Add Robot nature">
              <parameter
                    name="org.robotframework.red.configureRobotNature.enablement"
                    value="enable">
@@ -3874,9 +3874,9 @@
           </command>
           <command
                 commandId="org.robotframework.red.configureRobotNature"
-                label="Deconfigure as Robot project"
+                label="Remove Robot nature"
                 style="push"
-                tooltip="Deconfigure as Robot project">
+                tooltip="Remove Robot nature">
              <parameter
                    name="org.robotframework.red.configureRobotNature.enablement"
                    value="disable">
