@@ -6,10 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -17,7 +15,6 @@ import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -34,12 +31,15 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
     private final Supplier<String> separatorSupplier;
 
-    private final Consumer<Collection<IRegion>> linkedEditRegionsConsumer;
+    private final boolean isSeparatorJumpModeEnabled;
+
+    private final boolean isTsvFile;
 
     public RobotSuiteAutoEditStrategy(final Supplier<String> separatorSupplier,
-            final Consumer<Collection<IRegion>> linkedEditRegionsConsumer) {
+            final boolean isSeparatorJumpModeEnabled, final boolean isTsvFile) {
         this.separatorSupplier = separatorSupplier;
-        this.linkedEditRegionsConsumer = linkedEditRegionsConsumer;
+        this.isSeparatorJumpModeEnabled = isSeparatorJumpModeEnabled;
+        this.isTsvFile = isTsvFile;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
     private void customizeZeroLengthDocumentCommand(final IDocument document, final DocumentCommand command)
             throws InterruptedException, BadLocationException {
         if ("\t".equals(command.text)) {
-            replaceTabWithSpecifiedSeparator(command);
+            replaceTabWithSpecifiedSeparatorOrJumpToNextCell(document, command);
         } else if (TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
             autoIndentAfterNewLine(document, command);
         } else if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)
@@ -86,8 +86,30 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         }
     }
 
-    private void replaceTabWithSpecifiedSeparator(final DocumentCommand command) {
-        command.text = getSeparator();
+    private void replaceTabWithSpecifiedSeparatorOrJumpToNextCell(final IDocument document,
+            final DocumentCommand command) throws BadLocationException {
+        final Optional<Integer> jumpOffset = findRegionToJumpOf(document, command)
+                .map(region -> region.getOffset() + region.getLength())
+                .filter(offset -> offset > command.offset);
+        if (jumpOffset.isPresent()) {
+            command.text = null;
+            command.shiftsCaret = false;
+            command.caretOffset = jumpOffset.get();
+        } else {
+            command.text = getSeparator();
+        }
+    }
+
+    private Optional<IRegion> findRegionToJumpOf(final IDocument document, final DocumentCommand command)
+            throws BadLocationException {
+        if (!isSeparatorJumpModeEnabled) {
+            return Optional.empty();
+        }
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, isTsvFile, command.offset);
+        if (variableRegion.isPresent()) {
+            return variableRegion;
+        }
+        return DocumentUtilities.findCellRegion(document, isTsvFile, command.offset);
     }
 
     private void addVariableBrackets(final DocumentCommand command, final String selectedText) {
@@ -95,11 +117,6 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         command.text += wrappedText;
         command.shiftsCaret = false;
         command.caretOffset = command.offset + wrappedText.length();
-
-        final Collection<IRegion> regionsToLinkedEdit = new ArrayList<>();
-        regionsToLinkedEdit.add(new Region(command.caretOffset - selectedText.length(), selectedText.length()));
-        regionsToLinkedEdit.add(new Region(command.caretOffset + 1, 0));
-        linkedEditRegionsConsumer.accept(regionsToLinkedEdit);
     }
 
     private void autoIndentAfterNewLine(final IDocument document, final DocumentCommand command)

@@ -48,12 +48,12 @@ public class SuiteEditorPreferencePageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(7);
+        assertThat(editors).hasSize(8);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
-        assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
-                names -> assertThat(names).containsOnly(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB));
+        assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class, names -> assertThat(names)
+                .containsOnly(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, RedPreferences.SEPARATOR_JUMP_MODE_ENABLED));
         assertThat(namesGroupedByType).hasEntrySatisfying(ComboBoxFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.FILE_ELEMENTS_OPEN_MODE,
                         RedPreferences.CELL_WRAPPING, RedPreferences.BEHAVIOR_ON_CELL_COMMIT));

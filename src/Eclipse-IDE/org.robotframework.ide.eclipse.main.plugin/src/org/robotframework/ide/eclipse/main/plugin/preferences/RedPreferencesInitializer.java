@@ -77,6 +77,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
         preferences.put(RedPreferences.SEPARATOR_MODE, SeparatorsMode.FILE_TYPE_DEPENDENT.name());
         preferences.put(RedPreferences.SEPARATOR_TO_USE, "ssss");
+        preferences.putBoolean(RedPreferences.SEPARATOR_JUMP_MODE_ENABLED, false);
         preferences.putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
         preferences.put(RedPreferences.BEHAVIOR_ON_CELL_COMMIT, CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name());
         preferences.put(RedPreferences.CELL_WRAPPING, CellWrappingStrategy.SINGLE_LINE_CUT.name());

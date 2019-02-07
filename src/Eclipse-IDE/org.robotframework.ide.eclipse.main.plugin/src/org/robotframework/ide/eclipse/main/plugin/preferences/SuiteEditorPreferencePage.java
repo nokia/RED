@@ -146,7 +146,7 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
 
         final String regex = "^(ss+)|t+|((s|t)+\\|(s|t)+)$";
         final RegexValidatedStringFieldEditor separatorEditor = new RegexValidatedStringFieldEditor(
-                RedPreferences.SEPARATOR_TO_USE, "user defined separator (use '|', 's' for space or 't' for tab)",
+                RedPreferences.SEPARATOR_TO_USE, "User defined separator (use '|', 's' for space or 't' for tab)",
                 regex, sourceGroup);
         separatorEditor.setErrorMessage(
                 "User defined separator should have at least one tab or two spaces, or bar '|' surrounded "
@@ -163,6 +163,12 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
                 separatorEditor.setEnabled(newMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
             }
         };
+
+        final BooleanFieldEditor sourceJumpModeEditor = new BooleanFieldEditor(
+                RedPreferences.SEPARATOR_JUMP_MODE_ENABLED, "Jump out of active region", sourceGroup);
+        addField(sourceJumpModeEditor);
+        final Button sourceJumpModeEditorCheckbox = (Button) sourceJumpModeEditor.getDescriptionControl(sourceGroup);
+        GridDataFactory.fillDefaults().indent(5, 0).applyTo(sourceJumpModeEditorCheckbox);
     }
 
     private String[][] createTabPressLabelsAndValues() {
