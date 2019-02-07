@@ -12,10 +12,10 @@ Red.xml is automatically created when Robot project is created by action from
 _File -> New -> Robot Project_.
 
 In case of importing robot files to generic Eclipse project, right click on
-Project in Project Explorer and select "Configure as Robot project" to create
-red.xml
+Project in Project Explorer and select "Robot Framework -> Add Robot nature"
+to create red.xml
 
-![](red_xml/configure_as_robot.png)  
+![](red_xml/add_robot_nature.png)  
   
 
 In any case, red.xml shall be visible in Project Explorer in root folder.
