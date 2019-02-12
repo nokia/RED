@@ -44,12 +44,12 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToFilesDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotSuiteAutoEditStrategy.EditStrategyPreferences;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CodeReservedWordsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
@@ -103,6 +103,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private ColoringTokens coloringTokens;
 
+    private EditStrategyPreferences editStrategyPreferences;
+
     private final RedTokensStore store;
 
     public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor,
@@ -114,6 +116,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     ColoringTokens getColoringTokens() {
         return coloringTokens;
+    }
+
+    EditStrategyPreferences getEditStrategyPreferences() {
+        return editStrategyPreferences;
     }
 
     void resetTokensStore() {
@@ -149,10 +155,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IAutoEditStrategy[] getAutoEditStrategies(final ISourceViewer sourceViewer, final String contentType) {
-        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        final Supplier<String> separatorSupplier = () -> preferences.getSeparatorToUse(editor.fileModel.isTsvFile());
-        return new IAutoEditStrategy[] { new RobotSuiteAutoEditStrategy(separatorSupplier,
-                preferences.isSeparatorJumpModeEnabled(), editor.fileModel.isTsvFile()) };
+        if (editStrategyPreferences == null) {
+            editStrategyPreferences = new EditStrategyPreferences(RedPlugin.getDefault().getPreferences());
+            editStrategyPreferences.refresh();
+        }
+        return new IAutoEditStrategy[] {
+                new RobotSuiteAutoEditStrategy(editStrategyPreferences, editor.fileModel.isTsvFile()) };
     }
 
     @Override

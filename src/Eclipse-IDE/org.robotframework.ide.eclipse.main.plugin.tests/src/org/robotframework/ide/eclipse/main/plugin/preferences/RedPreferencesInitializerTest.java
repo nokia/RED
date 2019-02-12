@@ -125,6 +125,17 @@ public class RedPreferencesInitializerTest {
     }
 
     @Test
+    public void byDefaultAllVariablesPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).putBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED, false);
+        verify(preferences).put(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN, "\\w+");
+    }
+
+    @Test
     public void byDefaultThereAreNoActiveVariablesSetsNorTheSetsThemselves() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);

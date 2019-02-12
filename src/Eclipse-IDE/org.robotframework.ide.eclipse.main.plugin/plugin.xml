@@ -6557,6 +6557,12 @@
             name="Syntax Coloring">
       </page>
       <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.VariablesPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.variables"
+            name="Variables">
+      </page>
+      <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.LaunchingPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.launch"

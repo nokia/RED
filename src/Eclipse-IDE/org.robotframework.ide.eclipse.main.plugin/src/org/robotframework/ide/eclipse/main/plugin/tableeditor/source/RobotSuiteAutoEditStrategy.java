@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
@@ -24,21 +23,16 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
-    private static final String VAR_WRAP_PATTERN = "\\w+";
-
-    private final Supplier<String> separatorSupplier;
-
-    private final boolean isSeparatorJumpModeEnabled;
+    private final EditStrategyPreferences preferences;
 
     private final boolean isTsvFile;
 
-    public RobotSuiteAutoEditStrategy(final Supplier<String> separatorSupplier,
-            final boolean isSeparatorJumpModeEnabled, final boolean isTsvFile) {
-        this.separatorSupplier = separatorSupplier;
-        this.isSeparatorJumpModeEnabled = isSeparatorJumpModeEnabled;
+    public RobotSuiteAutoEditStrategy(final EditStrategyPreferences preferences, final boolean isTsvFile) {
+        this.preferences = preferences;
         this.isTsvFile = isTsvFile;
     }
 
@@ -65,7 +59,8 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             replaceTabWithSpecifiedSeparatorOrJumpToNextCell(document, command);
         } else if (TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
             autoIndentAfterNewLine(document, command);
-        } else if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)
+        } else if (preferences.isVariablesBracketsInsertionEnabled()
+                && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)
                 && (command.offset == document.getLength() || !"{".equals(document.get(command.offset, 1)))) {
             addVariableBrackets(command, "");
         }
@@ -73,12 +68,13 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
     private void customizePositiveLengthDocumentCommand(final IDocument document, final DocumentCommand command)
             throws BadLocationException {
-        if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)) {
+        if (preferences.isVariablesBracketsInsertionWrappingEnabled()
+                && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)) {
             final String selectedText = document.get(command.offset, command.length);
-            if (selectedText.matches(VAR_WRAP_PATTERN)) {
+            if (selectedText.matches(preferences.getVariablesBracketsInsertionWrappingPattern())) {
                 addVariableBrackets(command, selectedText);
             }
-        } else if (command.length == 1 && command.text.isEmpty()
+        } else if (preferences.isVariablesBracketsInsertionEnabled() && command.length == 1 && command.text.isEmpty()
                 && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(document.get(command.offset - 1, 1))
                 && document.get(command.offset, 2).equals("{}")) {
             // deleting empty variable brackets
@@ -96,13 +92,13 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             command.shiftsCaret = false;
             command.caretOffset = jumpOffset.get();
         } else {
-            command.text = getSeparator();
+            command.text = preferences.getSeparatorToUse(isTsvFile);
         }
     }
 
     private Optional<IRegion> findRegionToJumpOf(final IDocument document, final DocumentCommand command)
             throws BadLocationException {
-        if (!isSeparatorJumpModeEnabled) {
+        if (!preferences.isSeparatorJumpModeEnabled()) {
             return Optional.empty();
         }
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, isTsvFile, command.offset);
@@ -139,7 +135,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
         final IRobotLineElement firstElement = firstElem.get();
         if (isDefinitionRequiringIndent(currentLine, command.offset)) {
-            command.text += getSeparator();
+            command.text += preferences.getSeparatorToUse(isTsvFile);
 
         } else {
             String addedIndent = "";
@@ -171,10 +167,10 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 }
 
             } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
-                command.text += "\\" + getSeparator();
+                command.text += "\\" + preferences.getSeparatorToUse(isTsvFile);
 
             } else if (isRequiringContinuation(firstMeaningfulToken)) {
-                command.text += "..." + getSeparator();
+                command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
 
             }
 
@@ -198,7 +194,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 .isPresent();
         if (modificationStartsAfterTheToken) {
             final List<IRobotTokenType> typesOfFirstToken = firstToken.map(RobotToken::getTypes)
-                    .orElseGet(() -> new ArrayList<>());
+                    .orElseGet(ArrayList::new);
 
             return typesOfFirstToken.contains(RobotTokenType.TEST_CASE_NAME)
                     || typesOfFirstToken.contains(RobotTokenType.TASK_NAME)
@@ -245,7 +241,55 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 || types.contains(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
     }
 
-    private String getSeparator() {
-        return separatorSupplier.get();
+    static class EditStrategyPreferences {
+
+        // caches interesting preferences
+
+        private final RedPreferences preferences;
+
+        private String separatorToUseInTsv;
+
+        private String separatorToUseInRobot;
+
+        private boolean isSeparatorJumpModeEnabled;
+
+        private boolean isVariablesBracketsInsertionEnabled;
+
+        private boolean isVariablesBracketsInsertionWrappingEnabled;
+
+        private String variablesBracketsInsertionWrappingPattern;
+
+        EditStrategyPreferences(final RedPreferences preferences) {
+            this.preferences = preferences;
+        }
+
+        void refresh() {
+            separatorToUseInRobot = preferences.getSeparatorToUse(false);
+            separatorToUseInTsv = preferences.getSeparatorToUse(true);
+            isSeparatorJumpModeEnabled = preferences.isSeparatorJumpModeEnabled();
+            isVariablesBracketsInsertionEnabled = preferences.isVariablesBracketsInsertionEnabled();
+            isVariablesBracketsInsertionWrappingEnabled = preferences.isVariablesBracketsInsertionWrappingEnabled();
+            variablesBracketsInsertionWrappingPattern = preferences.getVariablesBracketsInsertionWrappingPattern();
+        }
+
+        String getSeparatorToUse(final boolean isTsvFile) {
+            return isTsvFile ? separatorToUseInTsv : separatorToUseInRobot;
+        }
+
+        boolean isSeparatorJumpModeEnabled() {
+            return isSeparatorJumpModeEnabled;
+        }
+
+        boolean isVariablesBracketsInsertionEnabled() {
+            return isVariablesBracketsInsertionEnabled;
+        }
+
+        boolean isVariablesBracketsInsertionWrappingEnabled() {
+            return isVariablesBracketsInsertionWrappingEnabled;
+        }
+
+        String getVariablesBracketsInsertionWrappingPattern() {
+            return variablesBracketsInsertionWrappingPattern;
+        }
     }
 }
