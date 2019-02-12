@@ -74,10 +74,14 @@ public class RedPreferences {
     public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "assistantKeywordPrefixAutoAdditionEnabled";
     public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
 
+    public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
+
+    public static final String VARIABLES_BRACKETS_INSERTION_ENABLED = "red.editor.variablesBracketsInsertionEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED = "red.editor.variablesBracketsInsertionWrappingEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN = "red.editor.variablesBracketsInsertionWrappingPattern";
+
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "projectModulesRecursiveAdditionOnVirtualenvEnabled";
     public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
-
-    public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
     public static final String LAUNCH_USE_ARGUMENT_FILE = "red.launch.useArgumentFile";
     public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
@@ -362,6 +366,18 @@ public class RedPreferences {
             final String coloringValue = store.getString(category.getPreferenceId());
             return ColoringPreference.fromPreferenceString(coloringValue);
         }
+    }
+
+    public boolean isVariablesBracketsInsertionEnabled() {
+        return store.getBoolean(VARIABLES_BRACKETS_INSERTION_ENABLED);
+    }
+
+    public boolean isVariablesBracketsInsertionWrappingEnabled() {
+        return store.getBoolean(VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED);
+    }
+
+    public String getVariablesBracketsInsertionWrappingPattern() {
+        return store.getString(VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN);
     }
 
     public Severity getProblemCategorySeverity(final ProblemCategory category) {

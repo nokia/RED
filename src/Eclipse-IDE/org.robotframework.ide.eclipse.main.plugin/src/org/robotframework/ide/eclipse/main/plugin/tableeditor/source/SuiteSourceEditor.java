@@ -271,6 +271,14 @@ public class SuiteSourceEditor extends TextEditor {
                             .contains(event.getKey())) {
 
                 foldingSupport.updateFoldingStructure(fileModel, getDocument());
+
+            } else if (newHashSet(RedPreferences.SEPARATOR_MODE, RedPreferences.SEPARATOR_JUMP_MODE_ENABLED,
+                    RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED,
+                    RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED,
+                    RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN).contains(event.getKey())) {
+
+                final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
+                config.getEditStrategyPreferences().refresh();
             }
         };
         final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID);

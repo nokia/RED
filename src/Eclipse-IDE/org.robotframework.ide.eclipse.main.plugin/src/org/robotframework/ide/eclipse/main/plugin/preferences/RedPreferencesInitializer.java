@@ -42,6 +42,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSourceFoldingPreferences(preferences);
         initializeSourceEditorAssistantPreferences(preferences);
         initializeSyntaxColoringPreferences(preferences);
+        initializeVariablesPreferences(preferences);
         initializeLibrariesPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
         initializeDefaultLaunchConfigurationPreferences(preferences);
@@ -104,6 +105,12 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
             preferences.put(category.getPreferenceId(), category.getDefault().toPreferenceString());
         }
+    }
+
+    private void initializeVariablesPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED, false);
+        preferences.putBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED, false);
+        preferences.put(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN, "\\w+");
     }
 
     private void initializeLibrariesPreferences(final IEclipsePreferences preferences) {

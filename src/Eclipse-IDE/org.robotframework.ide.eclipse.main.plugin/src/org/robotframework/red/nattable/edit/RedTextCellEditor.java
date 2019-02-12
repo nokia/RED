@@ -28,6 +28,7 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
@@ -47,8 +48,6 @@ import com.google.common.annotations.VisibleForTesting;
  * @author Michal Anglart
  */
 public class RedTextCellEditor extends TextCellEditor {
-
-    private static final String VAR_WRAP_PATTERN = "\\w+";
 
     private final int selectionStartShift;
 
@@ -125,7 +124,7 @@ public class RedTextCellEditor extends TextCellEditor {
         textControl.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
         textControl.addKeyListener(new TextKeyListener(parent));
-        textControl.addVerifyListener(new TextVerifyListener(textControl));
+        textControl.addVerifyListener(new TextVerifyListener(textControl, RedPlugin.getDefault().getPreferences()));
         validationJobScheduler.armRevalidationOn(textControl);
 
         return textControl;
@@ -243,20 +242,29 @@ public class RedTextCellEditor extends TextCellEditor {
 
         private final Text control;
 
-        private TextVerifyListener(final Text control) {
+        private final boolean isInsertionEnabled;
+
+        private final boolean isWrappingEnabled;
+
+        private final String wrappingPattern;
+
+        private TextVerifyListener(final Text control, final RedPreferences preferences) {
             this.control = control;
+            this.isInsertionEnabled = preferences.isVariablesBracketsInsertionEnabled();
+            this.isWrappingEnabled = preferences.isVariablesBracketsInsertionWrappingEnabled();
+            this.wrappingPattern = preferences.getVariablesBracketsInsertionWrappingPattern();
         }
 
         @Override
         public void verifyText(final VerifyEvent event) {
-            if (support.areContentProposalsShown()) {
+            if (support.areContentProposalsShown() || !isInsertionEnabled) {
                 return;
             }
 
             if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(event.text)
                     && !"{".equals(control.getText(event.start, event.end))) {
                 final String selectedText = control.getText(event.start, event.end - 1);
-                if (selectedText.isEmpty() || selectedText.matches(VAR_WRAP_PATTERN)) {
+                if (selectedText.isEmpty() || isWrappingEnabled && selectedText.matches(wrappingPattern)) {
                     addVariableBrackets(event);
                 }
             } else if ((event.keyCode == SWT.BS || event.keyCode == SWT.DEL) && event.start == event.end - 1) {
