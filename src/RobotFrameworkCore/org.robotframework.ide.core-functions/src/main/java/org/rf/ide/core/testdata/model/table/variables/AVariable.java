@@ -31,7 +31,7 @@ public abstract class AVariable extends AModelElement<VariableTable>
     private static final long serialVersionUID = 3690914169761757467L;
 
     public static final Set<String> ROBOT_VAR_IDENTIFICATORS = Stream
-            .of(VariableType.SCALAR, VariableType.LIST, VariableType.DICTIONARY)
+            .of(VariableType.SCALAR, VariableType.LIST, VariableType.DICTIONARY, VariableType.ENVIRONMENT)
             .map(VariableType::getIdentificator)
             .collect(Collectors.collectingAndThen(Collectors.toSet(), ImmutableSet::copyOf));
 
