@@ -10,10 +10,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -33,6 +37,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 
 public class RedPreferencesTest {
+
+    @Test
+    public void allPreferenceNamesStartWithRedPrefix() throws Exception {
+        final RedPreferences preferences = new RedPreferences(mock(IPreferenceStore.class));
+        final List<Field> preferenceNameFields = Arrays.stream(RedPreferences.class.getDeclaredFields())
+                .filter(f -> Modifier.isPublic(f.getModifiers()))
+                .filter(f -> Modifier.isStatic(f.getModifiers()))
+                .filter(f -> Modifier.isFinal(f.getModifiers()))
+                .filter(f -> f.getType().isAssignableFrom(String.class))
+                .collect(Collectors.toList());
+
+        for (final Field field : preferenceNameFields) {
+            assertThat((String) field.get(preferences)).startsWith("red.");
+        }
+    }
 
     @Test
     public void verifyFoldableElements_allCombinations() {

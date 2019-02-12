@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -37,51 +38,48 @@ import org.robotframework.red.graphics.ColorsManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Streams;
 
 public class RedPreferences {
 
-    private final IPreferenceStore store;
-
-    protected RedPreferences(final IPreferenceStore store) {
-        this.store = store;
-    }
-
-    public static final String OTHER_RUNTIMES = "otherRuntimes";
+    public static final String OTHER_RUNTIMES = "red.otherRuntimes";
     public static final String OTHER_RUNTIMES_EXECS = "red.otherRuntimesExecs";
-    public static final String ACTIVE_RUNTIME = "activeRuntime";
+    public static final String ACTIVE_RUNTIME = "red.activeRuntime";
     public static final String ACTIVE_RUNTIME_EXEC = "red.activeRuntimeExec";
 
     public static final String PARENT_DIRECTORY_NAME_IN_TAB = "red.editor.general.parendDirectoryNameInTab";
     public static final String FILE_ELEMENTS_OPEN_MODE = "red.editor.general.fileElementOpenMode";
-    public static final String SEPARATOR_MODE = "separatorMode";
-    public static final String SEPARATOR_TO_USE = "separatorToUse";
-    public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
-    public static final String BEHAVIOR_ON_CELL_COMMIT = "cellCommitBehavior";
+
+    public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "red.editor.tables.minimalArgsColumns";
+    public static final String BEHAVIOR_ON_CELL_COMMIT = "red.editor.tables.cellCommitBehavior";
     public static final String CELL_WRAPPING = "red.editor.tables.cellWrapping";
 
-    public static final String FOLDABLE_SECTIONS = "foldableSections";
-    public static final String FOLDABLE_CASES = "foldableCases";
-    public static final String FOLDABLE_TASKS = "foldableTasks";
-    public static final String FOLDABLE_KEYWORDS = "foldableKeywords";
-    public static final String FOLDABLE_DOCUMENTATION = "foldableDocumentation";
-    public static final String FOLDING_LINE_LIMIT = "foldingLineLimit";
+    public static final String SEPARATOR_MODE = "red.editor.source.separatorMode";
+    public static final String SEPARATOR_TO_USE = "red.editor.source.separatorToUse";
 
-    public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "assistantAutoActivationEnabled";
-    public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "assistantAutoActivationDelay";
-    public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "assistantAutoActivationChars";
-    public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "assistantKeywordPrefixAutoAdditionEnabled";
+    public static final String FOLDABLE_SECTIONS = "red.editor.folding.foldableSections";
+    public static final String FOLDABLE_CASES = "red.editor.folding.foldableCases";
+    public static final String FOLDABLE_TASKS = "red.editor.folding.foldableTasks";
+    public static final String FOLDABLE_KEYWORDS = "red.editor.folding.foldableKeywords";
+    public static final String FOLDABLE_DOCUMENTATION = "red.editor.folding.foldableDocumentation";
+    public static final String FOLDING_LINE_LIMIT = "red.editor.folding.lineLimit";
+
+    public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "red.editor.assistant.autoActivationEnabled";
+    public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "red.editor.assistant.autoActivationDelay";
+    public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "red.editor.assistant.autoActivationChars";
+    public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "red.editor.assistant.keywordPrefixAutoAdditionEnabled";
     public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
 
-    public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "projectModulesRecursiveAdditionOnVirtualenvEnabled";
-    public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
+    public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "red.libraries.projectModulesRecursiveAdditionOnVirtualenvEnabled";
+    public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "red.libraries.pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
     public static final String LAUNCH_USE_ARGUMENT_FILE = "red.launch.useArgumentFile";
     public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
     public static final String LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT = "red.launch.useSingleCommandLineArgument";
-
     public static final String LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS = "red.launch.additionalInterpreterArguments";
     public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
     public static final String LAUNCH_AGENT_CONNECTION_HOST = "red.launch.agentConnectionHost";
@@ -105,12 +103,17 @@ public class RedPreferences {
     public static final String TURN_OFF_VALIDATION = "red.validation.turnOff";
 
     public static final String TASKS_DETECTION_ENABLED = "red.tasks.enabled";
-
     public static final String TASKS_TAGS = "red.tasks.tags";
     public static final String TASKS_PRIORITIES = "red.tasks.priorities";
 
     public static final String STRING_VARIABLES_SETS = "red.string.variables.sets";
     public static final String STRING_VARIABLES_ACTIVE_SET = "red.string.variables.activeSet";
+
+    private final IPreferenceStore store;
+
+    protected RedPreferences(final IPreferenceStore store) {
+        this.store = store;
+    }
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -322,41 +325,8 @@ public class RedPreferences {
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
-        if (store.contains("syntaxColoring." + category.getId() + ".fontStyle")
-                || store.contains("syntaxColoring." + category.getId() + ".color.r")
-                || store.contains("syntaxColoring." + category.getId() + ".color.g")
-                || store.contains("syntaxColoring." + category.getId() + ".color.b")) {
-            // TODO: there are preferences written in old style; new style was introduced in 0.8.2
-            // remove handling old keys somewhere in future
-
-            final int fontStyle = store.contains("syntaxColoring." + category.getId() + ".fontStyle")
-                    ? store.getInt("syntaxColoring." + category.getId() + ".fontStyle")
-                    : category.getDefault().fontStyle;
-            final int red = store.contains("syntaxColoring." + category.getId() + ".color.r")
-                    ? store.getInt("syntaxColoring." + category.getId() + ".color.r")
-                    : category.getDefault().color.red;
-            final int green = store.contains("syntaxColoring." + category.getId() + ".color.g")
-                    ? store.getInt("syntaxColoring." + category.getId() + ".color.g")
-                    : category.getDefault().color.green;
-            final int blue = store.contains("syntaxColoring." + category.getId() + ".color.b")
-                    ? store.getInt("syntaxColoring." + category.getId() + ".color.b")
-                    : category.getDefault().color.blue;
-
-            final ColoringPreference preference = new ColoringPreference(new RGB(red, green, blue), fontStyle);
-
-            // remove old style preferences and set new
-            for (final IEclipsePreferences prefs : ((ScopedPreferenceStore) store).getPreferenceNodes(true)) {
-                prefs.remove("syntaxColoring." + category.getId() + ".fontStyle");
-                prefs.remove("syntaxColoring." + category.getId() + ".color.r");
-                prefs.remove("syntaxColoring." + category.getId() + ".color.g");
-                prefs.remove("syntaxColoring." + category.getId() + ".color.b");
-            }
-            store.setValue(category.getPreferenceId(), preference.toPreferenceString());
-            return preference;
-        } else {
-            final String coloringValue = store.getString(category.getPreferenceId());
-            return ColoringPreference.fromPreferenceString(coloringValue);
-        }
+        final String coloringValue = store.getString(category.getPreferenceId());
+        return ColoringPreference.fromPreferenceString(coloringValue);
     }
 
     public Severity getProblemCategorySeverity(final ProblemCategory category) {
@@ -425,6 +395,103 @@ public class RedPreferences {
 
         } catch (final IOException e) {
             throw new IllegalStateException();
+        }
+    }
+
+    void updatePreferencesWithoutPrefixesIfNeeded() {
+        // TODO: there are preferences written without "red." prefix
+        // red prefix was added to all preferences in 0.8.12 to fix preference exporting feature
+        // remove this method somewhere in future
+
+        boolean shouldSave = false;
+
+        final Builder<String, String> integerPreferencesBuilder = ImmutableMap.builder();
+        integerPreferencesBuilder.put("minimalArgsColumns", MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS);
+        integerPreferencesBuilder.put("assistantAutoActivationDelay", ASSISTANT_AUTO_ACTIVATION_DELAY);
+        integerPreferencesBuilder.put("foldingLineLimit", FOLDING_LINE_LIMIT);
+        for (final Entry<String, String> entry : integerPreferencesBuilder.build().entrySet()) {
+            if (store.contains(entry.getKey())) {
+                final int value = store.getInt(entry.getKey());
+                store.setToDefault(entry.getKey());
+                store.setValue(entry.getValue(), value);
+                shouldSave = true;
+            }
+        }
+
+        final Builder<String, String> booleanPreferencesBuilder = ImmutableMap.builder();
+        booleanPreferencesBuilder.put("projectModulesRecursiveAdditionOnVirtualenvEnabled",
+                PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
+        booleanPreferencesBuilder.put("pythonLibrariesLibdocsGenarationInSeperateProcessEnabled",
+                PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED);
+        booleanPreferencesBuilder.put("foldableSections", FOLDABLE_SECTIONS);
+        booleanPreferencesBuilder.put("foldableCases", FOLDABLE_CASES);
+        booleanPreferencesBuilder.put("foldableTasks", FOLDABLE_TASKS);
+        booleanPreferencesBuilder.put("foldableKeywords", FOLDABLE_KEYWORDS);
+        booleanPreferencesBuilder.put("foldableDocumentation", FOLDABLE_DOCUMENTATION);
+        booleanPreferencesBuilder.put("assistantAutoActivationEnabled", ASSISTANT_AUTO_ACTIVATION_ENABLED);
+        booleanPreferencesBuilder.put("assistantKeywordPrefixAutoAdditionEnabled",
+                ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED);
+        for (final Entry<String, String> entry : booleanPreferencesBuilder.build().entrySet()) {
+            if (store.contains(entry.getKey())) {
+                final boolean value = store.getBoolean(entry.getKey());
+                store.setToDefault(entry.getKey());
+                store.setValue(entry.getValue(), value);
+                shouldSave = true;
+            }
+        }
+
+        final Builder<String, String> stringPreferencesBuilder = ImmutableMap.builder();
+        stringPreferencesBuilder.put("otherRuntimes", OTHER_RUNTIMES);
+        stringPreferencesBuilder.put("activeRuntime", ACTIVE_RUNTIME);
+        stringPreferencesBuilder.put("cellCommitBehavior", BEHAVIOR_ON_CELL_COMMIT);
+        stringPreferencesBuilder.put("separatorMode", SEPARATOR_MODE);
+        stringPreferencesBuilder.put("separatorToUse", SEPARATOR_TO_USE);
+        stringPreferencesBuilder.put("assistantAutoActivationChars", ASSISTANT_AUTO_ACTIVATION_CHARS);
+        for (final Entry<String, String> entry : stringPreferencesBuilder.build().entrySet()) {
+            if (store.contains(entry.getKey())) {
+                final String value = store.getString(entry.getKey());
+                store.setToDefault(entry.getKey());
+                store.setValue(entry.getValue(), value);
+                shouldSave = true;
+            }
+        }
+
+        for (final SyntaxHighlightingCategory category : SyntaxHighlightingCategory.values()) {
+            if (store.contains("syntaxColoring." + category.getId() + ".fontStyle")
+                    || store.contains("syntaxColoring." + category.getId() + ".color.r")
+                    || store.contains("syntaxColoring." + category.getId() + ".color.g")
+                    || store.contains("syntaxColoring." + category.getId() + ".color.b")) {
+
+                final int fontStyle = store.contains("syntaxColoring." + category.getId() + ".fontStyle")
+                        ? store.getInt("syntaxColoring." + category.getId() + ".fontStyle")
+                        : category.getDefault().fontStyle;
+                final int red = store.contains("syntaxColoring." + category.getId() + ".color.r")
+                        ? store.getInt("syntaxColoring." + category.getId() + ".color.r")
+                        : category.getDefault().color.red;
+                final int green = store.contains("syntaxColoring." + category.getId() + ".color.g")
+                        ? store.getInt("syntaxColoring." + category.getId() + ".color.g")
+                        : category.getDefault().color.green;
+                final int blue = store.contains("syntaxColoring." + category.getId() + ".color.b")
+                        ? store.getInt("syntaxColoring." + category.getId() + ".color.b")
+                        : category.getDefault().color.blue;
+
+                final ColoringPreference preference = new ColoringPreference(new RGB(red, green, blue), fontStyle);
+
+                store.setToDefault("syntaxColoring." + category.getId() + ".fontStyle");
+                store.setToDefault("syntaxColoring." + category.getId() + ".color.r");
+                store.setToDefault("syntaxColoring." + category.getId() + ".color.g");
+                store.setToDefault("syntaxColoring." + category.getId() + ".color.b");
+                store.setValue(category.getPreferenceId(), preference.toPreferenceString());
+                shouldSave = true;
+            }
+        }
+
+        if (shouldSave && store instanceof IPersistentPreferenceStore) {
+            try {
+                ((IPersistentPreferenceStore) store).save();
+            } catch (final IOException e) {
+                // ok, it will not be saved
+            }
         }
     }
 

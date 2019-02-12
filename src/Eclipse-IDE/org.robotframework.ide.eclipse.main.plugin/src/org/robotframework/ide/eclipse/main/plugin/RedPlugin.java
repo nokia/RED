@@ -59,6 +59,7 @@ public class RedPlugin extends AbstractUIPlugin {
             if (RedSystemProperties.shouldShowSessionConsole()) {
                 RobotRuntimeEnvironment.addProcessListener(new RedSessionProcessListener());
             }
+            getPreferences().updatePreferencesWithoutPrefixesIfNeeded();
         } catch (final Exception e) {
             throw new IllegalStateException("Unable to start RED plugin", e);
         }

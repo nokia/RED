@@ -83,23 +83,6 @@
             name="Robot python file">
       </wizard>
    </extension>
-   <!--<extension
-         point="org.eclipse.ui.importWizards">
-      <category
-            id="org.robotframework.red.wizards.import.category"
-            name="Robot Framework">
-      </category>
-      <wizard
-            category="org.robotframework.red.wizards.import.category"
-            class="org.robotframework.ide.eclipse.main.plugin.wizards.ImportRobotProjectWizard"
-            icon="resources/import_robot_project.png"
-            id="org.robotframework.red.wizards.import.project"
-            name="Robot Project">
-         <description>
-            Import folder with Robot files as project into the workspace
-         </description>
-      </wizard>
-   </extension>-->
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
@@ -3041,11 +3024,6 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <!--and>
-             <reference
-                   definitionId="org.robotframework.table.onlyFullRowsAreSelected">
-             </reference>
-          </and-->
           <and>
              <reference
                    definitionId="org.robotframework.atLeastOneVariableIsSelected">
@@ -3070,11 +3048,6 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <!--and>
-             <reference
-                   definitionId="org.robotframework.table.onlyFullRowsAreSelected">
-             </reference>
-          </and-->
           <and>
              <reference
                    definitionId="org.robotframework.atLeastOneVariableIsSelected">
@@ -6787,9 +6760,7 @@
             searchResultClass="org.robotframework.ide.eclipse.main.plugin.search.SearchResult">
           </viewPage>
       </extension>
-      <extension
-            id="syntaxColoring"
-            point="org.eclipse.ui.preferenceTransfer">
+      <extension point="org.eclipse.ui.preferenceTransfer">
          <transfer
                icon="/resources/robot.png"
                id="org.robotframework.ide.eclipse.main.plugin.transfer1"
@@ -6800,32 +6771,7 @@
                      node="org.robotframework.ide.eclipse.main.plugin">
                   <key
                         match="prefix"
-                        name="red">
-                  </key>
-                  <key
-                        match="prefix"
-                        name="syntaxColoring">
-                  </key>
-                  <key
-                        match="prefix"
-                        name="assistant">
-                  </key>
-                  <key
-                        match="prefix"
-                        name="fold">
-                  </key>
-                  <key
-                        match="prefix"
-                        name="separator">
-                  </key>
-                  <key
-                        name="minimalArgsColumns">
-                  </key>
-                  <key
-                        name="cellCommitBehavior">
-                  </key>
-                  <key
-                        name="projectModulesRecursiveAdditionOnVirtualenvEnabled">
+                        name="red.">
                   </key>
                </entry>
             </mapping>

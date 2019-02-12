@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotVersion;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
@@ -109,10 +110,10 @@ public class TasksDataProviderTest {
 
     @Test
     public void columnsAreCountedCorrectly_whenMinimalArgumentsColumnsFieldIsChangedInPreferences() throws Exception {
-        preferenceUpdater.setValue("minimalArgsColumns", 15);
+        preferenceUpdater.setValue(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 15);
 
-        dataProvider.setInput(createTasksSection("*** Tasks ***", 
-                "task", 
+        dataProvider.setInput(createTasksSection("*** Tasks ***",
+                "task",
                 "  Log Many    ${a}    ${b}    ${c}"));
 
         assertThat(dataProvider.getColumnCount()).isEqualTo(16);
