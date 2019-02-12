@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlighting
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter.FormattingSeparatorType;
 import org.robotframework.red.graphics.ColorsManager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,52 +42,59 @@ import com.google.common.collect.Streams;
 
 public class RedPreferences {
 
-    private final IPreferenceStore store;
-
-    protected RedPreferences(final IPreferenceStore store) {
-        this.store = store;
-    }
-
-    public static final String OTHER_RUNTIMES = "otherRuntimes";
+    public static final String OTHER_RUNTIMES = "red.otherRuntimes";
     public static final String OTHER_RUNTIMES_EXECS = "red.otherRuntimesExecs";
-    public static final String ACTIVE_RUNTIME = "activeRuntime";
+    public static final String ACTIVE_RUNTIME = "red.activeRuntime";
     public static final String ACTIVE_RUNTIME_EXEC = "red.activeRuntimeExec";
 
     public static final String PARENT_DIRECTORY_NAME_IN_TAB = "red.editor.general.parendDirectoryNameInTab";
     public static final String FILE_ELEMENTS_OPEN_MODE = "red.editor.general.fileElementOpenMode";
-    public static final String SEPARATOR_MODE = "separatorMode";
-    public static final String SEPARATOR_TO_USE = "separatorToUse";
-    public static final String SEPARATOR_JUMP_MODE_ENABLED = "red.editor.general.separatorJumpModeEnabled";
-    public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
-    public static final String BEHAVIOR_ON_CELL_COMMIT = "cellCommitBehavior";
+
+    public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "red.editor.tables.minimalArgsColumns";
+    public static final String BEHAVIOR_ON_CELL_COMMIT = "red.editor.tables.cellCommitBehavior";
     public static final String CELL_WRAPPING = "red.editor.tables.cellWrapping";
 
-    public static final String FOLDABLE_SECTIONS = "foldableSections";
-    public static final String FOLDABLE_CASES = "foldableCases";
-    public static final String FOLDABLE_TASKS = "foldableTasks";
-    public static final String FOLDABLE_KEYWORDS = "foldableKeywords";
-    public static final String FOLDABLE_DOCUMENTATION = "foldableDocumentation";
-    public static final String FOLDING_LINE_LIMIT = "foldingLineLimit";
+    public static final String SEPARATOR_MODE = "red.editor.source.separatorMode";
+    public static final String SEPARATOR_TO_USE = "red.editor.source.separatorToUse";
+    public static final String SEPARATOR_JUMP_MODE_ENABLED = "red.editor.source.separatorJumpModeEnabled";
 
-    public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "assistantAutoActivationEnabled";
-    public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "assistantAutoActivationDelay";
-    public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "assistantAutoActivationChars";
-    public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "assistantKeywordPrefixAutoAdditionEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_ENABLED = "red.editor.variables.variablesBracketsInsertionEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED = "red.editor.variables.variablesBracketsInsertionWrappingEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN = "red.editor.variables.variablesBracketsInsertionWrappingPattern";
+
+    public static final String FOLDABLE_SECTIONS = "red.editor.folding.foldableSections";
+    public static final String FOLDABLE_CASES = "red.editor.folding.foldableCases";
+    public static final String FOLDABLE_TASKS = "red.editor.folding.foldableTasks";
+    public static final String FOLDABLE_KEYWORDS = "red.editor.folding.foldableKeywords";
+    public static final String FOLDABLE_DOCUMENTATION = "red.editor.folding.foldableDocumentation";
+    public static final String FOLDING_LINE_LIMIT = "red.editor.folding.lineLimit";
+
+    public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "red.editor.assistant.autoActivationEnabled";
+    public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "red.editor.assistant.autoActivationDelay";
+    public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "red.editor.assistant.autoActivationChars";
+    public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "red.editor.assistant.keywordPrefixAutoAdditionEnabled";
     public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
+    public static final String ASSISTANT_LINKED_ARGUMENTS_MODE = "red.editor.assistant.linkedArgumentsMode";
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
-    public static final String VARIABLES_BRACKETS_INSERTION_ENABLED = "red.editor.variablesBracketsInsertionEnabled";
-    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED = "red.editor.variablesBracketsInsertionWrappingEnabled";
-    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN = "red.editor.variablesBracketsInsertionWrappingPattern";
+    public static final String FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED = "red.editor.formatter.separatorAdjustmentEnabled";
+    public static final String FORMATTER_SEPARATOR_TYPE = "red.editor.formatter.separatorType";
+    public static final String FORMATTER_SEPARATOR_LENGTH = "red.editor.formatter.separatorLength";
+    public static final String FORMATTER_RIGHT_TRIM_ENABLED = "red.editor.formatter.rightTrimEnabled";
 
-    public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "projectModulesRecursiveAdditionOnVirtualenvEnabled";
-    public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
+    public static final String SAVE_ACTIONS_CODE_FORMATTING_ENABLED = "red.editor.save.codeFormattingEnabled";
+    public static final String SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED = "red.editor.save.changedLinesOnlyEnabled";
+    public static final String SAVE_ACTIONS_AUTO_DISCOVERING_ENABLED = "red.editor.save.autoDiscoveringEnabled";
+    public static final String SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED = "red.editor.save.autoDiscoveringSummaryWindowEnabled";
+
+    public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "red.libraries.projectModulesRecursiveAdditionOnVirtualenvEnabled";
+    public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "red.libraries.pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
+    public static final String LIBDOCS_AUTO_RELOAD_ENABLED = "red.libraries.libdocsAutoReloadEnabled";
 
     public static final String LAUNCH_USE_ARGUMENT_FILE = "red.launch.useArgumentFile";
     public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
     public static final String LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT = "red.launch.useSingleCommandLineArgument";
-
     public static final String LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS = "red.launch.additionalInterpreterArguments";
     public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
     public static final String LAUNCH_AGENT_CONNECTION_HOST = "red.launch.agentConnectionHost";
@@ -94,6 +102,7 @@ public class RedPreferences {
     public static final String LAUNCH_AGENT_CONNECTION_TIMEOUT = "red.launch.agentConnectionTimeout";
     public static final String LAUNCH_EXECUTABLE_FILE_PATH = "red.launch.executableFilePath";
     public static final String LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS = "red.launch.additionalExecutableFileArguments";
+    public static final String LAUNCH_ENVIRONMENT_VARIABLES = "red.launch.environmentVariables";
 
     public static final String LIMIT_MSG_LOG_OUTPUT = "red.launch.msgLogLimitEnabled";
     public static final String LIMIT_MSG_LOG_LENGTH = "red.launch.msgLogLimit";
@@ -110,12 +119,17 @@ public class RedPreferences {
     public static final String TURN_OFF_VALIDATION = "red.validation.turnOff";
 
     public static final String TASKS_DETECTION_ENABLED = "red.tasks.enabled";
-
     public static final String TASKS_TAGS = "red.tasks.tags";
     public static final String TASKS_PRIORITIES = "red.tasks.priorities";
 
     public static final String STRING_VARIABLES_SETS = "red.string.variables.sets";
     public static final String STRING_VARIABLES_ACTIVE_SET = "red.string.variables.activeSet";
+
+    private final IPreferenceStore store;
+
+    protected RedPreferences(final IPreferenceStore store) {
+        this.store = store;
+    }
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -183,6 +197,18 @@ public class RedPreferences {
         return store.getBoolean(SEPARATOR_JUMP_MODE_ENABLED);
     }
 
+    public boolean isVariablesBracketsInsertionEnabled() {
+        return store.getBoolean(VARIABLES_BRACKETS_INSERTION_ENABLED);
+    }
+
+    public boolean isVariablesBracketsInsertionWrappingEnabled() {
+        return store.getBoolean(VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED);
+    }
+
+    public String getVariablesBracketsInsertionWrappingPattern() {
+        return store.getString(VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN);
+    }
+
     public int getMinimalNumberOfArgumentColumns() {
         return store.getInt(MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS);
     }
@@ -215,12 +241,52 @@ public class RedPreferences {
         return store.getBoolean(ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED);
     }
 
+    public LinkedModeStrategy getAssistantLinkedArgumentsMode() {
+        return LinkedModeStrategy.valueOf(store.getString(ASSISTANT_LINKED_ARGUMENTS_MODE));
+    }
+
+    public boolean isFormatterSeparatorAdjustmentEnabled() {
+        return store.getBoolean(FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED);
+    }
+
+    public FormattingSeparatorType getFormatterSeparatorType() {
+        return FormattingSeparatorType.valueOf(store.getString(FORMATTER_SEPARATOR_TYPE));
+    }
+
+    public int getFormatterSeparatorLength() {
+        return store.getInt(FORMATTER_SEPARATOR_LENGTH);
+    }
+
+    public boolean isFormatterRightTrimEnabled() {
+        return store.getBoolean(FORMATTER_RIGHT_TRIM_ENABLED);
+    }
+
+    public boolean isSaveActionsCodeFormattingEnabled() {
+        return store.getBoolean(SAVE_ACTIONS_CODE_FORMATTING_ENABLED);
+    }
+
+    public boolean isSaveActionsChangedLinesOnlyEnabled() {
+        return store.getBoolean(SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED);
+    }
+
+    public boolean isAutoDiscoveringEnabled() {
+        return store.getBoolean(SAVE_ACTIONS_AUTO_DISCOVERING_ENABLED);
+    }
+
+    public boolean isAutoDiscoveringSummaryWindowEnabled() {
+        return store.getBoolean(SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED);
+    }
+
     public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {
         return store.getBoolean(PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
     }
 
     public boolean isPythonLibrariesLibdocGenerationInSeparateProcessEnabled() {
         return store.getBoolean(PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED);
+    }
+
+    public boolean isLibdocAutoReloadEnabled() {
+        return store.getBoolean(LIBDOCS_AUTO_RELOAD_ENABLED);
     }
 
     public EnumSet<FoldableElements> getFoldableElements() {
@@ -286,8 +352,30 @@ public class RedPreferences {
         return store.getString(LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS);
     }
 
+    public Map<String, String> getLaunchEnvironmentVariables() {
+        final String jsonMapping = store.getString(LAUNCH_ENVIRONMENT_VARIABLES);
+        if (jsonMapping.isEmpty()) {
+            return new LinkedHashMap<>();
+        }
+
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            final TypeReference<Map<String, String>> stringToStringMapType = new TypeReference<Map<String, String>>() {
+            };
+
+            return mapper.readValue(jsonMapping, stringToStringMapType);
+
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public boolean shouldUseSingleCommandLineArgument() {
         return store.getBoolean(LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT);
+    }
+
+    public void setShouldUseSingleCommandLineArgument(final boolean shouldUseSingleArg) {
+        store.setValue(LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT, shouldUseSingleArg);
     }
 
     public boolean shouldUseSingleFileDataSource() {
@@ -331,53 +419,8 @@ public class RedPreferences {
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
-        if (store.contains("syntaxColoring." + category.getId() + ".fontStyle")
-                || store.contains("syntaxColoring." + category.getId() + ".color.r")
-                || store.contains("syntaxColoring." + category.getId() + ".color.g")
-                || store.contains("syntaxColoring." + category.getId() + ".color.b")) {
-            // TODO: there are preferences written in old style; new style was introduced in 0.8.2
-            // remove handling old keys somewhere in future
-
-            final int fontStyle = store.contains("syntaxColoring." + category.getId() + ".fontStyle")
-                    ? store.getInt("syntaxColoring." + category.getId() + ".fontStyle")
-                    : category.getDefault().fontStyle;
-            final int red = store.contains("syntaxColoring." + category.getId() + ".color.r")
-                    ? store.getInt("syntaxColoring." + category.getId() + ".color.r")
-                    : category.getDefault().color.red;
-            final int green = store.contains("syntaxColoring." + category.getId() + ".color.g")
-                    ? store.getInt("syntaxColoring." + category.getId() + ".color.g")
-                    : category.getDefault().color.green;
-            final int blue = store.contains("syntaxColoring." + category.getId() + ".color.b")
-                    ? store.getInt("syntaxColoring." + category.getId() + ".color.b")
-                    : category.getDefault().color.blue;
-
-            final ColoringPreference preference = new ColoringPreference(new RGB(red, green, blue), fontStyle);
-
-            // remove old style preferences and set new
-            for (final IEclipsePreferences prefs : ((ScopedPreferenceStore) store).getPreferenceNodes(true)) {
-                prefs.remove("syntaxColoring." + category.getId() + ".fontStyle");
-                prefs.remove("syntaxColoring." + category.getId() + ".color.r");
-                prefs.remove("syntaxColoring." + category.getId() + ".color.g");
-                prefs.remove("syntaxColoring." + category.getId() + ".color.b");
-            }
-            store.setValue(category.getPreferenceId(), preference.toPreferenceString());
-            return preference;
-        } else {
-            final String coloringValue = store.getString(category.getPreferenceId());
-            return ColoringPreference.fromPreferenceString(coloringValue);
-        }
-    }
-
-    public boolean isVariablesBracketsInsertionEnabled() {
-        return store.getBoolean(VARIABLES_BRACKETS_INSERTION_ENABLED);
-    }
-
-    public boolean isVariablesBracketsInsertionWrappingEnabled() {
-        return store.getBoolean(VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED);
-    }
-
-    public String getVariablesBracketsInsertionWrappingPattern() {
-        return store.getString(VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN);
+        final String coloringValue = store.getString(category.getPreferenceId());
+        return ColoringPreference.fromPreferenceString(coloringValue);
     }
 
     public Severity getProblemCategorySeverity(final ProblemCategory category) {
@@ -562,5 +605,10 @@ public class RedPreferences {
         NEVER,
         ALWAYS,
         PROMPT
+    }
+
+    public enum LinkedModeStrategy {
+        CYCLE,
+        EXIT_ON_LAST
     }
 }

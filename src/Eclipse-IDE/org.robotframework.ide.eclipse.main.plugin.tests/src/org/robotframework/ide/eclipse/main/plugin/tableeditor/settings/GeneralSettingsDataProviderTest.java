@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.core.resources.IFile;
 import org.junit.Rule;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.red.junit.PreferenceUpdater;
@@ -68,7 +69,7 @@ public class GeneralSettingsDataProviderTest {
 
     @Test
     public void columnsAreCountedCorrectly_whenMinimalArgumentsColumnsFieldIsChangedInPreferences() throws Exception {
-        preferenceUpdater.setValue("minimalArgsColumns", 15);
+        preferenceUpdater.setValue(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 15);
 
         dataProvider.setInput(createSettingsSection("*** Settings ***",
                 "Force Tags    a    b    c"));
