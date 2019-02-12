@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -19,19 +20,24 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
+import org.robotframework.red.jface.preferences.RegexStringFieldEditor;
 import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
 
 public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
 
-    private Consumer<PropertyChangeEvent> enablementUpdater;
+    private Consumer<PropertyChangeEvent> separatorEnablementUpdater;
+
+    private BiConsumer<Boolean, Boolean> variablesEnablementUpdater;
 
     @Override
     protected void createFieldEditors() {
@@ -41,6 +47,7 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
         createGeneralSettingsGroup(parent);
         createTablesSettingsGroup(parent);
         createSourceSettingsGroup(parent);
+        createVariablesSettingsEditors(parent);
     }
 
     private void createLink(final Composite parent) {
@@ -157,7 +164,7 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
                 .valueOf(getPreferenceStore().getString(RedPreferences.SEPARATOR_MODE));
         separatorEditor.setEnabled(currentMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
 
-        enablementUpdater = event -> {
+        separatorEnablementUpdater = event -> {
             if (event.getSource() == editors) {
                 final SeparatorsMode newMode = SeparatorsMode.valueOf((String) event.getNewValue());
                 separatorEditor.setEnabled(newMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
@@ -181,9 +188,69 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
                         SeparatorsMode.FILE_TYPE_DEPENDENT.name() } };
     }
 
+    private void createVariablesSettingsEditors(final Composite parent) {
+        final Group varGroup = new Group(parent, SWT.NONE);
+        varGroup.setText("Variables");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(varGroup);
+        GridLayoutFactory.fillDefaults().applyTo(varGroup);
+
+        final Label varDescription = new Label(varGroup, SWT.WRAP);
+        varDescription.setText("When one of robot variable identificators ($, @, &&, %) is typed");
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(varDescription);
+
+        final BooleanFieldEditor varInsertionEnabled = new BooleanFieldEditor(
+                RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED, "Automatically add variable brackets", varGroup);
+        addField(varInsertionEnabled);
+        final Button varInsertionEnabledButton = (Button) varInsertionEnabled.getDescriptionControl(varGroup);
+        GridDataFactory.fillDefaults().indent(5, 0).applyTo(varInsertionEnabledButton);
+
+        final BooleanFieldEditor varWrappingEnabled = new BooleanFieldEditor(
+                RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED,
+                "Automatically wrap selected text with variable brackets", varGroup);
+        addField(varWrappingEnabled);
+        final Button varWrappingEnabledButton = (Button) varWrappingEnabled.getDescriptionControl(varGroup);
+        GridDataFactory.fillDefaults().indent(5, 0).applyTo(varWrappingEnabledButton);
+
+        final RegexStringFieldEditor varWrappingPattern = new RegexStringFieldEditor(
+                RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN, "Wrap selected text pattern", varGroup);
+        varWrappingPattern.setEmptyStringAllowed(false);
+        varWrappingPattern.setErrorMessage("Pattern cannot be empty");
+        addField(varWrappingPattern);
+        GridDataFactory.fillDefaults().indent(5, 0).applyTo(varWrappingPattern.getLabelControl(varGroup));
+
+        varInsertionEnabledButton.addSelectionListener(widgetSelectedAdapter(e -> {
+            varWrappingEnabled.setEnabled(varInsertionEnabledButton.getSelection(), varGroup);
+            varWrappingPattern.setEnabled(
+                    varInsertionEnabledButton.getSelection() && varWrappingEnabledButton.getSelection(), varGroup);
+        }));
+        varWrappingEnabledButton.addSelectionListener(widgetSelectedAdapter(e -> {
+            varWrappingPattern.setEnabled(varWrappingEnabledButton.getSelection(), varGroup);
+        }));
+
+        variablesEnablementUpdater = (isInsertionEnabled, isWrappingEnabled) -> {
+            varWrappingEnabled.setEnabled(isInsertionEnabled, varGroup);
+            varWrappingPattern.setEnabled(isInsertionEnabled && isWrappingEnabled, varGroup);
+        };
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        final boolean isInsertionEnabled = preferences.isVariablesBracketsInsertionEnabled();
+        final boolean isWrappingEnabled = preferences.isVariablesBracketsInsertionWrappingEnabled();
+        variablesEnablementUpdater.accept(isInsertionEnabled, isWrappingEnabled);
+    }
+
     @Override
     public void propertyChange(final PropertyChangeEvent event) {
-        enablementUpdater.accept(event);
+        separatorEnablementUpdater.accept(event);
         super.propertyChange(event);
+    }
+
+    @Override
+    protected void performDefaults() {
+        super.performDefaults();
+
+        final boolean isInsertionEnabled = getPreferenceStore()
+                .getDefaultBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED);
+        final boolean isWrappingEnabled = getPreferenceStore()
+                .getDefaultBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED);
+        variablesEnablementUpdater.accept(isInsertionEnabled, isWrappingEnabled);
     }
 }
