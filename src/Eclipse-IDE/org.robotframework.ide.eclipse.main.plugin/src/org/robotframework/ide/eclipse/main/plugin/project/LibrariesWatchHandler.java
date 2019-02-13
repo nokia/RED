@@ -378,7 +378,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         return rebuildTasksQueue.size();
     }
 
-    private class RebuildTask {
+    private static class RebuildTask {
 
         private final IProject project;
 

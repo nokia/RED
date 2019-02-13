@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -262,7 +260,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
     }
 
     private List<? extends IEditorPart> getDirtyEditors() {
-        final List<IEditorPart> dirtyEditors = newArrayList();
+        final List<IEditorPart> dirtyEditors = new ArrayList<>();
         for (int i = 0; i < getPageCount(); i++) {
             final IEditorPart editorPart = getEditor(i);
             if (editorPart != null && editorPart.isDirty()) {

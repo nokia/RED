@@ -5,11 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -35,45 +32,35 @@ import org.robotframework.red.swt.SwtThread.Evaluation;
  */
 public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolution {
 
-    private final String variable;
+    private final String name;
 
     public static List<DefineGlobalVariableInConfigFixer> createFixers(final String parameterizedPath) {
         final List<String> variables = RobotExpressions.getVariables(parameterizedPath);
-        final Map<String, String> vars = newHashMap();
-
-        final List<DefineGlobalVariableInConfigFixer> fixers = newArrayList();
-        for (final String var : variables) {
-            if (!vars.containsKey(var)) {
-                fixers.add(new DefineGlobalVariableInConfigFixer(var));
-            }
-        }
-        return fixers;
+        return variables.stream().map(DefineGlobalVariableInConfigFixer::new).collect(Collectors.toList());
     }
 
-    public DefineGlobalVariableInConfigFixer(final String variable) {
-        this.variable = variable;
+    public DefineGlobalVariableInConfigFixer(final String name) {
+        this.name = name;
     }
 
     @Override
     public String getLabel() {
-        return "Define '" + variable + "' variable";
+        return "Define '" + name + "' variable";
     }
 
     @Override
     protected ICompletionProposal asContentProposal(final IMarker marker, final IFile externalFile) {
-        return new DefineLibraryProposal(marker, externalFile, variable, getLabel());
+        return new DefineLibraryProposal(marker, externalFile, getLabel());
     }
 
     private class DefineLibraryProposal extends RedConfigFileCompletionProposal {
 
-        private final String name;
         private VariableMapping variableMapping;
+
         private List<VariableMapping> changedMappings;
 
-        public DefineLibraryProposal(final IMarker marker, final IFile externalFile, final String variableName,
-                final String shortDescription) {
+        public DefineLibraryProposal(final IMarker marker, final IFile externalFile, final String shortDescription) {
             super(marker, externalFile, shortDescription, null);
-            this.name = variableName;
         }
 
         @Override

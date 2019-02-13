@@ -14,10 +14,8 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.TextStyle;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
@@ -56,12 +54,7 @@ class VariableFilesLabelProvider extends RedCommonLabelProvider {
 
         label.append(Path.fromPortableString(varFile.getPath()).lastSegment(), styler);
         label.append(' ');
-        label.append("- " + new Path(varFile.getPath()), new Styler() {
-            @Override
-            public void applyStyles(final TextStyle textStyle) {
-                textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
-            }
-        });
+        label.append("- " + new Path(varFile.getPath()), Stylers.Common.ECLIPSE_DECORATION_STYLER);
         return label;
     }
 

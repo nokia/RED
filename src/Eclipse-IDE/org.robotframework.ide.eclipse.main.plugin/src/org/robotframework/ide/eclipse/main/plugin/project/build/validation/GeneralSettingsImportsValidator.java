@@ -84,8 +84,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 final String resolved = RobotExpressions
                         .resolve(suiteFile.getRobotProject().getRobotProjectHolder().getVariableMappings(), pathOrName);
                 if (RobotExpressions.isParameterized(resolved)) {
-                    // still parameterized after resolving
-                    reportUnresolvedParameterizedImport(pathOrNameToken);
+                    reportUnresolvedParameterizedImport(resolved, pathOrNameToken);
                 } else {
                     validateSpecifiedImport(imported, resolved, pathOrNameToken, true);
                 }
@@ -100,11 +99,11 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 .formatMessageWith(declarationToken.getText()), validationContext.getFile(), declarationToken);
     }
 
-    private void reportUnresolvedParameterizedImport(final RobotToken pathOrNameToken) {
-        final String path = pathOrNameToken.getText();
-        final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME, path);
+    private void reportUnresolvedParameterizedImport(final String resolved, final RobotToken pathOrNameToken) {
+        final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME, resolved);
         reporter.handleProblem(
-                RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED).formatMessageWith(path),
+                RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED)
+                        .formatMessageWith(pathOrNameToken.getText()),
                 validationContext.getFile(), pathOrNameToken, additional);
     }
 

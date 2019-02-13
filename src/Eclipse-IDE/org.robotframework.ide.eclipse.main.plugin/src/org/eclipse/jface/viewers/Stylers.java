@@ -27,6 +27,7 @@ public class Stylers {
     public static class Common {
 
         public static final Styler EMPTY_STYLER = new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 // no styles to apply
@@ -42,6 +43,7 @@ public class Stylers {
         };
 
         public static final Styler ECLIPSE_SEARCH_MATCH_STYLER = new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.background = RedTheme.Colors.getEclipseSearchMatchColor();
@@ -49,6 +51,7 @@ public class Stylers {
         };
 
         public static final Styler STRIKEOUT_STYLER = new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.strikeout = true;
@@ -64,6 +67,7 @@ public class Stylers {
         };
 
         public static final Styler ERROR_STYLER = new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = ColorsManager.getColor(255, 0, 0);
@@ -71,6 +75,7 @@ public class Stylers {
         };
 
         public static final Styler WARNING_STYLER = new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = ColorsManager.getColor(255, 165, 0);
@@ -78,6 +83,7 @@ public class Stylers {
         };
 
         public static final Styler MARKED_PREFIX_STYLER = new Styler() {
+
             @Override
             public void applyStyles(final TextStyle style) {
                 style.foreground = ColorsManager.getColor(135, 150, 255);
@@ -88,6 +94,7 @@ public class Stylers {
         };
 
         public static final Styler MATCH_STYLER = new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.background = ColorsManager.getColor(255, 255, 175);
@@ -108,6 +115,7 @@ public class Stylers {
 
     public static Styler mixingStyler(final Styler... stylers) {
         return new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 for (final Styler styler : stylers) {
@@ -122,6 +130,7 @@ public class Stylers {
             return Iterables.getFirst(stylers, null);
         }
         return new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 for (final Styler styler : stylers) {
@@ -133,6 +142,7 @@ public class Stylers {
 
     public static Styler mixingStyler(final StyleRange styleRange, final Styler... stylers) {
         return new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.background = styleRange.background;
@@ -155,6 +165,7 @@ public class Stylers {
 
     public static Styler withForeground(final int red, final int green, final int blue) {
         return new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = ColorsManager.getColor(red, green, blue);
@@ -164,6 +175,7 @@ public class Stylers {
 
     public static Styler withForeground(final RGB rgb) {
         return new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = ColorsManager.getColor(rgb);
@@ -173,6 +185,7 @@ public class Stylers {
 
     public static Styler withForeground(final Color color) {
         return new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = color;
@@ -182,6 +195,7 @@ public class Stylers {
 
     public static Styler withFont(final Font font) {
         return new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.font = font;
@@ -191,6 +205,7 @@ public class Stylers {
 
     public static Styler withFontStyle(final int style) {
         return new Styler() {
+
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.font = FontsManager.transformFontWithStyle(textStyle.font, style);
