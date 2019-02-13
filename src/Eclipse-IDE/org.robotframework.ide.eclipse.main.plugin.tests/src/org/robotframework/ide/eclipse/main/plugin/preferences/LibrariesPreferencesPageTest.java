@@ -5,11 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
@@ -40,16 +44,15 @@ public class LibrariesPreferencesPageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(2);
+        assertThat(editors).hasSize(5);
 
-        final FieldEditor autodiscoveringEditor = editors.get(0);
-        assertThat(autodiscoveringEditor).isInstanceOf(BooleanFieldEditor.class);
-        assertThat(autodiscoveringEditor.getPreferenceName())
-                .isEqualTo(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
-
-        final FieldEditor generatingLibdocEditor = editors.get(1);
-        assertThat(generatingLibdocEditor).isInstanceOf(BooleanFieldEditor.class);
-        assertThat(generatingLibdocEditor.getPreferenceName())
-                .isEqualTo(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED);
+        final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
+                .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
+        assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.AUTO_DISCOVERING_ENABLED,
+                        RedPreferences.AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED,
+                        RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED,
+                        RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
+                        RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED));
     }
 }

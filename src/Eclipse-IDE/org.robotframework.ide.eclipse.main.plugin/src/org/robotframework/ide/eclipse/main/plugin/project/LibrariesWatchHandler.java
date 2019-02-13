@@ -195,7 +195,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 @Override
                 public void run() {
                     final List<LibrarySpecification> libSpecsToRebuild = collectModifiedLibSpecs(modifiedFileName);
-                    if (robotProject.getRobotProjectConfig().isReferencedLibrariesAutoReloadEnabled()) {
+                    if (RedPlugin.getDefault().getPreferences().isLibdocAutoReloadEnabled()) {
                         rebuildLibSpecs(project, libSpecsToRebuild);
                     } else {
                         markLibSpecsAsModified(libSpecsToRebuild);

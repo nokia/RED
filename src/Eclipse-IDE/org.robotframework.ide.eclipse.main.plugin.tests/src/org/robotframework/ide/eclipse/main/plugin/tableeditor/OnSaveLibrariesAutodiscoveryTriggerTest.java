@@ -20,6 +20,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -27,17 +28,22 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(OnSaveLibrariesAutodiscoveryTriggerTest.class);
+
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     private static RobotModel model = new RobotModel();
 
@@ -124,7 +130,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
     @Test
     public void autodiscovererIsNotStarted_whenSuiteDoesNotContainUnknownLibrary() {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite_with_known_libraries.robot"));
         final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
@@ -136,13 +142,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
         verifyZeroInteractions(discoverer);
-
-        turnOffAutoDiscoveringInProjectConfig();
     }
 
     @Test
     public void autodiscovererIsNotStarted_whenItIsDisabled() {
-        turnOffAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, false);
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
@@ -155,13 +159,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
         verifyZeroInteractions(discoverer);
-
-        turnOnAutoDiscoveringInProjectConfig();
     }
 
     @Test
     public void autodiscovererIsNotStarted_whenProjectDoesNotHaveRobotNature() throws Exception {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
         projectProvider.removeRobotNature();
 
         final RobotSuiteFile suite = model
@@ -176,13 +178,12 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         verifyZeroInteractions(discoverer);
 
-        turnOffAutoDiscoveringInProjectConfig();
         projectProvider.addRobotNature();
     }
 
     @Test
     public void autodiscovererIsNotStarted_whenSuiteIsExcludedFromProject() throws Exception {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
         excludePathInProjectConfig("suite_with_unknown_library_1.robot");
 
         final RobotSuiteFile suite = model
@@ -197,13 +198,12 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         verifyZeroInteractions(discoverer);
 
-        turnOffAutoDiscoveringInProjectConfig();
         includePathInProjectConfig("suite_with_unknown_library_1.robot");
     }
 
     @Test
     public void autodiscovererStarts_whenUnknownLibraryIsDetected() {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
@@ -219,13 +219,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
-
-        turnOffAutoDiscoveringInProjectConfig();
     }
 
     @Test
     public void autodiscovererStarts_whenUnknownRemoteLibraryIsDetected() {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_remote_library.robot"));
@@ -241,13 +239,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
-
-        turnOffAutoDiscoveringInProjectConfig();
     }
 
     @Test
     public void autodiscovererStarts_whenUnknownLibraryIsDetectedInImportedResource() {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_in_resource.robot"));
@@ -263,13 +259,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
-
-        turnOffAutoDiscoveringInProjectConfig();
     }
 
     @Test
     public void autodiscovererStarts_whenUnknownLibraryIsDetectedInImportedResourcesWithCycle() {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_in_resources_with_cycle.robot"));
@@ -285,13 +279,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
-
-        turnOffAutoDiscoveringInProjectConfig();
     }
 
     @Test
     public void autodiscovererIsNotStarted_whenSuiteDoesNotContainUnknownLibraryInResource() {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_known_libraries_in_resource.robot"));
@@ -304,13 +296,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
         verifyZeroInteractions(discoverer);
-
-        turnOffAutoDiscoveringInProjectConfig();
     }
 
     @Test
     public void autodiscovererStartsOnlyOnce_whenMultipleTriggersExistButSaveAllIsDetected() {
-        turnOnAutoDiscoveringInProjectConfig();
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
 
         final RobotSuiteFile suite1 = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
@@ -337,20 +327,6 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
-
-        turnOffAutoDiscoveringInProjectConfig();
-    }
-
-    private void turnOnAutoDiscoveringInProjectConfig() {
-        final RobotProjectConfig config = model.createRobotProject(projectProvider.getProject())
-                .getRobotProjectConfig();
-        config.setReferencedLibrariesAutoDiscoveringEnabled(true);
-    }
-
-    private void turnOffAutoDiscoveringInProjectConfig() {
-        final RobotProjectConfig config = model.createRobotProject(projectProvider.getProject())
-                .getRobotProjectConfig();
-        config.setReferencedLibrariesAutoDiscoveringEnabled(false);
     }
 
     private void excludePathInProjectConfig(final String path) {

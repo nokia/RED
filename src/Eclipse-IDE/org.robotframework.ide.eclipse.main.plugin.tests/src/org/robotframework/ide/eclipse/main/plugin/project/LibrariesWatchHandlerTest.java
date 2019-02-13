@@ -7,11 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -26,16 +22,18 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.widgets.Display;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
-import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.red.junit.PreferenceUpdater;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -44,6 +42,9 @@ public class LibrariesWatchHandlerTest {
 
     @ClassRule
     public static TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     private static final String PYTHON_LIBRARY_NAME = "libTest";
 
@@ -275,8 +276,10 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabled() {
+        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
+
         final IProject project = createNewProjectMock(true);
-        final RobotProject robotProject = createNewRobotProjectSpy(project, true);
+        final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
@@ -286,11 +289,11 @@ public class LibrariesWatchHandlerTest {
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
-
         librariesWatchHandler.setRebuildTasksQueueSizeBeforeBuilderInvoke(1);
-        librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
 
+        librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
+
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(2);
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec1, libSpec2);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
@@ -298,8 +301,10 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabledAndLibraryIsModule() {
+        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
+
         final IProject project = createNewProjectMock(true);
-        final RobotProject robotProject = createNewRobotProjectSpy(project, true);
+        final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
@@ -308,8 +313,8 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.setRebuildTasksQueueSizeBeforeBuilderInvoke(1);
 
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
-
         librariesWatchHandler.execAllAwaitingMessages();
+
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(1);
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSizeAfterEachBuilderInvoke()).containsExactly(1);
@@ -318,8 +323,8 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.getSpecificationsToRebuild().clear();
 
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_FILE_NAME);
-
         librariesWatchHandler.execAllAwaitingMessages();
+
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(1);
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSizeAfterEachBuilderInvoke()).containsExactly(1, 1);
@@ -328,8 +333,10 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabledAndDuplicatedTasksAreRemoved() {
+        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
+
         final IProject project = createNewProjectMock(true);
-        final RobotProject robotProject = createNewRobotProjectSpy(project, true);
+        final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
@@ -339,14 +346,14 @@ public class LibrariesWatchHandlerTest {
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
-
         librariesWatchHandler.setRebuildTasksQueueSizeBeforeBuilderInvoke(8);
+
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_FILE_NAME);
         for (int i = 1; i <= 7; i++) {
             librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
         }
-
         librariesWatchHandler.execAllAwaitingMessages();
+
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(2);
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec1, libSpec2);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSizeAfterEachBuilderInvoke()).containsExactly(8, 1);
@@ -355,6 +362,8 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabled() {
+        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
+
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
@@ -365,14 +374,15 @@ public class LibrariesWatchHandlerTest {
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary1), libSpec1);
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary2), libSpec2);
         final IProject project = createNewProjectMock(true);
-        final RobotProject robotProject = createNewRobotProjectSpy(project, false, refLibs);
+        final RobotProject robotProject = createNewRobotProject(project, refLibs);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
 
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
-
         librariesWatchHandler.execAllAwaitingMessages();
+
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec1)).isTrue();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec2)).isTrue();
         assertThat(libSpec1.isModified()).isTrue();
@@ -381,6 +391,8 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabledAndDuplicatedEventsAreHandled() {
+        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
+
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
@@ -391,7 +403,7 @@ public class LibrariesWatchHandlerTest {
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary1), libSpec1);
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary2), libSpec2);
         final IProject project = createNewProjectMock(true);
-        final RobotProject robotProject = createNewRobotProjectSpy(project, false, refLibs);
+        final RobotProject robotProject = createNewRobotProject(project, refLibs);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
@@ -399,50 +411,56 @@ public class LibrariesWatchHandlerTest {
         for (int i = 1; i <= 5; i++) {
             librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
         }
-
         librariesWatchHandler.execAllAwaitingMessages();
+
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec1)).isTrue();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec2)).isTrue();
         assertThat(libSpec1.isModified()).isTrue();
         assertThat(libSpec2.isModified()).isTrue();
-        verify(robotProject, times(1)).getReferencedLibraries();
     }
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabledAndLibraryIsModule() {
+        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
+
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary), libSpec);
         final IProject project = createNewProjectMock(true);
-        final RobotProject robotProject = createNewRobotProjectSpy(project, false, refLibs);
+        final RobotProject robotProject = createNewRobotProject(project, refLibs);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_FILE_NAME);
-
         librariesWatchHandler.execAllAwaitingMessages();
+
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec)).isTrue();
         assertThat(libSpec.isModified()).isTrue();
-        verify(robotProject, times(1)).getReferencedLibraries();
     }
 
     @Test
     public void testRemoveDirtySpecs() {
+        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
+
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary), libSpec);
         final IProject project = createNewProjectMock(true);
-        final RobotProject robotProject = createNewRobotProjectSpy(project, false, refLibs);
+        final RobotProject robotProject = createNewRobotProject(project, refLibs);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
+
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
 
+        assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec)).isTrue();
         assertThat(libSpec.isModified()).isTrue();
 
@@ -453,8 +471,10 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenProjectNotExists() {
+        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
+
         final IProject project = createNewProjectMock(false);
-        final RobotProject robotProject = createNewRobotProjectSpy(project, true);
+        final RobotProject robotProject = createNewRobotProject(project);
 
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
@@ -463,6 +483,7 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
+        librariesWatchHandler.execAllAwaitingMessages();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.getLibrarySpecifications().asMap()).isEmpty();
@@ -475,22 +496,15 @@ public class LibrariesWatchHandlerTest {
         return project;
     }
 
-    private RobotProject createNewRobotProjectSpy(final IProject project, final boolean isAutoReloadEnabled,
-            final Map<LibraryDescriptor, LibrarySpecification> referencedLibraries) {
-        final RobotProject robotProject = createNewRobotProjectSpy(project, isAutoReloadEnabled);
-        robotProject.setReferencedLibraries(referencedLibraries);
-        return robotProject;
+    private RobotProject createNewRobotProject(final IProject project) {
+        return createNewRobotProject(project, new HashMap<>());
     }
 
-    private RobotProject createNewRobotProjectSpy(final IProject project, final boolean isAutoReloadEnabled) {
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
-
-        final RobotProjectConfig projectConfig = new RobotProjectConfig();
-        projectConfig.setIsReferencedLibrariesAutoReloadEnabled(isAutoReloadEnabled);
-
-        doReturn(projectConfig).when(robotProject).getRobotProjectConfig();
+    private RobotProject createNewRobotProject(final IProject project,
+            final Map<LibraryDescriptor, LibrarySpecification> referencedLibraries) {
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
         robotProject.setStandardLibraries(new HashMap<>());
-        robotProject.setReferencedLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(referencedLibraries);
         return robotProject;
     }
 

@@ -219,38 +219,6 @@ public class NullRobotProjectConfig extends RobotProjectConfig {
     }
 
     @Override
-    public void setIsReferencedLibrariesAutoReloadEnabled(final boolean isReferencedLibrariesAutoReloadEnabled) {
-        // nothing to do
-    }
-
-    @Override
-    public boolean isReferencedLibrariesAutoReloadEnabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isReferencedLibrariesAutoDiscoveringEnabled() {
-        return false;
-    }
-
-    @Override
-    public void setReferencedLibrariesAutoDiscoveringEnabled(
-            final boolean isReferencedLibrariesAutoDiscoveringEnabled) {
-        // nothing to do
-    }
-
-    @Override
-    public boolean isLibrariesAutoDiscoveringSummaryWindowEnabled() {
-        return false;
-    }
-
-    @Override
-    public void setLibrariesAutoDiscoveringSummaryWindowEnabled(
-            final boolean isLibrariesAutoDiscoveringSummaryWindowEnabled) {
-        // nothing to do
-    }
-
-    @Override
     public boolean usesPreferences() {
         return true;
     }

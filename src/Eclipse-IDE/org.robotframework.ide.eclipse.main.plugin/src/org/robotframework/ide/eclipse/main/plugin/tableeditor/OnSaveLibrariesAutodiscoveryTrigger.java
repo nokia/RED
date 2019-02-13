@@ -19,9 +19,9 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.validation.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ExcludedResources;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
@@ -50,8 +50,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
     OnSaveLibrariesAutodiscoveryTrigger() {
         this((robotProject, suites) -> {
-            final boolean showSummary = robotProject.getRobotProjectConfig()
-                    .isLibrariesAutoDiscoveringSummaryWindowEnabled();
+            final boolean showSummary = RedPlugin.getDefault().getPreferences().isAutoDiscoveringSummaryWindowEnabled();
             return new CombinedLibrariesAutoDiscoverer(robotProject, suites,
                     showSummary ? LibrariesAutoDiscovererWindow.openSummary() : libraryImports -> {});
         });
@@ -108,11 +107,11 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     }
 
     private boolean shouldStartAutoDiscovering(final RobotSuiteFile suite) {
-        final RobotProjectConfig projectConfig = suite.getRobotProject().getRobotProjectConfig();
         return RobotProjectNature.hasRobotNature(suite.getRobotProject().getProject())
-                && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled()
+                && RedPlugin.getDefault().getPreferences().isAutoDiscoveringEnabled()
                 && !ExcludedResources.isHiddenInEclipse(suite.getFile())
-                && !ExcludedResources.isInsideExcludedPath(suite.getFile(), projectConfig)
+                && !ExcludedResources.isInsideExcludedPath(suite.getFile(),
+                        suite.getRobotProject().getRobotProjectConfig())
                 && suiteHasUnknownLibraryIncludingNestedResources(suite);
     }
 

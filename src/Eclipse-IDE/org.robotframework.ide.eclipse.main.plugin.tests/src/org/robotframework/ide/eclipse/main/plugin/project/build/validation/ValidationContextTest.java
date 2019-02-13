@@ -31,7 +31,6 @@ public class ValidationContextTest {
 
         when(model.createRobotProject(project)).thenReturn(robotProject);
         when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
-        when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
         when(robotProject.getRuntimeEnvironment()).thenReturn(runtimeEnvironment);
         when(robotProject.getRobotParserComplianceVersion()).thenReturn(RobotVersion.from("3.0"));
 
@@ -53,7 +52,6 @@ public class ValidationContextTest {
 
         when(model.createRobotProject(project)).thenReturn(robotProject);
         when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
-        when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
         when(robotProject.getRuntimeEnvironment()).thenReturn(runtimeEnvironment);
         when(robotProject.getRobotParserComplianceVersion()).thenReturn(RobotVersion.from(null));
 
