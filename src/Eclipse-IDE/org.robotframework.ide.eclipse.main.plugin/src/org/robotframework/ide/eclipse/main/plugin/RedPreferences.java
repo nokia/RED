@@ -71,8 +71,11 @@ public class RedPreferences {
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
+    public static final String AUTO_DISCOVERING_ENABLED = "red.libraries.autoDiscoveringEnabled";
+    public static final String AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED = "red.libraries.autoDiscoveringSummaryWindowEnabled";
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "red.libraries.projectModulesRecursiveAdditionOnVirtualenvEnabled";
     public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "red.libraries.pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
+    public static final String LIBDOCS_AUTO_RELOAD_ENABLED = "red.libraries.libdocsAutoReloadEnabled";
 
     public static final String LAUNCH_USE_ARGUMENT_FILE = "red.launch.useArgumentFile";
     public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
@@ -206,12 +209,24 @@ public class RedPreferences {
         return store.getBoolean(ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED);
     }
 
+    public boolean isAutoDiscoveringEnabled() {
+        return store.getBoolean(AUTO_DISCOVERING_ENABLED);
+    }
+
+    public boolean isAutoDiscoveringSummaryWindowEnabled() {
+        return store.getBoolean(AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED);
+    }
+
     public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {
         return store.getBoolean(PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
     }
 
     public boolean isPythonLibrariesLibdocGenerationInSeparateProcessEnabled() {
         return store.getBoolean(PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED);
+    }
+
+    public boolean isLibdocAutoReloadEnabled() {
+        return store.getBoolean(LIBDOCS_AUTO_RELOAD_ENABLED);
     }
 
     public EnumSet<FoldableElements> getFoldableElements() {

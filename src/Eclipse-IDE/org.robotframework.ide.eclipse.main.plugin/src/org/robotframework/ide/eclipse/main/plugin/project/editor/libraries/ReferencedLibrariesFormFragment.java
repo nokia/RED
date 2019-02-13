@@ -35,7 +35,6 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -86,10 +85,6 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     private Button addLibspecButton;
     private Button addRemoteButton;
 
-    private Button autoLibDiscoverButton;
-    private Button showAutoLibDiscoverDialogButton;
-    private Button autoLibReloadButton;
-
     private ControlDecoration decoration;
 
     private IRuntimeEnvironment environment;
@@ -119,8 +114,6 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         createContextMenu();
 
         createButtons(internalComposite);
-
-        createAutoReloadAndDiscoverButtons(internalComposite);
 
         scrolledParent.setMinSize(internalComposite.computeSize(-1, -1));
 
@@ -285,53 +278,12 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         }
     }
 
-    private void createAutoReloadAndDiscoverButtons(final Composite parent) {
-        autoLibDiscoverButton = createCheckButton(parent, "Auto discover libraries after test suite save action",
-                widgetSelectedAdapter(e -> {
-                    final boolean selection = autoLibDiscoverButton.getSelection();
-                    editorInput.getProjectConfiguration().setReferencedLibrariesAutoDiscoveringEnabled(selection);
-                    if (!selection) {
-                        showAutoLibDiscoverDialogButton.setSelection(selection);
-                        editorInput.getProjectConfiguration()
-                                .setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
-                    }
-                    showAutoLibDiscoverDialogButton.setEnabled(selection);
-                    setDirty(true);
-                }));
-
-        showAutoLibDiscoverDialogButton = createCheckButton(parent,
-                "Show discovering summary after test suite save action", widgetSelectedAdapter(e -> {
-                    final boolean selection = showAutoLibDiscoverDialogButton.getSelection();
-                    editorInput.getProjectConfiguration().setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
-                    setDirty(true);
-                }));
-
-        autoLibReloadButton = createCheckButton(parent, "Automatically reload changed libraries",
-                widgetSelectedAdapter(e -> {
-                    final boolean selection = autoLibReloadButton.getSelection();
-                    editorInput.getProjectConfiguration().setIsReferencedLibrariesAutoReloadEnabled(selection);
-                    setDirty(true);
-                }));
-    }
-
-    private Button createCheckButton(final Composite parent, final String label,
-            final SelectionListener selectionListener) {
-        final Button button = toolkit.createButton(parent, label, SWT.CHECK | SWT.WRAP);
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(button);
-        button.addSelectionListener(selectionListener);
-        return button;
-    }
-
     private void setInput() {
         final RobotProjectConfig config = editorInput.getProjectConfiguration();
         final List<Object> input = new ArrayList<>();
         input.addAll(config.getRemoteLocations());
         input.addAll(config.getReferencedLibraries());
         viewer.setInput(input);
-
-        autoLibDiscoverButton.setSelection(config.isReferencedLibrariesAutoDiscoveringEnabled());
-        showAutoLibDiscoverDialogButton.setSelection(config.isLibrariesAutoDiscoveringSummaryWindowEnabled());
-        autoLibReloadButton.setSelection(config.isReferencedLibrariesAutoReloadEnabled());
     }
 
     @Override
@@ -363,9 +315,6 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addJavaLibButton.setEnabled(false);
         addLibspecButton.setEnabled(false);
         addRemoteButton.setEnabled(false);
-        autoLibDiscoverButton.setEnabled(false);
-        showAutoLibDiscoverDialogButton.setEnabled(false);
-        autoLibReloadButton.setEnabled(false);
         viewer.getTable().setEnabled(false);
     }
 
@@ -383,9 +332,6 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addJavaLibButton.setEnabled(isEditable && projectMayBeInterpretedByJython);
         addLibspecButton.setEnabled(isEditable);
         addRemoteButton.setEnabled(isEditable);
-        autoLibDiscoverButton.setEnabled(isEditable);
-        showAutoLibDiscoverDialogButton.setEnabled(autoLibDiscoverButton.getSelection() && isEditable);
-        autoLibReloadButton.setEnabled(isEditable);
         viewer.getTable().setEnabled(isEditable);
 
         if (!projectMayBeInterpretedByJython) {

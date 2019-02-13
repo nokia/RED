@@ -105,9 +105,12 @@ public class RedPreferencesInitializerTest {
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
+        verify(preferences).putBoolean(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
+        verify(preferences).putBoolean(RedPreferences.AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
                 true);
+        verify(preferences).putBoolean(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
     }
 
     @Test

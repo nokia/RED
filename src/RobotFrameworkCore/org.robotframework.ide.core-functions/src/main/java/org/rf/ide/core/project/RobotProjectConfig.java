@@ -31,8 +31,7 @@ import org.rf.ide.core.environment.SuiteExecutor;
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "pathsRelativityPoint", "variableMappings", "libraries",
         "pythonPaths", "classPaths", "remoteLocations", "referencedVariableFiles", "excludedPaths",
-        "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize", "isReferencedLibrariesAutoReloadEnabled",
-        "isReferencedLibrariesAutoDiscoveringEnabled", "isLibrariesAutoDiscoveringSummaryWindowEnabled" })
+        "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
@@ -80,15 +79,6 @@ public class RobotProjectConfig {
 
     @XmlElement(name = "validatedFileMaxSize", required = false)
     private String validatedFileMaxSize = VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB;
-
-    @XmlElement(name = "isReferencedLibrariesAutoReloadEnabled", required = false)
-    private boolean isReferencedLibrariesAutoReloadEnabled = true;
-
-    @XmlElement(name = "isReferencedLibrariesAutoDiscoveringEnabled", required = false)
-    private boolean isReferencedLibrariesAutoDiscoveringEnabled = true;
-
-    @XmlElement(name = "isLibrariesAutoDiscoveringSummaryWindowEnabled", required = false)
-    private boolean isLibrariesAutoDiscoveringSummaryWindowEnabled = false;
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -300,30 +290,6 @@ public class RobotProjectConfig {
 
     public static long getValidatedFileDefaultMaxSize() {
         return Long.parseLong(VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB);
-    }
-
-    public void setIsReferencedLibrariesAutoReloadEnabled(final boolean isReferencedLibrariesAutoReloadEnabled) {
-        this.isReferencedLibrariesAutoReloadEnabled = isReferencedLibrariesAutoReloadEnabled;
-    }
-
-    public boolean isReferencedLibrariesAutoReloadEnabled() {
-        return this.isReferencedLibrariesAutoReloadEnabled;
-    }
-
-    public boolean isReferencedLibrariesAutoDiscoveringEnabled() {
-        return isReferencedLibrariesAutoDiscoveringEnabled;
-    }
-
-    public void setReferencedLibrariesAutoDiscoveringEnabled(final boolean isReferencedLibrariesAutoDiscoveringEnabled) {
-        this.isReferencedLibrariesAutoDiscoveringEnabled = isReferencedLibrariesAutoDiscoveringEnabled;
-    }
-
-    public boolean isLibrariesAutoDiscoveringSummaryWindowEnabled() {
-        return isLibrariesAutoDiscoveringSummaryWindowEnabled;
-    }
-
-    public void setLibrariesAutoDiscoveringSummaryWindowEnabled(final boolean isLibrariesAutoDiscoveringSummaryWindowEnabled) {
-        this.isLibrariesAutoDiscoveringSummaryWindowEnabled = isLibrariesAutoDiscoveringSummaryWindowEnabled;
     }
 
     public boolean usesPreferences() {
