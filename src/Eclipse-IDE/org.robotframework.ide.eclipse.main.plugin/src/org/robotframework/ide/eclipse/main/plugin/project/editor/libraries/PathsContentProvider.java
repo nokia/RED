@@ -5,10 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -43,11 +42,13 @@ class PathsContentProvider extends StructuredContentProvider {
 
     @Override
     public Object[] getElements(final Object inputElement) {
+        final List<SearchPath> pathsFromSystem = variableAccessor.getPaths(pathVariableName)
+                .stream()
+                .map(path -> SearchPath.create(path, true))
+                .collect(Collectors.toList());
 
-        final List<String> paths = variableAccessor.getPaths(pathVariableName);
-
-        final List<Object> elements = newArrayList();
-        elements.addAll(transform(paths, path -> SearchPath.create(path, true)));
+        final List<Object> elements = new ArrayList<>();
+        elements.addAll(pathsFromSystem);
         elements.addAll((List<?>) inputElement);
         if (isEditable) {
             elements.add(new ElementAddingToken("search path", true));

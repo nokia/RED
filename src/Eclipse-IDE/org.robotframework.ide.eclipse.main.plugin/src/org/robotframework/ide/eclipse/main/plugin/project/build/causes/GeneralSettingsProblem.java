@@ -159,8 +159,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final String nameOrPath = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
-            return DefineGlobalVariableInConfigFixer.createFixers(nameOrPath);
+            final String parameterizedPath = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            return DefineGlobalVariableInConfigFixer.createFixers(parameterizedPath);
         }
     },
     IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS {

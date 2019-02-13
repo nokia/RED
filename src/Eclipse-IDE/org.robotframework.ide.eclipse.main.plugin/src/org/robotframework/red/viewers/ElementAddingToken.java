@@ -7,19 +7,18 @@ package org.robotframework.red.viewers;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * Those objects are used in order to have additional entry in table which can
  * be handled by editing supports
- * 
+ *
  * @author anglart
  */
 public class ElementAddingToken {
@@ -48,13 +47,8 @@ public class ElementAddingToken {
 
     public StyledString getStyledText() {
         final String msg = rank == 0 ? "...add new" + " " + newElementTypeName : "...";
-        return new StyledString(msg, new Styler() {
-            @Override
-            public void applyStyles(final TextStyle textStyle) {
-                textStyle.foreground = enabled ? ColorsManager.getColor(30, 127, 60) : ColorsManager.getColor(200, 200, 200);
-                textStyle.font = FontsManager.transformFontWithStyle(textStyle.font,
-                        rank == 0 ? SWT.ITALIC : SWT.ITALIC | SWT.BOLD);
-            }
-        });
+        final Color color = enabled ? ColorsManager.getColor(30, 127, 60) : ColorsManager.getColor(200, 200, 200);
+        final int style = rank == 0 ? SWT.ITALIC : SWT.ITALIC | SWT.BOLD;
+        return new StyledString(msg, Stylers.mixingStyler(Stylers.withForeground(color), Stylers.withFontStyle(style)));
     }
 }

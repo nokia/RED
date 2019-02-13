@@ -5,15 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
+import static org.eclipse.jface.viewers.Stylers.mixingStyler;
+
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.TextStyle;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class NavigatorKeywordsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
@@ -41,19 +41,9 @@ public class NavigatorKeywordsLabelProvider extends ColumnLabelProvider implemen
             if (!kwSpecification.isDeprecated()) {
                 return new StyledString(kwSpecification.getName());
             } else {
-                final StyledString label = new StyledString(kwSpecification.getName(), new Styler() {
-                    @Override
-                    public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = ColorsManager.getColor(245, 160, 70);
-                        textStyle.strikeout = true;
-                    }
-                });
-                label.append(" (deprecated)", new Styler() {
-                    @Override
-                    public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = ColorsManager.getColor(245, 160, 70);
-                    }
-                });
+                final StyledString label = new StyledString(kwSpecification.getName(),
+                        mixingStyler(Stylers.Common.STRIKEOUT_STYLER, Stylers.Common.WARNING_STYLER));
+                label.append(" (deprecated)", Stylers.Common.WARNING_STYLER);
                 return label;
             }
         }

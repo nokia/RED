@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -286,18 +286,12 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
     private List<ExcludedPath> getExcludedNotShownInTheTree(final List<ExcludedPath> allExcluded,
             final Set<ProjectTreeElement> excludedShownInTree) {
-        final List<ExcludedPath> paths = newArrayList();
-
-        for (final ExcludedPath excludedPath : allExcluded) {
-            boolean isInTree = false;
-            for (final ProjectTreeElement element : excludedShownInTree) {
-                if (element.getPath().equals(Path.fromPortableString(excludedPath.getPath()))) {
-                    isInTree = true;
-                    break;
-                }
-            }
+        final List<ExcludedPath> paths = new ArrayList<>();
+        for (final ExcludedPath path : allExcluded) {
+            final boolean isInTree = excludedShownInTree.stream()
+                    .anyMatch(element -> element.getPath().equals(Path.fromPortableString(path.getPath())));
             if (!isInTree) {
-                paths.add(excludedPath);
+                paths.add(path);
             }
         }
         return paths;
