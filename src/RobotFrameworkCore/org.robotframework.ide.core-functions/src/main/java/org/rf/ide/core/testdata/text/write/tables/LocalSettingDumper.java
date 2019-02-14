@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.testdata.text.write.tables;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
@@ -23,7 +22,7 @@ import org.rf.ide.core.testdata.text.write.DumperHelper;
 class LocalSettingDumper extends ExecutableTableElementDumper {
 
     LocalSettingDumper(final DumperHelper helper, final ModelType modelType) {
-        super(helper, modelType, newArrayList());
+        super(helper, modelType);
     }
 
     @Override

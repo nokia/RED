@@ -6,7 +6,6 @@
 package org.rf.ide.core.execution.debug.contexts;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +16,8 @@ import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.
 
 public class ExecutablesCompiler {
 
-    static List<ExecutableWithDescriptor> compileExecutables(final List<? extends RobotExecutableRow<?>> rows,
+    static List<ExecutableWithDescriptor> compileExecutables(final List<? extends RobotExecutableRow<?>> executables,
             final String template) {
-
-        final List<RobotExecutableRow<?>> executables = rows.stream().filter(RobotExecutableRow::isExecutable).collect(
-                toList());
 
         final List<ExecutableWithDescriptor> elements = new ArrayList<>();
         final List<ExecutableWithDescriptor> loopElements = new ArrayList<>();

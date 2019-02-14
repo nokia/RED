@@ -34,6 +34,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommen
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
+import com.google.common.base.Strings;
+
 /**
  * @author wypych
  */
@@ -201,22 +203,26 @@ public class ExecutablesRowHolderCommentService {
             call.resetStored();
 
             final List<RobotToken> execRowView = execRowView(call);
-            int startColumn = column;
+            final int startColumn = column;
             if (column == 0) {
+                final int index = call.getIndex();
+
+                final EditorCommand convertFromComment = value != null && looksLikeSetting(value)
+                        ? new ConvertCommentToSetting(eventBroker, call, value)
+                        : new ConvertCommentToCall(eventBroker, (RobotEmptyLine) call, Strings.nullToEmpty(value));
+                convertFromComment.execute();
+                executedCommands.add(convertFromComment);
+
                 if (value == null || value.isEmpty()) {
-                    final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker, call,
-                            execRowView.get(0).getText());
-                    changeTmpName.execute();
-                    executionContext.push(changeTmpName);
-                    startColumn = 1;
-                } else {
-                    final EditorCommand convertFromComment = looksLikeSetting(value)
-                            ? new ConvertCommentToSetting(eventBroker, call, value)
-                            : new ConvertCommentToCall(eventBroker, call, value);
-                    convertFromComment.execute();
-                    executedCommands.add(convertFromComment);
-                    return;
+                    final Optional<? extends EditorCommand> command = new KeywordCallsTableValuesChangingCommandsCollector()
+                            .collect(call.getParent().getChildren().get(index), null, 0);
+                    if (command.isPresent()) {
+                        command.get().setEventBroker(eventBroker);
+                        command.get().execute();
+                    }
                 }
+
+                return;
             }
 
             final List<RobotToken> commentToken = new ArrayList<>(0);
@@ -330,21 +336,26 @@ public class ExecutablesRowHolderCommentService {
                     .stream()
                     .map(RobotKeywordCall.tokenViaExecutableViewUpdateToken(view))
                     .collect(toList()));
-
-            if (tokens.size() >= 2) {
-                final RobotToken actionToken = tokens.get(0);
-                if (actionToken.getFilePosition().isNotSet() && actionToken.getText().isEmpty()) {
-                    final List<IRobotTokenType> types = tokens.get(1).getTypes();
-                    if (types.contains(RobotTokenType.START_HASH_COMMENT)
-                            || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
-                        tokens.remove(0);
-                    }
-                }
-            }
         } else {
             tokens.addAll(element.getLinkedElement().getElementTokens());
         }
+
+        if (isArtificialActionBeforeComment(tokens)) {
+            tokens.remove(0);
+        }
         return tokens;
+    }
+
+    private static boolean isArtificialActionBeforeComment(final List<RobotToken> tokens) {
+        if (tokens.size() >= 2) {
+            final RobotToken actionToken = tokens.get(0);
+            if (actionToken.getFilePosition().isNotSet() && actionToken.getText().isEmpty()) {
+                final List<IRobotTokenType> types = tokens.get(1).getTypes();
+                return types.contains(RobotTokenType.START_HASH_COMMENT)
+                        || types.contains(RobotTokenType.COMMENT_CONTINUE);
+            }
+        }
+        return false;
     }
 
     public static boolean isCommentOperation(final String oldText, final String newText) {

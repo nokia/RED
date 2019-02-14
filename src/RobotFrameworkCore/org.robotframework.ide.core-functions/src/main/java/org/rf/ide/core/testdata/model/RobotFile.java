@@ -83,7 +83,7 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
                 final int start = (line.getLineElements().isEmpty()) ? eolStartOffset
                         : line.getLineElements().get(0).getStartOffset();
                 final int end = eolStartOffset + line.getEndOfLine().getText().length();
-                if (start <= offset && offset < end) {
+                if (start <= offset && offset < end || end == offset && eolStartOffset == end) {
                     return Optional.of(lineIndex);
                 }
             }

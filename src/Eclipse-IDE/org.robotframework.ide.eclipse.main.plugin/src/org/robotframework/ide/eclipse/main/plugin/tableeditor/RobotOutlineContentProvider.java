@@ -127,15 +127,11 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
         return children.stream().filter(element -> {
             if (element instanceof RobotKeywordCall) {
                 final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
-                if (linkedElement != null && linkedElement instanceof RobotExecutableRow<?>) {
+                if (linkedElement instanceof RobotExecutableRow<?>) {
                     final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-                    // TODO: checking row type should be done without building line description
-                    if (row.isExecutable()) {
-                        final IExecutableRowDescriptor<?> descriptor = row.buildLineDescription();
-                        return descriptor.getRowType() != RowType.FOR_CONTINUE
-                                && descriptor.getRowType() != RowType.FOR_END;
-                    }
-                    return false;
+                    final IExecutableRowDescriptor<?> descriptor = row.buildLineDescription();
+                    final RowType rowType = descriptor.getRowType();
+                    return rowType != RowType.FOR_CONTINUE && rowType != RowType.FOR_END;
                 }
             }
             return false;

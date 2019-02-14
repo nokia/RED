@@ -5,9 +5,8 @@
  */
 package org.rf.ide.core.testdata.model.table;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -21,27 +20,15 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder, Serializable {
 
-    private RobotToken empty;
-
     private static final long serialVersionUID = -3838003731139030172L;
 
-    public RobotEmptyRow() {
-        empty = new RobotToken();
-    }
+    private RobotToken emptyToken = new RobotToken();
 
-    @Override
-    public void setParent(final T parent) {
-        super.setParent(parent);
-        fixMissingType();
-    }
+    private final List<RobotToken> comments = new ArrayList<>();
 
-    public boolean setEmptyToken(final RobotToken empty) {
-        final boolean isEmpty = isEmpty(empty.getText());
-        if (isEmpty) {
-            this.empty = empty;
-            fixMissingType();
-        }
-        return isEmpty;
+    public void setEmpty(final RobotToken empty) {
+        empty.setType(RobotTokenType.EMPTY_CELL);
+        emptyToken = empty;
     }
 
     @Override
@@ -50,48 +37,53 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
     }
 
     @Override
+    public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
+        comments.add(rt);
+    }
+
+    @Override
     public List<RobotToken> getComment() {
-        return Collections.emptyList();
+        return Collections.unmodifiableList(comments);
     }
 
     @Override
     public void setComment(final String comment) {
-        // do nothing
+        setComment(RobotToken.create(comment));
     }
 
     @Override
     public void setComment(final RobotToken comment) {
-        // do nothing
-    }
-
-    @Override
-    public void addCommentPart(final RobotToken cmPart) {
-        // do nothing
+        comments.clear();
+        addCommentPart(comment);
     }
 
     @Override
     public void removeCommentPart(final int index) {
-        // do nothing
+        comments.remove(index);
     }
 
     @Override
     public void clearComment() {
-        // do nothing
+        comments.clear();
     }
 
     @Override
     public ModelType getModelType() {
-        return empty.getTypes().contains(RobotTokenType.EMPTY_CELL) ? ModelType.EMPTY_LINE : ModelType.UNKNOWN;
+        return ModelType.EMPTY_LINE;
     }
 
     @Override
     public FilePosition getBeginPosition() {
-        return empty.getFilePosition();
+        return emptyToken.getFilePosition();
     }
 
     @Override
     public List<RobotToken> getElementTokens() {
-        return newArrayList(empty);
+        final List<RobotToken> tokens = new ArrayList<>();
+        tokens.add(emptyToken);
+        tokens.addAll(comments);
+        return tokens;
     }
 
     @Override
@@ -102,24 +94,26 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public RobotToken getDeclaration() {
-        return empty;
+        return emptyToken;
     }
 
     @Override
     public void insertValueAt(final String value, final int position) {
-        // do nothing
+
+        if (position == 0 && emptyToken.getFilePosition().isNotSet()) {
+            final RobotToken tokenToInsert = RobotToken.create("\\");
+            setEmpty(tokenToInsert);
+
+        } else if (!comments.isEmpty() && position - 1 <= comments.size()) {
+            final RobotToken tokenToInsert = RobotToken.create("");
+            tokenToInsert.setType(RobotTokenType.COMMENT_CONTINUE);
+
+            final int shift = emptyToken.getFilePosition().isNotSet() ? 1 : 0;
+            comments.add(position - 1 + shift, tokenToInsert);
+        }
     }
 
     public static boolean isEmpty(final String text) {
         return Pattern.matches("^[\\s]*$", text);
     }
-
-    private void fixMissingType() {
-        empty.setType(getRobotTokenType());
-    }
-
-    private RobotTokenType getRobotTokenType() {
-        return getParent() != null ? RobotTokenType.EMPTY_CELL : RobotTokenType.UNKNOWN;
-    }
-
 }

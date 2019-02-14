@@ -67,10 +67,10 @@ public class RobotKeywordCallTest {
         assertThat(calls.get(0).getName()).isEqualTo("Log");
         assertThat(calls.get(0).getArguments()).containsExactly("t");
         assertThat(calls.get(0).getComment()).isEmpty();
-        assertThat(calls.get(1).getName()).isEqualTo("  ");
+        assertThat(calls.get(1).getName()).isEmpty();
         assertThat(calls.get(1).getArguments()).isEmpty();
         assertThat(calls.get(1).getComment()).isEmpty();
-        assertThat(calls.get(2).getName()).isEqualTo("  ");
+        assertThat(calls.get(2).getName()).isEmpty();
         assertThat(calls.get(2).getArguments()).isEmpty();
         assertThat(calls.get(2).getComment()).isEmpty();
         assertThat(calls.get(3).getName()).isEmpty();
@@ -179,7 +179,7 @@ public class RobotKeywordCallTest {
                 .getChildren();
 
         for (final RobotKeywordCall call : callsBefore) {
-            call.insertCellAt(0, "");
+            call.insertEmptyCellAt(0);
         }
 
         final List<RobotKeywordCall> callsAfter = model.findSection(RobotCasesSection.class)
@@ -213,7 +213,7 @@ public class RobotKeywordCallTest {
                 .getChildren();
 
         for (final RobotKeywordCall call : callsBefore) {
-            call.insertCellAt(1, "");
+            call.insertEmptyCellAt(1);
         }
 
         final List<RobotKeywordCall> callsAfter = model.findSection(RobotCasesSection.class)
@@ -245,7 +245,7 @@ public class RobotKeywordCallTest {
                 .getChildren()
                 .get(0);
 
-        callBefore.insertCellAt(2, "");
+        callBefore.insertEmptyCellAt(2);
 
         final RobotKeywordCall callAfter = model.findSection(RobotCasesSection.class)
                 .get()

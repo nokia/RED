@@ -8,16 +8,19 @@ package org.rf.ide.core.testdata.text.read.postfixes;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
-import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.postfixes.PostProcessingFixActions.IPostProcessFixer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.separators.Separator;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.TreeRangeMap;
@@ -28,30 +31,38 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
     public void applyFix(final RobotFileOutput parsingOutput) {
         final RobotFile fileModel = parsingOutput.getFileModel();
         if (fileModel.getTestCaseTable().isPresent()) {
-            fix(fileModel.getFileContent(), fileModel.getTestCaseTable().getTestCases());
+            fix(parsingOutput.getFileFormat(), fileModel.getFileContent(), fileModel.getTestCaseTable().getTestCases());
         }
         if (fileModel.getTasksTable().isPresent()) {
-            fix(fileModel.getFileContent(), fileModel.getTasksTable().getTasks());
+            fix(parsingOutput.getFileFormat(), fileModel.getFileContent(), fileModel.getTasksTable().getTasks());
         }
         if (fileModel.getKeywordTable().isPresent()) {
-            fix(fileModel.getFileContent(), fileModel.getKeywordTable().getKeywords());
+            fix(parsingOutput.getFileFormat(), fileModel.getFileContent(), fileModel.getKeywordTable().getKeywords());
         }
     }
 
-    private void fix(final List<RobotLine> lines,
-            final List<? extends IExecutableStepsHolder<?>> execHolders) {
+    private <T extends AModelElement<? extends ARobotSectionTable>> void fix(final FileFormat fileFormat,
+            final List<RobotLine> lines, final List<? extends IExecutableStepsHolder<T>> execHolders) {
+        createEmptyLinesForLinesNotBelongingToAnyModelElement(lines, execHolders);
+        exchangeEmptyExecutableRowsWithEmptyRow(fileFormat, execHolders);
+    }
+
+    private <T extends AModelElement<? extends ARobotSectionTable>> void createEmptyLinesForLinesNotBelongingToAnyModelElement(
+            final List<RobotLine> lines,
+            final List<? extends IExecutableStepsHolder<T>> execHolders) {
+
         final TreeRangeMap<Integer, ModelType> linesToModelElements = TreeRangeMap.create();
 
-        for (final IExecutableStepsHolder<?> execHolder : execHolders) {
-            for (final AModelElement<?> child : execHolder.getElements()) {
+        for (final IExecutableStepsHolder<T> execHolder : execHolders) {
+            for (final AModelElement<T> child : execHolder.getElements()) {
                 final Range<Integer> range = Range.closed(child.getBeginPosition().getLine(),
                         child.getEndPosition().getLine());
                 linesToModelElements.put(range, child.getModelType());
             }
         }
 
-        for (final IExecutableStepsHolder<?> execHolder : execHolders) {
-            final List<?> elements = execHolder.getElements();
+        for (final IExecutableStepsHolder<T> execHolder : execHolders) {
+            final List<AModelElement<T>> elements = execHolder.getElements();
             final int holderStartLine = execHolder.getName().getLineNumber();
             final int holderEndLine = getHolderLastLine(execHolder, elements);
             
@@ -59,11 +70,15 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
                 continue;
             }
 
-            for (int i = holderStartLine; i <= holderEndLine; i++) {
+            for (int i = holderStartLine + 1; i <= holderEndLine; i++) {
                 final RobotLine line = lines.get(i - 1);
 
-                if (line.isEmpty() && linesToModelElements.get(i) == null) {
-                    addEmptyRow(execHolder, elements, i, line);
+                if (linesToModelElements.get(i) == null && line.isEmpty()) {
+                    final RobotEmptyRow<T> emptyRow = createEmptyRow(line);
+                    if (emptyRow != null) {
+                        final int index = find(elements, i);
+                        execHolder.addElement(index, emptyRow);
+                    }
                 }
             }
             for (int i = holderEndLine + 1; i <= lines.size(); i++) {
@@ -72,7 +87,11 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
                     break;
                 }
                 if (line.isEmpty()) {
-                    addEmptyRow(execHolder, elements, i, line);
+                    final RobotEmptyRow<T> emptyRow = createEmptyRow(line);
+                    if (emptyRow != null) {
+                        final int index = find(elements, i);
+                        execHolder.addElement(index, emptyRow);
+                    }
                 } else {
                     break;
                 }
@@ -81,36 +100,120 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
         }
     }
 
-    private int getHolderLastLine(final IExecutableStepsHolder<?> execHolder, final List<?> elements) {
+    private <T extends AModelElement<? extends ARobotSectionTable>> int getHolderLastLine(
+            final IExecutableStepsHolder<?> execHolder, final List<AModelElement<T>> elements) {
         if (elements.isEmpty()) {
             return execHolder.getName().getLineNumber();
         }
-        final AModelElement<?> lastElement = (AModelElement<?>) elements.get(elements.size() - 1);
+        final AModelElement<?> lastElement = elements.get(elements.size() - 1);
         final List<RobotToken> lastElementTokens = lastElement.getElementTokens();
         return lastElementTokens.get(lastElementTokens.size() - 1).getEndFilePosition().getLine();
     }
 
-    private void addEmptyRow(final IExecutableStepsHolder<?> execHolder, final List<?> elements, final int i,
+    private <T extends AModelElement<? extends ARobotSectionTable>> RobotEmptyRow<T> createEmptyRow(
             final RobotLine line) {
-        final RobotToken token = line.tokensStream().findFirst().get();
-        final List<IRobotTokenType> types = token.getTypes();
-        types.add(0, RobotTokenType.EMPTY_CELL);
-        types.remove(RobotTokenType.UNKNOWN);
 
-        final RobotEmptyRow<?> row = new RobotEmptyRow<>();
-        row.setEmptyToken(token);
+        if (line.getLineElements().size() == 1
+                && line.getLineElements().get(0).getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
 
-        execHolder.addElement(find(elements, i), row);
+            final RobotToken prettyAlign = (RobotToken) line.getLineElements().get(0);
+
+            final RobotToken token = RobotToken.create("", RobotTokenType.EMPTY_CELL);
+            token.setLineNumber(line.getLineNumber());
+            token.setStartOffset(prettyAlign.getEndOffset());
+            token.setStartColumn(prettyAlign.getEndColumn());
+
+            line.addLineElement(token);
+
+            final RobotEmptyRow<T> row = new RobotEmptyRow<>();
+            row.setEmpty(token);
+
+            return row;
+
+        } else if (line.getLineElements().get(0) instanceof Separator) {
+            final Separator separator = (Separator) line.getLineElements().get(0);
+
+            final RobotToken token = RobotToken.create("", RobotTokenType.EMPTY_CELL);
+            token.setLineNumber(line.getLineNumber());
+            token.setStartOffset(separator.getEndOffset());
+            token.setStartColumn(separator.getEndColumn());
+
+            line.addLineElement(token);
+
+            final RobotEmptyRow<T> row = new RobotEmptyRow<>();
+            row.setEmpty(token);
+
+            return row;
+        } else {
+            return null;
+        }
     }
 
-    private int find(final List<?> elements, final int emptyLineNumber) {
+    private <T extends AModelElement<? extends ARobotSectionTable>> int find(final List<AModelElement<T>> elements,
+            final int emptyLineNumber) {
         int i = 0;
-        for (final Object element : elements) {
-            if (((AModelElement<?>) element).getBeginPosition().getLine() > emptyLineNumber) {
+        for (final AModelElement<T> element : elements) {
+            if (element.getBeginPosition().getLine() > emptyLineNumber) {
                 return i;
             }
             i++;
         }
         return elements.size();
+    }
+
+    private <T extends AModelElement<? extends ARobotSectionTable>> void exchangeEmptyExecutableRowsWithEmptyRow(
+            final FileFormat fileFormat,
+            final List<? extends IExecutableStepsHolder<T>> execHolders) {
+
+        for (final IExecutableStepsHolder<T> holder : execHolders) {
+            final List<RobotExecutableRow<T>> executionRows = holder.getExecutionContext();
+
+            for (final RobotExecutableRow<T> executableRow : executionRows) {
+                if (!isExecutable(fileFormat, executableRow)) {
+                    final RobotEmptyRow<T> row = rewriteToEmptyToRow(executableRow);
+                    
+                    holder.replaceElement(executableRow, row);
+                }
+            }
+        }
+    }
+
+    public boolean isExecutable(final FileFormat fileFormat, final RobotExecutableRow<?> executableRow) {
+        final RobotToken action = executableRow.getAction();
+        if (action == null) {
+            return false;
+        }
+        if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+            final String text = action.getText().trim();
+            final List<RobotToken> elementTokens = executableRow.getElementTokens();
+            if (text.equals("\\")) {
+                return elementTokens.size() > 1
+                        && !elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+
+            } else if ("".equals(text)) {
+                if (fileFormat == FileFormat.TSV) {
+                    return elementTokens.size() > 1
+                            && !elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+
+                } else if (action.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
+                    return true;
+                }
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private <T extends AModelElement<? extends ARobotSectionTable>> RobotEmptyRow<T> rewriteToEmptyToRow(
+            final RobotExecutableRow<T> executableRow) {
+
+        final RobotEmptyRow<T> emptyRow = new RobotEmptyRow<>();
+        emptyRow.setEmpty(executableRow.getAction());
+        for (final RobotToken commentToken : executableRow.getComment()) {
+            emptyRow.addCommentPart(commentToken);
+        }
+        return emptyRow;
     }
 }

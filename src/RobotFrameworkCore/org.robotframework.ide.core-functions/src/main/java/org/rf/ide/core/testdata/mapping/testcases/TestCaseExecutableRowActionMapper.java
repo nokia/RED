@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.rf.ide.core.environment.RobotVersion;
+import org.rf.ide.core.testdata.mapping.HashCommentMapper;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
@@ -85,7 +86,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
 
         final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
         if (text.startsWith(" #") || text.startsWith("#")
-                || RobotExecutableRow.isTsvComment(text, robotFileOutput.getFileFormat())) {
+                || HashCommentMapper.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.TEST_CASE_ACTION_NAME);
             types.remove(RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
             types.add(RobotTokenType.START_HASH_COMMENT);

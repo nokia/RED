@@ -72,7 +72,7 @@ public class InsertCellToRightHandlerTest {
 
         new E4InsertCellToRightHandler().insertCellToRight(commandsStack, editor, selection);
 
-        verify(commandsStack).execute(refEq(new InsertCellCommand(call, 1, null)));
+        verify(commandsStack).execute(refEq(new InsertCellCommand(call, 1)));
         verifyNoMoreInteractions(commandsStack);
     }
 

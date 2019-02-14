@@ -159,7 +159,7 @@ public class DeleteCellCommandTest {
         assertThat_valueAtPosition_wasDeleted(0, allLabels, callAfter);
 
         final IRobotCodeHoldingElement parent = call.getParent();
-        final int index = call.getIndex();
+        final int index = callAfter.getIndex();
         for (final EditorCommand toUndo : command.getUndoCommands()) {
             toUndo.execute();
         }
@@ -296,7 +296,7 @@ public class DeleteCellCommandTest {
         assertThat_valueAtPosition_wasDeleted(0, allLabels, callAfter);
 
         final IRobotCodeHoldingElement parent = call.getParent();
-        final int index = call.getIndex();
+        final int index = callAfter.getIndex();
         for (final EditorCommand toUndo : command.getUndoCommands()) {
             toUndo.execute();
         }

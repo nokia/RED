@@ -94,6 +94,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
         return MoveElementHelper.moveDown(allElements, element);
     }
 
+    @Override
     public void replaceElement(final AModelElement<UserKeyword> oldElement,
             final AModelElement<UserKeyword> newElement) {
         newElement.setParent(this);

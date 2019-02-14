@@ -39,7 +39,7 @@ public class InsertCellToRightHandler extends DIParameterizedHandler<E4InsertCel
                     && call.getArgumentTokens().isEmpty();
 
             if (column < call.getLinkedElement().getElementTokens().size() - (isWholeLineComment ? 2 : 1)) {
-                commandsStack.execute(new InsertCellCommand(call, column + 1, null));
+                commandsStack.execute(new InsertCellCommand(call, column + 1));
             }
         }
     }

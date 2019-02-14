@@ -102,6 +102,7 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
         return MoveElementHelper.moveDown(allElements, element);
     }
 
+    @Override
     public void replaceElement(final AModelElement<TestCase> oldElement, final AModelElement<TestCase> newElement) {
         newElement.setParent(this);
         allElements.set(allElements.indexOf(oldElement), newElement);

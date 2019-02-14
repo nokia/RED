@@ -59,6 +59,10 @@ class ExecutableUnitsFixer {
                         }
                     }
                 } else if (rowType == RowType.SIMPLE) {
+                    if (row instanceof RobotExecutableRow<?> && ((RobotExecutableRow<?>) row).getAction() != null) {
+                        ((RobotExecutableRow<?>) row).getAction().getTypes().remove(RobotTokenType.FOR_CONTINUE_TOKEN);
+                    }
+
                     if (containsArtificialContinueAffectingForLoop(currentExecLine)) {
                         lastForExecutableIndex = newRows.size() - 1;
                         if (lastForIndex == -1) {

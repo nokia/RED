@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
@@ -29,13 +28,37 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     private static final long serialVersionUID = -4158729064542423691L;
 
-    private final static Pattern TSV_COMMENT = Pattern.compile("(\\s)*\"(\\s)*[#].*\"(\\s)*$");
-
-    private RobotToken action;
+    private RobotToken action = new RobotToken();
 
     private final List<RobotToken> arguments = new ArrayList<>();
 
     private final List<RobotToken> comments = new ArrayList<>();
+
+    public static boolean isExecutable(final FileFormat fileFormat, final List<RobotToken> tokens) {
+        final RobotToken action = !tokens.isEmpty() ? tokens.get(0) : null;
+        if (action == null) {
+            return false;
+        }
+        if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+            final String text = action.getText().trim();
+
+            if (text.equals("\\")) {
+                return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+
+            } else if ("".equals(text)) {
+                if (fileFormat == FileFormat.TSV) {
+                    return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+
+                } else if (action.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
+                    return true;
+                }
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public RobotExecutableRow() {
         this.action = new RobotToken();
@@ -238,34 +261,10 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
             final FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
 
-            if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                final String text = action.getText().trim();
-                final List<RobotToken> elementTokens = getElementTokens();
-                if (text.equals("\\")) {
-                    return elementTokens.size() > 1
-                            && !elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
-
-                } else if ("".equals(text)) {
-                    if (fileFormat == FileFormat.TSV) {
-                        return elementTokens.size() > 1
-                                && !elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
-
-                    } else if (action.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
-                        return true;
-                    }
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-            return false;
+            return RobotExecutableRow.isExecutable(fileFormat, getElementTokens());
         } else {
             return !action.getTypes().contains(RobotTokenType.START_HASH_COMMENT);
         }
-    }
-
-    public static boolean isTsvComment(final String text, final FileFormat format) {
-        return format == FileFormat.TSV && TSV_COMMENT.matcher(text).matches();
     }
 
     public IExecutableRowDescriptor<T> buildLineDescription() {

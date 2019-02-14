@@ -86,13 +86,12 @@ public class RobotParserSimpleExecutableContinueTest {
         final KeywordTable keywordTable = fileModel.getKeywordTable();
         assertThat(keywordTable.getKeywords()).hasSize(1);
         final UserKeyword userKeyword = keywordTable.getKeywords().get(0);
-        assertThat(userKeyword.getExecutionContext()).hasSize(4);
+        assertThat(userKeyword.getExecutionContext()).hasSize(3);
         final List<RobotExecutableRow<UserKeyword>> executionContext = userKeyword.getExecutionContext();
         assertExecutableLine(executionContext.get(0), "Log", Arrays.asList("parameter1"), new ArrayList<String>(0));
         assertExecutableLine(executionContext.get(1), "Log X", Arrays.asList("contArg1", "pnotable"),
                 Arrays.asList("#a", "data1", "#b", "data2"));
-        assertExecutableLine(executionContext.get(2), null, new ArrayList<String>(0), Arrays.asList("#a", "poor"));
-        assertExecutableLine(executionContext.get(3), "Log", Arrays.asList("me"), new ArrayList<String>(0));
+        assertExecutableLine(executionContext.get(2), "Log", Arrays.asList("me"), new ArrayList<String>(0));
     }
 
     private void assertExecutableLine(final RobotExecutableRow<UserKeyword> robotExecutableRow, final String actionText,

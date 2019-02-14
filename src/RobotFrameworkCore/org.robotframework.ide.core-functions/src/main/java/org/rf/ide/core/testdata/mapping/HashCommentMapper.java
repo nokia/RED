@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.mapping;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.mapping.comment.SettingCommentMapper;
 import org.rf.ide.core.testdata.mapping.comment.TableHeaderCommentMapper;
@@ -17,10 +18,10 @@ import org.rf.ide.core.testdata.mapping.comment.UserKeywordSettingCommentMapper;
 import org.rf.ide.core.testdata.mapping.comment.VariablesDeclarationCommentMapper;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
+import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -28,10 +29,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class HashCommentMapper implements IParsingMapper {
 
-    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
+    private final static Pattern TSV_COMMENT = Pattern.compile("(\\s)*\"(\\s)*[#].*\"(\\s)*$");
 
     private static final List<IHashCommentMapper> COMMENT_MAPPERS = new ArrayList<>();
-
     static {
         COMMENT_MAPPERS.add(new TableHeaderCommentMapper());
 
@@ -76,13 +76,16 @@ public class HashCommentMapper implements IParsingMapper {
         COMMENT_MAPPERS.add(UserKeywordSettingCommentMapper.forTeardown());
         COMMENT_MAPPERS.add(UserKeywordSettingCommentMapper.forTimeout());
     }
+
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
+
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
         final ParsingState nearestState = stateHelper.getCurrentState(processingState);
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                || RobotExecutableRow.isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
+                || isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
 
             if (isInsideTestCase(nearestState) || isInsideTask(nearestState) || isInsideKeyword(nearestState)) {
                 return false;
@@ -123,7 +126,7 @@ public class HashCommentMapper implements IParsingMapper {
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             addToStack = true;
 
-        } else if (RobotExecutableRow.isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
+        } else if (isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
             rt.getTypes().add(0, RobotTokenType.START_HASH_COMMENT);
             addToStack = true;
 
@@ -169,5 +172,9 @@ public class HashCommentMapper implements IParsingMapper {
             }
         }
         return ParsingState.TRASH;
+    }
+
+    public static boolean isTsvComment(final String text, final FileFormat format) {
+        return format == FileFormat.TSV && TSV_COMMENT.matcher(text).matches();
     }
 }
