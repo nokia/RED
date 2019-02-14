@@ -37,7 +37,7 @@ class ExecutableHolderExecutionRowDumper extends ExecutableTableElementDumper {
     }
 
     ExecutableHolderExecutionRowDumper(final DumperHelper helper, final ModelType modelType) {
-        super(helper, modelType, newArrayList(new ForContinueStartWithCommentFixer()));
+        super(helper, modelType);
     }
 
     @Override

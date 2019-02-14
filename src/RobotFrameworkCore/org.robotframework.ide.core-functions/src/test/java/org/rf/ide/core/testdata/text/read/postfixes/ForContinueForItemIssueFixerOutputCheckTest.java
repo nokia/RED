@@ -177,22 +177,16 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         assertThat(keywords).hasSize(1);
         final UserKeyword userKeyword = keywords.get(0);
         final List<RobotExecutableRow<UserKeyword>> executionContext = userKeyword.getExecutionContext();
-        assertThat(executionContext).hasSize(7);
+        assertThat(executionContext).hasSize(4);
         assertExecutableLine(executionContext.get(0), ": FoR", Arrays.asList("${x}", "IN", "cebula"),
                 new ArrayList<String>(0));
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(RowType.FOR);
-        assertExecutableLine(executionContext.get(1), "\\", new ArrayList<String>(0), new ArrayList<String>(0));
-        assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(RowType.COMMENTED_HASH);
-        assertExecutableLine(executionContext.get(2), "\\", new ArrayList<String>(0), Arrays.asList("#woda3"));
-        assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(RowType.COMMENTED_HASH);
-        assertExecutableLine(executionContext.get(3), "\\", Arrays.asList("Log", "ok"), Arrays.asList("#woda"));
-        assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
-        assertExecutableLine(executionContext.get(4), "\\", Arrays.asList("Log", "${x}"), new ArrayList<String>(0));
-        assertThat(executionContext.get(4).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
-        assertExecutableLine(executionContext.get(5), null, new ArrayList<String>(0), Arrays.asList("#", "ok"));
-        assertThat(executionContext.get(5).buildLineDescription().getRowType()).isEqualTo(RowType.COMMENTED_HASH);
-        assertExecutableLine(executionContext.get(6), "log", Arrays.asList("ok"), new ArrayList<String>(0));
-        assertThat(executionContext.get(6).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
+        assertExecutableLine(executionContext.get(1), "\\", Arrays.asList("Log", "ok"), Arrays.asList("#woda"));
+        assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
+        assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "${x}"), new ArrayList<String>(0));
+        assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
+        assertExecutableLine(executionContext.get(3), "log", Arrays.asList("ok"), new ArrayList<String>(0));
+        assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
     }
 
     @Test
@@ -206,7 +200,7 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         assertThat(keywords).hasSize(1);
         final UserKeyword userKeyword = keywords.get(0);
         final List<RobotExecutableRow<UserKeyword>> executionContext = userKeyword.getExecutionContext();
-        assertThat(executionContext).hasSize(9);
+        assertThat(executionContext).hasSize(8);
         assertExecutableLine(executionContext.get(0), ":FOR",
                 Arrays.asList("${x}", "IN", "1", "2", "", "3", "4", "Log"), new ArrayList<String>(0));
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(RowType.FOR);
@@ -214,18 +208,16 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
         assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("log"), Arrays.asList("#   hugo"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
-        assertExecutableLine(executionContext.get(3), "\\", new ArrayList<String>(0), Arrays.asList("#", "hash"));
-        assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(RowType.COMMENTED_HASH);
-        assertExecutableLine(executionContext.get(4), "\\", Arrays.asList("\\", "kw_w"), Arrays.asList("#", "d"));
+        assertExecutableLine(executionContext.get(3), "\\", Arrays.asList("\\", "kw_w"), Arrays.asList("#", "d"));
+        assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
+        assertExecutableLine(executionContext.get(4), "\\", Arrays.asList("kw_w"), new ArrayList<String>(0));
         assertThat(executionContext.get(4).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
-        assertExecutableLine(executionContext.get(5), "\\", Arrays.asList("kw_w"), new ArrayList<String>(0));
-        assertThat(executionContext.get(5).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
-        assertExecutableLine(executionContext.get(6), "...  #ok4", new ArrayList<String>(0), new ArrayList<String>(0));
+        assertExecutableLine(executionContext.get(5), "...  #ok4", new ArrayList<String>(0), new ArrayList<String>(0));
+        assertThat(executionContext.get(5).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
+        assertExecutableLine(executionContext.get(6), "log", Arrays.asList("ok"), new ArrayList<String>(0));
         assertThat(executionContext.get(6).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
-        assertExecutableLine(executionContext.get(7), "log", Arrays.asList("ok"), new ArrayList<String>(0));
+        assertExecutableLine(executionContext.get(7), "...  #ok", new ArrayList<String>(0), new ArrayList<String>(0));
         assertThat(executionContext.get(7).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
-        assertExecutableLine(executionContext.get(8), "...  #ok", new ArrayList<String>(0), new ArrayList<String>(0));
-        assertThat(executionContext.get(8).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
     }
 
     @Test
@@ -274,26 +266,22 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         assertThat(keywords).hasSize(1);
         final UserKeyword userKeyword = keywords.get(0);
         final List<RobotExecutableRow<UserKeyword>> executionContext = userKeyword.getExecutionContext();
-        assertThat(executionContext).hasSize(8);
+        assertThat(executionContext).hasSize(6);
 
         assertExecutableLine(executionContext.get(0), ": FOR", Arrays.asList("${x}", "IN", "1", "2", "", "3", "4"),
                 new ArrayList<String>(0));
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(RowType.FOR);
-        assertExecutableLine(executionContext.get(1), null, new ArrayList<String>(0), Arrays.asList("#   data"));
-        assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(RowType.COMMENTED_HASH);
-        assertExecutableLine(executionContext.get(2), null, new ArrayList<String>(0), Arrays.asList("#   hugo"));
-        assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(RowType.COMMENTED_HASH);
-        assertExecutableLine(executionContext.get(3), "...  ok", Arrays.asList("", "kw_w"),
+        assertExecutableLine(executionContext.get(1), "...  ok", Arrays.asList("", "kw_w"),
                 Arrays.asList("#", "hash", "#", "d"));
+        assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
+        assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("kw_w"), new ArrayList<String>(0));
+        assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
+        assertExecutableLine(executionContext.get(3), "...  #ok4", new ArrayList<String>(0), new ArrayList<String>(0));
         assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
-        assertExecutableLine(executionContext.get(4), "\\", Arrays.asList("kw_w"), new ArrayList<String>(0));
+        assertExecutableLine(executionContext.get(4), "log", Arrays.asList("ok"), new ArrayList<String>(0));
         assertThat(executionContext.get(4).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
-        assertExecutableLine(executionContext.get(5), "...  #ok4", new ArrayList<String>(0), new ArrayList<String>(0));
+        assertExecutableLine(executionContext.get(5), "...  #ok", new ArrayList<String>(0), new ArrayList<String>(0));
         assertThat(executionContext.get(5).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
-        assertExecutableLine(executionContext.get(6), "log", Arrays.asList("ok"), new ArrayList<String>(0));
-        assertThat(executionContext.get(6).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
-        assertExecutableLine(executionContext.get(7), "...  #ok", new ArrayList<String>(0), new ArrayList<String>(0));
-        assertThat(executionContext.get(7).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
     }
 
     @Test

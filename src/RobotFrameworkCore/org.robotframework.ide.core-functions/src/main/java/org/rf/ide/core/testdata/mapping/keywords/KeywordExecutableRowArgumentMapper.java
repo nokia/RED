@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.rf.ide.core.environment.RobotVersion;
+import org.rf.ide.core.testdata.mapping.HashCommentMapper;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -74,7 +75,7 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
         }
 
         if (text.startsWith("#") || commentContinue
-                || RobotExecutableRow.isTsvComment(text, robotFileOutput.getFileFormat())) {
+                || HashCommentMapper.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.KEYWORD_ACTION_NAME);
             types.remove(RobotTokenType.KEYWORD_ACTION_ARGUMENT);
             rt.getTypes().add(0, RobotTokenType.START_HASH_COMMENT);

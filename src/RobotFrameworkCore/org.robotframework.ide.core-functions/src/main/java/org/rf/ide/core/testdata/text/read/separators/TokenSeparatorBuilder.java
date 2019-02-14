@@ -22,27 +22,20 @@ public class TokenSeparatorBuilder {
     }
 
     public ALineSeparator createSeparator(final int lineNumber, final String line) {
-        ALineSeparator thisLineSeparator = null;
-
         if (format == FileFormat.TXT_OR_ROBOT) {
-            thisLineSeparator = new WhitespaceSeparator(lineNumber, line);
-            if (isPipeSeparated(line)) {
-                thisLineSeparator = new PipeSeparator(lineNumber, line);
-            }
-        } else if (format == FileFormat.TSV) {
-            thisLineSeparator = new StrictTsvTabulatorSeparator(lineNumber, line);
-        }
+            return isPipeSeparated(line) ? new PipeSeparator(lineNumber, line)
+                    : new WhitespaceSeparator(lineNumber, line);
 
-        return thisLineSeparator;
+        } else if (format == FileFormat.TSV) {
+            return new StrictTsvTabulatorSeparator(lineNumber, line);
+
+        } else {
+            return null;
+        }
     }
 
     @VisibleForTesting
-    public boolean isPipeSeparated(final String line) {
-        boolean result = false;
-        if (format == FileFormat.TXT_OR_ROBOT) {
-            result = PIPE_SEPARATOR_BEGIN.matcher(line).find();
-        }
-
-        return result;
+    boolean isPipeSeparated(final String line) {
+        return format == FileFormat.TXT_OR_ROBOT && PIPE_SEPARATOR_BEGIN.matcher(line).find();
     }
 }

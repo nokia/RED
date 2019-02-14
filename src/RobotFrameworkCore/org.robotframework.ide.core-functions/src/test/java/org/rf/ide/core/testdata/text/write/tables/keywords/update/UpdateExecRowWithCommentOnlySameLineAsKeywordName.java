@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordExecutableRowModelOperation;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -54,7 +55,7 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordName extends RobotForm
         final KeywordTable table = modelFile.getKeywordTable();
         final List<UserKeyword> keywords = table.getKeywords();
         final UserKeyword userKeyword = keywords.get(0);
-        userKeyword.getExecutionContext().get(0).setAction(RobotToken.create("keyAdded"));
+        ((RobotEmptyRow<UserKeyword>) userKeyword.getElements().get(0)).setEmpty(RobotToken.create("keyAdded"));
 
         // execute & verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordWithTheFirstCommentLineInTheNameLine"),

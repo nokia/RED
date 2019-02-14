@@ -17,7 +17,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -26,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -52,13 +53,13 @@ public class ConvertCommentToCallTest {
                 .appendLine("  # call  Catenate  1  2  #comment")
                 .build();
         final RobotCase testCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotKeywordCall keywordCall = testCase.getChildren().get(0);
+        final RobotEmptyLine commentedLine = (RobotEmptyLine) testCase.getChildren().get(0);
         @SuppressWarnings("unchecked")
-        final RobotExecutableRow<TestCase> oldLinked = (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement();
+        final RobotEmptyRow<TestCase> oldLinked = (RobotEmptyRow<TestCase>) commentedLine.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new ConvertCommentToCall(eventBroker, keywordCall, "call"))
+                .isInjectedInto(new ConvertCommentToCall(eventBroker, commentedLine, "call"))
                 .execute();
 
         assertThat(testCase.getChildren().size()).isEqualTo(1);
@@ -86,13 +87,13 @@ public class ConvertCommentToCallTest {
                 .appendLine("  # call  Catenate  1  2  #comment")
                 .build();
         final RobotTask task = model.findSection(RobotTasksSection.class).get().getChildren().get(0);
-        final RobotKeywordCall keywordCall = task.getChildren().get(0);
+        final RobotEmptyLine commentedLine = (RobotEmptyLine) task.getChildren().get(0);
         @SuppressWarnings("unchecked")
-        final RobotExecutableRow<Task> oldLinked = (RobotExecutableRow<Task>) keywordCall.getLinkedElement();
+        final RobotEmptyRow<Task> oldLinked = (RobotEmptyRow<Task>) commentedLine.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new ConvertCommentToCall(eventBroker, keywordCall, "call"))
+                .isInjectedInto(new ConvertCommentToCall(eventBroker, commentedLine, "call"))
                 .execute();
 
         assertThat(task.getChildren().size()).isEqualTo(1);
@@ -119,14 +120,13 @@ public class ConvertCommentToCallTest {
                 .appendLine("  # call  Catenate  1  2  #comment")
                 .build();
         final RobotKeywordDefinition keyword = model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
-        final RobotKeywordCall keywordCall = keyword.getChildren().get(0);
+        final RobotEmptyLine commentedLine = (RobotEmptyLine) keyword.getChildren().get(0);
         @SuppressWarnings("unchecked")
-        final RobotExecutableRow<UserKeyword> oldLinked = (RobotExecutableRow<UserKeyword>) keywordCall
-                .getLinkedElement();
+        final RobotEmptyRow<UserKeyword> oldLinked = (RobotEmptyRow<UserKeyword>) commentedLine.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new ConvertCommentToCall(eventBroker, keywordCall, "call"))
+                .isInjectedInto(new ConvertCommentToCall(eventBroker, commentedLine, "call"))
                 .execute();
 
         assertThat(keyword.getChildren().size()).isEqualTo(1);

@@ -47,7 +47,7 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         // one seems simpler
 
         // return if there is nothing to change and DO NOT convert RobotEmptyLine
-        if (keywordCall instanceof RobotEmptyLine && value == null) {
+        if (keywordCall instanceof RobotEmptyLine) {
             return;
         }
 

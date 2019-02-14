@@ -168,38 +168,6 @@ public class SetKeywordCallArgumentCommand2Test {
     }
 
     @Test
-    public void argumentsAndNameAreAugmentedWithBackslash_whenTryingToSetNonEmptyValueOutsideOfArgumentsList_andNameIsEmpty() {
-        final RobotKeywordCall call = createEmptyKeywordCall();
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
-        assertThat(call.getName()).isEqualTo("");
-        assertThat(call.getArguments()).isEmpty();
-        assertThat(call.getComment()).isEqualTo("# comment");
-
-        final SetKeywordCallArgumentCommand2 command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new SetKeywordCallArgumentCommand2(call, 3, "arg"));
-        command.execute();
-
-        assertThat(call.getName()).isEqualTo("\\");
-        assertThat(call.getArguments()).containsExactlyElementsOf(newArrayList("\\", "\\", "\\", "arg"));
-        assertThat(call.getComment()).isEqualTo("# comment");
-
-        for (final EditorCommand undo : command.getUndoCommands()) {
-            undo.execute();
-        }
-
-        assertThat(call.getName()).isEqualTo("");
-        assertThat(call.getArguments()).isEmpty();
-        assertThat(call.getComment()).isEqualTo("# comment");
-
-        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, call);
-        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_NAME_CHANGE, call);
-        verifyNoMoreInteractions(eventBroker);
-    }
-
-    @Test
     public void nothingChanges_whenTryingToSetEmptyValueOutsideOfArgumentsList_andCallHasEmptyName() {
         checkArgumentsDoesNotChange(createEmptyKeywordCall(), "", 3);
     }

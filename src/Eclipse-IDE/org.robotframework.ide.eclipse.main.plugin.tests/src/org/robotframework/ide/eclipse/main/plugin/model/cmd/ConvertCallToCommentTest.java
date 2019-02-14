@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -59,7 +60,7 @@ public class ConvertCallToCommentTest {
 
         assertThat(testCase.getChildren().size()).isEqualTo(1);
         final RobotKeywordCall result = testCase.getChildren().get(0);
-        assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
+        assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
                 .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME);
         assertThat(result.getName()).isEqualTo("");
@@ -94,7 +95,7 @@ public class ConvertCallToCommentTest {
 
         assertThat(keyword.getChildren().size()).isEqualTo(1);
         final RobotKeywordCall result = keyword.getChildren().get(0);
-        assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
+        assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
                 .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME);
         assertThat(result.getName()).isEqualTo("");
@@ -128,7 +129,7 @@ public class ConvertCallToCommentTest {
 
         assertThat(testCase.getChildren().size()).isEqualTo(3);
         final RobotKeywordCall result = testCase.getChildren().get(1);
-        assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
+        assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
                 .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME);
         assertThat(result.getName()).isEqualTo("");
@@ -163,7 +164,7 @@ public class ConvertCallToCommentTest {
 
         assertThat(keyword.getChildren().size()).isEqualTo(3);
         final RobotKeywordCall result = keyword.getChildren().get(1);
-        assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
+        assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
                 .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME);
         assertThat(result.getName()).isEqualTo("");

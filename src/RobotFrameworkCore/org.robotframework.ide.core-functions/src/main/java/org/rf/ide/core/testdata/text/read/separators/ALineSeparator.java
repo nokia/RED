@@ -69,10 +69,8 @@ public abstract class ALineSeparator {
     public Separator next() {
         init();
         updateIndex();
-        Separator found = null;
-        if (elementIndex > prevElementIndex) {
-            found = (Separator) lineElements.get(elementIndex);
-        }
+
+        final Separator found = elementIndex > prevElementIndex ? (Separator) lineElements.get(elementIndex) : null;
 
         prevElementIndex = elementIndex;
 
@@ -85,7 +83,7 @@ public abstract class ALineSeparator {
         init();
         updateIndex();
 
-        return (elementIndex > prevElementIndex);
+        return elementIndex > prevElementIndex;
     }
 
     private void updateIndex() {
@@ -101,16 +99,12 @@ public abstract class ALineSeparator {
     }
 
     private boolean isSeparator(final IRobotLineElement elem) {
-        boolean result = false;
-        final List<IRobotTokenType> types = elem.getTypes();
-        for (final IRobotTokenType type : types) {
+        for (final IRobotTokenType type : elem.getTypes()) {
             if (type == SeparatorType.PIPE || type == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
-                result = true;
-                break;
+                return true;
             }
         }
-
-        return result;
+        return false;
     }
 
     public abstract SeparatorType getProducedType();

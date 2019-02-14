@@ -27,7 +27,7 @@ public class KeywordsSectionTableDumper extends AExecutableTableDumper<KeywordTa
             dumpers.add(new LocalSettingDumper(helper, settingType));
         }
         dumpers.add(new ExecutableHolderExecutionRowDumper(helper, ModelType.USER_KEYWORD_EXECUTABLE_ROW));
-        dumpers.add(new ExecutableHolderEmptyLineDumper(helper, ModelType.EMPTY_LINE));
+        dumpers.add(new ExecutableHolderEmptyLineDumper(helper));
         return dumpers;
     }
 

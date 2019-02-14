@@ -114,9 +114,9 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
     }
 
     @Override
-    public RobotKeywordCall insertCellAt(final int position, final String newValue) {
+    public RobotKeywordCall insertEmptyCellAt(final int position) {
         if (position > 0) {
-            return super.insertCellAt(position, newValue);
+            return super.insertEmptyCellAt(position);
         }
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) getParent();
         final int index = getIndex();

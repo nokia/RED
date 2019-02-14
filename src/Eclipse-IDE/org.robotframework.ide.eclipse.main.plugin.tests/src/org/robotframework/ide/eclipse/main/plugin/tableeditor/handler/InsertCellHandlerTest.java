@@ -72,7 +72,7 @@ public class InsertCellHandlerTest {
 
         new E4InsertCellHandler().insertCell(commandsStack, editor, selection);
 
-        verify(commandsStack).execute(refEq(new InsertCellCommand(call, 0, null)));
+        verify(commandsStack).execute(refEq(new InsertCellCommand(call, 0)));
         verifyNoMoreInteractions(commandsStack);
     }
 }

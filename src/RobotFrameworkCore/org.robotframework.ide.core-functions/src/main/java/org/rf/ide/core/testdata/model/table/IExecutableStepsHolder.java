@@ -22,9 +22,11 @@ public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobot
 
     List<RobotExecutableRow<T>> getExecutionContext();
 
-    boolean removeElement(final AModelElement<T> element);
-
     AModelElement<T> addElement(final AModelElement<?> element);
 
     AModelElement<T> addElement(int index, final AModelElement<?> element);
+
+    public void replaceElement(final AModelElement<T> oldElement, final AModelElement<T> newElement);
+
+    boolean removeElement(final AModelElement<T> element);
 }

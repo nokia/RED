@@ -122,12 +122,12 @@ public class ActionNamesLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsAdded_forSlashThenCommentCase_InKeywords() {
+    public void labelIsNotAdded_forSlashThenCommentCase_InKeywords() {
         final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0).getChildren().get(3);
         when(dataProvider.getRowObject(3)).thenReturn(call);
         labelAccumulator.accumulateConfigLabels(labels, 0, 3);
-        assertThat(labels.getLabels()).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        assertThat(labels.getLabels()).isEmpty();
     }
 
     @Test

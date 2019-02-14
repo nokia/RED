@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.setting.TaskSetup;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
@@ -70,7 +69,7 @@ class TaskValidator implements ModelUnitValidator {
     }
 
     private boolean hasAnythingToExecute(final Task task) {
-        return task.getExecutionContext().stream().anyMatch(RobotExecutableRow::isExecutable);
+        return !task.getExecutionContext().isEmpty();
     }
 
     private void validateSettings() {
@@ -108,7 +107,6 @@ class TaskValidator implements ModelUnitValidator {
         if (templateKeyword == null) {
             task.getExecutionContext()
                     .stream()
-                    .filter(RobotExecutableRow::isExecutable)
                     .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))
                     .forEach(execValidators::add);
         }

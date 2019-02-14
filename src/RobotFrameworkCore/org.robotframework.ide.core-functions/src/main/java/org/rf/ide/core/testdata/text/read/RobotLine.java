@@ -15,6 +15,7 @@ import org.rf.ide.core.testdata.model.IChildElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 public class RobotLine implements IChildElement<RobotFile> {
@@ -85,7 +86,8 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public boolean isEmpty() {
-        return elementsStream().map(IRobotLineElement::getText).allMatch(s -> s.trim().isEmpty());
+        return elementsStream().map(IRobotLineElement::getText).allMatch(s -> s.trim().isEmpty())
+                || elementsStream().allMatch(s -> s instanceof Separator);
     }
 
     public Optional<Integer> getElementPositionInLine(final int offset, final PositionCheck posCheckStrategy) {
