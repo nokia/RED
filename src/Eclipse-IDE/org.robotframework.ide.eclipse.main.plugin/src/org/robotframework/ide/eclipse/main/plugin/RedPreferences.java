@@ -73,6 +73,7 @@ public class RedPreferences {
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "assistantAutoActivationChars";
     public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "assistantKeywordPrefixAutoAdditionEnabled";
     public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
+    public static final String ASSISTANT_LINKED_ARGUMENTS_MODE = "red.editor.assistant.linkedArgumentsMode";
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
@@ -213,6 +214,10 @@ public class RedPreferences {
 
     public boolean isAssistantKeywordFromNotImportedLibraryEnabled() {
         return store.getBoolean(ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED);
+    }
+
+    public LinkedModeStrategy getAssistantLinkedArgumentsMode() {
+        return LinkedModeStrategy.valueOf(store.getString(ASSISTANT_LINKED_ARGUMENTS_MODE));
     }
 
     public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {
@@ -562,5 +567,10 @@ public class RedPreferences {
         NEVER,
         ALWAYS,
         PROMPT
+    }
+
+    public enum LinkedModeStrategy {
+        CYCLE,
+        EXIT_ON_LAST
     }
 }

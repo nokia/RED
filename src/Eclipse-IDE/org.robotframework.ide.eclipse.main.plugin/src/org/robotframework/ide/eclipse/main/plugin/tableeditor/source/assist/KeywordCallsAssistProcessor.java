@@ -23,6 +23,7 @@ import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -139,10 +140,9 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     private Collection<Runnable> createOperationsToPerformAfterAccepting(final Collection<IRegion> regionsToLinkedEdit,
             final RedKeywordProposal proposal) {
         final Collection<Runnable> operations = new ArrayList<>();
-
         if (!regionsToLinkedEdit.isEmpty()) {
-            operations.add(() -> SwtThread
-                    .asyncExec(() -> RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit)));
+            operations.add(() -> SwtThread.asyncExec(() -> RedEditorLinkedModeUI.enableLinkedMode(viewer,
+                    regionsToLinkedEdit, RedPlugin.getDefault().getPreferences().getAssistantLinkedArgumentsMode())));
         }
 
         if (!proposal.isAccessible()) {
