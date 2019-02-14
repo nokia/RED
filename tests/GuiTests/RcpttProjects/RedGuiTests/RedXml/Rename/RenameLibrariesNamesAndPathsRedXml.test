@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _m_PqIB6aEeeW-PmLWrUUww
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/3/18 10:53 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/14/19 5:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -51,9 +51,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
 // close red.xml
 get-view "Project Explorer" | click
@@ -78,9 +75,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
 // close red.xml
 get-view "Project Explorer" | click
@@ -122,9 +116,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
 // copy library to second project
 with [get-view "Project Explorer" | get-tree] {
@@ -173,9 +164,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
 // rename some other file
 get-view "Project Explorer" | get-tree | select "RobotProject/empty_file" | select "RobotProject/empty_file" 
@@ -197,11 +185,9 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
 get-editor "red.xml" | click
 get-view "Project Explorer" | click
 get-editor "red.xml" | close
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
