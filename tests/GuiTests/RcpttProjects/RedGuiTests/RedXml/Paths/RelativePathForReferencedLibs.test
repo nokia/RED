@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Contexts: _eXb6MPp7EeW7_PzjO98BIw,_6kElkDBsEemdFPzzB7f3Tg
 Element-Name: RelativePathForReferencedLibs
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _8mYawAiBEearkLC-7wHL-g
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/14/18 5:45 PM
+Save-Time: 2/14/19 6:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -38,8 +38,14 @@ proc "check-arg-file-for-relative-path" [val project_name ""]{
 	}-else{
 		comapre-paths [format "(%s%s/libs|/linux_path/tests)" $RED_workspace_path $project_name]
 	}
-	 
-	
+}
+
+
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Libraries"
+    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
+    get-button "Apply and Close" | click
 }
 
 //open red.xml and add new path to PYTHONPAT
@@ -49,11 +55,6 @@ wait-for-loading-red-xml "RobotProject/red.xml"
 
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
-    with [get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action"] {
-        uncheck
-        key-type "M1+s"
-    }
-    wait 1000
     get-section Paths | get-table | select [get-item "...add new search path" ]
     get-section Paths | get-table | get-item "...add new search path" | double-click
 }

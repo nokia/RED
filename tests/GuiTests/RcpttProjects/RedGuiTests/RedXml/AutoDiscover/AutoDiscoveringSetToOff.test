@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-gXO8P_gEeWRL4nRKA71zA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/17/17 11:56 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/14/19 6:01 PM
 Testcase-Type: ecl
 Verifications: _gGHWMP_kEeWRL4nRKA71zA
 
@@ -15,39 +15,39 @@ Verifications: _gGHWMP_kEeWRL4nRKA71zA
 Content-Type: text/ecl
 Entry-Name: .content
 
-//open red.xml
-get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-
-//check if all checkboxes are selected
-get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
-    get-button "Auto discover libraries after test suite save action" | get-property selected | equals true 
+// check default settings
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Libraries"
+with [get-window Preferences | get-group "Libraries autodiscovering"] {
+    get-property childCount | equals 3 | verify-true
+    get-property caption | equals "Libraries autodiscovering" | verify-true
+    get-property "getChildren().Control[0].getText()" | equals "Auto discover libraries after test suite save action" 
         | verify-true
-    get-button "Show discovering summary after test suite save action" | get-property selected | equals true 
+    get-property "getChildren().Control[0].getSelection()" | equals true | verify-true
+    get-property "getChildren().Control[1].getText()" | equals "Show discovering summary after test suite save action" 
         | verify-true
+    get-property "getChildren().Control[1].getSelection()" | equals false | verify-true
+    get-property "getChildren().Control[2].getText()" 
+        | equals "Add project modules recursively to PYTHONPATH/CLASSPATH during autodiscovering on virtualenv" 
+        | verify-true
+    get-property "getChildren().Control[2].getSelection()" | equals false | verify-true
 }
 
-//uncheck "Auto discover.."
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" 
-    | get-button "Auto discover libraries after test suite save action" | uncheck
-
-get-button "Save \((Ctrl|M1)\+S\)" | click
-
-//check result - both options are not selected
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
-    get-button "Auto discover libraries after test suite save action" | get-property selected | equals false 
-        | verify-true
-    get-button "Show discovering summary after test suite save action" | get-property selected | equals false 
-        | verify-true
+// uncheck first option - second is disbaled and unchecked
+with [get-window Preferences] {
+    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
 }
-
-//second option is disbaled
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
-    get-button "Auto discover libraries after test suite save action" | get-property enablement | equals true 
-        | verify-true
-    get-button "Show discovering summary after test suite save action" | get-property enablement | equals false 
-        | verify-true
+with [get-window Preferences | get-group "Libraries autodiscovering"] {
+    with [get-button "Auto discover libraries after test suite save action"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button "Show discovering summary after test suite save action"] {
+        get-property enablement | equals false | verify-true
+        get-property selected | equals false | verify-true
+    }
 }
+get-window Preferences | get-button "Apply and Close" | click
 
 
 //add text to Suite
@@ -61,14 +61,13 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
 //check that no window is shown
 verify-error {get-window "Discovering libraries summary"}
 
-//check "Auto discover..", uncheck "Show.."
-get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
-    get-button "Auto discover libraries after test suite save action" | check
-    with [get-button "Show discovering summary after test suite save action"] {
-        uncheck
-        key-type "M1+s"
+//check "Auto discover libs.."
+get-preferences-menu | click
+with [get-window Preferences] {
+    with [get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action"] {
+        check
     }
+    get-button "Apply and Close" | click
 }
 get-tab-folder -index 1 | get-tab-item "lib_with_variable.robot" | click
 with [get-editor "lib_with_variable.robot" | get-text-viewer] {
@@ -82,13 +81,13 @@ verify-error {get-window "Discovering libraries summary"}
 
 //check that libs were added to red.xml
 with [get-tab-folder -index 1] {
-    get-property "pages[0]" | equals "*RobotProject/red.xml" | verify-true
-    get-property "pages[1]" | equals "lib_with_variable.robot" | verify-true
+    get-property "pages[0]" | equals "lib_with_variable.robot" | verify-true
     get-property activePage | equals "lib_with_variable.robot" | verify-true
-    get-property tabCount | equals 2 | verify-true
+    get-property tabCount | equals 1 | verify-true
 }
 
-get-tab-folder -index 1 | get-tab-item "*RobotProject/red.xml" | click
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
     get-property itemCount | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
@@ -118,53 +117,5 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
     get-property itemCount | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
 }
-
-
-//create new project and check default behaviour
-get-menu "File/New/Robot Project" | click
-with [get-window "New Robot project"] {
-    get-editbox -after [get-label "Project name:"] | set-text new
-    get-button Finish | click
-}
-//open red.xml
-get-view "Project Explorer" | get-tree | select "new/red.xml" | double-click
-get-editor "new/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
-with [get-editor "new/red.xml" | get-section "Referenced libraries"] {
-    //check if first option is selected and enabled
-    with [get-button "Auto discover libraries after test suite save action"] {
-        get-property enablement | equals true | verify-true
-        get-property selected | equals true | verify-true
-    }
-    //second is deselected
-    with [get-button "Show discovering summary after test suite save action"] {
-        get-property enablement | equals true | verify-true
-        get-property selected | equals false | verify-true
-    }
-    with [get-button "Automatically reload changed libraries"] {
-        get-property enablement | equals true | verify-true
-        get-property selected | equals true | verify-true
-    }
-}
-
-//unselect Auto discover
-get-editor "new/red.xml" | get-section "Referenced libraries" 
-    | get-button "Auto discover libraries after test suite save action" | uncheck
-with [get-editor "new/red.xml" | get-section "Referenced libraries"] {
-    with [get-button "Auto discover libraries after test suite save action"] {
-        get-property enablement | equals true | verify-true
-        get-property selected | equals false | verify-true
-    }
-    // summary is disabled now
-    with [get-button "Show discovering summary after test suite save action"] {
-        get-property enablement | equals false | verify-true
-        get-property selected | equals false | verify-true
-    }
-    with [get-button "Automatically reload changed libraries"] {
-        get-property enablement | equals true | verify-true
-        get-property selected | equals true | verify-true
-    }
-}
-
-
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
