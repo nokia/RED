@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nNd2gEd5EeaRB_Xz0tiYpg
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/6/19 2:58 PM
+Save-Time: 2/14/19 4:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -28,7 +28,7 @@ with [get-window "(Available Customizations)|(Filters and Customization)"] {
 }
 
 //deconfigure
-get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Deconfigure as Robot project" 
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Remove Robot nature" 
     | click
     
 //remove red.xml    
@@ -43,9 +43,9 @@ with [get-view "Project Explorer" | get-tree] {
     get-item -path "RobotProject/var.py" | get-property enablement | equals false | verify-true
 }
 
-//configure as robot project and open red.xml
+//Add Robot nature and open red.xml
 with [get-view "Project Explorer" | get-tree] {
-    select RobotProject | get-menu "Robot Framework/Configure as Robot project" | click
+    select RobotProject | get-menu "Robot Framework/Add Robot nature" | click
     select "RobotProject/red.xml" | select "RobotProject/red.xml" | get-menu "Open With/Text Editor" | click
 }
 
@@ -60,9 +60,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
 
 //reset to default    
@@ -80,7 +77,7 @@ with [get-window "(Available Customizations)|(Filters and Customization)"] {
 get-view "Project Explorer" | click
 get-editor "red.xml" | close
 // Deconfigure
-get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Deconfigure as Robot project" 
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Remove Robot nature" 
     | click
 // verify if Confirm configuration file removal windows apears
 get-window "Confirm configuration file removal" 
@@ -89,7 +86,7 @@ get-window "Confirm configuration file removal"
     + "Do you want to remove project configuration file 'red.xml' too?" | verify-true
 get-window "Confirm configuration file removal" | get-button Leave | click
 // Configure
-get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Configure as Robot project" 
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Add Robot nature" 
     | click
 // verify if Confirm configuration file replacement windows apears
 get-window "Confirm configuration file replacement" 
@@ -109,9 +106,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _59DNAEd3EeaRB_Xz0tiYpg
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/6/19 2:29 PM
+Save-Time: 2/14/19 5:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -45,7 +45,7 @@ with [get-window  "(Available Customizations)|(Filters and Customization)" ] {
 //------------------------------------ configure as robot project --------------------------------
 
 with [get-view "Project Explorer" | get-tree] {
-    select new | get-menu "Robot Framework/Configure as Robot project" | click
+    select new | get-menu "Robot Framework/Add Robot nature" | click
 }
 //check that Standard libs and red.xml are added    
 with [get-view "Project Explorer" | get-tree] {
@@ -70,9 +70,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
     
 //check .project    
@@ -99,7 +96,7 @@ get-editor ".project" | get-text-viewer | get-property text | equals "<?xml vers
 
 //decofigure
 with [get-view "Project Explorer" | get-tree] {
-    select new | get-menu "Robot Framework/Deconfigure as Robot project" | click
+    select new | get-menu "Robot Framework/Remove Robot nature" | click
 }
 
 //confirm to remove red.xml
@@ -124,7 +121,7 @@ get-editor ".project" | get-text-viewer | get-property text | equals "<?xml vers
     + "</projectDescription>" | verify-true
 
 //------------------------------------ configure as robot project --------------------------------
-get-view "Project Explorer" | get-tree | select new | get-menu "Robot Framework/Configure as Robot project" | click
+get-view "Project Explorer" | get-tree | select new | get-menu "Robot Framework/Add Robot nature" | click
 
 //check that Standard libs and red.xml are added    
 with [get-view "Project Explorer" | get-tree] {
@@ -150,9 +147,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
     
 //check .project    
