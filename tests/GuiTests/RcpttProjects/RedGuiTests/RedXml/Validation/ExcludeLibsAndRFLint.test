@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _hUCv4ATeEeim3830xglzMw
+Contexts: _hUCv4ATeEeim3830xglzMw,_6kElkDBsEemdFPzzB7f3Tg
 Element-Name: ExcludeLibsAndRFLint
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _c2s9wAaSEeiksYLFL8zyCg
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/8/18 11:00 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/14/19 5:06 PM
 Testcase-Type: ecl
 Verifications: _boFGIAagEeiksYLFL8zyCg
 
@@ -41,7 +41,7 @@ proc "check-menus-enablament" [val is_project true] [val include true]{
 	if [$is_project |eq true]{
 		with [get-view "Project Explorer" | get-tree] {
 		    get-menu -path "Robot Framework/Reset Robot Environment" | get-property enablement | equals true | verify-true
-		    get-menu -path "Robot Framework/Deconfigure as Robot project" | get-property enablement | equals true | verify-true
+		    get-menu -path "Robot Framework/Remove Robot nature" | get-property enablement | equals true | verify-true
 		}
 	}	
 	with [get-view "Project Explorer" | get-tree] {
