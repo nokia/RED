@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -81,7 +81,7 @@ abstract class HyperlinksToFilesDetector {
         return Optional.empty();
     }
 
-    protected abstract Function<IFile, Void> performAfterOpening();
+    protected abstract Consumer<IFile> performAfterOpening();
 
     private boolean isPath(final String pathAsString) {
         return pathAsString.endsWith("/") || pathAsString.endsWith(".py") || pathAsString.endsWith(".class")
