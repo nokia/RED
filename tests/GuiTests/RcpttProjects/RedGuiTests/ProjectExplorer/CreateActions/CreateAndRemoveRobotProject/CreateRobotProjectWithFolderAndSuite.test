@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/24/18 5:32 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/14/19 5:27 PM
 Tags: Quick
 Testcase-Type: ecl
 Verifications: _Xbz7EJUqEeaXOtocAkFx_w
@@ -333,9 +333,6 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
-    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
-    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
 //-----------------------------------------------------------------------------------------------------------------------    
 //add Robot test suite folder
