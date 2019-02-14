@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
@@ -109,8 +109,8 @@ public class HyperlinksToFilesDetectorTest {
 
             @SuppressWarnings("unchecked")
             @Override
-            protected Function<IFile, Void> performAfterOpening() {
-                return mock(Function.class);
+            protected Consumer<IFile> performAfterOpening() {
+                return mock(Consumer.class);
             }
         };
     }

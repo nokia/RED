@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.Region;
@@ -44,21 +44,16 @@ public class TableHyperlinksToFilesDetector extends HyperlinksToFilesDetector im
     }
 
     @Override
-    protected Function<IFile, Void> performAfterOpening() {
-        return new Function<IFile, Void>() {
-
-            @Override
-            public Void apply(final IFile file) {
-                final IEditorPart activeEditor = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .getActiveEditor();
-                if (activeEditor instanceof RobotFormEditor
-                        && activeEditor.getEditorInput().equals(new FileEditorInput(file))) {
-                    final RobotFormEditor suiteEditor = (RobotFormEditor) activeEditor;
-                    suiteEditor.activateFirstPage();
-                }
-                return null;
+    protected Consumer<IFile> performAfterOpening() {
+        return file -> {
+            final IEditorPart activeEditor = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow()
+                    .getActivePage()
+                    .getActiveEditor();
+            if (activeEditor instanceof RobotFormEditor
+                    && activeEditor.getEditorInput().equals(new FileEditorInput(file))) {
+                final RobotFormEditor suiteEditor = (RobotFormEditor) activeEditor;
+                suiteEditor.activateFirstPage();
             }
         };
     }

@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
@@ -25,10 +25,10 @@ public class FileHyperlink implements IHyperlink {
 
     private final String label;
 
-    private final Function<IFile, Void> operationToPerformAfterOpening;
+    private final Consumer<IFile> operationToPerformAfterOpening;
 
     public FileHyperlink(final IRegion from, final IFile toFile, final String label,
-            final Function<IFile, Void> operationToPerformAfterOpening) {
+            final Consumer<IFile> operationToPerformAfterOpening) {
         this.source = from;
         this.destinationFile = toFile;
         this.label = label;
@@ -54,6 +54,6 @@ public class FileHyperlink implements IHyperlink {
     public void open() {
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         SourceOpeningSupport.tryToOpenInEditor(page, destinationFile);
-        operationToPerformAfterOpening.apply(destinationFile);
+        operationToPerformAfterOpening.accept(destinationFile);
     }
 }
