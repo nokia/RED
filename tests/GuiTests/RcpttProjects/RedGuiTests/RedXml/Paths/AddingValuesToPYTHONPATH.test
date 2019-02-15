@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 1/29/19 12:15 PM
+Save-Time: 2/15/19 2:51 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -46,21 +46,14 @@ proc "check-arg-file-for-relative-path"{
 	}-else{
 		comapre-paths [format "(%s/RobotProject/libs|%s/not existing|/!@#\$%%path/new.file.txt|%s/correct tab /folder|%s/a|%s/b)" $RED_workspace_path $RED_workspace_path $RED_workspace_path $RED_workspace_path $RED_workspace_path]
 	}
-	 
-	
 }
     
 //remove autodiscover
-get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-
-wait-for-loading-red-xml "RobotProject/red.xml"
-
-with [get-editor "RobotProject/red.xml"] {
-    get-tab-folder | get-tab-item "Referenced libraries" | click
-    with [get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action"] {
-        uncheck
-        key-type "M1+s"
-    }
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Libraries"
+    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
+    get-button "Apply and Close" | click
 }
 
 //add Library "add" to Suite
@@ -83,7 +76,8 @@ try -times 8 -delay 1000 -command{
 //check error on console    
 get-view Console | get-text-viewer | get-property text 
     | contains " Importing test library 'add' failed: ImportError: No module named add\n" | verify-true
-get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 
 //add path to lib to red.xml
 get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-item "...add new search path" |double-click

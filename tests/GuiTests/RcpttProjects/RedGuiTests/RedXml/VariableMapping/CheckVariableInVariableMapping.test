@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/15/18 2:45 PM
+Save-Time: 2/15/19 2:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -41,6 +41,7 @@ try -times 5 -delay 1000 -command{
 
 // open red.xml and add Variable mapping  ${path} => resource_folder
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
+get-editor "ProjectWithResource/red.xml" | get-tab-folder | get-tab-item Variables | click
 get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
     | key-type Enter
 with [get-window "Add variable mapping"] {
