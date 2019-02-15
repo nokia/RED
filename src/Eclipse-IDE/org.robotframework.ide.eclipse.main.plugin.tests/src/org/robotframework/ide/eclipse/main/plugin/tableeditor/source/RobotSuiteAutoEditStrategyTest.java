@@ -58,9 +58,24 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
-    public void separatorIsInserted_whenTabWasOriginallyRequestedInTheEndOfCellRegion_andJumpOfModeIsEnabled() {
+    public void separatorIsInserted_whenTabWasOriginallyRequestedRightAfterCellRegion_andJumpOfModeIsEnabled() {
         final RobotDocument document = newDocument("abc  def");
         final DocumentCommand command = newDocumentCommand(3, "\t");
+
+        final EditStrategyPreferences preferences = newPreferences("the_separator", true);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEqualTo("the_separator");
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void separatorIsInserted_whenTabWasOriginallyRequestedRightBeforeCellRegion_andJumpOfModeIsEnabled() {
+        final RobotDocument document = newDocument("abc  def");
+        final DocumentCommand command = newDocumentCommand(0, "\t");
 
         final EditStrategyPreferences preferences = newPreferences("the_separator", true);
         final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
@@ -99,6 +114,36 @@ public class RobotSuiteAutoEditStrategyTest {
         assertThat(command.text).isNull();
         assertThat(command.shiftsCaret).isFalse();
         assertThat(command.caretOffset).isEqualTo(7);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void caretIsShifted_whenTabWasOriginallyRequestedRightAfterVariableRegion_andJumpOfModeIsEnabled() {
+        final RobotDocument document = newDocument("a${var}bc  def");
+        final DocumentCommand command = newDocumentCommand(1, "\t");
+
+        final EditStrategyPreferences preferences = newPreferences("the_separator", true);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isNull();
+        assertThat(command.shiftsCaret).isFalse();
+        assertThat(command.caretOffset).isEqualTo(9);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void caretIsShifted_whenTabWasOriginallyRequestedRightBeforeVariableRegion_andJumpOfModeIsEnabled() {
+        final RobotDocument document = newDocument("a${var}bc  def");
+        final DocumentCommand command = newDocumentCommand(7, "\t");
+
+        final EditStrategyPreferences preferences = newPreferences("the_separator", true);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isNull();
+        assertThat(command.shiftsCaret).isFalse();
+        assertThat(command.caretOffset).isEqualTo(9);
         assertThat(command.length).isEqualTo(0);
     }
 
