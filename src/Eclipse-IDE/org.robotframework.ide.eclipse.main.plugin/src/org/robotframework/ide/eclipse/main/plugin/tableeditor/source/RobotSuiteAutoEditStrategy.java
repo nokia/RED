@@ -56,7 +56,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
     private void customizeZeroLengthDocumentCommand(final IDocument document, final DocumentCommand command)
             throws InterruptedException, BadLocationException {
         if ("\t".equals(command.text)) {
-            replaceTabWithSpecifiedSeparatorOrJumpToNextCell(document, command);
+            replaceTabWithSpecifiedSeparatorOrJumpOutOfRegion(document, command);
         } else if (TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
             autoIndentAfterNewLine(document, command);
         } else if (preferences.isVariablesBracketsInsertionEnabled()
@@ -82,7 +82,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         }
     }
 
-    private void replaceTabWithSpecifiedSeparatorOrJumpToNextCell(final IDocument document,
+    private void replaceTabWithSpecifiedSeparatorOrJumpOutOfRegion(final IDocument document,
             final DocumentCommand command) throws BadLocationException {
         final Optional<Integer> jumpOffset = findRegionToJumpOf(document, command)
                 .map(region -> region.getOffset() + region.getLength())
@@ -101,11 +101,13 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         if (!preferences.isSeparatorJumpModeEnabled()) {
             return Optional.empty();
         }
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, isTsvFile, command.offset);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, isTsvFile, command.offset)
+                .filter(region -> region.getOffset() < command.offset);
         if (variableRegion.isPresent()) {
             return variableRegion;
         }
-        return DocumentUtilities.findCellRegion(document, isTsvFile, command.offset);
+        return DocumentUtilities.findCellRegion(document, isTsvFile, command.offset)
+                .filter(region -> region.getOffset() < command.offset);
     }
 
     private void addVariableBrackets(final DocumentCommand command, final String selectedText) {
