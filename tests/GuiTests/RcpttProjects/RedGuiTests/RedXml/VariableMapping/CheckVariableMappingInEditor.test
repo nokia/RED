@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _yxxmEJHxEeWEZYgZQ8Au9A
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/25/18 12:30 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/15/19 4:24 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -41,7 +41,8 @@ try -times 5 -delay 1000 -command{
 
 // open red.xml and add Variable mapping  ${path} => resource_folder
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
-get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
+get-editor "ProjectWithResource/red.xml" | get-tab-folder | get-tab-item Variables | click
+get-editor "ProjectWithResource/red.xml" | get-section "Variable mappings" | get-table | select "...add new mapping" 
     | key-type Enter
     
 //check how window looks like
@@ -78,7 +79,7 @@ with [get-window "Add variable mapping"] {
     get-button OK | click
 }
 with [get-editor "ProjectWithResource/red.xml"] {
-    with [get-section "Variables mappings" | get-table] {
+    with [get-section "Variable mappings" | get-table] {
         select "${path}" | activate-cell-edit
         get-editbox | key-type "M1+s"
         apply-cell-edit -deactivate
@@ -109,7 +110,7 @@ wait-for-zero-items -times 3 -delay 1000
 // open red.xml editor and remove Variable mapping entry
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
 with [get-editor "ProjectWithResource/red.xml"] {
-    with [get-section "Variables mappings" | get-table] {
+    with [get-section "Variable mappings" | get-table] {
         select "${path}" | key-type Del
         key-type "M1+s"
     }
@@ -134,7 +135,7 @@ get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | 
 // add correct mapping
  
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
-get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
+get-editor "ProjectWithResource/red.xml" | get-section "Variable mappings" | get-table | select "...add new mapping" 
     | key-type Enter
 with [get-window "Add variable mapping"] {
     with [get-editbox -after [get-label Name]] {
@@ -147,7 +148,7 @@ with [get-window "Add variable mapping"] {
 }
 
 // add wrong path as a secound entry
-with [get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table] {
+with [get-editor "ProjectWithResource/red.xml" | get-section "Variable mappings" | get-table] {
     select "${path}" | activate-cell-edit
     apply-cell-edit -deactivate
     select "...add new mapping" | key-type Enter
@@ -158,7 +159,7 @@ with [get-window "Add variable mapping"] {
     get-button OK | click
 }
 with [get-editor "ProjectWithResource/red.xml"] {
-    with [get-section "Variables mappings" | get-table] {
+    with [get-section "Variable mappings" | get-table] {
         select [get-item "${path}" -index 1] | activate-cell-edit
         get-editbox | key-type "M1+s"
         apply-cell-edit -deactivate
@@ -178,4 +179,5 @@ get-view Problems | get-tree
     | get-property caption 
     | equals "Resource import 'wrong_path/res_1.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
     | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

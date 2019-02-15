@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _dHj6oJSLEeeFCv2BTQK5Bg
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 2/5/18 2:18 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/15/19 3:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,7 +42,8 @@ get-button "Save \((Ctrl|M1)\+S\)" | click
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" 
     | get-menu "Open With/RED Project Editor" | click
 // go to Variables mappings and add variable with UTF-8 charset
-get-editor "RobotProject/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item Variables | click
+get-editor "RobotProject/red.xml" | get-section "Variable mappings" | get-table | select "...add new mapping" 
     | key-type Enter
 with [get-window "Add variable mapping"] {
     with [get-editbox -after [get-label Name]] {
@@ -61,7 +62,7 @@ with [get-window "Add variable mapping"] {
     get-button OK | click
 }
 // verify no Problems
-get-editor "RobotProject/red.xml" | get-section "Variables mappings" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section "Variable mappings" | get-table | key-type "M1+s"
 get-view Problems | click
 get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
 // open red.xml
@@ -72,7 +73,7 @@ get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-
 // verify no Problems
 get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
 // verify Variables mappings section in red.xml
-with [get-editor "RobotProject/red.xml" | get-section "Variables mappings" | get-table] {
+with [get-editor "RobotProject/red.xml" | get-section "Variable mappings" | get-table] {
     get-item "${vaęą}" | get-property "columns[0]" | equals "${vaęą}" | verify-true
     get-item "${vaęą}" | get-property "columns[1]" | equals "valueżąć" | verify-true
 }
