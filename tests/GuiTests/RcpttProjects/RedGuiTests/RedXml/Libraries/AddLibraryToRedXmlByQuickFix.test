@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/14/19 3:37 PM
+Save-Time: 2/15/19 2:09 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -20,6 +20,13 @@ This test has influance for AddingValuesToPYTHONPATH
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Libraries"
+    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
+    get-button "Apply and Close" | click
+}
 
 //open file
 get-view "Project Explorer" | get-tree | select "RobotProject/Script.robot" | double-click
@@ -200,99 +207,99 @@ try -times 8 -delay 1000 -command{
 	    | equals 3 | verify-true
 }
 
-////check if tree is expand in one case - RED-999
-//with [get-view "Project Explorer" | get-tree] {
-//    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file \\(0\\)" 
-//        | get-property "getExpanded()" | equals false | verify-true
-//    get-item -path "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
-//        | get-property "getExpanded()" | equals false | verify-true
-//    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
-//        | get-property "getExpanded()" | equals true | verify-true
-//}
-//
-////check libspeck
-//get-view "Project Explorer" | get-tree 
-//    | get-item "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
-//    | get-property "getItems().length" | equals 1 | verify-true
-//
-//get-view "Project Explorer" | get-tree 
-//    | get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
-//    | get-property "getItems().length" | equals 1 | verify-true
-//           
-//with [get-view "Project Explorer" | get-tree] {
-//    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-//        | equals "empty RobotProject/empty_file (0)" | verify-true
-//    get-item "RobotProject/Robot Referenced libraries" 
-//        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals Garfield | verify-true
-//    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
-//        | equals "here_is_class.Cat RobotProject (1)" | verify-true
-//    get-item "RobotProject/Robot Referenced libraries" 
-//        | get-property "getItems().TreeItem[2].getItems().TreeItem[0].getText()" | equals News | verify-true
-//    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getText()" 
-//        | equals "only_function RobotProject (1)" | verify-true
-//    get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
-//        | verify-true
-//}
-//
-////add here_is_class.DOG
-//get-tab-folder -index 1 | get-tab-item "Script.robot" | click
-//with [get-editor "Script.robot" | get-text-viewer] {
-//    set-caret-pos 6 28
-//    key-type "NUMPAD_ENTER" "\\u000D"
-//    type-text Li
-//    key-type "M1+SPACE"
-//    key-type Enter
-//    type-text "here_is_class."
-//    type-text Dog
-//    key-type "M1+s"
-//    wait 500
-//    set-caret-pos 7 19
-//    wait 100
-//    get-menu "Quick Fix" | click
-//    wait 500
-//}
-//
-//get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-//    | select "Discover 'here_is_class.Dog' and add to configuration" | click -default
-//    
-//wait-for-discover-window 
-//get-window "Discovering libraries summary" | get-tree 
-//    | get-item "here_is_class.Dog/Status: Added to project configuration" | get-property caption 
-//    | equals "Status: Added to project configuration" | verify-true
-//    
-//    
-//get-window "Discovering libraries summary" | get-button OK | click
-//get-editor "RobotProject/red.xml" | click
-////check red.xml
-//try -times 8 -delay 1000 -command{
-//	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-//	    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
-//	    get-property "getItems().TableItem[1].getText()" | equals "only_function - RobotProject" | verify-true
-//	    get-property "getItems().TableItem[2].getText()" | equals "here_is_class.Cat - RobotProject" | verify-true
-//	    get-property "getItems().TableItem[3].getText()" | equals "here_is_class.Dog - RobotProject" | verify-true
-//	    get-property "getItemCount()" | equals 4 | verify-true
-//	}
-//
-//}
-//
-//get-button "Save \((Ctrl|M1)\+S\)" | click
-//
-////add file that not exist - RED-540
-//with [get-editor "Script.robot" | get-text-viewer] {
-//    set-caret-pos 7 29
-//    key-type "NUMPAD_ENTER" "\\u000D"
-//    type-text "library    no_file.py"
-//    key-type "M1+s"
-//    set-caret-pos 8 16
-//    get-menu "Quick Fix" | click
-//}
-//wait 300
-//get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-//    | select "Discover 'no_file.py' and add to configuration" | click -default
-//    
-////check pop-up    
-//get-window "Library import problem" | get-label "Unable to find library under 'no_file.py' location." 
-//    | get-property caption | equals "Unable to find library under 'no_file.py' location." | verify-true
-//get-window "Library import problem" | get-button OK | click
+//check if tree is expand in one case - RED-999
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file \\(0\\)" 
+        | get-property "getExpanded()" | equals false | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
+        | get-property "getExpanded()" | equals false | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+        | get-property "getExpanded()" | equals true | verify-true
+}
+
+//check libspeck
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
+    | get-property "getItems().length" | equals 1 | verify-true
+
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+    | get-property "getItems().length" | equals 1 | verify-true
+           
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "empty RobotProject/empty_file (0)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals Garfield | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "here_is_class.Cat RobotProject (1)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[2].getItems().TreeItem[0].getText()" | equals News | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "only_function RobotProject (1)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
+        | verify-true
+}
+
+//add here_is_class.DOG
+get-tab-folder -index 1 | get-tab-item "Script.robot" | click
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 6 28
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Li
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "here_is_class."
+    type-text Dog
+    key-type "M1+s"
+    wait 500
+    set-caret-pos 7 19
+    wait 100
+    get-menu "Quick Fix" | click
+    wait 500
+}
+
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'here_is_class.Dog' and add to configuration" | click -default
+    
+wait-for-discover-window 
+get-window "Discovering libraries summary" | get-tree 
+    | get-item "here_is_class.Dog/Status: Added to project configuration" | get-property caption 
+    | equals "Status: Added to project configuration" | verify-true
+    
+    
+get-window "Discovering libraries summary" | get-button OK | click
+get-editor "RobotProject/red.xml" | click
+//check red.xml
+try -times 8 -delay 1000 -command{
+	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "only_function - RobotProject" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "here_is_class.Cat - RobotProject" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "here_is_class.Dog - RobotProject" | verify-true
+	    get-property "getItemCount()" | equals 4 | verify-true
+	}
+
+}
+
+get-button "Save \((Ctrl|M1)\+S\)" | click
+
+//add file that not exist - RED-540
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 7 29
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "library    no_file.py"
+    key-type "M1+s"
+    set-caret-pos 8 16
+    get-menu "Quick Fix" | click
+}
+wait 300
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'no_file.py' and add to configuration" | click -default
+    
+//check pop-up    
+get-window "Library import problem" | get-label "Unable to find library under 'no_file.py' location." 
+    | get-property caption | equals "Unable to find library under 'no_file.py' location." | verify-true
+get-window "Library import problem" | get-button OK | click
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
