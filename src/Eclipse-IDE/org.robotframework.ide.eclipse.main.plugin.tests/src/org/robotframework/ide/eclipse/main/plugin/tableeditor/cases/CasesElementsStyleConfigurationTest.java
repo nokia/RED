@@ -31,7 +31,8 @@ public class CasesElementsStyleConfigurationTest {
 
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
-        final CasesElementsStyleConfiguration configuration = new CasesElementsStyleConfiguration(theme, true, false);
+        final CasesElementsStyleConfiguration configuration = new CasesElementsStyleConfiguration(theme, true, false,
+                null, null);
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),

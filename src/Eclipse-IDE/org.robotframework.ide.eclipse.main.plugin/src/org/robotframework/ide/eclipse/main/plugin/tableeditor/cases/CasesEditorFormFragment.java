@@ -49,6 +49,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
@@ -327,7 +328,8 @@ class CasesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
         table.addConfiguration(new RowHeaderStyleConfiguration(theme));
         table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
-        table.addConfiguration(new CasesElementsStyleConfiguration(theme, fileModel.isEditable(), wrapCells));
+        table.addConfiguration(new CasesElementsStyleConfiguration(theme, fileModel.isEditable(), wrapCells,
+                RedImages.getTestCaseImage(), RedImages.getTemplatedTestCaseImage()));
         table.addConfiguration(new ActionNamesStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
