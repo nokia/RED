@@ -110,7 +110,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     private void createCurrentFrameworkInfo(final Composite parent) {
         currentFramework = toolkit.createFormText(parent, true);
         currentFramework.setImage(IMAGE_FOR_LINK, ImagesManager.getImage(RedImages.getRobotImage()));
-        GridDataFactory.fillDefaults().grab(true, false).indent(15, 5).applyTo(currentFramework);
+        GridDataFactory.fillDefaults().grab(true, false).indent(15, 10).applyTo(currentFramework);
 
         final IHyperlinkListener hyperlinkListener = createHyperlinkListener();
         currentFramework.addHyperlinkListener(hyperlinkListener);
@@ -184,13 +184,13 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
         viewer.setContentProvider(new ListInputStructuredContentProvider());
         ViewerColumnsFactory.newColumn("Name")
-                .withWidth(200)
+                .withWidth(320)
                 .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Path")
                 .withWidth(200)
+                .shouldShowLastVerticalSeparator(false)
                 .shouldGrabAllTheSpaceLeft(true)
-                .withMinWidth(30)
                 .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
                 .createFor(viewer);
     }

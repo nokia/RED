@@ -235,60 +235,56 @@ public class RobotProjectConfigTest {
     @Test
     public void variableFileIsAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ReferencedVariableFile> files = newArrayList(ReferencedVariableFile.create("abc", "x", "y", "z"),
-                ReferencedVariableFile.create("def", "1"));
+        final List<ReferencedVariableFile> files = newArrayList(ReferencedVariableFile.create("abc"),
+                ReferencedVariableFile.create("def"));
         config.setReferencedVariableFiles(files);
 
-        final boolean result = config.addReferencedVariableFile(ReferencedVariableFile.create("ghi", "2"));
+        final boolean result = config.addReferencedVariableFile(ReferencedVariableFile.create("ghi"));
 
         assertThat(result).isTrue();
-        assertThat(config.getReferencedVariableFiles()).containsExactly(
-                ReferencedVariableFile.create("abc", "x", "y", "z"), ReferencedVariableFile.create("def", "1"),
-                ReferencedVariableFile.create("ghi", "2"));
+        assertThat(config.getReferencedVariableFiles()).containsExactly(ReferencedVariableFile.create("abc"),
+                ReferencedVariableFile.create("def"), ReferencedVariableFile.create("ghi"));
     }
 
     @Test
     public void variableFileIsNotAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ReferencedVariableFile> files = newArrayList(ReferencedVariableFile.create("abc", "x", "y", "z"),
-                ReferencedVariableFile.create("def", "1"));
+        final List<ReferencedVariableFile> files = newArrayList(ReferencedVariableFile.create("abc"),
+                ReferencedVariableFile.create("def"));
         config.setReferencedVariableFiles(files);
 
-        final boolean result = config.addReferencedVariableFile(ReferencedVariableFile.create("def", "1"));
+        final boolean result = config.addReferencedVariableFile(ReferencedVariableFile.create("def"));
 
         assertThat(result).isFalse();
-        assertThat(config.getReferencedVariableFiles()).containsExactly(
-                ReferencedVariableFile.create("abc", "x", "y", "z"), ReferencedVariableFile.create("def", "1"));
+        assertThat(config.getReferencedVariableFiles()).containsExactly(ReferencedVariableFile.create("abc"),
+                ReferencedVariableFile.create("def"));
     }
 
     @Test
     public void variableFileIsRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ReferencedVariableFile> files = newArrayList(ReferencedVariableFile.create("abc", "x", "y", "z"),
-                ReferencedVariableFile.create("def", "1"));
+        final List<ReferencedVariableFile> files = newArrayList(ReferencedVariableFile.create("abc"),
+                ReferencedVariableFile.create("def"));
         config.setReferencedVariableFiles(files);
 
-        final boolean result = config
-                .removeReferencedVariableFiles(newArrayList(ReferencedVariableFile.create("def", "1")));
+        final boolean result = config.removeReferencedVariableFiles(newArrayList(ReferencedVariableFile.create("def")));
 
         assertThat(result).isTrue();
-        assertThat(config.getReferencedVariableFiles())
-                .containsExactly(ReferencedVariableFile.create("abc", "x", "y", "z"));
+        assertThat(config.getReferencedVariableFiles()).containsExactly(ReferencedVariableFile.create("abc"));
     }
 
     @Test
     public void variableFileIsNotRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ReferencedVariableFile> files = newArrayList(ReferencedVariableFile.create("abc", "x", "y", "z"),
-                ReferencedVariableFile.create("def", "1"));
+        final List<ReferencedVariableFile> files = newArrayList(ReferencedVariableFile.create("abc"),
+                ReferencedVariableFile.create("def"));
         config.setReferencedVariableFiles(files);
 
-        final boolean result = config
-                .removeReferencedVariableFiles(newArrayList(ReferencedVariableFile.create("ghi", "2")));
+        final boolean result = config.removeReferencedVariableFiles(newArrayList(ReferencedVariableFile.create("ghi")));
 
         assertThat(result).isFalse();
-        assertThat(config.getReferencedVariableFiles()).containsExactly(
-                ReferencedVariableFile.create("abc", "x", "y", "z"), ReferencedVariableFile.create("def", "1"));
+        assertThat(config.getReferencedVariableFiles()).containsExactly(ReferencedVariableFile.create("abc"),
+                ReferencedVariableFile.create("def"));
     }
 
     @Test

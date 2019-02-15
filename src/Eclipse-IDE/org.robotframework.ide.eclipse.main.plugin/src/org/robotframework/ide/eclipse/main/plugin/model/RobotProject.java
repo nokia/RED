@@ -334,25 +334,27 @@ public class RobotProject extends RobotContainer {
         final IRuntimeEnvironment env = getRuntimeEnvironment();
 
         referencedVariableFiles = new ArrayList<>();
-        for (final ReferencedVariableFile variableFile : config.getReferencedVariableFiles()) {
-            IPath path = new Path(variableFile.getPath());
-            if (!path.isAbsolute()) {
-                final IResource targetFile = getProject().getWorkspace().getRoot().findMember(path);
-                if (targetFile != null && targetFile.exists()) {
-                    path = targetFile.getLocation();
-                }
-            }
-
+        for (final ReferencedVariableFile varFile : config.getReferencedVariableFiles()) {
             try {
-                final Map<String, Object> varsMap = env.getVariablesFromFile(path.toFile(),
-                        variableFile.getArguments());
-                variableFile.setVariables(varsMap);
-                referencedVariableFiles.add(variableFile);
+                final Map<String, Object> varsMap = env.getVariablesFromFile(findSource(varFile), new ArrayList<>());
+                varFile.setVariables(varsMap);
+                referencedVariableFiles.add(varFile);
             } catch (final RuntimeEnvironmentException e) {
                 // unable to import the variables file
             }
         }
         return referencedVariableFiles;
+    }
+
+    private File findSource(final ReferencedVariableFile varFile) {
+        IPath path = new Path(varFile.getPath());
+        if (!path.isAbsolute()) {
+            final IResource targetFile = getProject().getWorkspace().getRoot().findMember(path);
+            if (targetFile != null && targetFile.exists()) {
+                path = targetFile.getLocation();
+            }
+        }
+        return path.toFile();
     }
 
     public void addKeywordSource(final RobotDryRunKeywordSource keywordSource) {

@@ -770,7 +770,7 @@ public class LocalProcessCommandLineBuilderTest {
     public void commandLineDoesNotContainPathsForVariableFiles() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars1.py"));
-        config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars2.py", "a", "b", "c"));
+        config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars2.py"));
         projectProvider.configure(config);
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Jython);
