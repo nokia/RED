@@ -36,11 +36,6 @@ public class ProjectValidationConfigurationEditorPart extends DIEditorPart<Proje
         }
 
         @Override
-        protected int getNumberOfColumnsInForm() {
-            return 1;
-        }
-
-        @Override
         protected ISelectionProvider getSelectionProvider() {
             return projectValidationFormFragment.getViewer();
         }

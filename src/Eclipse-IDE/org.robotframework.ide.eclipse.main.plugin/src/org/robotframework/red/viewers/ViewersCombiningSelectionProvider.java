@@ -42,7 +42,6 @@ public class ViewersCombiningSelectionProvider implements ISelectionProvider {
 
     @Override
     public void addSelectionChangedListener(final ISelectionChangedListener listener) {
-
         for (final TableViewer viewer : viewers) {
             viewer.addSelectionChangedListener(listener);
         }
