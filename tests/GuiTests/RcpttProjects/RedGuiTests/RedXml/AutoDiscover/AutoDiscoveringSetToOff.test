@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-gXO8P_gEeWRL4nRKA71zA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/14/19 6:01 PM
+Save-Time: 2/15/19 4:19 PM
 Testcase-Type: ecl
 Verifications: _gGHWMP_kEeWRL4nRKA71zA
 
@@ -117,5 +117,4 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
     get-property itemCount | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
 }
-
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

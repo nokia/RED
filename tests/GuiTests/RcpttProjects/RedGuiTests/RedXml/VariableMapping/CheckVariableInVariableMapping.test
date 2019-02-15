@@ -7,12 +7,20 @@ Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/15/19 2:25 PM
+Save-Time: 2/15/19 3:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+//remove autodisc afte saivng test
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Libraries"
+    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
+    get-button "Apply and Close" | click
+}
 
 // open test file
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/TestSuite.robot" | double-click
@@ -42,8 +50,8 @@ try -times 5 -delay 1000 -command{
 // open red.xml and add Variable mapping  ${path} => resource_folder
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
 get-editor "ProjectWithResource/red.xml" | get-tab-folder | get-tab-item Variables | click
-get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
-    | key-type Enter
+get-editor "ProjectWithResource/red.xml" | get-section "Variable mappings" | get-table | select "...add new mapping" | key-type Enter
+
 with [get-window "Add variable mapping"] {
     with [get-editbox -after [get-label Name]] {
         set-text "${path}"
@@ -55,7 +63,7 @@ with [get-window "Add variable mapping"] {
     }
     get-button OK | click
 }
-get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table | key-type "M1+s"
+get-editor "ProjectWithResource/red.xml" | get-section "Variable mappings" | get-table | key-type "M1+s"
 get-editor "TestSuite.robot" | click
 with [get-editor "TestSuite.robot" | get-text-viewer] {
     key-type "M1+s"
@@ -157,6 +165,8 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + ".* : INFO : log_from_test_resource\n"
     + ".* : INFO : log_from_test_resource_second\n"
     + "Ending test: ProjectWithResource.TestSuite.Test" | verify-true
+    
+    
 //----------------- Variables ----------------------------
 // add second variable file and rename it
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/external_var" | get-menu "New/Folder" | click
@@ -193,7 +203,7 @@ get-editor "TestSuite.robot" | get-text-viewer | set-text -text "*** Test Cases 
 get-eclipse-window | key-type "M1+s"
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | select "ProjectWithResource/red.xml" 
     | double-click
-with [get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table] {
+with [get-editor "ProjectWithResource/red.xml" | get-section "Variable mappings" | get-table] {
     select "${path}" | double-click
     select "${path}" | activate-cell-edit -column 1
     with [get-editbox] {
@@ -247,7 +257,7 @@ get-editor "TestSuite.robot" | get-text-viewer | set-text -text "*** Test Cases 
 
 // edit red.xml
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
-with [get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table] {
+with [get-editor "ProjectWithResource/red.xml" | get-section "Variable mappings" | get-table] {
     select "${path}" | double-click
     select "${path}" | activate-cell-edit -column 1
     with [get-editbox] {
@@ -310,4 +320,5 @@ with [get-editor "TestSuite.robot"] {
 }
 // verify if no Problems
 wait-for-zero-items -times 4 -delay 500
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
