@@ -14,7 +14,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorPage;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.general.GeneralProjectConfigurationEditorPart.GeneralProjectConfigurationEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
-import org.robotframework.red.viewers.ViewersCombiningSelectionProvider;
 
 public class GeneralProjectConfigurationEditorPart extends DIEditorPart<GeneralProjectConfigurationEditor> {
 
@@ -25,19 +24,16 @@ public class GeneralProjectConfigurationEditorPart extends DIEditorPart<GeneralP
     static class GeneralProjectConfigurationEditor extends RedProjectEditorPage {
 
         private FrameworksSectionFormFragment frameworksFragment;
-        private VariableMappingsFormFragment variableMappingsFragment;
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             frameworksFragment = new FrameworksSectionFormFragment();
-            variableMappingsFragment = new VariableMappingsFormFragment();
-            return newArrayList(frameworksFragment, variableMappingsFragment);
+            return newArrayList(frameworksFragment);
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return new ViewersCombiningSelectionProvider(frameworksFragment.getViewer(),
-                    variableMappingsFragment.getViewer());
+            return frameworksFragment.getViewer();
         }
     }
 }

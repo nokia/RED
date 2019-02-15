@@ -102,7 +102,7 @@ public abstract class RedProjectEditorPage {
     }
 
     protected int getNumberOfColumnsInForm() {
-        return 2;
+        return 1;
     }
 
     protected abstract ISelectionProvider getSelectionProvider();

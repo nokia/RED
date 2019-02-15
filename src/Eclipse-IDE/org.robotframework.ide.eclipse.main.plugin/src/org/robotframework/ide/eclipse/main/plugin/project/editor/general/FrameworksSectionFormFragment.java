@@ -98,7 +98,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
         final Composite sectionInternal = toolkit.createComposite(section);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(sectionInternal);
-        GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 10).applyTo(sectionInternal);
+        GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 5).applyTo(sectionInternal);
         section.setClient(sectionInternal);
 
         createCurrentFrameworkInfo(sectionInternal);

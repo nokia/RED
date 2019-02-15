@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorPage;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariablesProjectConfigurationEditorPart.VariablesProjectConfigurationEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.red.viewers.ViewersCombiningSelectionProvider;
 
 public class VariablesProjectConfigurationEditorPart extends DIEditorPart<VariablesProjectConfigurationEditor> {
 
@@ -23,22 +24,26 @@ public class VariablesProjectConfigurationEditorPart extends DIEditorPart<Variab
 
     static class VariablesProjectConfigurationEditor extends RedProjectEditorPage {
 
+        private VariableMappingsFormFragment variableMappingsFragment;
+
         private VariableFilesFormFragment variablesFragment;
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
+            variableMappingsFragment = new VariableMappingsFormFragment();
             variablesFragment = new VariableFilesFormFragment();
-            return newArrayList(variablesFragment);
+            return newArrayList(variableMappingsFragment, variablesFragment);
         }
 
         @Override
         protected int getNumberOfColumnsInForm() {
-            return 1;
+            return 2;
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return variablesFragment.getViewer();
+            return new ViewersCombiningSelectionProvider(variableMappingsFragment.getViewer(),
+                    variablesFragment.getViewer());
         }
     }
 }

@@ -37,6 +37,11 @@ public class ReferencedLibrariesProjectConfigurationEditorPart
         }
 
         @Override
+        protected int getNumberOfColumnsInForm() {
+            return 2;
+        }
+
+        @Override
         protected ISelectionProvider getSelectionProvider() {
             return new ViewersCombiningSelectionProvider(referencedFragment.getViewer(),
                     pathsFragment.getPythonPathViewer(), pathsFragment.getClassPathViewer());

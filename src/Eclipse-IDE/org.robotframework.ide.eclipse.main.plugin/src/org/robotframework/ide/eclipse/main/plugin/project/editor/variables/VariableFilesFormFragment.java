@@ -19,8 +19,8 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
@@ -71,7 +71,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     private RowExposingTableViewer viewer;
 
-    ISelectionProvider getViewer() {
+    TableViewer getViewer() {
         return viewer;
     }
 
@@ -82,7 +82,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         final Composite internalComposite = toolkit.createComposite(section);
         section.setClient(internalComposite);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 5).applyTo(internalComposite);
 
         createViewer(internalComposite);
         createColumns();

@@ -109,7 +109,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
             addEditorPart(new GeneralProjectConfigurationEditorPart(), "General", context);
             addEditorPart(new ReferencedLibrariesProjectConfigurationEditorPart(), "Referenced libraries", context);
-            addEditorPart(new VariablesProjectConfigurationEditorPart(), "Variable files", context);
+            addEditorPart(new VariablesProjectConfigurationEditorPart(), "Variables", context);
             addEditorPart(new ProjectValidationConfigurationEditorPart(), "Validation", context);
 
             setActivePart(getPageToActivate());
@@ -280,16 +280,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
         // save as is not allowed
     }
 
-    public void openGeneralPage() {
-        setActivePage(getPageIndexFor(GeneralProjectConfigurationEditorPart.class));
-    }
-
-    public void openLibrariesPage() {
-        setActivePage(getPageIndexFor(ReferencedLibrariesProjectConfigurationEditorPart.class));
-    }
-
-    public void openVariablesFilesPage() {
-        setActivePage(getPageIndexFor(VariablesProjectConfigurationEditorPart.class));
+    public void openPage(final Class<? extends IEditorPart> classOfPage) {
+        setActivePage(getPageIndexFor(classOfPage));
     }
 
     private int getPageIndexFor(final Class<? extends IEditorPart> classOfPage) {

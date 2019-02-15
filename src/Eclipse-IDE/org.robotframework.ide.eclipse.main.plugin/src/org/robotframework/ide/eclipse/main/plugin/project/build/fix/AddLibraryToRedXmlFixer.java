@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDi
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscovererWindow;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.SimpleLibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryLocator;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryLocator.IReferencedLibraryDetector;
@@ -126,7 +127,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         @Override
         protected void openDesiredPageInEditor(final RedProjectEditor editor) {
-            editor.openLibrariesPage();
+            editor.openPage(ReferencedLibrariesProjectConfigurationEditorPart.class);
         }
 
         @Override

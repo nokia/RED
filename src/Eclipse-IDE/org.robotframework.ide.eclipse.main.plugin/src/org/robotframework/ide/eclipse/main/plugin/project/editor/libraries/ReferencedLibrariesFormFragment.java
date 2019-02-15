@@ -107,7 +107,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         scrolledParent.setExpandHorizontal(true);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 10, 0, 5).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 5).applyTo(internalComposite);
 
         createViewer(internalComposite);
         createColumns();
@@ -139,7 +139,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         GridDataFactory.fillDefaults().grab(true, true).span(1, 4).indent(0, 10).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
-        viewer.getTable().setLinesVisible(false);
+        viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(false);
 
         viewer.setContentProvider(new ReferencedLibrariesContentProvider());

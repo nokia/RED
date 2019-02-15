@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -15,8 +15,8 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.general.VariableMappingsDetailsEditingSupport.VariableMappingNameEditingSupport;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.general.VariableMappingsDetailsEditingSupport.VariableMappingValueEditingSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableMappingsDetailsEditingSupport.VariableMappingNameEditingSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableMappingsDetailsEditingSupport.VariableMappingValueEditingSupport;
 
 public class VariableMappingsDetailsEditingSupportTest {
 

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
+package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,8 +37,8 @@ import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.general.VariableMappingsDetailsEditingSupport.VariableMappingNameEditingSupport;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.general.VariableMappingsDetailsEditingSupport.VariableMappingValueEditingSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableMappingsDetailsEditingSupport.VariableMappingNameEditingSupport;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableMappingsDetailsEditingSupport.VariableMappingValueEditingSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
@@ -81,7 +81,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         final Composite internalComposite = toolkit.createComposite(section);
         section.setClient(internalComposite);
         GridDataFactory.fillDefaults().applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 5).applyTo(internalComposite);
 
         createViewer(internalComposite);
         createColumns();
@@ -93,10 +93,9 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     private Section createSection(final Composite parent) {
         final Section section = toolkit.createSection(parent,
                 ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
-        section.setText("Variables mappings");
-        section.setDescription("Define variable values. Those mappings will "
-                + "be used by RED in order to resolve parameterized paths in Library, Resource and "
-                + "Variable settings.");
+        section.setText("Variable mappings");
+        section.setDescription("Define variable names and values. Those mappings will be used by RED"
+                + " for resolving parameterized paths in Library, Resource and Variables settings.");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
         return section;
     }
@@ -121,7 +120,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     private void createColumns() {
         final Supplier<VariableMapping> elementsCreator = newElementsCreator();
-        ViewerColumnsFactory.newColumn("Variable name")
+        ViewerColumnsFactory.newColumn("Name")
                 .withWidth(150)
                 .withMinWidth(50)
                 .editingEnabledOnlyWhen(editorInput.isEditable())

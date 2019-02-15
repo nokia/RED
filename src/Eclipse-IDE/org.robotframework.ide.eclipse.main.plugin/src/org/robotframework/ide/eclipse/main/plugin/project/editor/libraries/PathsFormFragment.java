@@ -112,7 +112,7 @@ class PathsFormFragment implements ISectionFormFragment {
         scrolledParent.setExpandHorizontal(true);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().extendedMargins(0, 10, 0, 5).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 5).applyTo(internalComposite);
 
         createRelativityCombo(internalComposite);
 
@@ -178,7 +178,7 @@ class PathsFormFragment implements ISectionFormFragment {
                 .applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
-        viewer.getTable().setLinesVisible(false);
+        viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(false);
 
         viewer.setContentProvider(new PathsContentProvider(config.getVariableName(), editorInput.isEditable()));
