@@ -208,11 +208,13 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
         viewer.setContentProvider(new ListInputStructuredContentProvider());
         ViewerColumnsFactory.newColumn("Name")
-                .withWidth(300)
+                .withWidth(320)
                 .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Path")
                 .withWidth(200)
+                .shouldShowLastVerticalSeparator(false)
+                .shouldGrabAllTheSpaceLeft(true)
                 .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
                 .createFor(viewer);
     }

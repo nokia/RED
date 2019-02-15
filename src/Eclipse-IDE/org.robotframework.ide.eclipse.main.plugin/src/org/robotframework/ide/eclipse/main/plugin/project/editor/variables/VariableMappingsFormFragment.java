@@ -80,7 +80,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
         final Composite internalComposite = toolkit.createComposite(section);
         section.setClient(internalComposite);
-        GridDataFactory.fillDefaults().applyTo(internalComposite);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
         GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 5).applyTo(internalComposite);
 
         createViewer(internalComposite);
@@ -122,16 +122,16 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         final Supplier<VariableMapping> elementsCreator = newElementsCreator();
         ViewerColumnsFactory.newColumn("Name")
                 .withWidth(150)
-                .withMinWidth(50)
+                .withMinWidth(150)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
                 .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, elementsCreator, eventBroker))
                 .labelsProvidedBy(new VariableMappingsNameLabelProvider())
                 .createFor(viewer);
 
         ViewerColumnsFactory.newColumn("Value")
-                .withWidth(100)
+                .withWidth(150)
+                .withMinWidth(150)
                 .shouldGrabAllTheSpaceLeft(true)
-                .withMinWidth(50)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
                 .editingSupportedBy(new VariableMappingValueEditingSupport(viewer, elementsCreator, eventBroker))
                 .labelsProvidedBy(new VariableMappingsValueLabelProvider())
