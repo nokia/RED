@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _JVkfkEcAEei0qKwna87CYQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/9/18 5:37 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/15/19 12:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,17 +15,12 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 // turn off autodiscovery
-get-view "Project Explorer" | get-tree | select "ManyModules/red.xml" | double-click
-wait-for-loading-red-xml -editor_name "ManyModules/red.xml"
-
-with [get-editor "ManyModules/red.xml"] {
-    get-tab-folder | get-tab-item "Referenced libraries" | click
-    get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action" | uncheck
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Libraries"
+    get-group "Libraries autodiscovering" | get-button "Show discovering summary after test suite save action" | uncheck
+    get-button "Apply and Close" | click
 }
-get-button "Save (M1+S)" | click
-
-//close red.xml
-get-editor "ManyModules/red.xml" | close
 
 
 //run QF
