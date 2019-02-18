@@ -20,10 +20,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.ImportPath;
-import org.rf.ide.core.project.ImportSearchPaths;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
-import org.rf.ide.core.project.ResolvedImportPath;
-import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileRegion;
@@ -240,9 +236,12 @@ public class RobotSetting extends RobotKeywordCall {
     }
 
     private Optional<ImportedLibrary> findSpecForPath(final String path) {
-        final RobotProject project = getSuiteFile().getRobotProject();
-
-        final Optional<IPath> possiblePath = getPath(project, path).map(URI::getPath).map(Path::new);
+        final RobotSuiteFile suiteFile = getSuiteFile();
+        final RobotProject project = suiteFile.getRobotProject();
+        final Optional<IPath> possiblePath = new RobotProjectPathsProvider(project)
+                .tryToFindAbsoluteUri(suiteFile.getFile(), ImportPath.from(path))
+                .map(URI::getPath)
+                .map(Path::new);
         if (!possiblePath.isPresent()) {
             return Optional.empty();
         }
@@ -262,31 +261,6 @@ public class RobotSetting extends RobotKeywordCall {
                 .findFirst();
     }
 
-    private Optional<URI> getPath(final RobotProject project, final String path) {
-        final ImportPath importPath = ImportPath.from(path);
-        final Optional<ResolvedImportPath> resolvedImportPath = resolvePath(project, importPath);
-        if (!resolvedImportPath.isPresent()) {
-            return Optional.empty();
-        }
-
-        if (importPath.isAbsolute()) {
-            return Optional.of(resolvedImportPath.get().getUri());
-        } else {
-            final PathsProvider pathsProvider = project.createPathsProvider();
-            return new ImportSearchPaths(pathsProvider)
-                    .findAbsoluteUri(RedWorkspace.tryToGetLocalUri(getSuiteFile().getFile()), resolvedImportPath.get());
-        }
-    }
-
-    private static Optional<ResolvedImportPath> resolvePath(final RobotProject project,
-            final ImportPath importPath) {
-        try {
-            return ResolvedImportPath.from(importPath, project.getRobotProjectHolder().getVariableMappings());
-        } catch (final MalformedPathImportException e) {
-            return Optional.empty();
-        }
-    }
-
     public Optional<IResource> getImportedResource() {
         if (!isResourceImport()) {
             throw new IllegalArgumentException("Cannot provide resource from setting other then Resource");
@@ -299,8 +273,10 @@ public class RobotSetting extends RobotKeywordCall {
 
         final String path = RobotExpressions.unescapeSpaces(args.get(0));
 
-        final RobotProject project = getSuiteFile().getRobotProject();
-        final Optional<URI> possiblePath = getPath(project, path);
+        final RobotSuiteFile suiteFile = getSuiteFile();
+        final RobotProject project = suiteFile.getRobotProject();
+        final Optional<URI> possiblePath = new RobotProjectPathsProvider(project)
+                .tryToFindAbsoluteUri(suiteFile.getFile(), ImportPath.from(path));
         if (!possiblePath.isPresent()) {
             return Optional.empty();
         }

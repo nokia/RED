@@ -7,14 +7,13 @@ package org.rf.ide.core.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.BeforeClass;
@@ -64,16 +63,12 @@ public class ImportSearchPathsTest {
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
         final Optional<URI> absUri = pathsSupport.findAbsoluteUri(importerUri, importPath);
-        final URI uri = pathsSupport.getAbsoluteUri(importerUri, importPath);
 
-        assertThat(absMarkedUri.isPresent()).isTrue();
+        assertThat(absMarkedUri).isPresent();
         assertThat(absMarkedUri.get().getRelativity()).isEqualTo(PathRelativityPoint.FILE);
         assertThat(absMarkedUri.get().getPath()).isEqualTo(importedUri);
 
-        assertThat(absUri.isPresent()).isTrue();
-        assertThat(absUri.get()).isEqualTo(importedUri);
-
-        assertThat(uri).isEqualTo(importedUri);
+        assertThat(absUri).hasValue(importedUri);
     }
 
     @Test
@@ -87,16 +82,12 @@ public class ImportSearchPathsTest {
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
         final Optional<URI> absUri = pathsSupport.findAbsoluteUri(importerUri, importPath);
-        final URI uri = pathsSupport.getAbsoluteUri(importerUri, importPath);
 
-        assertThat(absMarkedUri.isPresent()).isTrue();
+        assertThat(absMarkedUri).isPresent();
         assertThat(absMarkedUri.get().getRelativity()).isEqualTo(PathRelativityPoint.FILE);
         assertThat(absMarkedUri.get().getPath()).isEqualTo(importedUri);
 
-        assertThat(absUri.isPresent()).isTrue();
-        assertThat(absUri.get()).isEqualTo(importedUri);
-
-        assertThat(uri).isEqualTo(importedUri);
+        assertThat(absUri).hasValue(importedUri);
     }
 
     @Test
@@ -110,20 +101,16 @@ public class ImportSearchPathsTest {
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
         final Optional<URI> absUri = pathsSupport.findAbsoluteUri(importerUri, importPath);
-        final URI uri = pathsSupport.getAbsoluteUri(importerUri, importPath);
 
-        assertThat(absMarkedUri.isPresent()).isTrue();
+        assertThat(absMarkedUri).isPresent();
         assertThat(absMarkedUri.get().getRelativity()).isEqualTo(PathRelativityPoint.FILE);
         assertThat(absMarkedUri.get().getPath()).isEqualTo(importedUri);
 
-        assertThat(absUri.isPresent()).isTrue();
-        assertThat(absUri.get()).isEqualTo(importedUri);
-
-        assertThat(uri).isEqualTo(importedUri);
+        assertThat(absUri).hasValue(importedUri);
     }
 
     @Test
-    public void pathIsFoundForImportRelativeToImportingFile() {
+    public void pathIsFoundForImportRelativeToImportingFile() throws URISyntaxException {
         final URI importedUri = get(root, "folder", "file1.ext").toURI();
         final ResolvedImportPath importPath = ResolvedImportPath.from(ImportPath.from("folder/file1.ext")).get();
 
@@ -133,20 +120,16 @@ public class ImportSearchPathsTest {
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
         final Optional<URI> absUri = pathsSupport.findAbsoluteUri(importerUri, importPath);
-        final URI uri = pathsSupport.getAbsoluteUri(importerUri, importPath);
 
-        assertThat(absMarkedUri.isPresent()).isTrue();
+        assertThat(absMarkedUri).isPresent();
         assertThat(absMarkedUri.get().getRelativity()).isEqualTo(PathRelativityPoint.FILE);
         assertThat(absMarkedUri.get().getPath()).isEqualTo(importedUri);
 
-        assertThat(absUri.isPresent()).isTrue();
-        assertThat(absUri.get()).isEqualTo(importedUri);
-
-        assertThat(uri).isEqualTo(importedUri);
+        assertThat(absUri).hasValue(importedUri);
     }
 
     @Test
-    public void pathIsFoundForImportRelativeToPythonPath() {
+    public void pathIsFoundForImportRelativeToPythonPath() throws URISyntaxException {
         final URI importedUri = get(root, "python", "file2.ext").toURI();
         final ResolvedImportPath importPath = ResolvedImportPath.from(ImportPath.from("file2.ext")).get();
 
@@ -156,20 +139,16 @@ public class ImportSearchPathsTest {
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
         final Optional<URI> absUri = pathsSupport.findAbsoluteUri(importerUri, importPath);
-        final URI uri = pathsSupport.getAbsoluteUri(importerUri, importPath);
 
-        assertThat(absMarkedUri.isPresent()).isTrue();
+        assertThat(absMarkedUri).isPresent();
         assertThat(absMarkedUri.get().getRelativity()).isEqualTo(PathRelativityPoint.PYTHON_MODULE_SEARCH_PATH);
         assertThat(absMarkedUri.get().getPath()).isEqualTo(importedUri);
 
-        assertThat(absUri.isPresent()).isTrue();
-        assertThat(absUri.get()).isEqualTo(importedUri);
-
-        assertThat(uri).isEqualTo(importedUri);
+        assertThat(absUri).hasValue(importedUri);
     }
 
     @Test
-    public void pathIsFoundForImportRelativeToUserPath() {
+    public void pathIsFoundForImportRelativeToUserPath() throws URISyntaxException {
         final URI importedUri = get(root, "user", "file3.ext").toURI();
         final ResolvedImportPath importPath = ResolvedImportPath.from(ImportPath.from("file3.ext")).get();
 
@@ -179,20 +158,16 @@ public class ImportSearchPathsTest {
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
         final Optional<URI> absUri = pathsSupport.findAbsoluteUri(importerUri, importPath);
-        final URI uri = pathsSupport.getAbsoluteUri(importerUri, importPath);
 
-        assertThat(absMarkedUri.isPresent()).isTrue();
+        assertThat(absMarkedUri).isPresent();
         assertThat(absMarkedUri.get().getRelativity()).isEqualTo(PathRelativityPoint.USER_DEFINED_SEARCH_PATH);
         assertThat(absMarkedUri.get().getPath()).isEqualTo(importedUri);
 
-        assertThat(absUri.isPresent()).isTrue();
-        assertThat(absUri.get()).isEqualTo(importedUri);
-
-        assertThat(uri).isEqualTo(importedUri);
+        assertThat(absUri).hasValue(importedUri);
     }
 
     @Test
-    public void nothingIsProvidedForNonExistingRelativeImport() {
+    public void nothingIsProvidedForNonExistingRelativeImport() throws URISyntaxException {
         final ResolvedImportPath importPath = ResolvedImportPath.from(ImportPath.from("file4.ext")).get();
 
         final PathsProvider pathsProvider = createProvider(newArrayList(get(root, "python")),
@@ -202,12 +177,9 @@ public class ImportSearchPathsTest {
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
         final Optional<URI> absUri = pathsSupport.findAbsoluteUri(importerUri, importPath);
 
-        assertThat(absMarkedUri.isPresent()).isFalse();
-        assertThat(absUri.isPresent()).isFalse();
+        assertThat(absMarkedUri).isNotPresent();
 
-        assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> pathsSupport.getAbsoluteUri(importerUri, importPath))
-                .withNoCause();
+        assertThat(absUri).isNotPresent();
     }
 
     private static File get(final File root, final String... segments) {

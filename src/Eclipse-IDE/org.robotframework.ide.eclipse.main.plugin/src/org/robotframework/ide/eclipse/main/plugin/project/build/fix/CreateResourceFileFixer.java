@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -53,20 +54,24 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
         } catch (final IOException e) {
             return Optional.empty();
         }
-        final IPath fullPath = new Path(ResolvedImportPath.from(ImportPath.from(srcPath))
-                .get()
-                .resolveInRespectTo(RedWorkspace.tryToGetLocalUri(marker.getResource()))
-                .toString());
-        final IPath workspaceDir = new Path(
-                RedWorkspace.tryToGetLocalUri(marker.getResource().getWorkspace().getRoot()).toString());
-        if (workspaceDir.matchingFirstSegments(fullPath) != workspaceDir.segmentCount()) {
-            return Optional.empty();
-        }
-        final IPath pathToCreate = new Path(RedURI
-                .reverseUriSpecialCharsEscapes(fullPath.removeFirstSegments(workspaceDir.segmentCount()).toString()));
-        if (isValidPathToCreate(pathToCreate)) {
-            return Optional.of(pathToCreate);
-        } else {
+        try {
+            final IPath fullPath = new Path(ResolvedImportPath.from(ImportPath.from(srcPath))
+                    .get()
+                    .resolveInRespectTo(RedWorkspace.tryToGetLocalUri(marker.getResource()))
+                    .toString());
+            final IPath workspaceDir = new Path(
+                    RedWorkspace.tryToGetLocalUri(marker.getResource().getWorkspace().getRoot()).toString());
+            if (workspaceDir.matchingFirstSegments(fullPath) != workspaceDir.segmentCount()) {
+                return Optional.empty();
+            }
+            final IPath pathToCreate = new Path(RedURI.reverseUriSpecialCharsEscapes(
+                    fullPath.removeFirstSegments(workspaceDir.segmentCount()).toString()));
+            if (isValidPathToCreate(pathToCreate)) {
+                return Optional.of(pathToCreate);
+            } else {
+                return Optional.empty();
+            }
+        } catch (final URISyntaxException e) {
             return Optional.empty();
         }
     }

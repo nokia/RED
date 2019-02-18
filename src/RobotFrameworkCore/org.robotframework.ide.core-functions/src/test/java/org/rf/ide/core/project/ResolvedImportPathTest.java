@@ -6,6 +6,7 @@
 package org.rf.ide.core.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
@@ -16,27 +17,26 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import org.assertj.core.api.Condition;
 import org.junit.Test;
 import org.rf.ide.core.RedSystemProperties;
-import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 
 import com.google.common.collect.ImmutableMap;
 
 public class ResolvedImportPathTest {
 
-    @Test(expected = MalformedPathImportException.class)
+    @Test
     public void exceptionIsThrown_whenGivenPathIsInvalidUri() {
-        createResolved(":path/somewhere", Collections.emptyMap());
+        assertThatExceptionOfType(URISyntaxException.class)
+                .isThrownBy(() -> createResolved(":path/somewhere", Collections.emptyMap()));
     }
 
     @Test
-    public void noResolvedPathIsProvided_whenSomeParametersAreNotPossibleToBeResolved() {
+    public void noResolvedPathIsProvided_whenSomeParametersAreNotPossibleToBeResolved() throws URISyntaxException {
         final Map<String, String> parameters = ImmutableMap.of("${var1}", "val1", "${var2}", "val2");
 
-        assertThat(createResolved("${var}/path/somewhere", parameters)).is(absent());
-        assertThat(createResolved("${var}/${var1}/path/somewhere", parameters)).is(absent());
-        assertThat(createResolved("${var}/${var2}/path/somewhere", parameters)).is(absent());
+        assertThat(createResolved("${var}/path/somewhere", parameters)).isNotPresent();
+        assertThat(createResolved("${var}/${var1}/path/somewhere", parameters)).isNotPresent();
+        assertThat(createResolved("${var}/${var2}/path/somewhere", parameters)).isNotPresent();
     }
 
     @Test
@@ -44,17 +44,17 @@ public class ResolvedImportPathTest {
         final Map<String, String> parameters = ImmutableMap.of("${var1}", "val1", "${var2}", "val2");
 
         assertThat(createResolved("val/path/somewhere", parameters))
-                .has(elementContained(new ResolvedImportPath(new URI("val/path/somewhere"))));
+                .hasValue(new ResolvedImportPath(new URI("val/path/somewhere")));
         assertThat(createResolved("${var1}/path/somewhere", parameters))
-                .has(elementContained(new ResolvedImportPath(new URI("val1/path/somewhere"))));
+                .hasValue(new ResolvedImportPath(new URI("val1/path/somewhere")));
         assertThat(createResolved("${var2}/path/somewhere", parameters))
-                .has(elementContained(new ResolvedImportPath(new URI("val2/path/somewhere"))));
+                .hasValue(new ResolvedImportPath(new URI("val2/path/somewhere")));
         assertThat(createResolved("${var1}/${var2}/path/somewhere", parameters))
-                .has(elementContained(new ResolvedImportPath(new URI("val1/val2/path/somewhere"))));
+                .hasValue(new ResolvedImportPath(new URI("val1/val2/path/somewhere")));
     }
 
     @Test
-    public void testPathsResolution_whenResolvedPathIsRelative_inWindows() {
+    public void testPathsResolution_whenResolvedPathIsRelative_inWindows() throws URISyntaxException {
         assumeTrue(RedSystemProperties.isWindowsPlatform());
 
         final Map<String, String> parameters = Collections.emptyMap();
@@ -65,7 +65,7 @@ public class ResolvedImportPathTest {
     }
 
     @Test
-    public void testPathsResolution_whenResolvedPathIsRelative_inUnix() {
+    public void testPathsResolution_whenResolvedPathIsRelative_inUnix() throws URISyntaxException {
         assumeFalse(RedSystemProperties.isWindowsPlatform());
 
         final Map<String, String> parameters = Collections.emptyMap();
@@ -75,28 +75,8 @@ public class ResolvedImportPathTest {
         assertThat(uri).isEqualTo(new File("/some/relative/path/").toURI());
     }
 
-    private static Optional<ResolvedImportPath> createResolved(final String path,
-            final Map<String, String> parameters) {
+    private static Optional<ResolvedImportPath> createResolved(final String path, final Map<String, String> parameters)
+            throws URISyntaxException {
         return ResolvedImportPath.from(ImportPath.from(path), parameters);
-    }
-
-    private static <T> Condition<Optional<? extends T>> absent() {
-        return new Condition<Optional<? extends T>>() {
-
-            @Override
-            public boolean matches(final Optional<? extends T> optional) {
-                return !optional.isPresent();
-            }
-        };
-    }
-
-    private static <T> Condition<Optional<? extends T>> elementContained(final T element) {
-        return new Condition<Optional<? extends T>>() {
-
-            @Override
-            public boolean matches(final Optional<? extends T> optional) {
-                return optional.isPresent() && optional.get().equals(element);
-            }
-        };
     }
 }

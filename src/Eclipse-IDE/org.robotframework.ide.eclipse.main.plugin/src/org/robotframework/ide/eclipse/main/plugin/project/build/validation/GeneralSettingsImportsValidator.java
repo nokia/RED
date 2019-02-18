@@ -20,15 +20,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.RedURI;
 import org.rf.ide.core.project.ImportPath;
-import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.MarkedUri;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
-import org.rf.ide.core.project.ResolvedImportPath;
-import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProjectPathsProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -48,7 +45,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     protected final FileValidationContext validationContext;
 
-    private final RobotSuiteFile suiteFile;
+    protected final RobotSuiteFile suiteFile;
 
     private final List<? extends AImported> imports;
 
@@ -81,8 +78,10 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         } else {
             final String pathOrName = RobotExpressions.unescapeSpaces(pathOrNameToken.getText());
             if (RobotExpressions.isParameterized(pathOrName)) {
-                final String resolved = RobotExpressions
-                        .resolve(suiteFile.getRobotProject().getRobotProjectHolder().getVariableMappings(), pathOrName);
+                final Map<String, String> variablesMapping = suiteFile.getRobotProject()
+                        .getRobotProjectHolder()
+                        .getVariableMappings();
+                final String resolved = RobotExpressions.resolve(variablesMapping, pathOrName);
                 if (RobotExpressions.isParameterized(resolved)) {
                     reportUnresolvedParameterizedImport(resolved, pathOrNameToken);
                 } else {
@@ -131,7 +130,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             reportAbsolutePathImport(pathToken, path);
         }
 
-        final Optional<MarkedUri> absoluteMarkedPath = calculateAbsoluteUri(path);
+        final Optional<MarkedUri> absoluteMarkedPath = new RobotProjectPathsProvider(suiteFile.getRobotProject())
+                .tryToFindAbsoluteMarkedUri(suiteFile.getFile(), ImportPath.from(path));
         if (!absoluteMarkedPath.isPresent()) {
             reportMissingImportPath(path, pathToken, importPath);
             return;
@@ -198,25 +198,6 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 .reverseUriSpecialCharsEscapes(new File(absoluteUri).getAbsolutePath().replaceAll("\\\\", "/"));
         reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH)
                 .formatMessageWith(path, absolutePath), validationContext.getFile(), pathToken, attributes);
-    }
-
-    protected Optional<MarkedUri> calculateAbsoluteUri(final String path) {
-        final Map<String, String> variablesMapping = suiteFile.getRobotProject()
-                .getRobotProjectHolder()
-                .getVariableMappings();
-        try {
-            final Optional<ResolvedImportPath> resolvedPath = ResolvedImportPath.from(ImportPath.from(path),
-                    variablesMapping);
-            if (!resolvedPath.isPresent()) {
-                return Optional.empty();
-            }
-            final PathsProvider pathsProvider = suiteFile.getRobotProject().createPathsProvider();
-            final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
-            return searchPaths.findAbsoluteMarkedUri(RedWorkspace.tryToGetLocalUri(suiteFile.getFile()),
-                    resolvedPath.get());
-        } catch (final MalformedPathImportException e) {
-            return Optional.empty();
-        }
     }
 
     private void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {

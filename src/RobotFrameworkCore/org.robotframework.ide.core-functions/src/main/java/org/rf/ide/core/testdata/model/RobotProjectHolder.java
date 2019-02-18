@@ -22,7 +22,6 @@ import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
-import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -139,16 +138,6 @@ public class RobotProjectHolder {
 
     public void removeModelFile(final RobotFileOutput robotOutput) {
         readableProjectFiles.remove(robotOutput);
-    }
-
-    public void addImportedResources(final List<ResourceImportReference> referenced) {
-        for (final ResourceImportReference ref : referenced) {
-            addImportedResource(ref);
-        }
-    }
-
-    public void addImportedResource(final ResourceImportReference referenced) {
-        readableProjectFiles.add(referenced.getReference());
     }
 
     public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {

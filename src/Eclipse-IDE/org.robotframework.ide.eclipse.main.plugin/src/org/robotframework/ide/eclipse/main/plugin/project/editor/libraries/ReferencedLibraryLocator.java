@@ -9,7 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,15 +22,11 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.project.ImportPath;
-import org.rf.ide.core.project.ImportSearchPaths;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
-import org.rf.ide.core.project.ResolvedImportPath;
-import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProjectPathsProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
@@ -84,7 +80,10 @@ public class ReferencedLibraryLocator {
         Optional<File> libraryFile = Optional.empty();
         try {
             if (new Path(path).isAbsolute() || path.endsWith("/") || path.endsWith(".py")) {
-                libraryFile = findLibraryFileByPath(suiteFile, path);
+                libraryFile = new RobotProjectPathsProvider(suiteFile.getRobotProject())
+                        .findAbsoluteUri(suiteFile.getFile(), ImportPath.from(path))
+                        .map(File::new)
+                        .map(this::tryToCanonical);
                 if (libraryFile.isPresent()) {
                     final Entry<File, Collection<ReferencedLibrary>> imported = importByPath(libraryFile.get());
                     detector.libraryDetectedByPath(path, imported.getKey(), imported.getValue());
@@ -96,18 +95,9 @@ public class ReferencedLibraryLocator {
                 detector.libraryDetectingByPathFailed(path, libraryFile,
                         "The path '" + path + "' should point to either .py file or python module directory.");
             }
-        } catch (final RuntimeEnvironmentException | MalformedPathImportException e) {
+        } catch (final RuntimeEnvironmentException | URISyntaxException e) {
             detector.libraryDetectingByPathFailed(path, libraryFile, e.getMessage());
         }
-    }
-
-    private Optional<File> findLibraryFileByPath(final RobotSuiteFile suiteFile, final String path) {
-        final Map<String, String> vars = suiteFile.getRobotProject().getRobotProjectHolder().getVariableMappings();
-        return ResolvedImportPath.from(ImportPath.from(path), vars).flatMap(resolvedPath -> {
-            final PathsProvider pathsProvider = suiteFile.getRobotProject().createPathsProvider();
-            final URI importingFileUri = RedWorkspace.tryToGetLocalUri(suiteFile.getFile());
-            return new ImportSearchPaths(pathsProvider).findAbsoluteUri(importingFileUri, resolvedPath);
-        }).map(File::new).map(this::tryToCanonical);
     }
 
     private File tryToCanonical(final File file) {
