@@ -25,6 +25,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -195,6 +196,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         comment = null;
         if (linkedElement instanceof RobotExecutableRow) {
             return ((RobotExecutableRow<?>) linkedElement).getComment();
+        } else if (linkedElement instanceof RobotEmptyRow<?>) {
+            return ((RobotEmptyRow<?>) linkedElement).getComment();
         }
         return new ArrayList<>();
     }
@@ -210,6 +213,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     public Optional<RobotToken> getAction() {
         if (linkedElement instanceof RobotExecutableRow) {
             return Optional.of(((RobotExecutableRow<?>) linkedElement).getAction());
+        } else if (linkedElement instanceof RobotEmptyRow) {
+            return Optional.of(((RobotEmptyRow<?>) linkedElement).getDeclaration());
         }
         return Optional.empty();
     }
@@ -284,8 +289,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.getComment();
     }
 
-    public RobotKeywordCall insertCellAt(final int position, final String newValue) {
-        linkedElement.insertValueAt(newValue, position);
+    public RobotKeywordCall insertEmptyCellAt(final int position) {
+        linkedElement.insertValueAt("", position);
         resetStored();
         return this;
     }

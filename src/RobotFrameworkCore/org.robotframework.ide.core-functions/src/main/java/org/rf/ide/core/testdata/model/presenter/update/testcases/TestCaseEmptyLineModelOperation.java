@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.presenter.update.IExecutablesStepsHolderEl
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestCaseEmptyLineModelOperation implements IExecutablesStepsHolderElementOperation<TestCase> {
@@ -32,6 +33,7 @@ public class TestCaseEmptyLineModelOperation implements IExecutablesStepsHolderE
             final List<String> args, final String comment) {
         final RobotEmptyRow<TestCase> row = new RobotEmptyRow<>();
         row.setParent(testCase);
+        row.setEmpty(RobotToken.create("", RobotTokenType.EMPTY_CELL));
         return row;
     }
 

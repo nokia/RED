@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
@@ -119,7 +118,7 @@ class KeywordValidator implements ModelUnitValidator {
     }
 
     private boolean hasAnythingToExecute(final UserKeyword keyword) {
-        return keyword.getExecutionContext().stream().anyMatch(RobotExecutableRow::isExecutable);
+        return !keyword.getExecutionContext().isEmpty();
     }
 
     private boolean isReturnEmpty(final UserKeyword keyword) {
@@ -149,7 +148,6 @@ class KeywordValidator implements ModelUnitValidator {
                 .ifPresent(execValidators::add);
 
         keyword.getExecutionContext().stream()
-                .filter(RobotExecutableRow::isExecutable)
                 .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))
                 .forEach(execValidators::add);
         keyword.getTeardowns().stream()

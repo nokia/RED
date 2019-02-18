@@ -15,6 +15,8 @@ import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -24,34 +26,35 @@ public class ConvertCallToComment extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
 
-    private final String newName;
+    private final String name;
 
-    private final String oldName;
+    private RobotEmptyLine newEmptyLine;
 
     public ConvertCallToComment(final IEventBroker eventBroker, final RobotKeywordCall keywordCall, final String name) {
         this.eventBroker = eventBroker;
         this.keywordCall = keywordCall;
-        this.newName = name;
-        this.oldName = keywordCall.getName();
+        this.name = name;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
-        if (oldName.equals(newName)) {
+        final String oldName = keywordCall.getName();
+        if (oldName.equals(name)) {
             return;
         }
+        final IRobotCodeHoldingElement parent = keywordCall.getParent();
 
         final boolean isEmptyCall = oldName.isEmpty();
         final boolean hasNoComments = keywordCall.getComment().isEmpty();
 
         if (isEmptyCall) {
             if (hasNoComments) {
-                keywordCall.setComment(newName);
+                keywordCall.setComment(name);
             } else {
                 final List<RobotToken> comments = keywordCall.getCommentTokens();
                 if (!comments.isEmpty()) {
-                    comments.get(0).setText(newName);
+                    comments.get(0).setText(name);
                 }
             }
         } else {
@@ -60,6 +63,7 @@ public class ConvertCallToComment extends EditorCommand {
                 final RobotToken action = actionToken.get();
                 final List<RobotToken> arguments = keywordCall.getArgumentTokens();
                 final List<RobotToken> comments = keywordCall.getCommentTokens();
+
                 final Object parentObject = keywordCall.getLinkedElement().getParent();
 
                 RobotExecutableRow<?> newLinked = null;
@@ -84,9 +88,14 @@ public class ConvertCallToComment extends EditorCommand {
                             (RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement(), tempLinked);
                     newLinked = tempLinked;
                 }
+                newEmptyLine = new RobotEmptyLine(parent, newLinked);
+
+                final int index = parent.getChildren().indexOf(keywordCall);
+                parent.removeChild(keywordCall);
+                parent.getChildren().add(index, newEmptyLine);
 
                 action.setType(RobotTokenType.START_HASH_COMMENT);
-                action.setText(newName);
+                action.setText(name);
 
                 newLinked.addCommentPart(action);
                 for (int i = 0; i < arguments.size(); i++) {
@@ -104,13 +113,15 @@ public class ConvertCallToComment extends EditorCommand {
         }
         keywordCall.resetStored();
 
-        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(keywordCall).send(
-                RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordCall.getParent());
+        RedEventBroker.using(eventBroker)
+                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                .to(newEmptyLine)
+                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, parent);
     }
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new ConvertCommentToCall(eventBroker, keywordCall, oldName));
+        return newUndoCommands(new ReplaceRobotKeywordCallCommand(eventBroker, newEmptyLine, keywordCall));
     }
 
 }

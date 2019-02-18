@@ -115,6 +115,7 @@ public class Task extends CommonCase<TaskTable, Task> implements Serializable {
         return MoveElementHelper.moveDown(allElements, element);
     }
 
+    @Override
     public void replaceElement(final AModelElement<Task> oldElement, final AModelElement<Task> newElement) {
         newElement.setParent(this);
         allElements.set(allElements.indexOf(oldElement), newElement);

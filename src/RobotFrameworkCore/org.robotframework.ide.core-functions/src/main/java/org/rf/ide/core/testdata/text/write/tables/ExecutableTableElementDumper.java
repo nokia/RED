@@ -17,6 +17,8 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -36,15 +38,11 @@ public abstract class ExecutableTableElementDumper {
 
     private final TableElementDumperHelper elemHelper;
 
-    private final List<IForceFixBeforeDumpTask> afterSortTasks;
-
-    public ExecutableTableElementDumper(final DumperHelper helper, final ModelType servedType,
-            final List<IForceFixBeforeDumpTask> afterSortTasks) {
+    public ExecutableTableElementDumper(final DumperHelper helper, final ModelType servedType) {
         this.helper = helper;
         this.elemUtility = new ElementsUtility();
         this.servedType = servedType;
         this.elemHelper = new TableElementDumperHelper();
-        this.afterSortTasks = afterSortTasks;
     }
 
     public final boolean isServedType(final AModelElement<? extends IExecutableStepsHolder<?>> element) {
@@ -158,6 +156,26 @@ public abstract class ExecutableTableElementDumper {
             // check if is not end of line
             handleLastEndOfTheLineBreak(model, lines, currentLine, lastToken, tokens, nrOfTokens, lineEndPos, tokenId);
         }
+    }
+
+    private IRobotLineElement addSuffixAfterDeclarationElement(final RobotFile model, final List<RobotLine> lines,
+            final RobotToken elemDeclaration, final RobotLine currentLine, final IRobotLineElement lastToken) {
+        IRobotLineElement lastTokenToReturn = lastToken;
+        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
+        final int tokenPosIndex = lineElements.indexOf(elemDeclaration);
+        if (lineElements.size() - 1 > tokenPosIndex + 1) {
+            for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
+                final IRobotLineElement nextElem = lineElements.get(index);
+                final List<IRobotTokenType> types = nextElem.getTypes();
+                if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE) || types.contains(RobotTokenType.ASSIGNMENT)) {
+                    helper.getDumpLineUpdater().updateLine(model, lines, nextElem);
+                    lastTokenToReturn = nextElem;
+                } else {
+                    break;
+                }
+            }
+        }
+        return lastTokenToReturn;
     }
 
     private boolean isNewLineWithPreviousLineContinueToken(final RobotFile model, final List<RobotLine> lines,
@@ -365,29 +383,29 @@ public abstract class ExecutableTableElementDumper {
         final List<RobotToken> tokens = sorter.getTokensInElement();
 
         Collections.sort(tokens, sorter);
-        for (final IForceFixBeforeDumpTask task : afterSortTasks) {
-            task.fixBeforeDump(currentElement, tokens);
-        }
+        fixBeforeDump(currentElement, tokens);
         return tokens;
     }
 
-    private IRobotLineElement addSuffixAfterDeclarationElement(final RobotFile model, final List<RobotLine> lines,
-            final RobotToken elemDeclaration, final RobotLine currentLine, final IRobotLineElement lastToken) {
-        IRobotLineElement lastTokenToReturn = lastToken;
-        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
-        final int tokenPosIndex = lineElements.indexOf(elemDeclaration);
-        if (lineElements.size() - 1 > tokenPosIndex + 1) {
-            for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
-                final IRobotLineElement nextElem = lineElements.get(index);
-                final List<IRobotTokenType> types = nextElem.getTypes();
-                if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE) || types.contains(RobotTokenType.ASSIGNMENT)) {
-                    helper.getDumpLineUpdater().updateLine(model, lines, nextElem);
-                    lastTokenToReturn = nextElem;
-                } else {
-                    break;
+    private void fixBeforeDump(final AModelElement<? extends IExecutableStepsHolder<?>> currentElement,
+            final List<RobotToken> tokens) {
+
+        if ((currentElement instanceof RobotEmptyRow<?> || currentElement instanceof RobotExecutableRow<?>)
+                && !tokens.isEmpty()) {
+            final RobotToken firstToken = tokens.get(0);
+            if (currentElement.getDeclaration() != firstToken
+                    && firstToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                tokens.clear();
+
+                final List<RobotToken> tokensInOrderFromModel = currentElement.getElementTokens();
+                for (final RobotToken token : tokensInOrderFromModel) {
+                    token.setStartOffset(FilePosition.NOT_SET);
+                    token.setLineNumber(FilePosition.NOT_SET);
+                    token.setStartColumn(FilePosition.NOT_SET);
                 }
+
+                tokens.addAll(tokensInOrderFromModel);
             }
         }
-        return lastTokenToReturn;
     }
 }

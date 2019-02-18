@@ -47,7 +47,6 @@ public class SimpleRowDescriptorBuilderTest {
         final IExecutableRowDescriptor<UserKeyword> lineDesc = oneRow.buildLineDescription();
 
         // verify
-        assertThat(oneRow.isExecutable()).isTrue();
         assertThat(lineDesc.getAction().getToken().getText()).isEqualTo(action.getText());
         assertThat(lineDesc.getCreatedVariables()).hasSize(1);
         assertThat(lineDesc.getCreatedVariables().get(0).asToken().getText()).isEqualTo(createdScalar.getText());

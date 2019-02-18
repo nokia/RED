@@ -5,6 +5,8 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.filePositions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.noFilePositions;
@@ -21,12 +23,12 @@ public class RobotEmptyLineTest {
 
     @Test
     public void testEmptyLinesCreationFromCaseForTest() {
-        assertThat(createCallsFromCaseForTest()).hasSize(5);
+        assertThat(createCallsFromCaseForTest()).hasSize(6);
     }
 
     @Test
     public void testEmptyLinesCreationFromKeywordForTest() {
-        assertThat(createCallsFromKeywordForTest()).hasSize(5);
+        assertThat(createCallsFromKeywordForTest()).hasSize(6);
     }
 
     @Test
@@ -98,31 +100,24 @@ public class RobotEmptyLineTest {
     }
 
     private static void assertArguments(final List<RobotEmptyLine> list) {
-        assertThat(list).allSatisfy(el -> assertThat(el.getArguments()).isEmpty());
+        assertThat(list).allMatch(el -> el.getArguments().isEmpty());
     }
 
     private static void assertName(final List<RobotEmptyLine> list) {
-        for (int i = 0; i < list.size(); i++) {
-            if (i != 2) {
-                assertThat(list.get(i).getName()).isEmpty();
-            } else {
-                assertThat(list.get(i).getName()).isEqualTo("  ");
-            }
-        }
+        assertThat(list).allMatch(line -> line.getName().isEmpty());
     }
 
     private static void assertLabel(final List<RobotEmptyLine> list) {
-        for (int i = 0; i < list.size(); i++) {
-            if (i != 2) {
-                assertThat(list.get(i).getLabel()).isEmpty();
-            } else {
-                assertThat(list.get(i).getLabel()).isEqualTo("  ");
-            }
-        }
+        assertThat(list).allMatch(line -> line.getLabel().isEmpty());
     }
 
     private static void assertComment(final List<RobotEmptyLine> list) {
-        assertThat(list).allSatisfy(el -> assertThat(el.getCommentTokens()).isEmpty());
+        final List<String> comments = list.stream()
+                .map(RobotEmptyLine::getCommentTokens)
+                .map(List::stream)
+                .map(s -> s.map(RobotToken::getText).collect(joining("")))
+                .collect(toList());
+        assertThat(comments).containsExactly("", "# whole line commented", "", "", "", "");
     }
 
     @Test
@@ -140,7 +135,7 @@ public class RobotEmptyLineTest {
                 .get(0);
         final List<RobotToken> emptyTokenBefore = emptyBefore.getLinkedElement().getElementTokens();
 
-        emptyBefore.insertCellAt(0, "");
+        emptyBefore.insertEmptyCellAt(0);
 
         final RobotKeywordCall emptyAfter = model.findSection(RobotCasesSection.class)
                 .get()

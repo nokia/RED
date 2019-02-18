@@ -18,21 +18,19 @@ public class InsertCellCommand extends EditorCommand {
     private final RobotKeywordCall oldCall;
     private RobotKeywordCall newCall;
     private final int position;
-    private final String newValue;
 
-    public InsertCellCommand(final RobotKeywordCall call, final int position,
-            final String newValue) {
-        oldCall = call;
+    public InsertCellCommand(final RobotKeywordCall call, final int position) {
+        this.oldCall = call;
         this.position = position;
-        this.newValue = newValue == null ? "" : newValue;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
 
-        newCall = oldCall.insertCellAt(position, newValue);
+        newCall = oldCall.insertEmptyCellAt(position);
 
-        final String topic = (newCall instanceof RobotSetting) ? RobotModelEvents.ROBOT_SETTING_CHANGED
+        final String topic = newCall instanceof RobotSetting
+                ? RobotModelEvents.ROBOT_SETTING_CHANGED
                 : RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED;
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newCall).send(

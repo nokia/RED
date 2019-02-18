@@ -55,7 +55,7 @@ public class RobotDefinitionSettingTest {
                 .map(rt -> rt.getText()).collect(Collectors.toList());
         assertThat(tokensBefore).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1", "comment2");
 
-        settingBefore.insertCellAt(0, "");
+        settingBefore.insertEmptyCellAt(0);
 
         final RobotKeywordCall settingAfter = model.findSection(RobotCasesSection.class)
                 .get()
@@ -87,7 +87,7 @@ public class RobotDefinitionSettingTest {
                 .map(rt -> rt.getText()).collect(Collectors.toList());
         assertThat(tokensBefore).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1", "comment2");
 
-        settingBefore.insertCellAt(1, "");
+        settingBefore.insertEmptyCellAt(1);
 
         final RobotKeywordCall settingAfter = model.findSection(RobotCasesSection.class)
                 .get()
@@ -119,7 +119,7 @@ public class RobotDefinitionSettingTest {
                 .map(rt -> rt.getText()).collect(Collectors.toList());
         assertThat(tokensBefore).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1", "comment2");
 
-        settingBefore.insertCellAt(2, "");
+        settingBefore.insertEmptyCellAt(2);
 
         final RobotKeywordCall settingAfter = model.findSection(RobotCasesSection.class)
                 .get()
@@ -151,7 +151,7 @@ public class RobotDefinitionSettingTest {
                 .map(rt -> rt.getText()).collect(Collectors.toList());
         assertThat(tokensBefore).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1", "comment2");
 
-        settingBefore.insertCellAt(3, "");
+        settingBefore.insertEmptyCellAt(3);
 
         final RobotKeywordCall settingAfter = model.findSection(RobotCasesSection.class)
                 .get()
@@ -183,7 +183,7 @@ public class RobotDefinitionSettingTest {
                 .map(rt -> rt.getText()).collect(Collectors.toList());
         assertThat(tokensBefore).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1", "comment2");
 
-        settingBefore.insertCellAt(4, "");
+        settingBefore.insertEmptyCellAt(4);
 
         final RobotKeywordCall settingAfter = model.findSection(RobotCasesSection.class)
                 .get()
@@ -215,7 +215,7 @@ public class RobotDefinitionSettingTest {
                 .map(rt -> rt.getText()).collect(Collectors.toList());
         assertThat(tokensBefore).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1", "comment2");
 
-        settingBefore.insertCellAt(5, "");
+        settingBefore.insertEmptyCellAt(5);
 
         final RobotKeywordCall settingAfter = model.findSection(RobotCasesSection.class)
                 .get()

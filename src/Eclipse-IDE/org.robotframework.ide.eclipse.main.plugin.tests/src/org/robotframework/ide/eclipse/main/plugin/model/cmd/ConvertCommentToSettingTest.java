@@ -16,9 +16,6 @@ import static org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCallC
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -50,8 +47,6 @@ public class ConvertCommentToSettingTest {
                 .build();
         final RobotCase testCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
         final RobotKeywordCall keywordCall = testCase.getChildren().get(0);
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<TestCase> oldLinked = (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -67,7 +62,6 @@ public class ConvertCommentToSettingTest {
         assertThat(result.getArguments()).containsExactly("Catenate", "1", "2");
         assertThat(result.getComment()).isEqualTo("#comment");
         assertThat(result).has(properlySetParent());
-        assertThat(testCase.getLinkedElement().getExecutionContext()).doesNotContain(oldLinked);
         assertThat(testCase.getLinkedElement().getExecutionContext()).isEmpty();
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
@@ -83,9 +77,6 @@ public class ConvertCommentToSettingTest {
                 .build();
         final RobotKeywordDefinition keyword = model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
         final RobotKeywordCall keywordCall = keyword.getChildren().get(0);
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<UserKeyword> oldLinked = (RobotExecutableRow<UserKeyword>) keywordCall
-                .getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -101,7 +92,6 @@ public class ConvertCommentToSettingTest {
         assertThat(result.getArguments()).containsExactly("Catenate", "1", "2");
         assertThat(result.getComment()).isEqualTo("#comment");
         assertThat(result).has(properlySetParent());
-        assertThat(keyword.getLinkedElement().getExecutionContext()).doesNotContain(oldLinked);
         assertThat(keyword.getLinkedElement().getExecutionContext()).isEmpty();
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap

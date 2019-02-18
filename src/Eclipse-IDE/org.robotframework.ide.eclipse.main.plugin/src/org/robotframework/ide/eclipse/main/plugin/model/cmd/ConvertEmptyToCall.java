@@ -36,7 +36,7 @@ public class ConvertEmptyToCall extends EditorCommand {
 
         final int index = empty.getIndex();
         parent.removeChild(empty);
-        newCall = parent.createKeywordCall(index, name, new ArrayList<>(), "");
+        newCall = parent.createKeywordCall(index, name, new ArrayList<>(), empty.getComment());
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newCall).send(
                 RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);

@@ -22,16 +22,15 @@ public class RobotEmptyRowTest {
         empty.setText(emptyText);
 
         // execute
-        final boolean isSet = row.setEmptyToken(empty);
+        row.setEmpty(empty);
 
         // verify
-        assertThat(isSet).isTrue();
         assertThat(row.getElementTokens()).containsExactly(empty);
         assertThat(row.getElementTokens().get(0).getText()).isEqualTo(emptyText);
     }
 
     @Test
-    public void nonEmptyToken_isNotSet() {
+    public void nonEmptyToken_isSet() {
         // prepare
         final RobotEmptyRow<UserKeyword> row = new RobotEmptyRow<>();
         final RobotToken nonEmpty = new RobotToken();
@@ -39,12 +38,11 @@ public class RobotEmptyRowTest {
         nonEmpty.setText(nonEmptyText);
 
         // execute
-        final boolean isSet = row.setEmptyToken(nonEmpty);
+        row.setEmpty(nonEmpty);
 
         // verify
-        assertThat(isSet).isFalse();
-        assertThat(row.getElementTokens()).doesNotContain(nonEmpty);
-        assertThat(row.getElementTokens().get(0).getText()).isNotEqualTo(nonEmptyText);
+        assertThat(row.getElementTokens()).containsExactly(nonEmpty);
+        assertThat(row.getElementTokens().get(0).getText()).isEqualTo(nonEmptyText);
     }
 
     @Test
@@ -72,25 +70,6 @@ public class RobotEmptyRowTest {
     }
 
     @Test
-    public void commentsCanNotBeChanged() {
-        // prepare
-        final RobotEmptyRow<UserKeyword> row = new RobotEmptyRow<>();
-        final RobotToken comment = new RobotToken();
-        final String text = "# comment";
-        comment.setText(text);
-
-        // execute
-        row.clearComment();
-        row.removeCommentPart(0);
-        row.setComment("#foo");
-        row.setComment(comment);
-        row.addCommentPart(comment);
-
-        // verify
-        assertThat(row.getComment()).isEmpty();
-    }
-
-    @Test
     public void insertCell_doesNothing() {
         // prepare
         final RobotEmptyRow<UserKeyword> row = new RobotEmptyRow<>();
@@ -102,6 +81,5 @@ public class RobotEmptyRowTest {
 
         // verify
         assertThat(row.getElementTokens()).hasSize(1);
-        assertThat(RobotEmptyRow.isEmpty(row.getElementTokens().get(0).getText())).isTrue();
     }
 }

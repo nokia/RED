@@ -57,7 +57,7 @@ public class InsertCellCommandTest {
             final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(Collectors.toList());
             final int tokensNumber = callTokens.size();
             for (int i = 0; i < tokensNumber; i++) {
-                final InsertCellCommand command = new InsertCellCommand(call, i, "");
+                final InsertCellCommand command = new InsertCellCommand(call, i);
                 command.setEventBroker(eventBroker);
                 command.execute();
 
@@ -81,7 +81,7 @@ public class InsertCellCommandTest {
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
         final RobotKeywordCall call = robotCase.getChildren().get(0);
-        final InsertCellCommand command = new InsertCellCommand(call, 0, "");
+        final InsertCellCommand command = new InsertCellCommand(call, 0);
         command.setEventBroker(eventBroker);
         command.execute();
 
@@ -116,7 +116,7 @@ public class InsertCellCommandTest {
         final List<String> allLabelsWithFirstEmpty = callTokens.stream().map(RobotToken::getText)
                 .collect(Collectors.toList());
         for (int i = 1; i < 3; i++) {
-            final InsertCellCommand command = new InsertCellCommand(call, i, "");
+            final InsertCellCommand command = new InsertCellCommand(call, i);
             command.setEventBroker(eventBroker);
             command.execute();
 
@@ -153,7 +153,7 @@ public class InsertCellCommandTest {
         final List<String> allLabels = callTokens.stream().map(RobotToken::getText)
                 .collect(Collectors.toList());
         allLabels.remove(0); // first artificial comment token is empty and not visible for the user
-        final InsertCellCommand command = new InsertCellCommand(call, 0, "");
+        final InsertCellCommand command = new InsertCellCommand(call, 0);
         command.setEventBroker(eventBroker);
         command.execute();
 
@@ -173,7 +173,7 @@ public class InsertCellCommandTest {
         assertThat(currentLabels)
                 .containsExactlyElementsOf(allLabels);
 
-        verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
                 eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
@@ -193,7 +193,7 @@ public class InsertCellCommandTest {
             final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(Collectors.toList());
             final int tokensNumber = callTokens.size();
             for (int i = 0; i < tokensNumber; i++) {
-                final InsertCellCommand command = new InsertCellCommand(call, i, "");
+                final InsertCellCommand command = new InsertCellCommand(call, i);
                 command.setEventBroker(eventBroker);
                 command.execute();
 
@@ -218,7 +218,7 @@ public class InsertCellCommandTest {
         final RobotKeywordDefinition robotKeyword = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0);
         final RobotKeywordCall call = robotKeyword.getChildren().get(0);
-        final InsertCellCommand command = new InsertCellCommand(call, 0, "");
+        final InsertCellCommand command = new InsertCellCommand(call, 0);
         command.setEventBroker(eventBroker);
         command.execute();
 
@@ -254,7 +254,7 @@ public class InsertCellCommandTest {
         final List<String> allLabelsWithFirstEmpty = callTokens.stream().map(RobotToken::getText)
                 .collect(Collectors.toList());
         for (int i = 1; i < 3; i++) {
-            final InsertCellCommand command = new InsertCellCommand(call, i, "");
+            final InsertCellCommand command = new InsertCellCommand(call, i);
             command.setEventBroker(eventBroker);
             command.execute();
 
@@ -292,7 +292,7 @@ public class InsertCellCommandTest {
         final List<String> allLabels = callTokens.stream().map(RobotToken::getText)
                 .collect(Collectors.toList());
         allLabels.remove(0); // first artificial comment token is empty and not visible for the user
-        final InsertCellCommand command = new InsertCellCommand(call, 0, "");
+        final InsertCellCommand command = new InsertCellCommand(call, 0);
         command.setEventBroker(eventBroker);
         command.execute();
 
@@ -312,7 +312,7 @@ public class InsertCellCommandTest {
         assertThat(currentLabels)
                 .containsExactlyElementsOf(allLabels);
 
-        verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
                 eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
     }
 
@@ -331,7 +331,7 @@ public class InsertCellCommandTest {
             final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(Collectors.toList());
             final int tokensNumber = callTokens.size();
             for (int i = 2; i < tokensNumber; i++) {
-                final InsertCellCommand command = new InsertCellCommand(call, i, "");
+                final InsertCellCommand command = new InsertCellCommand(call, i);
                 command.setEventBroker(eventBroker);
                 command.execute();
 
@@ -364,7 +364,7 @@ public class InsertCellCommandTest {
             final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(Collectors.toList());
             final int tokensNumber = callTokens.size();
             for (int i = 2; i < tokensNumber; i++) {
-                final InsertCellCommand command = new InsertCellCommand(call, i, "");
+                final InsertCellCommand command = new InsertCellCommand(call, i);
                 command.setEventBroker(eventBroker);
                 command.execute();
 
