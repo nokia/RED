@@ -169,8 +169,8 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
             final List<RobotExecutableRow<T>> executionRows = holder.getExecutionContext();
 
             for (final RobotExecutableRow<T> executableRow : executionRows) {
-                if (!isExecutable(fileFormat, executableRow)) {
-                    final RobotEmptyRow<T> row = rewriteToEmptyToRow(executableRow);
+                if (!RobotExecutableRow.isExecutable(fileFormat, executableRow.getElementTokens())) {
+                    final RobotEmptyRow<T> row = rewriteToEmptyRow(executableRow);
                     
                     holder.replaceElement(executableRow, row);
                 }
@@ -178,35 +178,7 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
         }
     }
 
-    public boolean isExecutable(final FileFormat fileFormat, final RobotExecutableRow<?> executableRow) {
-        final RobotToken action = executableRow.getAction();
-        if (action == null) {
-            return false;
-        }
-        if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-            final String text = action.getText().trim();
-            final List<RobotToken> elementTokens = executableRow.getElementTokens();
-            if (text.equals("\\")) {
-                return elementTokens.size() > 1
-                        && !elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
-
-            } else if ("".equals(text)) {
-                if (fileFormat == FileFormat.TSV) {
-                    return elementTokens.size() > 1
-                            && !elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
-
-                } else if (action.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
-                    return true;
-                }
-                return false;
-            } else {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private <T extends AModelElement<? extends ARobotSectionTable>> RobotEmptyRow<T> rewriteToEmptyToRow(
+    private <T extends AModelElement<? extends ARobotSectionTable>> RobotEmptyRow<T> rewriteToEmptyRow(
             final RobotExecutableRow<T> executableRow) {
 
         final RobotEmptyRow<T> emptyRow = new RobotEmptyRow<>();
