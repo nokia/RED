@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -33,7 +32,6 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -111,7 +109,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
         viewer.getTable().setLinesVisible(true);
-        viewer.getTable().setHeaderVisible(true);
+        viewer.getTable().setHeaderVisible(false);
 
         viewer.setContentProvider(new VariableFilesContentProvider());
 
@@ -121,51 +119,13 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final Supplier<ReferencedVariableFile> elementsCreator = new VariableFileCreator(viewer.getTable().getShell(),
-                editorInput, eventBroker);
-        createFileColumn(elementsCreator);
-
-        final int numberOfColumns = calculateLongestArgumentsLength();
-        for (int i = 0; i < numberOfColumns; i++) {
-            final String name = i == 0 ? "Arguments" : "";
-            final boolean isLast = i == (numberOfColumns - 1);
-            createArgumentColumn(name, i, elementsCreator, isLast);
-        }
-    }
-
-    private void createFileColumn(final Supplier<ReferencedVariableFile> creator) {
-        ViewerColumnsFactory.newColumn("File")
-                .withWidth(300)
-                .withMinWidth(100)
+        final VariableFileCreator elementsCreator = new VariableFileCreator(viewer.getTable().getShell(), editorInput,
+                eventBroker);
+        ViewerColumnsFactory.newColumn("")
+                .shouldGrabAllTheSpaceLeft(true)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, creator))
+                .editingSupportedBy(new VariableFilesPathEditingSupport(viewer, elementsCreator))
                 .labelsProvidedBy(new VariableFilesLabelProvider(editorInput))
-                .createFor(viewer);
-    }
-
-    private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
-        final List<?> elements = (List<?>) viewer.getInput();
-        if (elements != null) {
-            for (final Object element : elements) {
-                final ReferencedVariableFile varFile = (ReferencedVariableFile) element;
-                if (varFile != null) {
-                    max = Math.max(max, varFile.getArguments().size());
-                }
-            }
-        }
-        return max;
-    }
-
-    private void createArgumentColumn(final String name, final int index,
-            final Supplier<ReferencedVariableFile> creator, final boolean shouldGrabAllTheSpace) {
-        ViewerColumnsFactory.newColumn(name)
-                .withWidth(100)
-                .shouldGrabAllTheSpaceLeft(shouldGrabAllTheSpace)
-                .withMinWidth(50)
-                .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, creator, eventBroker))
-                .labelsProvidedBy(new VariableFileArgumentsLabelProvider(index))
                 .createFor(viewer);
     }
 
@@ -222,7 +182,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenVarFileDetailChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_DETAIL_CHANGED) final ReferencedVariableFile varFile) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED) final ReferencedVariableFile varFile) {
         setDirty(true);
         viewer.refresh();
     }
@@ -242,7 +202,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
             final Object[] elements = ((List<?>) inputElement).toArray();
             if (editorInput.isEditable()) {
                 final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
-                newElements[elements.length] = new ElementAddingToken("variable file", true);
+                newElements[elements.length] = new ElementAddingToken("file", true);
                 return newElements;
             } else {
                 return elements;

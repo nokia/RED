@@ -543,18 +543,14 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class ReferencedVariableFile {
 
-        public static ReferencedVariableFile create(final String path, final String... arguments) {
+        public static ReferencedVariableFile create(final String path) {
             final ReferencedVariableFile file = new ReferencedVariableFile();
             file.setPath(path);
-            file.setArguments(newArrayList(arguments));
             return file;
         }
 
         @XmlAttribute
         private String path;
-
-        @XmlElement
-        private List<String> arguments = new ArrayList<>();;
 
         @XmlTransient
         private Map<String, Object> variables;
@@ -565,14 +561,6 @@ public class RobotProjectConfig {
 
         public String getPath() {
             return path;
-        }
-
-        public void setArguments(final List<String> arguments) {
-            this.arguments = arguments;
-        }
-
-        public List<String> getArguments() {
-            return arguments;
         }
 
         @XmlTransient
@@ -618,14 +606,14 @@ public class RobotProjectConfig {
                 return false;
             } else if (obj.getClass() == getClass()) {
                 final ReferencedVariableFile other = (ReferencedVariableFile) obj;
-                return Objects.equals(path, other.path) && Objects.equals(arguments, other.arguments);
+                return Objects.equals(path, other.path);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(path, arguments);
+            return Objects.hash(path);
         }
     }
 
