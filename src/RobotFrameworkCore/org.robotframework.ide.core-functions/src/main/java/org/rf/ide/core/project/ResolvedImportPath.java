@@ -16,28 +16,23 @@ import org.rf.ide.core.testdata.model.RobotExpressions;
 
 public final class ResolvedImportPath {
 
-    public static Optional<ResolvedImportPath> from(final ImportPath importPath) {
+    public static Optional<ResolvedImportPath> from(final ImportPath importPath) throws URISyntaxException {
         return from(importPath, Collections.emptyMap());
     }
 
     public static Optional<ResolvedImportPath> from(final ImportPath importPath, final Map<String, String> parameters)
-            throws MalformedPathImportException {
-        try {
-            final String path = importPath.getPath();
+            throws URISyntaxException {
+        final String path = importPath.getPath();
 
-            if (RobotExpressions.isParameterized(path)) {
-                final String resolvedPath = RobotExpressions.resolve(parameters, path);
-                if (RobotExpressions.isParameterized(resolvedPath)) {
-                    return Optional.empty();
-                } else {
-                    return Optional.of(create(resolvedPath));
-                }
+        if (RobotExpressions.isParameterized(path)) {
+            final String resolvedPath = RobotExpressions.resolve(parameters, path);
+            if (RobotExpressions.isParameterized(resolvedPath)) {
+                return Optional.empty();
             } else {
-                return Optional.of(create(path));
+                return Optional.of(create(resolvedPath));
             }
-
-        } catch (final URISyntaxException e) {
-            throw new MalformedPathImportException(e);
+        } else {
+            return Optional.of(create(path));
         }
     }
 
@@ -71,14 +66,5 @@ public final class ResolvedImportPath {
     @Override
     public int hashCode() {
         return uri.hashCode();
-    }
-
-    public static class MalformedPathImportException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public MalformedPathImportException(final Throwable t) {
-            super(t);
-        }
     }
 }
