@@ -213,7 +213,7 @@ public class ExecutablesRowHolderCommentService {
                 convertFromComment.execute();
                 executedCommands.add(convertFromComment);
 
-                if (value == null || value.isEmpty()) {
+                if (Strings.isNullOrEmpty(value)) {
                     final Optional<? extends EditorCommand> command = new KeywordCallsTableValuesChangingCommandsCollector()
                             .collect(call.getParent().getChildren().get(index), null, 0);
                     if (command.isPresent()) {

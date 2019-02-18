@@ -45,7 +45,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
             if (text.equals("\\")) {
                 return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
 
-            } else if ("".equals(text)) {
+            } else if (text.isEmpty()) {
                 if (fileFormat == FileFormat.TSV) {
                     return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
 
