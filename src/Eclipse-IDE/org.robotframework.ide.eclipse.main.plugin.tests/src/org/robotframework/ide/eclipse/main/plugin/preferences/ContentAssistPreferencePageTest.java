@@ -23,6 +23,7 @@ import org.eclipse.ui.IWorkbench;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 import org.robotframework.red.junit.ShellProvider;
 
 public class ContentAssistPreferencePageTest {
@@ -46,7 +47,7 @@ public class ContentAssistPreferencePageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(5);
+        assertThat(editors).hasSize(6);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
@@ -58,5 +59,7 @@ public class ContentAssistPreferencePageTest {
                 names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY));
         assertThat(namesGroupedByType).hasEntrySatisfying(StringFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS));
+        assertThat(namesGroupedByType).hasEntrySatisfying(ComboBoxFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE));
     }
 }

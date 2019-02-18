@@ -21,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.IssuesStrategy;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
@@ -42,6 +43,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSourceFoldingPreferences(preferences);
         initializeSourceEditorAssistantPreferences(preferences);
         initializeSyntaxColoringPreferences(preferences);
+        initializeVariablesPreferences(preferences);
         initializeLibrariesPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
         initializeDefaultLaunchConfigurationPreferences(preferences);
@@ -77,6 +79,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
         preferences.put(RedPreferences.SEPARATOR_MODE, SeparatorsMode.FILE_TYPE_DEPENDENT.name());
         preferences.put(RedPreferences.SEPARATOR_TO_USE, "ssss");
+        preferences.putBoolean(RedPreferences.SEPARATOR_JUMP_MODE_ENABLED, false);
         preferences.putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
         preferences.put(RedPreferences.BEHAVIOR_ON_CELL_COMMIT, CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name());
         preferences.put(RedPreferences.CELL_WRAPPING, CellWrappingStrategy.SINGLE_LINE_CUT.name());
@@ -97,12 +100,19 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "");
         preferences.putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
         preferences.putBoolean(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, false);
+        preferences.put(RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE, LinkedModeStrategy.EXIT_ON_LAST.name());
     }
 
     private void initializeSyntaxColoringPreferences(final IEclipsePreferences preferences) {
         for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
             preferences.put(category.getPreferenceId(), category.getDefault().toPreferenceString());
         }
+    }
+
+    private void initializeVariablesPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED, false);
+        preferences.putBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED, false);
+        preferences.put(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN, "\\w+");
     }
 
     private void initializeLibrariesPreferences(final IEclipsePreferences preferences) {

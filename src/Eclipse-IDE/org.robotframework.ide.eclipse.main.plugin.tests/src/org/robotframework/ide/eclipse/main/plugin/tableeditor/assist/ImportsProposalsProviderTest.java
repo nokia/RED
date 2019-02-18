@@ -60,10 +60,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
                 new ResourceImport(RobotToken.create("Resource")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final ResourceFileLocationsProposalsProvider provider = new ResourceFileLocationsProposalsProvider(model,
                 dataProvider);
 
@@ -79,10 +76,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
                 new VariablesImport(RobotToken.create("Variables")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final ResourceFileLocationsProposalsProvider provider = new ResourceFileLocationsProposalsProvider(model,
                 dataProvider);
 
@@ -100,10 +94,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
                 new ResourceImport(RobotToken.create("Resource")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final ResourceFileLocationsProposalsProvider provider = new ResourceFileLocationsProposalsProvider(model,
                 dataProvider);
 
@@ -127,10 +118,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
                 new ResourceImport(RobotToken.create("Resource")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final ResourceFileLocationsProposalsProvider provider = new ResourceFileLocationsProposalsProvider(model, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 0);
@@ -148,10 +136,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
                 new VariablesImport(RobotToken.create("Variables")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final VariableFileLocationsProposalsProvider provider = new VariableFileLocationsProposalsProvider(model,
                 dataProvider);
 
@@ -167,10 +152,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
                 new LibraryImport(RobotToken.create("Library")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final VariableFileLocationsProposalsProvider provider = new VariableFileLocationsProposalsProvider(model,
                 dataProvider);
 
@@ -188,10 +170,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
                 new VariablesImport(RobotToken.create("Variables")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final VariableFileLocationsProposalsProvider provider = new VariableFileLocationsProposalsProvider(model,
                 dataProvider);
 
@@ -215,10 +194,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
                 new VariablesImport(RobotToken.create("Variables")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final VariableFileLocationsProposalsProvider provider = new VariableFileLocationsProposalsProvider(model,
                 dataProvider);
 
@@ -241,10 +217,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
                 new LibraryImport(RobotToken.create("Library")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final LibrariesProposalsProvider provider = new LibrariesProposalsProvider(model, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 0);
@@ -263,10 +236,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
                 new ResourceImport(RobotToken.create("Resource")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final LibrariesProposalsProvider provider = new LibrariesProposalsProvider(model, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 0);
@@ -285,10 +255,7 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
                 new LibraryImport(RobotToken.create("Library")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
         final LibrariesProposalsProvider provider = new LibrariesProposalsProvider(model, dataProvider);
 
         for (int column = 0; column < 10; column++) {
@@ -315,12 +282,8 @@ public class ImportsProposalsProviderTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
                 new LibraryImport(RobotToken.create("Library")));
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(setting);
-
-        final LibrariesProposalsProvider provider = new LibrariesProposalsProvider(model,
-                dataProvider);
+        final IRowDataProvider<Object> dataProvider = createDataProvider(setting);
+        final LibrariesProposalsProvider provider = new LibrariesProposalsProvider(model, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), 1, context);
@@ -334,5 +297,12 @@ public class ImportsProposalsProviderTest {
 
         proposals[2].getModificationStrategy().insert(text, proposals[2]);
         assertThat(text.getText()).isEqualTo("b_vars.py");
+    }
+
+    private IRowDataProvider<Object> createDataProvider(final RobotSetting setting) {
+        @SuppressWarnings("unchecked")
+        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
+        when(dataProvider.getRowObject(0)).thenReturn(setting);
+        return dataProvider;
     }
 }

@@ -15,6 +15,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -26,22 +27,24 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
-
 public class CodeReservedWordsAssistProcessorTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(CodeReservedWordsAssistProcessorTest.class);
 
+    private static IFile suite;
+
+    private static IFile suiteWithFor;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("suite.robot",
+        suite = projectProvider.createFile("suite.robot",
                 "*** Keywords ***",
                 "keyword",
                 "  ",
                 "  cell1  cell2",
                 "  Giv");
-        projectProvider.createFile("suite_for.robot",
+        suiteWithFor = projectProvider.createFile("suite_for.robot",
                 "*** Keywords ***",
                 "keyword",
                 "  :FOR  ${x}  ",
@@ -50,34 +53,31 @@ public class CodeReservedWordsAssistProcessorTest {
 
     @AfterClass
     public static void afterSuite() {
-        projectProvider = null;
+        suite = null;
     }
 
     @Test
     public void codeReservedWordsProcessorIsValidOnlyForKeywordsOrCasesSections() {
-        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(createAssistant(suite));
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION);
     }
 
     @Test
     public void codeReservedWordsProcessorHasTitleDefined() {
-        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(createAssistant(suite));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
     @Test
     public void noProposalsAreProvided_whenIsNotInTheFirstCell() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(37)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 37);
 
         assertThat(proposals).isEmpty();
@@ -86,13 +86,12 @@ public class CodeReservedWordsAssistProcessorTest {
     @Test
     public void noProposalsAreProvided_whenNotInApplicableContentType() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(27)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 27);
 
         assertThat(proposals).isNull();
@@ -101,13 +100,12 @@ public class CodeReservedWordsAssistProcessorTest {
     @Test
     public void gherkinAndForProposalsAreProvided_whenAtTheEndOfFirstCellOfKeywordsSection() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(27)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 27);
 
         assertThat(proposals).hasSize(8).are(proposalWithImage(null));
@@ -126,13 +124,12 @@ public class CodeReservedWordsAssistProcessorTest {
     @Test
     public void gherkinAndForProposalsAreProvided_whenInsideTheCellAndProposalIsMatchingToInput() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(48)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 48);
 
         assertThat(proposals).hasSize(1).are(proposalWithImage(null));
@@ -144,13 +141,12 @@ public class CodeReservedWordsAssistProcessorTest {
     @Test
     public void gherkinAndForProposalsAreProvided_whenAtTheBeginningEndOfFirstCellOfKeywordsSection() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(30)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 30);
 
         assertThat(proposals).hasSize(8).are(proposalWithImage(null));
@@ -169,13 +165,13 @@ public class CodeReservedWordsAssistProcessorTest {
     @Test
     public void forIteratorProposalsAreProvided_whenAtTheEndOfForLine() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite_for.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suiteWithFor)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(39)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite_for.robot")));
+                createAssistant(suiteWithFor));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 39);
 
         assertThat(proposals).hasSize(4).are(proposalWithImage(null));
@@ -190,13 +186,13 @@ public class CodeReservedWordsAssistProcessorTest {
     @Test
     public void forIteratorProposalsAreProvided_whenWhenInsideTheCellOfForLine() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite_for.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suiteWithFor)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(56)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite_for.robot")));
+                createAssistant(suiteWithFor));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 56);
 
         assertThat(proposals).hasSize(4).are(proposalWithImage(null));
@@ -211,13 +207,13 @@ public class CodeReservedWordsAssistProcessorTest {
     @Test
     public void forIteratorProposalsAreProvided_whenAtTheBeginningOfTheCellOfForLine() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite_for.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suiteWithFor)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(54)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
-                createAssistant(projectProvider.getFile("suite_for.robot")));
+                createAssistant(suiteWithFor));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 54);
 
         assertThat(proposals).hasSize(4).are(proposalWithImage(null));
@@ -227,10 +223,5 @@ public class CodeReservedWordsAssistProcessorTest {
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN RANGE"),
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN ENUMERATE"),
                 new Document("*** Keywords ***", "keyword", "  :FOR  ${x}  ", "  :FOR  ${x}  IN ZIP"));
-    }
-
-    private IDocument documentFromFile(final String fileName) throws Exception {
-        final String content = projectProvider.getFileContent(fileName);
-        return new Document(Splitter.on('\n').splitToList(content));
     }
 }

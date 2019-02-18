@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -196,11 +197,9 @@ public class CodeReservedElementsProposalsProviderTest {
     public void thereAreInProposalProvided_whenInAtLeastThirdColumnAndCurrentKeywordIsForLoop() {
         final RobotExecutableRow<?> executableRow = new RobotExecutableRow<>();
         executableRow.setAction(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN));
-        final RobotKeywordCall forExecutable = new RobotKeywordCall(null, executableRow);
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(forExecutable);
+        final Iterable<RobotKeywordCall> elements = newArrayList(new RobotKeywordCall(null, executableRow));
+        final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
         final CodeReservedElementsProposalsProvider provider = new CodeReservedElementsProposalsProvider(null,
                 dataProvider);
 

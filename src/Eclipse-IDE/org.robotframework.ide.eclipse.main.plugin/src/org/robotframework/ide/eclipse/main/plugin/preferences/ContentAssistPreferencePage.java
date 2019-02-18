@@ -22,6 +22,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
+import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 
 public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
 
@@ -36,7 +38,6 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
         createLink(parent);
         createAutoActivationEditors(parent);
         createKeywordPrefixAutoAdditionEditor(parent);
-        createLibraryImportAutoAdditionEditor(parent);
     }
 
     private void createLink(final Composite parent) {
@@ -106,31 +107,42 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
         keywordsGroup.setText("Keywords");
         GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(keywordsGroup);
         GridLayoutFactory.fillDefaults().applyTo(keywordsGroup);
+
         final BooleanFieldEditor automaticKeywordPrefixingEditor = new BooleanFieldEditor(
                 RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED,
                 "Automatically add library or resource name to keyword proposal insertion", keywordsGroup);
         addField(automaticKeywordPrefixingEditor);
-        final Button button = (Button) automaticKeywordPrefixingEditor.getDescriptionControl(keywordsGroup);
-        GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
-    }
+        final Button automaticKeywordPrefixingButton = (Button) automaticKeywordPrefixingEditor
+                .getDescriptionControl(keywordsGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).applyTo(automaticKeywordPrefixingButton);
 
-    private void createLibraryImportAutoAdditionEditor(final Composite parent) {
-        final Group librariesGroup = new Group(parent, SWT.NONE);
-        librariesGroup.setText("Libraries");
-        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(librariesGroup);
-        GridLayoutFactory.fillDefaults().applyTo(librariesGroup);
         final BooleanFieldEditor keywordLibraryImportEditor = new BooleanFieldEditor(
                 RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED,
-                "Include keywords from not imported libraries", librariesGroup);
+                "Include keywords from not imported libraries", keywordsGroup);
         addField(keywordLibraryImportEditor);
-        final Button button = (Button) keywordLibraryImportEditor.getDescriptionControl(librariesGroup);
-        GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
+        final Button keywordLibraryImportButton = (Button) keywordLibraryImportEditor
+                .getDescriptionControl(keywordsGroup);
+        GridDataFactory.fillDefaults().indent(5, 0).applyTo(keywordLibraryImportButton);
 
-        final Label notImportedLibrariesDescription = new Label(librariesGroup, SWT.WRAP);
+        final Label notImportedLibrariesDescription = new Label(keywordsGroup, SWT.WRAP);
         notImportedLibrariesDescription.setText("When libraries are added to red.xml but not imported in robot file, "
                 + "keywords from such libraries will be included in propositions.");
-        GridDataFactory.fillDefaults().hint(150, SWT.DEFAULT).indent(5, 2).grab(true, false).applyTo(
-                notImportedLibrariesDescription);
+        GridDataFactory.fillDefaults()
+                .hint(150, SWT.DEFAULT)
+                .indent(5, 2)
+                .span(2, 1)
+                .grab(true, false)
+                .applyTo(notImportedLibrariesDescription);
+
+        final ComboBoxFieldEditor argumentsLinkedModeEditor = new ComboBoxFieldEditor(
+                RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE, "After pressing Tab in arguments edition mode", "", 5,
+                createArgumentsLinkedModeLabelsAndValues(), keywordsGroup);
+        addField(argumentsLinkedModeEditor);
+    }
+
+    private String[][] createArgumentsLinkedModeLabelsAndValues() {
+        return new String[][] { new String[] { "cycle between arguments", LinkedModeStrategy.CYCLE.name() },
+                new String[] { "exit on last argument", LinkedModeStrategy.EXIT_ON_LAST.name() } };
     }
 
     @Override

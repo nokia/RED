@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -176,11 +177,10 @@ public class WithNameElementsProposalsProviderTest {
     public void thereIsWithNameProposalProvided_whenInAtLeastThirdColumnAndCurrentSettingIsLibrary() {
         final RobotExecutableRow<?> executableRow = new RobotExecutableRow<>();
         executableRow.setAction(RobotToken.create("Library"));
-        final RobotSetting libraryImport = new RobotSetting(null, RobotSetting.SettingsGroup.LIBRARIES, executableRow);
 
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(libraryImport);
+        final Iterable<RobotSetting> elements = newArrayList(
+                new RobotSetting(null, RobotSetting.SettingsGroup.LIBRARIES, executableRow));
+        final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
         final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
 
         for (int column = 0; column < 10; column++) {

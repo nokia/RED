@@ -31,8 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
-
 public class VariablesImportAssistProcessorTest {
 
     @ClassRule
@@ -84,7 +82,7 @@ public class VariablesImportAssistProcessorTest {
         final int offset = 43;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
@@ -102,7 +100,7 @@ public class VariablesImportAssistProcessorTest {
         final int offset = 27;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -120,7 +118,7 @@ public class VariablesImportAssistProcessorTest {
         final int offset = 62;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -138,7 +136,7 @@ public class VariablesImportAssistProcessorTest {
         final int offset = 43;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -163,7 +161,7 @@ public class VariablesImportAssistProcessorTest {
         final int offset = 79;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -188,7 +186,7 @@ public class VariablesImportAssistProcessorTest {
         final int offset = 83;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -204,11 +202,5 @@ public class VariablesImportAssistProcessorTest {
         assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
                 .containsOnly(new Document("*** Settings ***", "Library   cell", "Variables  ",
                         "Variables  cell1  cell2", "Variables  dir1_1/vars.py"));
-    }
-
-    private static IDocument documentFromImportingFile() throws Exception {
-        final String path = importingFile.getProjectRelativePath().toPortableString();
-        final String content = projectProvider.getFileContent(path);
-        return new Document(Splitter.on('\n').splitToList(content));
     }
 }
