@@ -9,7 +9,6 @@ import static com.google.common.base.Predicates.notNull;
 import static java.util.stream.Collectors.toList;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -23,8 +22,6 @@ import java.util.stream.Stream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IEditorPart;
@@ -32,7 +29,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
-import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.environment.RobotVersion;
@@ -40,19 +36,16 @@ import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.libraries.LibrarySpecificationReader;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -317,10 +310,6 @@ public class RobotProject extends RobotContainer {
         return getProject().getFile(filename);
     }
 
-    public PathsProvider createPathsProvider() {
-        return new ProjectPathsProvider();
-    }
-
     @VisibleForTesting
     public void setReferencedVariablesFiles(final List<ReferencedVariableFile> varFiles) {
         this.referencedVariableFiles = varFiles;
@@ -366,46 +355,4 @@ public class RobotProject extends RobotContainer {
         return Optional.ofNullable(kwSources.get(qualifiedKwName));
     }
 
-    private class ProjectPathsProvider implements PathsProvider {
-
-        @Override
-        public boolean targetExists(final URI uri) {
-            if (uri.getScheme().equalsIgnoreCase("file")) {
-                try {
-                    return new File(uri).exists();
-                } catch (final IllegalArgumentException e) {
-                    return false;
-                }
-            } else {
-                final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-                return Stream
-                        .concat(Stream.of(root.findFilesForLocationURI(uri)),
-                                Stream.of(root.findContainersForLocationURI(uri)))
-                        .filter(IResource::exists)
-                        .findFirst()
-                        .isPresent();
-            }
-        }
-
-        @Override
-        public List<File> providePythonModulesSearchPaths() {
-            return getRobotProjectHolder().getModuleSearchPaths();
-        }
-
-        @Override
-        public List<File> provideUserSearchPaths() {
-            final RobotProjectConfig configuration = getRobotProjectConfig();
-            final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer();
-            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(getProject(), configuration);
-            return configuration.getPythonPaths()
-                    .stream()
-                    .map(SearchPath::getLocation)
-                    .map(variableReplacer::replaceKnownEnvironmentVariables)
-                    .map(Path::new)
-                    .map(redConfig::toAbsolutePath)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(toList());
-        }
-    }
 }

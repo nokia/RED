@@ -6,8 +6,6 @@
 package org.rf.ide.core.testdata.model;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +14,6 @@ import java.util.Optional;
 
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
-import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.importer.VariablesImporter;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
@@ -34,8 +31,6 @@ public class RobotFileOutput {
     private final RobotFile fileModel;
 
     private long lastModificationEpoch = FILE_NOT_EXIST_EPOCH;
-
-    private final List<ResourceImportReference> resourceReferences = new ArrayList<>();
 
     private List<VariablesFileImportReference> variablesReferenced = null;
 
@@ -143,54 +138,6 @@ public class RobotFileOutput {
 
     public void addBuildMessage(final BuildMessage msg) {
         buildingMessages.add(msg);
-    }
-
-    public void addResourceReferences(final List<ResourceImportReference> references) {
-        for (final ResourceImportReference resourceImportReference : references) {
-            addResourceReference(resourceImportReference);
-        }
-    }
-
-    public void addResourceReference(final ResourceImportReference ref) {
-        final int positionToSet = findResourceReferencePositionToReplace(ref);
-
-        if (positionToSet == -1) {
-            resourceReferences.add(ref);
-        } else {
-            resourceReferences.set(positionToSet, ref);
-        }
-    }
-
-    public int findResourceReferencePositionToReplace(final ResourceImportReference ref) {
-        int positionToSet = -1;
-
-        final int numberOfReferences = resourceReferences.size();
-        for (int i = 0; i < numberOfReferences; i++) {
-            final ResourceImportReference reference = resourceReferences.get(i);
-            final File file = reference.getReference().getProcessedFile();
-            final File thisFile = ref.getReference().getProcessedFile();
-            boolean isSameFile = false;
-            try {
-                if (Files.isSameFile(file.toPath(), thisFile.toPath())) {
-                    isSameFile = true;
-                }
-            } catch (final IOException e) {
-                if (file.toPath().normalize().toAbsolutePath().equals(thisFile.toPath().normalize().toAbsolutePath())) {
-                    isSameFile = true;
-                }
-            }
-
-            if (isSameFile) {
-                positionToSet = i;
-                break;
-            }
-        }
-
-        return positionToSet;
-    }
-
-    public List<ResourceImportReference> getResourceImportReferences() {
-        return Collections.unmodifiableList(resourceReferences);
     }
 
     public void setVariablesImportReferences(final List<VariablesFileImportReference> varReferences) {

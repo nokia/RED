@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -18,13 +17,10 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.rf.ide.core.project.ImportPath;
-import org.rf.ide.core.project.ImportSearchPaths;
-import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
-import org.rf.ide.core.project.ResolvedImportPath;
-import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProjectPathsProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 abstract class HyperlinksToFilesDetector {
@@ -38,7 +34,8 @@ abstract class HyperlinksToFilesDetector {
             return hyperlinks;
         }
 
-        final Optional<URI> absoluteUri = createAbsoluteUri(suiteFile, normalizedPath);
+        final Optional<URI> absoluteUri = new RobotProjectPathsProvider(suiteFile.getRobotProject())
+                .tryToFindAbsoluteUri(suiteFile.getFile(), ImportPath.from(normalizedPath));
         if (!absoluteUri.isPresent()) {
             return hyperlinks;
         }
@@ -48,24 +45,6 @@ abstract class HyperlinksToFilesDetector {
             hyperlinks.add(hyperlink.get());
         }
         return hyperlinks;
-    }
-
-    private Optional<URI> createAbsoluteUri(final RobotSuiteFile suiteFile, final String path) {
-        final Map<String, String> variablesMapping = suiteFile.getRobotProject()
-                .getRobotProjectHolder()
-                .getVariableMappings();
-        try {
-            final Optional<ResolvedImportPath> resolvedPath = ResolvedImportPath.from(ImportPath.from(path),
-                    variablesMapping);
-            if (!resolvedPath.isPresent()) {
-                return Optional.empty();
-            }
-            final PathsProvider pathsProvider = suiteFile.getRobotProject().createPathsProvider();
-            final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
-            return searchPaths.findAbsoluteUri(RedWorkspace.tryToGetLocalUri(suiteFile.getFile()), resolvedPath.get());
-        } catch (final MalformedPathImportException e) {
-            return Optional.empty();
-        }
     }
 
     private Optional<IHyperlink> createLink(final RobotSuiteFile suiteFile, final IRegion fromRegion, final URI path) {
