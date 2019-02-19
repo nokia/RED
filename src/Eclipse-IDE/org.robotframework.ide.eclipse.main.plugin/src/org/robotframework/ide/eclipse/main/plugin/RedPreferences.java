@@ -55,10 +55,11 @@ public class RedPreferences {
 
     public static final String SEPARATOR_MODE = "red.editor.source.separatorMode";
     public static final String SEPARATOR_TO_USE = "red.editor.source.separatorToUse";
-    public static final String SEPARATOR_JUMP_MODE_ENABLED = "red.editor.general.separatorJumpModeEnabled";
-    public static final String VARIABLES_BRACKETS_INSERTION_ENABLED = "red.editor.general.variablesBracketsInsertionEnabled";
-    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED = "red.editor.general.variablesBracketsInsertionWrappingEnabled";
-    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN = "red.editor.general.variablesBracketsInsertionWrappingPattern";
+    public static final String SEPARATOR_JUMP_MODE_ENABLED = "red.editor.source.separatorJumpModeEnabled";
+    
+    public static final String VARIABLES_BRACKETS_INSERTION_ENABLED = "red.editor.variables.variablesBracketsInsertionEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED = "red.editor.variables.variablesBracketsInsertionWrappingEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN = "red.editor.variables.variablesBracketsInsertionWrappingPattern";
 
     public static final String FOLDABLE_SECTIONS = "red.editor.folding.foldableSections";
     public static final String FOLDABLE_CASES = "red.editor.folding.foldableCases";

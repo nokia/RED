@@ -30,6 +30,7 @@ public class RedPreferencesInitializerTest {
         verify(preferences).putInt(RedPreferences.FOLDING_LINE_LIMIT, 2);
         verify(preferences).putBoolean(RedPreferences.FOLDABLE_SECTIONS, true);
         verify(preferences).putBoolean(RedPreferences.FOLDABLE_CASES, true);
+        verify(preferences).putBoolean(RedPreferences.FOLDABLE_TASKS, true);
         verify(preferences).putBoolean(RedPreferences.FOLDABLE_KEYWORDS, true);
         verify(preferences).putBoolean(RedPreferences.FOLDABLE_DOCUMENTATION, true);
     }
@@ -65,22 +66,16 @@ public class RedPreferencesInitializerTest {
 
         verify(preferences).putBoolean(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, false);
         verify(preferences).put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
-        verify(preferences).put(RedPreferences.SEPARATOR_MODE, SeparatorsMode.FILE_TYPE_DEPENDENT.name());
-        verify(preferences).put(RedPreferences.SEPARATOR_TO_USE, "ssss");
-        verify(preferences).putBoolean(RedPreferences.SEPARATOR_JUMP_MODE_ENABLED, false);
         verify(preferences).putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
         verify(preferences).put(RedPreferences.BEHAVIOR_ON_CELL_COMMIT,
                 CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name());
         verify(preferences).put(RedPreferences.CELL_WRAPPING, CellWrappingStrategy.SINGLE_LINE_CUT.name());
-    }
-
-    @Test
-    public void byDefaultCellContentIsDrawnInSingleLine() {
-        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
-
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
-
-        verify(preferences).put(RedPreferences.CELL_WRAPPING, CellWrappingStrategy.SINGLE_LINE_CUT.name());
+        verify(preferences).put(RedPreferences.SEPARATOR_MODE, SeparatorsMode.FILE_TYPE_DEPENDENT.name());
+        verify(preferences).put(RedPreferences.SEPARATOR_TO_USE, "ssss");
+        verify(preferences).putBoolean(RedPreferences.SEPARATOR_JUMP_MODE_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED, false);
+        verify(preferences).put(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN, "\\w+");
     }
 
     @Test
