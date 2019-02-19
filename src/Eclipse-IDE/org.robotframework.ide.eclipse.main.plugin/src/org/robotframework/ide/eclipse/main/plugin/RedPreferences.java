@@ -55,6 +55,10 @@ public class RedPreferences {
 
     public static final String SEPARATOR_MODE = "red.editor.source.separatorMode";
     public static final String SEPARATOR_TO_USE = "red.editor.source.separatorToUse";
+    public static final String SEPARATOR_JUMP_MODE_ENABLED = "red.editor.general.separatorJumpModeEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_ENABLED = "red.editor.general.variablesBracketsInsertionEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED = "red.editor.general.variablesBracketsInsertionWrappingEnabled";
+    public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN = "red.editor.general.variablesBracketsInsertionWrappingPattern";
 
     public static final String FOLDABLE_SECTIONS = "red.editor.folding.foldableSections";
     public static final String FOLDABLE_CASES = "red.editor.folding.foldableCases";
@@ -68,6 +72,7 @@ public class RedPreferences {
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "red.editor.assistant.autoActivationChars";
     public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "red.editor.assistant.keywordPrefixAutoAdditionEnabled";
     public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
+    public static final String ASSISTANT_LINKED_ARGUMENTS_MODE = "red.editor.assistant.linkedArgumentsMode";
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
@@ -177,6 +182,22 @@ public class RedPreferences {
         }
     }
 
+    public boolean isSeparatorJumpModeEnabled() {
+        return store.getBoolean(SEPARATOR_JUMP_MODE_ENABLED);
+    }
+
+    public boolean isVariablesBracketsInsertionEnabled() {
+        return store.getBoolean(VARIABLES_BRACKETS_INSERTION_ENABLED);
+    }
+
+    public boolean isVariablesBracketsInsertionWrappingEnabled() {
+        return store.getBoolean(VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED);
+    }
+
+    public String getVariablesBracketsInsertionWrappingPattern() {
+        return store.getString(VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN);
+    }
+
     public int getMinimalNumberOfArgumentColumns() {
         return store.getInt(MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS);
     }
@@ -207,6 +228,10 @@ public class RedPreferences {
 
     public boolean isAssistantKeywordFromNotImportedLibraryEnabled() {
         return store.getBoolean(ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED);
+    }
+
+    public LinkedModeStrategy getAssistantLinkedArgumentsMode() {
+        return LinkedModeStrategy.valueOf(store.getString(ASSISTANT_LINKED_ARGUMENTS_MODE));
     }
 
     public boolean isAutoDiscoveringEnabled() {
@@ -523,5 +548,10 @@ public class RedPreferences {
         NEVER,
         ALWAYS,
         PROMPT
+    }
+
+    public enum LinkedModeStrategy {
+        CYCLE,
+        EXIT_ON_LAST
     }
 }

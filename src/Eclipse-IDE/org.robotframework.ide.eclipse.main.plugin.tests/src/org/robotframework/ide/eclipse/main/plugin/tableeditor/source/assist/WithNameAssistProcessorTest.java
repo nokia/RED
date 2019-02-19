@@ -13,6 +13,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -24,49 +25,48 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
-
 public class WithNameAssistProcessorTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(WithNameAssistProcessorTest.class);
 
+    private static IFile suite;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("suite.robot",
+        suite = projectProvider.createFile("suite.robot",
                 "*** Settings ***", "Library  FooBar  ", "Resource  res.robot", "Library  FooBar  with xyz");
     }
 
     @AfterClass
     public static void afterSuite() {
-        projectProvider = null;
+        suite = null;
     }
 
     @Test
     public void withNameProcessorIsValidOnlyForSettingsSection() {
         final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+                createAssistant(suite));
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
     @Test
     public void withNameProcessorHasTitleDefined() {
         final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+                createAssistant(suite));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
     @Test
     public void noProposalsAreProvided_whenIsBeforeThirdCell() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
-        // use real offset and probably mock settingsgroup
+        // use real offset and probably mock settings group
         when(document.getContentType(30)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 30);
 
         assertThat(proposals).isNull();
@@ -75,13 +75,12 @@ public class WithNameAssistProcessorTest {
     @Test
     public void noProposalsAreProvided_whenNotInApplicableContentType() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(72)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 72);
 
         assertThat(proposals).isNull();
@@ -90,13 +89,12 @@ public class WithNameAssistProcessorTest {
     @Test
     public void withNameProposalIsProvided_whenInApplicableContentType() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(72)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 72);
 
         assertThat(proposals).isNotNull();
@@ -107,13 +105,12 @@ public class WithNameAssistProcessorTest {
     @Test
     public void withNameProposalIsProvided_whenInApplicableContentTypeAndMatchesInput() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(74)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 74);
 
         assertThat(proposals).isNotNull();
@@ -124,13 +121,12 @@ public class WithNameAssistProcessorTest {
     @Test
     public void withNameProposalIsProvided_whenInApplicableContentTypeAndAtTheEndOfCell() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(34)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 34);
 
         assertThat(proposals).isNotNull();
@@ -141,20 +137,14 @@ public class WithNameAssistProcessorTest {
     @Test
     public void noProposalsAreProvided_whenInApplicableContentTypeButDoesNotMatchInput() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(80)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssistant(projectProvider.getFile("suite.robot")));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssistant(suite));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 80);
 
         assertThat(proposals).isEmpty();
-    }
-
-    private IDocument documentFromFile(final String fileName) throws Exception {
-        final String content = projectProvider.getFileContent(fileName);
-        return new Document(Splitter.on('\n').splitToList(content));
     }
 }

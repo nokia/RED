@@ -44,7 +44,7 @@ public class RedVariableProposals {
     @VisibleForTesting
     RedVariableProposals(final RobotModel model, final RobotSuiteFile suiteFile,
             final AssistProposalPredicate<String> globalVarPredicate) {
-        this(model, suiteFile, ProposalMatchers.substringMatcher(), globalVarPredicate);
+        this(model, suiteFile, ProposalMatchers.variablesMatcher(), globalVarPredicate);
     }
 
     @VisibleForTesting

@@ -31,8 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
-
 public class ResourcesImportAssistProcessorTest {
 
     @ClassRule
@@ -84,7 +82,7 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 42;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
@@ -102,7 +100,7 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 27;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -120,7 +118,7 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 60;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -138,7 +136,7 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 42;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -163,7 +161,7 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 76;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -188,7 +186,7 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 80;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromImportingFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -204,11 +202,5 @@ public class ResourcesImportAssistProcessorTest {
         assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal))
                 .containsOnly(new Document("*** Settings ***", "Library   cell", "Resource  ", "Resource  cell1  cell2",
                         "Resource  dir1/res1.robot"));
-    }
-
-    private static IDocument documentFromImportingFile() throws Exception {
-        final String path = importingFile.getProjectRelativePath().toPortableString();
-        final String content = projectProvider.getFileContent(path);
-        return new Document(Splitter.on('\n').splitToList(content));
     }
 }

@@ -15,6 +15,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -32,8 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
-
 public class ImportsInSettingsAssistProcessorTest {
 
     @ClassRule
@@ -41,6 +40,8 @@ public class ImportsInSettingsAssistProcessorTest {
             ImportsInSettingsAssistProcessorTest.class);
 
     private static RobotModel robotModel;
+
+    private static IFile suite;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
@@ -50,7 +51,7 @@ public class ImportsInSettingsAssistProcessorTest {
         robotProject.setReferencedLibraries(Libraries.createRefLibs("lib", "lib2"));
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw");
 
-        projectProvider.createFile("suite.robot",
+        suite = projectProvider.createFile("suite.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
                 "Suite Setup     abc  def  ghi",
@@ -69,11 +70,12 @@ public class ImportsInSettingsAssistProcessorTest {
     @AfterClass
     public static void afterSuite() {
         robotModel = null;
+        suite = null;
     }
 
     @Test
     public void importsInSettingsProcessorIsValidOnlyForSettingsSections() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -82,7 +84,7 @@ public class ImportsInSettingsAssistProcessorTest {
 
     @Test
     public void importsInSettingsProcessorHasTitleDefined() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
@@ -93,12 +95,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 53;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -112,12 +114,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 37;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -131,12 +133,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 58;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -150,12 +152,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 203;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -169,12 +171,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 233;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -188,12 +190,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 263;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -207,12 +209,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 293;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -226,12 +228,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 53;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -267,12 +269,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 83;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -308,12 +310,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 113;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -349,12 +351,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 143;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -390,12 +392,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 173;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -431,12 +433,12 @@ public class ImportsInSettingsAssistProcessorTest {
         final int offset = 54;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
@@ -452,10 +454,5 @@ public class ImportsInSettingsAssistProcessorTest {
                         "Test Template   abc  def  ghi", "Force Tags      abc  def  ghi",
                         "Default Tags    abc  def  ghi", "Documentation   abc  def  ghi",
                         "Metadata        abc  def  ghi", "Library  lib", "Library  lib2  WITH NAME  alias"));
-    }
-
-    private static IDocument documentFromSuiteFile() throws Exception {
-        final String content = projectProvider.getFileContent("suite.robot");
-        return new Document(Splitter.on('\n').splitToList(content));
     }
 }

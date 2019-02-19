@@ -18,6 +18,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
@@ -137,8 +138,8 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
         final Collection<Runnable> operations = new ArrayList<>();
 
         if (!regionsToLinkedEdit.isEmpty()) {
-            operations.add(() -> SwtThread
-                    .asyncExec(() -> RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit)));
+            operations.add(() -> SwtThread.asyncExec(() -> RedEditorLinkedModeUI.enableLinkedMode(viewer,
+                    regionsToLinkedEdit, RedPlugin.getDefault().getPreferences().getAssistantLinkedArgumentsMode())));
         }
 
         return operations;

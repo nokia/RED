@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -49,8 +50,6 @@ import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
-
 public class KeywordCallsAssistProcessorTest {
 
     @ClassRule
@@ -61,13 +60,15 @@ public class KeywordCallsAssistProcessorTest {
 
     private static RobotModel robotModel;
 
+    private static IFile suite;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw1", "kw2");
 
-        projectProvider.createFile("suite.robot",
+        suite = projectProvider.createFile("suite.robot",
                 "*** Test Cases ***",
                 "case",
                 "  ",
@@ -83,12 +84,13 @@ public class KeywordCallsAssistProcessorTest {
     @AfterClass
     public static void afterSuite() {
         robotModel = null;
+        suite = null;
         RedPlugin.getModelManager().dispose();
     }
 
     @Test
     public void keywordsProcessorIsValidOnlyForKeywordsOrCasesSections() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
@@ -97,7 +99,7 @@ public class KeywordCallsAssistProcessorTest {
 
     @Test
     public void keywordsProcessorHasTitleDefined() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
@@ -107,12 +109,12 @@ public class KeywordCallsAssistProcessorTest {
         final int offset = 26;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -125,12 +127,12 @@ public class KeywordCallsAssistProcessorTest {
         final int offset = 24;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -143,12 +145,12 @@ public class KeywordCallsAssistProcessorTest {
         final int offset = 26;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -176,12 +178,12 @@ public class KeywordCallsAssistProcessorTest {
         final int offset = 29;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -205,12 +207,12 @@ public class KeywordCallsAssistProcessorTest {
         final int offset = 36;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -228,12 +230,12 @@ public class KeywordCallsAssistProcessorTest {
         final int offset = 41;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -252,7 +254,7 @@ public class KeywordCallsAssistProcessorTest {
 
     @Test
     public void regionsForLiveEditOfEmbeddedKeyword_areProperlyCalculated() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final KeywordEntity entity = new MockProposal("keyword ${e1} with ${e2} args");
@@ -263,7 +265,7 @@ public class KeywordCallsAssistProcessorTest {
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithoutArguments_areEmpty() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final KeywordEntity entity = new MockProposal("keyword");
@@ -274,7 +276,7 @@ public class KeywordCallsAssistProcessorTest {
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithSingleArgument_areProperlyCalculated() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final KeywordEntity entity = new MockProposal("keyword", "arg1");
@@ -285,7 +287,7 @@ public class KeywordCallsAssistProcessorTest {
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithManyArgument_areProperlyCalculated() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final KeywordEntity entity = new MockProposal("keyword", "arg1", "arg2");
@@ -304,12 +306,12 @@ public class KeywordCallsAssistProcessorTest {
         final int offset = 29;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile());
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -319,11 +321,6 @@ public class KeywordCallsAssistProcessorTest {
                 .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getKeywordImage())))
                 .haveExactly(4, proposalWithOperationsToPerformAfterAccepting(0))
                 .haveExactly(2, proposalWithOperationsToPerformAfterAccepting(1));
-    }
-
-    private static IDocument documentFromSuiteFile() throws Exception {
-        final String content = projectProvider.getFileContent("suite.robot");
-        return new Document(Splitter.on('\n').splitToList(content));
     }
 
     private static class MockProposal extends KeywordEntity implements AssistProposal {

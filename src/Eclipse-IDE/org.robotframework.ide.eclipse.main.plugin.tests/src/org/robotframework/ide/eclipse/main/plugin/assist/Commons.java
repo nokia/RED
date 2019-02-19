@@ -13,42 +13,24 @@ import com.google.common.collect.Range;
 class Commons {
 
     static ProposalMatcher prefixesMatcher() {
-        return new ProposalMatcher() {
-
-            @Override
-            public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
-                if (proposalContent.toLowerCase().startsWith(userContent.toLowerCase())) {
-                    return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
-                } else {
-                    return Optional.empty();
-                }
-            }
-        };
-    }
-
-    static <T> Comparator<T> reverseComparator(final Comparator<T> comparator) {
-        return new Comparator<T>() {
-
-            @Override
-            public int compare(final T o1, final T o2) {
-                return comparator.compare(o2, o1);
+        return (userContent, proposalContent) -> {
+            if (proposalContent.toLowerCase().startsWith(userContent.toLowerCase())) {
+                return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
+            } else {
+                return Optional.empty();
             }
         };
     }
 
     static Comparator<AssistProposal> firstProposalContaining(final String toContain) {
-        return new Comparator<AssistProposal>() {
-
-            @Override
-            public int compare(final AssistProposal p1, final AssistProposal p2) {
-                final boolean contains1 = p1.getLabel().contains(toContain);
-                final boolean contains2 = p2.getLabel().contains(toContain);
-                final int result = Boolean.compare(contains2, contains1);
-                if (result != 0) {
-                    return result;
-                }
-                return Integer.compare(p1.getLabel().indexOf(toContain), p2.getLabel().indexOf(toContain));
+        return (p1, p2) -> {
+            final boolean contains1 = p1.getLabel().contains(toContain);
+            final boolean contains2 = p2.getLabel().contains(toContain);
+            final int result = Boolean.compare(contains2, contains1);
+            if (result != 0) {
+                return result;
             }
+            return Integer.compare(p1.getLabel().indexOf(toContain), p2.getLabel().indexOf(toContain));
         };
     }
 }

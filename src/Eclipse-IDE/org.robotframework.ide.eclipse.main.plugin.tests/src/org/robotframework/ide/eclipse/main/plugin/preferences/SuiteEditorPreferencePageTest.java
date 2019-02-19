@@ -24,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
+import org.robotframework.red.jface.preferences.RegexStringFieldEditor;
 import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
 import org.robotframework.red.junit.ShellProvider;
 
@@ -48,12 +49,15 @@ public class SuiteEditorPreferencePageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(7);
+        assertThat(editors).hasSize(11);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
         assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
-                names -> assertThat(names).containsOnly(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB));
+                names -> assertThat(names).containsOnly(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB,
+                        RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED,
+                        RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED,
+                        RedPreferences.SEPARATOR_JUMP_MODE_ENABLED));
         assertThat(namesGroupedByType).hasEntrySatisfying(ComboBoxFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.FILE_ELEMENTS_OPEN_MODE,
                         RedPreferences.CELL_WRAPPING, RedPreferences.BEHAVIOR_ON_CELL_COMMIT));
@@ -63,5 +67,7 @@ public class SuiteEditorPreferencePageTest {
                 names -> assertThat(names).containsOnly(RedPreferences.SEPARATOR_MODE));
         assertThat(namesGroupedByType).hasEntrySatisfying(RegexValidatedStringFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.SEPARATOR_TO_USE));
+        assertThat(namesGroupedByType).hasEntrySatisfying(RegexStringFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN));
     }
 }

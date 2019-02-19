@@ -9,6 +9,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -25,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
 import com.google.common.io.CharStreams;
 
 /**
@@ -137,13 +140,11 @@ public class ProjectProvider implements TestRule {
         return file;
     }
 
-    public String getFileContent(final String filePath) throws IOException, CoreException {
-        return getFileContent(getFile(filePath));
-    }
-
-    public String getFileContent(final IFile file) throws IOException, CoreException {
+    public List<String> getFileContent(final IFile file) {
         try (final InputStream stream = file.getContents()) {
-            return CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
+            return Splitter.on('\n').splitToList(CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8)));
+        } catch (IOException | CoreException e) {
+            return new ArrayList<>();
         }
     }
 

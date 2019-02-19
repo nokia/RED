@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
 
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class RedSettingProposalsTest {
     @Test
     public void generalSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL_TESTS)
-                .getSettingsProposals("Te", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("Te")));
+                .getSettingsProposals("Te", AssistProposals.sortedByLabelsPrefixedFirst("Te").reversed());
 
         assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("Suite Teardown", "Suite Setup", "Test Timeout", "Test Template", "Test Teardown",
@@ -137,7 +136,7 @@ public class RedSettingProposalsTest {
     @Test
     public void keywordSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
-                .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("[T")));
+                .getSettingsProposals("[T", AssistProposals.sortedByLabelsPrefixedFirst("[T").reversed());
 
         assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("[Timeout]", "[Teardown]", "[Tags]");
     }
@@ -178,7 +177,7 @@ public class RedSettingProposalsTest {
     @Test
     public void testCaseSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
-                .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("[T")));
+                .getSettingsProposals("[T", AssistProposals.sortedByLabelsPrefixedFirst("[T").reversed());
 
         assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("[Timeout]", "[Template]", "[Teardown]", "[Tags]");

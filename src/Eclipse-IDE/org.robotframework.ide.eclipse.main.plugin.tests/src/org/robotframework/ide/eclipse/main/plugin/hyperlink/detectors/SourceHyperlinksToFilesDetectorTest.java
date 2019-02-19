@@ -10,13 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinksToFilesDetectorTest.objectsOfClass;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -28,8 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.base.Splitter;
 
 public class SourceHyperlinksToFilesDetectorTest {
 
@@ -52,7 +44,7 @@ public class SourceHyperlinksToFilesDetectorTest {
                 "*** Settings ***",
                 "Resource  file.robot  arg1  arg2");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -102,7 +94,7 @@ public class SourceHyperlinksToFilesDetectorTest {
                 "*** Settings ***",
                 "Resource  file.robot  arg1  arg2");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -125,7 +117,7 @@ public class SourceHyperlinksToFilesDetectorTest {
                 "kw",
                 "  Log  file.robot");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(getContent(file));
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -153,25 +145,17 @@ public class SourceHyperlinksToFilesDetectorTest {
         assertThat(hyperlinks).hasSize(1).have(objectsOfClass(FileHyperlink.class));
     }
 
-    private static IHyperlink[] detect(final String file, final String settingName, final String path)
+    private static IHyperlink[] detect(final String filePath, final String settingName, final String path)
             throws Exception {
-        final IFile f = projectProvider.createFile(file, "*** Settings ***",
+        final IFile file = projectProvider.createFile(filePath, "*** Settings ***",
                 settingName + "  " + path);
-        final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(f);
-        final Document document = new Document(getContent(f));
+        final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
+        final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
 
         final SourceHyperlinksToFilesDetector detector = new SourceHyperlinksToFilesDetector(suiteFile);
         return detector.detectHyperlinks(textViewer, new Region(30, 1), true);
-    }
-
-    private static List<String> getContent(final IFile file) {
-        try (InputStream stream = file.getContents()) {
-            return Splitter.on('\n').splitToList(projectProvider.getFileContent(file));
-        } catch (IOException | CoreException e) {
-            return new ArrayList<>();
-        }
     }
 }

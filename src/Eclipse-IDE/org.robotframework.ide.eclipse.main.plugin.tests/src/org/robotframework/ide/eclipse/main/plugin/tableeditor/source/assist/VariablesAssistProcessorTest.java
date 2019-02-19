@@ -15,6 +15,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -32,8 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Splitter;
-
 public class VariablesAssistProcessorTest {
 
     @ClassRule
@@ -41,13 +40,17 @@ public class VariablesAssistProcessorTest {
 
     private static RobotModel robotModel;
 
+    private static IFile suite;
+
+    private static IFile kwArgsSuite;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
         robotModel = new RobotModel();
 
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw1", "kw2");
 
-        projectProvider.createFile("suite.robot",
+        suite = projectProvider.createFile("suite.robot",
                 "*** Test Cases ***",
                 "case",
                 "  call  abc  d${bcdef",
@@ -61,7 +64,7 @@ public class VariablesAssistProcessorTest {
                 "&{d}  k1=v1  k2=v2",
                 "*** Settings ***",
                 "Metadata  abc  def");
-        projectProvider.createFile("keyword_args.robot",
+        kwArgsSuite = projectProvider.createFile("keyword_args.robot",
                 "*** Keywords ***",
                 "keyword",
                 "  [Arguments]  ${x}  ${y}",
@@ -77,11 +80,13 @@ public class VariablesAssistProcessorTest {
     @AfterClass
     public static void afterSuite() {
         robotModel = null;
+        suite = null;
+        kwArgsSuite = null;
     }
 
     @Test
     public void variablesProcessorIsValidOnlyForKeywordsOrCasesSections() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(
@@ -94,7 +99,7 @@ public class VariablesAssistProcessorTest {
 
     @Test
     public void variablesProcessorHasTitleDefined() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
@@ -104,12 +109,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 33;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn("__ct");
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -122,12 +127,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 19;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -140,12 +145,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 24;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -158,12 +163,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 63;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -176,12 +181,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 71;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -194,12 +199,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 111;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -212,12 +217,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 127;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -230,12 +235,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 160;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -248,12 +253,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 177;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -266,12 +271,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 32;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -301,12 +306,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 41;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -325,12 +330,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 88;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -349,12 +354,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 33;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -373,12 +378,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 85;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -397,12 +402,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 59;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("keyword_args.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(kwArgsSuite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("keyword_args.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(kwArgsSuite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -421,12 +426,12 @@ public class VariablesAssistProcessorTest {
         final int offset = 69;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(documentFromSuiteFile("keyword_args.robot"));
+        final IDocument document = spy(new Document(projectProvider.getFileContent(kwArgsSuite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("keyword_args.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(kwArgsSuite);
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -439,10 +444,5 @@ public class VariablesAssistProcessorTest {
                         "*** Test Cases ***"),
                 new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  abc  def  ${y}",
                         "*** Test Cases ***"));
-    }
-
-    private static IDocument documentFromSuiteFile(final String fileName) throws Exception {
-        final String content = projectProvider.getFileContent(fileName);
-        return new Document(Splitter.on('\n').splitToList(content));
     }
 }
