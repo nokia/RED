@@ -7,10 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
+import java.util.function.Consumer;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -21,6 +24,8 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 public class LaunchingPreferencePage extends RedFieldEditorPreferencePage {
+
+    private Consumer<Boolean> messageLogLimitEnablementUpdater;
 
     @Override
     protected void createFieldEditors() {
@@ -124,12 +129,31 @@ public class LaunchingPreferencePage extends RedFieldEditorPreferencePage {
 
         final IntegerFieldEditor limitLengthEditor = new IntegerFieldEditor(RedPreferences.LIMIT_MSG_LOG_LENGTH,
                 "Buffer size (characters)", group, 7);
-        button.addSelectionListener(
-                widgetSelectedAdapter(e -> limitLengthEditor.setEnabled(button.getSelection(), group)));
         final Label limitLabel = limitLengthEditor.getLabelControl(group);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(limitLabel);
         limitLengthEditor.setValidRange(0, 9_999_999);
         limitLengthEditor.setEnabled(getPreferenceStore().getBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT), group);
         addField(limitLengthEditor);
+
+        messageLogLimitEnablementUpdater = value -> limitLengthEditor.setEnabled(value, group);
+        messageLogLimitEnablementUpdater.accept(getPreferenceStore().getBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT));
+    }
+
+    @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+        if (event.getSource() instanceof BooleanFieldEditor
+                && ((BooleanFieldEditor) event.getSource()).getPreferenceName()
+                        .equals(RedPreferences.LIMIT_MSG_LOG_OUTPUT)) {
+            messageLogLimitEnablementUpdater.accept((Boolean) event.getNewValue());
+        }
+        super.propertyChange(event);
+    }
+
+    @Override
+    protected void performDefaults() {
+        super.performDefaults();
+
+        messageLogLimitEnablementUpdater
+                .accept(getPreferenceStore().getDefaultBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT));
     }
 }

@@ -353,7 +353,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
         viewer.getTree().setEnabled(false);
         excludeFilesBtn.setEnabled(false);
-        excludeFilesTxt.setEditable(false);
+        excludeFilesTxt.setEnabled(false);
     }
 
     @Inject
@@ -362,7 +362,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
         viewer.getTree().setEnabled(editorInput.isEditable());
         excludeFilesBtn.setEnabled(editorInput.isEditable());
-        excludeFilesTxt.setEditable(editorInput.isEditable());
+        excludeFilesTxt.setEnabled(excludeFilesBtn.getSelection() && editorInput.isEditable());
     }
 
     @Inject

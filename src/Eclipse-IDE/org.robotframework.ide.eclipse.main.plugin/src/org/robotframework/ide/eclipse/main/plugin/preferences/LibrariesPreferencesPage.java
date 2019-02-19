@@ -49,7 +49,7 @@ public class LibrariesPreferencesPage extends RedFieldEditorPreferencePage {
         addField(discoveringSummaryEditor);
         final Button discoveringSummaryButton = (Button) discoveringSummaryEditor
                 .getDescriptionControl(discoveringGroup);
-        GridDataFactory.fillDefaults().indent(5, 5).applyTo(discoveringSummaryButton);
+        GridDataFactory.fillDefaults().indent(25, 5).applyTo(discoveringSummaryButton);
 
         final BooleanFieldEditor recursiveAdditionEditor = new BooleanFieldEditor(
                 RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED,
