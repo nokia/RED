@@ -129,7 +129,7 @@ public class ReferencedLibraryLocatorTest {
         verifyZeroInteractions(importer);
 
         verify(detector).libraryDetectingByPathFailed(eq("{}/path_lib.py"), eq(Optional.empty()),
-                startsWith("java.net.URISyntaxException"));
+                startsWith("Illegal character in path"));
         verifyNoMoreInteractions(detector);
     }
 

@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.importer;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +16,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.rf.ide.core.project.ImportPath;
+import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.project.ResolvedImportPath;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -32,8 +36,6 @@ import com.google.common.annotations.VisibleForTesting;
 public class VariablesImporter {
 
     private static final Pattern ILLEGAL_PATH_TEXT = Pattern.compile("\\s+([\\\\]|/)");
-
-    private final AbsoluteUriFinder uriFinder = new AbsoluteUriFinder();
 
     public List<VariablesFileImportReference> importVariables(final PathsProvider pathsProvider,
             final RobotProjectHolder robotProject, final RobotFileOutput robotFile) {
@@ -63,8 +65,7 @@ public class VariablesImporter {
                     URI importUri = null;
                     final File currentRobotFile = robotFile.getProcessedFile().getAbsoluteFile();
                     try {
-                        final Optional<URI> foundUri = uriFinder.find(pathsProvider, variableMappings, currentRobotFile,
-                                path);
+                        final Optional<URI> foundUri = find(pathsProvider, variableMappings, currentRobotFile, path);
                         if (foundUri.isPresent()) {
                             importUri = foundUri.get();
                         } else {
@@ -116,6 +117,19 @@ public class VariablesImporter {
             }
         }
         return varsImported;
+    }
+
+    private Optional<URI> find(final PathsProvider pathsProvider, final Map<String, String> variableMappings,
+            final File importingFile, final String dependencyImportPath) throws URISyntaxException {
+        if (!importingFile.exists()) {
+            throw new IllegalStateException("Current file should exist");
+        }
+        final ImportPath importPath = ImportPath.from(dependencyImportPath);
+        final Optional<ResolvedImportPath> resolvedImportPath = ResolvedImportPath.from(importPath, variableMappings);
+        if (!resolvedImportPath.isPresent()) {
+            throw new IllegalStateException("Unable to resolve parameterized import path");
+        }
+        return new ImportSearchPaths(pathsProvider).findAbsoluteUri(importingFile.toURI(), resolvedImportPath.get());
     }
 
     @VisibleForTesting

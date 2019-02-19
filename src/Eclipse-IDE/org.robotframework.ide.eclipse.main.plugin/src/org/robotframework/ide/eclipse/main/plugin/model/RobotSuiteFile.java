@@ -456,7 +456,7 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
         }
         final RobotProject robotProject = getRobotProject();
         return fileOutput.getVariablesImportReferences(robotProject.getRobotProjectHolder(),
-                robotProject.createPathsProvider());
+                new RobotProjectPathsProvider(getRobotProject()).createPathsProvider());
     }
 
     public String getDocumentation() {

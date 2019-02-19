@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.File;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,9 +17,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.RedURI;
-import org.rf.ide.core.project.ImportSearchPaths.MarkedUri;
+import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProjectPathsProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
@@ -32,13 +34,10 @@ import com.google.common.collect.ImmutableMap;
 
 class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsValidator {
 
-    final RobotSuiteFile suiteFile;
-
     GeneralSettingsResourcesImportValidator(final FileValidationContext validationContext,
             final RobotSuiteFile suiteFile, final List<ResourceImport> imports,
             final ValidationReportingStrategy reporter) {
         super(validationContext, suiteFile, imports, reporter);
-        this.suiteFile = suiteFile;
     }
 
     @Override
@@ -97,9 +96,10 @@ class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsVali
                         pathToken);
             } else {
                 final String parentContainerName = new File(file.getParent()).getName();
-                final Optional<MarkedUri> absoluteMarkedPath = calculateAbsoluteUri(path);
-                final String absoluteImportString = absoluteMarkedPath.isPresent() ? RedURI.reverseUriSpecialCharsEscapes(
-                        new File(absoluteMarkedPath.get().getPath()).getAbsolutePath().replaceAll("\\\\", "/")) : "";
+                final Optional<URI> absoluteUri = new RobotProjectPathsProvider(suiteFile.getRobotProject())
+                        .tryToFindAbsoluteUri(suiteFile.getFile(), ImportPath.from(path));
+                final String absoluteImportString = absoluteUri.map(uri -> RedURI.reverseUriSpecialCharsEscapes(
+                        new File(uri.getPath()).getAbsolutePath().replaceAll("\\\\", "/"))).orElse("");
                 // When a relative path is too long to be properly resolved we get an absolute
                 // path with '..' (e.g. 'D:/../res.robot'). If such file exists the third
                 // condition avoids the problems caused by incorrect relative constructions.

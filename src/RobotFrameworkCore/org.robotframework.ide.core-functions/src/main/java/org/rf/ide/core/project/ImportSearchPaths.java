@@ -18,10 +18,6 @@ public class ImportSearchPaths {
         this.pathsProvider = pathsProvider;
     }
 
-    public URI getAbsoluteUri(final URI importingFileUri, final ResolvedImportPath importPath) {
-        return findAbsoluteUri(importingFileUri, importPath).get();
-    }
-
     public Optional<URI> findAbsoluteUri(final URI importingFileUri, final ResolvedImportPath importPath) {
         return findAbsoluteMarkedUri(importingFileUri, importPath).map(MarkedUri::getPath);
     }
