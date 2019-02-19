@@ -7,29 +7,28 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
+import java.util.function.Consumer;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
 import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 
 public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
 
-    private Text charsTextControl;
-
-    private Text delayTextControl;
+    private Consumer<Boolean> autoActivationEnablementUpdater;
 
     @Override
     protected void createFieldEditors() {
@@ -72,34 +71,29 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
         addField(autoActivationEnabled);
         final Button button = (Button) autoActivationEnabled.getDescriptionControl(autoActivationGroup);
         GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
-        final boolean isAutoActivationEnabled = RedPlugin.getDefault()
-                .getPreferences()
-                .isAssistantAutoActivationEnabled();
 
         final IntegerFieldEditor autoActivationDelay = new IntegerFieldEditor(
                 RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, "Auto activation delay (ms)", autoActivationGroup, 3);
         addField(autoActivationDelay);
-        delayTextControl = autoActivationDelay.getTextControl(autoActivationGroup);
-        delayTextControl.setEnabled(isAutoActivationEnabled);
         GridDataFactory.fillDefaults().indent(25, 2).applyTo(autoActivationDelay.getLabelControl(autoActivationGroup));
 
         final StringFieldEditor autoActivationChars = new StringFieldEditor(
                 RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "Auto activation triggers", autoActivationGroup);
         addField(autoActivationChars);
-        charsTextControl = autoActivationChars.getTextControl(autoActivationGroup);
-        charsTextControl.setEnabled(isAutoActivationEnabled);
         GridDataFactory.fillDefaults().indent(25, 2).applyTo(autoActivationChars.getLabelControl(autoActivationGroup));
-
-        button.addSelectionListener(widgetSelectedAdapter(e -> {
-            delayTextControl.setEnabled(button.getSelection());
-            charsTextControl.setEnabled(button.getSelection());
-        }));
 
         final Label autoActivationDescription = new Label(autoActivationGroup, SWT.WRAP);
         autoActivationDescription.setText(
                 "Completion can be triggered by user request or can be automatically triggered when one of specified characters is typed.");
         GridDataFactory.fillDefaults().hint(150, SWT.DEFAULT).indent(5, 2).span(2, 1).grab(true, false).applyTo(
                 autoActivationDescription);
+
+        autoActivationEnablementUpdater = value -> {
+            autoActivationDelay.setEnabled(value, autoActivationGroup);
+            autoActivationChars.setEnabled(value, autoActivationGroup);
+        };
+        autoActivationEnablementUpdater
+                .accept(getPreferenceStore().getBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED));
     }
 
     private void createKeywordPrefixAutoAdditionEditor(final Composite parent) {
@@ -146,12 +140,21 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
     }
 
     @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+        if (event.getSource() instanceof BooleanFieldEditor
+                && ((BooleanFieldEditor) event.getSource()).getPreferenceName()
+                        .equals(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED)) {
+            autoActivationEnablementUpdater.accept((Boolean) event.getNewValue());
+        }
+        super.propertyChange(event);
+    }
+
+    @Override
     protected void performDefaults() {
         super.performDefaults();
 
         final boolean isAutoActivationEnabled = getPreferenceStore()
                 .getDefaultBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED);
-        delayTextControl.setEnabled(isAutoActivationEnabled);
-        charsTextControl.setEnabled(isAutoActivationEnabled);
+        autoActivationEnablementUpdater.accept(isAutoActivationEnabled);
     }
 }

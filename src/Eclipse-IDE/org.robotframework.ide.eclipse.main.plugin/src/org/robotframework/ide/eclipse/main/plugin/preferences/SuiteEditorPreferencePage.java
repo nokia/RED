@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
@@ -35,7 +34,9 @@ import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
 
 public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
 
-    private Consumer<PropertyChangeEvent> separatorEnablementUpdater;
+    private static final String SEPARATOR_PATTERN = "^(ss+)|t+|((s|t)+\\|(s|t)+)$"; //$NON-NLS-1$
+
+    private Consumer<String> separatorEnablementUpdater;
 
     private BiConsumer<Boolean, Boolean> variablesEnablementUpdater;
 
@@ -146,36 +147,36 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
         GridDataFactory.fillDefaults().indent(0, 20).grab(true, false).span(2, 1).applyTo(sourceGroup);
         GridLayoutFactory.fillDefaults().applyTo(sourceGroup);
 
+        final Composite editorsParent = new Composite(sourceGroup, SWT.NONE);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(editorsParent);
         final RadioGroupFieldEditor editors = new RadioGroupFieldEditor(RedPreferences.SEPARATOR_MODE,
-                "When Tab key is pressed in source editor", 1, createTabPressLabelsAndValues(), sourceGroup);
+                "When Tab key is pressed in source editor", 1, createTabPressLabelsAndValues(), editorsParent);
         addField(editors);
-        GridDataFactory.fillDefaults().indent(5, 5).applyTo(editors.getLabelControl(sourceGroup));
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(editors.getLabelControl(editorsParent));
 
-        final String regex = "^(ss+)|t+|((s|t)+\\|(s|t)+)$";
+        final Composite separatorParent = new Composite(sourceGroup, SWT.NONE);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(separatorParent);
         final RegexValidatedStringFieldEditor separatorEditor = new RegexValidatedStringFieldEditor(
                 RedPreferences.SEPARATOR_TO_USE, "User defined separator (use '|', 's' for space or 't' for tab)",
-                regex, sourceGroup);
+                SEPARATOR_PATTERN, separatorParent);
         separatorEditor.setErrorMessage(
                 "User defined separator should have at least one tab or two spaces, or bar '|' surrounded "
                         + "with at least one space or tab");
         addField(separatorEditor);
-        GridDataFactory.fillDefaults().indent(5, 0).applyTo(separatorEditor.getLabelControl(sourceGroup));
-        final SeparatorsMode currentMode = SeparatorsMode
-                .valueOf(getPreferenceStore().getString(RedPreferences.SEPARATOR_MODE));
-        separatorEditor.setEnabled(currentMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
+        GridDataFactory.fillDefaults().indent(25, 0).applyTo(separatorEditor.getLabelControl(separatorParent));
 
-        separatorEnablementUpdater = event -> {
-            if (event.getSource() == editors) {
-                final SeparatorsMode newMode = SeparatorsMode.valueOf((String) event.getNewValue());
-                separatorEditor.setEnabled(newMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
-            }
-        };
-
+        final Composite sourceJumpModeParent = new Composite(sourceGroup, SWT.NONE);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(sourceJumpModeParent);
         final BooleanFieldEditor sourceJumpModeEditor = new BooleanFieldEditor(
-                RedPreferences.SEPARATOR_JUMP_MODE_ENABLED, "Jump out of active region", sourceGroup);
+                RedPreferences.SEPARATOR_JUMP_MODE_ENABLED, "Jump out of active region", sourceJumpModeParent);
         addField(sourceJumpModeEditor);
-        final Button sourceJumpModeEditorCheckbox = (Button) sourceJumpModeEditor.getDescriptionControl(sourceGroup);
+        final Button sourceJumpModeEditorCheckbox = (Button) sourceJumpModeEditor
+                .getDescriptionControl(sourceJumpModeParent);
         GridDataFactory.fillDefaults().indent(5, 0).applyTo(sourceJumpModeEditorCheckbox);
+
+        separatorEnablementUpdater = value -> separatorEditor
+                .setEnabled(SeparatorsMode.valueOf(value) != SeparatorsMode.ALWAYS_TABS, separatorParent);
+        separatorEnablementUpdater.accept(getPreferenceStore().getString(RedPreferences.SEPARATOR_MODE));
     }
 
     private String[][] createTabPressLabelsAndValues() {
@@ -209,37 +210,42 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
                 "Automatically wrap selected text with variable brackets", varGroup);
         addField(varWrappingEnabled);
         final Button varWrappingEnabledButton = (Button) varWrappingEnabled.getDescriptionControl(varGroup);
-        GridDataFactory.fillDefaults().indent(5, 0).applyTo(varWrappingEnabledButton);
+        GridDataFactory.fillDefaults().indent(25, 0).applyTo(varWrappingEnabledButton);
 
         final RegexStringFieldEditor varWrappingPattern = new RegexStringFieldEditor(
                 RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN, "Wrap selected text pattern", varGroup);
         varWrappingPattern.setEmptyStringAllowed(false);
         varWrappingPattern.setErrorMessage("Pattern cannot be empty");
         addField(varWrappingPattern);
-        GridDataFactory.fillDefaults().indent(5, 0).applyTo(varWrappingPattern.getLabelControl(varGroup));
-
-        varInsertionEnabledButton.addSelectionListener(widgetSelectedAdapter(e -> {
-            varWrappingEnabled.setEnabled(varInsertionEnabledButton.getSelection(), varGroup);
-            varWrappingPattern.setEnabled(
-                    varInsertionEnabledButton.getSelection() && varWrappingEnabledButton.getSelection(), varGroup);
-        }));
-        varWrappingEnabledButton.addSelectionListener(widgetSelectedAdapter(e -> {
-            varWrappingPattern.setEnabled(varWrappingEnabledButton.getSelection(), varGroup);
-        }));
+        GridDataFactory.fillDefaults().indent(25, 0).applyTo(varWrappingPattern.getLabelControl(varGroup));
 
         variablesEnablementUpdater = (isInsertionEnabled, isWrappingEnabled) -> {
             varWrappingEnabled.setEnabled(isInsertionEnabled, varGroup);
-            varWrappingPattern.setEnabled(isInsertionEnabled && isWrappingEnabled, varGroup);
+            varWrappingPattern.setEnabled(
+                    isInsertionEnabled && (isWrappingEnabled || varWrappingEnabled.getBooleanValue()), varGroup);
         };
-        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        final boolean isInsertionEnabled = preferences.isVariablesBracketsInsertionEnabled();
-        final boolean isWrappingEnabled = preferences.isVariablesBracketsInsertionWrappingEnabled();
+        final boolean isInsertionEnabled = getPreferenceStore()
+                .getBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED);
+        final boolean isWrappingEnabled = getPreferenceStore()
+                .getBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED);
         variablesEnablementUpdater.accept(isInsertionEnabled, isWrappingEnabled);
     }
 
     @Override
     public void propertyChange(final PropertyChangeEvent event) {
-        separatorEnablementUpdater.accept(event);
+        if (event.getSource() instanceof BooleanFieldEditor
+                && ((BooleanFieldEditor) event.getSource()).getPreferenceName()
+                        .equals(RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED)) {
+            variablesEnablementUpdater.accept((Boolean) event.getNewValue(), false);
+        } else if (event.getSource() instanceof BooleanFieldEditor
+                && ((BooleanFieldEditor) event.getSource()).getPreferenceName()
+                        .equals(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED)) {
+            variablesEnablementUpdater.accept(true, (Boolean) event.getNewValue());
+        } else if (event.getSource() instanceof RadioGroupFieldEditor
+                && ((RadioGroupFieldEditor) event.getSource()).getPreferenceName()
+                        .equals(RedPreferences.SEPARATOR_MODE)) {
+            separatorEnablementUpdater.accept((String) event.getNewValue());
+        }
         super.propertyChange(event);
     }
 
@@ -252,5 +258,6 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
         final boolean isWrappingEnabled = getPreferenceStore()
                 .getDefaultBoolean(RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED);
         variablesEnablementUpdater.accept(isInsertionEnabled, isWrappingEnabled);
+        separatorEnablementUpdater.accept(getPreferenceStore().getDefaultString(RedPreferences.SEPARATOR_MODE));
     }
 }
