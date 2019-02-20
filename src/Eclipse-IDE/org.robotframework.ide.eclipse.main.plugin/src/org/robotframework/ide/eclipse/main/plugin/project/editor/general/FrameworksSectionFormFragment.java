@@ -48,6 +48,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -238,24 +239,27 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenEnvironmentLoadingStarted(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        currentFramework.setText("", false, false);
-        sourceButton.setEnabled(false);
-        viewer.getTable().setEnabled(false);
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            currentFramework.setText("", false, false);
+            sourceButton.setEnabled(false);
+            viewer.getTable().setEnabled(false);
 
-        sourceButton.setSelection(!editorInput.getProjectConfiguration().usesPreferences());
+            sourceButton.setSelection(!editorInput.getProjectConfiguration().usesPreferences());
+        }
     }
 
     @Inject
     @Optional
     private void whenEnvironmentsWereLoaded(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        if (viewer.getTable() == null || viewer.getTable().isDisposed()) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final RedProjectConfigEventData<Environments> eventData) {
+        if (viewer.getTable() == null || viewer.getTable().isDisposed()
+                || !eventData.isApplicable(editorInput.getRobotProject())) {
             return;
         }
 
-        final List<IRuntimeEnvironment> allEnvironments = envs.getAllEnvironments();
-        final IRuntimeEnvironment env = envs.getActiveEnvironment();
+        final List<IRuntimeEnvironment> allEnvironments = eventData.getChangedElement().getAllEnvironments();
+        final IRuntimeEnvironment env = eventData.getChangedElement().getActiveEnvironment();
 
         final boolean isEditable = editorInput.isEditable();
         final boolean isUsingPrefs = editorInput.getProjectConfiguration().usesPreferences();

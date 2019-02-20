@@ -12,30 +12,36 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.viewers.ElementAddingToken;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PathsEditingSupportTest {
 
     @Rule
     public ShellProvider shell = new ShellProvider();
 
+    @Mock
+    private Consumer<SearchPath> successHandler;
+
     @Test
     public void editingPossibilityTest() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
-        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
 
         assertThat(support.canEdit(new ElementAddingToken("search path", true))).isTrue();
         assertThat(support.canEdit(SearchPath.create("custom", false))).isTrue();
@@ -44,24 +50,22 @@ public class PathsEditingSupportTest {
 
     @Test
     public void textCellEditorIsReturnedForSearchPath() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
         when(viewer.getControl()).thenReturn(shell.getShell());
 
-        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
 
         assertThat(support.getCellEditor(SearchPath.create("path"))).isInstanceOf(TextCellEditor.class);
     }
 
     @Test
     public void alwaysDeactivatingCellEditorIsReturnedForAddingToken() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
         when(viewer.getControl()).thenReturn(shell.getShell());
 
-        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
 
         assertThat(support.getCellEditor(new ElementAddingToken("search path", true)))
                 .isInstanceOf(AlwaysDeactivatingCellEditor.class);
@@ -69,61 +73,56 @@ public class PathsEditingSupportTest {
 
     @Test
     public void pathIsReturnedAsValueToEditForSearchPath() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
-        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
 
         assertThat(support.getValue(SearchPath.create("path_to_edit"))).isEqualTo("path_to_edit");
     }
 
     @Test
     public void nullIsReturnedAsValueToEditForAddingToken() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
-        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
 
         assertThat(support.getValue(new ElementAddingToken("search path", true))).isNull();
     }
 
     @Test
     public void newPathIsSetToSearchPathAndBrokerNotifiesListenersAboutIt() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
         final SearchPath searchPath = SearchPath.create("path");
 
-        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
         support.setValue(searchPath, "new_path");
 
         assertThat(searchPath.getLocation()).isEqualTo("new_path");
-        verify(eventBroker).send("topic", searchPath);
+        verify(successHandler).accept(searchPath);
     }
 
     @Test
     public void newPathIsNotSetToSearchPathAndBrokerDoesNotNotifyListenersAboutIt() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
         final SearchPath searchPath = SearchPath.create("path");
 
-        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
         support.setValue(searchPath, "path");
 
         assertThat(searchPath.getLocation()).isEqualTo("path");
-        verifyZeroInteractions(eventBroker);
+        verifyZeroInteractions(successHandler);
     }
 
     @Test
     public void creatorIsCalledWhenSettingValueForAddingToken() {
         final AtomicBoolean creatorCalled = new AtomicBoolean(false);
 
-        final IEventBroker eventBroker = mock(IEventBroker.class);
         final Supplier<SearchPath> creator = () -> {
             creatorCalled.set(true);
             return null;
@@ -133,7 +132,7 @@ public class PathsEditingSupportTest {
 
         final ElementAddingToken addingToken = new ElementAddingToken("search path", true);
 
-        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
+        final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
         support.setValue(addingToken, null);
 
         assertThat(creatorCalled.get()).isTrue();

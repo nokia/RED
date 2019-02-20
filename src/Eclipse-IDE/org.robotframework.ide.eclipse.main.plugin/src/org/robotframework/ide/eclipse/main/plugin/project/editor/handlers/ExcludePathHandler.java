@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.handlers;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,9 +43,8 @@ public class ExcludePathHandler extends DIParameterizedHandler<E4ExcludePathHand
                 input.getProjectConfiguration().addExcludedPath(path.toPortableString());
             }
 
-            final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
-                    input.getRobotProject().getConfigurationFile(), locationsToExclude);
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED,
+                    new RedProjectConfigEventData<>(input.getFile(), locationsToExclude));
         }
     }
 }

@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -22,15 +22,12 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport;
  */
 class PathsEditingSupport extends ElementsAddingEditingSupport {
 
-    private final String topic;
-
-    private final IEventBroker eventBroker;
+    private final Consumer<SearchPath> successHandler;
 
     PathsEditingSupport(final ColumnViewer viewer, final Supplier<SearchPath> elementsCreator,
-            final IEventBroker eventBroker, final String pathChangeEventTopic) {
+            final Consumer<SearchPath> successHandler) {
         super(viewer, 0, elementsCreator);
-        this.eventBroker = eventBroker;
-        this.topic = pathChangeEventTopic;
+        this.successHandler = successHandler;
     }
 
     @Override
@@ -70,7 +67,7 @@ class PathsEditingSupport extends ElementsAddingEditingSupport {
 
             if (!newValue.equals(oldValue)) {
                 path.setLocation(newValue);
-                eventBroker.send(topic, element);
+                successHandler.accept(path);
             }
         } else {
             super.setValue(element, value);

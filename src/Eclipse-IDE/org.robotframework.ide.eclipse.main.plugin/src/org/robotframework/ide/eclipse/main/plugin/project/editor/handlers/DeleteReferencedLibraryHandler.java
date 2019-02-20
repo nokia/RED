@@ -42,18 +42,16 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
             input.getRobotProject().unregisterWatchingOnReferencedLibraries(libraries);
 
             if (!libraries.isEmpty()) {
-                final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                        input.getRobotProject().getConfigurationFile(), libraries);
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
+                        new RedProjectConfigEventData<>(input.getFile(), libraries));
             }
 
             final List<RemoteLocation> locations = Selections.getElements(selection, RemoteLocation.class);
             input.getProjectConfiguration().removeRemoteLocations(locations);
 
             if (!locations.isEmpty()) {
-                final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<>(
-                        input.getRobotProject().getConfigurationFile(), locations);
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED,
+                        new RedProjectConfigEventData<>(input.getFile(), locations));
             }
         }
     }

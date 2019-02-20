@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project;
 
 import org.eclipse.core.resources.IFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 /**
  * @author Michal Anglart
@@ -28,6 +29,10 @@ public final class RedProjectConfigEventData<T> {
 
     public T getChangedElement() {
         return changedElement;
+    }
+
+    public boolean isApplicable(final RobotProject robotProject) {
+        return robotProject != null && robotProject.getConfigurationFile().equals(underlyingFile);
     }
 
 }

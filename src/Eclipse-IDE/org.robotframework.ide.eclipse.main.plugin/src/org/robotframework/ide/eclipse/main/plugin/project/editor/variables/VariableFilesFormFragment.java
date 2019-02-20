@@ -32,6 +32,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -161,8 +162,8 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenMarkerChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setInput();
         }
     }
@@ -170,23 +171,26 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenEnvironmentLoadingStarted(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        viewer.getTable().setEnabled(false);
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            viewer.getTable().setEnabled(false);
+        }
     }
 
     @Inject
     @Optional
     private void whenEnvironmentsWereLoaded(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        viewer.getTable().setEnabled(editorInput.isEditable());
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final RedProjectConfigEventData<Environments> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            viewer.getTable().setEnabled(editorInput.isEditable());
+        }
     }
 
     @Inject
     @Optional
     private void whenVarFileDetailChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED) final ReferencedVariableFile newFile) {
-        if (editorInput.getRobotProject() != null
-                && editorInput.getProjectConfiguration().getReferencedVariableFiles().contains(newFile)) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED) final RedProjectConfigEventData<ReferencedVariableFile> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
             viewer.refresh();
         }
@@ -195,9 +199,8 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenVarFileChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED) final List<ReferencedVariableFile> affectedFiles) {
-        if (editorInput.getRobotProject() != null
-                && editorInput.getProjectConfiguration().getReferencedVariableFiles() == affectedFiles) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<ReferencedVariableFile>> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setInput();
             setDirty(true);
             viewer.refresh();
