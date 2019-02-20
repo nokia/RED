@@ -344,7 +344,9 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Optional
     private void whenMarkerChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        setInput();
+        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            setInput();
+        }
     }
 
     @Inject
@@ -369,16 +371,12 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Optional
     private void whenExclusionListChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final RedProjectConfigEventData<Collection<IPath>> eventData) {
-        // some other file model has changed
-        if (editorInput.getRobotProject() == null
-                || !eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
-            return;
+        if (editorInput.getRobotProject() != null
+                && editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+            setDirty(true);
+            setInput();
+            refreshDecorators();
         }
-
-        setDirty(true);
-        setInput();
-
-        refreshDecorators();
     }
 
     private void refreshDecorators() {

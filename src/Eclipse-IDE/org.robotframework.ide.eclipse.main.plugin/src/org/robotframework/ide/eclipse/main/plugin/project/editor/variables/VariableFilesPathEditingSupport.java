@@ -88,7 +88,8 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
                 }
             }
             if (wasAdded) {
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED, variableFiles);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED,
+                        editorInput.getProjectConfiguration().getReferencedVariableFiles());
             }
 
             return firstAdded;

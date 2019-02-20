@@ -145,9 +145,8 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
                 final VariableMapping mapping = dialog.getMapping();
                 final boolean wasAdded = editorInput.getProjectConfiguration().addVariableMapping(mapping);
                 if (wasAdded) {
-                    setInput();
-                    setDirty(true);
-                    viewer.refresh();
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED,
+                            editorInput.getProjectConfiguration().getVariableMappings());
                 }
                 return mapping;
             }
@@ -188,7 +187,9 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenMarkerChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        setInput();
+        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            setInput();
+        }
     }
 
     @Inject
@@ -209,17 +210,23 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenMappingDetailChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_DETAIL_CHANGED) final VariableMapping mapping) {
-        setDirty(true);
-        viewer.refresh();
+        if (editorInput.getRobotProject() != null
+                && editorInput.getProjectConfiguration().getVariableMappings().contains(mapping)) {
+            setDirty(true);
+            viewer.refresh();
+        }
     }
 
     @Inject
     @Optional
     private void whenMappingsChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED) final List<VariableMapping> mappings) {
-        setInput();
-        setDirty(true);
-        viewer.refresh();
+        if (editorInput.getRobotProject() != null
+                && editorInput.getProjectConfiguration().getVariableMappings() == mappings) {
+            setInput();
+            setDirty(true);
+            viewer.refresh();
+        }
     }
 
     private class VariableMappingsContentProvider extends StructuredContentProvider {

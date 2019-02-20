@@ -162,7 +162,9 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenMarkerChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        setInput();
+        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            setInput();
+        }
     }
 
     @Inject
@@ -182,21 +184,28 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenVarFileDetailChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED) final ReferencedVariableFile varFile) {
-        setDirty(true);
-        viewer.refresh();
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED) final ReferencedVariableFile newFile) {
+        if (editorInput.getRobotProject() != null
+                && editorInput.getProjectConfiguration().getReferencedVariableFiles().contains(newFile)) {
+            setDirty(true);
+            viewer.refresh();
+        }
     }
 
     @Inject
     @Optional
     private void whenVarFileChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED) final List<ReferencedVariableFile> varFiles) {
-        setInput();
-        setDirty(true);
-        viewer.refresh();
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED) final List<ReferencedVariableFile> affectedFiles) {
+        if (editorInput.getRobotProject() != null
+                && editorInput.getProjectConfiguration().getReferencedVariableFiles() == affectedFiles) {
+            setInput();
+            setDirty(true);
+            viewer.refresh();
+        }
     }
 
     private class VariableFilesContentProvider extends StructuredContentProvider {
+
         @Override
         public Object[] getElements(final Object inputElement) {
             final Object[] elements = ((List<?>) inputElement).toArray();
