@@ -6,16 +6,25 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _qW9rQKJrEeWiTrudgyrHcQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/19/18 11:35 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/20/19 2:28 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Project Explorer" | get-tree | select "RobotProject/Script.robot" | double-click
+//turn off autodiscovery
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Libraries"
+    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
+    get-button "Apply and Close" | click
+}
+
+
 //add librery and use quick fox to add to red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/Script.robot" | double-click
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 4 1
     type-text "Library	libs/SumTwoDigits.py"

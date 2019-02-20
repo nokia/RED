@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _NpMZ8H4AEeij1MsLUrnY1A
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/2/18 4:46 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/20/19 3:26 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -105,7 +105,7 @@ compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 1 -ref_
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 2 -ref_table [list "log" "123" "" "" "" "" "" "" "" "" "" ]
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 3 -ref_table [list "Catenate" "" "" "11" "22" "33" "44" "55" "66" "#last" "" ]
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 4 -ref_table [list "" "[Teardown]" "" "Convert To Binary" "888" "" "" "" "" "" "" ]
-compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 5 -ref_table [list "     " "" "" "" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 5 -ref_table [list "" "" "" "" "" "" "" "" "" "" "" ]
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 6 -ref_table [list "..." "" "" "" "" "" "" "" "" "" "" ]
 
 compare-row-with-list -file "TestFile.robot" -table "User Keywords" -row 7 -ref_table [list "kw2" "" "" "" "" "" "" "" "" "" "" ]

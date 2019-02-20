@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _CEmxMGhtEeahDKoeWWpvig
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/22/17 5:17 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/20/19 3:02 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -76,8 +76,8 @@ with [get-editor "suite.tsv" | get-canvas -after [get-label "Test Cases"] -index
 
 check-test_case-row -file "suite.tsv" -row 1 -tc "\\"
 check-test_case-row -file "suite.tsv" -row 2 -tc "Catenate" -c1 "4" -c2 "5" -c3 "7" -c4 "8"
-check-test_case-row -file "suite.tsv" -row 3 -tc "\t\t\t\t"
-check-test_case-row -file "suite.tsv" -row 4 -tc "\t\t\t\t\t\t\t"
+check-test_case-row -file "suite.tsv" -row 3 -tc ""
+check-test_case-row -file "suite.tsv" -row 4 -tc ""
 check-test_case-row -file "suite.tsv" -row 5 -tc "..."
 
 check-test_case-row -file "suite.tsv" -row 6 -tc "test_2"
