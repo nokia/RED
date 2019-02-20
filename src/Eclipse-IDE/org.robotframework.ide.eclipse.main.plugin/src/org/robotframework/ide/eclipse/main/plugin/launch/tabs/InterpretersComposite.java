@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Optional;
@@ -17,8 +19,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -59,30 +59,22 @@ class InterpretersComposite extends Composite {
         useProjectExecutorButton = new Button(this, SWT.RADIO);
         useProjectExecutorButton.setText("Use interpreter as defined in project configuration");
         GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(useProjectExecutorButton);
-        useProjectExecutorButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                checkEnvironmentBtn.setEnabled(false);
-                comboExecutorName.setEnabled(false);
-                listener.interpreterChanged();
-            }
-        });
+        useProjectExecutorButton.addSelectionListener(widgetSelectedAdapter(eevent -> {
+            checkEnvironmentBtn.setEnabled(false);
+            comboExecutorName.setEnabled(false);
+            listener.interpreterChanged();
+        }));
     }
 
     private void createSystemInterpreterButton() {
         useSystemExecutorButton = new Button(this, SWT.RADIO);
         useSystemExecutorButton.setText("Use");
-        GridDataFactory.fillDefaults().grab(false, false).applyTo(useSystemExecutorButton);
-        useSystemExecutorButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                checkEnvironmentBtn.setEnabled(true);
-                comboExecutorName.setEnabled(true);
-                listener.interpreterChanged();
-            }
-        });
+        GridDataFactory.fillDefaults().applyTo(useSystemExecutorButton);
+        useSystemExecutorButton.addSelectionListener(widgetSelectedAdapter(eevent -> {
+            checkEnvironmentBtn.setEnabled(true);
+            comboExecutorName.setEnabled(true);
+            listener.interpreterChanged();
+        }));
         comboExecutorName = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
         comboExecutorName.setItems(Stream.of(SuiteExecutor.values()).map(SuiteExecutor::name).toArray(String[]::new));
         comboExecutorName.addModifyListener(e -> listener.interpreterChanged());
@@ -94,46 +86,40 @@ class InterpretersComposite extends Composite {
     private void createCheckEnvironmentButton() {
         checkEnvironmentBtn = new Button(this, SWT.PUSH);
         checkEnvironmentBtn.setText("Check interpreter");
-        GridDataFactory.fillDefaults().grab(false, false).align(SWT.END, SWT.FILL).applyTo(checkEnvironmentBtn);
-        checkEnvironmentBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
-                try {
-                    new ProgressMonitorDialog(getShell()).run(false, false, monitor -> {
-                        final SuiteExecutor interpreter = SuiteExecutor.valueOf(chosenExecutorName);
-                        final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
-                                .whereIsPythonInterpreter(interpreter);
-                        if (installation.isPresent()) {
-                            final Optional<String> robotVersion = installation
-                                    .flatMap(PythonInstallationDirectory::getRobotVersion);
-                            if (robotVersion.isPresent()) {
-                                MessageDialog.openInformation(null, "Interpreter checked", "The " + interpreter.name()
-                                        + " interpreter has " + robotVersion.get() + " installed");
-                            } else {
-                                MessageDialog.openWarning(null, "Interpreter checked",
-                                        "The " + interpreter.name() + " interpreter has no Robot installed");
-                            }
+        GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(checkEnvironmentBtn);
+        checkEnvironmentBtn.addSelectionListener(widgetSelectedAdapter(event -> {
+            final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
+            try {
+                new ProgressMonitorDialog(getShell()).run(false, false, monitor -> {
+                    final SuiteExecutor interpreter = SuiteExecutor.valueOf(chosenExecutorName);
+                    final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
+                            .whereIsPythonInterpreter(interpreter);
+                    if (installation.isPresent()) {
+                        final Optional<String> robotVersion = installation
+                                .flatMap(PythonInstallationDirectory::getRobotVersion);
+                        if (robotVersion.isPresent()) {
+                            MessageDialog.openInformation(null, "Interpreter checked", "The " + interpreter.name()
+                                    + " interpreter has " + robotVersion.get() + " installed");
                         } else {
-                            MessageDialog.openError(null, "Interpreter checked", "There is no " + interpreter.name()
-                                    + " interpreter in system PATH environment variable");
+                            MessageDialog.openWarning(null, "Interpreter checked",
+                                    "The " + interpreter.name() + " interpreter has no Robot installed");
                         }
-                    });
-                } catch (final InterruptedException e) {
-                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e),
-                            StatusManager.BLOCK);
-                } catch (final InvocationTargetException e) {
-                    StatusManager.getManager().handle(
-                            new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                                            "Unable to find "
-                                                    + SuiteExecutor.valueOf(chosenExecutorName).executableName()
-                                            + " executable in the system.",
-                                    e.getTargetException()),
-                            StatusManager.BLOCK);
-                }
+                    } else {
+                        MessageDialog.openError(null, "Interpreter checked", "There is no " + interpreter.name()
+                                + " interpreter in system PATH environment variable");
+                    }
+                });
+            } catch (final InterruptedException e) {
+                StatusManager.getManager()
+                        .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e), StatusManager.BLOCK);
+            } catch (final InvocationTargetException e) {
+                StatusManager.getManager()
+                        .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                                "Unable to find " + SuiteExecutor.valueOf(chosenExecutorName).executableName()
+                                        + " executable in the system.",
+                                e.getTargetException()), StatusManager.BLOCK);
             }
-        });
+        }));
     }
 
     void setInput(final boolean usesProjectInterpreter, final SuiteExecutor executor) {

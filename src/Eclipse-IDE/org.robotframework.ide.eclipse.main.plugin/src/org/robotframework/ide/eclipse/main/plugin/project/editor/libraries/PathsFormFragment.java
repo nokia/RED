@@ -137,10 +137,10 @@ class PathsFormFragment implements ISectionFormFragment {
     private void createRelativityCombo(final Composite sectionInternal) {
         final Label label = toolkit.createLabel(sectionInternal,
                 "Relative paths defined below are relative to:", SWT.WRAP);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(label);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
         relativityCombo = new Combo(sectionInternal, SWT.DROP_DOWN | SWT.READ_ONLY);
         relativityCombo.setItems(new String[] { RelativeTo.WORKSPACE.toString(), RelativeTo.PROJECT.toString() });
-        GridDataFactory.fillDefaults().indent(10, 0).applyTo(relativityCombo);
+        GridDataFactory.fillDefaults().applyTo(relativityCombo);
 
         relativityCombo.addModifyListener(e -> {
             final RobotProjectConfig config = editorInput.getProjectConfiguration();
@@ -171,11 +171,7 @@ class PathsFormFragment implements ISectionFormFragment {
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        GridDataFactory.fillDefaults()
-                .grab(true, true)
-                .indent(10, 0)
-                .minSize(100, 100)
-                .applyTo(viewer.getTable());
+        GridDataFactory.fillDefaults().grab(true, true).minSize(100, 100).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
         viewer.getTable().setLinesVisible(true);
@@ -194,12 +190,12 @@ class PathsFormFragment implements ISectionFormFragment {
                 .withWidth(300)
                 .labelsProvidedBy(new PathsLabelProvider(config.getVariableName(), editorInput))
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new PathsEditingSupport(viewer, elementsCreator(config.getPathAddingStrategy()),
-                        eventBroker, config.getPathModificationTopic()))
+                .editingSupportedBy(new PathsEditingSupport(viewer, elementsCreator(config), eventBroker,
+                        config.getPathModificationTopic()))
                 .createFor(viewer);
     }
 
-    private Supplier<SearchPath> elementsCreator(final PathAdder adder) {
+    private Supplier<SearchPath> elementsCreator(final ViewerConfiguration config) {
         return () -> {
             final PathEntryDialog dialog = new PathEntryDialog(site.getShell());
             if (dialog.open() == Window.OK) {
@@ -209,12 +205,10 @@ class PathsFormFragment implements ISectionFormFragment {
                 }
                 boolean added = false;
                 for (final SearchPath path : paths) {
-                    added |= adder.addPath(path);
+                    added |= config.getPathAddingStrategy().addPath(path);
                 }
                 if (added) {
-                    setInput();
-                    setDirty(true);
-                    classPathViewer.refresh();
+                    config.firePathAddingEvents();
                 }
                 return paths.get(paths.size() - 1);
             }
@@ -282,7 +276,9 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenMarkerChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        setInput();
+        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            setInput();
+        }
     }
 
     @Inject
@@ -326,10 +322,11 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenPythonPathChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_CHANGED) final SearchPath newPath) {
-        if (editorInput.getProjectConfiguration().getPythonPaths().contains(newPath)) {
+        if (editorInput.getRobotProject() != null
+                && editorInput.getProjectConfiguration().getPythonPaths().contains(newPath)) {
             setDirty(true);
             pythonPathViewer.refresh();
-            adjustColumnWidth(pythonPathViewer.getTable());
+            // adjustColumnWidth(pythonPathViewer.getTable());
         }
     }
 
@@ -337,11 +334,12 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenPythonPathStructureChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED) final List<SearchPath> affectedPaths) {
-        if (editorInput.getProjectConfiguration().getPythonPaths() == affectedPaths) {
+        if (editorInput.getRobotProject() != null
+                && editorInput.getProjectConfiguration().getPythonPaths() == affectedPaths) {
             setInput();
             setDirty(true);
             pythonPathViewer.refresh();
-            adjustColumnWidth(pythonPathViewer.getTable());
+            // adjustColumnWidth(pythonPathViewer.getTable());
         }
     }
 
@@ -349,7 +347,8 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenClassPathChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_CHANGED) final SearchPath newPath) {
-        if (editorInput.getProjectConfiguration().getClassPaths().contains(newPath)) {
+        if (editorInput.getRobotProject() != null
+                && editorInput.getProjectConfiguration().getClassPaths().contains(newPath)) {
             setDirty(true);
             classPathViewer.refresh();
             adjustColumnWidth(classPathViewer.getTable());
@@ -360,7 +359,8 @@ class PathsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenClassPathStructureChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED) final List<SearchPath> affectedPaths) {
-        if (editorInput.getProjectConfiguration().getClassPaths() == affectedPaths) {
+        if (editorInput.getRobotProject() != null
+                && editorInput.getProjectConfiguration().getClassPaths() == affectedPaths) {
             setInput();
             setDirty(true);
             classPathViewer.refresh();
@@ -372,15 +372,17 @@ class PathsFormFragment implements ISectionFormFragment {
 
         String getContextId();
 
-        String getMenuText();
-
-        String getMenuId();
-
         String getVariableName();
 
         String getPathModificationTopic();
 
         PathAdder getPathAddingStrategy();
+
+        void firePathAddingEvents();
+
+        String getMenuText();
+
+        String getMenuId();
     }
 
     private class PythonPathViewerConfiguration implements ViewerConfiguration {
@@ -403,6 +405,12 @@ class PathsFormFragment implements ISectionFormFragment {
         @Override
         public PathAdder getPathAddingStrategy() {
             return path -> editorInput.getProjectConfiguration().addPythonPath(path);
+        }
+
+        @Override
+        public void firePathAddingEvents() {
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED,
+                    editorInput.getProjectConfiguration().getPythonPaths());
         }
 
         @Override
@@ -436,6 +444,12 @@ class PathsFormFragment implements ISectionFormFragment {
         @Override
         public PathAdder getPathAddingStrategy() {
             return path -> editorInput.getProjectConfiguration().addClassPath(path);
+        }
+
+        @Override
+        public void firePathAddingEvents() {
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED,
+                    editorInput.getProjectConfiguration().getClassPaths());
         }
 
         @Override

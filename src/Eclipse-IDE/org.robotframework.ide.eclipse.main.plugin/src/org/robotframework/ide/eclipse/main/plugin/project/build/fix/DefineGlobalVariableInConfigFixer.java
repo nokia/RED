@@ -51,16 +51,17 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
 
     @Override
     protected ICompletionProposal asContentProposal(final IMarker marker, final IFile externalFile) {
-        return new DefineLibraryProposal(marker, externalFile, getLabel());
+        return new DefineVariableMappingProposal(marker, externalFile, getLabel());
     }
 
-    private class DefineLibraryProposal extends RedConfigFileCompletionProposal {
+    private class DefineVariableMappingProposal extends RedConfigFileCompletionProposal {
 
         private VariableMapping variableMapping;
 
         private List<VariableMapping> changedMappings;
 
-        public DefineLibraryProposal(final IMarker marker, final IFile externalFile, final String shortDescription) {
+        public DefineVariableMappingProposal(final IMarker marker, final IFile externalFile,
+                final String shortDescription) {
             super(marker, externalFile, shortDescription, null);
         }
 

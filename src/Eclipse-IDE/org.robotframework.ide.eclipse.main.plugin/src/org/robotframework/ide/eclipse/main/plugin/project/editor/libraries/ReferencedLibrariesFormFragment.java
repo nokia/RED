@@ -304,7 +304,9 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenMarkerChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        setInput();
+        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            setInput();
+        }
     }
 
     @Inject
@@ -351,9 +353,10 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenLibrariesChanged(@UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED)
-                final RedProjectConfigEventData<List<ReferencedLibrary>> eventData) {
-        if (eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
+    private void whenLibrariesChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<ReferencedLibrary>> eventData) {
+        if (editorInput.getRobotProject() != null
+                && eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
             setDirty(true);
             setInput();
         }
@@ -363,7 +366,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenRemoteLocationDetailChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED) final RedProjectConfigEventData<RemoteLocation> eventData) {
-        if (editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+        if (editorInput.getRobotProject() != null
+                && editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
             setDirty(true);
             setInput();
         }
@@ -373,7 +377,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenRemoteLocationChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<RemoteLocation>> eventData) {
-        if (editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+        if (editorInput.getRobotProject() != null
+                && editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
             setDirty(true);
             setInput();
         }

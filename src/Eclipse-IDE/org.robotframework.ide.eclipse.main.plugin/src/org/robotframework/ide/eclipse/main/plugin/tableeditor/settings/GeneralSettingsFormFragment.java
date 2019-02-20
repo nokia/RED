@@ -261,7 +261,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private Composite createPanel(final Section section) {
         final Composite panel = toolkit.createComposite(section);
         panel.setBackground(section.getBackground());
-        GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).applyTo(panel);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(panel);
         GridLayoutFactory.fillDefaults().applyTo(panel);
         section.setClient(panel);
         return panel;
