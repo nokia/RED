@@ -115,7 +115,7 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
                     return textBeforeSelection.substring(0, textBeforeSelection.length() - i);
                 }
             }
-            return textBeforeSelection;
+            return textBeforeSelection.substring(0, textBeforeSelection.length() - 1);
         }
 
         private String findSuffix(final String textAfterSelection) {

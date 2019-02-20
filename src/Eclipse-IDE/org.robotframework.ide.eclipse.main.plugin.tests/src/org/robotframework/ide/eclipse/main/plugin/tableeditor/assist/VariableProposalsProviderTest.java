@@ -195,6 +195,48 @@ public class VariableProposalsProviderTest {
         assertThat(text.getText()).isEqualTo("a@{c_list}b");
     }
 
+    @Test
+    public void thereAreVariablesProposalsProvided_whenThereIsAProposalMatchingCurrentContent_5() {
+        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        text.setText("$");
+        text.setSelection(1);
+
+        final RobotSuiteFile suite = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotKeywordCall callElement = suite.findSection(RobotCasesSection.class)
+                .get().getChildren().get(0).getChildren().get(0);
+
+        final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
+        final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
+        final AssistantContext context = new NatTableAssistantContext(0, 0);
+        final RedContentProposal[] proposals = provider.getProposals(text.getText(), text.getSelection().x, context);
+
+        assertThat(proposals).hasSize(2);
+
+        proposals[0].getModificationStrategy().insert(text, proposals[0]);
+        assertThat(text.getText()).isEqualTo("${a_var}");
+    }
+
+    @Test
+    public void thereAreVariablesProposalsProvided_whenThereIsAProposalMatchingCurrentContent_6() {
+        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        text.setText("a@b");
+        text.setSelection(2);
+
+        final RobotSuiteFile suite = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotKeywordCall callElement = suite.findSection(RobotCasesSection.class)
+                .get().getChildren().get(0).getChildren().get(0);
+
+        final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
+        final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
+        final AssistantContext context = new NatTableAssistantContext(0, 0);
+        final RedContentProposal[] proposals = provider.getProposals(text.getText(), text.getSelection().x, context);
+
+        assertThat(proposals).hasSize(1);
+
+        proposals[0].getModificationStrategy().insert(text, proposals[0]);
+        assertThat(text.getText()).isEqualTo("a@{c_list}b");
+    }
+
     private static IRowDataProvider<Object> createDataProvider(final Object rowObject) {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
