@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _iyS6MNymEeWGC6qnJEsRYg
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/20/18 10:09 AM
+Save-Time: 2/20/19 4:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -84,20 +84,19 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     //add log again and press enter - message is selected and willbe remove
     type-text Log
     key-type "M1+SPACE"
-    key-type Enter 
+    key-type Enter 		
     wait 300
     key-type Enter -times 2
 }
 
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Suite Setup    Catenate    I  will be added  ${param}\n"
-    + "Test Setup    Should Be Equal    item1    item2\n"
-    + "    \n\n"
+    + "Test Setup    Should Be Equal    item1    item2    \n\n\n"
     + "*** Test Cases ***\n"
     + "test 1\n"
-    + "    Should Be Equal As Integers        \n"
-    + "    Log    message\n"
-    + "    Log" | verify-true
+    + "    Should Be Equal As Integers            \n"
+    + "    Log    message    \n"
+    + "    Log    message" | verify-true
     
     
 //------------------------------------------------- tsv file --------------------------------------------------------------------
@@ -226,13 +225,13 @@ get-editor "tsv_file.tsv" | get-text-viewer | get-property text | equals "*** Se
     + "Test Setup\targs as list\t\n\n"
     + "*** Test Cases ***\n"
     + "test 2\n"
-    + "\ttwo args\ta\tb\n"
+    + "\ttwo args\ta\tb\t\n"
     + "\targs as list\t\n"
     + "\tkw with no args\n"
-    + "\ttwo args\tmy arg 1\tsecond arg\n"
+    + "\ttwo args\tmy arg 1\tsecond arg\t\n"
     + "\targs as list\t${my list}\n"
     + "\tShould Be Equal As Numbers\t67\t89\ttext\n"
-    + "\t\t\t\n\n"
+    + "\t\n\n"
     + "*** Keywords ***\n"
     + "two args\n"
     + "\t[Arguments]\t${a}\t${b}\t${op}=7\n"
@@ -249,4 +248,5 @@ get-editor "tsv_file.tsv" | get-text-viewer | get-property text | equals "*** Se
     + "\tNo Operation\n"
     + "\tGet Count\titem1\titem2\n"
     + "\ttwo args\ta\tb" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

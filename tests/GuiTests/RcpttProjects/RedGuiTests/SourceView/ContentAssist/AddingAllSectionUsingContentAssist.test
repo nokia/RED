@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _0soLkHJoEeWGwMKsQg8irg
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/24/18 11:05 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 2/20/19 12:13 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -58,7 +58,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter -times 2
     
     //add Variables
-    key-type BackSpace -times 4
     type-text bles
     key-type "M1+SPACE"
     key-type Enter

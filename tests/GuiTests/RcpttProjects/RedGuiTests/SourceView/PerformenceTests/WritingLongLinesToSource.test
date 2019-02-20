@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9Tqr0GCXEeaRBaqqj0N1Gg
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/10/18 11:13 AM
+Save-Time: 2/20/19 3:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -56,7 +56,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter
     type-text abcdefghijklmnoprstqwixyz12abcdefghi
     key-type Enter -times 2
-    key-type Left -times 4
     type-text "test 3"
     key-type Enter
     type-text Shou
@@ -66,7 +65,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter -times 2
     type-text "catenate  2  55  6"
     key-type "NUMPAD_ENTER" "\\u000D" -times 2
-    key-type Left -times 4
     
     //add KW section
     key-type "M1+SPACE"
@@ -96,7 +94,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Set
     + "    abcdefghijklmnoprstqwixyz12abcdefghi\n"
     + "    \n"
     + "test 3\n"
-    + "    Should Be Empty    this\n"
+    + "    Should Be Empty    this    \n"
     + "    catenate  2  55  6\n"
     + "    \n"
     + "*** Keywords ***\n"
@@ -189,7 +187,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     type-text  "1234568911223344556677889910111213141516"
     
   }  
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Settings*\n"
+get-editor "TestFile.robot" | get-editbox | get-property text | equals "*Settings*\n"
     + "REsource  my resouce\n"
     + "metadata nothing\n"
     + "Library  file_with _lib______.py\n"
@@ -203,7 +201,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Set
     + "    abcdefghijklmnoprstqwixyz12abcdefghi\n"
     + "    \n"
     + "test 3 or more\n"
-    + "    Should Be Empty    this\n"
+    + "    Should Be Empty    this    \n"
     + "    catenate  2  55  6\n"
     + "    \n"
     + "*** Keywords ***\n"
@@ -215,7 +213,6 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Set
     + "kw name is here to be longer than normal\n"
     + "    Should Be Equal  abcdefghi abcdefghi\n"
     + "    [Return]    ${variable number 1}" | verify-true
-
  
 with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Home
@@ -254,7 +251,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Set
     + "    abcdefghijklmnoprstqwixyz12abcdefghi\n"
     + "    \n"
     + "test 3 or more\n"
-    + "    Should Be Empty    this\n"
+    + "    Should Be Empty    this    \n"
     + "    catenate  2  55  6\n"
     + "test case name .with.dots:;89just-5+-\n"
     + "        \n"
@@ -267,4 +264,5 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Set
     + "kw name is here to be longer than normal\n"
     + "    Should Be Equal  abcdefghi abcdefghi\n"
     + "    [Return]    ${variable number 1}" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
