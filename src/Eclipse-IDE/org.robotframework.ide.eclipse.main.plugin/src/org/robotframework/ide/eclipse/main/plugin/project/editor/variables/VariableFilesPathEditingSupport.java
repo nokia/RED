@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
@@ -89,7 +90,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
             }
             if (wasAdded) {
                 eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED,
-                        editorInput.getProjectConfiguration().getReferencedVariableFiles());
+                        new RedProjectConfigEventData<>(editorInput.getFile(), variableFiles));
             }
 
             return firstAdded;
@@ -127,7 +128,8 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
                 final IPath path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(chosenFile));
                 varFile.setPath(path.toPortableString());
 
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED, varFile);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED,
+                        new RedProjectConfigEventData<>(editorInput.getFile(), varFile));
             }
             return varFile;
         }

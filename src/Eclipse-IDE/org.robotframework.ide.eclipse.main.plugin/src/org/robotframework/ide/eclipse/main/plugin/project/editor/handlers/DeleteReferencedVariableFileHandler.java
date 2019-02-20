@@ -13,6 +13,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteReferencedVariableFileHandler.E4DeleteVariableFileHandler;
@@ -32,10 +33,11 @@ public class DeleteReferencedVariableFileHandler extends DIParameterizedHandler<
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<ReferencedVariableFile> varFiles = Selections.getElements(selection,
                     ReferencedVariableFile.class);
-            input.getProjectConfiguration().removeReferencedVariableFiles(varFiles);
-
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED,
-                    input.getProjectConfiguration().getReferencedVariableFiles());
+            final boolean removed = input.getProjectConfiguration().removeReferencedVariableFiles(varFiles);
+            if (removed) {
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED,
+                        new RedProjectConfigEventData<>(input.getFile(), varFiles));
+            }
         }
     }
 }

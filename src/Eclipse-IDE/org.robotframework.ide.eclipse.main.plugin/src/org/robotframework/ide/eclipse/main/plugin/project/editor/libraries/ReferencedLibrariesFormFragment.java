@@ -11,6 +11,7 @@ import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -150,13 +151,16 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
+        final Consumer<RemoteLocation> successHandler = remoteLocation -> eventBroker.send(
+                RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED,
+                new RedProjectConfigEventData<>(editorInput.getFile(), remoteLocation));
         ViewerColumnsFactory.newColumn("")
                 .withWidth(200)
                 .withMinWidth(200)
                 .shouldGrabAllTheSpaceLeft(true)
                 .labelsProvidedBy(new ReferencedLibrariesLabelProvider(editorInput))
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new ReferencedLibrariesEditingSupport(viewer, editorInput, eventBroker))
+                .editingSupportedBy(new ReferencedLibrariesEditingSupport(viewer, successHandler))
                 .createFor(viewer);
     }
 
@@ -263,18 +267,16 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
             }
         }
         if (!added.isEmpty()) {
-            final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                    editorInput.getRobotProject().getConfigurationFile(), added);
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
+                    new RedProjectConfigEventData<>(editorInput.getFile(), added));
         }
     }
 
     private void addRemoteLocation(final RemoteLocation remoteLocation) {
         final boolean wasAdded = editorInput.getProjectConfiguration().addRemoteLocation(remoteLocation);
         if (wasAdded) {
-            final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<>(
-                    editorInput.getRobotProject().getConfigurationFile(), newArrayList(remoteLocation));
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED,
+                    new RedProjectConfigEventData<>(editorInput.getFile(), newArrayList(remoteLocation)));
         }
     }
 
@@ -303,8 +305,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenMarkerChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setInput();
         }
     }
@@ -312,19 +314,25 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenEnvironmentLoadingStarted(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        addPythonLibButton.setEnabled(false);
-        addJavaLibButton.setEnabled(false);
-        addLibspecButton.setEnabled(false);
-        addRemoteButton.setEnabled(false);
-        viewer.getTable().setEnabled(false);
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            addPythonLibButton.setEnabled(false);
+            addJavaLibButton.setEnabled(false);
+            addLibspecButton.setEnabled(false);
+            addRemoteButton.setEnabled(false);
+            viewer.getTable().setEnabled(false);
+        }
     }
 
     @Inject
     @Optional
     private void whenEnvironmentsWereLoaded(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        this.environment = envs.getActiveEnvironment();
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final RedProjectConfigEventData<Environments> eventData) {
+        if (!eventData.isApplicable(editorInput.getRobotProject())) {
+            return;
+        }
+
+        this.environment = eventData.getChangedElement().getActiveEnvironment();
 
         final boolean isEditable = editorInput.isEditable();
         final boolean projectMayBeInterpretedByJython = environment.isNullEnvironment()
@@ -355,8 +363,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenLibrariesChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<ReferencedLibrary>> eventData) {
-        if (editorInput.getRobotProject() != null
-                && eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
             setInput();
         }
@@ -366,8 +373,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenRemoteLocationDetailChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED) final RedProjectConfigEventData<RemoteLocation> eventData) {
-        if (editorInput.getRobotProject() != null
-                && editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
             setInput();
         }
@@ -377,8 +383,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenRemoteLocationChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<RemoteLocation>> eventData) {
-        if (editorInput.getRobotProject() != null
-                && editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
             setInput();
         }

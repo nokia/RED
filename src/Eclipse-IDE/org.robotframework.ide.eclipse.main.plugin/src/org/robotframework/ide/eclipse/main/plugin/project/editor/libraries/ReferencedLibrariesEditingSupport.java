@@ -5,7 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
+import java.util.function.Consumer;
+
 import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -13,9 +14,6 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.widgets.Composite;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 
 
 /**
@@ -24,15 +22,11 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
  */
 class ReferencedLibrariesEditingSupport extends EditingSupport {
 
-    private final RedProjectEditorInput editorInput;
+    private final Consumer<RemoteLocation> successHandler;
 
-    private final IEventBroker eventBroker;
-
-    ReferencedLibrariesEditingSupport(final ColumnViewer viewer, final RedProjectEditorInput editorInput,
-            final IEventBroker eventBroker) {
+    ReferencedLibrariesEditingSupport(final ColumnViewer viewer, final Consumer<RemoteLocation> successHandler) {
         super(viewer);
-        this.editorInput = editorInput;
-        this.eventBroker = eventBroker;
+        this.successHandler = successHandler;
     }
 
     @Override
@@ -68,9 +62,7 @@ class ReferencedLibrariesEditingSupport extends EditingSupport {
 
                 if (!newValue.equals(oldValue)) {
                     remoteLocation.setUri(newValue);
-                    final RedProjectConfigEventData<RemoteLocation> eventData = new RedProjectConfigEventData<>(
-                            editorInput.getRobotProject().getConfigurationFile(), remoteLocation);
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED, eventData);
+                    successHandler.accept(remoteLocation);
                 }
             } catch (final IllegalArgumentException e) {
                 // uri syntax was wrong...

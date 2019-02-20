@@ -10,6 +10,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeletePythonPathHandler.E4DeletePythonPathHandler;
@@ -24,11 +25,13 @@ public class DeletePythonPathHandler extends DIParameterizedHandler<E4DeletePyth
     }
 
     public static class E4DeletePythonPathHandler extends E4DeleteSearchPathHandler {
+
         @Execute
         public void deleteSearchPaths(@Named(value = Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
-            super.deleteSearchPaths(input.getProjectConfiguration().getPythonPaths(), selection, eventBroker,
-                    RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED);
+            super.deleteSearchPaths(input.getProjectConfiguration().getPythonPaths(), selection,
+                    paths -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED,
+                            new RedProjectConfigEventData<>(input.getFile(), paths)));
         }
     }
 }

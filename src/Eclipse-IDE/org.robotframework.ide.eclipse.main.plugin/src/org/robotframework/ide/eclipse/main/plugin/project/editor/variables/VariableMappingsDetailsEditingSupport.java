@@ -5,16 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 
 /**
@@ -22,12 +21,12 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport;
  */
 abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditingSupport {
 
-    private final IEventBroker eventBroker;
+    private final Consumer<VariableMapping> successHandler;
 
     VariableMappingsDetailsEditingSupport(final ColumnViewer viewer, final int index,
-            final Supplier<VariableMapping> elementsCreator, final IEventBroker eventBroker) {
+            final Supplier<VariableMapping> elementsCreator, final Consumer<VariableMapping> successHandler) {
         super(viewer, index, elementsCreator);
-        this.eventBroker = eventBroker;
+        this.successHandler = successHandler;
     }
 
     @Override
@@ -59,22 +58,20 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
 
             if (!newValue.equals(oldValue)) {
                 setMappingValue(mapping, newValue);
-                eventBroker.send(getEventTopic(), element);
+                successHandler.accept(mapping);
             }
         } else {
             super.setValue(element, value);
         }
     }
 
-    protected abstract String getEventTopic();
-
     protected abstract void setMappingValue(VariableMapping mapping, String value);
 
     static class VariableMappingNameEditingSupport extends VariableMappingsDetailsEditingSupport {
 
         VariableMappingNameEditingSupport(final ColumnViewer viewer, final Supplier<VariableMapping> elementsCreator,
-                final IEventBroker eventBroker) {
-            super(viewer, -1, elementsCreator, eventBroker);
+                final Consumer<VariableMapping> successHandler) {
+            super(viewer, -1, elementsCreator, successHandler);
         }
 
         @Override
@@ -86,18 +83,13 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
         protected void setMappingValue(final VariableMapping mapping, final String value) {
             mapping.setName(value);
         }
-
-        @Override
-        protected String getEventTopic() {
-            return RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_NAME_CHANGED;
-        }
     }
 
     static class VariableMappingValueEditingSupport extends VariableMappingsDetailsEditingSupport {
 
         VariableMappingValueEditingSupport(final ColumnViewer viewer, final Supplier<VariableMapping> elementsCreator,
-                final IEventBroker eventBroker) {
-            super(viewer, -1, elementsCreator, eventBroker);
+                final Consumer<VariableMapping> successHandler) {
+            super(viewer, -1, elementsCreator, successHandler);
         }
 
         @Override
@@ -108,11 +100,6 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
         @Override
         protected void setMappingValue(final VariableMapping mapping, final String value) {
             mapping.setValue(value);
-        }
-
-        @Override
-        protected String getEventTopic() {
-            return RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_VALUE_CHANGED;
         }
     }
 }
