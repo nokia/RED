@@ -24,13 +24,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 public class CleanVariableValueCommandTest {
 
     @Test
-    public void thereIsNoValueForScalar_whenClearCommandIsExecuted() {
+    public void thereIsNoValueForScalar_whenClearCommandIsExecuted_1() {
         final RobotVariable variable = createVariables().get(0);
         testValueClearing(variable, "");
     }
 
     @Test
-    public void thereIsNoValueForScalarAsList_whenClearCommandIsExecuted() {
+    public void thereIsNoValueForScalar_whenClearCommandIsExecuted_2() {
         final RobotVariable variable = createVariables().get(1);
         testValueClearing(variable, "");
     }
@@ -67,8 +67,8 @@ public class CleanVariableValueCommandTest {
 
     private static List<RobotVariable> createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar1}  0")
+                .appendLine("${scalar2}  0  1  2")
                 .appendLine("@{list}  1  2  3")
                 .appendLine("&{dict}  a=1  b=2  c=3  d=4")
                 .appendLine("invalid}  1  2  3")

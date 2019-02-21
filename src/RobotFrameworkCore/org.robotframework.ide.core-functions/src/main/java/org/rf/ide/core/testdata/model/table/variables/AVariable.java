@@ -134,7 +134,6 @@ public abstract class AVariable extends AModelElement<VariableTable>
     public ModelType getModelType() {
         switch (type) {
             case SCALAR:
-            case SCALAR_AS_LIST:
                 return ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE;
             case LIST:
                 return ModelType.LIST_VARIABLE_DECLARATION_IN_TABLE;
@@ -181,7 +180,6 @@ public abstract class AVariable extends AModelElement<VariableTable>
 
     public enum VariableType {
         SCALAR("$", RobotTokenType.VARIABLES_SCALAR_DECLARATION),
-        SCALAR_AS_LIST("$", RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION),
         LIST("@", RobotTokenType.VARIABLES_LIST_DECLARATION),
         DICTIONARY("&", RobotTokenType.VARIABLES_DICTIONARY_DECLARATION),
         ENVIRONMENT("%", RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION),

@@ -40,11 +40,11 @@ public class VariableColumnsPropertyAccessorTest {
     public void nameIsProperlyReturnedForDifferentVariables_whenGivenColumnIsTheFirstOne() {
         final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(
                 mock(RobotEditorCommandsStack.class));
-        
+
         final List<RobotVariable> variables = createVariablesForTest();
-        
-        assertThat(accessor.getDataValue(variables.get(0), 0)).isEqualTo("${scalar}");
-        assertThat(accessor.getDataValue(variables.get(1), 0)).isEqualTo("${scalar_as_list}");
+
+        assertThat(accessor.getDataValue(variables.get(0), 0)).isEqualTo("${scalar1}");
+        assertThat(accessor.getDataValue(variables.get(1), 0)).isEqualTo("${scalar2}");
         assertThat(accessor.getDataValue(variables.get(2), 0)).isEqualTo("@{list}");
         assertThat(accessor.getDataValue(variables.get(3), 0)).isEqualTo("&{dictionary}");
         assertThat(accessor.getDataValue(variables.get(4), 0)).isEqualTo("invalid}");
@@ -123,8 +123,9 @@ public class VariableColumnsPropertyAccessorTest {
         final List<RobotVariable> variables = createVariablesForTest();
 
         accessor.setDataValue(variables.get(0), 1, "1729");
+        accessor.setDataValue(variables.get(1), 1, "1729");
 
-        verify(stack).execute(isA(SetScalarValueCommand.class));
+        verify(stack, times(2)).execute(isA(SetScalarValueCommand.class));
     }
 
     @Test
@@ -135,7 +136,6 @@ public class VariableColumnsPropertyAccessorTest {
 
         final List<RobotVariable> variables = createVariablesForTest();
 
-        accessor.setDataValue(variables.get(1), 1, "1729");
         accessor.setDataValue(variables.get(2), 1, "1729");
         accessor.setDataValue(variables.get(3), 1, "1729");
         accessor.setDataValue(variables.get(4), 1, "1729");
@@ -187,8 +187,8 @@ public class VariableColumnsPropertyAccessorTest {
 
     private static List<RobotVariable> createVariablesForTest() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0  # comment 1")
-                .appendLine("${scalar_as_list}  0  1  2  # comment 2")
+                .appendLine("${scalar1}  0  # comment 1")
+                .appendLine("${scalar2}  0  1  2  # comment 2")
                 .appendLine("@{list}  1  2  3  # comment 3")
                 .appendLine("&{dictionary}  a=1  b=2  c=3  # comment 4")
                 .appendLine("invalid}  0  # comment 5")

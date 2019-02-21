@@ -84,8 +84,8 @@ public class CreateFreshVariableCommandTest {
 
     private static RobotVariablesSection createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar1}  0")
+                .appendLine("${scalar2}  0  1  2")
                 .appendLine("@{list}  1  2  3")
                 .appendLine("&{dict}  a=1  b=2  c=3  d=4")
                 .appendLine("invalid}  1  2  3")

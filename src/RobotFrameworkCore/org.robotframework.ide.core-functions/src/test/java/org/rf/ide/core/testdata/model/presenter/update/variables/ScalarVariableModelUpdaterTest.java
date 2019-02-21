@@ -55,7 +55,7 @@ public class ScalarVariableModelUpdaterTest {
         // verify
         final InOrder order = inOrder(mocked, toks);
         order.verify(toks, times(1)).size();
-        order.verify(toks, times(1)).get(0);
+        order.verify(toks, times(2)).get(0);
         order.verify(mocked, times(1)).addValue(one, 1);
         order.verifyNoMoreInteractions();
     }

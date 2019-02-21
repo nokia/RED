@@ -59,7 +59,6 @@ public class SetVariableNameCommand extends EditorCommand {
             variable.setLinkedElement(newHolder);
         }
 
-        variable.getLinkedElement().getType(); // in order to fix scalar to scalar as list
         variable.getLinkedElement().setName(getNewHolderName());
 
         if (typeHasChanged) {
@@ -177,8 +176,7 @@ public class SetVariableNameCommand extends EditorCommand {
 
     private boolean typeChangeIsRequired() {
         final VariableType projectedType = getProjectedType();
-        return variable.getType() != projectedType
-                && !(variable.getType() == VariableType.SCALAR_AS_LIST && projectedType == VariableType.SCALAR);
+        return variable.getType() != projectedType;
     }
 
     private VariableType getProjectedType() {

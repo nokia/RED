@@ -36,13 +36,13 @@ public class MoveVariableUpCommandTest {
 
         command.execute();
         assertThat(varSection.getChildren()).extracting(RobotElement::getName)
-                .containsExactly("scalar", "scalar_as_list", "list", "dict", "invalid}");
+                .containsExactly("scalar1", "scalar2", "list", "dict", "invalid}");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
         assertThat(varSection.getChildren()).extracting(RobotElement::getName)
-                .containsExactly("scalar", "scalar_as_list", "list", "dict", "invalid}");
+                .containsExactly("scalar1", "scalar2", "list", "dict", "invalid}");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -59,13 +59,13 @@ public class MoveVariableUpCommandTest {
 
         command.execute();
         assertThat(varSection.getChildren()).extracting(RobotElement::getName)
-                .containsExactly("scalar", "scalar_as_list", "list", "invalid}", "dict");
+                .containsExactly("scalar1", "scalar2", "list", "invalid}", "dict");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
         assertThat(varSection.getChildren()).extracting(RobotElement::getName)
-                .containsExactly("scalar", "scalar_as_list", "list", "dict", "invalid}");
+                .containsExactly("scalar1", "scalar2", "list", "dict", "invalid}");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_VARIABLE_MOVED, varSection);
         verifyNoMoreInteractions(eventBroker);
@@ -83,13 +83,13 @@ public class MoveVariableUpCommandTest {
 
         command.execute();
         assertThat(varSection.getChildren()).extracting(RobotElement::getName)
-                .containsExactly("scalar", "list", "scalar_as_list", "dict", "invalid}");
+                .containsExactly("scalar1", "list", "scalar2", "dict", "invalid}");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
         assertThat(varSection.getChildren()).extracting(RobotElement::getName)
-                .containsExactly("scalar", "scalar_as_list", "list", "dict", "invalid}");
+                .containsExactly("scalar1", "scalar2", "list", "dict", "invalid}");
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_VARIABLE_MOVED, varSection);
         verifyNoMoreInteractions(eventBroker);
@@ -97,8 +97,8 @@ public class MoveVariableUpCommandTest {
 
     private static RobotVariablesSection createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar1}  0")
+                .appendLine("${scalar2}  0  1  2")
                 .appendLine("@{list}  1  2  3")
                 .appendLine("&{dict}  a=1  b=2  c=3  d=4")
                 .appendLine("invalid}  1  2  3")

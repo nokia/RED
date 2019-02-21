@@ -71,7 +71,7 @@ public class MappingResult {
             final VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
             final VariableType robotType = varDec.getRobotType();
             if (robotType == VariableType.DICTIONARY || robotType == VariableType.LIST
-                    || robotType == VariableType.SCALAR || robotType == VariableType.SCALAR_AS_LIST) {
+                    || robotType == VariableType.SCALAR) {
                 final VariableDeclarationType extractorVariableType = varDec.getVariableType();
                 return !isCollectionVariableElementGet()
                         && (extractorVariableType == VariableDeclarationType.NORMAL_TEXT

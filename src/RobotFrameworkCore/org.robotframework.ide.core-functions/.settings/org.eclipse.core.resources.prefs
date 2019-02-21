@@ -5,6 +5,4 @@ encoding//src/test/java=UTF-8
 encoding//src/test/python/scripts/test_red_libraries.py=utf-8
 encoding//src/test/python/scripts/test_robot_session_server.py=utf-8
 encoding//src/test/resources=UTF-8
-encoding//target/pyunit/scripts/test_red_libraries.py=utf-8
-encoding//target/pyunit/scripts/test_robot_session_server.py=utf-8
 encoding/<project>=UTF-8

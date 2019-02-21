@@ -265,15 +265,15 @@ public enum RobotTokenType implements IRobotTokenType {
                     .removedFrom("3.1")
                     .build()),
     /**
-     * 
+     *
      */
     SETTING_TEST_SETUP_KEYWORD_NAME(TableType.SETTINGS),
     /**
-     * 
+     *
      */
     SETTING_TEST_SETUP_KEYWORD_ARGUMENT(TableType.SETTINGS),
     /**
-     * 
+     *
      */
     SETTING_TEST_TEARDOWN_DECLARATION(
             TableType.SETTINGS,
@@ -358,9 +358,6 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     VARIABLES_SCALAR_DECLARATION(TableType.VARIABLES, true),
-    /**
-     */
-    VARIABLES_SCALAR_AS_LIST_DECLARATION(TableType.VARIABLES, true),
     /**
      */
     VARIABLES_LIST_DECLARATION(TableType.VARIABLES, true),
@@ -575,7 +572,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_RETURN_VALUE(TableType.KEYWORDS),
     /**
-     * 
+     *
      */
     KEYWORD_SETTING_TEARDOWN(
             TableType.KEYWORDS,

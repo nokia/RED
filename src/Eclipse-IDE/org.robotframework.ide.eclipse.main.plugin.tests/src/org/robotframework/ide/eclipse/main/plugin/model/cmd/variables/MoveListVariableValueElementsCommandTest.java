@@ -30,15 +30,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.Comm
 public class MoveListVariableValueElementsCommandTest {
 
     @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToMoveElementsInScalar() {
-        final RobotVariable variable = createVariables().get(0);
-
-        final MoveListVariableValueElementsCommand command = new MoveListVariableValueElementsCommand(variable,
-                newArrayList(new RobotToken()), MoveDirection.UP);
-        command.execute();
-    }
-
-    @Test(expected = CommandExecutionException.class)
     public void exceptionIsThrown_whenTryingToMoveElementsInDictionary() {
         final RobotVariable variable = createVariables().get(3);
 
@@ -48,7 +39,7 @@ public class MoveListVariableValueElementsCommandTest {
     }
 
     @Test
-    public void elementsAreMovedUpInScalarAsListAndEventBrokerSendsEvent() {
+    public void elementsAreMovedUpInScalarAndEventBrokerSendsEvent() {
         final RobotVariable variable = createVariables().get(1);
 
         final List<RobotToken> elementsToMove = newArrayList(
@@ -65,7 +56,7 @@ public class MoveListVariableValueElementsCommandTest {
     }
 
     @Test
-    public void elementsAreMovedDownInScalarAsListAndEventBrokerSendsEvent() {
+    public void elementsAreMovedDownInScalarAndEventBrokerSendsEvent() {
         final RobotVariable variable = createVariables().get(1);
 
         final List<RobotToken> elementsToMove = newArrayList(
@@ -153,8 +144,8 @@ public class MoveListVariableValueElementsCommandTest {
 
     private static List<RobotVariable> createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2  3")
+                .appendLine("${scalar1}  0")
+                .appendLine("${scalar2}  0  1  2  3")
                 .appendLine("@{list}  1  2  3  4")
                 .appendLine("&{dict}  a=1  b=2")
                 .appendLine("invalid}  1  2  3  5")

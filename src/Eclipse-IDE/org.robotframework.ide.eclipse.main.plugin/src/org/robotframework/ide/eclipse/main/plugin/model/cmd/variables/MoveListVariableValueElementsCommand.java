@@ -53,7 +53,7 @@ public class MoveListVariableValueElementsCommand extends EditorCommand {
                     var.moveRightItem(token);
                 }
 
-            } else if (variable.getType() == VariableType.SCALAR_AS_LIST) {
+            } else if (variable.getType() == VariableType.SCALAR) {
                 final ScalarVariable var = (ScalarVariable) variable.getLinkedElement();
                 if (direction == MoveDirection.UP) {
                     var.moveLeftValue(token);

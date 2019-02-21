@@ -19,21 +19,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.CommandExecutionException;
 
 public class CreateCompoundVariableValueElementCommandTest {
 
-    @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToCreateElementInsideScalar() {
-        final RobotVariable variable = createVariables().get(0);
-
-        final CreateCompoundVariableValueElementCommand command = new CreateCompoundVariableValueElementCommand(
-                variable, "");
-        command.execute();
-    }
-
     @Test
-    public void newElementIsAddedToScalarAsListAndEventBrokerSendsEventAboutIt() {
+    public void newElementIsAddedToScalarAndEventBrokerSendsEventAboutIt() {
         final RobotVariable variable = createVariables().get(1);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
@@ -91,7 +81,7 @@ public class CreateCompoundVariableValueElementCommandTest {
     private static List<RobotVariable> createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
                 .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar}  0  1  2")
                 .appendLine("@{list}  1  2  3")
                 .appendLine("&{dict}  a=1  b=2  c=3  d=4")
                 .appendLine("invalid}  1  2  3")

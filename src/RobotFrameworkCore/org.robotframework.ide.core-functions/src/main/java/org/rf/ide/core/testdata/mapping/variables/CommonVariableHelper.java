@@ -31,7 +31,6 @@ public class CommonVariableHelper {
             if (type == RobotTokenType.START_HASH_COMMENT || type == RobotTokenType.COMMENT_CONTINUE) {
                 return false;
             } else if (type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
-                    || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
                     || type == RobotTokenType.VARIABLES_LIST_DECLARATION
                     || type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION) {
                 final String text = Strings.nullToEmpty(token.getText());

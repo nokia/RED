@@ -29,17 +29,17 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
     private final RobotVariable variable;
 
     private final String newElementContent;
-    
+
     private final int index;
-    
+
     private RobotToken newToken;
-    
+
     private DictionaryKeyValuePair newKeyValuePair;
 
     public CreateCompoundVariableValueElementCommand(final RobotVariable variable, final String newElementContent) {
         this(variable, newElementContent, -1);
     }
-    
+
     public CreateCompoundVariableValueElementCommand(final RobotVariable variable, final String newElementContent, final int index) {
         this.variable = variable;
         this.newElementContent = newElementContent;
@@ -49,7 +49,7 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
 
-        if (variable.getType() == VariableType.SCALAR_AS_LIST) {
+        if (variable.getType() == VariableType.SCALAR) {
             final ScalarVariable var = (ScalarVariable) variable.getLinkedElement();
             newToken = RobotToken.create(newElementContent);
             var.addNewValue(index < 0 ? var.getValues().size() : index, newToken);
@@ -75,7 +75,7 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
         }
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         EditorCommand command = null;
